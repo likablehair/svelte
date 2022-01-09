@@ -1,5 +1,6 @@
 {
-  "name": "my-app",
+  "name": "@likable-hair/svelte",
+  "description": "A Svelte component for likablehair",
   "version": "0.0.1",
   "scripts": {
     "dev": "svelte-kit dev",
@@ -21,7 +22,8 @@
     "svelte-check": "^2.2.6",
     "svelte-preprocess": "^4.9.4",
     "tslib": "^2.3.1",
-    "typescript": "^4.4.3"
+    "typescript": "^4.5.4",
+    "svelte2tsx": "^0.4.12"
   },
   "type": "module"
 }
