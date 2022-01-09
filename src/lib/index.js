@@ -1,5 +1,1 @@
-import HelloWorld from './HelloWorld.svelte'
-
-export default {
-  HelloWorld
-}
+export { default as HelloWorld } from './HelloWorld.svelte'
