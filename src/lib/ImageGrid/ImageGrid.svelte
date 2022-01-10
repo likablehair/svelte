@@ -1,6 +1,8 @@
 <script lang="ts">
   type Image = {
-    url: string
+    url: string,
+    title: string,
+    description: string
   }
 
   export let images: Image[] = [],
@@ -32,6 +34,7 @@
         minWidth={imageMinWidth}
         maxHeight={imageMaxHeight}
         minHeight={imageMinHeight}
+        description={image.description}
       ></Image>
     </div>
   {/each}
