@@ -10,7 +10,11 @@
     imageMaxWidth: string = undefined,
     imageMinWidth: string = undefined,
     imageMaxHeight: string = undefined,
-    imageMinHeight: string = undefined
+    imageMinHeight: string = undefined,
+    imageHeight: string = undefined,
+    imageWidth: string = undefined,
+    disableHover: boolean = false,
+    dark: boolean = false
 
   $: cssVariables = Object.entries({
       '--columns': columns
@@ -30,11 +34,15 @@
     <div class="image-container">
       <Image
         src={image.url}
+        height={imageHeight}
+        width={imageWidth}
         maxWidth={imageMaxWidth}
         minWidth={imageMinWidth}
         maxHeight={imageMaxHeight}
         minHeight={imageMinHeight}
         description={image.description}
+        disableHover={disableHover}
+        dark={dark}
       ></Image>
     </div>
   {/each}

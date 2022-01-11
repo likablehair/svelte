@@ -11,7 +11,8 @@
     src: string = undefined,
     title: string = undefined,
     description: string = undefined,
-    dark: boolean = false
+    dark: boolean = false,
+    disableHover: boolean = false
 
   const load = (src) => {
 		return new Promise<string>(async (resolve, reject) => {
@@ -49,7 +50,7 @@
   class="image-container"
   style={cssVariables} 
 >
-  <IntersectionObserver once={true} let:intersecting={intersecting} top={100} bottom={100}>
+  <IntersectionObserver once={true} let:intersecting={intersecting}>
     {#if intersecting}
       {#await load(src)}
         <Skeleton 
@@ -74,14 +75,17 @@
               src={base64}
               alt={description}
               class="image"
+              class:image-hover={!disableHover}
             />
           </div>
           <div 
             class="title"
+            class:title-hover={!disableHover}
           >{title || description}</div>
           {#if !!description}
             <div 
               class="description"
+              class:description-hover={!disableHover}
             >{description}</div>
           {/if}
         </div>
@@ -118,7 +122,6 @@
   }
 
   .image {
-    max-width: var(--max-width);
     object-fit: cover;
     max-width: var(--max-width);
     max-height: var(--max-height);
@@ -126,7 +129,7 @@
     min-height: var(--min-height);
     width: var(--width);
     height: var(--height);
-    border-radius: 10px;
+    transition: all 0.3s ease-in-out;
   }
 
   .title {
@@ -139,15 +142,36 @@
     transition: all 0.2s ease-in-out;
   }
 
+  .description {
+    position: absolute;
+    bottom: -70px;
+    left: 10px;
+    background-color: whitesmoke;
+    color: black;
+    font-size: 10pt;
+    transition: all 0.2s ease-in-out;
+  }
+
   .image-filter {
-    transition: all 0.3s ease-in-out;
+    max-width: var(--max-width);
+    max-height: var(--max-height);
+    min-width: var(--min-width);
+    min-height: var(--min-height);
+    width: var(--width);
+    height: var(--height);
+    border-radius: 10px;
+    overflow: hidden;
   }
 
-  .image-container:hover .title{
-    bottom: 30px
+  .image-container:hover .title-hover {
+    bottom: 50px
   }
 
-  .image-container:hover .image-filter {
+  .image-container:hover .description-hover {
+    bottom: 20px
+  }
+
+  .image-container:hover .image-hover {
     transform: scale(1.3);
   }
 </style>

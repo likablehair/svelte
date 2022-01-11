@@ -153,8 +153,7 @@
     images={images} 
     imageMaxWidth="32vw" 
     imageMinWidth="32vw"
-    imageMaxHeight="300px" 
-    imageMinHeight="300px"
+    imageHeight="400px"
   />
 </div>
 
