@@ -1,1 +1,1 @@
-export { default as ImageGrid } from './ImageGrid/ImageGrid.svelte'
+export { default as ImageGrid } from './media/ImageGrid.svelte'

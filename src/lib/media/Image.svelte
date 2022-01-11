@@ -12,14 +12,18 @@
     title: string = undefined,
     description: string = undefined,
     dark: boolean = false,
-    disableHover: boolean = false
+    disableHover: boolean = false,
+    rounded: boolean = true,
+    showSkeletonLoader: boolean = true,
+    imageCover: boolean = true,
+    imageContain: boolean = false,
 
   const load = (src) => {
 		return new Promise<string>(async (resolve, reject) => {
       if(browser) {
         const resp = await fetch(src);
         const blob = await resp.blob();
-  
+        
         let reader = new FileReader();
         reader.readAsDataURL(blob);
         reader.onload = () => resolve(reader.result.toString());
@@ -36,7 +40,9 @@
       '--min-width': minWidth,
       '--min-height': minHeight,
       '--width': width,
-      '--height': height
+      '--height': height,
+      '--border-radius': rounded ? '10px' : undefined,
+      '--object-fit': imageCover ? 'cover' : imageContain ? 'contain' : undefined,
     }).filter(([key]) => key.startsWith('--'))
     .reduce( (css, [key,value]) => {
       return `${ css }${ key }: ${ value };`
@@ -53,21 +59,23 @@
   <IntersectionObserver once={true} let:intersecting={intersecting}>
     {#if intersecting}
       {#await load(src)}
-        <Skeleton 
-          sections={[
-            {
-              type: SectionType.Image,
-              height: `calc(${height || minHeight || maxHeight} - 20px)`
-            }
-          ]}
-          maxWidth={maxWidth}
-          maxHeight={maxHeight}
-          minWidth={minWidth}
-          minHeight={minHeight}
-          width={width}
-          height={height}
-          dark={dark}
-        ></Skeleton>
+        {#if showSkeletonLoader}
+          <Skeleton
+            sections={[
+              {
+                type: SectionType.Image,
+                height: `calc(${height || minHeight || maxHeight} - 20px)`
+              }
+            ]}
+            maxWidth={maxWidth}
+            maxHeight={maxHeight}
+            minWidth={minWidth}
+            minHeight={minHeight}
+            width={width}
+            height={height}
+            dark={dark}
+          ></Skeleton>
+        {/if}
       {:then base64}
         <div style="position: relative">
           <div class="image-filter">
@@ -91,21 +99,23 @@
         </div>
       {/await}
     {:else}
-      <Skeleton
-        sections={[
-          {
-            type: SectionType.Image,
-            height: `calc(${height || minHeight || maxHeight} - 20px)`
-          }
-        ]}
-        maxWidth={maxWidth}
-        maxHeight={maxHeight}
-        minWidth={minWidth}
-        minHeight={minHeight}
-        width={width}
-        height={height}
-        dark={dark}
-      ></Skeleton>
+      {#if showSkeletonLoader}
+        <Skeleton
+          sections={[
+            {
+              type: SectionType.Image,
+              height: `calc(${height || minHeight || maxHeight} - 20px)`
+            }
+          ]}
+          maxWidth={maxWidth}
+          maxHeight={maxHeight}
+          minWidth={minWidth}
+          minHeight={minHeight}
+          width={width}
+          height={height}
+          dark={dark}
+        ></Skeleton>
+      {/if}
     {/if}
   </IntersectionObserver>
 </div>
@@ -122,7 +132,7 @@
   }
 
   .image {
-    object-fit: cover;
+    object-fit: var(--object-fit);
     max-width: var(--max-width);
     max-height: var(--max-height);
     min-width: var(--min-width);
@@ -159,8 +169,11 @@
     min-height: var(--min-height);
     width: var(--width);
     height: var(--height);
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .image-container:hover .title-hover {

@@ -23,7 +23,7 @@
       return `${ css }${ key }: ${ value };`
     }, '');
 
-  import Image from './_Image.svelte'
+  import Image from './Image.svelte'
 </script>
 
 <div 

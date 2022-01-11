@@ -143,7 +143,7 @@
     },
   ]
   
-  import ImageGrid from "$lib/ImageGrid/ImageGrid.svelte";
+  import ImageGrid from "$lib/media/ImageGrid.svelte";
 </script>
 
 <h1>Image grid</h1>
