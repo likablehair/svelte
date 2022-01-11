@@ -16,7 +16,7 @@
     rounded: boolean = true,
     showSkeletonLoader: boolean = true,
     imageCover: boolean = true,
-    imageContain: boolean = false,
+    imageContain: boolean = false
 
   const load = (src) => {
 		return new Promise<string>(async (resolve, reject) => {
