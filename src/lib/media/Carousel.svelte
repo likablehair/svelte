@@ -74,7 +74,6 @@
   .container::-webkit-scrollbar { 
     display: none;  /* Safari and Chrome */
   }
-
   .image-container {
     scroll-snap-align: start;
   }
