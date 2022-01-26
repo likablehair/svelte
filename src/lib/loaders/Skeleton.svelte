@@ -11,6 +11,7 @@
     maxHeight: string = undefined,
     minWidth: string = undefined,
     minHeight: string = undefined,
+    padding: string = '10px',
     width: string = undefined,
     height: string = undefined,
     dark: boolean = false
@@ -22,6 +23,7 @@
       '--min-height': minHeight,
       '--width': width,
       '--height': height,
+      '--padding': padding,
       '--card-background': dark ? '#000000' : '#fff',
       '--element-background': dark ? '#1a1a1a' : '#eee',
       '--animation-color': dark ? '#000000e6' : '#ffffffe6',
@@ -54,15 +56,15 @@
   .card {
     background: var(--card-background);
     position: relative;
-    padding: 10px;
+    padding: var(--padding);
     border-radius: 5px;
     box-shadow: 0 10px 100px rgba(0, 0, 0, 0.1);
-    width: calc(var(--width) - 20px);
-    height: calc(var(--height) - 20px);
-    max-width: calc(var(--max-width) - 20px);
-    max-height: calc(var(--max-height) - 20px);
-    min-width: calc(var(--min-width) - 20px);
-    min-height: calc(var(--min-height) - 20px);
+    width: calc(var(--width) - (var(--padding) * 2));
+    height: calc(var(--height) - (var(--padding) * 2));
+    max-width: calc(var(--max-width) - (var(--padding) * 2));
+    max-height: calc(var(--max-height) - (var(--padding) * 2));
+    min-width: calc(var(--min-width) - (var(--padding) * 2));
+    min-height: calc(var(--min-height) - (var(--padding) * 2));
     overflow: hidden;
   }
 

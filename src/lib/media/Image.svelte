@@ -13,7 +13,6 @@
     description: string = undefined,
     dark: boolean = false,
     disableHover: boolean = false,
-    rounded: boolean = true,
     showSkeletonLoader: boolean = true,
     imageCover: boolean = true,
     imageContain: boolean = false
@@ -41,7 +40,6 @@
       '--min-height': minHeight,
       '--width': width,
       '--height': height,
-      '--border-radius': rounded ? '10px' : undefined,
       '--object-fit': imageCover ? 'cover' : imageContain ? 'contain' : undefined,
     }).filter(([key]) => key.startsWith('--'))
     .reduce( (css, [key,value]) => {
@@ -64,27 +62,25 @@
             sections={[
               {
                 type: SectionType.Image,
-                height: `calc(${height || minHeight || maxHeight} - 20px)`
+                height: `100%`
               }
             ]}
-            maxWidth={maxWidth}
-            maxHeight={maxHeight}
-            minWidth={minWidth}
-            minHeight={minHeight}
-            width={width}
-            height={height}
+            padding="0px"
+            width="100%"
+            height="100%"
             dark={dark}
           ></Skeleton>
         {/if}
       {:then base64}
-        <div style="position: relative">
+        <div style="position: relative; height: 100%">
           <div class="image-filter">
-            <img 
-              src={base64}
-              alt={description}
+            <div
+              style={'background-image: url(' + base64 + ')'}
               class="image"
               class:image-hover={!disableHover}
-            />
+            >
+              <slot></slot>
+            </div>
           </div>
           <div 
             class="title"
@@ -104,15 +100,12 @@
           sections={[
             {
               type: SectionType.Image,
-              height: `calc(${height || minHeight || maxHeight} - 20px)`
+              height: `100%`
             }
           ]}
-          maxWidth={maxWidth}
-          maxHeight={maxHeight}
-          minWidth={minWidth}
-          minHeight={minHeight}
-          width={width}
-          height={height}
+          padding="0px"
+          width="100%"
+          height="100%"
           dark={dark}
         ></Skeleton>
       {/if}
@@ -128,18 +121,19 @@
     min-height: var(--min-height);
     width: var(--width);
     height: var(--height);
+    border-radius: var(--border-radius);
     overflow: hidden;
   }
 
   .image {
-    object-fit: var(--object-fit);
-    max-width: var(--max-width);
-    max-height: var(--max-height);
-    min-width: var(--min-width);
-    min-height: var(--min-height);
-    width: var(--width);
-    height: var(--height);
+    background-size: var(--object-fit);
+    background-repeat: no-repeat;
+    background-position: center center;
+    width: 100%;
+    height: 100%;
     transition: all 0.3s ease-in-out;
+    border-radius: var(--border-radius);
+    position: relative;
   }
 
   .title {
@@ -163,13 +157,8 @@
   }
 
   .image-filter {
-    max-width: var(--max-width);
-    max-height: var(--max-height);
-    min-width: var(--min-width);
-    min-height: var(--min-height);
-    width: var(--width);
-    height: var(--height);
-    border-radius: var(--border-radius);
+    width: 100%;
+    height: 100%;
     overflow: hidden;
     display: flex;
     justify-content: center;

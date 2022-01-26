@@ -43,6 +43,7 @@
         description={image.description}
         disableHover={disableHover}
         dark={dark}
+        --border-radius="10px"
       ></Image>
     </div>
   {/each}
