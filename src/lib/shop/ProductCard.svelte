@@ -6,12 +6,11 @@
     price: number = undefined,
     currency: string = '€',
     discount: number = undefined
-  
-  import '$lib/media/Image.svelte'
-  import '$lib/common/tailwind.css';
 
   $: priceLessDiscount = Number((price - discount).toFixed(2))
-import Image from '$lib/media/Image.svelte';
+
+  import Image from '$lib/media/Image.svelte';
+  import '$lib/common/tailwind.css';
 </script>
 
 <style>
