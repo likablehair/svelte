@@ -1,36 +1,13 @@
-<script lang="ts">
-  type Item = {
+<script context="module" lang="ts">
+  export type Item = {
     title: string,
     name: string,
     url?: string,
   }
+</script>
 
-  let items: Item[] = [
-    {
-      title: 'Works',
-      name: 'works',
-    },
-    {
-      title: 'Biography',
-      name: 'biography',
-    },
-    {
-      title: 'Publications',
-      name: 'publications',
-    },
-    {
-      title: 'Blog',
-      name: 'blog',
-    },
-    {
-      title: 'News',
-      name: 'news',
-    },
-    {
-      title: 'Contact',
-      name: 'contact',
-    },
-  ]
+<script lang="ts">
+  export let items: Item[] = []
 </script>
 
 <div class="flex">

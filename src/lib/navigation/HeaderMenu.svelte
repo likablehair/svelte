@@ -1,5 +1,8 @@
 <script lang="ts">
-  export let title: string = "";
+  import type { Item } from "./Navigator.svelte"
+
+  export let title: string = ""; 
+  export let items: Item[] = [];
 
   export let hideOnScroll: boolean = true;
   let scrollY, lastScrollY, visible = true
@@ -37,8 +40,11 @@
     <span class="text-2xl">{title}</span>
   </div>
   <div>
-    <Navigator></Navigator>
+    <Navigator
+      items={items}
+    ></Navigator>
   </div>
+  <slot name="append"></slot>
 </nav>
 
 <style>

@@ -20,7 +20,13 @@
     }, {
       name: 'Textfield',
       url: 'forms/Textfield'
-    }
+    }, {
+      name: 'HeaderMenu',
+      url: 'navigation/HeaderMenu'
+    }, {
+      name: 'Button',
+      url: 'buttons/Button'
+    }, 
   ]
 
   import '$lib/common/tailwind.css';
