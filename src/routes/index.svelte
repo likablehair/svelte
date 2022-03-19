@@ -1,160 +1,67 @@
 <script lang="ts">
-  let images = [
+  interface Component {
+    name: string,
+    url: string
+  }
+
+  let components: Component[] = [
     {
-      url: 'http://localhost:4000/guitars/guitar1.jpg',
-      description: 'Some guitar',
-      title: 'Some guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar2.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar3.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar4.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar5.jpg',
-      description: 'Some guitar',
-      title: 'Some guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar6.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar7.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    // repeat
-    {
-      url: 'http://localhost:4000/guitars/guitar1.jpg',
-      description: 'Some guitar',
-      title: 'Some guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar2.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar3.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar4.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar5.jpg',
-      description: 'Some guitar',
-      title: 'Some guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar6.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar7.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar1.jpg',
-      description: 'Some guitar',
-      title: 'Some guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar2.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar3.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar4.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar5.jpg',
-      description: 'Some guitar',
-      title: 'Some guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar6.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar7.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar1.jpg',
-      description: 'Some guitar',
-      title: 'Some guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar2.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar3.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar4.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar5.jpg',
-      description: 'Some guitar',
-      title: 'Some guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar6.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
-    {
-      url: 'http://localhost:4000/guitars/guitar7.jpg',
-      description: 'Some othe guitar',
-      title: 'Some othe guitar'
-    },
+      name: 'ImageGrid',
+      url: '/media/ImageGrid'
+    }, {
+      name: 'Carousel',
+      url: '/media/Carousel'
+    }, {
+      name: 'Card',
+      url: '/common/Card'
+    }, {
+      name: 'Calendar',
+      url: 'dates/Calendar'
+    }, {
+      name: 'Textfield',
+      url: 'forms/Textfield'
+    }
   ]
-  
-  import ImageGrid from "$lib/media/ImageGrid.svelte";
+
+  import '$lib/common/tailwind.css';
 </script>
 
-<h1>Image grid</h1>
+<svelte:head>
+  <title>Svelte likablehair components kit</title>
+</svelte:head>
 
-<div class="image-grid-container">
-  <ImageGrid 
-    images={images} 
-    imageMaxWidth="32vw" 
-    imageMinWidth="32vw"
-    imageHeight="400px"
-  />
+<div class="flex items-center justify-center pt-10">
+  <table>
+    <thead>
+      <th>Component Name</th>
+      <th>URL</th>
+    </thead>
+    <tbody>
+      {#each components as component }
+        <tr>
+          <td>{component.name}</td>
+          <td>
+            <a href={component.url}>{component.url}</a>
+          </td>
+        </tr>
+      {/each}
+    </tbody>
+  </table>
 </div>
 
 
+<style>
+  table {
+    border-spacing: 0px;
+  }
+
+  td, th {
+    border: 1px solid black;
+    border: 1px solid black;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    min-width: 200px;
+  }
+</style>

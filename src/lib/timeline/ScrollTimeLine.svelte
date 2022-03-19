@@ -70,7 +70,7 @@
   })
 
 
-  let scrollableDiv, titlesMobile, visibleIndex = 0, titlesMobileElement: HTMLElement,
+  let scrollableDiv, titlesMobile, visibleIndex = 0, titlesMobileElement: HTMLElement
   function handleElemenScroll(event) {
     let scrollValue: number = scrollableDiv.scrollTop
     let scrollableDivHeight: number = scrollableDiv.offsetHeight

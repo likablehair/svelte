@@ -1,14 +1,47 @@
 <script lang="ts">
-  export let label: string = "",
-    color: string = "",
-    value: string = "";
+  type VariantOptions = 'outlined' | 'boxed'
 
+  export let label: string = "",
+    placeholder: string = "",
+    color: string = "",
+    value: string = "",
+    variant: VariantOptions = 'outlined';
+
+  import { v4 as uuidv4 } from 'uuid';
+  import { onMount } from 'svelte'
+
+  let inputId: string = uuidv4(),
+    focused: boolean = false,
+    legendWidth: number = 0,
+    labelElement: HTMLElement = undefined
+  
+  onMount(() => {
+    if(!!labelElement) {
+      legendWidth = (labelElement.offsetWidth * 0.8) + 8
+    }
+  })
+
+  function handleFocus(): void {
+    focused = true
+  }
+
+  function handleBlur(): void {
+    focused = false
+  }
+
+
+  $: if(!!labelElement) {
+    legendWidth = !value && !focused ? 0 : (labelElement.offsetWidth * 0.8) + 8
+  }
   $: cssVariables = Object.entries({
       '--theme-color': color,
+      '--legend-width': legendWidth + 'px'
     }).filter(([key]) => key.startsWith('--'))
     .reduce( (css, [key,value]) => {
       return `${ css }${ key }: ${ value };`
     }, '');
+
+  import '$lib/common/tailwind.css';
 </script>
 
 <style>
@@ -17,87 +50,146 @@
     height: 50px;
     position: relative;
     width: var(--width, 100%);
+    --final-color: var(--theme-color, --border-color, rgb(88, 88, 88));
   }
 
-  .input {
-    border-radius: var(--border-radius, 5px);
-    border: 1px solid var(--border-color, rgb(122, 122, 122));
+  /* outlined input */
+
+  .input-outlined {
+    border: 0px solid;
     box-sizing: border-box;
     color: var(--color, black);
     font-size: 18px;
     height: 100%;
     outline: 0;
-    padding: 4px 20px 0;
+    padding: 4px 0px 0;
     width: 100%;
+    transition: all 0.3s;
   }
 
-  .cut {
-    background-color: transparent;
-    border-radius: 10px;
-    height: 17px;
-    left: 28px;
-    position: absolute;
-    padding-left: 10px;
-    padding-top: 3px;
-    padding-bottom: 3px;
-    padding-right: 10px;
-    top: -20px;
-    color: transparent;
-    transform: translateY(0);
-    transform-origin: 0 0;
-    transition: transform 200ms, background-color 200ms;
+  .fieldset-outlined {
+    border-radius: var(--border-radius, 5px);
+    border: 1px solid rgb(122, 122, 122);
+    padding-left: 4px;
   }
 
-  .input:focus ~ .cut,
-  .input:not(:placeholder-shown) ~ .cut {
-    transform: translateY(5px) scale(0.80);
-    background-color: rgb(255, 255, 255);
+  .focused .fieldset-outlined {
+    border: 1px solid var(--final-color);
+    color: var(--final-color);
   }
 
-  .placeholder {
-    color: #65657b;
-    left: 20px;
-    line-height: 14px;
-    pointer-events: none;
-    position: absolute;
-    transform-origin: 0 50%;
-    transition: transform 200ms, color 200ms;
-    top: 20px;
+  .legend-outlined {
+    width: var(--legend-width);
+    padding: 0px;
+    transition: width 0.3s, color 0.1s;
   }
 
-  .input:focus ~ .placeholder,
-  .input:not(:placeholder-shown) ~ .placeholder {
-    transform: translateY(-30px) translateX(15px) scale(0.80);
+  .label-outlined {
+    position: relative;
+    top: 13px;
+    left: 4px;
+    display: inline-block;
+    transition: all 0.3s;
+    transform-origin: top left;
+    transform: scale(1);
+    z-index: 2;
   }
 
-  .input:not(:placeholder-shown) ~ .placeholder {
-    color: #808097;
+  .texted .label-outlined {
+    top: -13px;
+    left: 4px;
+    transform: scale(.8);
   }
 
-  .input:focus ~ .placeholder {
-    color: var(--theme-color);
+  /* boxed input */
+
+  .fieldset-boxed {
+    border: 2px solid var(--final-color);
+    padding: 5px;
   }
 
-  .input:focus {
-    border: 1px solid var(--theme-color, rgb(122, 122, 122));
+  .input-boxed {
+    border: 0px solid;
+    box-sizing: border-box;
+    font-size: 18px;
+    height: 100%;
+    outline: 0;
+    padding: 4px 0px 0;
+    width: 100%;
+    transition: all 0.3s;
+    position: relative;
   }
+
+  .input-boxed::placeholder {
+    color: var(--final-color);
+    opacity: 60%;
+  }
+
 </style>
 
 
-<div class="input-container" style={cssVariables}>
-  <input 
-    id="firstname" 
-    class="input" 
-    type="text" 
-    placeholder=" " 
-    bind:value={value}
-    on:change
-    on:input
-    on:focus
-    on:blur
-  />
-  {#if !!label}
-    <div class="cut">{label}</div>
-  {/if}
-  <label for="firstname" class="placeholder">{label}</label>
+<div 
+  class="input-container" 
+  style={cssVariables}
+  class:focused={focused}
+  class:texted={focused || !!value}
+>
+  <fieldset 
+    aria-hidden="true" 
+    class="fieldset"
+    class:fieldset-outlined={variant == 'outlined'}
+    class:fieldset-boxed={variant == 'boxed'}
+  >
+    {#if variant == 'outlined'}
+        <legend class="legend-outlined"></legend>
+        <label 
+          for={inputId}
+          class="label-outlined"
+          bind:this={labelElement}
+        >{label}</label>
+        <div class="flex content-center relative bottom-3 ml-2 mr-2">
+          <div>
+            <slot name="prepend-inner"></slot>
+          </div>
+          <input 
+            id={inputId} 
+            class="input-outlined"
+            type="text"
+            placeholder={placeholder}
+            bind:value={value}
+            on:change
+            on:input
+            on:focus={handleFocus}
+            on:focus
+            on:blur={handleBlur}
+            on:blur
+          />
+          <div>
+            <slot name="append-inner"></slot>
+          </div>
+        </div>
+    {:else if variant == 'boxed'}
+      <div class="flex">
+        <div>
+          <slot name="prepend-inner"></slot>
+        </div>
+        <input
+          id={inputId}
+          class="input-boxed"
+          type="text"
+          placeholder={placeholder || label}
+          bind:value={value}
+          on:change
+          on:input
+          on:focus={handleFocus}
+          on:focus
+          on:blur={handleBlur}
+          on:blur
+        />
+        <div>
+          <slot name="append-inner"></slot>
+        </div>
+      </div>
+    {/if}
+  </fieldset>
 </div>

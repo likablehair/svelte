@@ -6,6 +6,7 @@
   }
 
   import Textfield from '$lib/forms/Textfield.svelte';
+  import Icon from '$lib/media/Icon.svelte'
 </script>
 
 <style>
@@ -28,7 +29,7 @@
   <Textfield
     --width="300px"
     label="Nome"
-    color="red"
+    color="#22a939"
     bind:value={textValue}
     on:input="{handleInputChange}"
   ></Textfield>
@@ -38,7 +39,30 @@
   <Textfield
     --width="300px"
     label="Lo stesso nome"
-    color="red"
+    color="#22a939"
+    variant="boxed"
     bind:value={textValue}
   ></Textfield>
+  <Textfield
+    --width="300px"
+    label="Con icona"
+    color="#22a939"
+    variant="boxed"
+    bind:value={textValue}
+  >
+    <svelte:fragment slot="append-inner">
+      <Icon name="mdi-home"></Icon>
+    </svelte:fragment>
+  </Textfield>
+  <Textfield
+    --width="300px"
+    label="Con icona"
+    color="#22a939"
+    variant="boxed"
+    bind:value={textValue}
+  >
+    <svelte:fragment slot="append-inner">
+      <Icon name="mdi-home"></Icon>
+    </svelte:fragment>
+  </Textfield>
 </div>

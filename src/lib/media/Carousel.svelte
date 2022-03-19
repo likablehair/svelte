@@ -44,7 +44,6 @@
         src={image.url}
         title={image.title}
         description={image.description}
-        rounded={false}
         disableHover={true}
         showSkeletonLoader={false}
         minWidth={width}
