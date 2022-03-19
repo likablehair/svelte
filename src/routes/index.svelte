@@ -7,13 +7,13 @@
   let components: Component[] = [
     {
       name: 'ImageGrid',
-      url: '/media/ImageGrid'
+      url: 'media/ImageGrid'
     }, {
       name: 'Carousel',
-      url: '/media/Carousel'
+      url: 'media/Carousel'
     }, {
       name: 'Card',
-      url: '/common/Card'
+      url: 'common/Card'
     }, {
       name: 'Calendar',
       url: 'dates/Calendar'

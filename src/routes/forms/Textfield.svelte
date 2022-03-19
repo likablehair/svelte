@@ -65,4 +65,15 @@
       <Icon name="mdi-home"></Icon>
     </svelte:fragment>
   </Textfield>
+
+  <Textfield
+    --width="300px"
+    label="Cerca ..."
+    color="#B8B8B8"
+    variant="boxed"
+  >
+    <svelte:fragment slot="prepend-inner">
+      <Icon name="mdi-search-web" class="mr-2" color="#B8B8B8"></Icon>
+    </svelte:fragment>
+  </Textfield>
 </div>

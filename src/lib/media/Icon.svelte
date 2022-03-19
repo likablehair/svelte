@@ -1,9 +1,14 @@
 <script lang="ts">
   export let name: string,
-    size: number = 15;
+    size: number = 15,
+    color: string = '';
+  
+  let clazz: string = ''
+  export { clazz as class }
 
   $: cssVariables = Object.entries({
-      '--size': size + 'pt'
+      '--size': size + 'pt',
+      '--color': color
     }).filter(([key]) => key.startsWith('--'))
     .reduce( (css, [key,value]) => {
       return `${ css }${ key }: ${ value };`
@@ -15,11 +20,12 @@
 <style>
 .icon {
   font-size: var(--size);
+  color: var(--color);
 }
 </style>
 
 <span
   style={cssVariables}
-  class="icon mdi {name}"
+  class="icon mdi {name} {clazz}"
 ></span>
 

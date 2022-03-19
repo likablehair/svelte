@@ -106,6 +106,7 @@
   .fieldset-boxed {
     border: 2px solid var(--final-color);
     padding: 5px;
+    border-radius: var(--border-radius, 0);
   }
 
   .input-boxed {
