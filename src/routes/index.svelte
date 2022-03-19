@@ -26,6 +26,9 @@
     }, {
       name: 'Button',
       url: 'buttons/Button'
+    }, {
+      name: 'TabSwitcher',
+      url: 'navigation/TabSwitcher'
     }, 
   ]
 
