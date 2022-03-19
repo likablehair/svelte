@@ -28,16 +28,21 @@
 
 <nav
   class="
-    shadow-md fixed h-12 w-screen -top-12 transition-all
+    shadow-md sticky h-12 -top-12 transition-all
     flex flex-wrap items-center
+    header-menu-container
   "
   class:top-0={visible}
 >
-  <div class="flex-none w-14 h-12">
-
-  </div>
-  <div class="grow">
-    <span class="text-2xl">{title}</span>
+  {#if $$slots.prepend}
+    <div class="h-12 flex-none">
+      <slot name="prepend"></slot>
+    </div>
+  {/if}
+  <div class="grow ml-1">
+    <slot name="title">
+      <span class="text-2xl">{title}</span>
+    </slot>
   </div>
   <div>
     <Navigator
@@ -48,4 +53,9 @@
 </nav>
 
 <style>
+  .header-menu-container {
+    background-color: var(--background-color, white);
+    color: var(--color);
+    width: var(--width, 100vw)
+  }
 </style>

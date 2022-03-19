@@ -2,6 +2,8 @@
   export let type: 'default' | 'text' | 'icon' = 'default'
   export let icon: string = undefined
   export let iconSize: number = 15
+  let clazz: string = ''
+  export { clazz as class };
 
 
   $: position = !!$$slots.append ? 'relative' : undefined
@@ -19,7 +21,7 @@
 </script>
 
 <div 
-  class="button"
+  class="button {clazz}"
   class:button-default={type === 'default'}
   class:button-text={type === 'text'}
   class:button-icon={type === 'icon'}
