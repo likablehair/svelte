@@ -8,7 +8,6 @@ const config = {
 	preprocess: preprocess(),
 
   kit: {
-    target: '#svelte',
     package: {
       dir: 'package',
       emitTypes: true
