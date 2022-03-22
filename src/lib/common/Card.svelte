@@ -1,9 +1,6 @@
 <script lang="ts">
-  import { Elevation } from '$lib/enums/elevation.enum';
-
   export let rounded: boolean = true,
-    outlined: boolean = false,
-    elevation: Elevation = Elevation.md;
+    outlined: boolean = false
 
   $: cssVariables = Object.entries({
     }).filter(([key]) => key.startsWith('--'))
@@ -30,13 +27,8 @@
 </style>
 
 <div 
-  class="card-container flex flex-col rounded-md shadow-lg" 
+  class="card-container flex flex-col shadow-lg" 
   style={cssVariables}
-  class:shadow-sm={!outlined && elevation == Elevation.sm}
-  class:shadow-md={!outlined && elevation == Elevation.md}
-  class:shadow-lg={!outlined && elevation == Elevation.lg}
-  class:shadow-xl={!outlined && elevation == Elevation.xl}
-  class:shadow-2xl={!outlined && elevation == Elevation.xxl}
   class:border-solid={outlined}
   class:rounded-md={rounded}
 >

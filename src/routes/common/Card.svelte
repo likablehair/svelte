@@ -1,6 +1,5 @@
 <script>
   import Card from '$lib/common/Card.svelte';
-  import { Elevation } from '$lib/enums/index';
 </script>
 
 <style>
@@ -19,7 +18,6 @@
     --height="200px"
     --background-color="green"
     --color="white"
-    elevation={Elevation.xl}
   >
     <svelte:fragment slot="header">In the header</svelte:fragment>
     <div>Hey I'm in a card</div>
@@ -29,6 +27,12 @@
     <div>Like entire journey</div>
     <div>There's no money</div>
     <div>Can get through</div>
+    <div>Really can't</div>
+    <div>Really can't</div>
+    <div>Really can't</div>
+    <div>Really can't</div>
+    <div>Really can't</div>
+    <div>Really can't</div>
     <div>Really can't</div>
     <div>Really can't</div>
     <svelte:fragment slot="footer">In the footer</svelte:fragment>

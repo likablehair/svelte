@@ -46,7 +46,6 @@
 
 <style>
   .input-container {
-    margin-top: 15px;
     height: 50px;
     position: relative;
     width: var(--width, 100%);
@@ -148,7 +147,7 @@
           class="label-outlined"
           bind:this={labelElement}
         >{label}</label>
-        <div class="flex content-center relative bottom-3 ml-2 mr-2">
+        <div class="flex content-center relative bottom-2 ml-2 mr-2">
           <div>
             <slot name="prepend-inner"></slot>
           </div>

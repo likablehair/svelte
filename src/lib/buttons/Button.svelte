@@ -16,7 +16,6 @@
       return `${ css }${ key }: ${ value };`
     }, '');
 
-  import '$lib/common/tailwind.css'
   import Icon from '$lib/media/Icon.svelte'
 </script>
 

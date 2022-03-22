@@ -35,7 +35,7 @@
     }, 
   ]
 
-  import '$lib/common/tailwind.css';
+  import '$lib/common/tailwind.css'
 </script>
 
 <svelte:head>
@@ -63,6 +63,11 @@
 
 
 <style>
+  .container {
+    display: flex;
+    
+  }
+
   table {
     border-spacing: 0px;
   }

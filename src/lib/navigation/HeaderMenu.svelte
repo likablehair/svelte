@@ -28,14 +28,14 @@
 
 <nav
   class="
-    shadow-md sticky h-12 -top-12 transition-all
+    shadow-md sticky h-14 -top-14 transition-all
     flex flex-wrap items-center
     header-menu-container
   "
   class:top-0={visible}
 >
   {#if $$slots.prepend}
-    <div class="h-12 flex-none">
+    <div class="h-14 flex-none">
       <slot name="prepend"></slot>
     </div>
   {/if}
