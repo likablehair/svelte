@@ -29,6 +29,9 @@
     }, {
       name: 'TabSwitcher',
       url: 'navigation/TabSwitcher'
+    }, {
+      name: 'SimpleTimeLine',
+      url: 'timeline/SimpleTimeLine'
     }, 
   ]
 
