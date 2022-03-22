@@ -7,12 +7,13 @@ const config = {
 	// for more information about preprocessors
 	preprocess: preprocess(),
 
-	kit: {
-		adapter: adapter(),
-
-		// hydrate the <div id="svelte"> element in src/app.html
-		target: '#svelte'
-	}
+  kit: {
+    target: '#svelte',
+    package: {
+      dir: 'package',
+      emitTypes: true
+    }
+  }
 };
 
 export default config;
