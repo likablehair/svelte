@@ -26,6 +26,7 @@
     }, '');
 
   import ProductCard from './ProductCard.svelte'
+  import '$lib/common/tailwind.css'
 </script>
 
 <div 

@@ -8,6 +8,8 @@
 
 <script lang="ts">
   export let items: Item[] = []
+
+  import '$lib/common/tailwind.css'
 </script>
 
 <div class="flex">

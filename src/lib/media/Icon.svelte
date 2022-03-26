@@ -15,6 +15,7 @@
     }, '');
   
   import '../common/materialDesign.css'
+  import '$lib/common/tailwind.css'
 </script>
 
 <style>

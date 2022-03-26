@@ -48,6 +48,7 @@
 
   import IntersectionObserver from '$lib/common/IntersectionObserver.svelte';
   import Skeleton from "$lib/loaders/Skeleton.svelte";
+  import '$lib/common/tailwind.css'
 </script>
 
 <div 

@@ -32,6 +32,9 @@
     }, {
       name: 'SimpleTimeLine',
       url: 'timeline/SimpleTimeLine'
+    }, {
+      name: 'ScrollTimeLine',
+      url: 'timeline/ScrollTimeLine'
     }, 
   ]
 

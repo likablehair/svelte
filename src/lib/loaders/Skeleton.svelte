@@ -31,6 +31,8 @@
     .reduce( (css, [key,value]) => {
       return `${ css }${ key }: ${ value };`
     }, '');
+  
+  import '$lib/common/tailwind.css'
 </script>
 
 <div class="card" style={cssVariables}>

@@ -24,6 +24,7 @@
     }, '');
 
   import Image from './Image.svelte'
+  import '$lib/common/tailwind.css'
 </script>
 
 <div 
