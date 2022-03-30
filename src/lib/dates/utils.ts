@@ -71,3 +71,17 @@ export const getDateRows: (monthIndex: number, year: number) => number[] = (mont
 
   return rows.filter(el => !Array.isArray(el))
 };
+
+type dateFormat = 'extended'
+export const dateToString: (date: Date, format?: dateFormat) => string = (date, format='extended') => {
+  let stringDate = ""
+  if(format == 'extended') {
+    const day = date.getDate()
+    const month = getMonthName(date.getMonth())
+    const year = date.getFullYear()
+
+    stringDate = `${day} ${month} ${year}`
+  }
+
+  return stringDate
+}
