@@ -34,8 +34,6 @@
     width="800px"
     periods={periods}
     value={selectedPeriod}
-    progressBackgroundColor="blue"
-    progressColor="red"
   ></ScrollTimeLine>
   <Button
     type="icon"

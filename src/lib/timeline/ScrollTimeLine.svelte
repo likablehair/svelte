@@ -13,9 +13,7 @@
 
   export let 
     value: Period | undefined = undefined,
-    progress: number = 0,
     periods: Period[] = [],
-    progressVisible: boolean = true,
     sideMenuVisible: boolean = true,
     
     width: string = "500px",
@@ -23,15 +21,26 @@
     minWidth: string = "initial",
     height: string = "300px",
     maxHeight: string = "100vh",
-    minHeight: string = "initial",
-    progressBackgroundColor: string = undefined,
-    progressColor: string = undefined
+    minHeight: string = "initial"
 
-  let visiblePeriodIndex: number = 0
+  let 
+    visiblePeriodIndex: number = 0, 
+    oldTitle: string = undefined,
+    newTitle: string = undefined,
+    oldTitleTop: string = '0%',
+    newTitleTop: string = '100%'
 
   onMount(() => {
     if(!value) value = periods[0]
+
+    if(!!value) {
+      oldTitle = value.title
+    }
   })
+
+  function animateTitle(oldTitle, newTitle) {
+
+  }
 
   function handleSwipeUp(detail) {
   }
@@ -43,7 +52,6 @@
       visiblePeriodIndex = periods.findIndex((period) => period.name == value.name)
     }
   import Gesture from '$lib/common/Gesture.svelte'
-  import ProgressBar from '$lib/progress/ProgressBar.svelte'
   import '$lib/common/tailwind.css'
 </script>
 
@@ -68,13 +76,6 @@
   style:minHeight={minHeight}
   class="timeline-container"
 >
-  {#if progressVisible}
-    <ProgressBar
-      value={progress}
-      backgroundColor={progressBackgroundColor}
-      color={progressColor}
-    ></ProgressBar>
-  {/if}
   <div style="display: flex;">
     {#if sideMenuVisible}
       <div class="side-menu shrink">
@@ -85,7 +86,28 @@
     {/if}
     <div class="slide grow">
       {#if !!value}
-        <h1>{value.title}</h1>
+        <div 
+          style:height="64px"
+          style:overflow="hidden"
+          style:position="relative"
+        >
+          <div 
+            style:height="100%"
+            style:position="absolute"
+            style:top={oldTitleTop}
+            class="old-title"
+          >
+            {oldTitle}
+          </div>
+          <div 
+            style:height="100%"
+            style:position="absolute"
+            style:top={newTitleTop}
+            class="new-title"
+          >
+            {newTitle}
+          </div>
+        </div>
       {/if}
     </div>
   </div>
