@@ -8,6 +8,7 @@
     minHeight: string = undefined,
     width: string = undefined,
     height: string = undefined,
+    borderRadius: string = undefined,
     src: string = undefined,
     title: string = undefined,
     description: string = undefined,
@@ -34,13 +35,6 @@
   };
 
   $: cssVariables = Object.entries({
-      '--max-width': maxWidth,
-      '--max-height': maxHeight,
-      '--min-width': minWidth,
-      '--min-height': minHeight,
-      '--width': width,
-      '--height': height,
-      '--object-fit': imageCover ? 'cover' : imageContain ? 'contain' : undefined,
     }).filter(([key]) => key.startsWith('--'))
     .reduce( (css, [key,value]) => {
       return `${ css }${ key }: ${ value };`
@@ -52,8 +46,15 @@
 </script>
 
 <div 
-  class="image-container"
+  style:width={width}
+  style:max-width={maxWidth}
+  style:min-width={minWidth}
+  style:height={height}
+  style:max-height={maxHeight}
+  style:min-height={minHeight}
+  style:border-radius={borderRadius}
   style={cssVariables} 
+  class="image-container"
 >
   <IntersectionObserver once={true} let:intersecting={intersecting}>
     {#if intersecting}
@@ -76,7 +77,8 @@
         <div style="position: relative; height: 100%">
           <div class="image-filter">
             <div
-              style={'background-image: url(' + base64 + ')'}
+              style:background-size={imageCover ? 'cover' : imageContain ? 'contain' : undefined}
+              style:background-image={`url(${base64})`}
               class="image"
               class:image-hover={!disableHover}
             >
@@ -116,18 +118,10 @@
 
 <style>
   .image-container {
-    max-width: var(--max-width);
-    max-height: var(--max-height);
-    min-width: var(--min-width);
-    min-height: var(--min-height);
-    width: var(--width);
-    height: var(--height);
-    border-radius: var(--border-radius);
     overflow: hidden;
   }
 
   .image {
-    background-size: var(--object-fit);
     background-repeat: no-repeat;
     background-position: center center;
     width: 100%;

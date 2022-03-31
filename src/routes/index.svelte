@@ -38,7 +38,10 @@
     }, {
       name: 'Breadcrumb',
       url: 'navigation/Breadcrumb'
-    }, 
+    }, {
+      name: 'Avatar',
+      url: 'media/Avatar'
+    },
   ]
 
   import '$lib/common/tailwind.css'

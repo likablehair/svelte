@@ -12,8 +12,8 @@
       title: "Secondo menu",
       url: "https://google.it",
     }, {
-      name: "secondMenu",
-      title: "Secondo menu",
+      name: "thirdMenu",
+      title: "Terzo menu",
       url: "https://google.it",
     },
   ]
