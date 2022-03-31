@@ -44,6 +44,9 @@
     }, {
       name: 'DescriptiveAvatar',
       url: 'media/DescriptiveAvatar'
+    }, {
+      name: 'AttachmentDownloader',
+      url: 'media/AttachmentDownloader'
     },
   ]
 

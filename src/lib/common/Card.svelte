@@ -1,36 +1,42 @@
 <script lang="ts">
-  export let rounded: boolean = true,
-    outlined: boolean = false
-
-  $: cssVariables = Object.entries({
-    }).filter(([key]) => key.startsWith('--'))
-    .reduce( (css, [key,value]) => {
-      return `${ css }${ key }: ${ value };`
-    }, '');
+  export let
+    outlined: boolean = false,
+    maxWidth: string = undefined,
+    maxHeight: string = undefined,
+    minWidth: string = undefined,
+    minHeight: string = undefined,
+    width: string = 'fit-content',
+    height: string = undefined,
+    padding: string = "5px",
+    borderRadius: string = "5px",
+    backgroundColor: string = "rgb(252, 252, 252)",
+    color: string = undefined,
+    borderColor: string = undefined,
+    borderWidth: string = undefined,
+    style: string = ""
 
   import '$lib/common/tailwind.css';
 </script>
 
 <style>
-  .card-container {
-    height: var(--height, fit-content);
-    width: var(--width, fit-content);
-    max-height: var(--max-height);
-    max-width: var(--max-width);
-    min-height: var(--min-height);
-    min-width: var(--min-width);
-    padding: var(--padding, 5px);
-    background-color: var(--background-color, rgb(252, 252, 252));
-    color: var(--color);
-    border-color: var(--border-color);
-  }
 </style>
 
-<div 
-  class="card-container flex flex-col shadow-lg" 
-  style={cssVariables}
+<div
+  style:width={width}
+  style:max-width={maxWidth}
+  style:min-width={minWidth}
+  style:height={height}
+  style:max-height={maxHeight}
+  style:min-height={minHeight}
+  style:padding={padding}
+  style:border-radius={borderRadius}
+  style:background-color={backgroundColor}
+  style:color={color}
+  style:border-color={borderColor}
+  style:border-width={borderWidth}
+  style={style}
+  class="flex flex-col shadow-lg" 
   class:border-solid={outlined}
-  class:rounded-md={rounded}
 >
   <div class="header flex-none">
     <slot name="header"></slot>
