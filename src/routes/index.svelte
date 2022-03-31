@@ -41,6 +41,9 @@
     }, {
       name: 'Avatar',
       url: 'media/Avatar'
+    }, {
+      name: 'DescriptiveAvatar',
+      url: 'media/DescriptiveAvatar'
     },
   ]
 
