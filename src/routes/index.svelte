@@ -35,6 +35,9 @@
     }, {
       name: 'ScrollTimeLine',
       url: 'timeline/ScrollTimeLine'
+    }, {
+      name: 'Breadcrumb',
+      url: 'navigation/Breadcrumb'
     }, 
   ]
 
@@ -66,11 +69,6 @@
 
 
 <style>
-  .container {
-    display: flex;
-    
-  }
-
   table {
     border-spacing: 0px;
   }

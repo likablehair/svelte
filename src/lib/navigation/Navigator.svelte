@@ -44,11 +44,6 @@
     content: '';
   }
 
-  .bar-link {
-    font-family: bely-display, sans-serif;
-    text-transform: lowercase;
-  }
-
   .bar-link::before {
     transform-origin: 100% 50%;
     transform: scale3d(0, 1, 1);
