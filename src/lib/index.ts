@@ -22,10 +22,10 @@ export { default as HeaderMenu } from './navigation/HeaderMenu.svelte'
 export { default as Navigator } from './navigation/Navigator.svelte'
 export { default as TabSwitcher } from './navigation/TabSwitcher.svelte'
 // progress
-export { default as ProgressBar } from './navigation/ProgressBar.svelte'
+export { default as ProgressBar } from './progress/ProgressBar.svelte'
 // shop
 export { default as ProductCard } from './shop/ProductCard.svelte'
 export { default as ProductGrid } from './shop/ProductCard.svelte'
 // timeline
-export { default as ScollTimeLine } from './shop/ScrollTimeLine.svelte'
-export { default as SimpleTimeLine } from './shop/SimpleTimeLine.svelte'
+export { default as ScollTimeLine } from './timeline/ScrollTimeLine.svelte'
+export { default as SimpleTimeLine } from './timeline/SimpleTimeLine.svelte'
