@@ -7,7 +7,7 @@ export { default as IntersectionObserver } from './common/IntersectionObserver.s
 // forms
 export { default as TextField } from './forms/TextField.svelte'
 // loaders
-export { default as Skeleton } from './forms/Skeleton.svelte'
+export { default as Skeleton } from './loaders/Skeleton.svelte'
 // media
 export { default as AttachmentDownloader } from './forms/AttachmentDownloader.svelte'
 export { default as Avatar } from './forms/Avatar.svelte'
