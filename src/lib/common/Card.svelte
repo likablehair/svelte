@@ -15,7 +15,7 @@
     borderWidth: string = undefined,
     style: string = ""
 
-  import '$lib/common/tailwind.css';
+  import './common/tailwind.css';
 </script>
 
 <style>
