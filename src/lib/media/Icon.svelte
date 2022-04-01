@@ -5,17 +5,8 @@
   
   let clazz: string = ''
   export { clazz as class }
-
-  $: cssVariables = Object.entries({
-      '--size': size + 'pt',
-      '--color': color
-    }).filter(([key]) => key.startsWith('--'))
-    .reduce( (css, [key,value]) => {
-      return `${ css }${ key }: ${ value };`
-    }, '');
   
   import '../common/materialDesign.css'
-  import '$lib/common/tailwind.css'
 </script>
 
 <style>
@@ -26,7 +17,8 @@
 </style>
 
 <span
-  style={cssVariables}
+  style:font-size={size + 'pt'}
+  style:color={color}
   class="icon mdi {name} {clazz}"
 ></span>
 

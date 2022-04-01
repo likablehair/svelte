@@ -17,7 +17,6 @@
     }, '');
 
   import Icon from '$lib/media/Icon.svelte'
-  import '$lib/common/tailwind.css'
 </script>
 
 <div 
