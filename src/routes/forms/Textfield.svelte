@@ -27,7 +27,7 @@
 
 <div class="card-container">
   <Textfield
-    --width="300px"
+    width="500px"
     label="Nome"
     color="#22a939"
     bind:value={textValue}
@@ -37,14 +37,15 @@
     il valore: {textValue}
   </div>
   <Textfield
-    --width="300px"
+    width="300px"
     label="Lo stesso nome"
     color="#22a939"
     variant="boxed"
+    borderRadius="0px"
     bind:value={textValue}
   ></Textfield>
   <Textfield
-    --width="300px"
+    width="300px"
     label="Con icona"
     color="#22a939"
     variant="boxed"
@@ -55,7 +56,7 @@
     </svelte:fragment>
   </Textfield>
   <Textfield
-    --width="300px"
+    width="300px"
     label="Con icona"
     color="#22a939"
     variant="boxed"
@@ -67,7 +68,7 @@
   </Textfield>
 
   <Textfield
-    --width="300px"
+    width="300px"
     label="Cerca ..."
     color="#B8B8B8"
     variant="boxed"

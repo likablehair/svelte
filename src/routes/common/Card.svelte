@@ -14,10 +14,10 @@
 
 <div class="card-container">
   <Card 
-    --padding="10px"
-    --height="200px"
-    --background-color="green"
-    --color="white"
+    padding="10px"
+    height="200px"
+    backgroundColor="green"
+    color="white"
   >
     <svelte:fragment slot="header">In the header</svelte:fragment>
     <div>Hey I'm in a card</div>

@@ -23,7 +23,7 @@
 
 <Carousel
   images={images}
-  --height="500px"
-  --width="1000px"
-  --max-width="100vw"
+  height="500px"
+  width="1000px"
+  max-width="100vw"
 ></Carousel>

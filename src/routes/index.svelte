@@ -15,6 +15,9 @@
       name: 'Card',
       url: 'common/Card'
     }, {
+      name: 'Skeleton',
+      url: 'loaders/Skeleton'
+    }, {
       name: 'Calendar',
       url: 'dates/Calendar'
     }, {

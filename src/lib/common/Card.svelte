@@ -15,10 +15,14 @@
     borderWidth: string = undefined,
     style: string = ""
 
-  import './tailwind.css';
 </script>
 
 <style>
+  .shadow-lg {
+    --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-colored: 0 10px 15px -3px #000, 0 4px 6px -4px #000;
+    box-shadow: inset 0 0 0 calc(1px + 0px) rgb(255 255 255/0.1), 0 0 #0000, 0 0 #0000;
+  }
 </style>
 
 <div
@@ -35,16 +39,28 @@
   style:border-color={borderColor}
   style:border-width={borderWidth}
   style={style}
-  class="flex flex-col shadow-lg" 
+  style:display="flex"
+  style:flex-direction="column"
+  class="shadow-lg" 
   class:border-solid={outlined}
 >
-  <div class="header flex-none">
+  <div 
+    style:flex="none"
+    class="header"
+  >
     <slot name="header"></slot>
   </div>
-  <div class="body shrink overflow-y-auto">
+  <div
+    style:flex-shrink="1"
+    style:overflow-y="auto"
+    class="body"
+  >
     <slot></slot>
   </div>
-  <div class="footer flex-none">
+  <div 
+    style:flex="none"
+    class="footer flex-none"
+  >
     <slot name="footer"></slot>
   </div>
 </div>

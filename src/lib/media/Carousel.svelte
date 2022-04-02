@@ -7,24 +7,25 @@
     description: string;
   }
 
-  export let images: Image[] = []
+  export let 
+    images: Image[] = [],
+    maxWidth: string = undefined,
+    maxHeight: string = undefined,
+    minWidth: string = undefined,
+    minHeight: string = undefined,
+    width: string = "100%",
+    height: string = "100%"
 
-  let container, width: string = '0px', height: string = '0px'
+  let container, localWidth: string = '0px', localHeight: string = '0px'
   onMount(() => {
     calculateWidthAndHeight()
   })
+
   function calculateWidthAndHeight() {
-    width = container.offsetWidth + 'px'
-    height = container.offsetHeight + 'px'
+    localWidth = container.offsetWidth + 'px'
+    localHeight = container.offsetHeight + 'px'
   }
 
-  $: cssVariables = Object.entries({
-    }).filter(([key]) => key.startsWith('--'))
-    .reduce( (css, [key,value]) => {
-      return `${ css }${ key }: ${ value };`
-    }, '');
-
-  import '$lib/common/tailwind.css';
   import Image from '$lib/media/Image.svelte';
 </script>
 
@@ -34,9 +35,16 @@
 
 
 <div 
-  style={cssVariables} 
+  style:max-width={maxWidth}
+  style:max-height={maxHeight}
+  style:min-width={minWidth}
+  style:min-height={minHeight}
+  style:width={width}
+  style:height={height}
+  style:display="flex"
+  style:flex-wrap="no-wrap"
   bind:this={container}
-  class="container flex flex-nowrap"
+  class="container"
 >
   {#each images as image}
     <div class="image-container">
@@ -46,9 +54,9 @@
         description={image.description}
         disableHover={true}
         showSkeletonLoader={false}
-        minWidth={width}
-        width={width}
-        height={height}
+        minWidth={localWidth}
+        width={localWidth}
+        height={localHeight}
         imageContain={true}
         imageCover={false}
       />
@@ -58,12 +66,6 @@
 
 <style>
   .container {
-    height: var(--height);
-    width: var(--width);
-    max-height: var(--max-height);
-    max-width: var(--max-width);
-    min-height: var(--min-height);
-    min-width: var(--min-width);
     overflow-x: scroll;
     scroll-snap-type: x mandatory;
     -ms-overflow-style: none;  /* Internet Explorer 10+ */

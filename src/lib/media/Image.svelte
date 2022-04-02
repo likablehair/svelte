@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { SectionType } from "$lib/loaders/sectionType";
   import { browser } from '$app/env';
 
   export let maxWidth: string = undefined,
@@ -34,15 +33,8 @@
 		});
   };
 
-  $: cssVariables = Object.entries({
-    }).filter(([key]) => key.startsWith('--'))
-    .reduce( (css, [key,value]) => {
-      return `${ css }${ key }: ${ value };`
-    }, '');
-
   import IntersectionObserver from '$lib/common/IntersectionObserver.svelte';
   import Skeleton from "$lib/loaders/Skeleton.svelte";
-  import '$lib/common/tailwind.css'
 </script>
 
 <div 
@@ -53,7 +45,6 @@
   style:max-height={maxHeight}
   style:min-height={minHeight}
   style:border-radius={borderRadius}
-  style={cssVariables} 
   class="image-container"
 >
   <IntersectionObserver once={true} let:intersecting={intersecting}>
@@ -63,7 +54,7 @@
           <Skeleton
             sections={[
               {
-                type: SectionType.Image,
+                type: 'image',
                 height: `100%`
               }
             ]}
@@ -102,7 +93,7 @@
         <Skeleton
           sections={[
             {
-              type: SectionType.Image,
+              type: 'image',
               height: `100%`
             }
           ]}

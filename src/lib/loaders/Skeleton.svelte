@@ -1,6 +1,8 @@
-<script lang="ts">
-  import type { SectionType } from './sectionType';
+<script lang="ts" context="module">
+  export type SectionType = "image" | "text"
+</script>
 
+<script lang="ts">
   type Section = {
     type: SectionType,
     height?: string
@@ -11,36 +13,41 @@
     maxHeight: string = undefined,
     minWidth: string = undefined,
     minHeight: string = undefined,
+    width: string = "100%",
+    height: string = "100%",
     padding: string = '10px',
-    width: string = undefined,
-    height: string = undefined,
     dark: boolean = false
-
-  $: cssVariables = Object.entries({
-      '--max-width': maxWidth,
-      '--max-height': maxHeight,
-      '--min-width': minWidth,
-      '--min-height': minHeight,
-      '--width': width,
-      '--height': height,
-      '--padding': padding,
-      '--card-background': dark ? '#000000' : '#fff',
-      '--element-background': dark ? '#1a1a1a' : '#eee',
-      '--animation-color': dark ? '#000000e6' : '#ffffffe6',
-    }).filter(([key]) => key.startsWith('--'))
-    .reduce( (css, [key,value]) => {
-      return `${ css }${ key }: ${ value };`
-    }, '');
   
-  import '$lib/common/tailwind.css'
+  $: widthLessPadding = `calc(${width} - (${padding} * 2))`
+  $: heightLessPadding = `calc(${height} - (${padding} * 2))`
+  $: maxWidthLessPadding = `calc(${maxWidth} - (${padding} * 2))`
+  $: maxHeightLessPadding = `calc(${maxHeight} - (${padding} * 2))`
+  $: minWidthLessPadding = `calc(${minWidth} - (${padding} * 2))`
+  $: minHeightLessPadding = `calc(${minHeight} - (${padding} * 2))`
+  $: elementBackground = dark ? '#1a1a1a' : '#eee'
+  $: animationBackground = dark ? '#000000e6' : '#ffffffe6'
+  $: cardBackground = dark ? '#000000' : '#fff'
 </script>
 
-<div class="card" style={cssVariables}>
+
+<div 
+  style:--skeleton-card-background={cardBackground}
+  style:--skeleton-animation-color={animationBackground}
+  style:width={widthLessPadding}
+  style:height={heightLessPadding}
+  style:max-width={maxWidthLessPadding}
+  style:max-height={maxHeightLessPadding}
+  style:min-width={minWidthLessPadding}
+  style:min-height={minHeightLessPadding}
+  style:padding={padding}
+  class="card"
+>
   {#each sections as section}
     {#if section.type == 'image'}
       <div 
+        style:height={section.height}
+        style:background={elementBackground}
         class="skeleton-image"
-        style="height: {section.height}"
       ></div>
     {/if}
   {/each}
@@ -48,7 +55,6 @@
 
 <style>
   .skeleton-image {
-    background: var(--element-background);
     margin-bottom: 10px;
     border-radius: 5px;
     overflow: hidden;
@@ -56,17 +62,10 @@
   }
   
   .card {
-    background: var(--card-background);
+    background: var(--skeleton-card-background);
     position: relative;
-    padding: var(--padding);
     border-radius: 5px;
     box-shadow: 0 10px 100px rgba(0, 0, 0, 0.1);
-    width: calc(var(--width) - (var(--padding) * 2));
-    height: calc(var(--height) - (var(--padding) * 2));
-    max-width: calc(var(--max-width) - (var(--padding) * 2));
-    max-height: calc(var(--max-height) - (var(--padding) * 2));
-    min-width: calc(var(--min-width) - (var(--padding) * 2));
-    min-height: calc(var(--min-height) - (var(--padding) * 2));
     overflow: hidden;
   }
 
@@ -85,7 +84,7 @@
     background: linear-gradient(
       90deg,
       transparent,
-      var(--animation-color),
+      var(--skeleton-animation-color),
       transparent
     );
     width: 50%;

@@ -5,7 +5,11 @@
     placeholder: string = "",
     color: string = "",
     value: string = "",
-    variant: VariantOptions = 'outlined';
+    variant: VariantOptions = 'outlined',
+    width: string = "100%",
+    textColor: string = "balck",
+    borderRadius: string = "5px",
+    borderColor: string = undefined
 
   import { v4 as uuidv4 } from 'uuid';
   import { onMount } from 'svelte'
@@ -33,23 +37,13 @@
   $: if(!!labelElement) {
     legendWidth = !value && !focused ? 0 : (labelElement.offsetWidth * 0.8) + 8
   }
-  $: cssVariables = Object.entries({
-      '--theme-color': color,
-      '--legend-width': legendWidth + 'px'
-    }).filter(([key]) => key.startsWith('--'))
-    .reduce( (css, [key,value]) => {
-      return `${ css }${ key }: ${ value };`
-    }, '');
-
-  import '$lib/common/tailwind.css';
 </script>
 
 <style>
   .input-container {
     height: 50px;
     position: relative;
-    width: var(--width, 100%);
-    --final-color: var(--theme-color, --border-color, rgb(88, 88, 88));
+    --textfield-final-color: var(--textfield-theme-color, --textfield-border-color, rgb(88, 88, 88));
   }
 
   /* outlined input */
@@ -57,7 +51,6 @@
   .input-outlined {
     border: 0px solid;
     box-sizing: border-box;
-    color: var(--color, black);
     font-size: 18px;
     height: 100%;
     outline: 0;
@@ -67,18 +60,17 @@
   }
 
   .fieldset-outlined {
-    border-radius: var(--border-radius, 5px);
     border: 1px solid rgb(122, 122, 122);
     padding-left: 4px;
   }
 
   .focused .fieldset-outlined {
-    border: 1px solid var(--final-color);
-    color: var(--final-color);
+    border: 1px solid var(--textfield-final-color);
+    color: var(--textfield-final-color);
   }
 
   .legend-outlined {
-    width: var(--legend-width);
+    width: var(--textfield-legend-width);
     padding: 0px;
     transition: width 0.3s, color 0.1s;
   }
@@ -103,9 +95,8 @@
   /* boxed input */
 
   .fieldset-boxed {
-    border: 2px solid var(--final-color);
+    border: 2px solid var(--textfield-final-color);
     padding: 5px;
-    border-radius: var(--border-radius, 0);
   }
 
   .input-boxed {
@@ -121,7 +112,7 @@
   }
 
   .input-boxed::placeholder {
-    color: var(--final-color);
+    color: var(--textfield-final-color);
     opacity: 60%;
   }
 
@@ -129,13 +120,18 @@
 
 
 <div 
+  style:width={width}
+  style:--textfield-theme-color={color}
+  style:--textfield-border-color={borderColor}
+  style:--textfield-legend-width={legendWidth + 'px'}
   class="input-container" 
-  style={cssVariables}
   class:focused={focused}
   class:texted={focused || !!value}
 >
   <fieldset 
-    aria-hidden="true" 
+    aria-hidden="true"
+    style:border-radius={borderRadius}
+    style:border-color={borderColor}
     class="fieldset"
     class:fieldset-outlined={variant == 'outlined'}
     class:fieldset-boxed={variant == 'boxed'}
@@ -147,11 +143,18 @@
           class="label-outlined"
           bind:this={labelElement}
         >{label}</label>
-        <div class="flex content-center relative bottom-2 ml-2 mr-2">
+        <div 
+          style:display="flex"
+          style:position="relative"
+          style:bottom="8px"
+          style:margin-left="8px"
+          style:margin-right="8px"
+        >
           <div>
             <slot name="prepend-inner"></slot>
           </div>
           <input 
+            style:color={textColor}
             id={inputId} 
             class="input-outlined"
             type="text"
@@ -169,11 +172,14 @@
           </div>
         </div>
     {:else if variant == 'boxed'}
-      <div class="flex">
+      <div 
+        style:display="flex"
+      >
         <div>
           <slot name="prepend-inner"></slot>
         </div>
         <input
+          style:color={textColor}
           id={inputId}
           class="input-boxed"
           type="text"

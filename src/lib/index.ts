@@ -5,7 +5,7 @@ export { default as Card } from './common/Card.svelte'
 export { default as Gesture } from './common/Gesture.svelte'
 export { default as IntersectionObserver } from './common/IntersectionObserver.svelte'
 // forms
-export { default as TextField } from './forms/TextField.svelte'
+export { default as TextField } from './forms/Textfield.svelte'
 // loaders
 export { default as Skeleton } from './loaders/Skeleton.svelte'
 // media
