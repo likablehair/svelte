@@ -2,9 +2,9 @@
   import ProductsGrid from "$lib/shop/ProductsGrid.svelte";
 </script>
 
-<div class="p-10">
+<div style:padding="20px" >
   <ProductsGrid
-    --width="90vw"
+    width="90vw"
     productMinWidth="200px"
     productMinHeight="200px"
     productHeight="400px"

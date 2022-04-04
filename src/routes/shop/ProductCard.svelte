@@ -1,13 +1,18 @@
 <script>
   import ProductCard from "$lib/shop/ProductCard.svelte";
-  import '$lib/common/tailwind.css';
 </script>
 
-<div class="flex justify-center items-center h-screen">
+<div
+  style:height="100vh"
+  style:display="flex"
+  style:justify-content="center"
+  style:align-items="center"
+  style:flex-direction="column"
+>
   <ProductCard
-    --height="400px"
-    --width="300px"
-    --max-width="90vw"
+    height="400px"
+    width="300px"
+    maxWidth="90vw"
     sale={true}
     image="http://localhost:4000/guitars/guitar6.jpg"
     title="Chitarra acustica per suonatori"

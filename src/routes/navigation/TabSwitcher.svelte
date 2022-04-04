@@ -4,7 +4,13 @@
   import TabSwitcher from "$lib/navigation/TabSwitcher.svelte";
 </script>
 
-<div class="flex flex-col justify-center items-center h-screen w-screen">
+<div
+  style:height="100px"
+  style:display="flex"
+  style:justify-content="center"
+  style:align-items="center"
+  style:flex-direction="column"
+>
   <TabSwitcher
     tabs={[
       {name: 'pippo', label: 'Pippo'},
@@ -15,7 +21,9 @@
     --color="#008080"
     bind:selected={selected}
   ></TabSwitcher>
-  <div class="mt-6">
+  <div 
+    style:margin-top="20px"
+  >
     {selected}
   </div>
 </div>

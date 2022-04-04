@@ -17,7 +17,6 @@
   $: selectedPeriod = periods[selectedPeriodIndex]
   import ScrollTimeLine from "$lib/timeline/ScrollTimeLine.svelte";
   import Button from "$lib/buttons/Button.svelte"
-  import '$lib/common/tailwind.css';
 </script>
 
 

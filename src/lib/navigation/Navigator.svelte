@@ -8,13 +8,16 @@
 
 <script lang="ts">
   export let items: Item[] = []
-
-  import '$lib/common/tailwind.css'
 </script>
 
-<div class="flex">
+<div 
+  style:display="flex"
+>
   {#each items as item}
-    <div class="link bar-link mr-5">
+    <div 
+      style:margin-right="20px"
+      class="link bar-link"
+    >
       {item.title}
     </div>
   {/each}

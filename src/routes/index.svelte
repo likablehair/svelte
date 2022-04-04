@@ -50,17 +50,27 @@
     }, {
       name: 'AttachmentDownloader',
       url: 'media/AttachmentDownloader'
+    }, {
+      name: 'ProductCard',
+      url: 'shop/ProductCard'
+    }, {
+      name: 'ProductsGrid',
+      url: 'shop/ProductsGrid'
     },
   ]
 
-  import '$lib/common/tailwind.css'
 </script>
 
 <svelte:head>
   <title>Svelte likablehair components kit</title>
 </svelte:head>
 
-<div class="flex items-center justify-center pt-10">
+<div 
+  style:display="flex"
+  style:justify-content="center"
+  style:align-items="center"
+  style:padding-top="20px"
+>
   <table>
     <thead>
       <th>Component Name</th>

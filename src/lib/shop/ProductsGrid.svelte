@@ -15,33 +15,28 @@
     productMaxHeight: string = '90vh',
     productMinHeight: string = '300px',
     productHeight: string = '300px',
-    productWidth: string = '200px'
-
-  $: cssVariables = Object.entries({
-      '--min-width': productMinWidth || productWidth || '200px',
-      '--product-width': productWidth || '200px'
-    }).filter(([key]) => key.startsWith('--'))
-    .reduce( (css, [key,value]) => {
-      return `${ css }${ key }: ${ value };`
-    }, '');
+    productWidth: string = '200px',
+    width: string = '100%',
+    gap: string = '1rem'
 
   import ProductCard from './ProductCard.svelte'
-  import '$lib/common/tailwind.css'
 </script>
 
 <div 
+  style:width={width}
+  style:gap={gap}
+  style:grid-template-columns={`repeat(auto-fit, minmax(${productMinWidth || productWidth || '200px'}, ${productWidth}))`}
   class="product-grid-container"
-  style={cssVariables}
 >
   {#each products as product }
     <div class="product-container">
       <ProductCard
-        --height={productHeight}
-        --width={productWidth}
-        --max-width={productMaxWidth}
-        --min-width={productMinWidth}
-        --max-height={productMaxHeight}
-        --min-height={productMinHeight}
+        height={productHeight}
+        width={productWidth}
+        max-width={productMaxWidth}
+        min-width={productMinWidth}
+        max-height={productMaxHeight}
+        min-height={productMinHeight}
         image={product.image}
         title={product.title}
         sale={product.sale}
@@ -60,11 +55,8 @@
 
 <style>
   .product-grid-container {
-    width: var(--width, 100%);
     display: grid;
-    gap: var(--gap, 1rem);
     align-content: space-between;
-    grid-template-columns: repeat(auto-fit, minmax(var(--min-width), var(--product-width)));
   }
 
   .product-container {

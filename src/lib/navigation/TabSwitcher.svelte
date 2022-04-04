@@ -34,25 +34,19 @@
     bookmarkWidth = tabButton.offsetWidth - 10
     bookmarkLeft = tabButton.offsetLeft + 5
   }
-
-  $: cssVariables = Object.entries({
-      '--bookmark-left': bookmarkLeft + 'px',
-      '--bookmark-width': bookmarkWidth + 'px',
-    }).filter(([key]) => key.startsWith('--'))
-    .reduce( (css, [key,value]) => {
-      return `${ css }${ key }: ${ value };`
-    }, '');
-
-  import '$lib/common/tailwind.css'
 </script>
 
 <div 
-  class="tab-switcher-container flex relative"
-  style={cssVariables}
+  style:position="relative"
+  style:display="flex"
+  class="tab-switcher-container"
 >
   {#each tabs as tab}
     <div 
-      class="mx-3 p-2 cursor-pointer"
+      style:cursor="pointer"
+      style:margin-left="12px"
+      style:margin-right="12px"
+      style:padding="8px"
       class:selected-tab={tab.name == selected}
       on:click={() => handleTabClick(tab)}
       bind:this={tabButtons[tab.name]}
@@ -60,7 +54,9 @@
       {tab.label}
     </div>
   {/each}
-  <span 
+  <span
+    style:left={bookmarkLeft + 'px'}
+    style:width={bookmarkWidth + 'px'}
     class="bookmark"
   ></span>
   <span class="horizontal-guide"></span>
@@ -93,8 +89,6 @@
     z-index: 10;
     background-color: var(--bookmark-color, var(--color, rgb(51 65 85)));
     transition: left 400ms, width 400ms;
-    left: var(--bookmark-left);
-    width: var(--bookmark-width)
   }
 
 </style>

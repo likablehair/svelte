@@ -5,22 +5,30 @@
     saleText: string = 'SALE',
     price: number = undefined,
     currency: string = '€',
-    discount: number = undefined
+    discount: number = undefined,
+    maxWidth: string = undefined,
+    maxHeight: string = undefined,
+    minWidth: string = undefined,
+    minHeight: string = undefined,
+    width: string = undefined,
+    height: string = undefined
 
   $: priceLessDiscount = Number((price - discount).toFixed(2))
 
   import Image from '$lib/media/Image.svelte';
-  import '$lib/common/tailwind.css';
 </script>
 
 <style>
-  .container {
-    height: var(--height);
-    width: var(--width);
-    max-height: var(--max-height);
-    max-width: var(--max-width);
-    min-height: var(--min-height);
-    min-width: var(--min-width);
+  .shadow-lg {
+    --shadow-color: #000;
+    --ring-inset: inset;
+    --ring-offset-width: 0px;
+    --ring-color: rgb(255 255 255/0.1);
+    --ring-offset-shadow: var(--ring-inset) 0 0 0 calc(1px + var(--ring-offset-width)) var(--ring-color);
+    --ring-shadow: 0 0 #0000;
+    --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-colored: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -4px var(--shadow-color);
+    box-shadow: var(--ring-offset-shadow, 0 0 #0000), var(--ring-shadow, 0 0 #0000), var(--shadow);
   }
 
   .info {
@@ -28,7 +36,16 @@
   }
 </style>
 
-<div class="container rounded-md shadow-lg">
+<div 
+  style:width={width}
+  style:height={height}
+  style:max-width={maxWidth}
+  style:max-height={maxHeight}
+  style:min-width={minWidth}
+  style:min-height={minHeight}
+  style:border-radius="0.375rem"
+  class="container shadow-lg"
+>
   <Image
     src={image}
     width="100%"
@@ -37,27 +54,63 @@
     --border-radius="10px 10px 0px 0px"
   >
     {#if sale}
-      <div class="font-semibold text-sm text-stone-50 bg-red-500 rounded-md top-2 right-2 w-fit absolute px-2">{saleText}</div>
+      <div 
+        style:font-weight="600"
+        style:font-size="14px"
+        style:line-height="20px"
+        style:color="rgb(250 250 249)"
+        style:background-color="rgb(239 68 68)"
+        style:border-radius="0.375rem"
+        style:top="8px"
+        style:right="8px"
+        style:width="fit-content"
+        style:position="absolute"
+        style:padding-left="8px"
+        style:padding-right="8px"
+      >{saleText}</div>
     {/if}
   </Image>
-  <div class="info p-2 relative ">
-    <div class="font-semibold">{title}</div>
+  <div 
+    style:padding="8px"
+    style:position="relative"
+    class="info"
+  >
+    <div style:font-weight="600" >{title}</div>
     {#if (price !== undefined && price !== null) || (discount !== undefined && discount !== null)}
-      <div class="absolute bottom-2 right-2">
+      <div 
+        style:position="absolute"
+        style:bottom="19px"
+        style:right="8px"
+      >
         {#if discount !== undefined && discount !== null }
-          <span class="line-through text-md tracking-wide font-normal text-gray-400">
+          <span 
+            style:text-decoration-line="line-through"
+            style:font-size=""
+            style:letter-spacing="0.025em"
+            style:font-weight="400px"
+            style:color="rgb(156 163 175)"
+          >
             {priceLessDiscount} {currency}
           </span>
         {/if}
 
         {#if price !== undefined && price !== null }
-          <span class="text-lg tracking-wide font-semibold">
+          <span 
+            style:letter-spacing="0.025em"
+            style:font-size="18px"
+            style:line-height="28px"
+            style:font-weight="600"
+          >
             {price} {currency}
           </span>
         {/if}
       </div>
     {/if}
-    <div class="absolute bottom-2 left-2">
+    <div 
+      style:position="absolute"
+      style:bottom="19px"
+      style:left="8px"
+    >
       <slot name="sizes">
 
       </slot>

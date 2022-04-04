@@ -52,7 +52,6 @@
       visiblePeriodIndex = periods.findIndex((period) => period.name == value.name)
     }
   import Gesture from '$lib/common/Gesture.svelte'
-  import '$lib/common/tailwind.css'
 </script>
 
 <style>
@@ -76,7 +75,7 @@
   style:minHeight={minHeight}
   class="timeline-container"
 >
-  <div style="display: flex;">
+  <div style:display="flex">
     {#if sideMenuVisible}
       <div class="side-menu shrink">
         {#if !!value}

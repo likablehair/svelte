@@ -16,23 +16,17 @@
     disableHover: boolean = false,
     dark: boolean = false
 
-  $: cssVariables = Object.entries({
-      '--columns': columns
-    }).filter(([key]) => key.startsWith('--'))
-    .reduce( (css, [key,value]) => {
-      return `${ css }${ key }: ${ value };`
-    }, '');
-
   import Image from './Image.svelte'
-  import '$lib/common/tailwind.css'
 </script>
 
-<div 
-  style={cssVariables}
+<div
   class="container flex-container"
 >
   {#each images as image }
-    <div class="image-container">
+    <div 
+      style:width={`calc((100% / var(${columns})) - (10px * ${columns})))`}
+      class="image-container"
+    >
       <Image
         src={image.url}
         height={imageHeight}
@@ -44,7 +38,7 @@
         description={image.description}
         disableHover={disableHover}
         dark={dark}
-        --border-radius="10px"
+        borderRadius="10px"
       ></Image>
     </div>
   {/each}
@@ -65,6 +59,5 @@
   .image-container {
     margin-right: 10px;
     margin-bottom: 10px;
-    width: calc((100% / var(--columns)) - (10px * var(--columns)));
   }
 </style>
