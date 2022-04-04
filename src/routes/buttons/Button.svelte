@@ -6,10 +6,10 @@
 <div class="container">
   <div class="section">
     <Button 
-      --color="white" 
-      --background-color="#008080"
-      --hover-background-color="#008f8f"
-      --width="400px"
+      color="white" 
+      backgroundColor="#008080"
+      hoverBackgroundColor="#008f8f"
+      width="400px"
     >
       Click me
       <span slot="append" style="padding-right: 10px">
@@ -19,9 +19,9 @@
   </div>
   <div class="section">
     <Button 
-      --color="#008080"
-      --hover-background-color="#00808012"
-      --padding="10px 20px 10px 20px"
+      color="#008080"
+      hoverBackgroundColor="#00808012"
+      padding="10px 20px 10px 20px"
       type="text"
     >
       Click me
@@ -29,16 +29,16 @@
   </div>
   <div class="section">
     <Button 
-      --color="#008080"
-      --hover-background-color="#00808012"
+      color="#008080"
+      hoverBackgroundColor="#00808012"
       type="icon"
       icon="mdi-account"
     ></Button>
   </div>
   <div class="section">
     <Button 
-      --color="#008080"
-      --hover-background-color="#00808012"
+      color="#008080"
+      hoverBackgroundColor="#00808012"
       type="icon"
       iconSize={25}
       icon="mdi-account"

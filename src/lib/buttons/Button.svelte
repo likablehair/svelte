@@ -1,31 +1,57 @@
 <script lang="ts">
-  export let type: 'default' | 'text' | 'icon' = 'default'
-  export let icon: string = undefined
-  export let iconSize: number = 15
-  let clazz: string = ''
+  export let type: 'default' | 'text' | 'icon' = 'default',
+    icon: string = undefined,
+    iconSize: number = 15,
+    clazz: string = '',
+    maxWidth: string = undefined,
+    maxHeight: string = undefined,
+    minWidth: string = undefined,
+    minHeight: string = undefined,
+    width: string = undefined,
+    height: string = undefined,
+    textAlign: string = "center",
+    cursor: string = "pointer",
+    padding: string = "5px",
+    fontSize: string = undefined,
+    color: string = undefined,
+    backgroundColor: string = undefined,
+    hoverBackgroundColor: string = '#008f8f',
+    borderRadius: string = undefined,
+    boxShadow: string = undefined
+
   export { clazz as class };
 
 
+  $: defaultBorderRadius = type == 'icon' ? '50%' : '5px'
   $: position = !!$$slots.append ? 'relative' : undefined
-  $: cssVariables = Object.entries({
-      '--icon-button-height': (iconSize + 15) + 'pt',
-      '--icon-button-width': (iconSize + 15) + 'pt',
-      '--button-position': position
-    }).filter(([key]) => key.startsWith('--'))
-    .reduce( (css, [key,value]) => {
-      return `${ css }${ key }: ${ value };`
-    }, '');
 
   import Icon from '$lib/media/Icon.svelte'
 </script>
 
 <div 
+  style:width={width}
+  style:max-width={maxWidth}
+  style:min-width={minWidth}
+  style:height={height}
+  style:max-height={maxHeight}
+  style:min-height={minHeight}
+  style:text-align={textAlign}
+  style:position={position}
+  style:cursor={cursor}
+  style:padding={padding}
+  style:font-size={fontSize}
+  style:color={color}
+  style:button-border-radius={!!borderRadius ? borderRadius : defaultBorderRadius}
+  style:--button-background-color={backgroundColor}
+  style:--button-hover-background-color={hoverBackgroundColor}
+  style:--button-box-shadow={boxShadow}
+  style:--button-icon-height={(iconSize + 5) + 'pt'}
+  style:--button-icon-width={(iconSize + 5) + 'pt'}
   class="button {clazz}"
   class:button-default={type === 'default'}
   class:button-text={type === 'text'}
   class:button-icon={type === 'icon'}
   on:click
-  style={cssVariables}
 >
   {#if !!icon}
     <Icon name={icon} size={iconSize}></Icon>
@@ -35,7 +61,6 @@
   {#if $$slots.append}
     <span class="append-item">
       <slot name="append">
-        
       </slot>
     </span>
   {/if}
@@ -49,57 +74,47 @@
 
   .button {
     overflow: hidden;
-    position: var(--button-position);
-    width: var(--width, fit-content);
-    height: var(--height, fit-content);
-    text-align: var(--text-align, center);
-    cursor: var(--cursor, pointer);
-    padding: var(--padding, 5px);
-    font-size: var(--font-size);
   }
 
   .button-default {
     transition: background-color 200ms;
-    color: var(--color);
-    background-color: var(--background-color);
+    background-color: var(--button-background-color);
     outline: 0;
     border: 0;
-    border-radius: var(--border-radius, 0.25rem);
-    box-shadow: var(--box-shadow, 0 0 0.5rem rgba(0, 0, 0, 0.3));
+    border-radius: var(--button-border-radius, 0.25rem);
+    box-shadow: var(--button-box-shadow, 0 0 0.5rem rgba(0, 0, 0, 0.3));
   }
 
   .button-default:hover {
-    background-color: var(--hover-background-color, var(--background-color));
+    background-color: var(--button-hover-background-color, var(--button-background-color));
   }
 
   .button-text {
-    color: var(--color);
     transition: background-color 200ms;
     text-transform: uppercase;
     font-weight: 600;
     outline: 0;
     border: 0;
-    border-radius: var(--border-radius, 0.25rem);
+    border-radius: var(--button-border-radius, 0.25rem);
   }
 
   .button-text:hover {
-    background-color: var(--hover-background-color, transparent);
+    background-color: var(--button-hover-background-color, transparent);
   }
 
   .button-icon {
-    color: var(--color);
     transition: background-color 200ms;
     outline: 0;
     border: 0;
-    border-radius: var(--border-radius, 50%);
-    height: var(--icon-button-height) !important;
-    width: var(--icon-button-width) !important;
+    border-radius: var(--button-border-radius, 50%);
+    height: var(--button-icon-height) !important;
+    width: var(--button-icon-width) !important;
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
   .button-icon:hover {
-    background-color: var(--hover-background-color, transparent);
+    background-color: var(--button-hover-background-color, transparent);
   }
 </style>

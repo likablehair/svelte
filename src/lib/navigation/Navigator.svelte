@@ -7,7 +7,19 @@
 </script>
 
 <script lang="ts">
-  export let items: Item[] = []
+  export let items: Item[] = [],
+    color: string = undefined
+
+  import { createEventDispatcher } from 'svelte';
+  const dispatch = createEventDispatcher<{
+    "item-click": {
+      item: Item,
+    }
+  }>()
+
+  function handleItemClick(item: Item) {
+    dispatch('item-click', { item })
+  }
 </script>
 
 <div 
@@ -16,7 +28,9 @@
   {#each items as item}
     <div 
       style:margin-right="20px"
+      style:color={color}
       class="link bar-link"
+      on:click={() => handleItemClick(item)}
     >
       {item.title}
     </div>
@@ -29,14 +43,13 @@
     font-size: 18px;
     position: relative;
     white-space: nowrap;
-    color: var(--color-text);
   }
 
   .link::before,
   .link::after {
     position: absolute;
     width: 100%;
-    height: 1px;
+    height: 1.5px;
     background: currentColor;
     top: 100%;
     left: 0;

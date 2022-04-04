@@ -15,10 +15,12 @@
 
 <HeaderMenu
   title="Titolo del sito"
+  initialBackgroundColor="transparent"
+  initialRemoveShadow={true}
+  hideOnScroll={false}
   items={[
     {name: 'work', title: 'Work'},
     {name: 'history', title: 'History'},
-    {name: 'trasparent', title: 'Transparent'},
   ]}
   on:item-click={handleNavigationClick}
 >
@@ -48,8 +50,8 @@
     </div>
   </div>
 </HeaderMenu>
-<div style="height: 200vh;">
-  <p>Sint laborum non labore laboris eu cillum dolore nostrud occaecat amet. Id veniam ullamco est nostrud cillum sit est consectetur in sint aliquip velit veniam amet. Do velit ut nisi magna et eiusmod aliqua ex exercitation elit consequat ex. Excepteur eiusmod deserunt culpa ea cupidatat non qui nisi quis est exercitation ea. Reprehenderit est est duis ad tempor veniam consectetur excepteur officia amet duis aliqua ullamco. Reprehenderit culpa laborum culpa ipsum dolor est consequat tempor excepteur irure veniam consequat exercitation aliquip.</p>
+<div style="height: 200vh; background-color: bisque; margin-top: -70px">
+  <p style="padding-top: 70px">Sint laborum non labore laboris eu cillum dolore nostrud occaecat amet. Id veniam ullamco est nostrud cillum sit est consectetur in sint aliquip velit veniam amet. Do velit ut nisi magna et eiusmod aliqua ex exercitation elit consequat ex. Excepteur eiusmod deserunt culpa ea cupidatat non qui nisi quis est exercitation ea. Reprehenderit est est duis ad tempor veniam consectetur excepteur officia amet duis aliqua ullamco. Reprehenderit culpa laborum culpa ipsum dolor est consequat tempor excepteur irure veniam consequat exercitation aliquip.</p>
   <h1>Secondo titolo</h1>
   <p>Sint laborum non labore laboris eu cillum dolore nostrud occaecat amet. Id veniam ullamco est nostrud cillum sit est consectetur in sint aliquip velit veniam amet. Do velit ut nisi magna et eiusmod aliqua ex exercitation elit consequat ex. Excepteur eiusmod deserunt culpa ea cupidatat non qui nisi quis est exercitation ea. Reprehenderit est est duis ad tempor veniam consectetur excepteur officia amet duis aliqua ullamco. Reprehenderit culpa laborum culpa ipsum dolor est consequat tempor excepteur irure veniam consequat exercitation aliquip.</p>
   <h1>Terzo titolo</h1>

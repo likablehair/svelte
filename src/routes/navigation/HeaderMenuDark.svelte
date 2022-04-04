@@ -14,14 +14,13 @@
     {name: 'work', title: 'Work'},
     {name: 'history', title: 'History'},
   ]}
-  --color="white"
-  --background-color="black"
+  color="white"
+  backgroundColor="black"
 >
   <div slot="append">
     <Button 
       type="icon"
       icon="mdi-white-balance-sunny"
-      --hover-background-color="#97979750"
       class="mr-2"
       on:click={handleLighClick}
     ></Button>

@@ -1,10 +1,14 @@
 <script lang="ts">
   import type { Item } from "./Navigator.svelte"
 
-  export let title: string = ""; 
-  export let items: Item[] = [];
+  export let title: string = "",
+    items: Item[] = [],
+    hideOnScroll: boolean = true,
+    initialRemoveShadow: boolean = false,
+    initialBackgroundColor: string = undefined,
+    backgroundColor: string = 'white',
+    color: string = undefined
 
-  export let hideOnScroll: boolean = true;
   let scrollY, lastScrollY, visible = true
   function handleScroll() {
     if(hideOnScroll) {
@@ -13,9 +17,17 @@
       } else {
         visible = true
       }
-      lastScrollY = scrollY
     }
+
+    lastScrollY = scrollY
   }
+
+
+  let localBackgroundColor: string = undefined 
+  $: if(scrollY == 0 && !!initialBackgroundColor)
+    localBackgroundColor = initialBackgroundColor
+  else
+    localBackgroundColor = backgroundColor
 
   import Navigator from './Navigator.svelte'
 </script>
@@ -26,14 +38,17 @@
 ></svelte:window>
 
 <nav
+  style:color={color}
+  style:background-color={localBackgroundColor}
   style:position="sticky"
   style:display="flex"
   style:flex-wrap="wrap"
   style:align-items="center"
   style:height="56px"
-  class="shadow-md transition-all header-menu-container"
+  class="transition-all header-menu-container"
   class:-top-14={!visible}
   class:top-0={visible}
+  class:shadow-md={!initialRemoveShadow || scrollY != 0}
 >
   {#if $$slots.prepend}
     <div 
@@ -57,6 +72,7 @@
   <div>
     <Navigator
       items={items}
+      on:item-click
     ></Navigator>
   </div>
   <slot name="append"></slot>
@@ -64,8 +80,6 @@
 
 <style>
   .header-menu-container {
-    background-color: var(--background-color, white);
-    color: var(--color);
     width: var(--width, 100vw)
   }
 
