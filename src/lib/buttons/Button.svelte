@@ -41,7 +41,7 @@
   style:padding={padding}
   style:font-size={fontSize}
   style:color={color}
-  style:button-border-radius={!!borderRadius ? borderRadius : defaultBorderRadius}
+  style:--button-border-radius={!!borderRadius ? borderRadius : defaultBorderRadius}
   style:--button-background-color={backgroundColor}
   style:--button-hover-background-color={hoverBackgroundColor}
   style:--button-box-shadow={boxShadow}
