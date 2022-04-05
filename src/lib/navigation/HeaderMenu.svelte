@@ -7,7 +7,8 @@
     initialRemoveShadow: boolean = false,
     initialBackgroundColor: string = undefined,
     backgroundColor: string = 'white',
-    color: string = undefined
+    color: string = undefined,
+    mobileMenu: boolean = true
 
   let scrollY, lastScrollY, visible = true
   function handleScroll() {
@@ -44,12 +45,14 @@
   on:scroll={handleScroll}
 ></svelte:window>
 
-<Drawer
-  bind:open={openDrawer}
-  backgroundColor={backgroundColor}
-  items={items}
-  on:item-click
-></Drawer>
+{#if mobileMenu }
+  <Drawer
+    bind:open={openDrawer}
+    backgroundColor={backgroundColor}
+    items={items}
+    on:item-click
+  ></Drawer>
+{/if}
 <nav
   style:color={color}
   style:background-color={localBackgroundColor}
@@ -74,18 +77,20 @@
       toggleDrawer={toggleDrawer} 
       openDrawer={openDrawer}
     >
-      <div 
-        style:width="fit-content"
-        style:margin-left="10px"
-        style:margin-right="10px"
-        class="hide-on-desktop"
-      >
-        <Button
-          type="icon"
-          icon="mdi-menu"
-          on:click={toggleDrawer}
-        ></Button>
-      </div>
+      {#if mobileMenu}
+        <div 
+          style:width="fit-content"
+          style:margin-left="10px"
+          style:margin-right="10px"
+          class="hide-on-desktop"
+        >
+          <Button
+            type="icon"
+            icon="mdi-menu"
+            on:click={toggleDrawer}
+          ></Button>
+        </div>
+      {/if}
     </slot>
   </div>
   <div 

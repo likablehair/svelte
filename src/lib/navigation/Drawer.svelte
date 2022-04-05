@@ -7,6 +7,7 @@
     space: string = '200px',
     openingSpeed: string = '0.3s',
     overlaySpeed: string = '0.2s',
+    blockScroll: boolean = true,
     overlay: boolean = true,
     backgroundColor: string = undefined,
     overlayColor: string = '#282828',
@@ -79,7 +80,7 @@
 
 <div
   style:--drawer-opening-speed={openingSpeed}
-  style:position="absolute"
+  style:position="fixed"
   style:height={height}
   style:width={width}
   style:top={top}
@@ -113,7 +114,7 @@
   <div
     on:click={handleClickOverlay}
     style:z-index={open ? zIndex - 1 : -5}
-    style:position="absolute"
+    style:position="fixed"
     style:top="0px"
     style:left="0px"
     style:width="100vw"
