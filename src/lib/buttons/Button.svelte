@@ -74,6 +74,7 @@
 
   .button {
     overflow: hidden;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
   }
 
   .button-default {
