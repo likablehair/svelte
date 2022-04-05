@@ -9,7 +9,14 @@
     width: string = "100%",
     textColor: string = "balck",
     borderRadius: string = "5px",
-    borderColor: string = undefined
+    borderColor: string = undefined,
+    backgroundColor: string = undefined,
+    padding: string = undefined,
+    paddingLeft: string = undefined,
+    paddingRight: string = undefined,
+    paddingBottom: string = undefined,
+    paddingTop: string = undefined,
+    fontSize: string = undefined
 
   import { v4 as uuidv4 } from 'uuid';
   import { onMount } from 'svelte'
@@ -132,6 +139,12 @@
     aria-hidden="true"
     style:border-radius={borderRadius}
     style:border-color={borderColor}
+    style:background-color={backgroundColor}
+    style:padding={padding}
+    style:padding-left={paddingLeft}
+    style:padding-right={paddingRight}
+    style:padding-bottom={paddingBottom}
+    style:padding-top={paddingTop}
     class="fieldset"
     class:fieldset-outlined={variant == 'outlined'}
     class:fieldset-boxed={variant == 'boxed'}
@@ -154,7 +167,9 @@
             <slot name="prepend-inner"></slot>
           </div>
           <input 
+            style:background-color={backgroundColor}
             style:color={textColor}
+            style:font-size={fontSize}
             id={inputId} 
             class="input-outlined"
             type="text"
@@ -179,7 +194,9 @@
           <slot name="prepend-inner"></slot>
         </div>
         <input
+          style:background-color={backgroundColor}
           style:color={textColor}
+          style:font-size={fontSize}
           id={inputId}
           class="input-boxed"
           type="text"

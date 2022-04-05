@@ -77,4 +77,23 @@
       <Icon name="mdi-search-web" class="mr-2" color="#B8B8B8"></Icon>
     </svelte:fragment>
   </Textfield>
+
+  <Textfield
+    width="300px"
+    label="Email"
+    textColor="white"
+    backgroundColor="#145DA0"
+    paddingBottom="8px"
+    paddingTop="8px"
+    paddingRight="15px"
+    paddingLeft="15px"
+    fontSize="12pt"
+    variant="boxed"
+  >
+    <svelte:fragment slot="append-inner">
+      <span style:margin-left="15px">
+        <Icon name="mdi-arrow-right" color="white"></Icon>
+      </span>
+    </svelte:fragment>
+  </Textfield>
 </div>
