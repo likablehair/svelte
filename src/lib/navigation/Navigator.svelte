@@ -48,6 +48,7 @@
     font-size: 18px;
     position: relative;
     white-space: nowrap;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
   }
 
   .link::before,
