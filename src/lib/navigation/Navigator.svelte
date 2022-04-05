@@ -8,7 +8,9 @@
 
 <script lang="ts">
   export let items: Item[] = [],
-    color: string = undefined
+    color: string = undefined,
+    vertical: boolean = false,
+    space: string = '20px'
 
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher<{
@@ -24,10 +26,13 @@
 
 <div 
   style:display="flex"
+  style:flex-direction={vertical ? 'column' : 'row'}
 >
   {#each items as item}
     <div 
-      style:margin-right="20px"
+      style:width="fit-content"
+      style:margin-right={!vertical ? space : undefined}
+      style:margin-bottom={vertical ? space : undefined}
       style:color={color}
       class="link bar-link"
       on:click={() => handleItemClick(item)}

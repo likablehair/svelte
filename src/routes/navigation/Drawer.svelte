@@ -15,6 +15,12 @@
   position={position}
   bind:open={open}
   backgroundColor="#B1D4E0"
+  items={[
+      { name: 'menu', title: 'Menù'},
+      { name: 'restaurant', title: 'Ristorante'},
+      { name: 'contacts', title: 'Contatti'},
+      { name: 'about', title: 'Informazioni'},
+    ]}
 ></Drawer>
 <div
   style:margin-top="40px"

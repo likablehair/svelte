@@ -59,6 +59,9 @@
     }, {
       name: 'Drawer',
       url: 'navigation/Drawer'
+    }, {
+      name: 'Navigator',
+      url: 'navigation/Navigator'
     },
   ]
 

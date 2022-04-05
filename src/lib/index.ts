@@ -21,6 +21,7 @@ export { default as BreadCrumb } from './navigation/BreadCrumb.svelte'
 export { default as HeaderMenu } from './navigation/HeaderMenu.svelte'
 export { default as Navigator } from './navigation/Navigator.svelte'
 export { default as TabSwitcher } from './navigation/TabSwitcher.svelte'
+export { default as Drawer } from './navigation/Drawer.svelte'
 // progress
 export { default as ProgressBar } from './progress/ProgressBar.svelte'
 // shop

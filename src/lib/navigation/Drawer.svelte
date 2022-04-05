@@ -1,4 +1,7 @@
 <script lang="ts">
+  import Navigator from '$lib/navigation/Navigator.svelte'
+  import type { Item } from '$lib/navigation/Navigator.svelte'
+
   export let open: boolean = false,
     position: 'left' | 'top' | 'right' | 'bottom' = 'left',
     space: string = '200px',
@@ -8,7 +11,8 @@
     backgroundColor: string = undefined,
     overlayColor: string = '#282828',
     overlayOpacity: string = '30%',
-    zIndex: number = 30
+    zIndex: number = 30,
+    items: Item[] = []
 
   let height: string = undefined,
     width: string = undefined,
@@ -89,7 +93,20 @@
   class:animate-bottom={position == 'bottom'}
   class:animate-top={position == 'top'}
 >
-  Drawer
+  <slot {open}>
+    <div
+      style:display="flex"
+      style:justify-content="center"
+      style:align-items="center"
+      style:margin-top={position == 'left' || position == 'right' ? '10px' : '0px'}
+      style:height={position == 'top' || position == 'bottom' ? '100%' : 'fit-content'}
+    >
+      <Navigator
+        items={items}
+        vertical={position == 'right' || position == 'left'}
+      ></Navigator>
+    </div>
+  </slot>
 </div>
 {#if overlay}
   <div
