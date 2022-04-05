@@ -55,7 +55,7 @@
     >
       <div
         style:flex-direction={singleSided || index % 2 == 0 ? 'row' : 'row-reverse'}
-        style:justify-content={singleSided || index % 2 == 0 ? 'start' : 'end'}
+        style:justify-content={singleSided || index % 2 == 0 ? 'start' : 'flex-end'}
         class="time-line-body"
       >
         <slot name="item" item={item}>
@@ -185,7 +185,7 @@
   .vertical-bottom-container {
     display: flex;
     flex-direction: column;
-    justify-content: end;
+    justify-content: flex-end;
     height: 100%;
   }
 </style>
