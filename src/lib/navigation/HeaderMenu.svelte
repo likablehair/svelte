@@ -22,6 +22,11 @@
     lastScrollY = scrollY
   }
 
+  export let openDrawer = false
+  function toggleDrawer() {
+    openDrawer = !openDrawer
+  }
+
 
   let localBackgroundColor: string = undefined 
   $: if(scrollY == 0 && !!initialBackgroundColor)
@@ -30,6 +35,8 @@
     localBackgroundColor = backgroundColor
 
   import Navigator from './Navigator.svelte'
+  import Button from '$lib/buttons/Button.svelte'
+  import Drawer from '$lib/navigation/Drawer.svelte'
 </script>
 
 <svelte:window
@@ -37,6 +44,12 @@
   on:scroll={handleScroll}
 ></svelte:window>
 
+<Drawer
+  bind:open={openDrawer}
+  backgroundColor={backgroundColor}
+  items={items}
+  on:item-click
+></Drawer>
 <nav
   style:color={color}
   style:background-color={localBackgroundColor}
@@ -50,14 +63,31 @@
   class:top-0={visible}
   class:shadow-md={!initialRemoveShadow || scrollY != 0}
 >
-  {#if $$slots.prepend}
-    <div 
-      style:height="56px"
-      style:flex="none"
+  <div 
+    style:height="56px"
+    style:flex="none"
+    style:display="flex"
+    style:align-items="center"
+  >
+    <slot 
+      name="prepend" 
+      toggleDrawer={toggleDrawer} 
+      openDrawer={openDrawer}
     >
-      <slot name="prepend"></slot>
-    </div>
-  {/if}
+      <div 
+        style:width="fit-content"
+        style:margin-left="10px"
+        style:margin-right="10px"
+        class="hide-on-desktop"
+      >
+        <Button
+          type="icon"
+          icon="mdi-menu"
+          on:click={toggleDrawer}
+        ></Button>
+      </div>
+    </slot>
+  </div>
   <div 
     style:flex-grow="1"
     style:margin-left="4px"
@@ -70,10 +100,14 @@
     </slot>
   </div>
   <div>
-    <Navigator
-      items={items}
-      on:item-click
-    ></Navigator>
+    <slot name="menu-desktop">
+      <div class="hide-on-mobile">
+        <Navigator
+          items={items}
+          on:item-click
+        ></Navigator>
+      </div>
+    </slot>
   </div>
   <slot name="append"></slot>
 </nav>
@@ -108,5 +142,27 @@
     transition-property: all;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms;
+  }
+
+  .hide-on-mobile {
+    visibility: visible !important;
+  }
+
+  .hide-on-desktop {
+    visibility: visible !important;
+  }
+
+  @media (max-width: 767.98px) {
+    .hide-on-mobile {
+      visibility: hidden !important;
+      display: none !important;
+    }
+  }
+
+  @media (min-width: 768px){
+    .hide-on-desktop {
+      visibility: hidden !important;
+      display: none !important;
+    }
   }
 </style>

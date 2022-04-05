@@ -104,6 +104,7 @@
       <Navigator
         items={items}
         vertical={position == 'right' || position == 'left'}
+        on:item-click
       ></Navigator>
     </div>
   </slot>

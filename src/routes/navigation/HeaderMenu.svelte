@@ -22,19 +22,6 @@
   ]}
   on:item-click={handleNavigationClick}
 >
-  <div slot="prepend">
-    <div 
-      style:margin-left="5px"
-      style:margin-top="7px"
-    >
-      <Button
-        type="icon"
-        icon="mdi-menu"
-        iconSize={20}
-        hoverBackgroundColor="#97979750"
-      ></Button>
-    </div>
-  </div>
   <div slot="append">
     <div 
       style:margin-right="5px"
