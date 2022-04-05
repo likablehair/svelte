@@ -49,6 +49,7 @@
   <Drawer
     bind:open={openDrawer}
     backgroundColor={backgroundColor}
+    color={color}
     items={items}
     on:item-click
   ></Drawer>

@@ -8,6 +8,7 @@
     openingSpeed: string = '0.3s',
     overlaySpeed: string = '0.2s',
     blockScroll: boolean = true,
+    color: string = undefined,
     overlay: boolean = true,
     backgroundColor: string = undefined,
     overlayColor: string = '#282828',
@@ -89,6 +90,7 @@
   style:right={right}
   style:background-color={backgroundColor}
   style:z-index={zIndex}
+  style:color={color}
   class:animate-left={position == 'left'}
   class:animate-right={position == 'right'}
   class:animate-bottom={position == 'bottom'}
