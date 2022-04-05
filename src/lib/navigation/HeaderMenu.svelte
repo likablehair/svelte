@@ -8,7 +8,8 @@
     initialBackgroundColor: string = undefined,
     backgroundColor: string = 'white',
     color: string = undefined,
-    mobileMenu: boolean = true
+    mobileMenu: boolean = true,
+    zIndex: number = 25;
 
   let scrollY, lastScrollY, visible = true
   function handleScroll() {
@@ -62,6 +63,7 @@
   style:flex-wrap="wrap"
   style:align-items="center"
   style:height="56px"
+  style:z-index={zIndex}
   class="transition-all header-menu-container"
   class:-top-14={!visible}
   class:top-0={visible}
