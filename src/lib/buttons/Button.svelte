@@ -15,7 +15,7 @@
     fontSize: string = undefined,
     color: string = undefined,
     backgroundColor: string = undefined,
-    hoverBackgroundColor: string = '#008f8f',
+    hoverBackgroundColor: string = '#88888847',
     borderRadius: string = undefined,
     boxShadow: string = undefined
 
@@ -47,7 +47,7 @@
   style:--button-box-shadow={boxShadow}
   style:--button-icon-height={(iconSize + 5) + 'pt'}
   style:--button-icon-width={(iconSize + 5) + 'pt'}
-  class="button {clazz}"
+  class="button no-select {clazz}"
   class:button-default={type === 'default'}
   class:button-text={type === 'text'}
   class:button-icon={type === 'icon'}
@@ -116,5 +116,15 @@
 
   .button-icon:hover {
     background-color: var(--button-hover-background-color, transparent);
+  }
+
+  .no-select {
+    -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+      -khtml-user-select: none; /* Konqueror HTML */
+        -moz-user-select: none; /* Old versions of Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome, Edge, Opera and Firefox */
   }
 </style>

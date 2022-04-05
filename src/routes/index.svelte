@@ -56,6 +56,9 @@
     }, {
       name: 'ProductsGrid',
       url: 'shop/ProductsGrid'
+    }, {
+      name: 'Drawer',
+      url: 'navigation/Drawer'
     },
   ]
 
