@@ -13,7 +13,11 @@
     color: string = undefined,
     borderColor: string = undefined,
     borderWidth: string = undefined,
-    style: string = ""
+    style: string = "",
+    marginBottom: string = undefined,
+    marginTop: string = undefined,
+    marginLeft: string = undefined,
+    marginRight: string = undefined
 
 </script>
 
@@ -38,6 +42,10 @@
   style:color={color}
   style:border-color={borderColor}
   style:border-width={borderWidth}
+  style:margin-bottom={marginBottom}
+  style:margin-top={marginTop}
+  style:margin-left={marginLeft}
+  style:margin-right={marginRight}
   style={style}
   style:display="flex"
   style:flex-direction="column"
