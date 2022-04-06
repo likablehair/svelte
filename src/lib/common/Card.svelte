@@ -13,21 +13,13 @@
     color: string = undefined,
     borderColor: string = undefined,
     borderWidth: string = undefined,
-    style: string = "",
     marginBottom: string = undefined,
     marginTop: string = undefined,
     marginLeft: string = undefined,
-    marginRight: string = undefined
+    marginRight: string = undefined,
+    boxShadow: string = "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)"
 
 </script>
-
-<style>
-  .shadow-lg {
-    --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --shadow-colored: 0 10px 15px -3px #000, 0 4px 6px -4px #000;
-    box-shadow: inset 0 0 0 calc(1px + 0px) rgb(255 255 255/0.1), 0 0 #0000, 0 0 #0000;
-  }
-</style>
 
 <div
   style:width={width}
@@ -46,10 +38,9 @@
   style:margin-top={marginTop}
   style:margin-left={marginLeft}
   style:margin-right={marginRight}
-  style={style}
+  style:box-shadow={boxShadow}
   style:display="flex"
   style:flex-direction="column"
-  class="shadow-lg" 
   class:border-solid={outlined}
 >
   <div 
