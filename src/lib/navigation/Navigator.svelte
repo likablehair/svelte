@@ -3,6 +3,7 @@
     title: string,
     name: string,
     url?: string,
+    detail?: object
   }
 </script>
 
