@@ -17,8 +17,8 @@
       {name: 'pluto', label: 'Pluto'},
       {name: 'gianniPinotto', label: 'Gianni pinotto e pinco pallo'},
     ]}
-    --width="90vw"
-    --color="#008080"
+    width="90vw"
+    color="#008080"
     bind:selected={selected}
   ></TabSwitcher>
   <div 

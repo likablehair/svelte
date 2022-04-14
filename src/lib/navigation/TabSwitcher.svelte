@@ -9,9 +9,12 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  export let tabs: Tab[]  = [];
-  export let selected: string = undefined;
-  export let mandatory: boolean = true;
+  export let tabs: Tab[]  = [],
+    selected: string = undefined,
+    mandatory: boolean = true,
+    width: string = undefined,
+    color: string = "rgb(51 65 85)",
+    bookmarkColor: string = undefined;
 
   let tabButtons: object = {}
   onMount(() => {
@@ -39,7 +42,7 @@
 <div 
   style:position="relative"
   style:display="flex"
-  class="tab-switcher-container"
+  style:width={width}
 >
   {#each tabs as tab}
     <div 
@@ -47,6 +50,7 @@
       style:margin-left="12px"
       style:margin-right="12px"
       style:padding="8px"
+      style:--tab-switcher-color={color}
       class:selected-tab={tab.name == selected}
       on:click={() => handleTabClick(tab)}
       bind:this={tabButtons[tab.name]}
@@ -57,27 +61,26 @@
   <span
     style:left={bookmarkLeft + 'px'}
     style:width={bookmarkWidth + 'px'}
+    style:--tab-switcher-bookmark-color={bookmarkColor || color}
     class="bookmark"
   ></span>
-  <span class="horizontal-guide"></span>
+  <span 
+    style:width={width}
+    class="horizontal-guide"
+  ></span>
 </div>
 
 <style>
-  .tab-switcher-container {
-    width: var(--width)
-  }
-
   .selected-tab {
-    color: var(--color, rgb(51 65 85));
+    color: var(--tab-switcher-color, rgb(51 65 85));
   }
   
   .horizontal-guide {
     position: absolute;
-    width: var(--width, 100%);
     z-index: 5;
     bottom: 0px;
     height: 1px;
-    background-color: var(--color, rgb(51 65 85));
+    background-color: var(--tab-switcher-color, rgb(51 65 85));
     opacity: 20%;
   }
 
@@ -87,7 +90,7 @@
     height: 2px;
     border-radius: 0.125rem;
     z-index: 10;
-    background-color: var(--bookmark-color, var(--color, rgb(51 65 85)));
+    background-color: var(--tab-switcher-bookmark-color, var(--tab-switcher-color, rgb(51 65 85)));
     transition: left 400ms, width 400ms;
   }
 
