@@ -42,10 +42,14 @@
 <div 
   style:position="relative"
   style:display="flex"
+  style:flex-wrap="nowrap"
+  style:overflow="auto"
   style:width={width}
 >
   {#each tabs as tab}
     <div 
+      style:word-break="keep-all"
+      style:white-spaces="nowrap"
       style:-webkit-tap-highlight-color="rgba(0,0,0,0)"
       style:cursor="pointer"
       style:margin-left="12px"

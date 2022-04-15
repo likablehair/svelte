@@ -36,8 +36,6 @@
     .reduce( (css, [key,value]) => {
       return `${ css }--simple-timeline${ key }: ${ value };`
     }, '');
-  
-  import Icon from '$lib/media/Icon.svelte'
 </script>
 
 <div 
@@ -69,7 +67,11 @@
               style:width={timesWidth}
               class="time-line-times"
             >
-              <slot name="times" item={item}>
+              <slot 
+                name="times" 
+                item={item}
+                dateToString={dateToString}
+              >
                 <div
                   class:vertical-centered-container={circleAlignment == 'center'}
                   class:vertical-bottom-container={circleAlignment == 'bottom'}
