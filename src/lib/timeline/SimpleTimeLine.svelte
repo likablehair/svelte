@@ -53,7 +53,7 @@
     >
       <div
         style:flex-direction={singleSided || index % 2 == 0 ? 'row' : 'row-reverse'}
-        style:justify-content={singleSided || index % 2 == 0 ? 'start' : 'flex-end'}
+        style:justify-content={'flex-start'}
         class="time-line-body"
       >
         <slot 
