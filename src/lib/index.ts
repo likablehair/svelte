@@ -4,6 +4,7 @@ export { default as Button } from './buttons/Button.svelte'
 export { default as Card } from './common/Card.svelte'
 export { default as Gesture } from './common/Gesture.svelte'
 export { default as IntersectionObserver } from './common/IntersectionObserver.svelte'
+export { default as MediaQuery } from './common/MediaQuery.svelte'
 // forms
 export { default as TextField } from './forms/Textfield.svelte'
 // loaders
@@ -17,7 +18,7 @@ export { default as Icon } from './media/Icon.svelte'
 export { default as Image } from './media/Image.svelte'
 export { default as ImageGrid } from './media/ImageGrid.svelte'
 // navigation
-export { default as BreadCrumb } from './navigation/BreadCrumb.svelte'
+export { default as Breadcrumb } from './navigation/Breadcrumb.svelte'
 export { default as HeaderMenu } from './navigation/HeaderMenu.svelte'
 export { default as Navigator } from './navigation/Navigator.svelte'
 export { default as TabSwitcher } from './navigation/TabSwitcher.svelte'
@@ -27,6 +28,8 @@ export { default as ProgressBar } from './progress/ProgressBar.svelte'
 // shop
 export { default as ProductCard } from './shop/ProductCard.svelte'
 export { default as ProductGrid } from './shop/ProductCard.svelte'
+// store
+export { default as mediaQueryStore } from './stores/mediaQuery'
 // timeline
 export { default as ScollTimeLine } from './timeline/ScrollTimeLine.svelte'
 export { default as SimpleTimeLine } from './timeline/SimpleTimeLine.svelte'
