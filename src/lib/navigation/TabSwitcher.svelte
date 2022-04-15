@@ -46,6 +46,7 @@
 >
   {#each tabs as tab}
     <div 
+      style:-webkit-tap-highlight-color="rgba(0,0,0,0)"
       style:cursor="pointer"
       style:margin-left="12px"
       style:margin-right="12px"

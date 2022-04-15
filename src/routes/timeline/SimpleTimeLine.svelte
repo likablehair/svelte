@@ -51,3 +51,19 @@
     singleSided={true}
   ></SimpleTimeLine>
 </div>
+
+<div
+  style:margin-top="30px"
+  style:display="flex"
+  style:justify-content="center"
+>
+  <SimpleTimeLine
+    width="600px"
+    timesWidth="120px"
+    items={items}
+  >
+    <svelte:fragment slot="infos" let:alignment>
+      {alignment}
+    </svelte:fragment>
+  </SimpleTimeLine>
+</div>

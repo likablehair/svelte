@@ -58,7 +58,11 @@
         style:justify-content={singleSided || index % 2 == 0 ? 'start' : 'flex-end'}
         class="time-line-body"
       >
-        <slot name="item" item={item}>
+        <slot 
+          name="item" 
+          item={item}
+          alignment={!singleSided && index % 2 == 0 ? 'right' : 'left'}
+        >
           {#if !!item.from || !!item.to || $$slots.times}
             <div
               style:padding={singleSided || index % 2 == 0 ? "0px 20px 0px 0px" : "0px 0px 0px 20px"}
@@ -87,7 +91,11 @@
             </div>
           {/if}
           <div class="time-line-infos">
-            <slot name="infos" item={item}>
+            <slot 
+              name="infos" 
+              item={item}
+              alignment={!singleSided && index % 2 == 0 ? 'right' : 'left'}
+            >
               {#if !!item.title}
                 <div 
                   style:text-align={singleSided || index % 2 == 0 ? 'left' : 'right'}
@@ -100,7 +108,11 @@
                   class="time-line-description"
                 >{item.description}</div>
               {/if}
-              <slot name="infos-append" item={item}></slot>
+              <slot 
+                name="infos-append" 
+                item={item}
+                alignment={!singleSided && index % 2 == 0 ? 'right' : 'left'}
+              ></slot>
             </slot>
           </div>
         </slot>

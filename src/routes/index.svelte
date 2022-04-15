@@ -62,6 +62,9 @@
     }, {
       name: 'Navigator',
       url: 'navigation/Navigator'
+    },  {
+      name: 'MediaQuery',
+      url: 'common/MediaQuery'
     },
   ]
 
