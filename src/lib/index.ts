@@ -5,6 +5,8 @@ export { default as Card } from './common/Card.svelte'
 export { default as Gesture } from './common/Gesture.svelte'
 export { default as IntersectionObserver } from './common/IntersectionObserver.svelte'
 export { default as MediaQuery } from './common/MediaQuery.svelte'
+// dialogs
+export { default as Dialog } from './dialogs/Dialog.svelte'
 // forms
 export { default as TextField } from './forms/Textfield.svelte'
 // loaders
@@ -17,6 +19,7 @@ export { default as DescriptiveAvatar } from './media/DescriptiveAvatar.svelte'
 export { default as Icon } from './media/Icon.svelte'
 export { default as Image } from './media/Image.svelte'
 export { default as ImageGrid } from './media/ImageGrid.svelte'
+export { default as Gallery } from './media/Gallery.svelte'
 // navigation
 export { default as Breadcrumb } from './navigation/Breadcrumb.svelte'
 export { default as HeaderMenu } from './navigation/HeaderMenu.svelte'
