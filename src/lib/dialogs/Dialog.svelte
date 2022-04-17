@@ -1,0 +1,105 @@
+<script lang="ts">
+  import { beforeUpdate, onMount } from "svelte";
+  export let open: boolean = false,
+    overlayOpacity: string = "30%",
+    overlayColor: string = "#282828"
+  
+  let zIndex: number = 50, 
+    localOpen: boolean = open
+
+  beforeUpdate(() => {
+    if(open && localOpen != open) {
+      let otherDialog: HTMLElement = document.querySelector("[data-dialog]")
+      if(!!otherDialog) {
+        zIndex = Number(otherDialog.style.zIndex) + 2
+      }
+    }
+    
+    localOpen = open
+  })
+
+  function closeDialog() {
+    open = false
+    localOpen = false
+  }
+
+  function handleOverlayClick() {
+    closeDialog()
+  }
+</script>
+
+<div 
+  style:z-index={zIndex}
+  style:--dialog-overlay-opacity={overlayOpacity}
+  style:display="flex"
+  style:align-items="center"
+  style:justify-content="space-between"
+  class="overlay-container"
+  class:overlay-container-active={localOpen}
+  on:touchmove|preventDefault={() => {}}
+  on:wheel|preventDefault={() => {}}
+>
+  <div
+    style:background-color={overlayColor} 
+    class="overlay"
+    class:overlay-active={localOpen}
+    on:click={handleOverlayClick}
+  ></div>
+  {#if localOpen }
+    <div
+      style:position="absolute"
+      style:top="0px"
+      style:right="0px"
+      style:z-index={zIndex + 1}
+    >
+      <slot name="top-right"></slot>
+    </div>
+    <div 
+      style:z-index={zIndex + 1}
+      on:click|stopPropagation
+    >
+      <slot name="center-left"></slot>
+    </div>
+    <div
+      on:click|stopPropagation
+      style:z-index={zIndex + 1}
+    >
+      <slot></slot>
+    </div>
+    <div
+      style:z-index={zIndex + 1}
+      on:click|stopPropagation
+    >
+      <slot name="center-right"></slot>
+    </div>
+  {/if}
+</div>
+
+<style>
+  .overlay-container {
+    height: 0;
+    width: 0;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+  }
+
+  .overlay-container-active {
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0%;
+  }
+
+  .overlay-active {
+    opacity: var(--dialog-overlay-opacity);
+  }
+</style>

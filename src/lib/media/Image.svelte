@@ -46,6 +46,7 @@
   style:min-height={minHeight}
   style:border-radius={borderRadius}
   class="image-container"
+  on:click
 >
   <IntersectionObserver once={true} let:intersecting={intersecting}>
     {#if intersecting}

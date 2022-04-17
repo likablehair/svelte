@@ -9,6 +9,9 @@
       name: 'ImageGrid',
       url: 'media/ImageGrid'
     }, {
+      name: 'Gallery',
+      url: 'media/Gallery'
+    }, {
       name: 'Carousel',
       url: 'media/Carousel'
     }, {
@@ -65,6 +68,9 @@
     },  {
       name: 'MediaQuery',
       url: 'common/MediaQuery'
+    }, {
+      name: 'Dialog',
+      url: 'dialogs/Dialog'
     },
   ]
 

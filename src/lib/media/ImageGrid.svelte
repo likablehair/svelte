@@ -1,9 +1,13 @@
-<script lang="ts">
-  type Image = {
+<script lang="ts" context="module">
+  export type Image = {
     url: string,
     title: string,
     description: string
   }
+</script>
+
+<script lang="ts">
+  import { createEventDispatcher } from 'svelte';
 
   export let images: Image[] = [],
     columns: number = undefined,
@@ -16,18 +20,32 @@
     disableHover: boolean = false,
     dark: boolean = false
 
-  import Image from './Image.svelte'
+  const dispatch = createEventDispatcher<{
+    'image-click': {
+      image: Image,
+      index: number
+    }
+  }>()
+
+  function handleImageClick(image: Image, index: number) {
+    dispatch("image-click", {
+      image,
+      index
+    })
+  }
+
+  import ImageComponent from './Image.svelte'
 </script>
 
 <div
   class="container flex-container"
 >
-  {#each images as image }
+  {#each images as image, index }
     <div 
       style:width={`calc((100% / var(${columns})) - (10px * ${columns})))`}
       class="image-container"
     >
-      <Image
+      <ImageComponent
         src={image.url}
         height={imageHeight}
         width={imageWidth}
@@ -39,7 +57,8 @@
         disableHover={disableHover}
         dark={dark}
         borderRadius="10px"
-      ></Image>
+        on:click={() => handleImageClick(image, index)}
+      ></ImageComponent>
     </div>
   {/each}
 </div>
