@@ -41,6 +41,7 @@
   style:box-shadow={boxShadow}
   style:display="flex"
   style:flex-direction="column"
+  on:click
   class:border-solid={outlined}
 >
   <div 
