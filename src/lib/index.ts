@@ -11,6 +11,7 @@ export { default as Dialog } from './dialogs/Dialog.svelte'
 export { default as TextField } from './forms/Textfield.svelte'
 // loaders
 export { default as Skeleton } from './loaders/Skeleton.svelte'
+export { default as CircularLoader } from './loaders/CircularLoader.svelte'
 // media
 export { default as AttachmentDownloader } from './media/AttachmentDownloader.svelte'
 export { default as Avatar } from './media/Avatar.svelte'

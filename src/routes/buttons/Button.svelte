@@ -1,6 +1,12 @@
 <script lang="ts">
   import Button from '$lib/buttons/Button.svelte'
   import Icon from '$lib/media/Icon.svelte'
+  import { onMount } from 'svelte';
+
+  let loading = true;
+  onMount(() => {
+    setInterval(() => loading = !loading, 2000)
+  })
 </script>
 
 <div class="container">
@@ -32,6 +38,7 @@
       color="#008080"
       hoverBackgroundColor="#00808012"
       type="icon"
+      loading={loading}
       icon="mdi-account"
     ></Button>
   </div>
@@ -41,6 +48,17 @@
       hoverBackgroundColor="#00808012"
       type="icon"
       iconSize={25}
+      icon="mdi-account"
+    ></Button>
+  </div>
+
+  <div class="section">
+    <Button 
+      color="#008080"
+      hoverBackgroundColor="#00808012"
+      type="icon"
+      iconSize={25}
+      loading={loading}
       icon="mdi-account"
     ></Button>
   </div>

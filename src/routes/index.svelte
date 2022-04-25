@@ -21,6 +21,9 @@
       name: 'Skeleton',
       url: 'loaders/Skeleton'
     }, {
+      name: 'CircularLoader',
+      url: 'loaders/CircularLoader'
+    }, {
       name: 'Calendar',
       url: 'dates/Calendar'
     }, {

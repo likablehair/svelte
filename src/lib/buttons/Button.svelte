@@ -1,5 +1,6 @@
 <script lang="ts">
   export let type: 'default' | 'text' | 'icon' = 'default',
+    loading: boolean = false,
     icon: string = undefined,
     iconSize: number = 15,
     clazz: string = '',
@@ -26,6 +27,7 @@
   $: position = !!$$slots.append ? 'relative' : undefined
 
   import Icon from '$lib/media/Icon.svelte'
+  import CircularLoader from '$lib/loaders/CircularLoader.svelte';
 </script>
 
 <div 
@@ -53,17 +55,24 @@
   class:button-icon={type === 'icon'}
   on:click
 >
-  {#if !!icon}
-    <Icon name={icon} size={iconSize}></Icon>
+  {#if loading}
+    <CircularLoader
+      color={color}
+    ></CircularLoader>
   {:else}
-    <slot></slot>
+    {#if !!icon}
+      <Icon name={icon} size={iconSize}></Icon>
+    {:else}
+      <slot></slot>
+    {/if}
+    {#if $$slots.append}
+      <span class="append-item">
+        <slot name="append">
+        </slot>
+      </span>
+    {/if}
   {/if}
-  {#if $$slots.append}
-    <span class="append-item">
-      <slot name="append">
-      </slot>
-    </span>
-  {/if}
+
 </div>
 
 <style>
