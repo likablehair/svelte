@@ -72,16 +72,26 @@ export const getDateRows: (monthIndex: number, year: number) => number[] = (mont
   return rows.filter(el => !Array.isArray(el))
 };
 
-type dateFormat = 'extended'
+type dateFormat = 'extended' | 'extendedMonthAndYear'
+const dateToExtendedString: (date: Date) => string = (date) => {
+  const day = date.getDate()
+  const month = getMonthName(date.getMonth())
+  const year = date.getFullYear()
+
+  return `${day} ${month} ${year}`
+}
+
+const dateToExtendedMonthAndYearString: (date: Date) => string = (date) => {
+  const month = getMonthName(date.getMonth())
+  const year = date.getFullYear()
+
+  return `${month} ${year}`
+}
+
 export const dateToString: (date: Date, format?: dateFormat) => string = (date, format='extended') => {
-  let stringDate = ""
   if(format == 'extended') {
-    const day = date.getDate()
-    const month = getMonthName(date.getMonth())
-    const year = date.getFullYear()
-
-    stringDate = `${day} ${month} ${year}`
+    return dateToExtendedString(date)
+  } else if (format == 'extendedMonthAndYear') {
+    return dateToExtendedMonthAndYearString(date)
   }
-
-  return stringDate
 }
