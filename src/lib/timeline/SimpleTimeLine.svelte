@@ -6,7 +6,7 @@
     imageUrl?: string
     from?: Date
     to?: Date
-    data?: object
+    data?: any
   }
 </script>
 
