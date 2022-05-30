@@ -59,7 +59,7 @@ export const getDateRows: (monthIndex: number, year: number) => number[] = (mont
     rows[index] = i + 1;
   });
 
-  Array.from({length: startIndex}).forEach((_, i) => {
+  Array.from({ length: startIndex }).forEach((_, i) => {
     rows[i] = (daysOfPreviousMonth - startIndex) + i + 1
   })
 
@@ -71,6 +71,46 @@ export const getDateRows: (monthIndex: number, year: number) => number[] = (mont
 
   return rows.filter(el => !Array.isArray(el))
 };
+
+export type DateStat = {
+  dayOfMonth: number,
+  dayOfWeek: number,
+  month: number,
+  year: number
+}
+
+export const getDateRowsStats: (monthIndex: number, year: number) => DateStat[] = (monthIndex, year) => {
+  let results = []
+  const days = getDateRows(monthIndex, year)
+  for(let i = 0; i < days.length; i += 1) {
+    let dateStat: DateStat = {
+      dayOfMonth: days[i],
+      dayOfWeek: i % 7,
+      month: monthIndex,
+      year: year
+    }
+
+    if(days[i] >= 20 && Math.floor(i / 7) == 0) {
+      if(monthIndex === 0) {
+        dateStat.month = 11
+        dateStat.year = year - 1
+      } else {
+        dateStat.month = monthIndex - 1
+      }
+    } else if (days[i] < 10 && Math.floor(i / 7) > 2) {
+      if(monthIndex === 11) {
+        dateStat.month = 0
+        dateStat.year = year + 1
+      } else {
+        dateStat.month = monthIndex + 1
+      }
+    }
+
+    results.push(dateStat)
+  }
+
+  return results
+}
 
 type dateFormat = 'extended' | 'extendedMonthAndYear'
 const dateToExtendedString: (date: Date) => string = (date) => {
