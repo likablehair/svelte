@@ -1,5 +1,6 @@
 <script lang="ts">
   export let type: 'default' | 'text' | 'icon' = 'default',
+    active: boolean = false,
     loading: boolean = false,
     icon: string = undefined,
     iconSize: number = 15,
@@ -15,13 +16,29 @@
     padding: string = "5px",
     fontSize: string = undefined,
     color: string = undefined,
+    display: string = undefined,
+    justifyContent: string = undefined,
+    alignItems: string = undefined,
     backgroundColor: string = undefined,
     hoverBackgroundColor: string = '#88888847',
+    activeBackgroundColor: string = hoverBackgroundColor,
     borderRadius: string = undefined,
     boxShadow: string = undefined
 
   export { clazz as class };
 
+  import { createEventDispatcher } from 'svelte';
+  const dispatch = createEventDispatcher<{
+    "click": {
+      nativeEvent: MouseEvent
+    }
+  }>()
+
+  function handleClick(event: MouseEvent) {
+    dispatch('click', {
+      nativeEvent: event
+    })
+  }
 
   $: defaultBorderRadius = type == 'icon' ? '50%' : '5px'
   $: position = !!$$slots.append ? 'relative' : undefined
@@ -43,8 +60,11 @@
   style:padding={padding}
   style:font-size={fontSize}
   style:color={color}
+  style:display={display}
+  style:justify-content={justifyContent}
+  style:align-items={alignItems}
   style:--button-border-radius={!!borderRadius ? borderRadius : defaultBorderRadius}
-  style:--button-background-color={backgroundColor}
+  style:--button-background-color={active ? activeBackgroundColor : backgroundColor}
   style:--button-hover-background-color={hoverBackgroundColor}
   style:--button-box-shadow={boxShadow}
   style:--button-icon-height={(iconSize + 5) + 'pt'}
@@ -53,7 +73,7 @@
   class:button-default={type === 'default'}
   class:button-text={type === 'text'}
   class:button-icon={type === 'icon'}
-  on:click
+  on:click={handleClick}
 >
   {#if loading}
     <CircularLoader

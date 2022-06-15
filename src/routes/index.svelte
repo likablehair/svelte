@@ -27,6 +27,12 @@
       name: 'Calendar',
       url: 'dates/Calendar'
     }, {
+      name: 'MonthSelector',
+      url: 'dates/MonthSelector'
+    }, {
+      name: 'YearSelector',
+      url: 'dates/YearSelector'
+    }, {
       name: 'Textfield',
       url: 'forms/Textfield'
     }, {

@@ -1,8 +1,10 @@
 <script lang="ts">
   import Calendar from '$lib/dates/Calendar.svelte'
 
-  let visibleMonth: number = new Date().getMonth()
-  let visibleYear: number = new Date().getFullYear()
+  let visibleMonth: number = new Date().getMonth(),
+    visibleYear: number = new Date().getFullYear(),
+    selectedDate: Date = new Date()
+
 
   function nextMonth() {
     if(visibleMonth == 11) {
@@ -41,8 +43,22 @@
     width="300px"
     visibleMonth={visibleMonth}
     visibleYear={visibleYear}
+    bind:selectedDate={selectedDate}
   ></Calendar>
-  <button on:click={previousMonth}>previous</button>
-  <button on:click={nextMonth}>next</button>
+  <div
+    style:display="flex"
+  >
+    <button on:click={previousMonth}>previous</button>
+    <div
+      style:padding="10px"
+    >
+      <div><b>visibleMonth:</b> {visibleMonth}</div>
+      <div><b>visibleYear:</b> {visibleYear}</div>
+      {#if !!selectedDate}
+        <div><b>selectedDate:</b> {selectedDate}</div>
+      {/if}
+    </div>
+    <button on:click={nextMonth}>next</button>
+  </div>
 </div>
 

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { fly } from 'svelte/transition';
   import { getDateRowsStats, getMonthName } from './utils'
   import type { DateStat } from './utils';
 
@@ -7,13 +8,15 @@
     visibleMonth: number = new Date().getMonth(),
     visibleYear: number = new Date().getFullYear(),
     showExtraMonthDays: boolean = true,
+    showHeader: boolean = true,
     height: string = "100%",
     width: string = "100%",
     dayWidth: string = '30px',
     dayHeight: string = '30px',
     dayHoverColor: string = '#c9c8c873',
     daySelectedColor: string = '#adadad',
-    dayBackgroundColor: string = undefined
+    dayBackgroundColor: string = undefined,
+    animationDuration: number = 200
 
   onMount(() => {
 
@@ -45,48 +48,56 @@
   style:height={height}
   style:width={width}
 >
-  <div class="grid-layout">
-    {#each ['L', 'M', 'M', 'G', 'V', 'S', 'D'] as weekHeader, index}
-      <slot
-        name="weekHeader"
-        header={weekHeader}
-        index={index}
-      >
-        <div
-          class="week-header-slot"
-        >{weekHeader}</div>
-      </slot>
-    {/each}
-    {#each getDateRowsStats(visibleMonth, visibleYear) as day}
-      {@const selected = !!selectedDate && selectedDate.getDate() == day.dayOfMonth && selectedDate.getMonth() == day.month && selectedDate.getFullYear() == day.year}
-      {@const extraMonth = day.month != visibleMonth}
-      <slot 
-        name="day" 
-        dayStat={day}
-        extraMonth={extraMonth}
-        selected={selected}
-      >
-        {#if (!showExtraMonthDays && day.month == visibleMonth) || showExtraMonthDays }  
-          <div
-            style:border-radius="50%"
-            style:background-color={dayBackgroundColor}
-            style:height={dayHeight}
-            style:width={dayWidth}
-            style:cursor={extraMonth ? 'default' : 'pointer'}
-            style:--calendar-hover-color={extraMonth ? '' : dayHoverColor}
-            style:--calendar-selected-color={daySelectedColor}
-            class="day-slot"
-            class:extra-month={extraMonth}
-            class:selected={selected}
-            class:not-selected={!selected}
-            on:click={() => handleDayClick(day, extraMonth)}
-          >{day.dayOfMonth}</div>
-        {:else}
-          <div></div>
-        {/if}
-      </slot>
-    {/each}
-  </div>
+  {#key visibleMonth }
+    <div 
+      in:fly="{{delay: animationDuration, duration: animationDuration, y: 30}}"
+      out:fly="{{duration: animationDuration, y: -30}}"
+      class="grid-layout"
+    >
+      {#if showHeader}
+        {#each ['L', 'M', 'M', 'G', 'V', 'S', 'D'] as weekHeader, index}
+          <slot
+            name="weekHeader"
+            header={weekHeader}
+            index={index}
+          >
+            <div
+              class="week-header-slot"
+            >{weekHeader}</div>
+          </slot>
+        {/each}
+      {/if}
+      {#each getDateRowsStats(visibleMonth, visibleYear) as day}
+        {@const selected = !!selectedDate && selectedDate.getDate() == day.dayOfMonth && selectedDate.getMonth() == day.month && selectedDate.getFullYear() == day.year}
+        {@const extraMonth = day.month != visibleMonth}
+        <slot 
+          name="day" 
+          dayStat={day}
+          extraMonth={extraMonth}
+          selected={selected}
+        >
+          {#if (!showExtraMonthDays && day.month == visibleMonth) || showExtraMonthDays }  
+            <div
+              style:border-radius="50%"
+              style:background-color={dayBackgroundColor}
+              style:height={dayHeight}
+              style:width={dayWidth}
+              style:cursor={extraMonth ? 'default' : 'pointer'}
+              style:--calendar-hover-color={extraMonth ? '' : dayHoverColor}
+              style:--calendar-selected-color={daySelectedColor}
+              class="day-slot"
+              class:extra-month={extraMonth}
+              class:selected={selected}
+              class:not-selected={!selected}
+              on:click={() => handleDayClick(day, extraMonth)}
+            >{day.dayOfMonth}</div>
+          {:else}
+            <div></div>
+          {/if}
+        </slot>
+      {/each}
+    </div>
+  {/key}
 </div>
 
 <style>
