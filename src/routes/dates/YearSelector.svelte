@@ -19,7 +19,7 @@
 
 <div class="card-container">
   <YearSelector
-    height="200px"
+    height="400px"
     width="300px"
     bind:selectedYear={selectedYear}
   ></YearSelector>

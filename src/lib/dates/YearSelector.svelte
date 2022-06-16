@@ -9,14 +9,9 @@
 
   let container: HTMLElement, targetButtons: { [k: string]: HTMLElement }  = {}
   onMount(() => {
-    console.log({...targetButtons})
-    container.scroll({
-      top: targetButtons[selectedYear].offsetTop,
-      behavior: "smooth"
-    })
-    // scrollAtCenter(container, targetButtons[selectedYear])
+    scrollAtCenter(container, targetButtons[selectedYear])
   })
-  
+
   const dispatch = createEventDispatcher<{
     "click": {
       year: number,
@@ -26,6 +21,8 @@
   function handleYearClick(year: number) {
     selectedYear = year
 
+    scrollAtCenter(container, targetButtons[selectedYear])
+
     dispatch('click', {
       year
     })
@@ -33,7 +30,8 @@
   import Button from '$lib/buttons/Button.svelte';
 </script>
 
-<div 
+<div
+  bind:this={container}
   style:height={height}
   style:width={width}
   class="selector-container"
@@ -44,9 +42,9 @@
       year={year}
     >
       <div
-        bind:this={targetButtons[selectedYear]}
+        bind:this={targetButtons[year]}
       >
-        <Button 
+        <Button
           height="30px"
           active={year == selectedYear}
           display="flex"
