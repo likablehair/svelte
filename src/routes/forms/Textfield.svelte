@@ -108,6 +108,7 @@
     variant="boxed"
     color="#B8B8B8"
     focusBorderColor="#1184ff"
+    borderColor="red"
     focusedBoxShadow="rgb(149 157 165 / 20%) 2px 2px 10px"
     borderWeight="1px"
   ></Textfield>

@@ -3,17 +3,17 @@
 
   export let label: string = "",
     placeholder: string = "",
-    color: string = "",
+    color: string = null,
     value: string = "",
     variant: VariantOptions = 'outlined',
     width: string = "100%",
-    textColor: string = "balck",
+    textColor: string = "black",
     borderWeight: string = "2px",
     borderRadius: string = "5px",
-    borderColor: string = undefined,
+    borderColor: string = null,
     focusBorderColor: string = null,
     focusedBoxShadow: string = undefined,
-    backgroundColor: string = undefined,
+    backgroundColor: string = null,
     padding: string = undefined,
     paddingLeft: string = undefined,
     paddingRight: string = undefined,
@@ -55,6 +55,7 @@
     height: 50px;
     position: relative;
     --textfield-final-color: var(--textfield-theme-color, --textfield-border-color, rgb(88, 88, 88));
+    --textfield-final-border-color: var(--textfield-border-color, var(--textfield-final-color))
   }
 
   /* outlined input */
@@ -76,7 +77,7 @@
   }
 
   .focused .fieldset-outlined {
-    border: var(--textfield-border-weight) solid var(--textfield-final-color);
+    border: var(--textfield-border-weight) solid var(--textfield-final-border-color);
     color: var(--textfield-final-color);
   }
 
@@ -106,9 +107,12 @@
   /* boxed input */
 
   .fieldset-boxed {
-    border: var(--textfield-border-weight) solid var(--textfield-final-color);
     padding: 5px;
     transition: border 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .not-focused .fieldset-boxed {
+    border: var(--textfield-border-weight) solid var(--textfield-final-border-color);
   }
 
   .focused .fieldset-boxed {
@@ -147,12 +151,12 @@
   style:--textfield-focused-box-shadow={focusedBoxShadow}
   class="input-container" 
   class:focused={focused}
+  class:not-focused={!focused}
   class:texted={focused || !!value}
 >
   <fieldset 
     aria-hidden="true"
     style:border-radius={borderRadius}
-    style:border-color={borderColor}
     style:background-color={backgroundColor}
     style:padding={padding}
     style:padding-left={paddingLeft}
