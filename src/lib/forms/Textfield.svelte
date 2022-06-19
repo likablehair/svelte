@@ -200,6 +200,9 @@
               on:focus
               on:blur={handleBlur}
               on:blur
+              on:keydown
+              on:keypress
+              on:keyup
             />
           {:else if type == 'text'}
             <input 
@@ -217,6 +220,9 @@
               on:focus
               on:blur={handleBlur}
               on:blur
+              on:keydown
+              on:keypress
+              on:keyup
             />
           {/if}
           <div>
@@ -246,6 +252,9 @@
             on:focus
             on:blur={handleBlur}
             on:blur
+            on:keydown
+              on:keypress
+              on:keyup
           />
         {:else if type == 'text'}
           <input
@@ -263,6 +272,9 @@
             on:focus
             on:blur={handleBlur}
             on:blur
+            on:keydown
+            on:keypress
+            on:keyup
           />
         {/if}
         <div>
