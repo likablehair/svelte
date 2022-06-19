@@ -11,7 +11,7 @@
     animationDuration: string = "0.1s";
 </script>
 
-<span 
+<div 
   style:--switch-toggle-active-color={toggleActiveColor}
   style:--switch-toggle-deactive-color={toggleDeactiveColor}
   style:--switch-animation-duration={animationDuration}
@@ -29,12 +29,13 @@
     <input 
       bind:checked={value}
       type="checkbox"
+      on:change
     >
     <span
       class="slider"
     ></span>
   </div>
-</span>
+</div>
 
 <style>
   .container {
