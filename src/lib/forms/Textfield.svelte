@@ -19,7 +19,8 @@
     paddingRight: string = undefined,
     paddingBottom: string = undefined,
     paddingTop: string = undefined,
-    fontSize: string = undefined
+    fontSize: string = undefined,
+    type: 'text' | 'password' = 'text'
 
   import { v4 as uuidv4 } from 'uuid';
   import { onMount } from 'svelte'
@@ -179,22 +180,41 @@
           <div>
             <slot name="prepend-inner"></slot>
           </div>
-          <input 
-            style:background-color={backgroundColor}
-            style:color={textColor}
-            style:font-size={fontSize}
-            id={inputId} 
-            class="input-outlined"
-            type="text"
-            placeholder={placeholder}
-            bind:value={value}
-            on:change
-            on:input
-            on:focus={handleFocus}
-            on:focus
-            on:blur={handleBlur}
-            on:blur
-          />
+          {#if type == 'password'}
+            <input 
+              style:background-color={backgroundColor}
+              style:color={textColor}
+              style:font-size={fontSize}
+              id={inputId} 
+              class="input-outlined"
+              type="password"
+              placeholder={placeholder}
+              bind:value={value}
+              on:change
+              on:input
+              on:focus={handleFocus}
+              on:focus
+              on:blur={handleBlur}
+              on:blur
+            />
+          {:else if type == 'text'}
+            <input 
+              style:background-color={backgroundColor}
+              style:color={textColor}
+              style:font-size={fontSize}
+              id={inputId} 
+              class="input-outlined"
+              type="text"
+              placeholder={placeholder}
+              bind:value={value}
+              on:change
+              on:input
+              on:focus={handleFocus}
+              on:focus
+              on:blur={handleBlur}
+              on:blur
+            />
+          {/if}
           <div>
             <slot name="append-inner"></slot>
           </div>
@@ -206,22 +226,41 @@
         <div>
           <slot name="prepend-inner"></slot>
         </div>
-        <input
-          style:background-color={backgroundColor}
-          style:color={textColor}
-          style:font-size={fontSize}
-          id={inputId}
-          class="input-boxed"
-          type="text"
-          placeholder={placeholder || label}
-          bind:value={value}
-          on:change
-          on:input
-          on:focus={handleFocus}
-          on:focus
-          on:blur={handleBlur}
-          on:blur
-        />
+        {#if type == 'password'}
+          <input
+            style:background-color={backgroundColor}
+            style:color={textColor}
+            style:font-size={fontSize}
+            id={inputId}
+            class="input-boxed"
+            type="password"
+            placeholder={placeholder || label}
+            bind:value={value}
+            on:change
+            on:input
+            on:focus={handleFocus}
+            on:focus
+            on:blur={handleBlur}
+            on:blur
+          />
+        {:else if type == 'text'}
+          <input
+            style:background-color={backgroundColor}
+            style:color={textColor}
+            style:font-size={fontSize}
+            id={inputId}
+            class="input-boxed"
+            type="text"
+            placeholder={placeholder || label}
+            bind:value={value}
+            on:change
+            on:input
+            on:focus={handleFocus}
+            on:focus
+            on:blur={handleBlur}
+            on:blur
+          />
+        {/if}
         <div>
           <slot name="append-inner"></slot>
         </div>
