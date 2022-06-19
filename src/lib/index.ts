@@ -9,6 +9,7 @@ export { default as MediaQuery } from './common/MediaQuery.svelte'
 export { default as Dialog } from './dialogs/Dialog.svelte'
 // forms
 export { default as TextField } from './forms/Textfield.svelte'
+export { default as Switch } from './forms/Switch.svelte'
 // loaders
 export { default as Skeleton } from './loaders/Skeleton.svelte'
 export { default as CircularLoader } from './loaders/CircularLoader.svelte'

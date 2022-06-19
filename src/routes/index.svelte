@@ -36,6 +36,9 @@
       name: 'Textfield',
       url: 'forms/Textfield'
     }, {
+      name: 'Switch',
+      url: 'forms/Switch'
+    }, {
       name: 'HeaderMenu',
       url: 'navigation/HeaderMenu'
     }, {

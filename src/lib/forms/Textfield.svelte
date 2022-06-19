@@ -8,8 +8,11 @@
     variant: VariantOptions = 'outlined',
     width: string = "100%",
     textColor: string = "balck",
+    borderWeight: string = "2px",
     borderRadius: string = "5px",
     borderColor: string = undefined,
+    focusBorderColor: string = null,
+    focusedBoxShadow: string = undefined,
     backgroundColor: string = undefined,
     padding: string = undefined,
     paddingLeft: string = undefined,
@@ -67,12 +70,12 @@
   }
 
   .fieldset-outlined {
-    border: 1px solid rgb(122, 122, 122);
+    border: var(--textfield-border-weight) solid rgb(122, 122, 122);
     padding-left: 4px;
   }
 
   .focused .fieldset-outlined {
-    border: 1px solid var(--textfield-final-color);
+    border: var(--textfield-border-weight) solid var(--textfield-final-color);
     color: var(--textfield-final-color);
   }
 
@@ -102,7 +105,14 @@
   /* boxed input */
 
   .fieldset-boxed {
-    border: 2px solid var(--textfield-final-color);
+    border: var(--textfield-border-weight) solid var(--textfield-final-color);
+    padding: 5px;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .focused .fieldset-boxed {
+    border: var(--textfield-border-weight) solid var(--textfield-focus-border-color, var(--textfield-final-color));
+    box-shadow: var(--textfield-focused-box-shadow);
     padding: 5px;
   }
 
@@ -130,7 +140,10 @@
   style:width={width}
   style:--textfield-theme-color={color}
   style:--textfield-border-color={borderColor}
+  style:--textfield-border-weight={borderWeight}
+  style:--textfield-focus-border-color={focusBorderColor}
   style:--textfield-legend-width={legendWidth + 'px'}
+  style:--textfield-focused-box-shadow={focusedBoxShadow}
   class="input-container" 
   class:focused={focused}
   class:texted={focused || !!value}
