@@ -44,14 +44,14 @@
   }
 </script>
 
-<div 
+<div
   style:height={height}
   style:width={width}
 >
   {#key visibleMonth }
-    <div 
+    <div
       in:fly="{{delay: animationDuration, duration: animationDuration, y: 30}}"
-      out:fly="{{duration: animationDuration, y: -30}}"
+      out:fly|local="{{duration: animationDuration, y: -30}}"
       class="grid-layout"
     >
       {#if showHeader}
@@ -70,13 +70,13 @@
       {#each getDateRowsStats(visibleMonth, visibleYear) as day}
         {@const selected = !!selectedDate && selectedDate.getDate() == day.dayOfMonth && selectedDate.getMonth() == day.month && selectedDate.getFullYear() == day.year}
         {@const extraMonth = day.month != visibleMonth}
-        <slot 
-          name="day" 
+        <slot
+          name="day"
           dayStat={day}
           extraMonth={extraMonth}
           selected={selected}
         >
-          {#if (!showExtraMonthDays && day.month == visibleMonth) || showExtraMonthDays }  
+          {#if (!showExtraMonthDays && day.month == visibleMonth) || showExtraMonthDays }
             <div
               style:border-radius="50%"
               style:background-color={dayBackgroundColor}

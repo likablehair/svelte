@@ -5,11 +5,4 @@ export function scrollAtCenter(parentElement: HTMLElement, targetElement: HTMLEl
     top: targetElement.offsetTop - parentElement.offsetTop - (parentElementHeight - targetElementheight)/2,
     behavior: "smooth"
   })
-  /*
-  targetElement.scrollIntoView({
-    behavior: "smooth",
-    inline: "center",
-    block: "center"
-  })
-  */
 }

@@ -13,6 +13,16 @@ export const monthNames: string[] = [
   "December"
 ];
 
+export const dayNames: string[] = [
+  "Sun",
+  "Mon",
+  "Tue",
+  "Wed",
+  "Thu",
+  "Fri",
+  "Sat"
+]
+
 export const monthDays: number[] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 export const isLeapYear: (year: number) => boolean = year => year % 4 === 0;
