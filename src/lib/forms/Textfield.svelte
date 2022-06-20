@@ -3,20 +3,24 @@
 
   export let label: string = "",
     placeholder: string = "",
-    color: string = "",
+    color: string = null,
     value: string = "",
     variant: VariantOptions = 'outlined',
     width: string = "100%",
-    textColor: string = "balck",
+    textColor: string = "black",
+    borderWeight: string = "2px",
     borderRadius: string = "5px",
-    borderColor: string = undefined,
-    backgroundColor: string = undefined,
+    borderColor: string = null,
+    focusBorderColor: string = null,
+    focusedBoxShadow: string = undefined,
+    backgroundColor: string = null,
     padding: string = undefined,
     paddingLeft: string = undefined,
     paddingRight: string = undefined,
     paddingBottom: string = undefined,
     paddingTop: string = undefined,
-    fontSize: string = undefined
+    fontSize: string = undefined,
+    type: 'text' | 'password' = 'text'
 
   import { v4 as uuidv4 } from 'uuid';
   import { onMount } from 'svelte'
@@ -51,6 +55,7 @@
     height: 50px;
     position: relative;
     --textfield-final-color: var(--textfield-theme-color, --textfield-border-color, rgb(88, 88, 88));
+    --textfield-final-border-color: var(--textfield-border-color, var(--textfield-final-color))
   }
 
   /* outlined input */
@@ -67,12 +72,12 @@
   }
 
   .fieldset-outlined {
-    border: 1px solid rgb(122, 122, 122);
+    border: var(--textfield-border-weight) solid rgb(122, 122, 122);
     padding-left: 4px;
   }
 
   .focused .fieldset-outlined {
-    border: 1px solid var(--textfield-final-color);
+    border: var(--textfield-border-weight) solid var(--textfield-final-border-color);
     color: var(--textfield-final-color);
   }
 
@@ -102,7 +107,17 @@
   /* boxed input */
 
   .fieldset-boxed {
-    border: 2px solid var(--textfield-final-color);
+    padding: 5px;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .not-focused .fieldset-boxed {
+    border: var(--textfield-border-weight) solid var(--textfield-final-border-color);
+  }
+
+  .focused .fieldset-boxed {
+    border: var(--textfield-border-weight) solid var(--textfield-focus-border-color, var(--textfield-final-color));
+    box-shadow: var(--textfield-focused-box-shadow);
     padding: 5px;
   }
 
@@ -130,15 +145,18 @@
   style:width={width}
   style:--textfield-theme-color={color}
   style:--textfield-border-color={borderColor}
+  style:--textfield-border-weight={borderWeight}
+  style:--textfield-focus-border-color={focusBorderColor}
   style:--textfield-legend-width={legendWidth + 'px'}
+  style:--textfield-focused-box-shadow={focusedBoxShadow}
   class="input-container" 
   class:focused={focused}
+  class:not-focused={!focused}
   class:texted={focused || !!value}
 >
   <fieldset 
     aria-hidden="true"
     style:border-radius={borderRadius}
-    style:border-color={borderColor}
     style:background-color={backgroundColor}
     style:padding={padding}
     style:padding-left={paddingLeft}
@@ -166,22 +184,47 @@
           <div>
             <slot name="prepend-inner"></slot>
           </div>
-          <input 
-            style:background-color={backgroundColor}
-            style:color={textColor}
-            style:font-size={fontSize}
-            id={inputId} 
-            class="input-outlined"
-            type="text"
-            placeholder={placeholder}
-            bind:value={value}
-            on:change
-            on:input
-            on:focus={handleFocus}
-            on:focus
-            on:blur={handleBlur}
-            on:blur
-          />
+          {#if type == 'password'}
+            <input 
+              style:background-color={backgroundColor}
+              style:color={textColor}
+              style:font-size={fontSize}
+              id={inputId} 
+              class="input-outlined"
+              type="password"
+              placeholder={placeholder}
+              bind:value={value}
+              on:change
+              on:input
+              on:focus={handleFocus}
+              on:focus
+              on:blur={handleBlur}
+              on:blur
+              on:keydown
+              on:keypress
+              on:keyup
+            />
+          {:else if type == 'text'}
+            <input 
+              style:background-color={backgroundColor}
+              style:color={textColor}
+              style:font-size={fontSize}
+              id={inputId} 
+              class="input-outlined"
+              type="text"
+              placeholder={placeholder}
+              bind:value={value}
+              on:change
+              on:input
+              on:focus={handleFocus}
+              on:focus
+              on:blur={handleBlur}
+              on:blur
+              on:keydown
+              on:keypress
+              on:keyup
+            />
+          {/if}
           <div>
             <slot name="append-inner"></slot>
           </div>
@@ -193,22 +236,47 @@
         <div>
           <slot name="prepend-inner"></slot>
         </div>
-        <input
-          style:background-color={backgroundColor}
-          style:color={textColor}
-          style:font-size={fontSize}
-          id={inputId}
-          class="input-boxed"
-          type="text"
-          placeholder={placeholder || label}
-          bind:value={value}
-          on:change
-          on:input
-          on:focus={handleFocus}
-          on:focus
-          on:blur={handleBlur}
-          on:blur
-        />
+        {#if type == 'password'}
+          <input
+            style:background-color={backgroundColor}
+            style:color={textColor}
+            style:font-size={fontSize}
+            id={inputId}
+            class="input-boxed"
+            type="password"
+            placeholder={placeholder || label}
+            bind:value={value}
+            on:change
+            on:input
+            on:focus={handleFocus}
+            on:focus
+            on:blur={handleBlur}
+            on:blur
+            on:keydown
+              on:keypress
+              on:keyup
+          />
+        {:else if type == 'text'}
+          <input
+            style:background-color={backgroundColor}
+            style:color={textColor}
+            style:font-size={fontSize}
+            id={inputId}
+            class="input-boxed"
+            type="text"
+            placeholder={placeholder || label}
+            bind:value={value}
+            on:change
+            on:input
+            on:focus={handleFocus}
+            on:focus
+            on:blur={handleBlur}
+            on:blur
+            on:keydown
+            on:keypress
+            on:keyup
+          />
+        {/if}
         <div>
           <slot name="append-inner"></slot>
         </div>
