@@ -10,6 +10,7 @@ export { default as Dialog } from './dialogs/Dialog.svelte'
 // forms
 export { default as TextField } from './forms/Textfield.svelte'
 export { default as Switch } from './forms/Switch.svelte'
+export { default as Checkbox } from './forms/Checkbox.svelte'
 // loaders
 export { default as Skeleton } from './loaders/Skeleton.svelte'
 export { default as CircularLoader } from './loaders/CircularLoader.svelte'
