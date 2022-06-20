@@ -113,7 +113,6 @@
     background-color: var(--button-background-color);
     outline: 0;
     border: var(--button-border);
-    border-color: var(--button-border-color);
     border-radius: var(--button-border-radius, 0.25rem);
     box-shadow: var(--button-box-shadow, 0 0 0.5rem rgba(0, 0, 0, 0.3));
   }
