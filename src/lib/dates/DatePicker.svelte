@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { monthNames, dayNames } from "./utils";
+    import { getMonthName, dateToString } from "./utils";
 
     import YearSelector from "./YearSelector.svelte";
     import MonthSelector from "./MonthSelector.svelte";
@@ -9,8 +9,12 @@
     export let selectedYear: number = new Date().getFullYear(),
         selectedMonth: number = new Date().getMonth(),
         selectedDate: Date = new Date(),
-        componentOpened: number = 0,
-        headerBackgroundColor: string = "#008080",
+        view: 'year'|'month'|'day' = 'day',
+        primaryColor: string = "#008080",
+        headerBackgroundColor: string = primaryColor,
+        arrowColor: string = primaryColor,
+        hoverColor: string = "#00808012",
+        selectedDayColor: string = "black",
         headerColor: string = "white",
         cardColor: string = "black",
         cardBackGroundColor: string = "rgba(255,255,255,0)",
@@ -21,19 +25,19 @@
     let selectableYears: number[] = [...Array(150).keys()].map(
         (i) => i + (new Date().getFullYear() - 75)
     );
-    let elementDisabled: number = 0;
+    let elementDisabled: 'year' | 'date' = 'date';
 
-    $: visibleSelector = componentOpened < 2;
+    $: visibleSelector = view == 'day' || view == 'month';
     $: {
         selectorText =
-            componentOpened == 0
-                ? monthNames[selectedMonth] + " " + selectedYear
+            view == 'day'
+                ? getMonthName(selectedMonth) + " " + selectedYear
                 : selectedYear.toString();
     }
-    $: elementDisabled = componentOpened == 2 ? 1 : 0;
+    $: elementDisabled = view == 'year' ? 'year' : 'date';
 
     function next() {
-        if (componentOpened == 0) {
+        if (view == 'day') {
             if (selectedMonth == 11) {
                 selectedMonth = 0;
                 selectedYear += 1;
@@ -47,7 +51,7 @@
     }
 
     function previous() {
-        if (componentOpened == 0) {
+        if (view == 'day') {
             if (selectedMonth == 0) {
                 selectedMonth = 11;
                 selectedYear -= 1;
@@ -61,15 +65,18 @@
     }
 
     function SelectorHandler() {
-        componentOpened++;
+        if (view == 'month')
+            view = 'year';
+        else
+            view = 'month';
     }
 
     function handleYearChange() {
-        componentOpened = 1;
+        view = "month";
     }
 
     function handleMonthChange() {
-        componentOpened = 0;
+        view = "day";
     }
 </script>
 
@@ -87,18 +94,18 @@
         style:color={headerColor}
     >
         <span
-            class:disabled="{elementDisabled == 1}"
+            class:disabled="{elementDisabled == 'year'}"
             on:click={() => {
-                componentOpened = 2;
+                view = 'year';
             }}>{selectedYear}</span
         >
         <h2
-            class:disabled="{elementDisabled == 0}"
+            class:disabled="{elementDisabled == 'date'}"
             on:click={() => {
-                componentOpened = 0;
+                view = 'day';
             }}
         >
-            {dayNames[selectedDate.getDay()] + ", " + monthNames[selectedDate.getUTCMonth()] + " " + selectedDate.getDate()}
+            {dateToString(selectedDate, 'dayAndMonth', 'it')}
         </h2>
     </div>
     <div class="body" style:height="75%">
@@ -106,8 +113,8 @@
             <div class="selector-row" style:height="25%">
                 <div class="row-elem">
                     <Button
-                        color="#008080"
-                        hoverBackgroundColor="#00808012"
+                        color={arrowColor}
+                        hoverBackgroundColor={hoverColor}
                         type="icon"
                         iconSize={25}
                         icon="mdi-chevron-left"
@@ -116,15 +123,18 @@
                 </div>
                 <div class="row-elem selector">
                     {#key selectorText}
-                        <div on:click={SelectorHandler}>
+                        <div
+                            on:click={SelectorHandler}
+                            style:--primary-color={primaryColor}
+                        >
                             {selectorText}
                         </div>
                     {/key}
                 </div>
                 <div class="row-elem">
                     <Button
-                        color="#008080"
-                        hoverBackgroundColor="#00808012"
+                        color={arrowColor}
+                        hoverBackgroundColor={hoverColor}
                         type="icon"
                         iconSize={25}
                         icon="mdi-chevron-right"
@@ -133,14 +143,14 @@
                 </div>
             </div>
         {/if}
-        {#if componentOpened == 1}
+        {#if view == 'month'}
             <MonthSelector
                 height="75%"
                 {width}
                 bind:selectedMonth
                 on:click={handleMonthChange}
             />
-        {:else if componentOpened == 2}
+        {:else if view == 'year'}
             <YearSelector
                 height="100%"
                 {width}
@@ -155,12 +165,18 @@
                 bind:visibleMonth={selectedMonth}
                 bind:visibleYear={selectedYear}
                 bind:selectedDate={selectedDate}
+                dayHoverColor={hoverColor}
+                daySelectedColor={primaryColor}
+                selectedTextColor={selectedDayColor}
             />
         {/if}
     </div>
 </div>
 
 <style>
+    .container {
+        border-radius: 5px;
+    }
     .header {
         border-radius: 5px 5px 0 0;
     }
@@ -202,7 +218,7 @@
     }
     .selector > div:hover {
         cursor: pointer;
-        color: #008080;
+        color: var(--primary-color);
     }
     .disabled {
         pointer-events: none;

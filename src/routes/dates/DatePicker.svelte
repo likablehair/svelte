@@ -10,11 +10,12 @@
         height="400px"
         width="300px"
         bind:selectedDate
+        selectedDayColor = "white"
     />
     <div style:display="flex">
         <div>
             <b>selectedDate:</b>
-            {selectedDate}
+            {dateToString(selectedDate, 'dayAndMonth', 'en')}
         </div>
     </div>
 </div>

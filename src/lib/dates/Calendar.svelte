@@ -15,6 +15,7 @@
     dayHeight: string = '30px',
     dayHoverColor: string = '#c9c8c873',
     daySelectedColor: string = '#adadad',
+    selectedTextColor: string = "black",
     dayBackgroundColor: string = undefined,
     animationDuration: number = 200
 
@@ -85,6 +86,7 @@
               style:cursor={extraMonth ? 'default' : 'pointer'}
               style:--calendar-hover-color={extraMonth ? '' : dayHoverColor}
               style:--calendar-selected-color={daySelectedColor}
+              style:--calendar-selected-text-color={selectedTextColor}
               class="day-slot"
               class:extra-month={extraMonth}
               class:selected={selected}
@@ -123,6 +125,7 @@
 
 .selected {
   background-color: var(--calendar-selected-color);
+  color: var(--calendar-selected-text-color);
 }
 
 .day-slot.not-selected:hover {
