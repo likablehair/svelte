@@ -25,6 +25,20 @@
   </div>
   <div class="section">
     <Button 
+      color="#008080" 
+      backgroundColor="trasparent"
+      hoverBackgroundColor="#0080802b"
+      border="solid 1px #008080"
+      width="400px"
+    >
+      Click me
+      <span slot="append" style="padding-right: 10px">
+        <Icon name="mdi-account"></Icon>
+      </span>
+    </Button>
+  </div>
+  <div class="section">
+    <Button 
       color="#008080"
       hoverBackgroundColor="#00808012"
       padding="10px 20px 10px 20px"

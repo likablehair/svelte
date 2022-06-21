@@ -39,6 +39,9 @@
       name: 'Switch',
       url: 'forms/Switch'
     }, {
+      name: 'Checkbox',
+      url: 'forms/Checkbox'
+    }, {
       name: 'HeaderMenu',
       url: 'navigation/HeaderMenu'
     }, {

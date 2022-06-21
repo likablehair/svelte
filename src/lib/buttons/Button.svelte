@@ -23,6 +23,7 @@
     hoverBackgroundColor: string = '#88888847',
     activeBackgroundColor: string = hoverBackgroundColor,
     borderRadius: string = undefined,
+    border: string = undefined,
     boxShadow: string = undefined
 
   export { clazz as class };
@@ -63,6 +64,7 @@
   style:display={display}
   style:justify-content={justifyContent}
   style:align-items={alignItems}
+  style:--button-border={border}
   style:--button-border-radius={!!borderRadius ? borderRadius : defaultBorderRadius}
   style:--button-background-color={active ? activeBackgroundColor : backgroundColor}
   style:--button-hover-background-color={hoverBackgroundColor}
@@ -110,7 +112,7 @@
     transition: background-color 200ms;
     background-color: var(--button-background-color);
     outline: 0;
-    border: 0;
+    border: var(--button-border);
     border-radius: var(--button-border-radius, 0.25rem);
     box-shadow: var(--button-box-shadow, 0 0 0.5rem rgba(0, 0, 0, 0.3));
   }
@@ -124,7 +126,7 @@
     text-transform: uppercase;
     font-weight: 600;
     outline: 0;
-    border: 0;
+    border: var(--button-border);
     border-radius: var(--button-border-radius, 0.25rem);
   }
 
@@ -135,7 +137,7 @@
   .button-icon {
     transition: background-color 200ms;
     outline: 0;
-    border: 0;
+    border: var(--button-border);
     border-radius: var(--button-border-radius, 50%);
     height: var(--button-icon-height) !important;
     width: var(--button-icon-width) !important;
