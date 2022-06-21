@@ -86,7 +86,10 @@
     }, {
       name: 'Dialog',
       url: 'dialogs/Dialog'
-    },
+    }, {
+      name: 'DatePicker',
+      url: 'dates/DatePicker'
+    }
   ]
 
 </script>
@@ -95,7 +98,7 @@
   <title>Svelte likablehair components kit</title>
 </svelte:head>
 
-<div 
+<div
   style:display="flex"
   style:justify-content="center"
   style:align-items="center"

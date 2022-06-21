@@ -1,17 +1,54 @@
-export const monthNames: string[] = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December"
-];
+const monthNames: {it: string[], en: string[]} = {
+  en: [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ],
+  it: [
+    "Gennaio",
+    "Febbraio",
+    "Marzo",
+    "Aprile",
+    "Maggio",
+    "Giugno",
+    "Luglio",
+    "Agosto",
+    "Settembre",
+    "Ottobre",
+    "Novembre",
+    "Dicembre"
+  ]
+};
+
+const dayNames: {it: string[], en: string[]} = {
+  en: [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday"
+  ],
+  it: [
+    "Domenica",
+    "Lunedì",
+    "Martedy",
+    "Mercoledì",
+    "Giovedì",
+    "Venerdì",
+    "Sabato"
+  ]
+};
 
 export const monthDays: number[] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
@@ -25,7 +62,12 @@ export const getMonthDays: (index: number, year: number) => number = (index, yea
   return index !== 1 ? monthDays[index] : isLeapYear(year) ? 29 : 28;
 };
 
-export const getMonthName: (index: number) => string = index => monthNames[index];
+export const getMonthName: (index: number, locale?: 'it' | 'en') => string = (index, locale='it') => {
+  return monthNames[locale][index]
+}
+export const getDayName: (index: number, locale?: 'it' | 'en') => string = (index, locale = 'it') => {
+  return dayNames[locale][index]
+}
 
 export type MonthStats = {
   name: string;
@@ -112,26 +154,54 @@ export const getDateRowsStats: (monthIndex: number, year: number) => DateStat[] 
   return results
 }
 
-type dateFormat = 'extended' | 'extendedMonthAndYear'
-const dateToExtendedString: (date: Date) => string = (date) => {
+type dateFormat = 'extended' | 'extendedMonthAndYear' | 'standard' | 'dayAndMonth'
+
+const dateToExtendedString: (date: Date, locale?: 'it' | 'en') => string = (date, locale ='it') => {
   const day = date.getDate()
-  const month = getMonthName(date.getMonth())
+  const month = getMonthName(date.getMonth(), locale)
   const year = date.getFullYear()
 
   return `${day} ${month} ${year}`
 }
 
-const dateToExtendedMonthAndYearString: (date: Date) => string = (date) => {
-  const month = getMonthName(date.getMonth())
+const dateToExtendedMonthAndYearString: (date: Date, locale?: 'it' | 'en') => string = (date, locale = 'it') => {
+  const month = getMonthName(date.getMonth(), locale)
   const year = date.getFullYear()
 
   return `${month} ${year}`
 }
 
-export const dateToString: (date: Date, format?: dateFormat) => string = (date, format='extended') => {
-  if(format == 'extended') {
-    return dateToExtendedString(date)
-  } else if (format == 'extendedMonthAndYear') {
-    return dateToExtendedMonthAndYearString(date)
+const dateToStandardString: (date: Date, locale?: 'it' | 'en') => string = (date, locale = 'it') => {
+  const month = date.getMonth()
+  const year = date.getFullYear()
+  const day = date.getDate()
+
+  if (locale == 'en')
+    return `${month + 1}-${day}-${year}`
+  else if (locale == 'it')
+    return `${day}/${month + 1}/${year}`
+}
+
+const dateToDayAndMonthString: (date: Date, locale?: 'it' | 'en') => string = (date, locale = 'it') => {
+  const dayName = getDayName(date.getDay(), locale)
+  const day = date.getDate()
+  const month = getMonthName(date.getMonth(), locale)
+
+  if (locale == 'en')
+    return `${dayName.substring(0, 3)}, ${month.substring(0,3)} ${day}`
+  else if (locale == 'it')
+    return `${dayName.substring(0, 3)} ${day} ${month.substring(0,3)}`
+}
+
+export const dateToString: (date: Date, format?: dateFormat, locale?: 'it'|'en') => string = (date, format='extended', locale = 'it') => {
+  switch (format) {
+    case 'extended':
+      return dateToExtendedString(date, locale);
+    case 'extendedMonthAndYear':
+      return dateToExtendedMonthAndYearString(date, locale);
+    case 'standard':
+      return dateToStandardString(date, locale);
+    case 'dayAndMonth':
+      return dateToDayAndMonthString(date, locale);
   }
 }
