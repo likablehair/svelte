@@ -11,6 +11,22 @@
         width="300px"
         bind:selectedDate
         selectedDayColor = "white"
+        locale="it"
+    />
+    <div style:display="flex">
+        <div>
+            <b>selectedDate:</b>
+            {dateToString(selectedDate, 'dayAndMonth', 'en')}
+        </div>
+    </div>
+</div>
+<div class="card-container">
+    <DatePicker
+        height="400px"
+        width="300px"
+        bind:selectedDate
+        selectedDayColor = "white"
+        locale="en"
     />
     <div style:display="flex">
         <div>

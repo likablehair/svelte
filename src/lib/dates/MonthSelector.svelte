@@ -1,9 +1,13 @@
 <script lang="ts">
+  import type { Locale } from './utils'
   import { getMonthName } from './utils'
 
   export let selectedMonth: number = undefined,
+    locale: Locale = 'it',
     height: string = "100%",
-    width: string = "100%";
+    width: string = "100%",
+    monthSelectedColor: string = '#adadad',
+    monthSelectedTextColor: string = '#21a';
   
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher<{
@@ -31,21 +35,23 @@
     <slot
       name="selector"
       month={monthIndex}
-      monthName={getMonthName(monthIndex)}
+      monthName={getMonthName(monthIndex, locale)}
     >
       <Button 
         active={monthIndex == selectedMonth}
         display="flex"
         alignItems="center"
         justifyContent="center"
+        activeBackgroundColor={monthSelectedColor}
+        color={monthIndex == selectedMonth ? monthSelectedTextColor : null}
         on:click={() => handleMonthClick(monthIndex)}
       >
         <slot
           name="label"
           month={monthIndex}
-          monthName={getMonthName(monthIndex)}
+          monthName={getMonthName(monthIndex, locale)}
         >
-          {getMonthName(monthIndex)}
+          {getMonthName(monthIndex, locale)}
         </slot>
       </Button>
     </slot>

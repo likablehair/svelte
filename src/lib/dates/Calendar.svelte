@@ -1,12 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { fly } from 'svelte/transition';
-  import { getDateRowsStats, getMonthName } from './utils'
-  import type { DateStat } from './utils';
+  import { getDateRowsStats, getDaysNames } from './utils'
+  import type { DateStat, Locale } from './utils';
 
   export let selectedDate: Date = undefined,
     visibleMonth: number = new Date().getMonth(),
     visibleYear: number = new Date().getFullYear(),
+    locale: Locale = 'it',
     showExtraMonthDays: boolean = true,
     showHeader: boolean = true,
     height: string = "100%",
@@ -56,7 +57,7 @@
       class="grid-layout"
     >
       {#if showHeader}
-        {#each ['L', 'M', 'M', 'G', 'V', 'S', 'D'] as weekHeader, index}
+        {#each getDaysNames(locale).map(name => name[0]) as weekHeader, index}
           <slot
             name="weekHeader"
             header={weekHeader}
@@ -68,7 +69,7 @@
           </slot>
         {/each}
       {/if}
-      {#each getDateRowsStats(visibleMonth, visibleYear) as day}
+      {#each getDateRowsStats(visibleMonth, visibleYear, locale) as day}
         {@const selected = !!selectedDate && selectedDate.getDate() == day.dayOfMonth && selectedDate.getMonth() == day.month && selectedDate.getFullYear() == day.year}
         {@const extraMonth = day.month != visibleMonth}
         <slot

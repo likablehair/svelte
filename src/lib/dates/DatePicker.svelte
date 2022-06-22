@@ -1,5 +1,6 @@
 <script lang="ts">
     import { getMonthName, dateToString } from "./utils";
+    import type { Locale } from "./utils";
 
     import YearSelector from "./YearSelector.svelte";
     import MonthSelector from "./MonthSelector.svelte";
@@ -10,6 +11,7 @@
         selectedMonth: number = new Date().getMonth(),
         selectedDate: Date = new Date(),
         view: 'year'|'month'|'day' = 'day',
+        locale: Locale = 'it',
         primaryColor: string = "#008080",
         headerBackgroundColor: string = primaryColor,
         arrowColor: string = primaryColor,
@@ -31,7 +33,7 @@
     $: {
         selectorText =
             view == 'day'
-                ? getMonthName(selectedMonth) + " " + selectedYear
+                ? getMonthName(selectedMonth, locale) + " " + selectedYear
                 : selectedYear.toString();
     }
     $: elementDisabled = view == 'year' ? 'year' : 'date';
@@ -105,7 +107,7 @@
                 view = 'day';
             }}
         >
-            {dateToString(selectedDate, 'dayAndMonth', 'it')}
+            {dateToString(selectedDate, 'dayAndMonth', locale)}
         </h2>
     </div>
     <div class="body" style:height="75%">
@@ -149,6 +151,9 @@
                 {width}
                 bind:selectedMonth
                 on:click={handleMonthChange}
+                locale={locale}
+                monthSelectedColor={primaryColor}
+                monthSelectedTextColor={selectedDayColor}
             />
         {:else if view == 'year'}
             <YearSelector
@@ -168,6 +173,7 @@
                 dayHoverColor={hoverColor}
                 daySelectedColor={primaryColor}
                 selectedTextColor={selectedDayColor}
+                locale={locale}
             />
         {/if}
     </div>
