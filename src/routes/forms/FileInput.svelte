@@ -8,13 +8,15 @@
 
 <div class="card-container">
   <FileInput
+    persistOverUpload = {true}
     height="100px"
     width="500px"
     backgroundColor="rgba(220,220,220,0.1)"
     elevation={true}
     rounded
-    bind:persistentFiles={files}
+    bind:files={files}
     bind:dropAreaActive
+    focusShadow="7px rgba(39, 94, 254, 0.3)"
   >
     <span slot="body" style:height="100%" style:width="100%" style:display="flex">
       <div class="body-container"  class:active={dropAreaActive}>
@@ -25,7 +27,7 @@
 
   <div style:margin-top="30px">
     {#each files as file}
-      {file.text().then(res => {console.log(res)})}
+      {file.name}
       <br>
     {/each}
     {dropAreaActive}
@@ -58,5 +60,6 @@
   }
   .active {
     border-color: rgba(255,0,0,0.5);
+    color: rgba(255,0,0,0.7);
   }
 </style>

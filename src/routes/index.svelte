@@ -89,6 +89,9 @@
     }, {
       name: 'FileInput',
       url: 'forms/FileInput'
+    }, {
+      name: 'FileInputList',
+      url: 'forms/FileInputList'
     }
   ]
 

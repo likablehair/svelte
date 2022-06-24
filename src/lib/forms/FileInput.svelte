@@ -1,31 +1,37 @@
 <script type="ts">
-    export let files: FileList = undefined,
-        persistentFiles: File[] = [],
+    export let files: File[] = undefined,
+        persistOverUpload: boolean = true,
         height: string = "100%",
         width: string = "100%",
         backgroundColor: string = "rgba(255,255,255,0)",
         textColor: string = "black",
         rounded: boolean = true,
         elevation: boolean = true,
+        focusShadow: string = undefined,
         dropAreaActive: boolean = true;
 
     let inputElement: HTMLElement = undefined;
-    let dropAreaElevation: boolean = false;
 
     const highlight: (highlighted: boolean) => void = (highlighted) => {
-        if (elevation) dropAreaElevation = highlighted;
         dropAreaActive = highlighted;
     };
 
     function handleFileDrop(event) {
-        files = event.dataTransfer.files;
-        persistentFiles = [...persistentFiles, ...Array.from(files)];
+        let droppedFiles: FileList = event.dataTransfer.files;
+        if (!persistOverUpload)
+            files = Array.from(droppedFiles)
+        else
+            files = [...files, ...Array.from(droppedFiles)];
     }
 
     function handleFileFromInput(event) {
-        files = event.target.files;
-        persistentFiles = [...persistentFiles, ...Array.from(files)];
+        let selecteFiles: FileList = event.target.files;
+        if (!persistOverUpload)
+            files = Array.from(selecteFiles)
+        else
+            files = [...files, ...Array.from(selecteFiles)];
     }
+
 </script>
 
 <div
@@ -39,9 +45,12 @@
     on:mouseleave={() => highlight(false)}
     style:height
     style:width
-    style="background-color: {backgroundColor}; color: {textColor};"
+    style:background-color={backgroundColor}
+    style:color={textColor}
     class:rounded
-    class:elevated={dropAreaElevation}
+    class:elevated={dropAreaActive && !focusShadow && elevation}
+    class:custom-shadow={dropAreaActive && focusShadow}
+    style:--focus-shadow={focusShadow}
 >
     <slot name="body">
         <span> Drop file here or click to upload </span>
@@ -50,7 +59,6 @@
     <input
         type="file"
         multiple
-        bind:files
         bind:this={inputElement}
         on:input={handleFileFromInput}
     />
@@ -82,6 +90,9 @@
             0 4px 6px -4px var(--shadow-color);
         box-shadow: var(--ring-offset-shadow, 0 0 #0000),
             var(--ring-shadow, 0 0 #0000), var(--shadow);
+    }
+    .custom-shadow {
+        box-shadow: 0 0 0 var(--focus-shadow);
     }
     .rounded {
         border-radius: 5px;
