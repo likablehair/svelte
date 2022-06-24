@@ -1,8 +1,8 @@
 <script lang="ts">
     import Button from "$lib/buttons/Button.svelte";
-import FileInput from "$lib/forms/FileInput.svelte";
-import Icon from "$lib/media/Icon.svelte";
-import { stop_propagation } from "svelte/internal";
+    import FileInput from "$lib/forms/FileInput.svelte";
+    import Icon from "$lib/media/Icon.svelte";
+    import { stop_propagation } from "svelte/internal";
 
     export let files: File[] = undefined,
         persistOverUpload: boolean = true,

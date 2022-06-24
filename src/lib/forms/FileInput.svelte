@@ -1,4 +1,6 @@
 <script type="ts">
+    import { createEventDispatcher } from 'svelte'
+
     export let files: File[] = undefined,
         persistOverUpload: boolean = true,
         height: string = "100%",
@@ -16,20 +18,33 @@
         dropAreaActive = highlighted;
     };
 
-    function handleFileDrop(event) {
+    const dispatch = createEventDispatcher<{
+        "fileDrop": {
+            nativeEvent: DragEvent
+        },
+        "fileSelect": {
+            nativeEvent: Event
+        }
+    }>()
+
+    function handleFileDrop(event: DragEvent) {
         let droppedFiles: FileList = event.dataTransfer.files;
-        if (!persistOverUpload)
-            files = Array.from(droppedFiles)
-        else
-            files = [...files, ...Array.from(droppedFiles)];
+        if (!persistOverUpload) files = Array.from(droppedFiles);
+        else files = [...files, ...Array.from(droppedFiles)];
+
+        dispatch('fileDrop', {
+            nativeEvent: event
+        })
     }
 
-    function handleFileFromInput(event) {
-        let selecteFiles: FileList = event.target.files;
-        if (!persistOverUpload)
-            files = Array.from(selecteFiles)
-        else
-            files = [...files, ...Array.from(selecteFiles)];
+    function handleFileFromInput(event: Event) {
+        let selectedFiles: FileList = (<HTMLInputElement>event.target).files;
+        if (!persistOverUpload) files = Array.from(selectedFiles);
+        else files = [...files, ...Array.from(selectedFiles)];
+
+        dispatch('fileSelect', {
+            nativeEvent: event
+        })
     }
 
 </script>

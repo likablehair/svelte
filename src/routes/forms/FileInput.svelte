@@ -17,6 +17,8 @@
     bind:files={files}
     bind:dropAreaActive
     focusShadow="7px rgba(39, 94, 254, 0.3)"
+    on:fileDrop="{(e)=>{ alert("dropped "+ e.detail.nativeEvent.dataTransfer.files.length+"file(s)") }}"
+    on:fileSelect="{(e)=>{ console.log(e.detail.nativeEvent.target) }}"
   >
     <span slot="body" style:height="100%" style:width="100%" style:display="flex">
       <div class="body-container"  class:active={dropAreaActive}>
