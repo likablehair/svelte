@@ -2,7 +2,6 @@
   import FileInput from "$lib/forms/FileInput.svelte";
 
   let files: File[] = [];
-  let dropAreaActive: boolean = false;
 
 </script>
 
@@ -12,16 +11,19 @@
     height="100px"
     width="500px"
     backgroundColor="rgba(220,220,220,0.1)"
-    elevation={true}
     rounded
     bind:files={files}
-    bind:dropAreaActive
-    focusShadow="7px rgba(39, 94, 254, 0.3)"
-    on:fileDrop="{(e)=>{ alert("dropped "+ e.detail.nativeEvent.dataTransfer.files.length+"file(s)") }}"
-    on:fileSelect="{(e)=>{ console.log(e.detail.nativeEvent.target) }}"
+    on:fileDrop="{(e)=>{ console.log(e.detail.files) }}"
+    on:fileSelect="{(e)=>{ console.log(e.detail.files) }}"
+    disabled={false}
   >
-    <span slot="body" style:height="100%" style:width="100%" style:display="flex">
-      <div class="body-container"  class:active={dropAreaActive}>
+    <span slot="body"
+      let:active={active}
+      style:height="100%"
+      style:width="100%"
+      style:display="flex"
+    >
+      <div class="body-container"  class:active={active}>
         <span >Drop file here or click to upload</span>
       </div>
     </span>
@@ -32,7 +34,6 @@
       {file.name}
       <br>
     {/each}
-    {dropAreaActive}
   </div>
 </div>
 

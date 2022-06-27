@@ -8,22 +8,24 @@
         backgroundColor: string = "rgba(255,255,255,0)",
         textColor: string = "black",
         rounded: boolean = true,
-        elevation: boolean = true,
-        focusShadow: string = undefined,
-        dropAreaActive: boolean = true;
+        disabled: boolean = false,
+        focusShadow: string = "inset 0 0 0 1px rgb(255 255 255/0.1), 0 0 #0000, 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)";
 
     let inputElement: HTMLElement = undefined;
+    let dropAreaActive: boolean = false;
 
     const highlight: (highlighted: boolean) => void = (highlighted) => {
-        dropAreaActive = highlighted;
+        dropAreaActive = highlighted && !disabled;
     };
 
     const dispatch = createEventDispatcher<{
         "fileDrop": {
-            nativeEvent: DragEvent
+            nativeEvent: DragEvent,
+            files: File[]
         },
         "fileSelect": {
-            nativeEvent: Event
+            nativeEvent: Event,
+            files: File[]
         }
     }>()
 
@@ -33,7 +35,8 @@
         else files = [...files, ...Array.from(droppedFiles)];
 
         dispatch('fileDrop', {
-            nativeEvent: event
+            nativeEvent: event,
+            files: Array.from(droppedFiles)
         })
     }
 
@@ -43,7 +46,8 @@
         else files = [...files, ...Array.from(selectedFiles)];
 
         dispatch('fileSelect', {
-            nativeEvent: event
+            nativeEvent: event,
+            files: Array.from(selectedFiles)
         })
     }
 
@@ -55,7 +59,10 @@
     on:dragover|preventDefault={() => highlight(true)}
     on:dragleave={() => highlight(false)}
     on:dragend={() => highlight(false)}
-    on:drop|preventDefault={handleFileDrop}
+    on:drop|preventDefault={(e)=>{
+        if(!disabled)
+            handleFileDrop(e)
+    }}
     on:mouseenter={() => highlight(true)}
     on:mouseleave={() => highlight(false)}
     style:height
@@ -63,11 +70,12 @@
     style:background-color={backgroundColor}
     style:color={textColor}
     class:rounded
-    class:elevated={dropAreaActive && !focusShadow && elevation}
-    class:custom-shadow={dropAreaActive && focusShadow}
-    style:--focus-shadow={focusShadow}
+    class:disabled={disabled}
+    style:--file-input-focus-shadow={focusShadow}
 >
-    <slot name="body">
+    <slot
+        name="body"
+        active={dropAreaActive}>
         <span> Drop file here or click to upload </span>
     </slot>
 
@@ -76,6 +84,7 @@
         multiple
         bind:this={inputElement}
         on:input={handleFileFromInput}
+        disabled={disabled}
     />
 </div>
 
@@ -88,26 +97,15 @@
         cursor: pointer;
         transition: 0.2s;
     }
+    .disabled {
+        opacity: 0.5;
+        cursor: default;
+    }
     .drop-area > input {
         display: none;
     }
-    .elevated {
-        --shadow-color: #000;
-        --ring-inset: inset;
-        --ring-offset-width: 0px;
-        --ring-color: rgb(255 255 255/0.1);
-        --ring-offset-shadow: var(--ring-inset) 0 0 0
-            calc(1px + var(--ring-offset-width)) var(--ring-color);
-        --ring-shadow: 0 0 #0000;
-        --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
-            0 4px 6px -4px rgb(0 0 0 / 0.1);
-        --shadow-colored: 0 10px 15px -3px var(--shadow-color),
-            0 4px 6px -4px var(--shadow-color);
-        box-shadow: var(--ring-offset-shadow, 0 0 #0000),
-            var(--ring-shadow, 0 0 #0000), var(--shadow);
-    }
-    .custom-shadow {
-        box-shadow: 0 0 0 var(--focus-shadow);
+    .drop-area:hover:not(.disabled) {
+        box-shadow: var(--file-input-focus-shadow);
     }
     .rounded {
         border-radius: 5px;

@@ -2,7 +2,6 @@
     import Button from "$lib/buttons/Button.svelte";
     import FileInput from "$lib/forms/FileInput.svelte";
     import Icon from "$lib/media/Icon.svelte";
-    import { stop_propagation } from "svelte/internal";
 
     export let files: File[] = undefined,
         persistOverUpload: boolean = true,
@@ -11,7 +10,6 @@
         backgroundColor: string = "rgba(255,255,255,0)",
         textColor: string = "rgba(0,0,0,0.7)",
         rounded: boolean = true,
-        elevation: boolean = true,
         focusShadow: string = undefined,
         dropAreaActive: boolean = true,
         icon: string = "mdi-folder",
@@ -46,14 +44,12 @@
       {height}
       {width}
       {backgroundColor}
-      {elevation}
       {rounded}
       bind:files={files}
-      bind:dropAreaActive={dropAreaActive}
       {focusShadow}
       {textColor}
     >
-      <span slot="body" style:height="100%" style:width="100%" style:display="flex">
+      <span slot="body" style:height="100%" style:width="100%" style:display="flex" let:active={dropAreaActive}>
         <div class="body-container"  class:active={dropAreaActive}>
             {#if files.length == 0}
             <span >Drop file here or click to upload</span>

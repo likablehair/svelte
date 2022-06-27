@@ -11,7 +11,6 @@
         height="200px"
         width="500px"
         backgroundColor="rgba(220,220,220,0.1)"
-        elevation={true}
         rounded
         bind:files={files}
         bind:dropAreaActive
