@@ -87,6 +87,12 @@
       name: 'Dialog',
       url: 'dialogs/Dialog'
     }, {
+      name: 'FileInput',
+      url: 'forms/FileInput'
+    }, {
+      name: 'FileInputList',
+      url: 'forms/FileInputList'
+    }, {
       name: 'DatePicker',
       url: 'dates/DatePicker'
     }
