@@ -92,6 +92,9 @@
     }, {
       name: 'FileInputList',
       url: 'forms/FileInputList'
+    }, {
+      name: 'DatePicker',
+      url: 'dates/DatePicker'
     }
   ]
 

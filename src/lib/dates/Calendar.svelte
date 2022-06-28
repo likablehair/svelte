@@ -1,12 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { fly } from 'svelte/transition';
-  import { getDateRowsStats, getMonthName } from './utils'
-  import type { DateStat } from './utils';
+  import { getDateRowsStats, getDaysNames } from './utils'
+  import type { DateStat, Locale } from './utils';
 
   export let selectedDate: Date = undefined,
     visibleMonth: number = new Date().getMonth(),
     visibleYear: number = new Date().getFullYear(),
+    locale: Locale = 'it',
     showExtraMonthDays: boolean = true,
     showHeader: boolean = true,
     height: string = "100%",
@@ -15,6 +16,7 @@
     dayHeight: string = '30px',
     dayHoverColor: string = '#c9c8c873',
     daySelectedColor: string = '#adadad',
+    selectedTextColor: string = "black",
     dayBackgroundColor: string = undefined,
     animationDuration: number = 200
 
@@ -44,18 +46,18 @@
   }
 </script>
 
-<div 
+<div
   style:height={height}
   style:width={width}
 >
   {#key visibleMonth }
-    <div 
+    <div
       in:fly="{{delay: animationDuration, duration: animationDuration, y: 30}}"
-      out:fly="{{duration: animationDuration, y: -30}}"
+      out:fly|local="{{duration: animationDuration, y: -30}}"
       class="grid-layout"
     >
       {#if showHeader}
-        {#each ['L', 'M', 'M', 'G', 'V', 'S', 'D'] as weekHeader, index}
+        {#each getDaysNames(locale).map(name => name[0]) as weekHeader, index}
           <slot
             name="weekHeader"
             header={weekHeader}
@@ -67,16 +69,16 @@
           </slot>
         {/each}
       {/if}
-      {#each getDateRowsStats(visibleMonth, visibleYear) as day}
+      {#each getDateRowsStats(visibleMonth, visibleYear, locale) as day}
         {@const selected = !!selectedDate && selectedDate.getDate() == day.dayOfMonth && selectedDate.getMonth() == day.month && selectedDate.getFullYear() == day.year}
         {@const extraMonth = day.month != visibleMonth}
-        <slot 
-          name="day" 
+        <slot
+          name="day"
           dayStat={day}
           extraMonth={extraMonth}
           selected={selected}
         >
-          {#if (!showExtraMonthDays && day.month == visibleMonth) || showExtraMonthDays }  
+          {#if (!showExtraMonthDays && day.month == visibleMonth) || showExtraMonthDays }
             <div
               style:border-radius="50%"
               style:background-color={dayBackgroundColor}
@@ -85,6 +87,7 @@
               style:cursor={extraMonth ? 'default' : 'pointer'}
               style:--calendar-hover-color={extraMonth ? '' : dayHoverColor}
               style:--calendar-selected-color={daySelectedColor}
+              style:--calendar-selected-text-color={selectedTextColor}
               class="day-slot"
               class:extra-month={extraMonth}
               class:selected={selected}
@@ -123,6 +126,7 @@
 
 .selected {
   background-color: var(--calendar-selected-color);
+  color: var(--calendar-selected-text-color);
 }
 
 .day-slot.not-selected:hover {
