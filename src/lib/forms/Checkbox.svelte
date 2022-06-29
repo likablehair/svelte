@@ -12,7 +12,7 @@
     disabledInnerColor: string = "#e1e6f9"
 </script>
 
-<input 
+<input
   style:--checkbox-active-color={activeColor}
   style:--checkbox-active-inner-color={activeInnerColor}
   style:--checkbox-focus-shadow={focusShadow}
@@ -23,7 +23,7 @@
   style:--checkbox-disabled-inner-color={disabledInnerColor}
   id={id}
   type="checkbox"
-  checked={value}
+  bind:checked={value}
   disabled={disabled}
 >
 
@@ -107,6 +107,6 @@
       top: 4px;
       transform: rotate(var(--r, 20deg));
     }
-    
+
   }
 </style>

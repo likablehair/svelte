@@ -95,6 +95,9 @@
     }, {
       name: 'DatePicker',
       url: 'dates/DatePicker'
+    }, {
+      name: 'SimpleTable',
+      url: 'common/SimpleTable'
     }
   ]
 
