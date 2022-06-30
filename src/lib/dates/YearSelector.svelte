@@ -1,6 +1,6 @@
 <script lang="ts">
   import { scrollAtCenter } from "$lib/common/scroller"
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { beforeUpdate, createEventDispatcher, onMount } from 'svelte';
 
   export let selectedYear: number = undefined,
     selectableYears: number[] = [...Array(150).keys()].map(i => i + (new Date().getFullYear() - 75)),
@@ -9,7 +9,7 @@
 
   let container: HTMLElement, targetButtons: { [k: string]: HTMLElement }  = {}
   onMount(() => {
-    scrollAtCenter(container, targetButtons[selectedYear])
+    scrollAtCenter(container, targetButtons[selectedYear], "auto")
   })
 
   const dispatch = createEventDispatcher<{
@@ -21,7 +21,7 @@
   function handleYearClick(year: number) {
     selectedYear = year
 
-    scrollAtCenter(container, targetButtons[selectedYear])
+    scrollAtCenter(container, targetButtons[selectedYear], "smooth")
 
     dispatch('click', {
       year
