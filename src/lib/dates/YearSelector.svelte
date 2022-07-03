@@ -1,6 +1,6 @@
 <script lang="ts">
   import { scrollAtCenter } from "$lib/common/scroller"
-  import { beforeUpdate, createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
 
   export let selectedYear: number = undefined,
     selectableYears: number[] = [...Array(150).keys()].map(i => i + (new Date().getFullYear() - 75)),
