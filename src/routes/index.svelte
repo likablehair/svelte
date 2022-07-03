@@ -98,6 +98,9 @@
     }, {
       name: 'Textarea',
       url: 'forms/Textarea'
+    }, {
+      name: 'SimpleTable',
+      url: 'common/SimpleTable'
     }
   ]
 

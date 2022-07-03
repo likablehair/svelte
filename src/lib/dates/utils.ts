@@ -173,7 +173,7 @@ export const getDateRowsStats: (monthIndex: number, year: number, locale?: Local
   return results
 }
 
-export type DateFormat = 'extended' | 'extendedMonthAndYear' | 'standard' | 'dayAndMonth'
+export type DateFormat = 'extended' | 'extendedMonthAndYear' | 'standard' | 'dayAndMonth' | 'dayAndHours'
 
 const dateToExtendedString: (date: Date, locale?: Locale) => string = (date, locale='it') => {
   const day = date.getDate()
@@ -212,6 +212,24 @@ const dateToDayAndMonthString: (date: Date, locale?: Locale) => string = (date, 
     return `${dayName.substring(0, 3)} ${day} ${month.substring(0,3)}`
 }
 
+const dateToDayAndHourd: (date: Date, locale?: Locale) => string = (date, locale='it') => {
+  const day = dateToStandardString(date, locale)
+  let hours = date.getHours()
+  const minutes = date.getMinutes()
+  if (locale == 'en') {
+    let period
+    if (hours > 12){
+      period = 'pm'
+      hours -=12
+    }
+    else
+      period = 'am'
+    return `${day} at ${hours}:${minutes} ${period}`
+  }
+  else if (locale == 'it')
+    return `${day} alle ${hours}:${minutes}`
+}
+
 export const dateToString: (date: Date, format?: DateFormat, locale?: Locale) => string = (date, format='extended', locale='it') => {
   switch (format) {
     case 'extended':
@@ -222,5 +240,7 @@ export const dateToString: (date: Date, format?: DateFormat, locale?: Locale) =>
       return dateToStandardString(date, locale);
     case 'dayAndMonth':
       return dateToDayAndMonthString(date, locale);
+    case 'dayAndHours':
+      return dateToDayAndHourd(date, locale);
   }
 }
