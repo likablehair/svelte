@@ -95,6 +95,9 @@
     }, {
       name: 'DatePicker',
       url: 'dates/DatePicker'
+    }, {
+      name: 'Textarea',
+      url: 'forms/Textarea'
     }
   ]
 
