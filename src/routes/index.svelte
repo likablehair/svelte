@@ -98,6 +98,9 @@
     }, {
       name: 'SimpleTable',
       url: 'common/SimpleTable'
+    }, {
+      name: 'TimePickerTextField',
+      url: 'dates/TimePickerTextField'
     }
   ]
 
