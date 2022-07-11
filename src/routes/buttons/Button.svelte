@@ -7,6 +7,11 @@
   onMount(() => {
     setInterval(() => loading = !loading, 2000)
   })
+
+  let buttonText = "ButtonToClick"
+  function handleButtonToClick() {
+    buttonText = "ButtonHasClicked"
+  }
 </script>
 
 <div class="container">
@@ -17,8 +22,8 @@
       hoverBackgroundColor="#008f8f"
       width="400px"
     >
-      Click me
-      <span slot="append" style="padding-right: 10px">
+      ButtonWithAccount
+      <span slot="append" style="padding-right: 10px" data-testid="account-icon">
         <Icon name="mdi-account"></Icon>
       </span>
     </Button>
@@ -30,8 +35,9 @@
       hoverBackgroundColor="#0080802b"
       border="solid 1px #008080"
       width="400px"
+      on:click={handleButtonToClick}
     >
-      Click me
+      {buttonText}
       <span slot="append" style="padding-right: 10px">
         <Icon name="mdi-account"></Icon>
       </span>

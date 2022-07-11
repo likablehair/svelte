@@ -9,26 +9,67 @@
     "preview": "svelte-kit preview --port 4000",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
-    "lint": "eslint --ignore-path .gitignore ."
+    "lint": "eslint --ignore-path .gitignore .",
+    "test": "jest src",
+    "test:watch": "npm run test -- --watch"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "next",
     "@sveltejs/kit": "next",
+    "@testing-library/cypress": "^8.0.3",
+    "@testing-library/jest-dom": "^5.16.4",
     "@typescript-eslint/eslint-plugin": "^4.31.1",
     "@typescript-eslint/parser": "^4.31.1",
     "autoprefixer": "^10.4.2",
+    "babel-jest": "^28.1.2",
+    "cypress": "^10.3.0",
     "eslint": "^7.32.0",
     "eslint-plugin-svelte3": "^3.2.1",
+    "jest": "^28.1.2",
+    "jest-environment-jsdom": "^28.1.2",
     "svelte": "^3.44.0",
     "svelte-check": "^2.2.6",
-    "svelte-preprocess": "^4.9.4",
+    "svelte-jester": "^2.3.2",
+    "svelte-preprocess": "^4.10.7",
     "svelte2tsx": "^0.4.12",
+    "ts-jest": "^28.0.5",
     "tslib": "^2.3.1",
-    "typescript": "^4.5.4"
+    "typescript": "^4.7.4"
   },
   "type": "module",
   "dependencies": {
     "@mdi/font": "^6.5.95",
+    "@testing-library/svelte": "^3.1.3",
+    "jest-css-modules-transform": "^4.4.2",
     "uuid": "^8.3.2"
-  }
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.svelte$": [
+        "svelte-jester",
+        {
+          "preprocess": true
+        }
+      ],
+      "^.+\\.js$": "babel-jest",
+      "^.+\\.ts$": "ts-jest",
+      ".+\\.(css|styl|less|sass|scss)$": "jest-css-modules-transform"
+    },
+    "moduleFileExtensions": [
+      "js",
+      "svelte",
+      "ts"
+    ],
+    "moduleDirectories": [
+      "src",
+      "node_modules"
+    ],
+    "testEnvironment": "jsdom",
+    "moduleNameMapper": {
+      "^\\$lib(.*)$": "<rootDir>/src/lib/$1"
+    }
+  },
+  "setupFilesAfterEnv": [
+    "@testing-library/jest-dom/extend-expect"
+  ]
 }
