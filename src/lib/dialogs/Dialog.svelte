@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { beforeUpdate, onMount } from "svelte";
+  import { beforeUpdate } from "svelte";
   export let open: boolean = false,
     overlayOpacity: string = "30%",
     overlayColor: string = "#282828"
@@ -9,9 +9,14 @@
 
   beforeUpdate(() => {
     if(open && localOpen != open) {
-      let otherDialog: HTMLElement = document.querySelector("[data-dialog]")
-      if(!!otherDialog) {
-        zIndex = Number(otherDialog.style.zIndex) + 2
+      let otherDialogs: NodeListOf<HTMLElement> = document.querySelectorAll("[data-dialog=true]")
+      if(otherDialogs.length > 0) {
+        let maxZIndex: number
+        otherDialogs.forEach((dialog) => {
+          if(!maxZIndex || maxZIndex < Number(dialog.style.zIndex))
+            maxZIndex = Number(dialog.style.zIndex)
+        })
+        zIndex = maxZIndex + 2
       }
     }
     
@@ -29,6 +34,7 @@
 </script>
 
 <div 
+  data-dialog={localOpen}
   style:z-index={zIndex}
   style:--dialog-overlay-opacity={overlayOpacity}
   style:display="flex"

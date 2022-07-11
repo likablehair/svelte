@@ -18,6 +18,9 @@
       name: 'Card',
       url: 'common/Card'
     }, {
+      name: 'Menu',
+      url: 'common/Menu'
+    }, {
       name: 'Skeleton',
       url: 'loaders/Skeleton'
     }, {
