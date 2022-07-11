@@ -39,6 +39,7 @@
   "type": "module",
   "dependencies": {
     "@mdi/font": "^6.5.95",
+    "@sveltejs/adapter-node": "^1.0.0-next.79",
     "@testing-library/svelte": "^3.1.3",
     "jest-css-modules-transform": "^4.4.2",
     "uuid": "^8.3.2"
