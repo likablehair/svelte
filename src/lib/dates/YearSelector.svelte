@@ -9,7 +9,7 @@
 
   let container: HTMLElement, targetButtons: { [k: string]: HTMLElement }  = {}
   onMount(() => {
-    scrollAtCenter(container, targetButtons[selectedYear])
+    scrollAtCenter(container, targetButtons[selectedYear], "auto")
   })
 
   const dispatch = createEventDispatcher<{
@@ -21,7 +21,7 @@
   function handleYearClick(year: number) {
     selectedYear = year
 
-    scrollAtCenter(container, targetButtons[selectedYear])
+    scrollAtCenter(container, targetButtons[selectedYear], "smooth")
 
     dispatch('click', {
       year

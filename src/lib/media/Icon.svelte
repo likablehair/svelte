@@ -1,24 +1,28 @@
 <script lang="ts">
   export let name: string,
     size: number = 15,
-    color: string = '';
-  
-  let clazz: string = ''
-  export { clazz as class }
-  
-  import '../common/materialDesign.css'
+    color: string = "",
+    click: boolean = false;
+
+  let clazz: string = "";
+  export { clazz as class };
+
+  import "../common/materialDesign.css";
+
 </script>
 
-<style>
-.icon {
-  font-size: var(--size);
-  color: var(--color);
-}
-</style>
-
 <span
-  style:font-size={size + 'pt'}
-  style:color={color}
+  style:font-size={size + "pt"}
+  style:color
   class="icon mdi {name} {clazz}"
-></span>
+  on:click
+  style:cursor={click ? "pointer" : "default"}
+  style:pointer-events={click ? "auto" : "none"}
+/>
 
+<style>
+  .icon {
+    font-size: var(--size);
+    color: var(--color);
+  }
+</style>

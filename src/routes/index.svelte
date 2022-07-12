@@ -18,6 +18,9 @@
       name: 'Card',
       url: 'common/Card'
     }, {
+      name: 'Menu',
+      url: 'common/Menu'
+    }, {
       name: 'Skeleton',
       url: 'loaders/Skeleton'
     }, {
@@ -101,6 +104,9 @@
     }, {
       name: 'TimePickerTextField',
       url: 'dates/TimePickerTextField'
+    }, {
+      name: 'Chip',
+      url: 'navigation/Chip'
     }
   ]
 
