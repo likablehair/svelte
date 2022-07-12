@@ -1,8 +1,11 @@
 <script lang="ts">
 
+  import { v4 as uuidv4 } from 'uuid';
+
   export let label: string = null,
     placeholder: string = "placeholder",
-    fontFamily: string = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif",
+    textAreaId: string = uuidv4(),
+    fontFamily: string = "inherit",
     value: string = "",
     resizable: boolean = true,
     disabled: boolean = false,
@@ -23,10 +26,6 @@
     labelColor: string = undefined,
     width: string = "100%",
     height: string = "100%";
-
-    import { v4 as uuidv4 } from 'uuid';
-
-    let textAreaId: string = uuidv4();
 
 </script>
 
