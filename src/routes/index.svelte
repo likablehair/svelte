@@ -107,6 +107,9 @@
     }, {
       name: 'Chip',
       url: 'navigation/Chip'
+    }, {
+      name: 'VerticalSwitch',
+      url: 'forms/VerticalSwitch'
     }
   ]
 
