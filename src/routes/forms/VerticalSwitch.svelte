@@ -1,13 +1,13 @@
 <script lang="ts">
   let value: boolean = false
-  let options: string[] = ["ON","OFF"]
   import VerticalSwitch from '$lib/forms/VerticalSwitch.svelte';
+  import Icon from '$lib/media/Icon.svelte';
+
 </script>
 
 <div class="card-container">
   <VerticalSwitch
     bind:value={value}
-    options={options}
     rounded
     height="100px"
     width="50px"
@@ -16,7 +16,14 @@
     selectedOptionColor="#64B5F6"
     optionColor="#BBDEFB"
     animationDuration="0.2s"
-  ></VerticalSwitch>
+  >
+    <span slot="firstOption">
+      <Icon name="mdi-white-balance-sunny" size={18}></Icon>
+    </span>
+    <span slot="secondOption">
+      <Icon name="mdi-weather-night" size={18}></Icon>
+    </span>
+  </VerticalSwitch>
   <span style:margin-top="200px">{value}</span>
 </div>
 

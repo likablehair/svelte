@@ -1,7 +1,6 @@
 <script lang="ts">
 
-  export let options: string[] = undefined,
-    value: boolean = false,
+  export let value: boolean = false,
     height: string = "60px",
     width: string = "30px",
     rounded: boolean = false,
@@ -32,14 +31,18 @@
     on:click={()=>value = !value}
   >
     <div
-      class={value ? "first-option selected" : "first-option"}
+      class={value?"first-option selected":"first-option"}
     >
-      {options[0]}
+      <slot name="firstOption">
+        1
+      </slot>
     </div>
     <div
-      class={value ? "second-option" : "second-option selected"}
+      class={value?"second-option":"second-option selected"}
     >
-      {options[1]}
+      <slot name="secondOption">
+        0
+      </slot>
     </div>
     <input
       bind:checked={value}
@@ -101,13 +104,13 @@
     color: var(--vertical-switch-option-color);
     font-size: var(--vertical-switch-font-size);
     user-select: none;
-    transition: var(--vertical-switch-animation-duration);
   }
 
   .selected {
     color: var(--vertical-switch-selected-option-color);
     z-index: 5;
     font-weight: bold;
+    transition: var(--vertical-switch-animation-duration);
   }
 
   .slider {
