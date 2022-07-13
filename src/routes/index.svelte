@@ -110,6 +110,9 @@
     }, {
       name: 'VerticalSwitch',
       url: 'forms/VerticalSwitch'
+    }, {
+      name: 'VerticalTextSwitch',
+      url: 'forms/VerticalTextSwitch'
     }
   ]
 
