@@ -33,14 +33,14 @@
     <div
       class={value?"first-option selected":"first-option"}
     >
-      <slot name="firstOption">
+      <slot name="trueOption">
         1
       </slot>
     </div>
     <div
       class={value?"second-option":"second-option selected"}
     >
-      <slot name="secondOption">
+      <slot name="falseOption">
         0
       </slot>
     </div>

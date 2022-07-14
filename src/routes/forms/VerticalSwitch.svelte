@@ -17,10 +17,10 @@
     optionColor="#BBDEFB"
     animationDuration="0.2s"
   >
-    <span slot="firstOption">
+    <span slot="trueOption">
       <Icon name="mdi-white-balance-sunny" size={18}></Icon>
     </span>
-    <span slot="secondOption">
+    <span slot="falseOption">
       <Icon name="mdi-weather-night" size={18}></Icon>
     </span>
   </VerticalSwitch>

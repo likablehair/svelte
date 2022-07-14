@@ -14,10 +14,10 @@
     secondColor="#1976D2"
     backgroundColor="#E3F2FD"
   >
-    <span slot="firstOption">
+    <span slot="trueOption">
       <Icon name="mdi-white-balance-sunny" size={18}></Icon>
     </span>
-    <span slot="secondOption">
+    <span slot="falseOption">
       <Icon name="mdi-weather-night" size={18}></Icon>
     </span>
   </VerticalTextSwitch>

@@ -11,7 +11,7 @@
 
 <div class="card-container">
   <TimePickerTextField
-    width="500px"
+    width="300px"
     bind:text={text}
     bind:time={time}
     hourFormat='12'
