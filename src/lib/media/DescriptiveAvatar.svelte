@@ -12,6 +12,7 @@
     height: string = undefined,
     maxHeight: string = undefined,
     minHeight: string = undefined,
+    lazyLoaded: boolean = false,
     borderRadius: string = "50%";
 
   let textAlignment: 'left' | 'right' | 'center'
@@ -67,6 +68,7 @@
       maxHeight={maxHeight}
       minHeight={minHeight}
       borderRadius={borderRadius}
+      lazyLoaded={lazyLoaded}
     ></Avatar>
   </div>
   <div 
