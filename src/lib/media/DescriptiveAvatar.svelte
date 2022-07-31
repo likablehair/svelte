@@ -13,7 +13,8 @@
     maxHeight: string = undefined,
     minHeight: string = undefined,
     lazyLoaded: boolean = false,
-    borderRadius: string = "50%";
+    borderRadius: string = "50%",
+    referrerpolicy: string = "no-referrer";
 
   let textAlignment: 'left' | 'right' | 'center'
 
@@ -69,6 +70,7 @@
       minHeight={minHeight}
       borderRadius={borderRadius}
       lazyLoaded={lazyLoaded}
+      referrerpolicy={referrerpolicy}
     ></Avatar>
   </div>
   <div 

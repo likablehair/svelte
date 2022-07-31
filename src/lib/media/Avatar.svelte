@@ -9,6 +9,7 @@
     maxHeight: string = undefined,
     minHeight: string = undefined,
     lazyLoaded: boolean = false,
+    referrerpolicy: string = "no-referrer",
     borderRadius: string = "50%";
 
   import Image from '$lib/media/Image.svelte'
@@ -39,5 +40,6 @@
     style:min-height={minHeight}
     style:border-radius={borderRadius}
     style:object-fit="cover"
+    referrerpolicy={referrerpolicy}
   />
 {/if}
