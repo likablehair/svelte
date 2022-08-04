@@ -24,7 +24,10 @@
     activeBackgroundColor: string = hoverBackgroundColor,
     borderRadius: string = undefined,
     border: string = undefined,
-    boxShadow: string = undefined
+    boxShadow: string = undefined,
+    loaderHeight: string = undefined,
+    loaderWidth: string = undefined,
+    disabled: boolean = false
 
   export { clazz as class };
 
@@ -36,6 +39,7 @@
   }>()
 
   function handleClick(event: MouseEvent) {
+    if(disabled) return
     dispatch('click', {
       nativeEvent: event
     })
@@ -80,6 +84,8 @@
   {#if loading}
     <CircularLoader
       color={color}
+      height={loaderHeight}
+      width={loaderWidth}
     ></CircularLoader>
   {:else}
     {#if !!icon}
@@ -153,8 +159,8 @@
   .no-select {
     -webkit-touch-callout: none; /* iOS Safari */
       -webkit-user-select: none; /* Safari */
-      -khtml-user-select: none; /* Konqueror HTML */
-        -moz-user-select: none; /* Old versions of Firefox */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Old versions of Firefox */
           -ms-user-select: none; /* Internet Explorer/Edge */
               user-select: none; /* Non-prefixed version, currently
                                     supported by Chrome, Edge, Opera and Firefox */
