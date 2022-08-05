@@ -1,7 +1,7 @@
 {
   "name": "@likable-hair/svelte",
   "description": "A Svelte component for likablehair",
-  "version": "0.0.46",
+  "version": "0.0.47",
   "scripts": {
     "dev": "svelte-kit dev --port 4000",
     "build": "svelte-kit build",

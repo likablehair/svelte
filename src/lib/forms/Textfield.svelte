@@ -1,5 +1,8 @@
+<script lang="ts" context="module">
+  export type VariantOptions = 'outlined' | 'boxed'
+</script>
+
 <script lang="ts">
-  type VariantOptions = 'outlined' | 'boxed'
 
   export let label: string = "",
     placeholder: string = "",
@@ -7,6 +10,9 @@
     value: string = "",
     variant: VariantOptions = 'outlined',
     width: string = "100%",
+    height: string = "50px",
+    maxWidth: string = undefined,
+    minWidth: string = undefined,
     textColor: string = "black",
     borderWeight: string = "2px",
     borderRadius: string = "5px",
@@ -20,7 +26,8 @@
     paddingBottom: string = undefined,
     paddingTop: string = undefined,
     fontSize: string = undefined,
-    type: 'text' | 'password' = 'text'
+    type: 'text' | 'password' = 'text',
+    inputElement: HTMLElement = undefined
 
   import { v4 as uuidv4 } from 'uuid';
   import { onMount } from 'svelte'
@@ -52,7 +59,6 @@
 
 <style>
   .input-container {
-    height: 50px;
     position: relative;
     --textfield-final-color: var(--textfield-theme-color, --textfield-border-color, rgb(88, 88, 88));
     --textfield-final-border-color: var(--textfield-border-color, var(--textfield-final-color))
@@ -143,6 +149,9 @@
 
 <div 
   style:width={width}
+  style:min-width={minWidth}
+  style:max-width={maxWidth}
+  style:height={height}
   style:--textfield-theme-color={color}
   style:--textfield-border-color={borderColor}
   style:--textfield-border-weight={borderWeight}
@@ -203,6 +212,7 @@
               on:keydown
               on:keypress
               on:keyup
+              bind:this={inputElement}
             />
           {:else if type == 'text'}
             <input 
@@ -223,6 +233,7 @@
               on:keydown
               on:keypress
               on:keyup
+              bind:this={inputElement}
             />
           {/if}
           <div>
@@ -253,8 +264,9 @@
             on:blur={handleBlur}
             on:blur
             on:keydown
-              on:keypress
-              on:keyup
+            on:keypress
+            on:keyup
+            bind:this={inputElement}
           />
         {:else if type == 'text'}
           <input
@@ -275,6 +287,7 @@
             on:keydown
             on:keypress
             on:keyup
+            bind:this={inputElement}
           />
         {/if}
         <div>

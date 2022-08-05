@@ -42,6 +42,9 @@
       name: 'Switch',
       url: 'forms/Switch'
     }, {
+      name: 'Autocomplete',
+      url: 'forms/Autocomplete'
+    }, {
       name: 'Checkbox',
       url: 'forms/Checkbox'
     }, {

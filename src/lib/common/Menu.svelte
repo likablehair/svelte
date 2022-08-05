@@ -13,6 +13,11 @@
     left: number = undefined,
     width: string,
     height: string,
+    maxHeight: string = undefined,
+    overflow: string = "auto",
+    refreshPosition: boolean = false,
+    boxShadow: string = undefined,
+    borderRadius: string = undefined,
     activator: HTMLElement = undefined,
     anchor: 'bottom' | 'bottom-center' = 'bottom',
     closeOnClickOutside: boolean = false,
@@ -25,10 +30,10 @@
     outAnimationConfig: SlideParams | FlyParams | FadeParams = {
       duration: 100,
       y: 10
-    }
+    },
+    menuElement: HTMLElement = undefined
 
   let zIndex = 50, 
-    menuElement: HTMLElement,
     currentUid: string = uuidv4()
 
 
@@ -85,6 +90,13 @@
 
     if(!!maxZIndex) zIndex = maxZIndex + 2
   }
+  $: if(!!width) {
+    calculateMenuPosition({ activator, menuElement})
+  }
+  $: if(refreshPosition) {
+    calculateMenuPosition({ activator, menuElement})
+    refreshPosition = false
+  }
   $: if(closeOnClickOutside && !!menuElement) {
     window.addEventListener('click', (event) => {
       open = false
@@ -110,9 +122,13 @@
     style:z-index={zIndex}
     style:position="absolute"
     style:top={top + "px"}
+    style:box-shadow={boxShadow}
+    style:border-radius={borderRadius}
     style:left={left + "px"}
     style:height={height}
+    style:max-height={maxHeight}
     style:width={width}
+    style:overflow={overflow}
     in:inAnimation={inAnimationConfig}
     out:outAnimation={outAnimationConfig}
   >

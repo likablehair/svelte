@@ -4,8 +4,7 @@
   import Button from '$lib/buttons/Button.svelte';
   import { createEventDispatcher } from 'svelte';
 
-  export let active: boolean = true,
-    close: boolean = false,
+  export let close: boolean = false,
     closeIcon: string = "mdi-close-circle",
     color: string = "blue",
     textColor: string = "white",
@@ -23,53 +22,48 @@
     }
 
     function handleCloseClick() {
-      active = false;
       dispatch('close')
     }
 
-
-
 </script>
 
-{#if active}
-  <div
-    class="chip"
-    style:border-radius={label?"5px":"100px"}
-    style:background-color="{color}"
-    style:color={outlined?color:textColor}
-    class:label={label}
-    class:outlined={outlined}
-    class:disabled={disabled}
-    on:click={handleChipClick}
+<div
+  class="chip"
+  style:border-radius={label?"5px":"100px"}
+  style:background-color="{color}"
+  style:color={outlined?color:textColor}
+  class:label={label}
+  class:outlined={outlined}
+  class:disabled={disabled}
+  on:click={handleChipClick}
+>
+  {#if filter}
+    <div class="icon-before">
+      <Icon
+        name={filterIcon}
+        size={size}
+      ></Icon>
+    </div>
+  {/if}
+  <div class="text"
+    style:font-size="{size}pt"
+    style:line-height="{size}pt"
   >
-    {#if filter}
-      <div class="icon-before">
-        <Icon
-          name={filterIcon}
-          size={size}
-        ></Icon>
-      </div>
-    {/if}
-    <div class="text"
-      style:font-size="{size}pt"
-      style:line-height="{size}pt"
-    >
-    <slot></slot>
-  </div>
-    {#if close}
-      <div class="icon-after">
-        <Button
-          icon={closeIcon}
-          iconSize={size}
-          type='icon'
-          hoverBackgroundColor="none"
-          on:click={handleCloseClick}
-        >
-        </Button>
-      </div>
-    {/if}
-  </div>
-{/if}
+  <slot></slot>
+</div>
+  {#if close}
+    <div class="icon-after">
+      <Button
+        icon={closeIcon}
+        iconSize={size}
+        type='icon'
+        hoverBackgroundColor="none"
+        on:click={handleCloseClick}
+      >
+      </Button>
+    </div>
+  {/if}
+</div>
 
 <style>
   .chip {
