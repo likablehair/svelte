@@ -43,4 +43,14 @@
   >
     {value.map((el) => el.label)}
   </div>
+
+  <Autocomplete
+    values={[
+      items[0]
+    ]}
+    bind:items={items}
+    maxWidth="300px"
+    width="300px"
+    disabled={true}
+  ></Autocomplete>
 </div>

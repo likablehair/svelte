@@ -9,21 +9,20 @@
 </script>
 
 <script lang="ts">
-  import { scrollAtCenter } from "$lib/common/scroller"
-
   export let values: Item[] = [],
     items: Item[],
     searchFunction: (item: Item, searchText: string) => boolean = undefined,
     multiple: boolean = false,
+    disabled: boolean = false,
     width: string = "auto",
     maxWidth: string = undefined,
     // textfield
     textFieldLabel: string = "",
     textFieldPlaceholder: string = "",
     textFieldColor: string = null,
-    textFieldValue: string = "",
     textFieldVariant: VariantOptions = 'boxed',
     textFieldMaxWidth: string = "min(100px, 90%)",
+    textFieldMinWidth: string = undefined,
     textFieldHeight: string = "auto",
     textFieldTextColor: string = "black",
     textFieldBorderWeight: string = "2px",
@@ -38,6 +37,7 @@
     textFieldPaddingBottom: string = undefined,
     textFieldPaddingTop: string = undefined,
     textFieldFontSize: string = undefined,
+    // menu
     menuBackgroundColor: string = "#FFF",
     menuBoxShadow: string = "rgba(149, 157, 165, 0.2) 0px 8px 24px",
     menuBorderRadius: string = "5px",
@@ -49,14 +49,11 @@
     chipTextColor: string = "black",
     chipHeight: string = "30px"
 
-  function search(value: string) {
-
-  }
-
   function select(item: Item) {
     const alreadyPresent = values.findIndex((i) => i.value === item.value) != -1
     if(!alreadyPresent) {
-      values = [...values, item]
+      if(multiple) values = [...values, item]
+      else values = [ item ]
       refreshMenuWidth()
     }
   }
@@ -68,6 +65,7 @@
 
   function toggle(item: Item) {
     const alreadyPresent = values.findIndex((i) => i.value === item.value) != -1
+    console.log(item, alreadyPresent)
     if(alreadyPresent) unselect(item)
     else select(item)
   }
@@ -96,7 +94,9 @@
     openMenu()
   }
 
-  function handleTextFieldBlur() { }
+  function handleTextFieldBlur() {
+    // closeMenu()
+  }
 
   let menuElement: HTMLElement
   function handleWindowKeyDown(event: KeyboardEvent) {
@@ -139,6 +139,7 @@
   bind:this={activator}
   style:width={width}
   style:max-width={maxWidth}
+  style:opacity={disabled ? '50%' : '100%'}
   on:click={handleContainerClick}
 >
   <slot name="selection-container">
@@ -170,6 +171,7 @@
         bind:value={searchText}
         variant={textFieldVariant}
         maxWidth={textFieldMaxWidth}
+        minWidth={textFieldMinWidth}
         textColor={textFieldTextColor}
         borderWeight={textFieldBorderWeight}
         borderRadius={textFieldBorderRadius}
@@ -184,6 +186,7 @@
         paddingTop={textFieldPaddingTop}
         fontSize={textFieldFontSize}
         height={textFieldHeight}
+        disabled={disabled}
         on:focus={handleTextFieldFocus}
         on:blur={handleTextFieldBlur}
         on:keydown={handleWindowKeyDown}
@@ -211,16 +214,25 @@
       style:background-color={menuBackgroundColor}
     >
       {#each filteredItems as item, index}
-        <div
-          style:--autocomplete-selected-item-background-color={selectedItemBackgroundColor}
-          style:--autocomplete-focus-item-background-color={focusItemBackgroundColor}
-          class:selection-item={true}
-          class:focused={index == focusedIndex}
-          class:selected={values.findIndex((i) => {
+        <slot 
+          name="item" 
+          item={item} 
+          index={index} 
+          selected={values.findIndex((i) => {
             return i.value == item.value
           }) != -1}
-          on:click={(event) => toggle(item)}
-        >{item.label}</div>
+        >
+          <div
+            style:--autocomplete-selected-item-background-color={selectedItemBackgroundColor}
+            style:--autocomplete-focus-item-background-color={focusItemBackgroundColor}
+            class:selection-item={true}
+            class:focused={index == focusedIndex}
+            class:selected={values.findIndex((i) => {
+              return i.value == item.value
+            }) != -1}
+            on:click={(event) => toggle(item)}
+          >{item.label}</div>
+        </slot>
       {/each}
     </div>
   </Menu>

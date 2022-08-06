@@ -8,6 +8,7 @@
     placeholder: string = "",
     color: string = null,
     value: string = "",
+    disabled: boolean = false,
     variant: VariantOptions = 'outlined',
     width: string = "100%",
     height: string = "50px",
@@ -202,6 +203,7 @@
               class="input-outlined"
               type="password"
               placeholder={placeholder}
+              disabled={disabled}
               bind:value={value}
               on:change
               on:input
@@ -223,6 +225,7 @@
               class="input-outlined"
               type="text"
               placeholder={placeholder}
+              disabled={disabled}
               bind:value={value}
               on:change
               on:input
@@ -256,6 +259,7 @@
             class="input-boxed"
             type="password"
             placeholder={placeholder || label}
+            disabled={disabled}
             bind:value={value}
             on:change
             on:input
@@ -277,6 +281,7 @@
             class="input-boxed"
             type="text"
             placeholder={placeholder || label}
+            disabled={disabled}
             bind:value={value}
             on:change
             on:input
