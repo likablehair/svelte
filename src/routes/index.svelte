@@ -102,6 +102,9 @@
       name: 'DatePicker',
       url: 'dates/DatePicker'
     }, {
+      name: 'Textarea',
+      url: 'forms/Textarea'
+    }, {
       name: 'SimpleTable',
       url: 'common/SimpleTable'
     }, {
