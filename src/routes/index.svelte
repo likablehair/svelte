@@ -108,8 +108,17 @@
       name: 'SimpleTable',
       url: 'common/SimpleTable'
     }, {
+      name: 'TimePickerTextField',
+      url: 'dates/TimePickerTextField'
+    }, {
       name: 'Chip',
       url: 'navigation/Chip'
+    }, {
+      name: 'VerticalSwitch',
+      url: 'forms/VerticalSwitch'
+    }, {
+      name: 'VerticalTextSwitch',
+      url: 'forms/VerticalTextSwitch'
     }
   ]
 
