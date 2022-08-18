@@ -15,6 +15,7 @@
     width: string = undefined,
     color: string = "rgb(51 65 85)",
     bookmarkColor: string = undefined,
+    horizontalGuideColor: string = "rgb(51 65 85)",
     margin: string = "12px";
 
   let tabButtons: object = {}
@@ -71,7 +72,7 @@
     class="bookmark"
   ></span>
   <span 
-    style:--tab-switcher-color={bookmarkColor || color}
+    style:--tab-switcher-horizontal-guide-color={horizontalGuideColor || color}
     style:width={width}
     class="horizontal-guide"
   ></span>
@@ -87,7 +88,7 @@
     z-index: 5;
     bottom: 0px;
     height: 1px;
-    background-color: var(--tab-switcher-color, rgb(51 65 85));
+    background-color: var(--tab-switcher-horizontal-guide-color, rgb(51 65 85));
     opacity: 20%;
   }
 
