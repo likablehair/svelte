@@ -71,7 +71,7 @@
     class="bookmark"
   ></span>
   <span 
-    style:--tab-switcher-bookmark-color={bookmarkColor || color}
+    style:--tab-switcher-color={bookmarkColor || color}
     style:width={width}
     class="horizontal-guide"
   ></span>
