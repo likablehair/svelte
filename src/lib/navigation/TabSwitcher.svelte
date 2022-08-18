@@ -14,7 +14,8 @@
     mandatory: boolean = true,
     width: string = undefined,
     color: string = "rgb(51 65 85)",
-    bookmarkColor: string = undefined;
+    bookmarkColor: string = undefined,
+    margin: string = "12px";
 
   let tabButtons: object = {}
   onMount(() => {
@@ -52,8 +53,8 @@
       style:white-spaces="nowrap"
       style:-webkit-tap-highlight-color="rgba(0,0,0,0)"
       style:cursor="pointer"
-      style:margin-left="12px"
-      style:margin-right="12px"
+      style:margin-left={margin}
+      style:margin-right={margin}
       style:padding="8px"
       style:--tab-switcher-color={color}
       class:selected-tab={tab.name == selected}
@@ -70,6 +71,7 @@
     class="bookmark"
   ></span>
   <span 
+    style:--tab-switcher-bookmark-color={bookmarkColor || color}
     style:width={width}
     class="horizontal-guide"
   ></span>
