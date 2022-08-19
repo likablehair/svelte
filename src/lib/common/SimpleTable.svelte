@@ -26,55 +26,63 @@
 
 </script>
 
-<div class="container" style:height style:width>
-    <table
-        style:background-color={backgroundColor}
-        style:width="100%"
-        style:min-width={minWidth}
-    >
-        <thead
-            style:background-color={headerColor}
-            style:height={headerHeight}
-        >
-            {#each headers as head}
-                <th
-                    style:width={head.width}
-                    style:min-width={head.minWidth}
-                >
-                    {head.label}
-                </th>
-            {/each}
-            {#if $$slots.appendLastColumn}
-                <th></th>
-            {/if}
-        </thead>
-        <tbody>
-            {#each items as item, i}
-                <tr
-                    style:border-color={rowSeparatorColor}
-                    style:height={rowHeight}
-                >
-                    {#each headers as header , j}
-                        <td>
-                            {#if header.type=='custom'}
-                                <slot name="customColumn" index={i} columnIndex={j} item={item}></slot>
-                            {:else if header.type=='date'}
-                                {dateToString(item[header.value], 'dayAndHours', 'it')}
-                            {:else}
-                                {item[header.value]}
-                            {/if}
-                        </td>
-                    {/each}
-                    {#if $$slots.appendLastColumn}
-                        <td>
-                            <slot name="appendLastColumn" index={i} item={item}></slot>
-                        </td>
-                    {/if}
-                </tr>
-            {/each}
-        </tbody>
-    </table>
-</div>
+{#if !!items && Array.isArray(items) }
+  <div class="container" style:height style:width>
+      <table
+          style:background-color={backgroundColor}
+          style:width="100%"
+          style:min-width={minWidth}
+      >
+          <thead
+              style:background-color={headerColor}
+              style:height={headerHeight}
+          >
+              {#each headers as head}
+                  <th
+                      style:width={head.width}
+                      style:min-width={head.minWidth}
+                  >
+                      {head.label}
+                  </th>
+              {/each}
+              {#if $$slots.appendLastColumn}
+                  <th></th>
+              {/if}
+          </thead>
+          <tbody>
+              {#each items as item, i}
+                  <tr
+                      style:border-color={rowSeparatorColor}
+                      style:height={rowHeight}
+                  >
+                      {#each headers as header , j}
+                          <td>
+                              {#if header.type=='custom'}
+                                  <slot 
+                                    name="customColumn" 
+                                    index={i} 
+                                    columnIndex={j} 
+                                    header={header}
+                                    item={item}
+                                  ></slot>
+                              {:else if header.type=='date'}
+                                  {dateToString(item[header.value], 'dayAndHours', 'it')}
+                              {:else}
+                                  {item[header.value]}
+                              {/if}
+                          </td>
+                      {/each}
+                      {#if $$slots.appendLastColumn}
+                          <td>
+                              <slot name="appendLastColumn" index={i} item={item}></slot>
+                          </td>
+                      {/if}
+                  </tr>
+              {/each}
+          </tbody>
+      </table>
+  </div>
+{/if}
 
 <style>
     table {

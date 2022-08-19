@@ -27,11 +27,22 @@
     }
   })
 
-  let bookmarkWidth: number = 0, bookmarkLeft: number = 0
-  function handleTabClick(clickedTab: Tab) {
-    selected = clickedTab.name
+  import { createEventDispatcher } from 'svelte';
+  const dispatch = createEventDispatcher<{
+    "tab-click": {
+      nativeEvent: MouseEvent,
+      tab: Tab
+    }
+  }>()
 
+  let bookmarkWidth: number = 0, bookmarkLeft: number = 0
+  function handleTabClick(clickedTab: Tab, nativeEvent: MouseEvent) {
+    selected = clickedTab.name
     setBookmarkPosition()
+    dispatch('tab-click', {
+      nativeEvent: nativeEvent,
+      tab: clickedTab
+    })
   }
 
   function setBookmarkPosition() {
@@ -59,7 +70,7 @@
       style:padding="8px"
       style:--tab-switcher-color={color}
       class:selected-tab={tab.name == selected}
-      on:click={() => handleTabClick(tab)}
+      on:click={(event) => handleTabClick(tab, event)}
       bind:this={tabButtons[tab.name]}
     >
       {tab.label}
