@@ -60,7 +60,7 @@
   class="descriptive-avatar-container"
 >
   <div class="avatar-container">
-    <solt name="avatar">
+    <slot name="avatar">
       <Avatar
         src={src}
         width={width}
@@ -73,7 +73,7 @@
         lazyLoaded={lazyLoaded}
         referrerpolicy={referrerpolicy}
       ></Avatar>
-    </solt>
+    </slot>
   </div>
   <div 
     style:margin-left={!reverse && direction === 'row' ? avatarSpacing : undefined}
