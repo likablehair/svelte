@@ -47,8 +47,10 @@
 
   function setBookmarkPosition() {
     let tabButton: HTMLElement = tabButtons[selected]
-    bookmarkWidth = tabButton.offsetWidth - 10
-    bookmarkLeft = tabButton.offsetLeft + 5
+    if(!!tabButton) {
+      bookmarkWidth = tabButton.offsetWidth - 10
+      bookmarkLeft = tabButton.offsetLeft + 5
+    }
   }
 
   $: if(!!selected) setBookmarkPosition()
