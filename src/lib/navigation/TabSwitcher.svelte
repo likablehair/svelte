@@ -50,6 +50,8 @@
     bookmarkWidth = tabButton.offsetWidth - 10
     bookmarkLeft = tabButton.offsetLeft + 5
   }
+
+  $: if(!!selected) setBookmarkPosition()
 </script>
 
 <div 
