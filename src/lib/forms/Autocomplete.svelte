@@ -15,6 +15,7 @@
     multiple: boolean = false,
     disabled: boolean = false,
     width: string = "auto",
+    height: string = "auto",
     maxWidth: string = undefined,
     // textfield
     textFieldLabel: string = "",
@@ -65,7 +66,7 @@
 
   function toggle(item: Item) {
     const alreadyPresent = values.findIndex((i) => i.value === item.value) != -1
-    console.log(item, alreadyPresent)
+    
     if(alreadyPresent) unselect(item)
     else select(item)
   }
@@ -139,6 +140,7 @@
   bind:this={activator}
   style:width={width}
   style:max-width={maxWidth}
+  style:height={height}
   style:opacity={disabled ? '50%' : '100%'}
   on:click={handleContainerClick}
 >

@@ -60,18 +60,20 @@
   class="descriptive-avatar-container"
 >
   <div class="avatar-container">
-    <Avatar
-      src={src}
-      width={width}
-      maxWidth={maxWidth}
-      minWidth={minWidth}
-      height={height}
-      maxHeight={maxHeight}
-      minHeight={minHeight}
-      borderRadius={borderRadius}
-      lazyLoaded={lazyLoaded}
-      referrerpolicy={referrerpolicy}
-    ></Avatar>
+    <solt name="avatar">
+      <Avatar
+        src={src}
+        width={width}
+        maxWidth={maxWidth}
+        minWidth={minWidth}
+        height={height}
+        maxHeight={maxHeight}
+        minHeight={minHeight}
+        borderRadius={borderRadius}
+        lazyLoaded={lazyLoaded}
+        referrerpolicy={referrerpolicy}
+      ></Avatar>
+    </solt>
   </div>
   <div 
     style:margin-left={!reverse && direction === 'row' ? avatarSpacing : undefined}
