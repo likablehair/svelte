@@ -28,6 +28,7 @@
     paddingTop: string = undefined,
     fontSize: string = undefined,
     type: 'text' | 'password' = 'text',
+    readonly: boolean = false,
     inputElement: HTMLElement = undefined
 
   import { v4 as uuidv4 } from 'uuid';
@@ -204,6 +205,7 @@
               type="password"
               placeholder={placeholder}
               disabled={disabled}
+              readonly={readonly}
               bind:value={value}
               on:change
               on:input
@@ -226,6 +228,7 @@
               type="text"
               placeholder={placeholder}
               disabled={disabled}
+              readonly={readonly}
               bind:value={value}
               on:change
               on:input
@@ -260,6 +263,7 @@
             type="password"
             placeholder={placeholder || label}
             disabled={disabled}
+            readonly={readonly}
             bind:value={value}
             on:change
             on:input
@@ -282,6 +286,7 @@
             type="text"
             placeholder={placeholder || label}
             disabled={disabled}
+            readonly={readonly}
             bind:value={value}
             on:change
             on:input
