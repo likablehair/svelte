@@ -41,8 +41,12 @@
     style:justify-content="center"
     style:flex-direction="column"
   >
-    <div>
+    <div style:overflow="auto">
       Sono un div per il dialog
+      <div style:height="150px" style:text-align="center">scrollable</div>
+      <div style:height="150px" style:text-align="center">scrollable</div>
+      <div style:height="150px" style:text-align="center">scrollable</div>
+      <div style:height="150px" style:text-align="center">scrollable</div>
     </div>
     <Button
       backgroundColor="#bcd6e6"

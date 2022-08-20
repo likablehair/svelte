@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from "$app/env";
   import { beforeUpdate } from "svelte";
   export let open: boolean = false,
     overlayOpacity: string = "30%",
@@ -17,6 +18,15 @@
             maxZIndex = Number(dialog.style.zIndex)
         })
         zIndex = maxZIndex + 2
+      }
+
+      document.body.style.overflow = 'hidden'
+    } else if(!open) {
+      if(browser) {
+        let otherDialogs: NodeListOf<HTMLElement> = document.querySelectorAll("[data-dialog=true]")
+        if(otherDialogs.length <= 1) {
+          document.body.style.overflow = 'auto'
+        }
       }
     }
     
@@ -42,14 +52,14 @@
   style:justify-content="space-between"
   class="overlay-container"
   class:overlay-container-active={localOpen}
-  on:touchmove|preventDefault={() => {}}
-  on:wheel|preventDefault={() => {}}
 >
   <div
     style:background-color={overlayColor} 
     class="overlay"
     class:overlay-active={localOpen}
     on:click={handleOverlayClick}
+    on:touchmove|preventDefault={() => {}}
+    on:wheel|preventDefault={() => {}}
   ></div>
   {#if localOpen }
     <div

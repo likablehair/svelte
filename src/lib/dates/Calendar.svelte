@@ -17,6 +17,7 @@
     dayHoverColor: string = '#c9c8c873',
     daySelectedColor: string = '#adadad',
     selectedTextColor: string = "black",
+    gridGap: string = "1px",
     dayBackgroundColor: string = undefined,
     animationDuration: number = 200
 
@@ -54,6 +55,7 @@
     <div
       in:fly="{{delay: animationDuration, duration: animationDuration, y: 30}}"
       out:fly|local="{{duration: animationDuration, y: -30}}"
+      style:gap={gridGap}
       class="grid-layout"
     >
       {#if showHeader}
@@ -108,7 +110,7 @@
 .grid-layout {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-  gap: 1px;
+  height: 100%;
 }
 
 .day-slot {

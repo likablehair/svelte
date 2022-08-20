@@ -104,8 +104,6 @@ export const getDateRows: (monthIndex: number, year: number, locale?: Locale) =>
     else startIndex -= 1
   }
 
-  console.log(startIndex)
-
   let lastIndex = new Date(year, monthIndex + 1, 0).getDay()
   if(locale == 'it') {
     if (lastIndex === 0) lastIndex = 6
