@@ -24,6 +24,7 @@
   id={id}
   type="checkbox"
   bind:checked={value}
+  on:change
   disabled={disabled}
 >
 
