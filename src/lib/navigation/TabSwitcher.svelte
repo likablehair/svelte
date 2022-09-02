@@ -7,7 +7,7 @@
 </script>
 
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { afterUpdate, onMount } from 'svelte'
 
   export let tabs: Tab[]  = [],
     selected: string = undefined,
@@ -25,6 +25,10 @@
     if(!!selected) {
       setBookmarkPosition()
     }
+  })
+
+  afterUpdate(() => {
+    setBookmarkPosition()
   })
 
   import { createEventDispatcher } from 'svelte';
@@ -52,8 +56,6 @@
       bookmarkLeft = tabButton.offsetLeft + 5
     }
   }
-
-  $: if(!!selected) setBookmarkPosition()
 </script>
 
 <div 
