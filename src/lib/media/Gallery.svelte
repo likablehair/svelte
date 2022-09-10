@@ -1,6 +1,3 @@
-<script lang="ts" context="module">
-</script>
-
 <script lang="ts">
   import type { Image } from "./ImageGrid.svelte";
 
@@ -24,13 +21,13 @@
     selectedImage = images[selectedIndex]
   }
 
-  function switchNext() {
+  function switchPrevious() {
     if(selectedIndex < (images.length - 1)) {
       selectedIndex++
     }
   }
 
-  function switchPrevious() {
+  function switchNext() {
     if(selectedIndex > 0) {
       selectedIndex--
     }
