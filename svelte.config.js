@@ -9,10 +9,10 @@ const config = {
 
   kit: {
     adapter: adapter({ out: 'build' }),
-    package: {
-      dir: 'package',
-      emitTypes: true
-    }
+  },
+  package: {
+    dir: 'package',
+    emitTypes: true
   }
 };
 

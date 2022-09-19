@@ -7,7 +7,7 @@
 */
 
 import { readable } from "svelte/store";
-import { browser } from "$app/env";
+import { browser } from "$app/environment";
 
 export type DeviceDimension = {
   xs: boolean,

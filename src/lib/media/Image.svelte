@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { browser } from '$app/env';
+  import { browser } from '$app/environment';
 
   export let maxWidth: string = undefined,
     maxHeight: string = undefined,

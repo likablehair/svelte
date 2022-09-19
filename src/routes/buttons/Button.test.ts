@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import { fireEvent, getByTestId, render } from '@testing-library/svelte'
-import ButtonPlayground from './Button.svelte'
+import ButtonPlayground from './Button/+page.svelte'
 
 test('shows proper slots when rendered', async () => {
   const { getByText } = render(ButtonPlayground, {})

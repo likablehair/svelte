@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { browser } from "$app/env";
+  import { browser } from "$app/environment";
   import { beforeUpdate } from "svelte";
   export let open: boolean = false,
     overlayOpacity: string = "30%",
