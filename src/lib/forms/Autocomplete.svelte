@@ -50,18 +50,38 @@
     chipTextColor: string = "black",
     chipHeight: string = "30px"
 
+  let dispatch = createEventDispatcher<{
+    'change': {
+      unselect: Item | undefined,
+      select: Item | undefined,
+      selection: Item[]
+    }
+  }>()
+
   function select(item: Item) {
     const alreadyPresent = values.findIndex((i) => i.value === item.value) != -1
     if(!alreadyPresent) {
       if(multiple) values = [...values, item]
       else values = [ item ]
       refreshMenuWidth()
+
+      dispatch('change', {
+        unselect: undefined,
+        select: item,
+        selection: values 
+      })
     }
   }
 
   function unselect(item: Item) {
     values = values.filter((i) => i.value != item.value)
     refreshMenuWidth()
+
+    dispatch('change', {
+      unselect: item,
+      select: undefined,
+      selection: values 
+    })
   }
 
   function toggle(item: Item) {
@@ -139,6 +159,7 @@
   import Textfield from "$lib/forms/Textfield.svelte";
   import Chip from '$lib/navigation/Chip.svelte';
   import Menu from '$lib/common/Menu.svelte';
+    import { createEventDispatcher } from 'svelte';
 </script>
 
 <svelte:window></svelte:window>
