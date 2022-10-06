@@ -18,6 +18,7 @@
     headerColor: string = "rgba(0,0,0,0.05)",
     rowSeparatorColor: string = headerColor,
     headerHeight: string = "30px",
+    headerBorderRadius: string = "5px",
     rowHeight: string = "70px",
     minWidth: string = undefined,
     height: string = "100%",
@@ -31,7 +32,11 @@
       style:width="100%"
       style:min-width={minWidth}
     >
-      <thead style:background-color={headerColor} style:height={headerHeight}>
+      <thead 
+        style:background-color={headerColor} 
+        style:height={headerHeight}
+        style:border-radius={headerBorderRadius}
+      >
         {#each headers as head}
           <th style:width={head.width} style:min-width={head.minWidth}>
             {head.label}
