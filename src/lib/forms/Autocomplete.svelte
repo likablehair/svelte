@@ -115,7 +115,14 @@
 
   let input: HTMLElement
   function handleContainerClick() {
-    if(!menuOpened) input.focus()
+    if(!menuOpened) {
+      input.focus()
+
+      // had to timeout because it was catching click outside
+      setTimeout(() => {
+        openMenu()
+      }, 50);
+    }
   }
 
   let searchText: string, filteredItems: Item[] = items

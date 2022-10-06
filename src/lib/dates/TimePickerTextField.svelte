@@ -1,7 +1,7 @@
 <script lang="ts">
   import Textfield from "$lib/forms/Textfield.svelte";
   import VerticalTextSwitch from "$lib/forms/VerticalTextSwitch.svelte";
-import DatePicker from "./DatePicker.svelte";
+  import DatePicker from "./DatePicker.svelte";
 
   export let hourFormat: "12" | "24" = "24",
     dayPeriod: "am" | "pm" = "am",

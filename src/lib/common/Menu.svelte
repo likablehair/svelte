@@ -102,13 +102,25 @@
       open = false
     })
 
+    window.addEventListener('touchstart', (event) => {
+      open = false
+    })
+
     if(!!activator) {
       activator.addEventListener('click', (event) => {
         event.stopPropagation()
-      })  
+      })
+
+      activator.addEventListener('touchstart', (event) => {
+        event.stopPropagation()
+      })
     }
 
     menuElement.addEventListener('click', (event) => {
+      event.stopPropagation()
+    })
+
+    menuElement.addEventListener('touchstart', (event) => {
       event.stopPropagation()
     })
   }
