@@ -27,7 +27,7 @@
     paddingBottom: string = undefined,
     paddingTop: string = undefined,
     fontSize: string = undefined,
-    type: 'text' | 'password' = 'text',
+    type: 'text' | 'password' | 'number' = 'text',
     readonly: boolean = false,
     inputElement: HTMLElement = undefined
 
