@@ -7,7 +7,7 @@
   export let label: string = "",
     placeholder: string = "",
     color: string = null,
-    value: string = "",
+    value: string | number = "",
     disabled: boolean = false,
     variant: VariantOptions = 'outlined',
     width: string = "100%",
@@ -241,6 +241,29 @@
               on:keyup
               bind:this={inputElement}
             />
+          {:else if type == 'number'}
+            <input 
+              style:background-color={backgroundColor}
+              style:color={textColor}
+              style:font-size={fontSize}
+              id={inputId} 
+              class="input-outlined"
+              type="number"
+              placeholder={placeholder}
+              disabled={disabled}
+              readonly={readonly}
+              bind:value={value}
+              on:change
+              on:input
+              on:focus={handleFocus}
+              on:focus
+              on:blur={handleBlur}
+              on:blur
+              on:keydown
+              on:keypress
+              on:keyup
+              bind:this={inputElement}
+            />
           {/if}
           <div>
             <slot name="append-inner"></slot>
@@ -284,6 +307,29 @@
             id={inputId}
             class="input-boxed"
             type="text"
+            placeholder={placeholder || label}
+            disabled={disabled}
+            readonly={readonly}
+            bind:value={value}
+            on:change
+            on:input
+            on:focus={handleFocus}
+            on:focus
+            on:blur={handleBlur}
+            on:blur
+            on:keydown
+            on:keypress
+            on:keyup
+            bind:this={inputElement}
+          />
+        {:else if type == 'number'}
+          <input
+            style:background-color={backgroundColor}
+            style:color={textColor}
+            style:font-size={fontSize}
+            id={inputId}
+            class="input-boxed"
+            type="number"
             placeholder={placeholder || label}
             disabled={disabled}
             readonly={readonly}
