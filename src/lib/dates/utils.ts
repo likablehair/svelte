@@ -218,14 +218,21 @@ const dateToDayAndHourd: (date: Date, locale?: Locale) => string = (date, locale
     let period
     if (hours > 12){
       period = 'pm'
-      hours -=12
-    }
-    else
+      hours -= 12
+    } else {
       period = 'am'
-    return `${day} at ${hours}:${minutes} ${period}`
+    }
+
+    let minuteFormatted: string = minutes.toString()
+    if(minutes < 10) minuteFormatted = '0' + minutes
+    return `${day} at ${hours}:${minuteFormatted} ${period}`
   }
-  else if (locale == 'it')
-    return `${day} alle ${hours}:${minutes}`
+  else if (locale == 'it') {
+    let minutesFormatted: string = minutes.toString()
+    if(minutes < 10) minutesFormatted = '0' + minutesFormatted
+    
+    return `${day} alle ${hours}:${minutesFormatted}`
+  }
 }
 
 export const dateToString: (date: Date, format?: DateFormat, locale?: Locale) => string = (date, format='extended', locale='it') => {
