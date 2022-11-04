@@ -53,7 +53,11 @@
     color={color}
     items={items}
     on:item-click
-  ></Drawer>
+  >
+    {#if !!$$slots.drawer}
+      <slot name="drawer"></slot>
+    {/if}
+  </Drawer>
 {/if}
 <nav
   style:color={color}
