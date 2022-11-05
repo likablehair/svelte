@@ -15,7 +15,9 @@
         icon: string = "mdi-folder",
         iconSize: number = 30,
         selectedRowColor: string = "red",
-        selectedRowBackground: string = "rgba(0,0,0,0.1)";
+        selectedRowBackground: string = "rgba(0,0,0,0.1)",
+        hoverColor: string = "rgba(255,0,0,0.5)",
+        borderColor: string = "rgba(0, 0, 0, 0.2)";
 
     let fileActive: File = null;
 
@@ -38,7 +40,11 @@
 
   </script>
 
-  <div class="card-container">
+  <div 
+    class="card-container" 
+    style:--file-input-list-hover-color={hoverColor}
+    style:--file-input-list-border-color={borderColor}
+  >
     <FileInput
       {persistOverUpload}
       {height}
@@ -101,7 +107,7 @@
         Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     }
     .body-container {
-      border: dotted rgba(0, 0, 0, 0.2);
+      border: dotted var(--file-input-list-border-color);
       border-radius: 5px;
       box-sizing: border-box;
       width: calc(100% - 20px);
@@ -115,7 +121,7 @@
       overflow-y: auto;
     }
     .active {
-      border-color: rgba(255,0,0,0.5);
+      border-color: var(--file-input-list-hover-color);
     }
     .file-active {
       color: var(--selected-color);
