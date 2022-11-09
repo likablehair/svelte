@@ -10,6 +10,7 @@
     color: string = undefined,
     drawerBackgroundColor: string = 'white',
     drawerColor: string = undefined,
+    drawerSpace: string | undefined = undefined,
     mobileMenu: boolean = true,
     zIndex: number = 25;
 
@@ -54,6 +55,7 @@
     backgroundColor={drawerBackgroundColor}
     color={drawerColor}
     items={items}
+    space={drawerSpace}
     on:item-click
   >
     {#if !!$$slots.drawer}
