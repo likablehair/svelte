@@ -8,6 +8,8 @@
     initialBackgroundColor: string = undefined,
     backgroundColor: string = 'white',
     color: string = undefined,
+    drawerBackgroundColor: string = 'white',
+    drawerColor: string = undefined,
     mobileMenu: boolean = true,
     zIndex: number = 25;
 
@@ -49,8 +51,8 @@
 {#if mobileMenu }
   <Drawer
     bind:open={openDrawer}
-    backgroundColor={backgroundColor}
-    color={color}
+    backgroundColor={drawerBackgroundColor}
+    color={drawerColor}
     items={items}
     on:item-click
   >
