@@ -82,6 +82,16 @@
       {tab.label}
     </div>
   {/each}
+  {#if $$slots.append}
+    <div 
+      style:flex-grow="1"
+      style:display="flex"
+      style:justify-content="flex-end"
+    >
+      <slot name="append">
+      </slot>
+    </div>
+  {/if}
   <span
     style:left={bookmarkLeft + 'px'}
     style:width={bookmarkWidth + 'px'}
