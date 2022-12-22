@@ -20,13 +20,13 @@
     headerColor: string = "white",
     cardColor: string = "black",
     cardBackGroundColor: string = "rgba(255,255,255,0)",
+    selectableYears: number[] = [...Array(150).keys()].map(
+      (i) => i + (new Date().getFullYear() - 75)
+    ),
     height: string = "100%",
     width: string = "100%";
 
   let selectorText: string = undefined;
-  let selectableYears: number[] = [...Array(150).keys()].map(
-    (i) => i + (new Date().getFullYear() - 75)
-  );
   let elementDisabled: "year" | "date" = "date";
 
   $: visibleSelector = view == "day" || view == "month";
