@@ -4,6 +4,8 @@
     description: string = undefined,
     borderColor: string = "#B8B8B8",
     iconColor: string = "#8D8D8D",
+    iconSize: number = 40,
+    iconName: string = 'mdi-file',
     borderWidth: string = '1px',
     maxWidth: string = undefined,
     maxHeight: string = undefined,
@@ -44,10 +46,11 @@
   <div
     style:display="flex"
     style:align-items="center"
+    style:gap="10px"
   >
     <Icon 
-      name="mdi-file" 
-      size={40} 
+      name={iconName}
+      size={iconSize}
       color={iconColor}
     ></Icon>
     <div
