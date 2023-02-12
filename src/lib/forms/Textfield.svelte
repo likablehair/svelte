@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  export type VariantOptions = 'outlined' | 'boxed'
+  export type VariantOptions = 'outlined' | 'boxed';
 </script>
 
 <script lang="ts">
@@ -29,7 +29,8 @@
     fontSize: string = undefined,
     type: 'text' | 'password' | 'number' = 'text',
     readonly: boolean = false,
-    inputElement: HTMLElement = undefined
+    inputElement: HTMLElement = undefined,
+    autocomplete: boolean = true
 
   import { v4 as uuidv4 } from 'uuid';
   import { onMount } from 'svelte'
@@ -38,7 +39,7 @@
     focused: boolean = false,
     legendWidth: number = 0,
     labelElement: HTMLElement = undefined
-  
+
   onMount(() => {
     if(!!labelElement) {
       legendWidth = (labelElement.offsetWidth * 0.8) + 8
@@ -149,7 +150,7 @@
 </style>
 
 
-<div 
+<div
   style:width={width}
   style:min-width={minWidth}
   style:max-width={maxWidth}
@@ -160,12 +161,12 @@
   style:--textfield-focus-border-color={focusBorderColor}
   style:--textfield-legend-width={legendWidth + 'px'}
   style:--textfield-focused-box-shadow={focusedBoxShadow}
-  class="input-container" 
+  class="input-container"
   class:focused={focused}
   class:not-focused={!focused}
   class:texted={focused || !!value}
 >
-  <fieldset 
+  <fieldset
     aria-hidden="true"
     style:border-radius={borderRadius}
     style:background-color={backgroundColor}
@@ -180,12 +181,12 @@
   >
     {#if variant == 'outlined'}
         <legend class="legend-outlined"></legend>
-        <label 
+        <label
           for={inputId}
           class="label-outlined"
           bind:this={labelElement}
         >{label}</label>
-        <div 
+        <div
           style:display="flex"
           style:position="relative"
           style:bottom="8px"
@@ -196,11 +197,12 @@
             <slot name="prepend-inner"></slot>
           </div>
           {#if type == 'password'}
-            <input 
+            <input
+              autocomplete={autocomplete ? 'on' : 'new-password'}
               style:background-color={backgroundColor}
               style:color={textColor}
               style:font-size={fontSize}
-              id={inputId} 
+              id={inputId}
               class="input-outlined"
               type="password"
               placeholder={placeholder}
@@ -219,11 +221,12 @@
               bind:this={inputElement}
             />
           {:else if type == 'text'}
-            <input 
+            <input
+              autocomplete={autocomplete ? 'on' : 'off'}
               style:background-color={backgroundColor}
               style:color={textColor}
               style:font-size={fontSize}
-              id={inputId} 
+              id={inputId}
               class="input-outlined"
               type="text"
               placeholder={placeholder}
@@ -270,7 +273,7 @@
           </div>
         </div>
     {:else if variant == 'boxed'}
-      <div 
+      <div
         style:display="flex"
       >
         <div>
@@ -278,6 +281,7 @@
         </div>
         {#if type == 'password'}
           <input
+            autocomplete={autocomplete ? 'on' : 'new-password'}
             style:background-color={backgroundColor}
             style:color={textColor}
             style:font-size={fontSize}
@@ -297,10 +301,10 @@
             on:keydown
             on:keypress
             on:keyup
-            bind:this={inputElement}
           />
         {:else if type == 'text'}
           <input
+            autocomplete={autocomplete ? 'on' : 'off'}
             style:background-color={backgroundColor}
             style:color={textColor}
             style:font-size={fontSize}
