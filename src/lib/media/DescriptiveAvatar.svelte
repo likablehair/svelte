@@ -58,6 +58,8 @@
   style:align-items="center"
   style:flex-direction={reverse ? direction + '-reverse' : direction}
   class="descriptive-avatar-container"
+  on:click
+  on:keypress
 >
   <div class="avatar-container">
     <slot name="avatar">
