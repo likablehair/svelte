@@ -7,7 +7,7 @@
 */
 
 import { readable } from "svelte/store";
-import { browser } from "$app/environment";
+import { BROWSER } from 'esm-env';
 
 export type DeviceDimension = {
   xs: boolean;
@@ -123,7 +123,7 @@ let defaultDimension: DeviceDimension = {
   l: false,
   xl: false,
 };
-if (browser) {
+if (BROWSER) {
   defaultDimension = getDeviceDimensionFromWidth(window.innerWidth);
 }
 
@@ -155,7 +155,7 @@ export default readable<DeviceDimension>(defaultDimension, (set) => {
     if (results) set(results);
   };
 
-  if (browser) {
+  if (BROWSER) {
     set(getDeviceDimensionFromWidth(window.innerWidth));
 
     mqlXs = window.matchMedia("(max-width: 425px)");
@@ -175,7 +175,7 @@ export default readable<DeviceDimension>(defaultDimension, (set) => {
   }
 
   return () => {
-    if (browser) {
+    if (BROWSER) {
       mqlXs.removeEventListener("change", listenerXs);
       mqlS.removeEventListener("change", listenerS);
       mqlM.removeEventListener("change", listenerM);

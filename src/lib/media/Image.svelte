@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { browser } from "$app/environment";
+  import { BROWSER } from 'esm-env';
 
   export let maxWidth: string | undefined = undefined,
     maxHeight: string | undefined = undefined,
@@ -19,7 +19,7 @@
 
   const load = (src: string | undefined) => {
     return new Promise<string | undefined>((resolve, reject) => {
-      if (browser && !!src) {
+      if (BROWSER && !!src) {
         fetch(src)
           .then((resp) => {
             resp

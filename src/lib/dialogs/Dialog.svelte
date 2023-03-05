@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { browser } from "$app/environment";
+  import { BROWSER } from 'esm-env';
   import { beforeUpdate } from "svelte";
   export let open = false,
     overlayOpacity = "30%",
@@ -23,7 +23,7 @@
 
       document.body.style.overflow = "hidden";
     } else if (!open) {
-      if (browser) {
+      if (BROWSER) {
         let otherDialogs: NodeListOf<HTMLElement> =
           document.querySelectorAll("[data-dialog=true]");
         if (otherDialogs.length <= 1) {
