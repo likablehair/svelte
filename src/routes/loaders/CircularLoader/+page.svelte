@@ -9,5 +9,5 @@
   style:align-items="center"
   style:flex-direction="column"
 >
-  <CircularLoader></CircularLoader>
+  <CircularLoader />
 </div>

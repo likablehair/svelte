@@ -1,42 +1,44 @@
 <script lang="ts">
   type Product = {
-    image: string,
-    title: string,
-    sale?: boolean,
-    saleText?: string,
-    price?: number,
-    currency?: string,
-    discount?: number
-  }
+    image: string;
+    title: string;
+    sale?: boolean;
+    saleText?: string;
+    price?: number;
+    currency?: string;
+    discount?: number;
+  };
 
   export let products: Product[] = [],
-    productMaxWidth: string = '90vw',
-    productMinWidth: string = '200px',
-    productMaxHeight: string = '90vh',
-    productMinHeight: string = '300px',
-    productHeight: string = '300px',
-    productWidth: string = '200px',
-    width: string = '100%',
-    gap: string = '1rem'
+    productMaxWidth = "90vw",
+    productMinWidth = "200px",
+    productMaxHeight = "90vh",
+    productMinHeight = "300px",
+    productHeight = "300px",
+    productWidth = "200px",
+    width = "100%",
+    gap = "1rem";
 
-  import ProductCard from './ProductCard.svelte'
+  import ProductCard from "./ProductCard.svelte";
 </script>
 
-<div 
-  style:width={width}
-  style:gap={gap}
-  style:grid-template-columns={`repeat(auto-fit, minmax(${productMinWidth || productWidth || '200px'}, ${productWidth}))`}
+<div
+  style:width
+  style:gap
+  style:grid-template-columns={`repeat(auto-fit, minmax(${
+    productMinWidth || productWidth || "200px"
+  }, ${productWidth}))`}
   class="product-grid-container"
 >
-  {#each products as product }
+  {#each products as product}
     <div class="product-container">
       <ProductCard
         height={productHeight}
         width={productWidth}
-        max-width={productMaxWidth}
-        min-width={productMinWidth}
-        max-height={productMaxHeight}
-        min-height={productMinHeight}
+        maxWidth={productMaxWidth}
+        minWidth={productMinWidth}
+        maxHeight={productMaxHeight}
+        minHeight={productMinHeight}
         image={product.image}
         title={product.title}
         sale={product.sale}
@@ -46,7 +48,7 @@
         discount={product.discount}
       >
         <svelte:fragment slot="sizes">
-          <slot name="sizes" {product} ></slot>
+          <slot name="sizes" {product} />
         </svelte:fragment>
       </ProductCard>
     </div>

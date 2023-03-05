@@ -1,17 +1,17 @@
 <script lang="ts">
-  export let value: boolean = false,
-    height: string = "20px",
-    width: string = "40px",
-    padding: string = "6px",
-    borderRadius: string = "10px",
-    toggleActiveColor: string = "#5c5c5c",
-    toggleDeactiveColor: string = "#5c5c5c",
-    backgroundActiveColor: string = "#e6e6e6",
-    backgroundDeactiveColor: string = "#e6e6e6",
-    animationDuration: string = "0.1s";
+  export let value = false,
+    height = "20px",
+    width = "40px",
+    padding = "6px",
+    borderRadius = "10px",
+    toggleActiveColor = "#5c5c5c",
+    toggleDeactiveColor = "#5c5c5c",
+    backgroundActiveColor = "#e6e6e6",
+    backgroundDeactiveColor = "#e6e6e6",
+    animationDuration = "0.1s";
 </script>
 
-<div 
+<div
   style:--switch-toggle-active-color={toggleActiveColor}
   style:--switch-toggle-deactive-color={toggleDeactiveColor}
   style:--switch-animation-duration={animationDuration}
@@ -21,19 +21,16 @@
   style:--switch-border-radius={borderRadius}
   class="container"
 >
-  <div 
+  <div
     class="inner-container"
-    style:background-color={value ? backgroundActiveColor : backgroundDeactiveColor}
-    on:click={() => value = !value}
+    style:background-color={value
+      ? backgroundActiveColor
+      : backgroundDeactiveColor}
+    on:click={() => (value = !value)}
+    on:keypress={() => (value = !value)}
   >
-    <input 
-      bind:checked={value}
-      type="checkbox"
-      on:change
-    >
-    <span
-      class="slider"
-    ></span>
+    <input bind:checked={value} type="checkbox" on:change />
+    <span class="slider" />
   </div>
 </div>
 
@@ -75,8 +72,14 @@
     position: absolute;
     top: var(--switch-toggle-top-padding);
     left: var(--switch-toggle-left-padding);
-    width: calc(var(--switch-width) / 2 - var(--switch-toggle-right-padding) - var(--switch-toggle-left-padding));
-    height: calc(var(--switch-height) - var(--switch-toggle-top-padding) - var(--switch-toggle-bottom-padding));
+    width: calc(
+      var(--switch-width) / 2 - var(--switch-toggle-right-padding) -
+        var(--switch-toggle-left-padding)
+    );
+    height: calc(
+      var(--switch-height) - var(--switch-toggle-top-padding) -
+        var(--switch-toggle-bottom-padding)
+    );
     border-radius: var(--switch-border-radius);
     background-color: var(--switch-toggle-deactive-color);
     transition: var(--switch-animation-duration);

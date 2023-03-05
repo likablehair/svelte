@@ -1,20 +1,18 @@
 <script lang="ts">
+  import { fly } from "svelte/transition";
 
-  import { fly } from 'svelte/transition'
+  export let value = false,
+    height = "100%",
+    width = "100%",
+    backgroundColor: string | undefined = undefined,
+    firstColor: string | undefined = undefined,
+    secondColor: string | undefined = firstColor,
+    fontSize = "12px",
+    hoverBackgroundColor: string | undefined = undefined,
+    hoverBoxShadow: string | undefined = undefined,
+    animationDuration = 200;
 
-  export let value: boolean = false,
-    height: string = "100%",
-    width: string = "100%",
-    backgroundColor: string = undefined,
-    firstColor: string = undefined,
-    secondColor: string = firstColor,
-    fontSize: string = "12px",
-    hoverBackgroundColor: string = undefined,
-    hoverBoxShadow: string = undefined,
-    animationDuration: number = 200;
-
-  let optionHeight: number = undefined
-
+  let optionHeight: number | undefined = undefined;
 </script>
 
 <div
@@ -25,29 +23,38 @@
   style:--vertical-text-switch-hover-background-color={hoverBackgroundColor}
   style:--vertical-text-switch-hover-box-shadow={hoverBoxShadow}
   bind:clientHeight={optionHeight}
-  on:click={()=>value = !value}
+  on:click={() => (value = !value)}
+  on:keypress={() => (value = !value)}
   style:background-color={backgroundColor}
   style:padding="5px"
 >
   {#if value}
     <div
-      in:fly="{{ y: optionHeight/2, duration: animationDuration/2, delay: animationDuration/2}}"
-      out:fly="{{ y: -optionHeight/2, duration: animationDuration/2}}"
+      in:fly={{
+        y: optionHeight / 2,
+        duration: animationDuration / 2,
+        delay: animationDuration / 2,
+      }}
+      out:fly={{ y: -optionHeight / 2, duration: animationDuration / 2 }}
       class="option"
       style:color={firstColor}
       style:font-size={fontSize}
     >
-      <slot name="trueOption"></slot>
+      <slot name="trueOption" />
     </div>
   {:else}
     <div
-      in:fly="{{ y: optionHeight/2, duration: animationDuration/2, delay: animationDuration/2}}"
-      out:fly="{{ y: -optionHeight/2, duration: animationDuration/2}}"
+      in:fly={{
+        y: optionHeight / 2,
+        duration: animationDuration / 2,
+        delay: animationDuration / 2,
+      }}
+      out:fly={{ y: -optionHeight / 2, duration: animationDuration / 2 }}
       class="option"
       style:color={secondColor}
       style:font-size={fontSize}
     >
-      <slot name="falseOption"></slot>
+      <slot name="falseOption" />
     </div>
   {/if}
   <input type="checkbox" bind:value />

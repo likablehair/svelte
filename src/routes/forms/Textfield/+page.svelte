@@ -1,29 +1,13 @@
 <script>
-  let textValue = "my text"
+  let textValue = "my text";
 
   function handleInputChange(event) {
-    console.log(event)
+    console.log(event);
   }
 
-  import Textfield from '$lib/forms/Textfield.svelte';
-  import Icon from '$lib/media/Icon.svelte'
+  import Textfield from "$lib/forms/Textfield.svelte";
+  import Icon from "$lib/media/Icon.svelte";
 </script>
-
-<style>
-  .card-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    height: 100vh;
-    width: 100vw;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  }
-
-  .value {
-    margin-top: 30px;
-  }
-</style>
 
 <div class="card-container">
   <Textfield
@@ -31,8 +15,8 @@
     label="Nome"
     color="#22a939"
     bind:value={textValue}
-    on:input="{handleInputChange}"
-  ></Textfield>
+    on:input={handleInputChange}
+  />
   <div class="value">
     il valore: {textValue}
   </div>
@@ -43,7 +27,7 @@
     variant="boxed"
     borderRadius="0px"
     bind:value={textValue}
-  ></Textfield>
+  />
   <Textfield
     width="300px"
     label="Con icona"
@@ -52,7 +36,7 @@
     bind:value={textValue}
   >
     <svelte:fragment slot="append-inner">
-      <Icon name="mdi-home"></Icon>
+      <Icon name="mdi-home" />
     </svelte:fragment>
   </Textfield>
   <Textfield
@@ -63,18 +47,13 @@
     bind:value={textValue}
   >
     <svelte:fragment slot="append-inner">
-      <Icon name="mdi-home"></Icon>
+      <Icon name="mdi-home" />
     </svelte:fragment>
   </Textfield>
 
-  <Textfield
-    width="300px"
-    label="Cerca ..."
-    color="#B8B8B8"
-    variant="boxed"
-  >
+  <Textfield width="300px" label="Cerca ..." color="#B8B8B8" variant="boxed">
     <svelte:fragment slot="prepend-inner">
-      <Icon name="mdi-search-web" class="mr-2" color="#B8B8B8"></Icon>
+      <Icon name="mdi-search-web" class="mr-2" color="#B8B8B8" />
     </svelte:fragment>
   </Textfield>
 
@@ -92,7 +71,7 @@
   >
     <svelte:fragment slot="append-inner">
       <span style:margin-left="15px">
-        <Icon name="mdi-arrow-right" color="white"></Icon>
+        <Icon name="mdi-arrow-right" color="white" />
       </span>
     </svelte:fragment>
   </Textfield>
@@ -112,7 +91,7 @@
     focusedBoxShadow="rgb(149 157 165 / 20%) 2px 2px 10px"
     borderWeight="1px"
     autocomplete={false}
-  ></Textfield>
+  />
 
   <Textfield
     width="300px"
@@ -130,5 +109,22 @@
     focusedBoxShadow="rgb(149 157 165 / 20%) 2px 2px 10px"
     borderWeight="1px"
     autocomplete={false}
-></Textfield>
+  />
 </div>
+
+<style>
+  .card-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  }
+
+  .value {
+    margin-top: 30px;
+  }
+</style>

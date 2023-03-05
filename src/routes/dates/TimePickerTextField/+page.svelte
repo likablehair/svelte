@@ -2,22 +2,23 @@
   import TimePickerTextField from "$lib/dates/TimePickerTextField.svelte";
 
   let time: Date = undefined,
-    text: string = "",
-    validTime: boolean = false
+    text = "",
+    validTime = false;
 
-  $: validTime = !(time == undefined)
-
+  $: validTime = !(time == undefined);
 </script>
 
 <div class="card-container">
   <TimePickerTextField
     width="300px"
-    bind:text={text}
-    bind:time={time}
-    hourFormat='12'
-    focusedBoxShadow={validTime?"rgba(0,0,0,0.2) 0px 2px 10px":"rgba(255,0,0,0.4) 0px 2px 10px"}
+    bind:text
+    bind:time
+    hourFormat="12"
+    focusedBoxShadow={validTime
+      ? "rgba(0,0,0,0.2) 0px 2px 10px"
+      : "rgba(255,0,0,0.4) 0px 2px 10px"}
   />
-  <div style:margin-top=50px>
+  <div style:margin-top="50px">
     <div>
       <b>date:</b>
       {time}

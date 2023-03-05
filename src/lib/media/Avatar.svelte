@@ -1,45 +1,44 @@
 <script lang="ts">
-  export let 
-    src: string,
-    alt: string = "",
-    width: string = "40px",
-    maxWidth: string = undefined,
-    minWidth: string = undefined,
-    height: string = "40px",
-    maxHeight: string = undefined,
-    minHeight: string = undefined,
-    lazyLoaded: boolean = false,
-    referrerpolicy: string = "no-referrer",
-    borderRadius: string = "50%";
+  export let src: string,
+    alt = "",
+    width = "40px",
+    maxWidth: string | undefined = undefined,
+    minWidth: string | undefined = undefined,
+    height = "40px",
+    maxHeight: string | undefined = undefined,
+    minHeight: string | undefined = undefined,
+    lazyLoaded = false,
+    referrerpolicy: ReferrerPolicy | null | undefined = "no-referrer",
+    borderRadius = "50%";
 
-  import Image from '$lib/media/Image.svelte'
+  import Image from "$lib/media/Image.svelte";
 </script>
 
 {#if lazyLoaded}
   <Image
-    src={src}
-    width={width}
-    maxWidth={maxWidth}
-    minWidth={minWidth}
-    height={height}
-    maxHeight={maxHeight}
-    minHeight={minHeight}
-    borderRadius={borderRadius}
+    {src}
+    {width}
+    {maxWidth}
+    {minWidth}
+    {height}
+    {maxHeight}
+    {minHeight}
+    {borderRadius}
     disableHover={true}
     showSkeletonLoader={true}
-  ></Image>
+  />
 {:else}
   <img
-    src={src}
-    alt={alt}
-    style:width={width}
+    {src}
+    {alt}
+    style:width
     style:max-width={maxWidth}
     style:min-width={minWidth}
-    style:height={height}
+    style:height
     style:max-height={maxHeight}
     style:min-height={minHeight}
     style:border-radius={borderRadius}
     style:object-fit="cover"
-    referrerpolicy={referrerpolicy}
+    {referrerpolicy}
   />
 {/if}

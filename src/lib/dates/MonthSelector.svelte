@@ -1,43 +1,39 @@
 <script lang="ts">
-  import type { Locale } from './utils'
-  import { getMonthName } from './utils'
+  import type { Locale } from "./utils";
+  import { getMonthName } from "./utils";
 
-  export let selectedMonth: number = undefined,
-    locale: Locale = 'it',
-    height: string = "100%",
-    width: string = "100%",
-    monthSelectedColor: string = '#adadad',
-    monthSelectedTextColor: string = '#21a';
-  
-  import { createEventDispatcher } from 'svelte';
+  export let selectedMonth: number | undefined = undefined,
+    locale: Locale = "it",
+    height = "100%",
+    width = "100%",
+    monthSelectedColor = "#adadad",
+    monthSelectedTextColor = "#21a";
+
+  import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher<{
-    "click": {
-      monthIndex: number,
-    }
-  }>()
+    click: {
+      monthIndex: number;
+    };
+  }>();
 
   function handleMonthClick(monthIndex: number) {
-    selectedMonth = monthIndex
+    selectedMonth = monthIndex;
 
-    dispatch('click', {
-      monthIndex
-    })
+    dispatch("click", {
+      monthIndex,
+    });
   }
-  import Button from '$lib/buttons/Button.svelte';
+  import Button from "$lib/buttons/Button.svelte";
 </script>
 
-<div 
-  style:height={height}
-  style:width={width}
-  class="selector-container"
->
+<div style:height style:width class="selector-container">
   {#each [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] as monthIndex}
     <slot
       name="selector"
       month={monthIndex}
       monthName={getMonthName(monthIndex, locale)}
     >
-      <Button 
+      <Button
         active={monthIndex == selectedMonth}
         display="flex"
         alignItems="center"

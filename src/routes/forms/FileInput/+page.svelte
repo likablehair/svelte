@@ -2,29 +2,33 @@
   import FileInput from "$lib/forms/FileInput.svelte";
 
   let files: File[] = [];
-
 </script>
 
 <div class="card-container">
   <FileInput
-    persistOverUpload = {true}
+    persistOverUpload={true}
     height="100px"
     width="500px"
     backgroundColor="rgba(220,220,220,0.1)"
     rounded
-    bind:files={files}
-    on:fileDrop="{(e)=>{ console.log(e.detail.files) }}"
-    on:fileSelect="{(e)=>{ console.log(e.detail.files) }}"
+    bind:files
+    on:fileDrop={(e) => {
+      console.log(e.detail.files);
+    }}
+    on:fileSelect={(e) => {
+      console.log(e.detail.files);
+    }}
     disabled={false}
   >
-    <span slot="body"
-      let:active={active}
+    <span
+      slot="body"
+      let:active
       style:height="100%"
       style:width="100%"
       style:display="flex"
     >
-      <div class="body-container"  class:active={active}>
-        <span >Drop file here or click to upload</span>
+      <div class="body-container" class:active>
+        <span>Drop file here or click to upload</span>
       </div>
     </span>
   </FileInput>
@@ -32,7 +36,7 @@
   <div style:margin-top="30px">
     {#each files as file}
       {file.name}
-      <br>
+      <br />
     {/each}
   </div>
 </div>
@@ -62,7 +66,7 @@
     transition: 0.2s;
   }
   .active {
-    border-color: rgba(255,0,0,0.5);
-    color: rgba(255,0,0,0.7);
+    border-color: rgba(255, 0, 0, 0.5);
+    color: rgba(255, 0, 0, 0.7);
   }
 </style>

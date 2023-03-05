@@ -1,24 +1,9 @@
 <script>
-  import Card from '$lib/common/Card.svelte';
+  import Card from "$lib/common/Card.svelte";
 </script>
 
-<style>
-  .card-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    width: 100vw;
-  }
-</style>
-
 <div class="card-container">
-  <Card 
-    padding="10px"
-    height="200px"
-    backgroundColor="green"
-    color="white"
-  >
+  <Card padding="10px" height="200px" backgroundColor="green" color="white">
     <svelte:fragment slot="header">In the header</svelte:fragment>
     <div>Hey I'm in a card</div>
     <div>It's a long story</div>
@@ -38,3 +23,13 @@
     <svelte:fragment slot="footer">In the footer</svelte:fragment>
   </Card>
 </div>
+
+<style>
+  .card-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+  }
+</style>

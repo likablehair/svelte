@@ -2,83 +2,82 @@
   import type { Image } from "./ImageGrid.svelte";
 
   export let images: Image[] = [],
-    columns: number = undefined,
-    imageMaxWidth: string = undefined,
-    imageMinWidth: string = undefined,
-    imageMaxHeight: string = undefined,
-    imageMinHeight: string = undefined,
-    imageHeight: string = undefined,
-    imageWidth: string = undefined,
-    disableHover: boolean = false,
-    dark: boolean = false
+    columns: number | undefined = undefined,
+    imageMaxWidth: string | undefined = undefined,
+    imageMinWidth: string | undefined = undefined,
+    imageMaxHeight: string | undefined = undefined,
+    imageMinHeight: string | undefined = undefined,
+    imageHeight: string | undefined = undefined,
+    imageWidth: string | undefined = undefined,
+    disableHover = false,
+    dark = false;
 
-  let selectedIndex: number = undefined, selectedImage: Image = undefined
-  function handleImageClick(e) {
-    selectedIndex = e.detail.index
+  let selectedIndex: number | undefined = 0,
+    selectedImage: Image | undefined = undefined;
+  function handleImageClick(e: CustomEvent) {
+    selectedIndex = e.detail.index;
   }
 
-  $: if(selectedIndex !== undefined && selectedIndex !== null) {
-    selectedImage = images[selectedIndex]
+  $: if (selectedIndex !== undefined && selectedIndex !== null) {
+    selectedImage = images[selectedIndex];
   }
 
   function switchPrevious() {
-    if(selectedIndex < (images.length - 1)) {
-      selectedIndex++
+    if (selectedIndex !== undefined && selectedIndex < images.length - 1) {
+      selectedIndex++;
     }
   }
 
   function switchNext() {
-    if(selectedIndex > 0) {
-      selectedIndex--
+    if (selectedIndex !== undefined && selectedIndex > 0) {
+      selectedIndex--;
     }
   }
 
-  function handleSwipe(e) {
-    if(e.detail.direction == 'right') {
-      switchPrevious()
-    } else if(e.detail.direction == 'left') {
-      switchNext()
-    } else if(e.detail.direction == 'down') {
-      selectedIndex = undefined
+  function handleSwipe(
+    e: CustomEvent<{ direction: "right" | "left" | "down" }>
+  ) {
+    if (e.detail.direction == "right") {
+      switchPrevious();
+    } else if (e.detail.direction == "left") {
+      switchNext();
+    } else if (e.detail.direction == "down") {
+      selectedIndex = undefined;
     }
   }
 
-  import ImageGrid from "$lib/media/ImageGrid.svelte"
-  import ImageComponent from "$lib/media/Image.svelte"
-  import Dialog from "$lib/dialogs/Dialog.svelte"
-  import Button from "$lib/buttons/Button.svelte"
+  import ImageGrid from "$lib/media/ImageGrid.svelte";
+  import ImageComponent from "$lib/media/Image.svelte";
+  import Dialog from "$lib/dialogs/Dialog.svelte";
+  import Button from "$lib/buttons/Button.svelte";
   import MediaQuery from "$lib/common/MediaQuery.svelte";
   import Gesture from "$lib/common/Gesture.svelte";
 </script>
 
-<ImageGrid 
-  images={images}
-  columns={columns}
-  imageMaxWidth={imageMaxWidth}
-  imageMinWidth={imageMinWidth}
-  imageMaxHeight={imageMaxHeight}
-  imageMinHeight={imageMinHeight}
-  imageHeight={imageHeight}
-  imageWidth={imageWidth}
-  disableHover={disableHover}
-  dark={dark}
+<ImageGrid
+  {images}
+  {columns}
+  {imageMaxWidth}
+  {imageMinWidth}
+  {imageMaxHeight}
+  {imageMinHeight}
+  {imageHeight}
+  {imageWidth}
+  {disableHover}
+  {dark}
   on:image-click={handleImageClick}
 />
 
-<Gesture
-  on:swipe={handleSwipe}
-></Gesture>
+<Gesture on:swipe={handleSwipe} />
 
-<MediaQuery
-  let:sAndDown
->
+<MediaQuery let:sAndDown>
   <Dialog
     open={selectedIndex !== undefined && selectedIndex !== null}
     overlayOpacity="80%"
     overlayColor="black"
   >
     <ImageComponent
-      src={selectedImage.url}
+      src={selectedImage?.url}
       height={sAndDown ? "80vh" : "100vh"}
       width={sAndDown ? "100vw" : "80vw"}
       maxWidth="80vw"
@@ -86,7 +85,7 @@
       imageContain={true}
       imageCover={false}
       showSkeletonLoader={false}
-    ></ImageComponent>
+    />
     <svelte:fragment slot="center-left">
       {#if !sAndDown}
         <Button
@@ -95,7 +94,7 @@
           iconSize={30}
           color="white"
           on:click={() => switchNext()}
-        ></Button>
+        />
       {/if}
     </svelte:fragment>
     <svelte:fragment slot="center-right">
@@ -106,7 +105,7 @@
           iconSize={30}
           color="white"
           on:click={() => switchPrevious()}
-        ></Button>
+        />
       {/if}
     </svelte:fragment>
     <svelte:fragment slot="top-right">
@@ -115,8 +114,8 @@
         icon="mdi-close"
         iconSize={30}
         color="white"
-        on:click={() => selectedIndex = undefined}
-      ></Button>
+        on:click={() => (selectedIndex = undefined)}
+      />
     </svelte:fragment>
   </Dialog>
 </MediaQuery>

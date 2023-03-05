@@ -18,5 +18,5 @@
     title="Chitarra acustica per suonatori"
     price={699.99}
     discount={200}
-  ></ProductCard>
+  />
 </div>

@@ -2,14 +2,7 @@
   import MediaQuery from "$lib/common/MediaQuery.svelte";
 </script>
 
-<MediaQuery 
-  let:s 
-  let:xs
-  let:m
-  let:l
-  let:xl
-  let:mAndDown
->
+<MediaQuery let:s let:xs let:m let:l let:xl let:mAndDown>
   {#if s}
     sono un dispositivo s
   {/if}

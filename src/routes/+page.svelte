@@ -1,127 +1,163 @@
 <script lang="ts">
   interface Component {
-    name: string,
-    url: string
+    name: string;
+    url: string;
   }
 
   let components: Component[] = [
     {
-      name: 'ImageGrid',
-      url: 'media/ImageGrid'
-    }, {
-      name: 'Gallery',
-      url: 'media/Gallery'
-    }, {
-      name: 'Carousel',
-      url: 'media/Carousel'
-    }, {
-      name: 'Card',
-      url: 'common/Card'
-    }, {
-      name: 'Menu',
-      url: 'common/Menu'
-    }, {
-      name: 'Skeleton',
-      url: 'loaders/Skeleton'
-    }, {
-      name: 'CircularLoader',
-      url: 'loaders/CircularLoader'
-    }, {
-      name: 'Calendar',
-      url: 'dates/Calendar'
-    }, {
-      name: 'MonthSelector',
-      url: 'dates/MonthSelector'
-    }, {
-      name: 'YearSelector',
-      url: 'dates/YearSelector'
-    }, {
-      name: 'Textfield',
-      url: 'forms/Textfield'
-    }, {
-      name: 'Switch',
-      url: 'forms/Switch'
-    }, {
-      name: 'Autocomplete',
-      url: 'forms/Autocomplete'
-    }, {
-      name: 'Checkbox',
-      url: 'forms/Checkbox'
-    }, {
-      name: 'HeaderMenu',
-      url: 'navigation/HeaderMenu'
-    }, {
-      name: 'Button',
-      url: 'buttons/Button'
-    }, {
-      name: 'TabSwitcher',
-      url: 'navigation/TabSwitcher'
-    }, {
-      name: 'SimpleTimeLine',
-      url: 'timeline/SimpleTimeLine'
-    }, {
-      name: 'ScrollTimeLine',
-      url: 'timeline/ScrollTimeLine'
-    }, {
-      name: 'Breadcrumb',
-      url: 'navigation/Breadcrumb'
-    }, {
-      name: 'Avatar',
-      url: 'media/Avatar'
-    }, {
-      name: 'DescriptiveAvatar',
-      url: 'media/DescriptiveAvatar'
-    }, {
-      name: 'AttachmentDownloader',
-      url: 'media/AttachmentDownloader'
-    }, {
-      name: 'ProductCard',
-      url: 'shop/ProductCard'
-    }, {
-      name: 'ProductsGrid',
-      url: 'shop/ProductsGrid'
-    }, {
-      name: 'Drawer',
-      url: 'navigation/Drawer'
-    }, {
-      name: 'Navigator',
-      url: 'navigation/Navigator'
-    },  {
-      name: 'MediaQuery',
-      url: 'common/MediaQuery'
-    }, {
-      name: 'Dialog',
-      url: 'dialogs/Dialog'
-    }, {
-      name: 'FileInput',
-      url: 'forms/FileInput'
-    }, {
-      name: 'FileInputList',
-      url: 'forms/FileInputList'
-    }, {
-      name: 'DatePicker',
-      url: 'dates/DatePicker'
-    }, {
-      name: 'Textarea',
-      url: 'forms/Textarea'
-    }, {
-      name: 'SimpleTable',
-      url: 'common/SimpleTable'
-    }, {
-      name: 'TimePickerTextField',
-      url: 'dates/TimePickerTextField'
-    }, {
-      name: 'Chip',
-      url: 'navigation/Chip'
-    }, {
-      name: 'VerticalSwitch',
-      url: 'forms/VerticalSwitch'
-    }, {
-      name: 'VerticalTextSwitch',
-      url: 'forms/VerticalTextSwitch'
-    }
-  ]
-
+      name: "ImageGrid",
+      url: "media/ImageGrid",
+    },
+    {
+      name: "Gallery",
+      url: "media/Gallery",
+    },
+    {
+      name: "Carousel",
+      url: "media/Carousel",
+    },
+    {
+      name: "Card",
+      url: "common/Card",
+    },
+    {
+      name: "Menu",
+      url: "common/Menu",
+    },
+    {
+      name: "Skeleton",
+      url: "loaders/Skeleton",
+    },
+    {
+      name: "CircularLoader",
+      url: "loaders/CircularLoader",
+    },
+    {
+      name: "Calendar",
+      url: "dates/Calendar",
+    },
+    {
+      name: "MonthSelector",
+      url: "dates/MonthSelector",
+    },
+    {
+      name: "YearSelector",
+      url: "dates/YearSelector",
+    },
+    {
+      name: "Textfield",
+      url: "forms/Textfield",
+    },
+    {
+      name: "Switch",
+      url: "forms/Switch",
+    },
+    {
+      name: "Autocomplete",
+      url: "forms/Autocomplete",
+    },
+    {
+      name: "Checkbox",
+      url: "forms/Checkbox",
+    },
+    {
+      name: "HeaderMenu",
+      url: "navigation/HeaderMenu",
+    },
+    {
+      name: "Button",
+      url: "buttons/Button",
+    },
+    {
+      name: "TabSwitcher",
+      url: "navigation/TabSwitcher",
+    },
+    {
+      name: "SimpleTimeLine",
+      url: "timeline/SimpleTimeLine",
+    },
+    {
+      name: "ScrollTimeLine",
+      url: "timeline/ScrollTimeLine",
+    },
+    {
+      name: "Breadcrumb",
+      url: "navigation/Breadcrumb",
+    },
+    {
+      name: "Avatar",
+      url: "media/Avatar",
+    },
+    {
+      name: "DescriptiveAvatar",
+      url: "media/DescriptiveAvatar",
+    },
+    {
+      name: "AttachmentDownloader",
+      url: "media/AttachmentDownloader",
+    },
+    {
+      name: "ProductCard",
+      url: "shop/ProductCard",
+    },
+    {
+      name: "ProductsGrid",
+      url: "shop/ProductsGrid",
+    },
+    {
+      name: "Drawer",
+      url: "navigation/Drawer",
+    },
+    {
+      name: "Navigator",
+      url: "navigation/Navigator",
+    },
+    {
+      name: "MediaQuery",
+      url: "common/MediaQuery",
+    },
+    {
+      name: "Dialog",
+      url: "dialogs/Dialog",
+    },
+    {
+      name: "FileInput",
+      url: "forms/FileInput",
+    },
+    {
+      name: "FileInputList",
+      url: "forms/FileInputList",
+    },
+    {
+      name: "DatePicker",
+      url: "dates/DatePicker",
+    },
+    {
+      name: "Textarea",
+      url: "forms/Textarea",
+    },
+    {
+      name: "SimpleTable",
+      url: "common/SimpleTable",
+    },
+    {
+      name: "TimePickerTextField",
+      url: "dates/TimePickerTextField",
+    },
+    {
+      name: "Chip",
+      url: "navigation/Chip",
+    },
+    {
+      name: "VerticalSwitch",
+      url: "forms/VerticalSwitch",
+    },
+    {
+      name: "VerticalTextSwitch",
+      url: "forms/VerticalTextSwitch",
+    },
+  ];
 </script>
 
 <svelte:head>
@@ -140,7 +176,7 @@
       <th>URL</th>
     </thead>
     <tbody>
-      {#each components as component }
+      {#each components as component}
         <tr>
           <td>{component.name}</td>
           <td>
@@ -152,13 +188,13 @@
   </table>
 </div>
 
-
 <style>
   table {
     border-spacing: 0px;
   }
 
-  td, th {
+  td,
+  th {
     border: 1px solid black;
     border: 1px solid black;
     padding-left: 10px;

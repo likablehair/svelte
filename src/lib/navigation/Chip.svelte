@@ -1,66 +1,58 @@
 <script lang="ts">
+  import Icon from "$lib/media/Icon.svelte";
+  import Button from "$lib/buttons/Button.svelte";
+  import { createEventDispatcher } from "svelte";
 
-  import Icon from '$lib/media/Icon.svelte'
-  import Button from '$lib/buttons/Button.svelte';
-  import { createEventDispatcher } from 'svelte';
+  export let close = false,
+    closeIcon = "mdi-close-circle",
+    color = "blue",
+    textColor = "white",
+    disabled = false,
+    filter = false,
+    filterIcon = "mdi-check",
+    label = false,
+    outlined = false,
+    size = 12;
 
-  export let close: boolean = false,
-    closeIcon: string = "mdi-close-circle",
-    color: string = "blue",
-    textColor: string = "white",
-    disabled: boolean = false,
-    filter: boolean = false,
-    filterIcon: string = "mdi-check",
-    label: boolean = false,
-    outlined: boolean = false,
-    size: number = 12;
+  const dispatch = createEventDispatcher();
 
-    const dispatch = createEventDispatcher()
+  function handleChipClick() {
+    dispatch("click");
+  }
 
-    function handleChipClick() {
-      dispatch('click')
-    }
-
-    function handleCloseClick() {
-      dispatch('close')
-    }
-
+  function handleCloseClick() {
+    dispatch("close");
+  }
 </script>
 
 <div
   class="chip"
-  style:border-radius={label?"5px":"100px"}
-  style:background-color="{color}"
-  style:color={outlined?color:textColor}
-  class:label={label}
-  class:outlined={outlined}
-  class:disabled={disabled}
+  style:border-radius={label ? "5px" : "100px"}
+  style:background-color={color}
+  style:color={outlined ? color : textColor}
+  class:label
+  class:outlined
+  class:disabled
   on:click={handleChipClick}
+  on:keypress={handleChipClick}
 >
   {#if filter}
     <div class="icon-before">
-      <Icon
-        name={filterIcon}
-        size={size}
-      ></Icon>
+      <Icon name={filterIcon} {size} />
     </div>
   {/if}
-  <div class="text"
-    style:font-size="{size}pt"
-    style:line-height="{size}pt"
-  >
-  <slot></slot>
-</div>
+  <div class="text" style:font-size="{size}pt" style:line-height="{size}pt">
+    <slot />
+  </div>
   {#if close}
     <div class="icon-after">
       <Button
         icon={closeIcon}
         iconSize={size}
-        type='icon'
+        type="icon"
         hoverBackgroundColor="none"
         on:click={handleCloseClick}
-      >
-      </Button>
+      />
     </div>
   {/if}
 </div>

@@ -1,47 +1,45 @@
 <script lang="ts" context="module">
   export type Image = {
-    url: string,
-    title: string,
-    description: string
-  }
+    url: string;
+    title: string;
+    description: string;
+  };
 </script>
 
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher } from "svelte";
 
   export let images: Image[] = [],
-    columns: number = undefined,
-    imageMaxWidth: string = undefined,
-    imageMinWidth: string = undefined,
-    imageMaxHeight: string = undefined,
-    imageMinHeight: string = undefined,
-    imageHeight: string = undefined,
-    imageWidth: string = undefined,
-    disableHover: boolean = false,
-    dark: boolean = false
+    columns: number | undefined = undefined,
+    imageMaxWidth: string | undefined = undefined,
+    imageMinWidth: string | undefined = undefined,
+    imageMaxHeight: string | undefined = undefined,
+    imageMinHeight: string | undefined = undefined,
+    imageHeight: string | undefined = undefined,
+    imageWidth: string | undefined = undefined,
+    disableHover = false,
+    dark = false;
 
   const dispatch = createEventDispatcher<{
-    'image-click': {
-      image: Image,
-      index: number
-    }
-  }>()
+    "image-click": {
+      image: Image;
+      index: number;
+    };
+  }>();
 
   function handleImageClick(image: Image, index: number) {
     dispatch("image-click", {
       image,
-      index
-    })
+      index,
+    });
   }
 
-  import ImageComponent from './Image.svelte'
+  import ImageComponent from "./Image.svelte";
 </script>
 
-<div
-  class="container flex-container"
->
-  {#each images as image, index }
-    <div 
+<div class="container flex-container">
+  {#each images as image, index}
+    <div
       style:width={`calc((100% / var(${columns})) - (10px * ${columns})))`}
       class="image-container"
     >
@@ -54,18 +52,18 @@
         maxHeight={imageMaxHeight}
         minHeight={imageMinHeight}
         description={image.description}
-        disableHover={disableHover}
-        dark={dark}
+        {disableHover}
+        {dark}
         borderRadius="10px"
         on:click={() => handleImageClick(image, index)}
-      ></ImageComponent>
+      />
     </div>
   {/each}
 </div>
 
 <style>
   .container {
-    width: 100%
+    width: 100%;
   }
 
   .flex-container {

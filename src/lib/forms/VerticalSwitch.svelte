@@ -1,16 +1,14 @@
 <script lang="ts">
-
-  export let value: boolean = false,
-    height: string = "60px",
-    width: string = "30px",
-    rounded: boolean = false,
-    backgroundColor: string = "#90CAF9",
+  export let value = false,
+    height = "60px",
+    width = "30px",
+    rounded = false,
+    backgroundColor = "#90CAF9",
     selectedOptionColor: string = backgroundColor,
-    sliderColor: string = "white",
+    sliderColor = "white",
     optionColor: string = sliderColor,
-    fontSize: string = "11px",
-    animationDuration: string = "0.1s";
-
+    fontSize = "11px",
+    animationDuration = "0.1s";
 </script>
 
 <div
@@ -25,33 +23,20 @@
   style:--vertical-switch-option-color={optionColor}
   style:--vertical-switch-font-size={fontSize}
   style:--vertical-switch-animation-duration={animationDuration}
-  >
+>
   <div
     class="inner-container"
-    on:click={()=>value = !value}
+    on:click={() => (value = !value)}
+    on:keypress={() => (value = !value)}
   >
-    <div
-      class={value?"first-option selected":"first-option"}
-    >
-      <slot name="trueOption">
-        1
-      </slot>
+    <div class={value ? "first-option selected" : "first-option"}>
+      <slot name="trueOption">1</slot>
     </div>
-    <div
-      class={value?"second-option":"second-option selected"}
-    >
-      <slot name="falseOption">
-        0
-      </slot>
+    <div class={value ? "second-option" : "second-option selected"}>
+      <slot name="falseOption">0</slot>
     </div>
-    <input
-      bind:checked={value}
-      type="checkbox"
-      on:change
-    />
-    <span
-      class={value?"slider top":"slider bottom"}
-    />
+    <input bind:checked={value} type="checkbox" on:change />
+    <span class={value ? "slider top" : "slider bottom"} />
   </div>
 </div>
 
@@ -74,7 +59,7 @@
     background-color: var(--vertical-switch-background-color);
     cursor: pointer;
     text-align: center;
-    border-radius: var(--vertical-switch-container-border-radius)
+    border-radius: var(--vertical-switch-container-border-radius);
   }
 
   .first-option {
@@ -129,7 +114,9 @@
   }
 
   .bottom {
-    top: calc(var(--vertical-switch-height) - var(--vertical-switch-slider-diameter) - 2px)
+    top: calc(
+      var(--vertical-switch-height) - var(--vertical-switch-slider-diameter) -
+        2px
+    );
   }
-
 </style>

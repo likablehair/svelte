@@ -1,29 +1,29 @@
 <script lang="ts">
-  export let loading: boolean = true,
-    height: string = "30px",
-    width: string = "30px",
-    color: string = "black"
+  export let loading = true,
+    height = "30px",
+    width = "30px",
+    color: string | null | undefined = "black";
 </script>
 
-<svg 
-  xmlns="http://www.w3.org/2000/svg" 
-  viewBox="21.904761904761905 21.904761904761905 43.80952380952381 43.80952380952381" 
-  style:color={color}
-  style:height={height}
-  style:width={width}
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="21.904761904761905 21.904761904761905 43.80952380952381 43.80952380952381"
+  style:color
+  style:height
+  style:width
   class:active={loading}
 >
-  <circle 
-    fill="transparent" 
-    cx="43.80952380952381" 
-    cy="43.80952380952381" 
-    r="20" 
-    stroke-width="3.8095238095238093" 
-    stroke-dasharray="125.664" 
+  <circle
+    fill="transparent"
+    cx="43.80952380952381"
+    cy="43.80952380952381"
+    r="20"
+    stroke-width="3.8095238095238093"
+    stroke-dasharray="125.664"
     stroke-dashoffset="125.66370614359172px"
     style:stroke="currentColor"
     class:active={loading}
-  ></circle>
+  />
 </svg>
 
 <style>
@@ -31,7 +31,7 @@
     -webkit-animation: progress-circular-dash 1.4s ease-in-out infinite;
     animation: progress-circular-dash 1.4s ease-in-out infinite;
     stroke-linecap: round;
-    stroke-dasharray: 80,200;
+    stroke-dasharray: 80, 200;
     stroke-dashoffset: 0px;
   }
 
@@ -41,18 +41,18 @@
 
   @keyframes progress-circular-dash {
     0% {
-      stroke-dasharray:1,200;
-      stroke-dashoffset:0px
+      stroke-dasharray: 1, 200;
+      stroke-dashoffset: 0px;
     }
-    
+
     50% {
-      stroke-dasharray:100,200;
-      stroke-dashoffset:-15px
+      stroke-dasharray: 100, 200;
+      stroke-dashoffset: -15px;
     }
-    
+
     to {
-      stroke-dasharray:100,200;
-      stroke-dashoffset:-124px
+      stroke-dasharray: 100, 200;
+      stroke-dashoffset: -124px;
     }
   }
 

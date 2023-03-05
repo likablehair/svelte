@@ -1,129 +1,146 @@
 <script context="module" lang="ts">
   export type TimeLineItem = {
-    name: string
-    title?: string
-    description?: string
-    imageUrl?: string
-    from?: Date
-    to?: Date
-    data?: any
-  }
+    name: string;
+    title?: string;
+    description?: string;
+    imageUrl?: string;
+    from?: Date;
+    to?: Date;
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
+    data?: any;
+  };
 </script>
 
 <script lang="ts">
-  import { dateToString } from '$lib/dates/utils'
+  import { dateToString } from "$lib/dates/utils";
 
-  export let 
-    items: TimeLineItem[] = [],
-    singleSided: boolean = false,
-
-    height: string = undefined,
-    width: string = undefined,
-    itemMarginTop: string = "15px",
-    itemMarginBottom: string = "0px",
-    firstItemMarginTop: string = "5px",
-    lastItemMarginBottom: string = "5px",
-    circleColor: string = "black",
-    circleDiameter: string = "15px",
-    timesWidth: string = undefined,
-    circleAlignment: 'top' | 'center' | 'bottom' = 'top'
+  export let items: TimeLineItem[] = [],
+    singleSided = false,
+    height: string | undefined = undefined,
+    width: string | undefined = undefined,
+    itemMarginTop = "15px",
+    itemMarginBottom = "0px",
+    firstItemMarginTop = "5px",
+    lastItemMarginBottom = "5px",
+    circleColor = "black",
+    circleDiameter = "15px",
+    timesWidth: string | undefined = undefined,
+    circleAlignment: "top" | "center" | "bottom" = "top";
 
   $: cssVariables = Object.entries({
-      '-divider-width': '48px',
-      '-central-line-left': singleSided ? `calc(var(--simple-timeline-divider-width)/2)` : "calc(50% - 1px)",
-      '-body-width': singleSided ? `calc(100% - var(--simple-timeline-divider-width))` : `calc(50% - var(--simple-timeline-divider-width) / 2)`
-    }).filter(([key]) => key.startsWith('-'))
-    .reduce( (css, [key,value]) => {
-      return `${ css }--simple-timeline${ key }: ${ value };`
-    }, '');
+    "-divider-width": "48px",
+    "-central-line-left": singleSided
+      ? `calc(var(--simple-timeline-divider-width)/2)`
+      : "calc(50% - 1px)",
+    "-body-width": singleSided
+      ? `calc(100% - var(--simple-timeline-divider-width))`
+      : `calc(50% - var(--simple-timeline-divider-width) / 2)`,
+  })
+    .filter(([key]) => key.startsWith("-"))
+    .reduce((css, [key, value]) => {
+      return `${css}--simple-timeline${key}: ${value};`;
+    }, "");
 </script>
 
-<div 
-  style:height={height}
-  style:width={width}
-  style={cssVariables}
-  class="container"
->
-  {#each items as item, index }
+<div style:height style:width style={cssVariables} class="container">
+  {#each items as item, index}
     <div
       style:margin-top={index == 0 ? firstItemMarginTop : itemMarginTop}
-      style:margin-bottom={index == items.length - 1 ? lastItemMarginBottom : itemMarginBottom}
-      style:flex-direction={singleSided || index % 2 == 0 ? 'row-reverse' : 'row'}
+      style:margin-bottom={index == items.length - 1
+        ? lastItemMarginBottom
+        : itemMarginBottom}
+      style:flex-direction={singleSided || index % 2 == 0
+        ? "row-reverse"
+        : "row"}
       class="time-line-item"
     >
       <div
-        style:flex-direction={singleSided || index % 2 == 0 ? 'row' : 'row-reverse'}
-        style:justify-content={'flex-start'}
+        style:flex-direction={singleSided || index % 2 == 0
+          ? "row"
+          : "row-reverse"}
+        style:justify-content={"flex-start"}
         class="time-line-body"
       >
-        <slot 
-          name="item" 
-          item={item}
-          alignment={!singleSided && index % 2 == 0 ? 'right' : 'left'}
+        <slot
+          name="item"
+          {item}
+          alignment={!singleSided && index % 2 == 0 ? "right" : "left"}
         >
           {#if !!item.from || !!item.to || $$slots.times}
             <div
-              style:padding={singleSided || index % 2 == 0 ? "0px 20px 0px 0px" : "0px 0px 0px 20px"}
+              style:padding={singleSided || index % 2 == 0
+                ? "0px 20px 0px 0px"
+                : "0px 0px 0px 20px"}
               style:width={timesWidth}
               class="time-line-times"
             >
-              <slot 
-                name="times" 
-                item={item}
-                dateToString={dateToString}
-              >
+              <slot name="times" {item} {dateToString}>
                 <div
-                  class:vertical-centered-container={circleAlignment == 'center'}
-                  class:vertical-bottom-container={circleAlignment == 'bottom'}
+                  class:vertical-centered-container={circleAlignment ==
+                    "center"}
+                  class:vertical-bottom-container={circleAlignment == "bottom"}
                 >
                   {#if !!item.from}
-                    <div 
-                      style:text-align={singleSided || index % 2 == 0 ? 'left' : 'right'}
+                    <div
+                      style:text-align={singleSided || index % 2 == 0
+                        ? "left"
+                        : "right"}
                       style="font-weight: 200; font-size: 9pt"
-                    >{dateToString(item.from)}</div>
+                    >
+                      {dateToString(item.from)}
+                    </div>
                   {/if}
                   {#if !!item.to}
-                    <div 
-                      style:text-align={singleSided || index % 2 == 0 ? 'left' : 'right'}
+                    <div
+                      style:text-align={singleSided || index % 2 == 0
+                        ? "left"
+                        : "right"}
                       style="font-weight: 200; font-size: 9pt"
-                    >{dateToString(item.to)}</div>
+                    >
+                      {dateToString(item.to)}
+                    </div>
                   {/if}
                 </div>
               </slot>
             </div>
           {/if}
           <div class="time-line-infos">
-            <slot 
-              name="infos" 
-              item={item}
-              alignment={!singleSided && index % 2 == 0 ? 'right' : 'left'}
+            <slot
+              name="infos"
+              {item}
+              alignment={!singleSided && index % 2 == 0 ? "right" : "left"}
             >
               {#if !!item.title}
-                <div 
-                  style:text-align={singleSided || index % 2 == 0 ? 'left' : 'right'}
+                <div
+                  style:text-align={singleSided || index % 2 == 0
+                    ? "left"
+                    : "right"}
                   class="time-line-title"
-                >{item.title}</div>
+                >
+                  {item.title}
+                </div>
               {/if}
               {#if !!item.description}
-                <div 
-                  style:text-align={singleSided || index % 2 == 0 ? 'left' : 'right'}
+                <div
+                  style:text-align={singleSided || index % 2 == 0
+                    ? "left"
+                    : "right"}
                   class="time-line-description"
-                >{item.description}</div>
+                >
+                  {item.description}
+                </div>
               {/if}
-              <slot 
-                name="infos-append" 
-                item={item}
-                alignment={!singleSided && index % 2 == 0 ? 'right' : 'left'}
-              ></slot>
+              <slot
+                name="infos-append"
+                {item}
+                alignment={!singleSided && index % 2 == 0 ? "right" : "left"}
+              />
             </slot>
           </div>
         </slot>
       </div>
-      <div 
-        style:align-items={circleAlignment}
-        class="time-line-divider"
-      >
-        <slot name="circle" item={item}>
+      <div style:align-items={circleAlignment} class="time-line-divider">
+        <slot name="circle" {item}>
           <div
             style="margin-top: 5px;"
             style:background-color={circleColor}
@@ -131,7 +148,7 @@
             style:width={circleDiameter}
             style:z-index="5"
             class="circle"
-          ></div>
+          />
         </slot>
       </div>
     </div>

@@ -1,37 +1,36 @@
 <script lang="ts">
-  export let
-    outlined: boolean = false,
-    maxWidth: string = undefined,
-    maxHeight: string = undefined,
-    minWidth: string = undefined,
-    minHeight: string = undefined,
-    width: string = 'fit-content',
-    height: string = undefined,
-    padding: string = "5px",
-    borderRadius: string = "5px",
-    backgroundColor: string = "rgb(252, 252, 252)",
-    color: string = undefined,
-    borderColor: string = undefined,
-    borderWidth: string = undefined,
-    marginBottom: string = undefined,
-    marginTop: string = undefined,
-    marginLeft: string = undefined,
-    marginRight: string = undefined,
-    boxShadow: string = "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)"
-
+  export let outlined = false,
+    maxWidth: string | undefined = undefined,
+    maxHeight: string | undefined = undefined,
+    minWidth: string | undefined = undefined,
+    minHeight: string | undefined = undefined,
+    width = "fit-content",
+    height: string | undefined = undefined,
+    padding = "5px",
+    borderRadius = "5px",
+    backgroundColor = "rgb(252, 252, 252)",
+    color: string | undefined = undefined,
+    borderColor: string | undefined = undefined,
+    borderWidth: string | undefined = undefined,
+    marginBottom: string | undefined = undefined,
+    marginTop: string | undefined = undefined,
+    marginLeft: string | undefined = undefined,
+    marginRight: string | undefined = undefined,
+    boxShadow =
+      "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)";
 </script>
 
 <div
-  style:width={width}
+  style:width
   style:max-width={maxWidth}
   style:min-width={minWidth}
-  style:height={height}
+  style:height
   style:max-height={maxHeight}
   style:min-height={minHeight}
-  style:padding={padding}
+  style:padding
   style:border-radius={borderRadius}
   style:background-color={backgroundColor}
-  style:color={color}
+  style:color
   style:border-color={borderColor}
   style:border-width={borderWidth}
   style:margin-bottom={marginBottom}
@@ -42,25 +41,16 @@
   style:display="flex"
   style:flex-direction="column"
   on:click
+  on:keypress
   class:border-solid={outlined}
 >
-  <div 
-    style:flex="none"
-    class="header"
-  >
-    <slot name="header"></slot>
+  <div style:flex="none" class="header">
+    <slot name="header" />
   </div>
-  <div
-    style:flex-shrink="1"
-    style:overflow-y="auto"
-    class="body"
-  >
-    <slot></slot>
+  <div style:flex-shrink="1" style:overflow-y="auto" class="body">
+    <slot />
   </div>
-  <div 
-    style:flex="none"
-    class="footer flex-none"
-  >
-    <slot name="footer"></slot>
+  <div style:flex="none" class="footer flex-none">
+    <slot name="footer" />
   </div>
 </div>

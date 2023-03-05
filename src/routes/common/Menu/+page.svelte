@@ -1,17 +1,23 @@
 <script lang="ts">
-  import Menu from '$lib/common/Menu.svelte';
-  import Button from '$lib/buttons/Button.svelte'
+  import Menu from "$lib/common/Menu.svelte";
+  import Button from "$lib/buttons/Button.svelte";
 
-  let menuTop: number, menuLeft: number, open: boolean = false
+  let menuTop: number,
+    menuLeft: number,
+    open = false;
   function handleClick(e: MouseEvent) {
-    open = true
-    
-    menuTop = e.pageY
-    menuLeft = e.pageX
+    open = true;
+
+    menuTop = e.pageY;
+    menuLeft = e.pageX;
   }
 
-  let homeButton1: HTMLElement, openByHomeButton1: boolean = false,
-    homeButton2: HTMLElement, openByHomeButton2: boolean = false
+  function handleKeypress() {}
+
+  let homeButton1: HTMLElement,
+    openByHomeButton1 = false,
+    homeButton2: HTMLElement,
+    openByHomeButton2 = false;
 </script>
 
 <div
@@ -24,8 +30,8 @@
     <Button
       type="icon"
       icon="mdi-home"
-      on:click={() => openByHomeButton1 = !openByHomeButton1}
-    ></Button>
+      on:click={() => (openByHomeButton1 = !openByHomeButton1)}
+    />
   </div>
 </div>
 
@@ -46,13 +52,7 @@
   </div>
 </Menu>
 
-<Menu
-  top={menuTop}
-  left={menuLeft}
-  width="200px"
-  height="auto"
-  bind:open={open}
->
+<Menu top={menuTop} left={menuLeft} width="200px" height="auto" bind:open>
   <div
     style:border="1px solid black"
     style:background-color="white"
@@ -70,12 +70,12 @@
   style:flex-direction="column"
   style:width="150vw"
   on:click={handleClick}
+  on:keypress={handleKeypress}
 >
   {#each [...Array(15).keys()] as index}
-      <div
-        style:margin-top="30px"
-        style:margin-bottom="30px"
-      >Clicca da qualsiasi parte per aprire un menù</div>
+    <div style:margin-top="30px" style:margin-bottom="30px">
+      Clicca da qualsiasi parte per aprire un menù
+    </div>
   {/each}
 </div>
 
@@ -89,8 +89,8 @@
     <Button
       type="icon"
       icon="mdi-home"
-      on:click={() => openByHomeButton2 = !openByHomeButton2}
-    ></Button>
+      on:click={() => (openByHomeButton2 = !openByHomeButton2)}
+    />
   </div>
 </div>
 

@@ -9,9 +9,7 @@
   style:align-items="center"
   style:flex-direction="column"
 >
-  <Avatar
-    src="http://localhost:4000/avatars/avatar1.jpeg"
-  ></Avatar>
+  <Avatar src="http://localhost:4000/avatars/avatar1.jpeg" />
 </div>
 
 <div
@@ -25,7 +23,7 @@
     width="80px"
     height="80px"
     src="http://localhost:4000/avatars/avatar1.jpeg"
-  ></Avatar>
+  />
 </div>
 
 <div
@@ -40,11 +38,9 @@
     height="70px"
     borderRadius="30%"
     src="http://localhost:4000/avatars/avatar1.jpeg"
-  ></Avatar>
+  />
 </div>
-<div
-  style="height: 130vh;"
-></div>
+<div style="height: 130vh;" />
 <div
   style:height="100px"
   style:display="flex"
@@ -58,5 +54,5 @@
     height="70px"
     borderRadius="30%"
     src="http://localhost:4000/avatars/avatar2.jpeg"
-  ></Avatar>
+  />
 </div>

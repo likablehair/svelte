@@ -1,5 +1,5 @@
 <script lang="ts">
-  let selected: string
+  let selected: string;
 
   import TabSwitcher from "$lib/navigation/TabSwitcher.svelte";
 </script>
@@ -13,17 +13,15 @@
 >
   <TabSwitcher
     tabs={[
-      {name: 'pippo', label: 'Pippo'},
-      {name: 'pluto', label: 'Pluto'},
-      {name: 'gianniPinotto', label: 'Gianni pinotto e pinco pallo'},
+      { name: "pippo", label: "Pippo" },
+      { name: "pluto", label: "Pluto" },
+      { name: "gianniPinotto", label: "Gianni pinotto e pinco pallo" },
     ]}
     width="90vw"
     color="#008080"
-    bind:selected={selected}
-  ></TabSwitcher>
-  <div 
-    style:margin-top="20px"
-  >
+    bind:selected
+  />
+  <div style:margin-top="20px">
     {selected}
   </div>
 </div>

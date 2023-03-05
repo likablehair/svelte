@@ -1,109 +1,116 @@
 <script lang="ts">
-  import { browser } from '$app/environment';
+  import { browser } from "$app/environment";
 
-  export let maxWidth: string = undefined,
-    maxHeight: string = undefined,
-    minWidth: string = undefined,
-    minHeight: string = undefined,
-    width: string = undefined,
-    height: string = undefined,
-    borderRadius: string = undefined,
-    src: string = undefined,
-    title: string = undefined,
-    description: string = undefined,
-    dark: boolean = false,
-    disableHover: boolean = false,
-    showSkeletonLoader: boolean = true,
-    imageCover: boolean = true,
-    imageContain: boolean = false
+  export let maxWidth: string | undefined = undefined,
+    maxHeight: string | undefined = undefined,
+    minWidth: string | undefined = undefined,
+    minHeight: string | undefined = undefined,
+    width: string | undefined = undefined,
+    height: string | undefined = undefined,
+    borderRadius: string | undefined = undefined,
+    src: string | undefined = undefined,
+    title: string | undefined = undefined,
+    description: string | undefined = undefined,
+    dark = false,
+    disableHover = false,
+    showSkeletonLoader = true,
+    imageCover = true,
+    imageContain = false;
 
-  const load = (src) => {
-		return new Promise<string>(async (resolve, reject) => {
-      if(browser) {
-        const resp = await fetch(src);
-        const blob = await resp.blob();
-        
-        let reader = new FileReader();
-        reader.readAsDataURL(blob);
-        reader.onload = () => resolve(reader.result.toString());
-        reader.onerror = (error) => reject(error);
+  const load = (src: string | undefined) => {
+    return new Promise<string | undefined>((resolve, reject) => {
+      if (browser && !!src) {
+        fetch(src)
+          .then((resp) => {
+            resp
+              .blob()
+              .then((blob) => {
+                let reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onload = () => resolve(reader.result?.toString() || "");
+                reader.onerror = (error) => reject(error);
+              })
+              .catch((err) => reject(err));
+          })
+          .catch((err) => reject(err));
       } else {
-        resolve(undefined)
+        resolve(undefined);
       }
-		});
+    });
   };
 
-  import IntersectionObserver from '$lib/common/IntersectionObserver.svelte';
+  import IntersectionObserver from "$lib/common/IntersectionObserver.svelte";
   import Skeleton from "$lib/loaders/Skeleton.svelte";
 </script>
 
-<div 
-  style:width={width}
+<div
+  style:width
   style:max-width={maxWidth}
   style:min-width={minWidth}
-  style:height={height}
+  style:height
   style:max-height={maxHeight}
   style:min-height={minHeight}
   style:border-radius={borderRadius}
   class="image-container"
   on:click
+  on:keypress
 >
-  <IntersectionObserver once={true} let:intersecting={intersecting}>
+  <IntersectionObserver once={true} let:intersecting>
     {#if intersecting}
       {#await load(src)}
         {#if showSkeletonLoader}
           <Skeleton
             sections={[
               {
-                type: 'image',
-                height: `100%`
-              }
+                type: "image",
+                height: `100%`,
+              },
             ]}
             padding="0px"
             width="100%"
             height="100%"
-            dark={dark}
-          ></Skeleton>
+            {dark}
+          />
         {/if}
       {:then base64}
         <div style="position: relative; height: 100%">
           <div class="image-filter">
             <div
-              style:background-size={imageCover ? 'cover' : imageContain ? 'contain' : undefined}
+              style:background-size={imageCover
+                ? "cover"
+                : imageContain
+                ? "contain"
+                : undefined}
               style:background-image={`url(${base64})`}
               class="image"
               class:image-hover={!disableHover}
             >
-              <slot></slot>
+              <slot />
             </div>
           </div>
-          <div 
-            class="title"
-            class:title-hover={!disableHover}
-          >{title || description}</div>
+          <div class="title" class:title-hover={!disableHover}>
+            {title || description}
+          </div>
           {#if !!description}
-            <div 
-              class="description"
-              class:description-hover={!disableHover}
-            >{description}</div>
+            <div class="description" class:description-hover={!disableHover}>
+              {description}
+            </div>
           {/if}
         </div>
       {/await}
-    {:else}
-      {#if showSkeletonLoader}
-        <Skeleton
-          sections={[
-            {
-              type: 'image',
-              height: `100%`
-            }
-          ]}
-          padding="0px"
-          width="100%"
-          height="100%"
-          dark={dark}
-        ></Skeleton>
-      {/if}
+    {:else if showSkeletonLoader}
+      <Skeleton
+        sections={[
+          {
+            type: "image",
+            height: `100%`,
+          },
+        ]}
+        padding="0px"
+        width="100%"
+        height="100%"
+        {dark}
+      />
     {/if}
   </IntersectionObserver>
 </div>
@@ -153,11 +160,11 @@
   }
 
   .image-container:hover .title-hover {
-    bottom: 50px
+    bottom: 50px;
   }
 
   .image-container:hover .description-hover {
-    bottom: 20px
+    bottom: 20px;
   }
 
   .image-container:hover .image-hover {

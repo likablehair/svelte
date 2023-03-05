@@ -1,36 +1,35 @@
 <script lang="ts" context="module">
-  export type SectionType = "image" | "text"
+  export type SectionType = "image" | "text";
 </script>
 
 <script lang="ts">
   type Section = {
-    type: SectionType,
-    height?: string
-  }
+    type: SectionType;
+    height?: string;
+  };
 
   export let sections: Section[] = [],
-    maxWidth: string = undefined,
-    maxHeight: string = undefined,
-    minWidth: string = undefined,
-    minHeight: string = undefined,
-    width: string = "100%",
-    height: string = "100%",
-    padding: string = '10px',
-    dark: boolean = false
-  
-  $: widthLessPadding = `calc(${width} - (${padding} * 2))`
-  $: heightLessPadding = `calc(${height} - (${padding} * 2))`
-  $: maxWidthLessPadding = `calc(${maxWidth} - (${padding} * 2))`
-  $: maxHeightLessPadding = `calc(${maxHeight} - (${padding} * 2))`
-  $: minWidthLessPadding = `calc(${minWidth} - (${padding} * 2))`
-  $: minHeightLessPadding = `calc(${minHeight} - (${padding} * 2))`
-  $: elementBackground = dark ? '#1a1a1a' : '#eee'
-  $: animationBackground = dark ? '#000000e6' : '#ffffffe6'
-  $: cardBackground = dark ? '#000000' : '#fff'
+    maxWidth: string | undefined = undefined,
+    maxHeight: string | undefined = undefined,
+    minWidth: string | undefined = undefined,
+    minHeight: string | undefined = undefined,
+    width = "100%",
+    height = "100%",
+    padding = "10px",
+    dark = false;
+
+  $: widthLessPadding = `calc(${width} - (${padding} * 2))`;
+  $: heightLessPadding = `calc(${height} - (${padding} * 2))`;
+  $: maxWidthLessPadding = `calc(${maxWidth} - (${padding} * 2))`;
+  $: maxHeightLessPadding = `calc(${maxHeight} - (${padding} * 2))`;
+  $: minWidthLessPadding = `calc(${minWidth} - (${padding} * 2))`;
+  $: minHeightLessPadding = `calc(${minHeight} - (${padding} * 2))`;
+  $: elementBackground = dark ? "#1a1a1a" : "#eee";
+  $: animationBackground = dark ? "#000000e6" : "#ffffffe6";
+  $: cardBackground = dark ? "#000000" : "#fff";
 </script>
 
-
-<div 
+<div
   style:--skeleton-card-background={cardBackground}
   style:--skeleton-animation-color={animationBackground}
   style:width={widthLessPadding}
@@ -39,16 +38,16 @@
   style:max-height={maxHeightLessPadding}
   style:min-width={minWidthLessPadding}
   style:min-height={minHeightLessPadding}
-  style:padding={padding}
+  style:padding
   class="card"
 >
   {#each sections as section}
-    {#if section.type == 'image'}
-      <div 
+    {#if section.type == "image"}
+      <div
         style:height={section.height}
         style:background={elementBackground}
         class="skeleton-image"
-      ></div>
+      />
     {/if}
   {/each}
 </div>
@@ -60,7 +59,7 @@
     overflow: hidden;
     width: 100%;
   }
-  
+
   .card {
     background: var(--skeleton-card-background);
     position: relative;
@@ -79,7 +78,7 @@
   }
 
   .card::before {
-    content: '';
+    content: "";
     position: absolute;
     background: linear-gradient(
       90deg,

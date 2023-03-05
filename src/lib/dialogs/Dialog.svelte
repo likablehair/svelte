@@ -1,49 +1,51 @@
 <script lang="ts">
   import { browser } from "$app/environment";
   import { beforeUpdate } from "svelte";
-  export let open: boolean = false,
-    overlayOpacity: string = "30%",
-    overlayColor: string = "#282828"
-  
-  let zIndex: number = 50, 
-    localOpen: boolean = open
+  export let open = false,
+    overlayOpacity = "30%",
+    overlayColor = "#282828";
+
+  let zIndex = 50,
+    localOpen: boolean = open;
 
   beforeUpdate(() => {
-    if(open && localOpen != open) {
-      let otherDialogs: NodeListOf<HTMLElement> = document.querySelectorAll("[data-dialog=true]")
-      if(otherDialogs.length > 0) {
-        let maxZIndex: number
+    if (open && localOpen != open) {
+      let otherDialogs: NodeListOf<HTMLElement> =
+        document.querySelectorAll("[data-dialog=true]");
+      if (otherDialogs.length > 0) {
+        let maxZIndex = 0;
         otherDialogs.forEach((dialog) => {
-          if(!maxZIndex || maxZIndex < Number(dialog.style.zIndex))
-            maxZIndex = Number(dialog.style.zIndex)
-        })
-        zIndex = maxZIndex + 2
+          if (!maxZIndex || maxZIndex < Number(dialog.style.zIndex))
+            maxZIndex = Number(dialog.style.zIndex);
+        });
+        zIndex = maxZIndex + 2;
       }
 
-      document.body.style.overflow = 'hidden'
-    } else if(!open) {
-      if(browser) {
-        let otherDialogs: NodeListOf<HTMLElement> = document.querySelectorAll("[data-dialog=true]")
-        if(otherDialogs.length <= 1) {
-          document.body.style.overflow = 'auto'
+      document.body.style.overflow = "hidden";
+    } else if (!open) {
+      if (browser) {
+        let otherDialogs: NodeListOf<HTMLElement> =
+          document.querySelectorAll("[data-dialog=true]");
+        if (otherDialogs.length <= 1) {
+          document.body.style.overflow = "auto";
         }
       }
     }
-    
-    localOpen = open
-  })
+
+    localOpen = open;
+  });
 
   function closeDialog() {
-    open = false
-    localOpen = false
+    open = false;
+    localOpen = false;
   }
 
   function handleOverlayClick() {
-    closeDialog()
+    closeDialog();
   }
 </script>
 
-<div 
+<div
   data-dialog={localOpen}
   style:z-index={zIndex}
   style:--dialog-overlay-opacity={overlayOpacity}
@@ -54,39 +56,43 @@
   class:overlay-container-active={localOpen}
 >
   <div
-    style:background-color={overlayColor} 
+    style:background-color={overlayColor}
     class="overlay"
     class:overlay-active={localOpen}
     on:click={handleOverlayClick}
+    on:keypress={handleOverlayClick}
     on:touchmove|preventDefault={() => {}}
     on:wheel|preventDefault={() => {}}
-  ></div>
-  {#if localOpen }
+  />
+  {#if localOpen}
     <div
       style:position="absolute"
       style:top="0px"
       style:right="0px"
       style:z-index={zIndex + 1}
     >
-      <slot name="top-right"></slot>
-    </div>
-    <div 
-      style:z-index={zIndex + 1}
-      on:click|stopPropagation
-    >
-      <slot name="center-left"></slot>
-    </div>
-    <div
-      on:click|stopPropagation
-      style:z-index={zIndex + 1}
-    >
-      <slot></slot>
+      <slot name="top-right" />
     </div>
     <div
       style:z-index={zIndex + 1}
       on:click|stopPropagation
+      on:keypress|stopPropagation
     >
-      <slot name="center-right"></slot>
+      <slot name="center-left" />
+    </div>
+    <div
+      style:z-index={zIndex + 1}
+      on:click|stopPropagation
+      on:keypress|stopPropagation
+    >
+      <slot />
+    </div>
+    <div
+      style:z-index={zIndex + 1}
+      on:click|stopPropagation
+      on:keypress|stopPropagation
+    >
+      <slot name="center-right" />
     </div>
   {/if}
 </div>

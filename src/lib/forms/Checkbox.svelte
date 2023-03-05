@@ -1,15 +1,15 @@
 <script lang="ts">
-  export let value: boolean = false,
-    id: string = undefined,
-    disabled: boolean = false,
-    activeColor: string = "#275efe",
-    activeInnerColor: string = "#fff",
-    focusShadow: string = "2px rgba(39, 94, 254, 0.3)",
-    borderColor: string = "#bbc1e1",
-    borderHoverColor: string = "#275efe",
-    backgroundColor: string = "#fff",
-    disabledColor: string = "#f6f8ff",
-    disabledInnerColor: string = "#e1e6f9"
+  export let value = false,
+    id: string | undefined = undefined,
+    disabled = false,
+    activeColor = "#275efe",
+    activeInnerColor = "#fff",
+    focusShadow = "2px rgba(39, 94, 254, 0.3)",
+    borderColor = "#bbc1e1",
+    borderHoverColor = "#275efe",
+    backgroundColor = "#fff",
+    disabledColor = "#f6f8ff",
+    disabledInnerColor = "#e1e6f9";
 </script>
 
 <input
@@ -21,12 +21,12 @@
   style:--checkbox-background-color={backgroundColor}
   style:--checkbox-disabled-color={disabledColor}
   style:--checkbox-disabled-inner-color={disabledInnerColor}
-  id={id}
+  {id}
   type="checkbox"
   bind:checked={value}
   on:change
-  disabled={disabled}
->
+  {disabled}
+/>
 
 <style>
   @supports (-webkit-appearance: none) or (-moz-appearance: none) {
@@ -108,6 +108,5 @@
       top: 4px;
       transform: rotate(var(--r, 20deg));
     }
-
   }
 </style>

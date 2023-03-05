@@ -5,6 +5,7 @@
     type: "boolean" | "string" | "number" | "date" | "custom";
     width?: string;
     minWidth?: string;
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
     data?: { [key: string]: any };
   };
 </script>
@@ -12,17 +13,17 @@
 <script lang="ts">
   import { dateToString } from "$lib/dates/utils";
 
-  export let headers: Header[] = undefined,
-    items: { [key: string]: any }[] = undefined,
-    backgroundColor: string = "rgba(255,255,255,0)",
-    headerColor: string = "rgba(0,0,0,0.05)",
+  export let headers: Header[] = [],
+    items: { [key: string]: any }[] = [],
+    backgroundColor = "rgba(255,255,255,0)",
+    headerColor = "rgba(0,0,0,0.05)",
     rowSeparatorColor: string = headerColor,
-    headerHeight: string = "30px",
-    headerBorderRadius: string = "5px",
-    rowHeight: string = "70px",
-    minWidth: string = undefined,
-    height: string = "100%",
-    width: string = "100%";
+    headerHeight = "30px",
+    headerBorderRadius = "5px",
+    rowHeight = "70px",
+    minWidth: string | undefined = undefined,
+    height = "100%",
+    width = "100%";
 </script>
 
 {#if !!items && Array.isArray(items)}
@@ -32,8 +33,8 @@
       style:width="100%"
       style:min-width={minWidth}
     >
-      <thead 
-        style:background-color={headerColor} 
+      <thead
+        style:background-color={headerColor}
         style:height={headerHeight}
         style:border-radius={headerBorderRadius}
       >

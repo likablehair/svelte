@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Navigator from '$lib/navigation/Navigator.svelte'
+  import Navigator from "$lib/navigation/Navigator.svelte";
 </script>
 
 <div
@@ -11,12 +11,12 @@
 >
   <Navigator
     items={[
-      { name: 'menu', title: 'Menù'},
-      { name: 'restaurant', title: 'Ristorante'},
-      { name: 'contacts', title: 'Contatti'},
-      { name: 'about', title: 'Informazioni'},
+      { name: "menu", title: "Menù" },
+      { name: "restaurant", title: "Ristorante" },
+      { name: "contacts", title: "Contatti" },
+      { name: "about", title: "Informazioni" },
     ]}
-  ></Navigator>
+  />
 </div>
 
 <div
@@ -29,10 +29,10 @@
   <Navigator
     vertical={true}
     items={[
-      { name: 'menu', title: 'Menù'},
-      { name: 'restaurant', title: 'Ristorante'},
-      { name: 'contacts', title: 'Contatti'},
-      { name: 'about', title: 'Informazioni'},
+      { name: "menu", title: "Menù" },
+      { name: "restaurant", title: "Ristorante" },
+      { name: "contacts", title: "Contatti" },
+      { name: "about", title: "Informazioni" },
     ]}
-  ></Navigator>
+  />
 </div>

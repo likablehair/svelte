@@ -13,7 +13,7 @@
     src="http://localhost:4000/avatars/avatar1.jpeg"
     title="Avar titolo"
     description="Avatar sottotitolo corto"
-  ></DescriptiveAvatar>
+  />
 </div>
 
 <div
@@ -27,8 +27,8 @@
     src="http://localhost:4000/avatars/avatar1.jpeg"
     title="Avar titolo"
     description="Avatar sottotitolo corto"
-    reverse="{true}"
-  ></DescriptiveAvatar>
+    reverse={true}
+  />
 </div>
 
 <div
@@ -44,7 +44,7 @@
     description="Avatar sottotitolo corto"
     height="100px"
     width="100px"
-  ></DescriptiveAvatar>
+  />
 </div>
 
 <div
@@ -59,5 +59,5 @@
     title="Avar titolo"
     description="Avatar sottotitolo corto"
     direction="column"
-  ></DescriptiveAvatar>
+  />
 </div>

@@ -1,70 +1,67 @@
 <script lang="ts">
-  import type { Item } from "./Navigator.svelte"
+  import type { Item } from "./Navigator.svelte";
 
-  export let title: string = "",
+  export let title = "",
     items: Item[] = [],
-    hideOnScroll: boolean = true,
-    initialRemoveShadow: boolean = false,
-    initialBackgroundColor: string = undefined,
-    backgroundColor: string = 'white',
-    color: string = undefined,
-    drawerBackgroundColor: string = 'white',
-    drawerColor: string = undefined,
+    hideOnScroll = true,
+    initialRemoveShadow = false,
+    initialBackgroundColor: string | undefined = undefined,
+    backgroundColor = "white",
+    color: string | undefined = undefined,
+    drawerBackgroundColor = "white",
+    drawerColor: string | undefined = undefined,
     drawerSpace: string | undefined = undefined,
-    mobileMenu: boolean = true,
-    zIndex: number = 25;
+    mobileMenu = true,
+    zIndex = 25;
 
-  let scrollY, lastScrollY, visible = true
+  let scrollY: number,
+    lastScrollY: number,
+    visible = true;
   function handleScroll() {
-    if(hideOnScroll) {
-      if(scrollY > lastScrollY) {
-        visible = false
+    if (hideOnScroll) {
+      if (scrollY > lastScrollY) {
+        visible = false;
       } else {
-        visible = true
+        visible = true;
       }
     }
 
-    lastScrollY = scrollY
+    lastScrollY = scrollY;
   }
 
-  export let openDrawer = false
+  export let openDrawer = false;
   function toggleDrawer() {
-    openDrawer = !openDrawer
+    openDrawer = !openDrawer;
   }
 
+  let localBackgroundColor: string | undefined = undefined;
+  $: if (scrollY == 0 && !!initialBackgroundColor)
+    localBackgroundColor = initialBackgroundColor;
+  else localBackgroundColor = backgroundColor;
 
-  let localBackgroundColor: string = undefined 
-  $: if(scrollY == 0 && !!initialBackgroundColor)
-    localBackgroundColor = initialBackgroundColor
-  else
-    localBackgroundColor = backgroundColor
-
-  import Navigator from './Navigator.svelte'
-  import Button from '$lib/buttons/Button.svelte'
-  import Drawer from '$lib/navigation/Drawer.svelte'
+  import Navigator from "./Navigator.svelte";
+  import Button from "$lib/buttons/Button.svelte";
+  import Drawer from "$lib/navigation/Drawer.svelte";
 </script>
 
-<svelte:window
-  bind:scrollY={scrollY}
-  on:scroll={handleScroll}
-></svelte:window>
+<svelte:window bind:scrollY on:scroll={handleScroll} />
 
-{#if mobileMenu }
+{#if mobileMenu}
   <Drawer
     bind:open={openDrawer}
     backgroundColor={drawerBackgroundColor}
     color={drawerColor}
-    items={items}
+    {items}
     space={drawerSpace}
     on:item-click
   >
     {#if !!$$slots.drawer}
-      <slot name="drawer"></slot>
+      <slot name="drawer" />
     {/if}
   </Drawer>
 {/if}
 <nav
-  style:color={color}
+  style:color
   style:background-color={localBackgroundColor}
   style:position="sticky"
   style:display="flex"
@@ -77,60 +74,43 @@
   class:top-0={visible}
   class:shadow-md={!initialRemoveShadow || scrollY != 0}
 >
-  <div 
+  <div
     style:height="56px"
     style:flex="none"
     style:display="flex"
     style:align-items="center"
   >
-    <slot 
-      name="prepend" 
-      toggleDrawer={toggleDrawer} 
-      openDrawer={openDrawer}
-    >
+    <slot name="prepend" {toggleDrawer} {openDrawer}>
       {#if mobileMenu}
-        <div 
+        <div
           style:width="fit-content"
           style:margin-left="10px"
           style:margin-right="10px"
           class="hide-on-desktop"
         >
-          <Button
-            type="icon"
-            icon="mdi-menu"
-            on:click={toggleDrawer}
-          ></Button>
+          <Button type="icon" icon="mdi-menu" on:click={toggleDrawer} />
         </div>
       {/if}
     </slot>
   </div>
-  <div 
-    style:flex-grow="1"
-    style:margin-left="4px"
-  >
+  <div style:flex-grow="1" style:margin-left="4px">
     <slot name="title">
-      <span 
-        style:font-size="24px"
-        style:line-height="32px"
-      >{title}</span>
+      <span style:font-size="24px" style:line-height="32px">{title}</span>
     </slot>
   </div>
   <div>
     <slot name="menu-desktop">
       <div class="hide-on-mobile">
-        <Navigator
-          items={items}
-          on:item-click
-        ></Navigator>
+        <Navigator {items} on:item-click />
       </div>
     </slot>
   </div>
-  <slot name="append"></slot>
+  <slot name="append" />
 </nav>
 
 <style>
   .header-menu-container {
-    width: var(--width, 100vw)
+    width: var(--width, 100vw);
   }
 
   .shadow-md {
@@ -138,12 +118,15 @@
     --ring-inset: inset;
     --ring-offset-width: 0px;
     --ring-color: rgb(255 255 255/0.1);
-    --ring-offset-shadow: var(--ring-inset) 0 0 0 calc(1px + var(--ring-offset-width)) var(--ring-color);
+    --ring-offset-shadow: var(--ring-inset) 0 0 0
+      calc(1px + var(--ring-offset-width)) var(--ring-color);
     --ring-shadow: 0 0 #0000;
     --shadow: 0 0 #0000;
     --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-colored: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color);
-    box-shadow: var(--ring-offset-shadow, 0 0 #0000), var(--ring-shadow, 0 0 #0000), var(--shadow);
+    --shadow-colored: 0 4px 6px -1px var(--shadow-color),
+      0 2px 4px -2px var(--shadow-color);
+    box-shadow: var(--ring-offset-shadow, 0 0 #0000),
+      var(--ring-shadow, 0 0 #0000), var(--shadow);
   }
 
   .-top-14 {
@@ -175,7 +158,7 @@
     }
   }
 
-  @media (min-width: 768px){
+  @media (min-width: 768px) {
     .hide-on-desktop {
       visibility: hidden !important;
       display: none !important;

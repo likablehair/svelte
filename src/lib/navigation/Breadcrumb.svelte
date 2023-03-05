@@ -1,34 +1,50 @@
 <script lang="ts" context="module">
   export type BreadcrumbItem = {
-    name: string,
-    title: string,
-    url?: string
-  }
+    name: string;
+    title: string;
+    url?: string;
+  };
 </script>
 
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher<{
     "item-click": {
-      item: BreadcrumbItem,
-    }
-  }>()
+      item: BreadcrumbItem;
+    };
+  }>();
 
-  export let 
-    items: BreadcrumbItem[] = [],
-    underliner: boolean = true,
-    separatorIcon: string = 'mdi-chevron-right',
-    separatorIconSize: number = 10,
-    spacing: string = "20px"
+  export let items: BreadcrumbItem[] = [],
+    underliner = true,
+    separatorIcon = "mdi-chevron-right",
+    separatorIconSize = 10,
+    spacing = "20px";
 
   function handleLinkClick(item: BreadcrumbItem) {
-    dispatch('item-click', {
+    dispatch("item-click", {
       item: item,
-    })
+    });
   }
-  
-  import Icon from "$lib/media/Icon.svelte"
+
+  import Icon from "$lib/media/Icon.svelte";
 </script>
+
+<div>
+  {#each items as item, index}
+    <span
+      class="history"
+      class:link={underliner && index != items.length - 1}
+      class:bar-link={underliner && index != items.length - 1}
+      on:click={() => handleLinkClick(item)}
+      on:keypress={() => handleLinkClick(item)}>{item.title}</span
+    >
+    {#if index != items.length - 1}<span
+        style:margin-left={`calc(${spacing} / 2)`}
+        style:margin-right={`calc(${spacing} / 2)`}
+        ><Icon name={separatorIcon} size={separatorIconSize} /></span
+      >{/if}
+  {/each}
+</div>
 
 <style>
   .history {
@@ -53,7 +69,7 @@
   }
 
   .link::before {
-    content: '';
+    content: "";
   }
 
   .bar-link::before {
@@ -67,19 +83,3 @@
     transform: scale3d(1, 1, 1);
   }
 </style>
-
-<div>
-  {#each items as item, index}
-    <span
-      class="history"
-      class:link={underliner && index != items.length - 1}
-      class:bar-link={underliner && index != items.length - 1}
-      on:click={() => handleLinkClick(item)}
-    >{item.title}</span>
-    {#if index != items.length - 1}<span 
-      style:margin-left={`calc(${spacing} / 2)`}
-      style:margin-right={`calc(${spacing} / 2)`}
-    ><Icon name={separatorIcon} size={separatorIconSize}></Icon></span>{/if}
-  {/each}
-</div>
-

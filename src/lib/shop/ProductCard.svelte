@@ -1,44 +1,26 @@
 <script lang="ts">
-  export let image: string = '',
-    title: string = '',
-    sale: boolean = false,
-    saleText: string = 'SALE',
-    price: number = undefined,
-    currency: string = '€',
-    discount: number = undefined,
-    maxWidth: string = undefined,
-    maxHeight: string = undefined,
-    minWidth: string = undefined,
-    minHeight: string = undefined,
-    width: string = undefined,
-    height: string = undefined
+  export let image = "",
+    title = "",
+    sale = false,
+    saleText = "SALE",
+    price: number | undefined = undefined,
+    currency = "€",
+    discount: number | undefined = undefined,
+    maxWidth: string | undefined = undefined,
+    maxHeight: string | undefined = undefined,
+    minWidth: string | undefined = undefined,
+    minHeight: string | undefined = undefined,
+    width: string | undefined = undefined,
+    height: string | undefined = undefined;
 
-  $: priceLessDiscount = Number((price - discount).toFixed(2))
+  $: priceLessDiscount = Number(((price || 0) - (discount || 0)).toFixed(2));
 
-  import Image from '$lib/media/Image.svelte';
+  import Image from "$lib/media/Image.svelte";
 </script>
 
-<style>
-  .shadow-lg {
-    --shadow-color: #000;
-    --ring-inset: inset;
-    --ring-offset-width: 0px;
-    --ring-color: rgb(255 255 255/0.1);
-    --ring-offset-shadow: var(--ring-inset) 0 0 0 calc(1px + var(--ring-offset-width)) var(--ring-color);
-    --ring-shadow: 0 0 #0000;
-    --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --shadow-colored: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -4px var(--shadow-color);
-    box-shadow: var(--ring-offset-shadow, 0 0 #0000), var(--ring-shadow, 0 0 #0000), var(--shadow);
-  }
-
-  .info {
-    height: var(--info-height, 100px);
-  }
-</style>
-
-<div 
-  style:width={width}
-  style:height={height}
+<div
+  style:width
+  style:height
   style:max-width={maxWidth}
   style:max-height={maxHeight}
   style:min-width={minWidth}
@@ -54,7 +36,7 @@
     --border-radius="10px 10px 0px 0px"
   >
     {#if sale}
-      <div 
+      <div
         style:font-weight="600"
         style:font-size="14px"
         style:line-height="20px"
@@ -67,54 +49,64 @@
         style:position="absolute"
         style:padding-left="8px"
         style:padding-right="8px"
-      >{saleText}</div>
+      >
+        {saleText}
+      </div>
     {/if}
   </Image>
-  <div 
-    style:padding="8px"
-    style:position="relative"
-    class="info"
-  >
-    <div style:font-weight="600" >{title}</div>
+  <div style:padding="8px" style:position="relative" class="info">
+    <div style:font-weight="600">{title}</div>
     {#if (price !== undefined && price !== null) || (discount !== undefined && discount !== null)}
-      <div 
-        style:position="absolute"
-        style:bottom="19px"
-        style:right="8px"
-      >
-        {#if discount !== undefined && discount !== null }
-          <span 
+      <div style:position="absolute" style:bottom="19px" style:right="8px">
+        {#if discount !== undefined && discount !== null}
+          <span
             style:text-decoration-line="line-through"
             style:font-size=""
             style:letter-spacing="0.025em"
             style:font-weight="400px"
             style:color="rgb(156 163 175)"
           >
-            {priceLessDiscount} {currency}
+            {priceLessDiscount}
+            {currency}
           </span>
         {/if}
 
-        {#if price !== undefined && price !== null }
-          <span 
+        {#if price !== undefined && price !== null}
+          <span
             style:letter-spacing="0.025em"
             style:font-size="18px"
             style:line-height="28px"
             style:font-weight="600"
           >
-            {price} {currency}
+            {price}
+            {currency}
           </span>
         {/if}
       </div>
     {/if}
-    <div 
-      style:position="absolute"
-      style:bottom="19px"
-      style:left="8px"
-    >
-      <slot name="sizes">
-
-      </slot>
+    <div style:position="absolute" style:bottom="19px" style:left="8px">
+      <slot name="sizes" />
     </div>
   </div>
 </div>
 
+<style>
+  .shadow-lg {
+    --shadow-color: #000;
+    --ring-inset: inset;
+    --ring-offset-width: 0px;
+    --ring-color: rgb(255 255 255/0.1);
+    --ring-offset-shadow: var(--ring-inset) 0 0 0
+      calc(1px + var(--ring-offset-width)) var(--ring-color);
+    --ring-shadow: 0 0 #0000;
+    --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-colored: 0 10px 15px -3px var(--shadow-color),
+      0 4px 6px -4px var(--shadow-color);
+    box-shadow: var(--ring-offset-shadow, 0 0 #0000),
+      var(--ring-shadow, 0 0 #0000), var(--shadow);
+  }
+
+  .info {
+    height: var(--info-height, 100px);
+  }
+</style>

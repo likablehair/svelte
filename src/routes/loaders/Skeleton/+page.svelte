@@ -1,7 +1,6 @@
 <script lang="ts">
-  import Skeleton from '$lib/loaders/Skeleton.svelte'
+  import Skeleton from "$lib/loaders/Skeleton.svelte";
 </script>
-
 
 <div
   style:background-color="#a1a1a1"
@@ -15,14 +14,14 @@
   <Skeleton
     sections={[
       {
-        type: 'image',
-        height: `100%`
-      }
+        type: "image",
+        height: `100%`,
+      },
     ]}
     padding="0px"
     width="50%"
     height="100%"
-  ></Skeleton>
+  />
 </div>
 
 <div
@@ -36,15 +35,15 @@
   <Skeleton
     sections={[
       {
-        type: 'image',
-        height: `100%`
-      }
+        type: "image",
+        height: `100%`,
+      },
     ]}
     padding="0px"
     width="50%"
     height="100%"
     dark={true}
-  ></Skeleton>
+  />
 </div>
 
 <div
@@ -59,16 +58,16 @@
   <Skeleton
     sections={[
       {
-        type: 'image',
-        height: `20px`
+        type: "image",
+        height: `20px`,
       },
       {
-        type: 'image',
-        height: `40px`
+        type: "image",
+        height: `40px`,
       },
     ]}
     padding="10px"
     width="50%"
     height="90px"
-  ></Skeleton>
+  />
 </div>

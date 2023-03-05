@@ -1,8 +1,15 @@
 <script lang="ts">
-  let value: boolean = false
+  let value = false;
 
-  import Checkbox from '$lib/forms/Checkbox.svelte';
+  import Checkbox from "$lib/forms/Checkbox.svelte";
 </script>
+
+<div class="card-container">
+  <Checkbox bind:value />
+  <div style:margin-top="30px">
+    {value}
+  </div>
+</div>
 
 <style>
   .card-container {
@@ -12,17 +19,7 @@
     flex-direction: column;
     height: 100vh;
     width: 100vw;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   }
 </style>
-
-<div class="card-container">
-  <Checkbox
-    bind:value={value}
-  ></Checkbox>
-  <div
-    style:margin-top="30px"
-  >
-    {value}
-  </div>
-</div>

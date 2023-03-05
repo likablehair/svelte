@@ -1,45 +1,45 @@
 <script lang="ts">
-  export let 
-    value: number = 0,
-    total: number = 100,
-    height: string = '5px',
-    width: string = '100%',
-    radius: string = '2px',
-    backgroundColor: string = undefined,
-    color: string = undefined
+  export let value = 0,
+    total = 100,
+    height = "5px",
+    width = "100%",
+    radius = "2px",
+    backgroundColor: string | undefined = undefined,
+    color: string | undefined = undefined;
 
-  $: hundredBasedProgress = total === 0 ? 100 : value * 100 / total
+  $: hundredBasedProgress = total === 0 ? 100 : (value * 100) / total;
   $: cssVariables = Object.entries({
-      '--progress-width': hundredBasedProgress + '%',
-    }).filter(([key]) => key.startsWith('--'))
-    .reduce( (css, [key,value]) => {
-      return `${ css }${ key }: ${ value };`
-    }, '');
+    "--progress-width": hundredBasedProgress + "%",
+  })
+    .filter(([key]) => key.startsWith("--"))
+    .reduce((css, [key, value]) => {
+      return `${css}${key}: ${value};`;
+    }, "");
 </script>
 
-<style>
-.progress-bar-container {
-  overflow: hidden;
-}
-
-.progress {
-  max-width: 100%;
-  transition: width 300ms ease-in;
-}
-</style>
-
-<div 
+<div
   style={cssVariables}
-  style:height={height}
-  style:width={width}
+  style:height
+  style:width
   style:border-radius={radius}
   style:background-color={backgroundColor}
   class="progress-bar-container"
 >
-  <div 
-    style:height={height}
-    style:width={hundredBasedProgress + '%'}
+  <div
+    style:height
+    style:width={hundredBasedProgress + "%"}
     style:background-color={color}
     class="progress"
-  ></div>
+  />
 </div>
+
+<style>
+  .progress-bar-container {
+    overflow: hidden;
+  }
+
+  .progress {
+    max-width: 100%;
+    transition: width 300ms ease-in;
+  }
+</style>

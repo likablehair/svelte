@@ -7,23 +7,24 @@
       name: "firstMenu",
       title: "Primo menu",
       url: "https://google.it",
-    }, {
+    },
+    {
       name: "secondMenu",
       title: "Secondo menu",
       url: "https://google.it",
-    }, {
+    },
+    {
       name: "thirdMenu",
       title: "Terzo menu",
       url: "https://google.it",
     },
-  ]
-  let message = ""
+  ];
+  let message = "";
 
   function handleBreacrumItem(event) {
-    message = "Hai cliccato " + event.detail.item.name
+    message = "Hai cliccato " + event.detail.item.name;
   }
 </script>
-
 
 <div
   style:height="200px"
@@ -32,10 +33,7 @@
   style:align-items="center"
   style:flex-direction="column"
 >
-  <Breadcrumb
-    items={items}
-    on:item-click={handleBreacrumItem}
-  ></Breadcrumb>
+  <Breadcrumb {items} on:item-click={handleBreacrumItem} />
   <div style:margin-top="15px">
     {message}
   </div>
@@ -48,13 +46,13 @@
   style:flex-direction="column"
 >
   <Breadcrumb
-    items={items}
+    {items}
     on:item-click={handleBreacrumItem}
     underliner={false}
     spacing="90px"
     separatorIcon="mdi-arrow-right"
     separatorIconSize={13}
-  ></Breadcrumb>
+  />
   <div style:margin-top="15px">
     {message}
   </div>

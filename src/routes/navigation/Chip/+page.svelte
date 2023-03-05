@@ -2,7 +2,7 @@
   import Switch from "$lib/forms/Switch.svelte";
   import Chip from "$lib/navigation/Chip.svelte";
 
-  let openFilter: boolean = false;
+  let openFilter = false;
 
   function handleClick() {
     console.log("click");

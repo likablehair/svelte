@@ -1,42 +1,40 @@
 <script context="module" lang="ts">
   export type Item = {
-    title: string,
-    name: string,
-    url?: string,
-    detail?: object
-  }
+    title: string;
+    name: string;
+    url?: string;
+    detail?: object;
+  };
 </script>
 
 <script lang="ts">
   export let items: Item[] = [],
-    color: string = undefined,
-    vertical: boolean = false,
-    space: string = '20px'
+    color: string | undefined = undefined,
+    vertical = false,
+    space = "20px";
 
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher<{
     "item-click": {
-      item: Item,
-    }
-  }>()
+      item: Item;
+    };
+  }>();
 
   function handleItemClick(item: Item) {
-    dispatch('item-click', { item })
+    dispatch("item-click", { item });
   }
 </script>
 
-<div 
-  style:display="flex"
-  style:flex-direction={vertical ? 'column' : 'row'}
->
+<div style:display="flex" style:flex-direction={vertical ? "column" : "row"}>
   {#each items as item}
-    <div 
+    <div
       style:width="fit-content"
       style:margin-right={!vertical ? space : undefined}
       style:margin-bottom={vertical ? space : undefined}
-      style:color={color}
+      style:color
       class="link bar-link"
       on:click={() => handleItemClick(item)}
+      on:keypress={() => handleItemClick(item)}
     >
       {item.title}
     </div>
@@ -49,7 +47,7 @@
     font-size: 18px;
     position: relative;
     white-space: nowrap;
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   }
 
   .link::before,
@@ -64,7 +62,7 @@
   }
 
   .link::before {
-    content: '';
+    content: "";
   }
 
   .bar-link::before {

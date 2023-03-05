@@ -12,21 +12,21 @@
     selectedDate: Date = new Date(),
     view: "year" | "month" | "day" = "day",
     locale: Locale = "it",
-    primaryColor: string = "#008080",
+    primaryColor = "#008080",
     headerBackgroundColor: string = primaryColor,
     arrowColor: string = primaryColor,
-    hoverColor: string = "#00808012",
-    selectedDayColor: string = "black",
-    headerColor: string = "white",
-    cardColor: string = "black",
-    cardBackGroundColor: string = "rgba(255,255,255,0)",
+    hoverColor = "#00808012",
+    selectedDayColor = "black",
+    headerColor = "white",
+    cardColor = "black",
+    cardBackGroundColor = "rgba(255,255,255,0)",
     selectableYears: number[] = [...Array(150).keys()].map(
       (i) => i + (new Date().getFullYear() - 75)
     ),
-    height: string = "100%",
-    width: string = "100%";
+    height = "100%",
+    width = "100%";
 
-  let selectorText: string = undefined;
+  let selectorText: string | undefined = undefined;
   let elementDisabled: "year" | "date" = "date";
 
   $: visibleSelector = view == "day" || view == "month";
@@ -96,11 +96,17 @@
       class:disabled={elementDisabled == "year"}
       on:click={() => {
         view = "year";
+      }}
+      on:keypress={() => {
+        view = "year";
       }}>{selectedYear}</span
     >
     <h2
       class:disabled={elementDisabled == "date"}
       on:click={() => {
+        view = "day";
+      }}
+      on:keypress={() => {
         view = "day";
       }}
     >
@@ -124,6 +130,7 @@
           {#key selectorText}
             <div
               on:click={SelectorHandler}
+              on:keypress={SelectorHandler}
               style:--primary-color={primaryColor}
             >
               {selectorText}
