@@ -1,6 +1,6 @@
 # Likablehair Svelte component library
 
-A simple library that contains svelte components, used by likablehair frontend applications
+A simple library that contains svelte components, used by likablehair frontend applications.
 
 ## Developer guide
 
