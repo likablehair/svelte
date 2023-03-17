@@ -26,7 +26,7 @@
     });
   }
 
-  import Icon from "$lib/media/Icon.svelte";
+  import Icon from "$lib/components/simple/media/Icon.svelte";
 </script>
 
 <div>

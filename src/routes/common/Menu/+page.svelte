@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Menu from "$lib/common/Menu.svelte";
-  import Button from "$lib/buttons/Button.svelte";
+  import Menu from "$lib/components/simple/common/Menu.svelte";
+  import Button from "$lib/components/simple/buttons/Button.svelte";
 
   let menuTop: number,
     menuLeft: number,

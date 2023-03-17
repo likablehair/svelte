@@ -2,8 +2,8 @@
   let open = false,
     openSecond = false;
 
-  import Dialog from "$lib/dialogs/Dialog.svelte";
-  import Button from "$lib/buttons/Button.svelte";
+  import Dialog from "$lib//components/simple/dialogs/Dialog.svelte";
+  import Button from "$lib/components/simple/buttons/Button.svelte";
 </script>
 
 <div

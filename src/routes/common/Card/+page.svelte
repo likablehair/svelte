@@ -1,5 +1,5 @@
 <script>
-  import Card from "$lib/common/Card.svelte";
+  import Card from "$lib/components/simple/common/Card.svelte";
 </script>
 
 <div class="card-container">

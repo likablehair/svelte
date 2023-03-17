@@ -5,7 +5,7 @@
   import YearSelector from "./YearSelector.svelte";
   import MonthSelector from "./MonthSelector.svelte";
   import Calendar from "./Calendar.svelte";
-  import Button from "$lib/buttons/Button.svelte";
+  import Button from "$lib/components/simple/buttons/Button.svelte";
 
   export let selectedYear: number = new Date().getFullYear(),
     selectedMonth: number = new Date().getMonth(),

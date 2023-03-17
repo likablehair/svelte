@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import HeaderMenu from "$lib/navigation/HeaderMenu.svelte";
-  import Button from "$lib/buttons/Button.svelte";
+  import Button from "$lib/components/simple/buttons/Button.svelte";
 
   function handleLighClick() {
     goto("/navigation/HeaderMenuDark");

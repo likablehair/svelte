@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Icon from "$lib/media/Icon.svelte";
-  import Button from "$lib/buttons/Button.svelte";
+  import Icon from "$lib/components/simple/media/Icon.svelte";
+  import Button from "$lib/components/simple/buttons/Button.svelte";
   import { createEventDispatcher } from "svelte";
 
   export let close = false,

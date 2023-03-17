@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Button from "$lib/buttons/Button.svelte";
-  import FileInput from "$lib/forms/FileInput.svelte";
-  import Icon from "$lib/media/Icon.svelte";
+  import Button from "$lib/components/simple/buttons/Button.svelte";
+  import FileInput from "$lib/components/simple/forms/FileInput.svelte";
+  import Icon from "$lib/components/simple/media/Icon.svelte";
 
   export let files: File[] = [],
     persistOverUpload = true,

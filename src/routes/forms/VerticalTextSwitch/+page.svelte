@@ -1,7 +1,7 @@
 <script lang="ts">
   let value = false;
   import VerticalTextSwitch from "$lib/forms/VerticalTextSwitch.svelte";
-  import Icon from "$lib/media/Icon.svelte";
+  import Icon from "$lib/components/simple/media/Icon.svelte";
 </script>
 
 <div class="card-container">

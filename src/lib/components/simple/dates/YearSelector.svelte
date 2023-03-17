@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { scrollAtCenter } from "$lib/common/scroller";
+  import { scrollAtCenter } from "$lib/components/simple/common/scroller";
   import { createEventDispatcher, onMount } from "svelte";
 
   export let selectedYear: number | undefined = undefined,
@@ -32,7 +32,7 @@
       year,
     });
   }
-  import Button from "$lib/buttons/Button.svelte";
+  import Button from "$lib/components/simple/buttons/Button.svelte";
 </script>
 
 <div bind:this={container} style:height style:width class="selector-container">

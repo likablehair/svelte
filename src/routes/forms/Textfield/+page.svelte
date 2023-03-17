@@ -6,7 +6,7 @@
   }
 
   import Textfield from "$lib/forms/Textfield.svelte";
-  import Icon from "$lib/media/Icon.svelte";
+  import Icon from "$lib/components/simple/media/Icon.svelte";
 </script>
 
 <div class="card-container">

@@ -58,8 +58,8 @@
   $: defaultBorderRadius = type == "icon" ? "50%" : "5px";
   $: position = $$slots.append ? "relative" : undefined;
 
-  import Icon from "$lib/media/Icon.svelte";
-  import CircularLoader from "$lib/loaders/CircularLoader.svelte";
+  import Icon from "$lib/components/simple/media/Icon.svelte";
+  import CircularLoader from "$lib/components/simple/loaders/CircularLoader.svelte";
 </script>
 
 <div

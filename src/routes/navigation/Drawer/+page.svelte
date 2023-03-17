@@ -8,7 +8,7 @@
   }
 
   import Drawer from "$lib/navigation/Drawer.svelte";
-  import Button from "$lib/buttons/Button.svelte";
+  import Button from "$lib/components/simple/buttons/Button.svelte";
 </script>
 
 <Drawer

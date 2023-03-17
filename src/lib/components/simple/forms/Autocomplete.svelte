@@ -163,9 +163,9 @@
     filteredItems = items;
   }
 
-  import Textfield from "$lib/forms/Textfield.svelte";
-  import Chip from "$lib/navigation/Chip.svelte";
-  import Menu from "$lib/common/Menu.svelte";
+  import Textfield from "$lib/components/simple/forms/Textfield.svelte";
+  import Chip from "$lib/components/simple/navigation/Chip.svelte";
+  import Menu from "$lib/components/simple/common/Menu.svelte";
   import { createEventDispatcher } from "svelte";
 </script>
 

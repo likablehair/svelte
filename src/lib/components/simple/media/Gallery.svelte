@@ -46,12 +46,12 @@
     }
   }
 
-  import ImageGrid from "$lib/media/ImageGrid.svelte";
-  import ImageComponent from "$lib/media/Image.svelte";
-  import Dialog from "$lib/dialogs/Dialog.svelte";
-  import Button from "$lib/buttons/Button.svelte";
-  import MediaQuery from "$lib/common/MediaQuery.svelte";
-  import Gesture from "$lib/common/Gesture.svelte";
+  import ImageGrid from "$lib/components/simple/media/ImageGrid.svelte";
+  import ImageComponent from "$lib/components/simple/media/Image.svelte";
+  import Dialog from "$lib/components/simple/dialogs/Dialog.svelte";
+  import Button from "$lib/components/simple/buttons/Button.svelte";
+  import MediaQuery from "$lib/components/simple/common/MediaQuery.svelte";
+  import Gesture from "$lib/components/simple/common/Gesture.svelte";
 </script>
 
 <ImageGrid

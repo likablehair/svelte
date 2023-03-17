@@ -1,8 +1,8 @@
 <script lang="ts">
-  import SimpleTable from "$lib/common/SimpleTable.svelte";
-  import type { Header } from "$lib/common/SimpleTable.svelte";
-  import Checkbox from "$lib/forms/Checkbox.svelte";
-  import Button from "$lib/buttons/Button.svelte";
+  import SimpleTable from "$lib/components/simple/common/SimpleTable.svelte";
+  import type { Header } from "$lib/components/simple/common/SimpleTable.svelte";
+  import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
+  import Button from "$lib/components/simple/buttons/Button.svelte";
 
   let headers: Header[] = [
     {

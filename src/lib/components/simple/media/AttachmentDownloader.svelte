@@ -13,8 +13,8 @@
     width = "fit-content",
     height: string | undefined = undefined;
 
-  import Icon from "$lib/media/Icon.svelte";
-  import Card from "$lib/common/Card.svelte";
+  import Icon from "$lib/components/simple/media/Icon.svelte";
+  import Card from "$lib/components/simple/common/Card.svelte";
 </script>
 
 <Card

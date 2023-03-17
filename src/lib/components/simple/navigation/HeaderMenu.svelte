@@ -40,7 +40,7 @@
   else localBackgroundColor = backgroundColor;
 
   import Navigator from "./Navigator.svelte";
-  import Button from "$lib/buttons/Button.svelte";
+  import Button from "$lib/components/simple/buttons/Button.svelte";
   import Drawer from "$lib/navigation/Drawer.svelte";
 </script>
 

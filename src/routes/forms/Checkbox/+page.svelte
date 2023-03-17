@@ -1,7 +1,7 @@
 <script lang="ts">
   let value = false;
 
-  import Checkbox from "$lib/forms/Checkbox.svelte";
+  import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
 </script>
 
 <div class="card-container">

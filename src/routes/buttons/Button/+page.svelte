@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Button from "$lib/buttons/Button.svelte";
-  import Icon from "$lib/media/Icon.svelte";
+  import Button from "$lib/components/simple/buttons/Button.svelte";
+  import Icon from "$lib/components/simple/media/Icon.svelte";
   import { onMount } from "svelte";
 
   let loading = true;

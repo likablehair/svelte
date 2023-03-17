@@ -23,7 +23,7 @@
       monthIndex,
     });
   }
-  import Button from "$lib/buttons/Button.svelte";
+  import Button from "$lib/components/simple/buttons/Button.svelte";
 </script>
 
 <div style:height style:width class="selector-container">
