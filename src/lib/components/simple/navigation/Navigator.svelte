@@ -11,6 +11,9 @@
   export let items: Item[] = [],
     color: string | undefined = undefined,
     vertical = false,
+    variant: 'standard' | 'underlined' = 'underlined',
+    textColor: string | undefined = '',
+    hoverTextColor: string | undefined = undefined,
     space = "20px";
 
   import { createEventDispatcher } from "svelte";
@@ -25,14 +28,21 @@
   }
 </script>
 
-<div style:display="flex" style:flex-direction={vertical ? "column" : "row"}>
+<div 
+  style:--navigator-text-color={textColor}
+  style:--navigator-hover-text-color={hoverTextColor}
+  style:display="flex" 
+  style:flex-direction={vertical ? "column" : "row"}
+>
   {#each items as item}
     <div
       style:width="fit-content"
       style:margin-right={!vertical ? space : undefined}
       style:margin-bottom={vertical ? space : undefined}
       style:color
-      class="link bar-link"
+      class="link"
+      class:bar-link={variant == 'underlined'}
+      class:standard-link={variant == 'standard'}
       on:click={() => handleItemClick(item)}
       on:keypress={() => handleItemClick(item)}
     >
@@ -50,8 +60,10 @@
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   }
 
-  .link::before,
-  .link::after {
+  /* bar link */
+
+  .bar-link::before,
+  .bar-link::after {
     position: absolute;
     width: 100%;
     height: 1.5px;
@@ -61,7 +73,7 @@
     pointer-events: none;
   }
 
-  .link::before {
+  .bar-link::before {
     content: "";
   }
 
@@ -74,5 +86,17 @@
   .bar-link:hover::before {
     transform-origin: 0% 50%;
     transform: scale3d(1, 1, 1);
+  }
+
+  /* standard link */
+  .standard-link {
+    color: var(--navigator-text-color);
+    transition-property: color;
+    transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+    transition-duration: .5s;
+  }
+
+  .standard-link:hover {
+    color: var(--navigator-hover-text-color);
   }
 </style>

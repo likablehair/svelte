@@ -48,7 +48,10 @@
       class="side-bar"
       class:opened={drawerOpened}
     >
-      <div class="header-toolbar">
+      <div 
+        class="header-toolbar"
+        class:opened-drawer={drawerOpened}
+      >
         <slot name="menu">
           <div class="inner-menu">
             {#if mAndDown}
@@ -150,6 +153,11 @@
     height: var(--stable-divider-side-bar-layout-header-menu-height);
     left: var(--stable-divider-side-bar-layout-side-bar-width);
     border-bottom: 1px solid var(--stable-divider-side-bar-layout-header-menu-border-color);
+    backdrop-filter: blur(4px);
+    background-color: var(--stable-divider-side-bar-layout-inner-header-menu-background-color);
+    transition-property: background-color;
+    transition-timing-function: cubic-bezier(.4,0,.2,1);
+    transition-duration: .5s;
     right: 0;
     top: 0;
   }
@@ -157,6 +165,14 @@
   @media (max-width: 1024px) {
   	.header-toolbar {
       left: 0;
+    }
+
+    .header-toolbar.opened-drawer {
+      background-color: inherit;
+    }
+
+    .header-toolbar:hover {
+      background-color: inherit;
     }
   }
 
@@ -181,7 +197,7 @@
     height: 100%;
     display: flex;
     align-items: center;
-    backdrop-filter: blur(4px);
+    justify-content: space-between;
   }
 
   * {

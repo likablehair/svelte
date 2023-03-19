@@ -1,0 +1,107 @@
+<script lang="ts">
+  import Dialog from '$lib/components/simple/dialogs/Dialog.svelte'
+    import { createEventDispatcher } from 'svelte';
+
+  export let color: string = "rgb(113 113 122)",
+    searchButtonRingColor: string = "rgba(24,24,27,.1)",
+    searchButtonHoverRingColor: string = "rgba(24,24,27,.2)",
+    searchButtonWidth: string = "100%",
+    searchButtonMaxWidth: string = "28rem",
+    searchButtonHeight: string = "2rem",
+    searchButtonBackgroundColor: string = "white",
+    searchButtonPadding: string = "0rem 0.75rem 0rem 0.5rem",
+    searchButtonFontSize: string = ".875rem"
+
+    let searchDialogOpended: boolean = false
+
+    let dispatch = createEventDispatcher<{
+      'toggle-search-dialog': {
+        opened: boolean
+      }
+    }>()
+
+    function toggleSearchDialog()  {
+      searchDialogOpended = !searchDialogOpended
+      dispatch('toggle-search-dialog', { opened: searchDialogOpended })
+    }
+</script>
+
+<div
+  style:--global-search-text-field-ring-color={searchButtonRingColor}
+  style:--global-search-text-field-hover-ring-color={searchButtonHoverRingColor}
+  style:--global-search-text-field-color={color}
+  style:--global-search-text-field-width={searchButtonWidth}
+  style:--global-search-text-field-max-width={searchButtonMaxWidth}
+  style:--global-search-text-field-height={searchButtonHeight}
+  style:--global-search-text-field-background-color={searchButtonBackgroundColor}
+  style:--global-search-text-field-padding={searchButtonPadding}
+  style:--global-search-text-field-font-size={searchButtonFontSize}
+>
+  <button 
+    on:click={toggleSearchDialog}
+    class="search-like-button"
+  >
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      aria-hidden="true"
+      class="search-icon"
+      ><path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M12.01 12a4.25 4.25 0 1 0-6.02-6 4.25 4.25 0 0 0 6.02 6Zm0 0 3.24 3.25"
+      /></svg
+    >
+    Search
+    <kbd class="shortcut"><kbd class="shortcut">⌘</kbd><kbd class="shortcut">K</kbd></kbd>
+  </button>
+  <Dialog
+    bind:open={searchDialogOpended}
+  >
+    <div
+      style:background-color="white"
+    >Ciao</div>
+  </Dialog>
+</div>
+
+<style>
+  .search-like-button {
+    --global-search-text-field-ring-real-color: var(--global-search-text-field-ring-color);
+    box-shadow: inset 0 0 0 1px var(--global-search-text-field-ring-color);
+    color: var(--global-search-text-field-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: var(--global-search-text-field-width);
+    max-width: var(--global-search-text-field-max-width);
+    height: var(--global-search-text-field-height);
+    font-size: var(--global-search-text-field-font-size);
+    line-height: 1.5rem;
+    background-color: var(--global-search-text-field-background-color);
+    border-radius: 9999px;
+    padding: var(--global-search-text-field-padding);
+    border: 0 solid #e5e7eb;
+    cursor: pointer;
+    transition-property: box-shadow;
+    transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+    transition-duration: .5s;
+  }
+
+  .search-like-button:hover {
+    box-shadow: inset 0 0 0 1px var(--global-search-text-field-hover-ring-color);
+  }
+
+  .search-icon {
+    height: 1.25rem;
+    width: 1.25rem;
+    stroke: currentColor;
+  }
+
+  .shortcut {
+    margin-left: auto;
+    font-size: 1rem;
+    color: var(--global-search-text-field-color);
+    text-transform: none;
+    font-family: ui-sans-serif,system-ui,-apple-system;
+  }
+</style>
