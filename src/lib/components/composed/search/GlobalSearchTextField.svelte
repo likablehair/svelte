@@ -1,7 +1,8 @@
 <script lang="ts">
   import Dialog from '$lib/components/simple/dialogs/Dialog.svelte'
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import SearchBar from './SearchBar.svelte';
+  import Keyboarder, { type CallbackFunction } from '$lib/utils/keyboarder';
 
   export let color: string = "rgb(113 113 122)",
     searchButtonRingColor: string = "rgba(24,24,27,.1)",
@@ -13,7 +14,8 @@
     searchButtonPadding: string = "0rem 0.75rem 0rem 0.5rem",
     searchButtonFontSize: string = ".875rem"
 
-    let searchDialogOpended: boolean = false
+    let searchDialogOpended: boolean = false,
+      searchBarInput: HTMLElement
 
     let dispatch = createEventDispatcher<{
       'toggle-search-dialog': {
@@ -21,8 +23,24 @@
       }
     }>()
 
+    onMount(() => {
+      let handler: CallbackFunction = (params) => {
+        if((params.meta || params.ctrl) && params.key == 'k') {
+          toggleSearchDialog()
+        }
+      }
+
+      Keyboarder.on(handler)
+
+      return () => {
+        Keyboarder.off(handler)
+      }
+    })
+
+
     function toggleSearchDialog()  {
       searchDialogOpended = !searchDialogOpended
+      if(searchDialogOpended) searchBarInput.focus()
       dispatch('toggle-search-dialog', { opened: searchDialogOpended })
     }
 </script>
@@ -76,7 +94,9 @@
         style:width="100%"
         style:height="fit-content"
       >
-        <SearchBar></SearchBar>
+        <SearchBar
+          bind:input={searchBarInput}
+        ></SearchBar>
       </div>
     </div>
   </Dialog>

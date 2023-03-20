@@ -2,6 +2,7 @@
   import Teleporter from '$lib/utils/teleporter';
   import { BROWSER } from 'esm-env';
   import { beforeUpdate, onMount } from "svelte";
+  import Keyboarder, { type CallbackFunction } from '$lib/utils/keyboarder';
 
   export let open = false,
     overlayOpacity = "30%",
@@ -23,11 +24,18 @@
       teleportedUid = tp.attachNode(dialogElement)
     }
 
+    let keyboarderHandler: CallbackFunction = (params) => {
+      if(params.key == 'Escape' && localOpen) closeDialog()
+    }
+    Keyboarder.on(keyboarderHandler)
+
     return () => {
       if(!!teleportedUid) {
         let tp = new Teleporter()
         tp.destroyNode(teleportedUid)
       }
+
+      Keyboarder.off(keyboarderHandler)
     }
   })
 

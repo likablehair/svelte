@@ -1,7 +1,8 @@
 <script lang="ts">
   export let maxWidth: string = "36rem",
     width: string = "100%",
-    ringColor: string = "rgba(24,24,27,.1)"
+    ringColor: string = "rgba(24,24,27,.1)",
+    input: HTMLElement | undefined = undefined
 </script>
 
 <div
@@ -34,6 +35,7 @@
     maxlength="512" 
     tabindex="0"
     class="input" 
+    bind:this={input}
   />
 </div>
 
