@@ -119,7 +119,7 @@
       top: var(--stable-divider-side-bar-layout-header-menu-height);
       background-color: var(--stable-divider-side-bar-layout-drawer-background-color);
       bottom: 0;
-      z-index: 120;
+      z-index: 30;
       width: var(--stable-divider-side-bar-layout-drawer-width);
       max-width: 100vw;
     }
@@ -144,7 +144,7 @@
     .overlay.visible {
       background-color: hsla(240,5%,65%,.2);
       backdrop-filter: blur(4px);
-      z-index: 100;
+      z-index: 20;
     }
   }
 

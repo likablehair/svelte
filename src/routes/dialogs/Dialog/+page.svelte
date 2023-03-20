@@ -1,6 +1,7 @@
 <script lang="ts">
   let open = false,
-    openSecond = false;
+    openSecond = false,
+    counter: number = 0;
 
   import Dialog from "$lib//components/simple/dialogs/Dialog.svelte";
   import Button from "$lib/components/simple/buttons/Button.svelte";
@@ -39,10 +40,12 @@
   >
     <div style:overflow="auto">
       Sono un div per il dialog
-      <div style:height="150px" style:text-align="center">scrollable</div>
-      <div style:height="150px" style:text-align="center">scrollable</div>
-      <div style:height="150px" style:text-align="center">scrollable</div>
-      <div style:height="150px" style:text-align="center">scrollable</div>
+      <div style:height="150px" style:text-align="center">I'm also scrollable</div>
+      <div style:height="150px" style:text-align="center">I'm also scrollable</div>
+      <div style:height="150px" style:text-align="center">I'm also scrollable</div>
+      <div style:height="150px" style:text-align="center">I'm also scrollable</div>
+      <button on:click={() => counter += 1}>Plus one</button>
+      <div>value: {counter}</div>
     </div>
     <Button
       backgroundColor="#bcd6e6"

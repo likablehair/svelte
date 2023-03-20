@@ -9,6 +9,7 @@
   <svelte:fragment slot="inner-menu">
     <div
       style:flex="1 1 auto"
+      style:margin-right="10px"
     >
       <GlobalSearchTextField></GlobalSearchTextField>
     </div>

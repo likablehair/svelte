@@ -1,6 +1,7 @@
 <script lang="ts">
   import Dialog from '$lib/components/simple/dialogs/Dialog.svelte'
-    import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
+  import SearchBar from './SearchBar.svelte';
 
   export let color: string = "rgb(113 113 122)",
     searchButtonRingColor: string = "rgba(24,24,27,.1)",
@@ -57,10 +58,27 @@
   </button>
   <Dialog
     bind:open={searchDialogOpended}
+    transition="scale"
+    overlayBackdropFilter="blur(2px)"
   >
     <div
-      style:background-color="white"
-    >Ciao</div>
+      style:max-width="90vw"
+      style:width="600px"
+      style:height="500px"
+      style:display="flex"
+      style:justify-content="center"
+      on:click={() => searchDialogOpended = false}
+      on:keypress={() => searchDialogOpended = false}
+    >
+      <div
+        on:click|stopPropagation={() => { }}
+        on:keypress|stopPropagation={() => { }}
+        style:width="100%"
+        style:height="fit-content"
+      >
+        <SearchBar></SearchBar>
+      </div>
+    </div>
   </Dialog>
 </div>
 
