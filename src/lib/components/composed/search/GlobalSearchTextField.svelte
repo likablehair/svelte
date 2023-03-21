@@ -3,6 +3,7 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import SearchBar from './SearchBar.svelte';
   import Keyboarder, { type CallbackFunction } from '$lib/utils/keyboarder';
+  import SearchResults from './SearchResults.svelte';
 
   export let color: string = "rgb(113 113 122)",
     searchButtonRingColor: string = "rgba(24,24,27,.1)",
@@ -15,7 +16,8 @@
     searchButtonFontSize: string = ".875rem"
 
     let searchDialogOpended: boolean = false,
-      searchBarInput: HTMLElement
+      searchBarInput: HTMLElement,
+      searchText: string | undefined = undefined
 
     let dispatch = createEventDispatcher<{
       'toggle-search-dialog': {
@@ -96,7 +98,15 @@
       >
         <SearchBar
           bind:input={searchBarInput}
+          bind:value={searchText}
         ></SearchBar>
+        {#if !!searchText}
+          <SearchResults
+            margin="-.5rem 0 0 0"
+            borderRadius="0 0 .5rem .5rem"
+            loading={true}
+          ></SearchResults>
+        {/if}
       </div>
     </div>
   </Dialog>
