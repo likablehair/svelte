@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { TimeLineItem } from "$lib/timeline/SimpleTimeLine.svelte";
+  import type { TimeLineItem } from "$lib/components/simple/timeline/SimpleTimeLine.svelte";
 
-  import SimpleTimeLine from "$lib/timeline/SimpleTimeLine.svelte";
+  import SimpleTimeLine from "$lib/components/simple/timeline/SimpleTimeLine.svelte";
 
   let items: TimeLineItem[] = [
     {
