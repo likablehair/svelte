@@ -1,6 +1,7 @@
 <script context="module" lang="ts">
   export type Item = {
-    title: string;
+    title?: string;
+    icon?: string;
     name: string;
     url?: string;
     detail?: object;
@@ -8,6 +9,9 @@
 </script>
 
 <script lang="ts">
+  import { createEventDispatcher } from "svelte";
+  import Icon from "../media/Icon.svelte"
+  
   export let items: Item[] = [],
     color: string | undefined = undefined,
     vertical = false,
@@ -16,7 +20,6 @@
     hoverTextColor: string | undefined = undefined,
     space = "20px";
 
-  import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher<{
     "item-click": {
       item: Item;
@@ -33,21 +36,25 @@
   style:--navigator-hover-text-color={hoverTextColor}
   style:display="flex" 
   style:flex-direction={vertical ? "column" : "row"}
+  style:gap={space}
 >
   {#each items as item}
-    <div
+    <a
       style:width="fit-content"
-      style:margin-right={!vertical ? space : undefined}
-      style:margin-bottom={vertical ? space : undefined}
       style:color
       class="link"
       class:bar-link={variant == 'underlined'}
       class:standard-link={variant == 'standard'}
       on:click={() => handleItemClick(item)}
       on:keypress={() => handleItemClick(item)}
+      href={item.url}
     >
-      {item.title}
-    </div>
+      {#if !!item.title}
+        {item.title}
+      {:else if !!item.icon}
+        <Icon name={item.icon}></Icon>
+      {/if}
+    </a>
   {/each}
 </div>
 
@@ -58,6 +65,8 @@
     position: relative;
     white-space: nowrap;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    text-decoration: none;
+    color: var(--navigator-text-color);
   }
 
   /* bar link */

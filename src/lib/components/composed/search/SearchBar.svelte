@@ -53,6 +53,9 @@
       class="input" 
       bind:this={input}
       bind:value={value}
+      on:input
+      on:change
+      on:keydown
     />
   </slot>
 </div>

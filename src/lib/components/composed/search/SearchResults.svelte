@@ -1,15 +1,18 @@
 <script lang="ts" context="module">
   export type Result = {
     title: string
+    name: string | number,
     subtitle?: string
-    description?: string
     url?: string,
     /* eslint-disable  @typescript-eslint/no-explicit-any */
-    data: Record<string, any>
-  }
+    data?: Record<string, any>
+  };
 </script>
 
 <script lang="ts">
+  import SelectableVerticalList from "$lib/components/simple/lists/SelectableVerticalList.svelte";
+
+
   export let maxWidth: string | undefined = undefined,
     width: string = "100%",
     height: string | undefined = undefined,
@@ -20,9 +23,10 @@
     loadingText: string = "Searching for references ...",
     borderColor: string = "rgb(228 228 231/1)",
     borderRadius: string | undefined = undefined,
-    results: Result[] = [],
+    results: Result[] | undefined = [],
     loading: boolean = false,
-    footer: boolean = true
+    footer: boolean = true,
+    activeKeyboard: boolean = false
 </script>
 
 <div 
@@ -42,7 +46,7 @@
         <span style:font-size=".875rem">{loadingText}</span>
       </slot>
     </div>
-  {:else if results.length == 0}
+  {:else if !results || results.length == 0}
     <div
       class="no-data-container"
     >
@@ -51,7 +55,30 @@
       </slot>
     </div>
   {:else}
-    <div>some results</div>
+    <div>
+      <SelectableVerticalList
+        elements={results.map((r) => {
+          return {
+            title: r.title,
+            description: r.subtitle,
+            name: r.name,
+            data: r.data
+          }
+        })}
+        activeKeyboard={activeKeyboard}
+        on:focus
+        on:select
+      >
+        <div 
+          slot="description" 
+          let:element
+          style:margin-top=".5rem"
+          style:opacity="60%"
+        >
+          {element.description}
+        </div>
+      </SelectableVerticalList>
+    </div>
   {/if}
   {#if footer}  
     <div class="footer">

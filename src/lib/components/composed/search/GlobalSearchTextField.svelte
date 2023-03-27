@@ -3,7 +3,7 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import SearchBar from './SearchBar.svelte';
   import Keyboarder, { type CallbackFunction } from '$lib/utils/keyboarder';
-  import SearchResults from './SearchResults.svelte';
+  import SearchResults, { type Result } from './SearchResults.svelte';
 
   export let color: string = "rgb(113 113 122)",
     searchButtonRingColor: string = "rgba(24,24,27,.1)",
@@ -13,11 +13,16 @@
     searchButtonHeight: string = "2rem",
     searchButtonBackgroundColor: string = "white",
     searchButtonPadding: string = "0rem 0.75rem 0rem 0.5rem",
-    searchButtonFontSize: string = ".875rem"
+    searchButtonFontSize: string = ".875rem",
+    searchButtonText: string = "Search",
+    searchDialogOpened: boolean = false,
+    transitionDuration: string = ".8s",
+    searcher: (params: { searchText: string }) => Promise<Result[] | undefined> = () => Promise.resolve([])
 
-    let searchDialogOpended: boolean = false,
-      searchBarInput: HTMLElement,
-      searchText: string | undefined = undefined
+    let searchBarInput: HTMLElement,
+      searchText: string | undefined = undefined,
+      searchResults: Result[] | undefined = undefined,
+      searchLoading: boolean = false
 
     let dispatch = createEventDispatcher<{
       'toggle-search-dialog': {
@@ -39,11 +44,24 @@
       }
     })
 
+    function handleKeydown(event: KeyboardEvent) {
+      if(event.key == 'ArrowDown' || event.key == 'ArrowUp') event.preventDefault()
+    }
 
     function toggleSearchDialog()  {
-      searchDialogOpended = !searchDialogOpended
-      if(searchDialogOpended) searchBarInput.focus()
-      dispatch('toggle-search-dialog', { opened: searchDialogOpended })
+      searchDialogOpened = !searchDialogOpened
+      if(searchDialogOpened) searchBarInput.focus()
+      dispatch('toggle-search-dialog', { opened: searchDialogOpened })
+    }
+
+    async function search() {
+      if(!!searchText) {
+        searchLoading = true
+        searchResults = await searcher({
+          searchText
+        })
+        searchLoading = false
+      }
     }
 </script>
 
@@ -58,28 +76,40 @@
   style:--global-search-text-field-padding={searchButtonPadding}
   style:--global-search-text-field-font-size={searchButtonFontSize}
 >
-  <button 
-    on:click={toggleSearchDialog}
-    class="search-like-button"
+  <slot 
+    name="search-button"
+    toggleSearchDialog
   >
-    <svg
-      viewBox="0 0 20 20"
-      fill="none"
-      aria-hidden="true"
-      class="search-icon"
-      ><path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M12.01 12a4.25 4.25 0 1 0-6.02-6 4.25 4.25 0 0 0 6.02 6Zm0 0 3.24 3.25"
-      /></svg
+    <button 
+      on:click={toggleSearchDialog}
+      class="search-like-button"
     >
-    Search
-    <kbd class="shortcut"><kbd class="shortcut">⌘</kbd><kbd class="shortcut">K</kbd></kbd>
-  </button>
+      <slot name="search-button-icon">
+        <svg
+          viewBox="0 0 20 20"
+          fill="none"
+          aria-hidden="true"
+          class="search-icon"
+          ><path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12.01 12a4.25 4.25 0 1 0-6.02-6 4.25 4.25 0 0 0 6.02 6Zm0 0 3.24 3.25"
+          /></svg
+        >
+      </slot>
+      <slot name="search-button-text">
+        {searchButtonText}
+      </slot>
+      <slot name="search-button-shortcut">
+        <kbd class="shortcut"><kbd class="shortcut">⌘</kbd><kbd class="shortcut">K</kbd></kbd>
+      </slot>
+    </button>
+  </slot>
   <Dialog
-    bind:open={searchDialogOpended}
+    bind:open={searchDialogOpened}
     transition="scale"
     overlayBackdropFilter="blur(2px)"
+    transitionDuration={transitionDuration}
   >
     <div
       style:max-width="90vw"
@@ -87,8 +117,8 @@
       style:height="500px"
       style:display="flex"
       style:justify-content="center"
-      on:click={() => searchDialogOpended = false}
-      on:keypress={() => searchDialogOpended = false}
+      on:click={() => searchDialogOpened = false}
+      on:keypress={() => searchDialogOpened = false}
     >
       <div
         on:click|stopPropagation={() => { }}
@@ -96,16 +126,34 @@
         style:width="100%"
         style:height="fit-content"
       >
-        <SearchBar
-          bind:input={searchBarInput}
-          bind:value={searchText}
-        ></SearchBar>
+        <slot 
+          name="search-bar"
+          searchBarInput
+          searchText
+          search
+        >
+          <SearchBar
+            bind:input={searchBarInput}
+            bind:value={searchText}
+            on:input={search}
+            on:keydown={handleKeydown}
+          ></SearchBar>
+        </slot>
         {#if !!searchText}
-          <SearchResults
-            margin="-.5rem 0 0 0"
-            borderRadius="0 0 .5rem .5rem"
-            loading={true}
-          ></SearchResults>
+          <slot 
+            name="search-results"
+            searchLoading
+            searchResults
+          >
+            <SearchResults
+              margin="-.5rem 0 0 0"
+              borderRadius="0 0 .5rem .5rem"
+              loading={searchLoading}
+              results={searchResults}
+              activeKeyboard
+              on:select
+            ></SearchResults>
+          </slot>
         {/if}
       </div>
     </div>

@@ -63,14 +63,14 @@
                 ></Icon>
               </div>
             {/if}
-            <slot name="inner-menu">
+            <slot name="inner-menu" hamburgerVisible={mAndDown}>
               Menu
             </slot>
           </div>
         </slot>
       </div>
       <div class="side-bar-content">
-        <slot name="sidebar">
+        <slot name="sidebar" hamburgerVisible={mAndDown}>
           Sidebar
         </slot>
       </div>

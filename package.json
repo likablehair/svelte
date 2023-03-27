@@ -55,7 +55,8 @@
   "type": "module",
   "dependencies": {
     "esm-env": "^1.0.0",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "highlight.js": "^11.7.0"
   },
   "typesVersions": {
     ">4.0": {

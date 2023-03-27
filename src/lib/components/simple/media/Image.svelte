@@ -1,5 +1,7 @@
 <script lang="ts">
   import { BROWSER } from 'esm-env';
+  import IntersectionObserver from "$lib/components/simple/common/IntersectionObserver.svelte";
+  import Skeleton from "$lib/components/simple/loaders/Skeleton.svelte";
 
   export let maxWidth: string | undefined = undefined,
     maxHeight: string | undefined = undefined,
@@ -38,9 +40,6 @@
       }
     });
   };
-
-  import IntersectionObserver from "$lib/common/IntersectionObserver.svelte";
-  import Skeleton from "$lib/loaders/Skeleton.svelte";
 </script>
 
 <div
