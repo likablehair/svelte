@@ -45,18 +45,14 @@
     style:border-top-right-radius={!!title ? undefined : borderRadius}
     style:border-top-left-radius={!!title ? undefined : borderRadius}
     style:background-color={codeBackgroundColor}
-  >
-    <pre
+  ><pre
       style:margin="0px"
       style:padding={codePadding}
-    >
-      <code 
+    ><code 
         class="language-javascript"
         style:padding-top="1rem"
-        style:padding-bottom="0rem"
+        style:padding-bottom="1rem"
         style:font-size="1rem"
         style:line-height="1.5rem"
-      >{code}</code>
-    </pre>
-  </div>
+      >{code}</code></pre></div>
 </div>
