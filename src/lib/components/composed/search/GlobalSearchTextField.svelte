@@ -78,7 +78,7 @@
 >
   <slot 
     name="search-button"
-    toggleSearchDialog
+    {toggleSearchDialog}
   >
     <button 
       on:click={toggleSearchDialog}

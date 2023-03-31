@@ -1,8 +1,10 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import hljs from 'highlight.js';
+  import hljsSvelte from 'highlightjs-svelte';
   import 'highlight.js/styles/github.css';
   import './dracula.css'
+  import { escape } from 'lodash'
 
 
   export let 
@@ -13,16 +15,22 @@
     headerPadding: string = "1rem 1rem",
     codePadding: string = "0rem 1rem",
     color: string = "white",
+    boxShadow: string = "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
     code: string,
-    title: string | undefined = undefined
+    title: string | undefined = undefined,
+    language: 'javascript' | 'bash' | 'html' | 'svelte' = 'javascript'
 
+  let codeElement: HTMLElement
   onMount(() => {
-    hljs.highlightAll()
+    hljsSvelte(hljs)
+    hljs.highlightElement(codeElement)
   })
 </script>
 
 <div 
   class="container"
+  style:box-shadow={boxShadow}
+  style:border-radius={borderRadius}
 >
   {#if !!title}  
     <div 
@@ -49,10 +57,11 @@
       style:margin="0px"
       style:padding={codePadding}
     ><code 
-        class="language-javascript"
+        bind:this={codeElement}
+        class="language-{language}"
         style:padding-top="1rem"
         style:padding-bottom="1rem"
         style:font-size="1rem"
         style:line-height="1.5rem"
-      >{code}</code></pre></div>
+      >{@html escape(code)}</code></pre></div>
 </div>

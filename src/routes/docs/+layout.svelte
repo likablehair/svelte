@@ -6,23 +6,43 @@
   import logo from './logo.svg'
   import "../../app.css";
   import colors from  "./stores/colors";
+  import { beforeNavigate, goto } from "$app/navigation";
 
-  let searchDialogOpened: boolean = false
+  let searchDialogOpened: boolean = false,
+    drawerOpened: boolean = false
 
-  function search(params: { searchText: string }): Promise<{ title: string, name: string, subtitle: string }[]> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          { title: 'Ciao', name: 'ciao', subtitle: 'sottotitolo di ciao' },
-          { title: 'Come', name: 'come', subtitle: 'sottotitolo di come' },
-          { title: 'Stai', name: 'stai', subtitle: 'sottotitolo di stai' }
-        ])
-      }, 2000);
+  beforeNavigate(() => {
+    drawerOpened = false
+  })
+
+  async function search(params: { searchText: string }): Promise<{ title: string, name: string, subtitle: string, data?: any }[]> {
+    let response = await fetch('/docs/search?text=' + params.searchText)
+    let results = await response.json()
+    return results.map((el: {
+      title: string, 
+      name: string, 
+      data?: any,
+      url?: string,
+      description: string,
+      subtitle?: string
+    }) => {
+      el.subtitle = el.url
+      el.data = {
+        url: el.url
+      }
+      return el
     })
+  }
+
+  async function handleSearchSelect(event: CustomEvent<{element: { data?: { url: string }}}>) {
+    if(!!event.detail.element.data) goto(event.detail.element.data.url)
+    searchDialogOpened = false
   }
 </script>
 
-<StableDividedSideBarLayout>
+<StableDividedSideBarLayout
+  bind:drawerOpened={drawerOpened}
+>
   <div slot="sidebar" let:hamburgerVisible>
     {#if !hamburgerVisible}
       <div
@@ -53,20 +73,21 @@
             {
               title: 'Simple components',
               name: 'simpleComponents',
+              disabled: true,
               url: '/docs/components/simple-components',
               children: [
                 {
                   title: 'Button',
                   name: 'button',
-                  url: '/docs/components/simple-components/button',
+                  url: '/docs/components/simple-components/Button',
                 }, {
                   title: 'Card',
                   name: 'card',
-                  url: '/docs/components/simple-components/card',
+                  url: '/docs/components/simple-components/Card',
                 },  {
                   title: 'Gesture',
                   name: 'gesture',
-                  url: '/docs/components/simple-components/gesture',
+                  url: '/docs/components/simple-components/Gesture',
                 },
               ]
             }, {
@@ -95,12 +116,13 @@
         <GlobalSearchTextField
           searcher={search}
           bind:searchDialogOpened={searchDialogOpened}
-          on:select={() => searchDialogOpened = false}
+          on:select={handleSearchSelect}
         ></GlobalSearchTextField>
       </div>
     {:else}
       <div
         class="application-bar-logo-container"
+        style:flex="1 1 auto"
       >
         <img 
           src={logo} 
@@ -108,6 +130,36 @@
           class="application-logo"
         />
       </div>
+      <GlobalSearchTextField
+        searcher={search}
+        bind:searchDialogOpened={searchDialogOpened}
+        on:select={handleSearchSelect}
+      >
+        <div 
+          style:display="flex"
+          style:align-items="center"
+          style:margin-right="1rem"
+          style:color="grey"
+          slot="search-button" 
+          let:toggleSearchDialog
+        >
+          <svg
+            on:click={toggleSearchDialog}
+            style:height="1.5rem"
+            style:width="1.5rem"
+            style:stroke="currentColor"
+            viewBox="0 0 20 20"
+            fill="none"
+            aria-hidden="true"
+            class="search-icon"
+            ><path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12.01 12a4.25 4.25 0 1 0-6.02-6 4.25 4.25 0 0 0 6.02 6Zm0 0 3.24 3.25"
+            /></svg
+          >
+        </div>
+      </GlobalSearchTextField>
     {/if}
     <Navigator
       variant="standard"
@@ -131,7 +183,11 @@
     ></Navigator>
   </svelte:fragment>
 
-  <slot></slot>
+  <div class="content-container">
+    <div class="content">
+      <slot></slot>
+    </div>
+  </div>
 </StableDividedSideBarLayout>
 
 <style>
@@ -151,5 +207,15 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
+  }
+
+  .content-container {
+    display: flex;
+    justify-content: center;
+  }
+
+  .content {
+    max-width: 1100px;
+    width: 100%;
   }
 </style>

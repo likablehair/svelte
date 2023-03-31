@@ -1,4 +1,5 @@
 <script>
+  import FinalButton from "../FinalButton.svelte";
   import Code from "$lib/components/simple/typography/Code.svelte";
 
   let basicButtonImport = `import { Button } from '@likable-hair/svelte'`
@@ -55,3 +56,8 @@
   code={basicMediaQueryUsage}
   title="MediaQueryComponent.svelte"
 ></Code>
+
+<FinalButton
+  nextText="Quickstart"
+  nextUrl="/docs/quickstart"
+></FinalButton>

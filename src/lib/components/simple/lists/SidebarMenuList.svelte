@@ -3,6 +3,7 @@
     title: string,
     name: string | number,
     url?: string,
+    disabled?: boolean,
     children?: Menu[]
   };
 </script>
@@ -14,6 +15,8 @@
     level: number = 0,
     selected: string | number | undefined = undefined,
     bookmarkColor: string = "black",
+    color: string = "inherit",
+    hoverColor: string = 'inherit',
     selectedTextColor: string = "inherit",
     selectedFontWeight: string = "600",
     autoDetectUrl: boolean = false
@@ -89,6 +92,11 @@
 
     return undefined
   }
+
+  function handleUrlClick(e: Event, menu: Menu) {
+    if(menu.disabled) e.preventDefault()
+    else selected = menu.name
+  }
 </script>
 
 <ul
@@ -96,6 +104,8 @@
   style:--sidebar-menu-list-primary-color={bookmarkColor}
   style:--sidebar-menu-list-selected-text-color={selectedTextColor}
   style:--sidebar-menu-list-selected-font-weight={selectedFontWeight}
+  style:--sidebar-menu-list-color={color}
+  style:--sidebar-menu-list-hover-color={hoverColor}
 >
   {#if level == 0}
     <div class="guide"></div>
@@ -107,8 +117,10 @@
     <li>
       <a 
         href={menu.url} 
-        on:click={() => selected = menu.name} 
+        on:click={(event) => handleUrlClick(event, menu)} 
         title={menu.title}
+        aria-disabled={menu.disabled}
+        data-sveltekit-preload-data={menu.disabled ? 'off' : 'hover'}
         class="menu-link"
         class:active={selected == menu.name}
       >{menu.title}</a>
@@ -128,6 +140,7 @@
     list-style: none;
     padding-left: 1rem;
     position: relative;
+    line-height: 1rem;
   }
 
   a {
@@ -139,6 +152,10 @@
     text-overflow: ellipsis;
     width: 100%;
     display: inline-block;
+  }
+
+  a[aria-disabled=true] {
+    opacity: 50%;
   }
 
   .guide {
@@ -165,10 +182,14 @@
   .menu-link {
     padding-left: 0.5rem;
     text-decoration: none;
-    color: inherit;
+    color: var(--sidebar-menu-list-color);
     transition-property: color font-weight;
     transition-duration: .4s;
     transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+  }
+
+  .menu-link:hover {
+    color: var(--sidebar-menu-list-hover-color)
   }
 
   .menu-link.active {

@@ -4,7 +4,6 @@
     loading = false,
     icon: string | undefined = undefined,
     iconSize = 15,
-    clazz = "",
     maxWidth: string | undefined = undefined,
     maxHeight: string | undefined = undefined,
     minWidth: string | undefined = undefined,
@@ -25,11 +24,9 @@
     borderRadius: string | undefined = undefined,
     border: string | undefined = undefined,
     boxShadow: string | undefined = undefined,
-    loaderHeight: string | undefined = undefined,
+    loaderHeight: string | undefined = '15px',
     loaderWidth: string | undefined = undefined,
     disabled = false;
-
-  export { clazz as class };
 
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher<{
@@ -89,7 +86,7 @@
   style:--button-box-shadow={boxShadow}
   style:--button-icon-height={iconSize + 5 + "pt"}
   style:--button-icon-width={iconSize + 5 + "pt"}
-  class="button no-select {clazz}"
+  class="button no-select"
   class:button-default={type === "default"}
   class:button-text={type === "text"}
   class:button-icon={type === "icon"}
@@ -97,7 +94,13 @@
   on:keypress={handleKeyPress}
 >
   {#if loading}
-    <CircularLoader {color} height={loaderHeight} width={loaderWidth} />
+    <div
+      style:height={'calc(' + loaderHeight + ' + .6rem)'}
+      style:display="flex"
+      style:align-items="center"
+    >
+      <CircularLoader {color} height={loaderHeight} width={loaderWidth} />
+    </div>
   {:else}
     {#if !!icon}
       <Icon name={icon} size={iconSize} />
