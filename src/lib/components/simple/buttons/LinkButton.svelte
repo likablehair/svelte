@@ -1,19 +1,22 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-    import Icon from "../media/Icon.svelte";
+  import Icon from "../media/Icon.svelte";
 
+  // css variable
+  export let _color: string | null = null,
+    _fontSize: string | null = null,
+    _lineHeight: string | null = null,
+    _padding: string | null = null,
+    _backgroundColor: string | null = null,
+    _hoverBackgroundColor: string | null = null,
+    _borderRadius: string | null = null,
+    _width: string | null = null,
+    _height: string | null = null,
+    _gap: string | null = null,
+    _fontWeight: string | null = null
+
+  // props
   export let disabled: boolean = false,
-    color: string = "inherit",
-    fontSize: string = ".875rem",
-    lineHeight: string = "1.5rem",
-    padding: string = "0.25rem 0.75rem 0.25rem 0.75rem",
-    backgroundColor: string = "rgb(244 244 245/1)",
-    hoverBackgroundColor: string = "rgb(228 228 231/1)",
-    borderRadius: string = "9999px",
-    width: string = "fit-content",
-    height: string = "auto",
-    gap: string = "0.5rem",
-    fontWeight: string = "500",
     href: string,
     prependIcon: string | undefined = undefined,
     appendIcon: string | undefined = undefined,
@@ -50,30 +53,44 @@
   href={href}
   target={target}
   rel={target == '_blank' ? 'noreferrer' : undefined}
-  style:color={color}
-  style:width={width}
-  style:height={height}
-  style:font-size={fontSize}
-  style:font-weight={fontWeight}
-  style:line-height={lineHeight}
-  style:padding={padding}
-  style:background-color={backgroundColor}
-  style:border-radius={borderRadius}
-  style:gap={gap}
-  style:--link-button-hover-background-color={hoverBackgroundColor}
+  style:--link-button-color={_color}
+  style:--link-button-width={_width}
+  style:--link-button-height={_height}
+  style:--link-button-font-size={_fontSize}
+  style:--link-button-font-weight={_fontWeight}
+  style:--link-button-line-height={_lineHeight}
+  style:--link-button-padding={_padding}
+  style:--link-button-background-color={_backgroundColor}
+  style:--link-button-border-radius={_borderRadius}
+  style:--link-button-gap={_gap}
+  style:--link-button-hover-background-color={_hoverBackgroundColor}
   class="link"
 >
-  {#if !!prependIcon}
-    <Icon name={prependIcon} size={iconSize}></Icon>
-  {/if}
+  <slot name="prepend" {prependIcon} {iconSize}>
+    {#if !!prependIcon}
+      <Icon name={prependIcon} size={iconSize}></Icon>
+    {/if}
+  </slot>
   <slot></slot>
-  {#if !!appendIcon}
-    <Icon name={appendIcon} size={iconSize}></Icon>
-  {/if}
+  <slot name="append" {appendIcon} {iconSize}>
+    {#if !!appendIcon}
+      <Icon name={appendIcon} size={iconSize}></Icon>
+    {/if}
+  </slot>
 </a>
 
 <style>
   .link {
+    color: var(--link-button-color, inherit);
+    font-size: var(--link-button-font-size, .875rem);
+    line-height: var(--link-button-line-height, 1.5rem);
+    padding: var(--link-button-padding, 0.25rem 0.75rem 0.25rem 0.75rem);
+    background-color: var(--link-button-background-color, rgb(244 244 245/1));
+    border-radius: var(--link-button-border-radius, 9999px);
+    width: var(--link-button-width, fit-content);
+    height: var(--link-button-height, auto);
+    gap: var(--link-button-gap, 0.5rem);
+    font-weight: var(--link-button-font-weight, 500);
     display: flex;
     justify-content: center;
     align-content: center;
@@ -84,6 +101,6 @@
   }
 
   .link:hover {
-    background-color: var(--link-button-hover-background-color) !important;
+    background-color: var(--link-button-hover-background-color, rgb(228 228 231/1));
   }
 </style>

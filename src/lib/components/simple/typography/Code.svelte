@@ -11,7 +11,7 @@
     codeBackgroundColor: string = "rgb(24 24 27/1)",
     headerBackgroundColor: string = "rgb(39 39 42/1)",
     dividerColor: string = "rgb(63 63 70)",
-    borderRadius: string = "1rem",
+    borderRadius: string = ".5rem",
     headerPadding: string = "1rem 1rem",
     codePadding: string = "0rem 1rem",
     color: string = "white",

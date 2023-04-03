@@ -22,7 +22,7 @@ let lighColors: Colors = {
   background: '#FFFFFF',
   contrast: '#0F1722',
   lightContrast: '#6A7585',
-  thinContrast: '#AFBACA',
+  thinContrast: '#f4f4f5',
   warning: '#AD0000',
   warningBackground: '#ffa7a7',
   alert: '#D2A157'

@@ -81,14 +81,14 @@
                   name: 'button',
                   url: '/docs/components/simple-components/Button',
                 }, {
-                  title: 'Card',
-                  name: 'card',
-                  url: '/docs/components/simple-components/Card',
-                },  {
-                  title: 'Gesture',
-                  name: 'gesture',
-                  url: '/docs/components/simple-components/Gesture',
-                },
+                  title: 'DefaultButton',
+                  name: 'defaultButton',
+                  url: '/docs/components/simple-components/DefaultButton',
+                }, {
+                  title: 'LinkButton',
+                  name: 'linkButton',
+                  url: '/docs/components/simple-components/LinkButton',
+                }
               ]
             }, {
               title: 'Composed components',

@@ -1,29 +1,81 @@
-<script lang="ts">
-  export let props: {
+<script lang="ts" context="module">
+  export type Prop = {
     name: string,
     type: string,
     description: string,
-    default: string
-  }[] = []
+    default?: string
+  };
+</script>
+
+<script lang="ts">
+  import colors from "../stores/colors";
+  export let props: Prop[] = [],
+    styleProps: Prop[] = []
 </script>
 
 <ul class="container">
-  {#each props as prop}
-    <div class="element">
-      <div class="first-column">
-        <div class="first-line">
-          <code>{prop.name}</code>
-          <div class="props-type">{prop.type}</div>
+  <div class="subhead">🕹️ standard props</div>
+  {#if props.length > 0}
+    {#each props as prop}
+      <div class="element">
+        <div class="first-column">
+          <div class="first-line">
+            <code>{prop.name}</code>
+            <div class="props-type">{prop.type}</div>
+          </div>
+          <div class="second-line">
+            {prop.description}
+          </div>
         </div>
-        <div class="second-line">
-          {prop.description}
+        <div class="append-column">
+          {#if !!prop.default}
+            <code>{prop.default}</code>
+          {/if}
         </div>
       </div>
-      <div class="append-column">
-        <code>{prop.default}</code>
-      </div>
+    {/each}
+  {:else}
+    <div
+      style:display="flex"
+      style:height="3rem"
+      style:font-size=".7rem"
+      style:align-items="center"
+      style:justify-content="center"
+      style:color={$colors.lightContrast}
+    >
+      No data
     </div>
-  {/each}
+  {/if}
+  <div class="subhead">🎨 style props</div>
+  {#if styleProps.length > 0}
+    {#each styleProps as prop}
+      <div class="element">
+        <div class="first-column">
+          <div class="first-line">
+            <code>{prop.name}</code>
+            <div class="props-type">{prop.type}</div>
+          </div>
+          <div class="second-line">
+            {prop.description}
+          </div>
+        </div>
+        <div class="append-column">
+          <code>{prop.default}</code>
+        </div>
+      </div>
+    {/each}
+  {:else}
+    <div
+      style:display="flex"
+      style:height="3rem"
+      style:font-size=".7rem"
+      style:align-items="center"
+      style:justify-content="center"
+      style:color={$colors.lightContrast}
+    >
+      No data
+    </div>
+  {/if}
 </ul>
 
 <style>
@@ -31,8 +83,15 @@
     display: flex;
     flex-direction: column;
     list-style: none;
+    gap: 1rem;
     margin: 0;
     padding: 0;
+  }
+
+  .subhead {
+    font-size: .8rem;
+    font-weight: 700;
+    margin: 2rem 0rem;
   }
 
   .element {
@@ -40,6 +99,7 @@
     padding: 1rem 0 1rem 0;
     display: flex;
     align-items: center;
+    gap: 3rem;
   }
 
   .first-line {

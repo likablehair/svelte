@@ -183,7 +183,7 @@
     padding-left: 0.5rem;
     text-decoration: none;
     color: var(--sidebar-menu-list-color);
-    transition-property: color font-weight;
+    transition-property: color;
     transition-duration: .4s;
     transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
   }
