@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { v4 as uuidv4 } from "uuid";
+  import { createId } from '@paralleldrive/cuid2';
+
   import {
     fly,
     type FadeParams,
@@ -40,7 +41,7 @@
     menuElement: HTMLElement | undefined = undefined;
 
   let zIndex = 50,
-    currentUid: string = uuidv4();
+    currentUid: string = createId();
 
   function calculateMenuPosition(params: {
     activator: HTMLElement;

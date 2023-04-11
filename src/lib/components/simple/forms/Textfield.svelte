@@ -31,10 +31,10 @@
     inputElement: HTMLElement | undefined = undefined,
     autocomplete = true;
 
-  import { v4 as uuidv4 } from "uuid";
+  import { createId } from '@paralleldrive/cuid2';
   import { onMount } from "svelte";
 
-  let inputId: string = uuidv4(),
+  let inputId: string = createId(),
     focused = false,
     legendWidth = 0,
     labelElement: HTMLElement | undefined = undefined;

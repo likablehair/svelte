@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { v4 as uuidv4 } from "uuid";
+  import { createId } from '@paralleldrive/cuid2';
 
   export let label: string | null = null,
     placeholder = "placeholder",
-    textAreaId: string = uuidv4(),
+    textAreaId: string = createId(),
     fontFamily = "inherit",
     value = "",
     resizable = true,

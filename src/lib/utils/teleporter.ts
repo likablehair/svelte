@@ -1,5 +1,5 @@
 import { BROWSER } from 'esm-env';
-import { v4 as uuidv4 } from "uuid";
+import { createId } from '@paralleldrive/cuid2';
 
 type TeleportingUid = string
 
@@ -27,7 +27,7 @@ class Teleporter {
   }
 
   attachNode(node: HTMLElement): TeleportingUid {
-    let teleportedUid = uuidv4()
+    let teleportedUid = createId()
     node.setAttribute('teleported-uid', teleportedUid)
     node.classList.add('_teleported')
 
