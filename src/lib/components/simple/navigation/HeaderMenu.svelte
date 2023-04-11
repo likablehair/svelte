@@ -41,7 +41,7 @@
 
   import Navigator from "./Navigator.svelte";
   import Button from "$lib/components/simple/buttons/Button.svelte";
-  import Drawer from "$lib/navigation/Drawer.svelte";
+  import Drawer from "$lib/components/simple/navigation/Drawer.svelte";
 </script>
 
 <svelte:window bind:scrollY on:scroll={handleScroll} />

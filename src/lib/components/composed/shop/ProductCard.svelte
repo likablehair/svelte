@@ -15,7 +15,7 @@
 
   $: priceLessDiscount = Number(((price || 0) - (discount || 0)).toFixed(2));
 
-  import Image from "$lib/media/Image.svelte";
+  import Image from "$lib/components/simple/media/Image.svelte";
 </script>
 
 <div
