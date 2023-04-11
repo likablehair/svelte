@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Textfield from "$lib/forms/Textfield.svelte";
-  import VerticalTextSwitch from "$lib/forms/VerticalTextSwitch.svelte";
+  import Textfield from "$lib/components/simple/forms/Textfield.svelte";
+  import VerticalTextSwitch from "$lib/components/simple/forms/VerticalTextSwitch.svelte";
 
   export let hourFormat: "12" | "24" = "24",
     dayPeriod: "am" | "pm" = "am",

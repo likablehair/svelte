@@ -25,7 +25,7 @@
     textAlignment = "left";
   }
 
-  import Avatar from "$lib/media/Avatar.svelte";
+  import Avatar from "$lib/components/simple/media/Avatar.svelte";
 </script>
 
 <div

@@ -12,7 +12,7 @@
 </script>
 
 <script lang="ts">
-  import { dateToString } from "$lib/dates/utils";
+  import { dateToString } from "$lib/components/simple/dates/utils";
 
   export let items: TimeLineItem[] = [],
     singleSided = false,

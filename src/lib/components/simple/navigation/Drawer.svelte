@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Navigator from "$lib/navigation/Navigator.svelte";
-  import type { Item } from "$lib/navigation/Navigator.svelte";
+  import Navigator from "$lib/components/simple/navigation/Navigator.svelte";
+  import type { Item } from "$lib/components/simple/navigation/Navigator.svelte";
 
   export let open = false,
     position: "left" | "top" | "right" | "bottom" = "left",

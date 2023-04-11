@@ -11,7 +11,7 @@
     referrerpolicy: ReferrerPolicy | null | undefined = "no-referrer",
     borderRadius = "50%";
 
-  import Image from "$lib/media/Image.svelte";
+  import Image from "$lib/components/simple/media/Image.svelte";
 </script>
 
 {#if lazyLoaded}

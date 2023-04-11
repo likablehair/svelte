@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import Image from "$lib/media/Image.svelte";
+  import Image from "$lib/components/simple/media/Image.svelte";
 
   type Image = {
     url: string;
