@@ -15,6 +15,11 @@ export default [
     status: 'stable',
     url: '/docs/components/simple-components/LinkButton'
   }, {
+    title: 'TextField',
+    description: 'A simple textfield',
+    status: 'notStable',
+    url: '/docs/components/simple-components/TextField'
+  }, {
     title: 'Card',
     description: 'A card with header, body and footer. The body is scrollable and the header and footer are fixed',
     status: 'stable',

@@ -88,6 +88,10 @@
                   title: 'LinkButton',
                   name: 'linkButton',
                   url: '/docs/components/simple-components/LinkButton',
+                }, {
+                  title: 'TextField',
+                  name: 'TextField',
+                  url: '/docs/components/simple-components/TextField',
                 }
               ]
             }, {
