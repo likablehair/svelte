@@ -1,4 +1,11 @@
-export default [
+import lodash from "lodash"
+
+let list: {
+  title: string,
+  description: string,
+  status: 'stable' | 'beta' | 'deprecated',
+  url: string
+}[] = [
   {
     title: 'Button',
     description: 'A button to click',
@@ -7,7 +14,7 @@ export default [
   }, {
     title: 'DefaultButton',
     description: 'A default button',
-    status: 'notStable',
+    status: 'beta',
     url: '/docs/components/simple-components/DefaultButton'
   }, {
     title: 'LinkButton',
@@ -17,7 +24,7 @@ export default [
   }, {
     title: 'TextField',
     description: 'A simple textfield',
-    status: 'notStable',
+    status: 'deprecated',
     url: '/docs/components/simple-components/TextField'
   }, {
     title: 'Card',
@@ -44,5 +51,17 @@ export default [
     description: 'Custom elements that appear on the screen wherever you want them to be positioned',
     status: 'stable',
     url: '/docs/components/simple-components/Menu'
-  },
+  }, {
+    title: 'SimpleTextField',
+    description: 'A simple text input',
+    status: 'beta',
+    url: '/docs/components/simple-components/Menu'
+  }, {
+    title: 'AlertBanner',
+    description: 'An alert that shows you noticeable information',
+    status: 'stable',
+    url: '/docs/components/simple-components/AlertBanner'
+  }
 ]
+
+export default lodash.sortBy(list, 'title')

@@ -40,6 +40,8 @@
     labelElement: HTMLElement | undefined = undefined;
 
   onMount(() => {
+    console.warn('TextField component is going to be depracated. Please use SimpleTextField instead.')
+
     if (labelElement) {
       legendWidth = labelElement.offsetWidth * 0.8 + 8;
     }

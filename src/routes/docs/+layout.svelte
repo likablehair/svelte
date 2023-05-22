@@ -7,6 +7,7 @@
   import "../../app.css";
   import colors from  "./stores/colors";
   import { beforeNavigate, goto } from "$app/navigation";
+  import componentDatabase from './search/components.database'
 
   let searchDialogOpened: boolean = false,
     drawerOpened: boolean = false
@@ -75,25 +76,13 @@
               name: 'simpleComponents',
               disabled: true,
               url: '/docs/components/simple-components',
-              children: [
-                {
-                  title: 'Button',
-                  name: 'button',
-                  url: '/docs/components/simple-components/Button',
-                }, {
-                  title: 'DefaultButton',
-                  name: 'defaultButton',
-                  url: '/docs/components/simple-components/DefaultButton',
-                }, {
-                  title: 'LinkButton',
-                  name: 'linkButton',
-                  url: '/docs/components/simple-components/LinkButton',
-                }, {
-                  title: 'TextField',
-                  name: 'TextField',
-                  url: '/docs/components/simple-components/TextField',
+              children: componentDatabase.map((el) => {
+                return {
+                  title: el.title,
+                  name: el.title,
+                  url: el.url
                 }
-              ]
+              })
             }, {
               title: 'Composed components',
               name: 'composedComponents',

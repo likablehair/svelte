@@ -23,6 +23,7 @@ export { default as FileInputList } from './components/simple/forms/FileInputLis
 export { default as Switch } from './components/simple/forms/Switch.svelte'
 export { default as Textarea } from './components/simple/forms/Textarea.svelte'
 export { default as Textfield } from './components/simple/forms/Textfield.svelte'
+export { default as SimpleTextField } from './components/simple/forms/SimpleTextField.svelte'
 export { default as VerticalSwitch } from './components/simple/forms/VerticalSwitch.svelte'
 export { default as VerticalTextSwitch } from './components/simple/forms/VerticalTextSwitch.svelte'
 
