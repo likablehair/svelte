@@ -55,7 +55,7 @@ let list: {
     title: 'SimpleTextField',
     description: 'A simple text input',
     status: 'beta',
-    url: '/docs/components/simple-components/Menu'
+    url: '/docs/components/simple-components/SimpleTextField'
   }, {
     title: 'AlertBanner',
     description: 'An alert that shows you noticeable information',
