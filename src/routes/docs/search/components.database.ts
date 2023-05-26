@@ -61,6 +61,11 @@ let list: {
     description: 'An alert that shows you noticeable information',
     status: 'stable',
     url: '/docs/components/simple-components/AlertBanner'
+  }, {
+    title: 'Dialog',
+    description: 'A dialog for peace',
+    status: 'stable',
+    url: '/docs/components/simple-components/Dialog'
   }
 ]
 

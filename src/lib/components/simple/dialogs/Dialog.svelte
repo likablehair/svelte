@@ -5,12 +5,14 @@
   import Keyboarder, { type CallbackFunction } from '$lib/utils/keyboarder';
 
   export let open = false,
-    overlayOpacity = "30%",
-    overlayColor = "#282828",
-    overlayBackdropFilter: string | undefined = undefined,
-    transition: 'fly-down' | 'fly-up' | 'fly-horizontal' | 'scale' | 'fade' = 'fly-up',
-    transitionTimingFunction: string = 'cubic-bezier(0.075, 0.82, 0.165, 1)',
-    transitionDuration: string = '0.5s'
+    transition: 'fly-down' | 'fly-up' | 'fly-horizontal' | 'scale' | 'fade' = 'fly-up'
+
+  export let _overlayOpacity: string = "30%",
+    _overlayColor: string = "#282828",
+    _overlayBackdropFilter: string | undefined = undefined,
+    _transitionTimingFunction: string = 'cubic-bezier(0.075, 0.82, 0.165, 1)',
+    _transitionDuration: string = '0.5s'
+
 
   let zIndex = 50,
     localOpen: boolean = open,
@@ -86,14 +88,14 @@
 >
   <div
     data-dialog={localOpen}
-    style:--dialog-overlay-opacity={overlayOpacity}
-    style:--dialog-transition-timing-function={transitionTimingFunction}
-    style:--dialog-transition-duration={transitionDuration}
+    style:--dialog-overlay-opacity={_overlayOpacity}
+    style:--dialog-transition-timing-function={_transitionTimingFunction}
+    style:--dialog-transition-duration={_transitionDuration}
     style:--dialog-z-index={zIndex}
     style:display="flex"
     style:align-items="center"
     style:justify-content="space-between"
-    style:backdrop-filter={localOpen ? overlayBackdropFilter : 'none'}
+    style:backdrop-filter={localOpen ? _overlayBackdropFilter : 'none'}
     class="overlay-container"
     class:overlay-container-active={localOpen}
     class:overlay-container-deactive={!localOpen}
@@ -101,7 +103,7 @@
     bind:this={dialogElement}
   >
     <div
-      style:background-color={overlayColor}
+      style:background-color={_overlayColor}
       class="overlay"
       class:overlay-active={localOpen}
       class:hidden-behind={!localOpen && !hasBeenOpened}

@@ -9,16 +9,17 @@
     type TransitionConfig,
   } from "svelte/transition";
 
+  export let _top: number | undefined = undefined,
+    _left: number | undefined = undefined,
+    _width: string = 'auto',
+    _height: string = 'auto',
+    _maxHeight: string | undefined = undefined,
+    _overflow = "auto",
+    _boxShadow: string | undefined = undefined,
+    _borderRadius: string | undefined = undefined
+
   export let open = false,
-    top: number | undefined = undefined,
-    left: number | undefined = undefined,
-    width: string,
-    height: string,
-    maxHeight: string | undefined = undefined,
-    overflow = "auto",
     refreshPosition = false,
-    boxShadow: string | undefined = undefined,
-    borderRadius: string | undefined = undefined,
     activator: HTMLElement | undefined = undefined,
     anchor: "bottom" | "bottom-center" = "bottom",
     closeOnClickOutside = false,
@@ -53,29 +54,30 @@
           let { left: activatorLeft, top: activatorTop } =
             params.activator.getBoundingClientRect();
           let activatorHeight = params.activator.offsetHeight;
-          top = activatorTop + window.scrollY + activatorHeight;
-          left = activatorLeft + window.scrollX;
+          _top = activatorTop + window.scrollY + activatorHeight;
+          _left = activatorLeft + window.scrollX;
         } else if (anchor == "bottom-center") {
           let { left: activatorLeft, top: activatorTop } =
             params.activator.getBoundingClientRect();
           let activatorHeight = params.activator.offsetHeight;
           let activatorWidth = params.activator.offsetWidth;
           let menuWidth = params.menuElement.offsetWidth;
-          top = activatorTop + window.scrollY + activatorHeight;
-          left = activatorLeft + window.scrollX;
+
+          _top = activatorTop + window.scrollY + activatorHeight;
+          _left = activatorLeft + window.scrollX;
           if (menuWidth > activatorWidth) {
-            left = left - (menuWidth - activatorWidth) / 2;
+            _left = _left - (menuWidth - activatorWidth) / 2;
           } else {
-            left = left - (activatorWidth - menuWidth) / 2;
+            _left = _left + (activatorWidth - menuWidth) / 2;
           }
         }
       }
 
       if (
         window.innerWidth + window.scrollX <
-        (left || 0) + (menuElement?.offsetWidth || 0)
+        (_left || 0) + (menuElement?.offsetWidth || 0)
       ) {
-        left = Math.max(
+        _left = Math.max(
           window.innerWidth + window.scrollX - (menuElement?.offsetWidth || 0),
           0
         );
@@ -110,7 +112,7 @@
 
     if (maxZIndex) zIndex = maxZIndex + 2;
   }
-  $: if (!!width && !!activator && !!menuElement) {
+  $: if (!!_width && !!activator && !!menuElement) {
     calculateMenuPosition({ activator, menuElement });
   }
   $: if (refreshPosition && !!activator && !!menuElement) {
@@ -144,6 +146,7 @@
       event.stopPropagation();
     });
   }
+
 </script>
 
 {#if open}
@@ -153,14 +156,14 @@
     data-uid={currentUid}
     style:z-index={zIndex}
     style:position="absolute"
-    style:top={top + "px"}
-    style:box-shadow={boxShadow}
-    style:border-radius={borderRadius}
-    style:left={left + "px"}
-    style:height
-    style:max-height={maxHeight}
-    style:width
-    style:overflow
+    style:top={_top + "px"}
+    style:box-shadow={_boxShadow}
+    style:border-radius={_borderRadius}
+    style:left={_left + "px"}
+    style:height={_height}
+    style:max-height={_maxHeight}
+    style:width={_width}
+    style:overflow={_overflow}
     in:inAnimation={inAnimationConfig}
     out:outAnimation={outAnimationConfig}
   >
