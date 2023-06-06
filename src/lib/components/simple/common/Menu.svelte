@@ -82,6 +82,17 @@
           0
         );
       }
+
+      if(!!positionedAncestor) {
+        let { left: positionedAncestorLeft, top: positionedAncestorTop } = positionedAncestor.getBoundingClientRect();
+
+        if(!_left) _left = 0
+        if(!_top) _top = 0
+
+
+        _left = _left - (positionedAncestorLeft)
+        _top = _top - (positionedAncestorTop)
+      }
     }
   }
 
@@ -120,7 +131,7 @@
     refreshPosition = false;
   }
   $: if (closeOnClickOutside && !!menuElement) {
-    window.addEventListener("click", () => {
+    window.addEventListener("mousedown", () => {
       open = false;
     });
 
@@ -129,7 +140,7 @@
     });
 
     if (activator) {
-      activator.addEventListener("click", (event) => {
+      activator.addEventListener("mousedown", (event) => {
         event.stopPropagation();
       });
 
@@ -138,13 +149,28 @@
       });
     }
 
-    menuElement.addEventListener("click", (event) => {
+    menuElement.addEventListener("mousedown", (event) => {
       event.stopPropagation();
     });
 
     menuElement.addEventListener("touchstart", (event) => {
       event.stopPropagation();
     });
+  }
+
+
+  let positionedAncestor: HTMLElement | undefined = undefined
+
+  $: if(!!menuElement && !!activator) {
+    let elem = getPositionedAncestor(menuElement.parentElement)
+    positionedAncestor = elem == null ? undefined : elem
+    calculateMenuPosition({menuElement, activator})
+  }
+
+  function getPositionedAncestor(elem: HTMLElement | null): HTMLElement | null {
+    if (!elem) return null
+    if (['fixed', 'absolute'].includes(getComputedStyle(elem).position)) return elem
+    return getPositionedAncestor(elem.parentElement)
   }
 
 </script>
