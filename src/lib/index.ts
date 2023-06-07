@@ -54,3 +54,6 @@ export { default as ProductsGrid } from './components/composed/shop/ProductsGrid
 export { default as mediaQuery } from './stores/mediaQuery'
 
 export { default as SimpleTimeLine } from './components/simple/timeline/SimpleTimeLine.svelte'
+
+export { default as CollapsibleSideBarLayout } from './components/layouts/CollapsibleSideBarLayout.svelte'
+export { default as StableDividedSideBarLayout } from './components/layouts/StableDividedSideBarLayout.svelte'
