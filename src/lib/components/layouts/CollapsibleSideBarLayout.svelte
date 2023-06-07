@@ -337,6 +337,10 @@
       left: 0;
     }
 
+    .header-toolbar.collapsed {
+      left: 0;
+    }
+
     .header-toolbar.opened {
       background-color: inherit;
     }
@@ -346,6 +350,10 @@
     }
 
     .main-section {
+      padding-left: 0;
+    }
+
+    .main-section.collapsed {
       padding-left: 0;
     }
 
