@@ -103,6 +103,7 @@
     left: 0;
     right: 0;
     padding: var(--stable-divider-side-bar-layout-side-bar-padding);
+    z-index: 10;
   }
 
   .overlay {
