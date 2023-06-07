@@ -29,8 +29,8 @@
       menuElements: MenuElement[] = [],
       menuIconsSize: number = 16,
       selectedMenuElementId: string | undefined = undefined,
-      fullLogoPath: string | undefined = undefined,
-      partialLogoPath: string | undefined = undefined
+      fullLogo: string | undefined = undefined,
+      partialLogo: string | undefined = undefined
 
     let dispatch = createEventDispatcher<{
       'collapse': {
@@ -110,9 +110,9 @@
         class:collapsed={drawerCollapsed}
       >
         <slot name="sidebar-header" hamburgerVisible={mAndDown} collapsed={drawerCollapsed}>
-          {#if !!fullLogoPath && !!partialLogoPath && !mAndDown}
-            <div class="logo-container">
-              <img src={fullLogoPath} alt={fullLogoPath}>
+          {#if !!fullLogo && !!partialLogo && !mAndDown}
+            <div class="logo-container" class:collapsed={drawerCollapsed}>
+              <img src={drawerCollapsed ? partialLogo : fullLogo} alt="logo">
             </div>
           {/if}
         </slot>
@@ -170,7 +170,19 @@
 <style>
 
   .logo-container {
-    width: 100%;
+    padding-left: 16px;
+    padding-top: 10px;
+    transition-property: width padding-left;
+    transition-timing-function: cubic-bezier(.4,0,.2,1);
+    transition-duration: var(--collapsible-side-bar-layout-collapse-transition-time);
+  }
+
+  .logo-container.collapsed {
+    padding-left: 8px;
+  }
+
+  .logo-container img {
+    height: calc(var(--collapsible-side-bar-layout-collapsed-width) - 20px);
   }
 
   .side-bar {
@@ -224,7 +236,7 @@
 
   .menu {
     width: auto;
-    margin-top: 20px;
+    margin-top: 40px;
     margin-bottom: 20px;
   }
 

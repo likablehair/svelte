@@ -4,6 +4,7 @@
   import SidebarMenuList from "$lib/components/simple/lists/SidebarMenuList.svelte";
   import Navigator from "$lib/components/simple/navigation/Navigator.svelte";
   import logo from '../../logo.svg'
+  import logoPartial from  '../../logo_partial.svg'
   import "../../../../app.css";
   import colors from  "../../stores/colors";
   import { beforeNavigate, goto } from "$app/navigation";
@@ -44,8 +45,8 @@
 
 <CollapsibleSideBarLayout
   bind:drawerOpened={drawerOpened}
-  fullLogoPath="../../logo.svg"
-  partialLogoPath="../../logo.svg"
+  fullLogo={logo}
+  partialLogo={logoPartial}
   menuElements={[
     {
       id: 'home',
@@ -155,13 +156,6 @@
 <style>
   .application-logo {
     height: 50px;
-  }
-
-  .application-logo-container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
   }
 
   .application-bar-logo-container {
