@@ -17,7 +17,7 @@
     }
 
     type MenuItem = MenuElement | Spacer
-
+  
     export let _pagePadding: string = "20px 0 0 30px",
       _menuElementMarginBottom: string = "30px",
       _menuElementFontSize: string = "1.1rem",
@@ -62,6 +62,7 @@
     function toggleExpansion() {
       drawerCollapsed = !drawerCollapsed
     }
+
 
     function handleMenuClick(menu: MenuItem) {
       if('id' in menu) {
@@ -202,7 +203,7 @@
     height: 1px;
     background-color: var(--collapsible-side-bar-layout-divider-color);
   }
-
+  
   .logo-container {
     padding-left: 16px;
     padding-top: 10px;
