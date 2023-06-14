@@ -47,7 +47,7 @@
   bind:drawerOpened={drawerOpened}
   fullLogo={logo}
   partialLogo={logoPartial}
-  menuElements={[
+  menuItems={[
     {
       id: 'home',
       icon: "mdi-home",
@@ -57,6 +57,10 @@
       icon: "mdi-domain",
       name: "Elezioni"
     }, {
+      marginTop: "20px",
+      marginBottom: "20px",
+      divider: true
+    }, {
       id: 'registration',
       icon: "mdi-clipboard-outline",
       name: "Raccolta dati"
@@ -64,6 +68,10 @@
       id: 'monitor',
       icon: "mdi-checkbox-marked-outline",
       name: "Monitor"
+    }, {
+      marginTop: "10px",
+      marginBottom: "100px",
+      divider: false
     }, {
       id: 'settings',
       icon: "mdi-cog-outline",

@@ -10,6 +10,14 @@
       icon: string
     }
 
+    type Spacer = {
+      divider: boolean,
+      marginTop: string,
+      marginBottom: string
+    }
+
+    type MenuItem = MenuElement | Spacer
+
     export let _pagePadding: string = "20px 0 0 30px",
       _menuElementMarginBottom: string = "30px",
       _menuElementFontSize: string = "1.1rem",
@@ -22,15 +30,17 @@
       _collapseTransitionTime: string = "0.4s",
       _sideBarBackgroundColor: string = "white",
       _overlayColor: string = "hsla(240,5%,65%,.2)",
-      _headerBackgroundColor: string = "#FFFF"
+      _headerBackgroundColor: string = "#FFFF",
+      _dividersColor: string = '#d2d2d2'
 
     export let drawerOpened: boolean = false,
       drawerCollapsed: boolean = false,
-      menuElements: MenuElement[] = [],
+      menuItems: MenuItem[] = [],
       menuIconsSize: number = 16,
       selectedMenuElementId: string | undefined = undefined,
       fullLogo: string | undefined = undefined,
-      partialLogo: string | undefined = undefined
+      partialLogo: string | undefined = undefined,
+      openedHeader: boolean = false
 
     let dispatch = createEventDispatcher<{
       'collapse': {
@@ -53,9 +63,11 @@
       drawerCollapsed = !drawerCollapsed
     }
 
-    function handleMenuClick(menu: MenuElement) {
-      selectedMenuElementId = menu.id
-      dispatch('menu-click', { menu: menu })
+    function handleMenuClick(menu: MenuItem) {
+      if('id' in menu) {
+        selectedMenuElementId = menu.id
+        dispatch('menu-click', { menu: menu })
+      }
     }
 
     function handleOverlayClick() {}
@@ -66,7 +78,7 @@
 <MediaQuery let:mAndDown>
   <div
     style:--collapsible-side-bar-layout-expanded-width={_expandedSideBarWidth}
-    style:--collapsible-side-bar-layout-header-height={_headerHeight}
+    style:--collapsible-side-bar-layout-header-height={openedHeader || mAndDown ? _headerHeight : "0px"}
     style:--collapsible-side-bar-layout-collapsed-width={_collapsedSideBarWidth}
     style:--collapsible-side-bar-layout-collapse-transition-time={_collapseTransitionTime}
     style:--collapsible-side-bar-layout-menu-element-margin-bottom={_menuElementMarginBottom}
@@ -77,6 +89,7 @@
     style:--collapsible-side-bar-layout-sidebar-background-color={_sideBarBackgroundColor}
     style:--collapsible-side-bar-layout-overlay-color={_overlayColor}
     style:--collapsible-side-bar-layout-header-background-color={_headerBackgroundColor}
+    style:--collapsible-side-bar-layout-divider-color={_dividersColor}
   >
     <header
       class="side-bar"
@@ -99,9 +112,11 @@
                 ></Icon>
               </div>
             {/if}
-            <slot name="inner-menu" hamburgerVisible={mAndDown}>
-              Menu
-            </slot>
+            {#if openedHeader || mAndDown}
+              <slot name="inner-menu" hamburgerVisible={mAndDown}>
+                Menu
+              </slot>
+            {/if}
           </div>
         </slot>
       </div>
@@ -125,16 +140,27 @@
               class="menu"
               class:collapsed={drawerCollapsed}
             >
-              {#each menuElements as menu}
-                <div
-                  class="menu-row"
-                  class:selected={menu.id === selectedMenuElementId}
-                  on:click={() => handleMenuClick(menu)}
-                  on:keypress
-                >
-                  <div class="menu-icon"><Icon name={menu.icon} size={menuIconsSize}></Icon></div>
-                  <div class="menu-name">{menu.name}</div>
-                </div>
+              {#each menuItems as menu}
+                {#if 'id' in menu}
+                  <div
+                    class="menu-row"
+                    class:selected={menu.id === selectedMenuElementId}
+                    on:click={() => handleMenuClick(menu)}
+                    on:keypress
+                  >
+                    <div class="menu-icon"><Icon name={menu.icon} size={menuIconsSize}></Icon></div>
+                    <div class="menu-name">{menu.name}</div>
+                  </div>
+                {:else}
+                  <div
+                    style:margin-top={menu.marginTop}
+                    style:margin-bottom={menu.marginBottom}
+                    style:margin-right="14px"
+                    class:divider={menu.divider}
+                    class="menu-row"
+                  >
+                  </div>
+                {/if}
               {/each}
             </div>
           </div>
@@ -142,6 +168,9 @@
         <CollapsibleDivider
           bind:collapsed={drawerCollapsed}
           disabled={mAndDown}
+          _circleColor={_dividersColor}
+          _dividerColor={_dividersColor}
+          _iconColor={_dividersColor}
         ></CollapsibleDivider>
         <slot name="sidebar-footer" hamburgerVisible={mAndDown} collapsed={drawerCollapsed}></slot>
       </div>
@@ -168,6 +197,11 @@
 
 
 <style>
+
+  .divider {
+    height: 1px;
+    background-color: var(--collapsible-side-bar-layout-divider-color);
+  }
 
   .logo-container {
     padding-left: 16px;
