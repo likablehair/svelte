@@ -9,20 +9,37 @@
 <h1>Button</h1>
 <ComponentSubtitle>Beautiful buttons are coming for your next project.</ComponentSubtitle>
 <h2>Example</h2>
-<div class="example">
-  <Button
-    backgroundColor={$colors.primary}
-    color={$colors.background}
-    hoverBackgroundColor={$colors.secondary}
-    width="200px"
-    maxWidth="90vw"
-  >Click me</Button>
-</div>
+<form method="POST">
+  <div class="example">
+    <Button
+      _backgroundColor={$colors.primary}
+      _color={$colors.background}
+      _hoverBackgroundColor={$colors.secondary}
+      _width="200px"
+      _maxWidth="90vw"
+    >Type: button</Button>
+  </div>
+  <div class="example">
+    <Button
+      type="submit"
+      _backgroundColor={$colors.primary}
+      _color={$colors.background}
+      _hoverBackgroundColor={$colors.secondary}
+      _width="200px"
+      _maxWidth="90vw"
+    >Type: submit</Button>
+  </div>
+</form>
 <h2>Props</h2>
 <PropsViewer
   props={[
     {
       name: 'type',
+      type: '"button" | "submit"',
+      description: "HTML type attribute",
+      default: "button"
+    }, {
+      name: 'buttonType',
       type: '"default" | "text" | "icon"',
       default: "default",
       description: "Define the type of the button."
@@ -47,112 +64,112 @@
       default: '15',
       description: 'The size of the icon shwon with the \'icon\' property'
     }, {
-      name: 'maxWidth',
+      name: '_maxWidth',
       type: 'string',
       default: 'undefined',
       description: 'The max width of the outer element'
     }, {
-      name: 'maxHeight',
+      name: '_maxHeight',
       type: 'string',
       default: 'undefined',
       description: 'The max height of the outer element'
     }, {
-      name: 'minWidth',
+      name: '_minWidth',
       type: 'string',
       default: 'undefined',
       description: 'The min width of the outer element'
     }, {
-      name: 'minHeight',
+      name: '_minHeight',
       type: 'string',
       default: 'undefined',
       description: 'The min height of the outer element'
     }, {
-      name: 'width',
+      name: '_width',
       type: 'string',
       default: 'undefined',
       description: 'The width of the outer element'
     }, {
-      name: 'height',
+      name: '_height',
       type: 'string',
       default: 'undefined',
       description: 'The height of the outer element'
     }, {
-      name: 'textAlign',
+      name: '_textAlign',
       type: 'string',
       default: 'center',
       description: 'The text-align of the outer element'
     }, {
-      name: 'cursor',
+      name: '_cursor',
       type: 'string',
       default: 'pointer',
       description: 'The cursor of the outer element'
     }, {
-      name: 'padding',
+      name: '_padding',
       type: 'string',
       default: '5px',
       description: 'The padding of the outer element'
     }, {
-      name: 'fontSize',
+      name: '_fontSize',
       type: 'string',
       default: 'undefined',
       description: 'The font-size of the outer element'
     }, {
-      name: 'color',
+      name: '_color',
       type: 'string',
       default: 'undefined',
       description: 'The color property of the outer element'
     }, {
-      name: 'display',
+      name: '_display',
       type: 'string',
       default: 'undefined',
       description: 'The display property of the outer element'
     }, {
-      name: 'justifyContent',
+      name: '_justifyContent',
       type: 'string',
       default: 'undefined',
       description: 'The justify-content property of the outer element'
     }, {
-      name: 'alignItems',
+      name: '_alignItems',
       type: 'string',
       default: 'undefined',
       description: 'The align-items property of the outer element'
     }, {
-      name: 'backgroundColor',
+      name: '_backgroundColor',
       type: 'string',
       default: 'undefined',
       description: 'The background color of the button'
     }, {
-      name: 'hoverBackgroundColor',
+      name: '_hoverBackgroundColor',
       type: 'string',
       default: '#88888847',
       description: 'The hover color of the button'
     }, {
-      name: 'activeBackgroundColor',
+      name: '_activeBackgroundColor',
       type: 'string',
       default: 'hoverBackgroundColor',
       description: 'The active color of the button'
     }, {
-      name: 'borderRadius',
+      name: '_borderRadius',
       type: 'string',
       default: 'undefined',
       description: 'The border-radius property of the outer element'
     }, {
-      name: 'border',
+      name: '_border',
       type: 'string',
       default: 'undefined',
       description: 'The border property of the outer element'
     }, {
-      name: 'boxShadow',
+      name: '_boxShadow',
       type: 'string',
       default: 'undefined',
       description: 'The box-shadow property of the outer element'
     }, {
-      name: 'loaderHeight',
+      name: '_loaderHeight',
       type: 'string',
       default: '15px',
       description: 'The height of the loader shown with the loading prop'
     }, {
-      name: 'loaderWidth',
+      name: '_loaderWidth',
       type: 'string',
       default: 'undefined',
       description: 'The width of the loader shown with the loading prop'
@@ -173,5 +190,6 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
+    margin-bottom: 20px;
   }
 </style>

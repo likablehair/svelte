@@ -1,32 +1,34 @@
 <script lang="ts">
-  export let type: "default" | "text" | "icon" = "default",
+  export let buttonType: "default" | "text" | "icon" = "default",
+    type: "button" | "submit" = "button",
     active = false,
     loading = false,
     icon: string | undefined = undefined,
     iconSize = 15,
-    maxWidth: string | undefined = undefined,
-    maxHeight: string | undefined = undefined,
-    minWidth: string | undefined = undefined,
-    minHeight: string | undefined = undefined,
-    width: string | undefined = undefined,
-    height: string | undefined = undefined,
-    textAlign = "center",
-    cursor = "pointer",
-    padding = "5px",
-    fontSize: string | undefined = undefined,
-    color: string | null | undefined = undefined,
-    display: string | undefined = undefined,
-    justifyContent: string | undefined = undefined,
-    alignItems: string | undefined = undefined,
-    backgroundColor: string | undefined = undefined,
-    hoverBackgroundColor = "#88888847",
-    activeBackgroundColor: string = hoverBackgroundColor,
-    borderRadius: string | undefined = undefined,
-    border: string | undefined = undefined,
-    boxShadow: string | undefined = undefined,
-    loaderHeight: string | undefined = '15px',
-    loaderWidth: string | undefined = undefined,
-    disabled = false;
+    disabled = false
+
+  export let _maxWidth: string | undefined = undefined,
+    _maxHeight: string | undefined = undefined,
+    _minWidth: string | undefined = undefined,
+    _minHeight: string | undefined = undefined,
+    _width: string | undefined = undefined,
+    _height: string | undefined = undefined,
+    _textAlign = "center",
+    _cursor = "pointer",
+    _padding = "8px",
+    _fontSize: string | undefined = undefined,
+    _color: string | null | undefined = undefined,
+    _display: string | undefined = undefined,
+    _justifyContent: string | undefined = undefined,
+    _alignItems: string | undefined = undefined,
+    _backgroundColor: string | undefined = undefined,
+    _hoverBackgroundColor = "#88888847",
+    _activeBackgroundColor: string = _hoverBackgroundColor,
+    _borderRadius: string | undefined = undefined,
+    _border: string | undefined = undefined,
+    _boxShadow: string | undefined = undefined,
+    _loaderHeight: string | undefined = '15px',
+    _loaderWidth: string | undefined = undefined
 
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher<{
@@ -52,54 +54,58 @@
     });
   }
 
-  $: defaultBorderRadius = type == "icon" ? "50%" : "5px";
+  $: defaultBorderRadius = buttonType == "icon" ? "50%" : "5px";
   $: position = $$slots.append ? "relative" : undefined;
 
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import CircularLoader from "$lib/components/simple/loaders/CircularLoader.svelte";
 </script>
 
-<div
-  style:width
-  style:max-width={maxWidth}
-  style:min-width={minWidth}
-  style:height
-  style:max-height={maxHeight}
-  style:min-height={minHeight}
-  style:text-align={textAlign}
+<button
+  type={type}
+  style:box-sizing="content-box"
+  style:font-family="inherit"
+  style:width={_width}
+  style:max-width={_maxWidth}
+  style:min-width={_minWidth}
+  style:height={_height}
+  style:max-height={_maxHeight}
+  style:min-height={_minHeight}
+  style:text-align={_textAlign}
   style:position
-  style:cursor
-  style:padding
-  style:font-size={fontSize}
-  style:color
-  style:display
-  style:justify-content={justifyContent}
-  style:align-items={alignItems}
-  style:--button-border={border}
-  style:--button-border-radius={borderRadius
-    ? borderRadius
+  style:cursor={_cursor}
+  style:padding={_padding}
+  style:font-size={_fontSize}
+  style:color={_color}
+  style:display={_display}
+  style:justify-content={_justifyContent}
+  style:align-items={_alignItems}
+  style:--button-border={_border}
+  style:--button-border-radius={_borderRadius
+    ? _borderRadius
     : defaultBorderRadius}
   style:--button-background-color={active
-    ? activeBackgroundColor
-    : backgroundColor}
-  style:--button-hover-background-color={hoverBackgroundColor}
-  style:--button-box-shadow={boxShadow}
+    ? _activeBackgroundColor
+    : _backgroundColor}
+  style:--button-hover-background-color={_hoverBackgroundColor}
+  style:--button-box-shadow={_boxShadow}
   style:--button-icon-height={iconSize + 5 + "pt"}
   style:--button-icon-width={iconSize + 5 + "pt"}
   class="button no-select"
-  class:button-default={type === "default"}
-  class:button-text={type === "text"}
-  class:button-icon={type === "icon"}
+  class:button-default={buttonType === "default"}
+  class:button-text={buttonType === "text"}
+  class:button-icon={buttonType === "icon"}
   on:click={handleClick}
   on:keypress={handleKeyPress}
 >
   {#if loading}
     <div
-      style:height={'calc(' + loaderHeight + ' + .6rem)'}
+      style:height={'calc(' + _loaderHeight + ' + .6rem)'}
       style:display="flex"
+      style:justify-content="center"
       style:align-items="center"
     >
-      <CircularLoader {color} height={loaderHeight} width={loaderWidth} />
+      <CircularLoader color={_color} height={_loaderHeight} width={_loaderWidth} />
     </div>
   {:else}
     {#if !!icon}
@@ -113,7 +119,7 @@
       </span>
     {/if}
   {/if}
-</div>
+</button>
 
 <style>
   .append-item {
