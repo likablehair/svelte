@@ -2,6 +2,7 @@ import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { create, insertMultiple, search } from '@orama/orama'
 import componentsDatabase from './components.database';
+import themingDatabase from './theming.database';
 
 const db = await create({
   schema: {
@@ -13,6 +14,7 @@ const db = await create({
 })
 
 await insertMultiple(db, componentsDatabase)
+await insertMultiple(db, themingDatabase)
 
 export const GET = (async ({ url }) => {
   let searchText = url.searchParams.get('text')
@@ -21,6 +23,7 @@ export const GET = (async ({ url }) => {
 
   let searchResults = await search(db, {
     term: searchText,
+    // tolerance: 1,
     properties: ['title', 'description'],
     limit: Number(limit) || 5
   })

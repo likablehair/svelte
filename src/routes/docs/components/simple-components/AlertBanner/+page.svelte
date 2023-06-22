@@ -17,6 +17,7 @@
     <AlertBanner
       title="Warning"
       description="an alert is coming"
+      --alert-banner-color="red"
     ></AlertBanner>
   </div>
 </div>
@@ -42,47 +43,47 @@
   ]}
   styleProps={[
     {
-      name: '_bannerColor',
+      name: '--alert-banner-color',
       type: 'string',
       default: "grey",
       description: "Banner color."
     }, {
-      name: '_cursor',
+      name: '--alert-banner-cursor',
       type: 'string',
       default: "pointer",
       description: "Cursors css property."
     }, {
-      name: '_borderRadius',
+      name: '--alert-banner-border-radius',
       type: 'string',
       default: 'null',
       description: 'Border radius css property.'
     }, {
-      name: '_paddingLeft',
+      name: '--alert-banner-padding-left',
       type: 'string',
       default: 'null',
       description: 'Padding left css property.'
     }, {
-      name: '_paddingRight',
+      name: '--alert-banner-padding-right',
       type: 'string',
       default: 'null',
       description: 'Padding right css property.'
     }, {
-      name: '_paddingTop',
+      name: '--alert-banner-padding-top',
       type: 'string',
       default: 'null',
       description: 'Padding top css property.'
     }, {
-      name: '_paddingBottom',
+      name: '--alert-banner-padding-bottom',
       type: 'string',
       default: 'null',
       description: 'Padding bottom value.'
     }, {
-      name: '_borderWidth',
+      name: '--alert-banner-border-width',
       type: 'string',
       default: 'null',
       description: 'Border width css property.'
     }, {
-      name: '_width',
+      name: '--alert-banner-width',
       type: 'string',
       default: 'null',
       description: 'Container width css property.'

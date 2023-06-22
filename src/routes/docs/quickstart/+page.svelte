@@ -2,6 +2,7 @@
   import standardComponent from './stadardComponent'
   import Code from "$lib/components/simple/typography/Code.svelte";
   import FinalButton from "../FinalButton.svelte";
+  import cssImportFile from './cssImportFile';
 
   let basicButtonImport = `npm install @likable-hair/svelte`
 </script>
@@ -20,6 +21,17 @@
   code={basicButtonImport}
   language="bash"
 ></Code>
+
+<p>
+  Then you have to create a +layout.svelte in the root of the 
+  routes directory and import the css file:
+</p>
+<Code
+  code={cssImportFile}
+  language="svelte"
+  title="routes/+layout.svelte"
+></Code>
+
 <p>
   Then you're free to go! You can write component like this:
 </p>
@@ -32,6 +44,6 @@
 <FinalButton
   previousText="Introduction"
   previousUrl="/docs/introduction"
-  nextText="Components"
-  nextUrl="/docs/components"
+  nextText="Theming"
+  nextUrl="/docs/theming"
 ></FinalButton>

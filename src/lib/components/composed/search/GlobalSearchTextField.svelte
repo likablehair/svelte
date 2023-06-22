@@ -1,20 +1,33 @@
 <script lang="ts">
+  import './GlobalSearchTextField.css'
   import Dialog from '$lib/components/simple/dialogs/Dialog.svelte'
   import { createEventDispatcher, onMount } from 'svelte';
   import SearchBar from './SearchBar.svelte';
   import Keyboarder, { type CallbackFunction } from '$lib/utils/keyboarder';
   import SearchResults, { type Result } from './SearchResults.svelte';
 
-  export let color: string = "rgb(113 113 122)",
-    searchButtonRingColor: string = "rgba(24,24,27,.1)",
-    searchButtonHoverRingColor: string = "rgba(24,24,27,.2)",
-    searchButtonWidth: string = "100%",
-    searchButtonMaxWidth: string = "28rem",
-    searchButtonHeight: string = "2rem",
-    searchButtonBackgroundColor: string = "white",
-    searchButtonPadding: string = "0rem 0.75rem 0rem 0.5rem",
-    searchButtonFontSize: string = ".875rem",
-    searchButtonText: string = "Search",
+  let clazz: {
+    container?: string,
+    button?: string,
+    shortcut?: string
+  } = {};
+	export { clazz as class };
+
+  /* 
+    Styles:
+    
+    --global-search-text-field-ring-color
+    --global-search-text-field-hover-ring-color
+    --global-search-text-field-color
+    --global-search-text-field-width
+    --global-search-text-field-max-width
+    --global-search-text-field-height
+    --global-search-text-field-background-color
+    --global-search-text-field-padding
+    --global-search-text-field-font-size
+  */
+
+  export let searchButtonText: string = "Search",
     searchDialogOpened: boolean = false,
     transitionDuration: string = ".8s",
     searcher: (params: { searchText: string }) => Promise<Result[] | undefined> = () => Promise.resolve([])
@@ -65,24 +78,14 @@
     }
 </script>
 
-<div
-  style:--global-search-text-field-ring-color={searchButtonRingColor}
-  style:--global-search-text-field-hover-ring-color={searchButtonHoverRingColor}
-  style:--global-search-text-field-color={color}
-  style:--global-search-text-field-width={searchButtonWidth}
-  style:--global-search-text-field-max-width={searchButtonMaxWidth}
-  style:--global-search-text-field-height={searchButtonHeight}
-  style:--global-search-text-field-background-color={searchButtonBackgroundColor}
-  style:--global-search-text-field-padding={searchButtonPadding}
-  style:--global-search-text-field-font-size={searchButtonFontSize}
->
+<div class={clazz.container || ''}>
   <slot 
     name="search-button"
     {toggleSearchDialog}
   >
     <button 
       on:click={toggleSearchDialog}
-      class="search-like-button"
+      class="search-like-button {clazz.button || ''}"
     >
       <slot name="search-button-icon">
         <svg
@@ -101,15 +104,15 @@
         {searchButtonText}
       </slot>
       <slot name="search-button-shortcut">
-        <kbd class="shortcut"><kbd class="shortcut">⌘</kbd><kbd class="shortcut">K</kbd></kbd>
+        <kbd class="shortcut {clazz.shortcut || ''}"><kbd class="shortcut">⌘</kbd><kbd class="shortcut">K</kbd></kbd>
       </slot>
     </button>
   </slot>
   <Dialog
     bind:open={searchDialogOpened}
     transition="scale"
-    overlayBackdropFilter="blur(2px)"
-    transitionDuration={transitionDuration}
+    _overlayBackdropFilter="blur(2px)"
+    _transitionDuration={transitionDuration}
   >
     <div
       style:max-width="90vw"
@@ -146,8 +149,8 @@
             searchResults
           >
             <SearchResults
-              margin="-.5rem 0 0 0"
-              borderRadius="0 0 .5rem .5rem"
+              --search-results-margin="-.5rem 0 0 0"
+              --search-results-border-radius="0 0 .5rem .5rem"
               loading={searchLoading}
               results={searchResults}
               activeKeyboard
@@ -162,20 +165,43 @@
 
 <style>
   .search-like-button {
-    --global-search-text-field-ring-real-color: var(--global-search-text-field-ring-color);
-    box-shadow: inset 0 0 0 1px var(--global-search-text-field-ring-color);
-    color: var(--global-search-text-field-color);
+    box-shadow: inset 0 0 0 1px var(
+      --global-search-text-field-ring-color,
+      var(--global-search-text-field-default-ring-color)
+    );
+    color: var(
+      --global-search-text-field-color,
+      var(--global-search-text-field-default-color)
+    );
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    width: var(--global-search-text-field-width);
-    max-width: var(--global-search-text-field-max-width);
-    height: var(--global-search-text-field-height);
-    font-size: var(--global-search-text-field-font-size);
+    width: var(
+      --global-search-text-field-width,
+      var(--global-search-text-field-default-width)
+    );
+    max-width: var(
+      --global-search-text-field-max-width,
+      var(--global-search-text-field-default-max-width)
+    );
+    height: var(
+      --global-search-text-field-height,
+      var(--global-search-text-field-default-height)
+    );
+    font-size: var(
+      --global-search-text-field-font-size,
+      var(--global-search-text-field-default-font-size)
+    );
     line-height: 1.5rem;
-    background-color: var(--global-search-text-field-background-color);
+    background-color: var(
+      --global-search-text-field-background-color,
+      var(--global-search-text-field-default-background-color)
+    );
     border-radius: 9999px;
-    padding: var(--global-search-text-field-padding);
+    padding: var(
+      --global-search-text-field-padding,
+      var(--global-search-text-field-default-padding)
+    );
     border: 0 solid #e5e7eb;
     cursor: pointer;
     transition-property: box-shadow;
@@ -184,7 +210,10 @@
   }
 
   .search-like-button:hover {
-    box-shadow: inset 0 0 0 1px var(--global-search-text-field-hover-ring-color);
+    box-shadow: inset 0 0 0 1px var(
+      --global-search-text-field-hover-ring-color,
+      var(--global-search-text-field-default-hover-ring-color)
+    );
   }
 
   .search-icon {
@@ -196,7 +225,10 @@
   .shortcut {
     margin-left: auto;
     font-size: 1rem;
-    color: var(--global-search-text-field-color);
+    color: var(
+      --global-search-text-field-color,
+      var(--global-search-text-field-default-color)
+    );
     text-transform: none;
     font-family: ui-sans-serif,system-ui,-apple-system;
   }

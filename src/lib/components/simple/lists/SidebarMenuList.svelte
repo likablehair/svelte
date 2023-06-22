@@ -9,7 +9,18 @@
 </script>
 
 <script lang="ts">
+  import './SidebarMenuList.css'
   import { page } from "$app/stores";
+
+  /* 
+    Styles
+
+    --sidebar-menu-list-primary-color
+    --sidebar-menu-list-selected-text-color
+    --sidebar-menu-list-selected-font-weight
+    --sidebar-menu-list-color
+    --sidebar-menu-list-hover-color
+  */
 
   export let menus: Menu[],
     level: number = 0,
@@ -159,8 +170,8 @@
   }
 
   .guide {
-    background-color: rgba(24,24,27,.1);
-    width: 2px;
+    background-color: rgb(var(--global-color-contrast-50));
+    width: 1px;
     position: absolute;
     top: 0;
     bottom: 0;
@@ -168,7 +179,10 @@
   }
 
   .bookmark {
-    background-color: var(--sidebar-menu-list-primary-color);
+    background-color: var(
+      --sidebar-menu-list-primary-color,
+      var(--sidebar-menu-list-default-primary-color)
+    );
     width: 2px;
     position: absolute;
     top: calc((var(--sidebar-menu-list-selected-index) - 1) * 2.2rem);
@@ -182,18 +196,30 @@
   .menu-link {
     padding-left: 0.5rem;
     text-decoration: none;
-    color: var(--sidebar-menu-list-color);
+    color: var(
+      --sidebar-menu-list-color,
+      var(--sidebar-menu-list-default-color)
+    );
     transition-property: color;
     transition-duration: .4s;
     transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
   }
 
   .menu-link:hover {
-    color: var(--sidebar-menu-list-hover-color)
+    color: var(
+      --sidebar-menu-list-hover-color,
+      var(--sidebar-menu-list-default-hover-color)
+    )
   }
 
   .menu-link.active {
-    color: var(--sidebar-menu-list-selected-text-color);
-    font-weight: var(--sidebar-menu-list-selected-font-weight)
+    color: var(
+      --sidebar-menu-list-selected-text-color,
+      var(--sidebar-menu-list-default-selected-text-color)
+    );
+    font-weight: var(
+      --sidebar-menu-list-selected-font-weight,
+      var(--sidebar-menu-list-default-selected-font-weight)
+    )
   }
 </style>

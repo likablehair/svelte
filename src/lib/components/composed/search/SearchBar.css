@@ -1,0 +1,10 @@
+:root {
+  --search-bar-default-ring-color: rgb(var(--global-color-contrast-100));
+  --search-bar-default-background-color: rgb(var(--global-color-background-100));
+  --search-bar-default-border-radius: 0.5rem;
+  --search-bar-default-height: 3rem;
+  --search-bar-default-padding: 0rem 1rem 0rem 1rem;
+  --search-bar-default-line-height: 1.5rem;
+  --search-bar-default-font-size: .875rem;
+  --search-bar-default-width: 100%;
+}

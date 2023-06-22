@@ -1,0 +1,16 @@
+:root {
+  --stable-divided-side-bar-layout-default-content-padding: 1rem 2rem 1rem 2rem;
+  --stable-divided-side-bar-layout-default-side-bar-width: 18rem;
+  --stable-divided-side-bar-layout-default-side-bar-border-color: 
+    rgb(var(--global-color-grey-500));
+  --stable-divided-side-bar-layout-default-side-bar-padding: 1rem 1.5rem 2rem 1.5rem;
+  --stable-divided-side-bar-layout-default-header-menu-height: 3.5rem;
+  --stable-divided-side-bar-layout-default-header-menu-border-color:
+    rgb(var(--global-color-grey-500));
+  --stable-divided-side-bar-layout-default-header-menu-padding: 0rem 2rem 0rem 2rem;
+  --stable-divided-side-bar-layout-default-inner-header-menu-background-color:
+    rgb(var(--global-color-background-100));
+  --stable-divided-side-bar-layout-default-drawer-background-color:
+    rgb(var(--global-color-background-50));
+  --stable-divided-side-bar-layout-default-drawer-width: 24rem;
+}

@@ -1,0 +1,9 @@
+:root {
+  --alert-banner-default-border-radius: 5px;
+  --alert-banner-default-color: var(--my-var-blue);
+  --alert-banner-default-border-width: .7rem;
+  --alert-banner-default-padding-left: .5rem;
+  --alert-banner-default-padding-top: .3rem;
+  --alert-banner-default-padding-bottom: .3rem;
+  --alert-banner-default-padding-bottom: .3rem;
+}

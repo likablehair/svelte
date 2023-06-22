@@ -1,0 +1,5 @@
+:root {
+  --circular-loader-default-width: 30px;
+  --circular-loader-default-height: 30px;
+  --circular-loader-default-color: var(global-color-primary-500);
+}

@@ -12,11 +12,6 @@ let list: {
     status: 'stable',
     url: '/docs/components/simple-components/Button'
   }, {
-    title: 'DefaultButton',
-    description: 'A default button',
-    status: 'beta',
-    url: '/docs/components/simple-components/DefaultButton'
-  }, {
     title: 'LinkButton',
     description: 'A button that use a link tag',
     status: 'stable',

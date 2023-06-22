@@ -1,0 +1,7 @@
+:root {
+  --sidebar-menu-list-default-primary-color: rgb(var(--global-color-primary-500));
+  --sidebar-menu-list-default-selected-text-color: rgb(var(--global-color-primary-500));
+  --sidebar-menu-list-default-selected-font-weight: 600;
+  --sidebar-menu-list-default-color: inherit;
+  --sidebar-menu-list-default-hover-color: inherit;
+}

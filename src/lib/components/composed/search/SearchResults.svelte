@@ -10,19 +10,32 @@
 </script>
 
 <script lang="ts">
+  import './SearchResults.css'
   import SelectableVerticalList from "$lib/components/simple/lists/SelectableVerticalList.svelte";
 
+  let clazz: {
+    container?: string,
+    loading?: string,
+    noData?: string,
+    results?: string
+  } = {};
+	export { clazz as class };
 
-  export let maxWidth: string | undefined = undefined,
-    width: string = "100%",
-    height: string | undefined = undefined,
-    maxHeight: string | undefined = undefined,
-    margin: string | undefined = undefined,
-    backgroundColor: string = "rgb(255 255 255/1)",
-    noDataText: string = "Sorry, nothing found",
+  /*
+    Styles
+
+    --search-results-width
+    --search-results-max-width
+    --search-results-height
+    --search-results-max-height
+    --search-results-margin
+    --search-results-background-color
+    --search-results-border-color
+    --search-results-border-radius
+  */
+
+  export let noDataText: string = "Sorry, nothing found",
     loadingText: string = "Searching for references ...",
-    borderColor: string = "rgb(228 228 231/1)",
-    borderRadius: string | undefined = undefined,
     results: Result[] | undefined = [],
     loading: boolean = false,
     footer: boolean = true,
@@ -30,32 +43,24 @@
 </script>
 
 <div 
-  style:--search-results-width={width}
-  style:--search-results-max-width={maxWidth}
-  style:--search-results-height={height}
-  style:--search-results-max-height={maxHeight}
-  style:--search-results-margin={margin}
-  style:--search-results-background-color={backgroundColor}
-  style:--search-results-border-color={borderColor}
-  style:--search-results-border-radius={borderRadius}
-  class="container"
+  class="container {clazz.container || ''}"
 >
   {#if loading}
-    <div class="loading-container">
+    <div class="loading-container {clazz.loading || ''}">
       <slot name="loading">
         <span style:font-size=".875rem">{loadingText}</span>
       </slot>
     </div>
   {:else if !results || results.length == 0}
     <div
-      class="no-data-container"
+      class="no-data-container {clazz.noData || ''}"
     >
       <slot name="no-data">
         <span style:font-size=".875rem">{noDataText}</span>
       </slot>
     </div>
   {:else}
-    <div>
+    <div class={clazz.results || ''}>
       <SelectableVerticalList
         elements={results.map((r) => {
           return {
@@ -97,14 +102,38 @@
 
 <style>
   .container {
-    width: var(--search-results-width);
-    max-width: var(--search-results-max-width);
-    height: var(--search-results-height);
-    max-height: var(--search-results-max-height);
-    background-color: var(--search-results-background-color);
-    margin: var(--search-results-margin);
-    border-top: 1px solid var(--search-results-border-color);
-    border-radius: var(--search-results-border-radius);
+    width: var(
+      --search-results-width,
+      var(--search-results-default-width)
+    );
+    max-width: var(
+      --search-results-max-width,
+      var(--search-results-default-max-width)
+    );
+    height: var(
+      --search-results-height,
+      var(--search-results-default-height)
+    );
+    max-height: var(
+      --search-results-max-height,
+      var(--search-results-default-max-height)
+    );
+    background-color: var(
+      --search-results-background-color,
+      var(--search-results-default-background-color)
+    );
+    margin: var(
+      --search-results-margin,
+      var(--search-results-default-margin)
+    );
+    border-top: 1px solid var(
+      --search-results-border-color,
+      var(--search-results-default-border-color)
+    );
+    border-radius: var(
+      --search-results-border-radius,
+      var(--search-results-default-border-radius)
+    );
   }
 
   .no-data-container, .loading-container {
@@ -115,7 +144,10 @@
   }
 
   .footer {
-    border-top: 1px solid var(--search-results-border-color);
+    border-top: 1px solid var(
+      --search-results-border-color,
+      var(--search-results-default-border-color)
+    );
     display: flex;
     align-items: center;
     justify-content: flex-end;

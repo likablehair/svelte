@@ -1,0 +1,13 @@
+:root {
+  --link-button-default-color: rgb(var(--global-color-contrast-900));
+  --link-button-default-width: fit-content;
+  --link-button-default-height: auto;
+  --link-button-default-font-size: .875rem;
+  --link-button-default-font-weight: 500;
+  --link-button-default-line-height: 1.5rem;
+  --link-button-default-padding: 0.25rem 0.75rem 0.25rem 0.75rem;
+  --link-button-default-background-color: rgb(var(--global-color-background-300));
+  --link-button-default-border-radius: 9999px;
+  --link-button-default-gap: .5rem;
+  --link-button-default-hover-background-color: rgb(var(--global-color-background-400));
+}

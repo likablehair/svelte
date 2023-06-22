@@ -1,19 +1,33 @@
 <script lang="ts">
+  import './StableDividedSideBarLayout.css'
   import MediaQuery from "$lib/components/simple/common/MediaQuery.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte"
   import { createEventDispatcher } from "svelte";
 
-  export let sideBarWidth: string = "18rem",
-    sideBarBorderColor: string = "hsl(0deg 0% 39.85% / 50%)",
-    sideBarPadding: string = "1rem 1.5rem 2rem 1.5rem",
-    headerMenuHeight: string = "3.5rem",
-    headerMenuBorderColor: string = "hsl(0deg 0% 39.85% / 50%)",
-    headerMenuPadding: string = "0rem 2rem 0rem 2rem",
-    padding: string = "1rem 2rem 1rem 2rem",
-    innerHeaderMenuBackgroundColor: string = "rgb(255 255 255/0.5)",
-    drawerBackgroundColor: string = "white",
-    drawerWidth: string = "24rem",
-    drawerOpened: boolean = false
+  let clazz: {
+    container?: string,
+    header?: string,
+    mainSection?: string,
+    overlay?: string
+  } = {};
+	export { clazz as class };
+
+  /*
+    Styles:
+
+    --stable-divided-side-bar-layout-content-padding
+    --stable-divided-side-bar-layout-side-bar-width
+    --stable-divided-side-bar-layout-side-bar-border-color
+    --stable-divided-side-bar-layout-side-bar-padding
+    --stable-divided-side-bar-layout-header-menu-height
+    --stable-divided-side-bar-layout-header-menu-border-color
+    --stable-divided-side-bar-layout-header-menu-padding
+    --stable-divided-side-bar-layout-inner-header-menu-background-color
+    --stable-divided-side-bar-layout-drawer-background-color
+    --stable-divided-side-bar-layout-drawer-width
+  */
+
+  export let drawerOpened: boolean = false
 
   let dispatch = createEventDispatcher<{
     'drawer-change': {
@@ -34,18 +48,10 @@
 
 <MediaQuery let:mAndDown>
   <div
-    style:--stable-divider-side-bar-layout-side-bar-width={sideBarWidth}
-    style:--stable-divider-side-bar-layout-side-bar-border-color={sideBarBorderColor}
-    style:--stable-divider-side-bar-layout-side-bar-padding={sideBarPadding}
-    style:--stable-divider-side-bar-layout-header-menu-height={headerMenuHeight}
-    style:--stable-divider-side-bar-layout-header-menu-border-color={headerMenuBorderColor}
-    style:--stable-divider-side-bar-layout-header-menu-padding={headerMenuPadding}
-    style:--stable-divider-side-bar-layout-inner-header-menu-background-color={innerHeaderMenuBackgroundColor}
-    style:--stable-divider-side-bar-layout-drawer-background-color={drawerBackgroundColor}
-    style:--stable-divider-side-bar-layout-drawer-width={drawerWidth}
+    class={clazz.container || ''}
   >
     <header 
-      class="side-bar"
+      class="side-bar {clazz.header}"
       class:opened={drawerOpened}
     >
       <div 
@@ -75,15 +81,15 @@
         </slot>
       </div>
     </header>
-    <div class="main-section">
+    <div class="main-section {clazz.mainSection || ''}">
       <div 
-        class="overlay"
+        class="overlay {clazz.overlay || ''}"
         on:click={handleOverlayClick}
         on:keypress={handleOverlayClick}
         class:visible={drawerOpened}
       ></div>
       <div
-        style:padding={padding}
+        class="content"
         class:blurred={drawerOpened}
       >
         <slot>Content</slot>
@@ -96,13 +102,22 @@
 <style>
   .side-bar {
     position: fixed;
-    width: var(--stable-divider-side-bar-layout-side-bar-width);
-    border-right: 1px solid var(--stable-divider-side-bar-layout-side-bar-border-color);
+    width: var(
+      --stable-divided-side-bar-layout-side-bar-width, 
+      var(--stable-divided-side-bar-layout-default-side-bar-width)
+    );
+    border-right: 1px solid var(
+      --stable-divided-side-bar-layout-side-bar-border-color,
+      var(--stable-divided-side-bar-layout-default-side-bar-border-color)
+    );
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
-    padding: var(--stable-divider-side-bar-layout-side-bar-padding);
+    padding: var(
+      --stable-divided-side-bar-layout-side-bar-padding,
+      var(--stable-divided-side-bar-layout-default-side-bar-padding)
+    );
     z-index: 10;
   }
 
@@ -110,18 +125,37 @@
     display: none;
   }
 
+  .content {
+    padding: var(
+      --stable-divided-side-bar-layout-content-padding,
+      var(--stable-divided-side-bar-layout-default-content-padding)
+    );
+  }
+
   @media (max-width: 1024px) {
   	.side-bar {
-      left: calc(0rem - var(--stable-divider-side-bar-layout-drawer-width));
+      left: calc(0rem - var(
+          --stable-divided-side-bar-layout-drawer-width,
+          var(--stable-divided-side-bar-layout-default-drawer-width)
+        )
+      );
       right: auto;
       transition-property: left;
       transition-timing-function: cubic-bezier(.4,0,.2,1);
       transition-duration: .5s;
-      top: var(--stable-divider-side-bar-layout-header-menu-height);
-      background-color: var(--stable-divider-side-bar-layout-drawer-background-color);
+      top: var(--stable-divided-side-bar-layout-header-menu-height,
+        var(--stable-divided-side-bar-layout-default-header-menu-height)
+      );
+      background-color: var(
+        --stable-divided-side-bar-layout-drawer-background-color,
+        var(--stable-divided-side-bar-layout-default-drawer-background-color)
+      );
       bottom: 0;
       z-index: 30;
-      width: var(--stable-divider-side-bar-layout-drawer-width);
+      width: var(
+        --stable-divided-side-bar-layout-drawer-width,
+        var(--stable-divided-side-bar-layout-default-drawer-width)
+      );
       max-width: 100vw;
     }
 
@@ -131,7 +165,10 @@
 
     .overlay {
       position: fixed;
-      top: var(--stable-divider-side-bar-layout-header-menu-height);
+      top: var(
+        --stable-divided-side-bar-layout-header-menu-height,
+        var(--stable-divided-side-bar-layout-default-header-menu-height)
+      );
       left: 0;
       bottom: 0;
       right: 0;
@@ -151,11 +188,23 @@
 
   .header-toolbar {
     position: fixed;
-    height: var(--stable-divider-side-bar-layout-header-menu-height);
-    left: var(--stable-divider-side-bar-layout-side-bar-width);
-    border-bottom: 1px solid var(--stable-divider-side-bar-layout-header-menu-border-color);
+    height: var(
+      --stable-divided-side-bar-layout-header-menu-height,
+      var(--stable-divided-side-bar-layout-default-header-menu-height)
+    );
+    left: var(
+      --stable-divided-side-bar-layout-side-bar-width,
+      var(--stable-divided-side-bar-layout-default-side-bar-width)
+    );
+    border-bottom: 1px solid var(
+      --stable-divided-side-bar-layout-header-menu-border-color,
+      var(--stable-divided-side-bar-layout-default-header-menu-border-color)
+    );
     backdrop-filter: blur(4px);
-    background-color: var(--stable-divider-side-bar-layout-inner-header-menu-background-color);
+    background-color: var(
+      --stable-divided-side-bar-layout-inner-header-menu-background-color,
+      var(--stable-divided-side-bar-layout-default-inner-header-menu-background-color)
+    );
     transition-property: background-color;
     transition-timing-function: cubic-bezier(.4,0,.2,1);
     transition-duration: .5s;
@@ -178,8 +227,14 @@
   }
 
   .main-section {
-    padding-left: var(--stable-divider-side-bar-layout-side-bar-width);
-    padding-top: var(--stable-divider-side-bar-layout-header-menu-height);
+    padding-left: var(
+      --stable-divided-side-bar-layout-side-bar-width,
+      var(--stable-divided-side-bar-layout-default-side-bar-width)
+    );
+    padding-top: var(
+      --stable-divided-side-bar-layout-header-menu-height,
+      var(--stable-divided-side-bar-layout-default-header-menu-height,)
+    );
   }
 
   @media (max-width: 1024px) {
@@ -193,8 +248,14 @@
   }
 
   .inner-menu {
-    padding: var(--stable-divider-side-bar-layout-header-menu-padding);
-    background-color: var(--stable-divider-side-bar-layout-inner-header-menu-background-color);
+    padding: var(
+      --stable-divided-side-bar-layout-header-menu-padding,
+      var(--stable-divided-side-bar-layout-default-header-menu-padding)
+    );
+    background-color: var(
+      --stable-divided-side-bar-layout-inner-header-menu-background-color,
+      var(--stable-divided-side-bar-layout-default-inner-header-menu-background-color)
+    );
     height: 100%;
     display: flex;
     align-items: center;

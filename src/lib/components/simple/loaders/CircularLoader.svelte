@@ -1,17 +1,25 @@
 <script lang="ts">
-  export let loading = true,
-    height = "30px",
-    width = "30px",
-    color: string | null | undefined = "black";
+  import './CircularLoader.css'
+
+  let clazz: string = '';
+	export { clazz as class };
+
+  /*
+    Styles
+
+    --circular-loader-width
+    --circular-loader-height
+    --circular-loader-color
+  */
+
+  export let loading = true
 </script>
 
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="21.904761904761905 21.904761904761905 43.80952380952381 43.80952380952381"
-  style:color
-  style:height
-  style:width
   class:active={loading}
+  class={clazz}
 >
   <circle
     fill="transparent"
@@ -27,6 +35,21 @@
 </svg>
 
 <style>
+  svg {
+    height: var(
+      --circular-loader-height,
+      var(--circular-loader-default-height)
+    );
+    width: var(
+      --circular-loader-width,
+      var(--circular-loader-default-width)
+    );
+    width: var(
+      --circular-loader-color,
+      var(--circular-loader-default-color)
+    );
+  }
+
   circle.active {
     -webkit-animation: progress-circular-dash 1.4s ease-in-out infinite;
     animation: progress-circular-dash 1.4s ease-in-out infinite;

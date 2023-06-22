@@ -18,7 +18,7 @@
     maxWidth: string | undefined = undefined,
     height: string | undefined = undefined,
     maxHeight: string | undefined = undefined,
-    selectionBackgrounColor: string = "rgb(250 250 250/1)",
+    selectionBackgrounColor: string = "rgb(var(--global-color-background-300))",
     selectionColor: string = "inherit",
     activeKeyboard: boolean = false,
     loopSelection: boolean = true,

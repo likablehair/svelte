@@ -1,0 +1,16 @@
+:root {
+  --button-default-text-align: center;
+  --button-default-cursor: pointer;
+  --button-default-padding: 8px;
+  --button-default-border-radius: .5rem;
+  --button-default-icon-border-radius: 50%;
+  --button-default-color: rgb(var(--global-color-grey-50));
+  --button-default-text-color: rgb(var(--global-color-contrast-900));
+  --button-default-background-color: rgb(var(--global-color-primary-500));
+  --button-default-hover-background-color: rgb(var(--global-color-primary-600));
+  --button-default-text-background-color: transparent;
+  --button-default-text-hover-background-color: rgb(var(--global-color-primary-500), 0.2);
+  --button-default-active-background-color: rgb(var(--global-color-primary-500));
+  --button-default-text-active-background-color: rgb(var(--global-color-primary-500), 0.4);
+  --button-default-box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.3);
+}

@@ -1,0 +1,11 @@
+:root {
+  --global-search-text-field-default-ring-color: rgb(var(--global-color-contrast-100)); /* rgba(24, 24, 27, .1) */
+  --global-search-text-field-default-hover-ring-color: rgb(var(--global-color-contrast-300)); /* rgba(24, 24, 27, .2) */
+  --global-search-text-field-default-color: rgb(var(--global-color-contrast-600)); /* rgb(113 113 122) */
+  --global-search-text-field-default-width: 100%;
+  --global-search-text-field-default-max-width: 28rem;
+  --global-search-text-field-default-height: 2rem;
+  --global-search-text-field-default-background-color: rgb(var(--global-color-background-100));
+  --global-search-text-field-default-padding: 0rem 0.75rem 0rem 0.5rem;
+  --global-search-text-field-default-font-size: .875rem;
+}

@@ -1,0 +1,5 @@
+:root {
+  --search-results-default-width: 100%;
+  --search-results-default-background-color: rgb(var(--global-color-background-100));
+  --search-results-default-border-color: rgb(var(--global-color-background-300));
+}

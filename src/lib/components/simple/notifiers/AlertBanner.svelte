@@ -1,16 +1,27 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
+  import './AlertBanner.css'
+  import { createEventDispatcher } from "svelte";
 
-  // css props
-  export let _cursor: string = 'pointer',
-    _bannerColor: string | null = 'grey',
-    _borderRadius: string | null = null,
-    _paddingLeft: string | null = null,
-    _paddingRight: string | null = null,
-    _paddingTop: string | null = null,
-    _paddingBottom: string | null = null,
-    _borderWidth: string | null = null,
-    _width: string | null = null
+  let clazz: {
+    container?: string,
+    border?: string,
+    body?: string
+  } = {};
+	export { clazz as class };
+
+  /* 
+    Styles:
+    
+    --alert-banner-color
+    --alert-banner-cursor
+    --alert-banner-border-radius
+    --alert-banner-padding-left
+    --alert-banner-padding-right
+    --alert-banner-padding-top
+    --alert-banner-padding-bottom
+    --alert-banner-border-width
+    --alert-banner-width
+  */
 
   // props
   export let title: string | undefined = undefined,
@@ -32,23 +43,14 @@
 </script>
 
 <div 
-  style:--alert-banner-color={_bannerColor}
-  style:--alert-banner-border-radius={_borderRadius}
-  style:--alert-banner-padding-left={_paddingLeft}
-  style:--alert-banner-padding-right={_paddingRight}
-  style:--alert-banner-padding-top={_paddingTop}
-  style:--alert-banner-padding-bottom={_paddingBottom}
-  style:--alert-banner-border-width={_borderWidth}
-  style:width={_width}
-  class="alert-banner-container"
-  style:cursor={_cursor}
+  class="alert-banner-container {clazz.container || ''}"
   on:keypress={handleKeypressEvent}
   on:click={handleClickEvent}
 >
   <div 
-    class="border-colored"
+    class="border-colored {clazz.border || ''}"
   ></div>
-  <div class="body">
+  <div class="body {clazz.body || ''}">
     <div class="content">
       <slot name="content" title={title} description={description}>
         {#if !!title}
@@ -73,16 +75,22 @@
   .alert-banner-container {
     position: relative;
     box-shadow: 0 3px 1px -2px rgba(0,0,0,.2),0 2px 2px 0 rgba(0,0,0,.14),0 1px 5px 0 rgba(0,0,0,.12)!important;
-    border-radius: var(--alert-banner-border-radius, 5px);
+    border-radius: var(--alert-banner-border-radius, var(--alert-banner-default-border-radius));
+    cursor: var(--alert-banner-cursor, var(--alert-banner-default-cursor));
+    width: var(--alert-banner-width, var(--alert-banner-default-width));
   }
 
   .border-colored {
-    background-color: var(--alert-banner-color);
+    background-color: var(--alert-banner-color, var(--alert-banner-default-color));
     position: absolute;
-    width: var(--alert-banner-border-width, .7rem);
+    width: var(--alert-banner-border-width, var(--alert-banner-default-border-width));
     top: 0px;
     bottom: 0px;
-    border-radius: var(--alert-banner-border-radius, 5px) 0px 0px var(--alert-banner-border-radius, 5px);
+    border-radius: 
+      var(--alert-banner-border-radius, var(--alert-banner-default-border-radius))
+      0px 
+      0px 
+      var(--alert-banner-border-radius, var(--alert-banner-default-border-radius));
   }
 
   .body {
@@ -92,10 +100,10 @@
   }
 
   .content {
-    padding-left: var(--alert-banner-padding-left, .5rem);
-    padding-top: var(--alert-banner-padding-top, .3rem);
-    padding-bottom: var(--alert-banner-padding-bottom, .3rem);
-    padding-right: var(--alert-banner-padding-bottom, .3rem);
+    padding-left: var(--alert-banner-padding-left, var(--alert-banner-default-padding-left));
+    padding-top: var(--alert-banner-padding-top, var(--alert-banner-default-padding-top));
+    padding-bottom: var(--alert-banner-padding-bottom, var(--alert-banner-default-padding-bottom));
+    padding-right: var(--alert-banner-padding-right, var(--alert-banner-default-padding-right));
   }
 
   .title {

@@ -1,34 +1,41 @@
 <script lang="ts">
+  import './Button.css'
+
+  let clazz: string = '';
+	export { clazz as class };
+
+  /*
+    Styles
+
+    --button-width
+    --button-max-width
+    --button-min-width
+    --button-height
+    --button-max-height
+    --button-min-height
+    --button-text-align
+    --button-cursor
+    --button-padding
+    --button-font-size
+    --button-color
+    --button-display
+    --button-justify-content
+    --button-align-items
+    --button-border
+    --button-border-radius
+    --button-background-color
+    --button-hover-background-color
+    --button-box-shadow
+    --button-icon-height
+    --button-icon-width
+  */
+
   export let buttonType: "default" | "text" | "icon" = "default",
     type: "button" | "submit" = "button",
-    active = false,
     loading = false,
     icon: string | undefined = undefined,
     iconSize = 15,
     disabled = false
-
-  export let _maxWidth: string | undefined = undefined,
-    _maxHeight: string | undefined = undefined,
-    _minWidth: string | undefined = undefined,
-    _minHeight: string | undefined = undefined,
-    _width: string | undefined = undefined,
-    _height: string | undefined = undefined,
-    _textAlign = "center",
-    _cursor = "pointer",
-    _padding = "8px",
-    _fontSize: string | undefined = undefined,
-    _color: string | null | undefined = undefined,
-    _display: string | undefined = undefined,
-    _justifyContent: string | undefined = undefined,
-    _alignItems: string | undefined = undefined,
-    _backgroundColor: string | undefined = undefined,
-    _hoverBackgroundColor = "#88888847",
-    _activeBackgroundColor: string = _hoverBackgroundColor,
-    _borderRadius: string | undefined = undefined,
-    _border: string | undefined = undefined,
-    _boxShadow: string | undefined = undefined,
-    _loaderHeight: string | undefined = '15px',
-    _loaderWidth: string | undefined = undefined
 
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher<{
@@ -54,7 +61,6 @@
     });
   }
 
-  $: defaultBorderRadius = buttonType == "icon" ? "50%" : "5px";
   $: position = $$slots.append ? "relative" : undefined;
 
   import Icon from "$lib/components/simple/media/Icon.svelte";
@@ -63,35 +69,10 @@
 
 <button
   type={type}
-  style:box-sizing="content-box"
-  style:font-family="inherit"
-  style:width={_width}
-  style:max-width={_maxWidth}
-  style:min-width={_minWidth}
-  style:height={_height}
-  style:max-height={_maxHeight}
-  style:min-height={_minHeight}
-  style:text-align={_textAlign}
   style:position
-  style:cursor={_cursor}
-  style:padding={_padding}
-  style:font-size={_fontSize}
-  style:color={_color}
-  style:display={_display}
-  style:justify-content={_justifyContent}
-  style:align-items={_alignItems}
-  style:--button-border={_border}
-  style:--button-border-radius={_borderRadius
-    ? _borderRadius
-    : defaultBorderRadius}
-  style:--button-background-color={active
-    ? _activeBackgroundColor
-    : _backgroundColor}
-  style:--button-hover-background-color={_hoverBackgroundColor}
-  style:--button-box-shadow={_boxShadow}
   style:--button-icon-height={iconSize + 5 + "pt"}
   style:--button-icon-width={iconSize + 5 + "pt"}
-  class="button no-select"
+  class="button no-select {clazz || ''}"
   class:button-default={buttonType === "default"}
   class:button-text={buttonType === "text"}
   class:button-icon={buttonType === "icon"}
@@ -100,12 +81,13 @@
 >
   {#if loading}
     <div
-      style:height={'calc(' + _loaderHeight + ' + .6rem)'}
       style:display="flex"
       style:justify-content="center"
       style:align-items="center"
     >
-      <CircularLoader color={_color} height={_loaderHeight} width={_loaderWidth} />
+      <CircularLoader 
+        --circular-loader-color="var(--button-color)"
+      />
     </div>
   {:else}
     {#if !!icon}
@@ -129,43 +111,142 @@
 
   .button {
     overflow: hidden;
+    box-sizing: content-box;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    width: var(
+      --button-width,
+      var(--button-default-width)
+    );
+    max-width: var(
+      --button-max-width,
+      var(--button-default-max-width)
+    );
+    min-width: var(
+      --button-min-width,
+      var(--button-default-min-width)
+    );
+    height: var(
+      --button-height,
+      var(--button-default-height)
+    );
+    max-height: var(
+      --button-max-height,
+      var(--button-default-max-height)
+    );
+    min-height: var(
+      --button-min-height,
+      var(--button-default-min-height)
+    );
+    text-align: var(
+      --button-text-align,
+      var(--button-default-text-align)
+    );
+    cursor: var(
+      --button-cursor,
+      var(--button-default-cursor)
+    );
+    padding: var(
+      --button-padding,
+      var(--button-default-padding)
+    );
+    font-size: var(
+      --button-font-size,
+      var(--button-default-font-size)
+    );
+    display: var(
+      --button-display,
+      var(--button-default-display)
+    );
+    justify-content: var(
+      --button-justify-content,
+      var(--button-default-justify-content)
+    );
+    align-items: var(
+      --button-align-items,
+      var(--button-default-align-items)
+    );
+    border: var(
+      --button-border,
+      var(--button-default-border)
+    );
   }
 
   .button-default {
     transition: background-color 200ms;
-    background-color: var(--button-background-color);
     outline: 0;
-    border: var(--button-border);
-    border-radius: var(--button-border-radius, 0.25rem);
-    box-shadow: var(--button-box-shadow, 0 0 0.5rem rgba(0, 0, 0, 0.3));
+    border-radius: var(
+      --button-border-radius, 
+      var(--button-default-border-radius)
+    );
+    box-shadow: var(
+      --button-box-shadow,
+      var(--button-default-box-shadow)
+    );
+    background-color: var(
+      --button-background-color,
+      var(--button-default-background-color)
+    );
+    color: var(
+      --button-color,
+      var(--button-default-color)
+    );
   }
 
   .button-default:hover {
     background-color: var(
       --button-hover-background-color,
-      var(--button-background-color)
+      var(--button-default-hover-background-color)
+    );
+  }
+
+  .button-default:active {
+    background-color: var(
+      --button-active-background-color,
+      var(--button-default-active-background-color)
     );
   }
 
   .button-text {
     transition: background-color 200ms;
     text-transform: uppercase;
+    letter-spacing: .05rem;
     font-weight: 600;
     outline: 0;
-    border: var(--button-border);
-    border-radius: var(--button-border-radius, 0.25rem);
+    border-radius: var(
+      --button-border-radius, 
+      var(--button-default-border-radius)
+    );
+    color: var(
+      --button-color,
+      var(--button-default-text-color)
+    );
+    background-color: var(
+      --button-background-color,
+      var(--button-default-text-background-color)
+    );
   }
 
   .button-text:hover {
-    background-color: var(--button-hover-background-color, transparent);
+    background-color: var(
+      --button-hover-background-color,
+      var(--button-default-text-hover-background-color)
+    );
+  }
+
+  .button-text:active {
+    background-color: var(
+      --button-active-background-color,
+      var(--button-default-text-active-background-color)
+    );
   }
 
   .button-icon {
     transition: background-color 200ms;
     outline: 0;
-    border: var(--button-border);
-    border-radius: var(--button-border-radius, 50%);
+    border-radius: var(
+      --button-border-radius, 
+      var(--button-default--icon-border-radius)
+    );
     height: var(--button-icon-height) !important;
     width: var(--button-icon-width) !important;
     display: flex;

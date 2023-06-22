@@ -16,11 +16,6 @@
 <h2>Example</h2>
 <div class="example">
   <Button
-    backgroundColor={$colors.primary}
-    color={$colors.background}
-    hoverBackgroundColor={$colors.secondary}
-    width="200px"
-    maxWidth="90vw"
     on:click={() => { dialogOpened = !dialogOpened }}
   >
     Click me
@@ -28,8 +23,11 @@
 </div>
 <Dialog
   bind:open={dialogOpened}
+  transition="scale"
 >
-  <div>
+  <div
+    style:color="black"
+  >
     <Card
       padding="30px"
       width="260px"
