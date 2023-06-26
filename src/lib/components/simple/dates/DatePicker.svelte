@@ -1,30 +1,27 @@
 <script lang="ts">
+  import './DatePicker.css'
   import { getMonthName, dateToString } from "./utils";
   import type { Locale } from "./utils";
-
   import YearSelector from "./YearSelector.svelte";
   import MonthSelector from "./MonthSelector.svelte";
   import Calendar from "./Calendar.svelte";
   import Button from "$lib/components/simple/buttons/Button.svelte";
+
+  let clazz: {
+    container?: string,
+    header?: string,
+    selectorRow?: string
+  } = {};
+	export { clazz as class };
 
   export let selectedYear: number = new Date().getFullYear(),
     selectedMonth: number = new Date().getMonth(),
     selectedDate: Date = new Date(),
     view: "year" | "month" | "day" = "day",
     locale: Locale = "it",
-    primaryColor = "#008080",
-    headerBackgroundColor: string = primaryColor,
-    arrowColor: string = primaryColor,
-    hoverColor = "#00808012",
-    selectedDayColor = "black",
-    headerColor = "white",
-    cardColor = "black",
-    cardBackGroundColor = "rgba(255,255,255,0)",
     selectableYears: number[] = [...Array(150).keys()].map(
       (i) => i + (new Date().getFullYear() - 75)
-    ),
-    height = "100%",
-    width = "100%";
+    )
 
   let selectorText: string | undefined = undefined;
   let elementDisabled: "year" | "date" = "date";
@@ -80,17 +77,10 @@
 </script>
 
 <div
-  class="container"
-  style:background={cardBackGroundColor}
-  style:color={cardColor}
-  style:height
-  style:width
+  class="container {clazz.container || ''}"
 >
   <div
-    class="header"
-    style:height="25%"
-    style:background={headerBackgroundColor}
-    style:color={headerColor}
+    class="header {clazz.header || ''}"
   >
     <span
       class:disabled={elementDisabled == "year"}
@@ -113,14 +103,13 @@
       {dateToString(selectedDate, "dayAndMonth", locale)}
     </h2>
   </div>
-  <div class="body" style:height="75%">
+  <div class="body">
     {#if visibleSelector}
-      <div class="selector-row" style:height="25%">
+      <div class="selector-row {clazz.selectorRow || ''}" style:height="calc(var(--date-picker-height, var(--date-picker-default-height)) / 8 * 1)">
         <div class="row-elem">
           <Button
-            color={arrowColor}
-            hoverBackgroundColor={hoverColor}
-            type="icon"
+            --button-background-color="transparent"
+            buttonType="icon"
             iconSize={25}
             icon="mdi-chevron-left"
             on:click={previous}
@@ -131,7 +120,6 @@
             <div
               on:click={SelectorHandler}
               on:keypress={SelectorHandler}
-              style:--primary-color={primaryColor}
             >
               {selectorText}
             </div>
@@ -139,9 +127,8 @@
         </div>
         <div class="row-elem">
           <Button
-            color={arrowColor}
-            hoverBackgroundColor={hoverColor}
-            type="icon"
+            --button-background-color="transparent"
+            buttonType="icon"
             iconSize={25}
             icon="mdi-chevron-right"
             on:click={next}
@@ -151,32 +138,26 @@
     {/if}
     {#if view == "month"}
       <MonthSelector
-        height="75%"
-        {width}
+        --month-selector-height="calc((var(--date-picker-height, var(--date-picker-default-height)) / 8 * 5) - 10px)"
+        --month-selector-width="var(--date-picker-width, var(--date-picker-default-width))"
         bind:selectedMonth
         on:click={handleMonthChange}
         {locale}
-        monthSelectedColor={primaryColor}
-        monthSelectedTextColor={selectedDayColor}
       />
     {:else if view == "year"}
       <YearSelector
-        height="100%"
-        {width}
+        --year-selector-height="calc(var(--date-picker-height, var(--date-picker-default-height)) / 8 * 6)"
         bind:selectedYear
         {selectableYears}
         on:click={handleYearChange}
       />
     {:else}
       <Calendar
-        height="75%"
-        {width}
+        --calendar-height="calc((var(--date-picker-height, var(--date-picker-default-height)) / 8 * 5) - 10px)"
+        --calendar-width="var(--date-picker-width, var(--date-picker-default-width))"
         bind:visibleMonth={selectedMonth}
         bind:visibleYear={selectedYear}
         bind:selectedDate
-        dayHoverColor={hoverColor}
-        daySelectedColor={primaryColor}
-        selectedTextColor={selectedDayColor}
         {locale}
         on:day-click
       />
@@ -187,12 +168,35 @@
 <style>
   .container {
     border-radius: 5px;
+    height: var(
+      --date-picker-height,
+      var(--date-picker-default-height)
+    );
+    width: var(
+      --date-picker-width,
+      var(--date-picker-default-width)
+    );
+    box-shadow: var(
+      --date-picker-box-shadow,
+      var(--date-picker-default-box-shadow)
+    );
   }
+
   .header {
     border-radius: 5px 5px 0 0;
+    background-color: var(
+      --date-picker-header-background-color,
+      var(--date-picker-default-header-background-color)
+    );
+    height: calc(var(--date-picker-height, var(--date-picker-default-height)) / 4);
+    color: var(
+      --date-picker-header-color,
+      var(--date-picker-default-header-color)
+    );
   }
   .header > h2 {
-    margin-left: 30px;
+    margin-left: 15px;
+    margin-top: 5px;
     transition: 0.1s;
     opacity: 0.8;
   }
@@ -229,7 +233,6 @@
   }
   .selector > div:hover {
     cursor: pointer;
-    color: var(--primary-color);
   }
   .disabled {
     pointer-events: none;

@@ -9,7 +9,7 @@
     rgb(var(--global-color-grey-500));
   --stable-divided-side-bar-layout-default-header-menu-padding: 0rem 2rem 0rem 2rem;
   --stable-divided-side-bar-layout-default-inner-header-menu-background-color:
-    rgb(var(--global-color-background-100));
+    rgb(var(--global-color-background-100), .5);
   --stable-divided-side-bar-layout-default-drawer-background-color:
     rgb(var(--global-color-background-50));
   --stable-divided-side-bar-layout-default-drawer-width: 24rem;

@@ -1,0 +1,10 @@
+:root {
+  --calendar-default-height: 100%;
+  --calendar-default-width: 100%;
+  --calendar-default-day-width: 30px;
+  --calendar-default-day-height: 30px;
+  --calendar-default-day-hover-background-color: rgb(var(--global-color-primary-600), .3);
+  --calendar-default-selected-day-background-color: rgb(var(--global-color-primary-600));
+  --calendar-default-selected-day-color: rgb(var(--global-color-grey-50));
+  --calendar-default-grid-gap: 1px;
+}

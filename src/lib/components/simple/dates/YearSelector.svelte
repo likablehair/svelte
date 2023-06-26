@@ -1,13 +1,22 @@
 <script lang="ts">
+  import './YearSelector.css'
   import { scrollAtCenter } from "$lib/components/simple/common/scroller";
   import { createEventDispatcher, onMount } from "svelte";
+
+  /*
+    Styles
+
+    --year-selector-height
+    --year-selector-width
+  */
+
+  let clazz: string | undefined = undefined;
+	export { clazz as class };
 
   export let selectedYear: number | undefined = undefined,
     selectableYears: number[] = [...Array(150).keys()].map(
       (i) => i + (new Date().getFullYear() - 75)
-    ),
-    height = "100%",
-    width = "100%";
+    )
 
   let container: HTMLElement,
     targetButtons: { [k: string]: HTMLElement } = {};
@@ -35,16 +44,18 @@
   import Button from "$lib/components/simple/buttons/Button.svelte";
 </script>
 
-<div bind:this={container} style:height style:width class="selector-container">
+<div bind:this={container} class="selector-container {clazz || ''}">
   {#each selectableYears as year}
-    <slot name="selector" {year}>
-      <div bind:this={targetButtons[year]}>
+    <slot name="selector" {year} {handleYearClick}>
+      <div bind:this={targetButtons[year]} style:width="100%">
         <Button
-          height="30px"
-          active={year == selectedYear}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
+          --button-background-color={year == selectedYear ? "rgb(var(--global-color-primary-500))" : "trasparent"}
+          --button-hover-background-color={year == selectedYear ? "var(--button-background-color)" : "rgb(var(--global-color-primary-500), .2)"}
+          --button-color={year == selectedYear ?  "rgb(var(--global-color-grey-50))" : undefined}
+          --button-font-weight="500"
+          --button-width="var(--year-selector-width, var(--year-selector-default-width))"
+          --button-padding=".5rem 0px"
+          buttonType="text"
           on:click={() => handleYearClick(year)}
         >
           <slot name="label" {year}>
@@ -65,5 +76,13 @@
 <style>
   .selector-container {
     overflow-y: auto;
+    height: var(
+      --year-selector-height,
+      var(--year-selector-default-height)
+    );
+    width: var(
+      --year-selector-width,
+      var(--year-selector-default-width)
+    );
   }
 </style>

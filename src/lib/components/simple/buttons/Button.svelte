@@ -17,6 +17,7 @@
     --button-cursor
     --button-padding
     --button-font-size
+    --button-font-weight
     --button-color
     --button-display
     --button-justify-content
@@ -190,6 +191,10 @@
       --button-color,
       var(--button-default-color)
     );
+    font-weight: var(
+      --button-font-weight,
+      var(--button-default-font-weight)
+    );
   }
 
   .button-default:hover {
@@ -210,7 +215,6 @@
     transition: background-color 200ms;
     text-transform: uppercase;
     letter-spacing: .05rem;
-    font-weight: 600;
     outline: 0;
     border-radius: var(
       --button-border-radius, 
@@ -223,6 +227,10 @@
     background-color: var(
       --button-background-color,
       var(--button-default-text-background-color)
+    );
+    font-weight: var(
+      --button-font-weight,
+      var(--button-default-text-font-weight)
     );
   }
 
@@ -252,6 +260,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: var(
+      --button-background-color,
+      var(--button-default-background-color)
+    );
+    color: var(
+      --button-color,
+      var(--button-default-icon-color)
+    );
+    font-weight: var(
+      --button-font-weight,
+      var(--button-default-font-weight)
+    );
   }
 
   .button-icon:hover {

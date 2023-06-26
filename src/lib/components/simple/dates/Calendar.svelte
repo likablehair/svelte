@@ -1,7 +1,15 @@
 <script lang="ts">
+  import './Calendar.css'
   import { fly } from "svelte/transition";
   import { getDateRowsStats, getDaysNames } from "./utils";
   import type { DateStat, Locale } from "./utils";
+
+  let clazz: {
+    container?: string,
+    weekHeader?: string,
+    day?: string
+  } = {};
+	export { clazz as class };
 
   export let selectedDate: Date | undefined = undefined,
     visibleMonth: number = new Date().getMonth(),
@@ -9,15 +17,6 @@
     locale: Locale = "it",
     showExtraMonthDays = true,
     showHeader = true,
-    height = "100%",
-    width = "100%",
-    dayWidth = "30px",
-    dayHeight = "30px",
-    dayHoverColor = "#c9c8c873",
-    daySelectedColor = "#adadad",
-    selectedTextColor = "black",
-    gridGap = "1px",
-    dayBackgroundColor: string | undefined = undefined,
     animationDuration = 200;
 
   import { createEventDispatcher } from "svelte";
@@ -50,18 +49,17 @@
   }
 </script>
 
-<div style:height style:width>
+<div class="container {clazz.container || ''}">
   {#key visibleMonth}
     <div
       in:fly={{ delay: animationDuration, duration: animationDuration, y: 30 }}
       out:fly|local={{ duration: animationDuration, y: -30 }}
-      style:gap={gridGap}
       class="grid-layout"
     >
       {#if showHeader}
         {#each getDaysNames(locale).map((name) => name[0]) as weekHeader, index}
           <slot name="weekHeader" header={weekHeader} {index}>
-            <div class="week-header-slot">{weekHeader}</div>
+            <div class="week-header-slot {clazz.weekHeader || ''}">{weekHeader}</div>
           </slot>
         {/each}
       {/if}
@@ -76,14 +74,7 @@
           {#if (!showExtraMonthDays && day.month == visibleMonth) || showExtraMonthDays}
             <div
               style:border-radius="50%"
-              style:background-color={dayBackgroundColor}
-              style:height={dayHeight}
-              style:width={dayWidth}
-              style:cursor={extraMonth ? "default" : "pointer"}
-              style:--calendar-hover-color={extraMonth ? "" : dayHoverColor}
-              style:--calendar-selected-color={daySelectedColor}
-              style:--calendar-selected-text-color={selectedTextColor}
-              class="day-slot"
+              class="day-slot {clazz.day || ''}"
               class:extra-month={extraMonth}
               class:selected
               class:not-selected={!selected}
@@ -102,10 +93,25 @@
 </div>
 
 <style>
+  .container {
+    height: var(
+      --calendar-height,
+      var(--calendar-default-height)
+    );
+    width: var(
+      --calendar-width,
+      var(--calendar-default-width)
+    );
+  }
+
   .grid-layout {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     height: 100%;
+    gap: var(
+      --calendar-grid-gap,
+      var(--calendar-default-grid-gap)
+    );
   }
 
   .day-slot {
@@ -115,6 +121,22 @@
     justify-self: center;
     align-self: center;
     transition: background-color 0.1s ease-in;
+    height: var(
+      --calendar-day-height,
+      var(--calendar-default-day-height)
+    );
+    width: var(
+      --calendar-day-width,
+      var(--calendar-default-day-width)
+    );
+    background-color: var(
+      --calendar-day-background-color,
+      var(--calendar-default-day-background-color)
+    );
+  }
+
+  .day-slot:not(.extra-month) {
+    cursor: pointer;
   }
 
   .extra-month {
@@ -122,12 +144,21 @@
   }
 
   .selected {
-    background-color: var(--calendar-selected-color);
-    color: var(--calendar-selected-text-color);
+    background-color: var(
+      --calendar-selected-day-background-color,
+      var(--calendar-default-selected-day-background-color)
+    );
+    color: var(
+      --calendar-selected-day-color,
+      var(--calendar-default-selected-day-color)
+    );
   }
 
-  .day-slot.not-selected:hover {
-    background-color: var(--calendar-hover-color);
+  .day-slot.not-selected:hover:not(.extra-month) {
+    background-color: var(
+      --calendar-day-hover-background-color,
+      var(--calendar-default-day-hover-background-color)
+    );
   }
 
   .week-header-slot {

@@ -61,7 +61,12 @@ let list: {
     description: 'A dialog for peace',
     status: 'stable',
     url: '/docs/components/simple-components/Dialog'
-  }
+    }, {
+      title: 'DatePicker',
+      description: 'Day to change, day to stick to the habits',
+      status: 'stable',
+      url: '/docs/components/simple-components/DatePicker'
+    }
 ]
 
 export default lodash.sortBy(list, 'title')
