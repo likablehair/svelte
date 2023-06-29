@@ -27,15 +27,13 @@
     --button-background-color
     --button-hover-background-color
     --button-box-shadow
-    --button-icon-height
-    --button-icon-width
   */
 
   export let buttonType: "default" | "text" | "icon" = "default",
     type: "button" | "submit" = "button",
     loading = false,
     icon: string | undefined = undefined,
-    iconSize = 15,
+    tabindex: number | null = null,
     disabled = false
 
   import { createEventDispatcher } from "svelte";
@@ -71,14 +69,13 @@
 <button
   type={type}
   style:position
-  style:--button-icon-height={iconSize + 5 + "pt"}
-  style:--button-icon-width={iconSize + 5 + "pt"}
   class="button no-select {clazz || ''}"
   class:button-default={buttonType === "default"}
   class:button-text={buttonType === "text"}
   class:button-icon={buttonType === "icon"}
   on:click={handleClick}
   on:keypress={handleKeyPress}
+  tabindex={tabindex}
 >
   {#if loading}
     <div
@@ -92,7 +89,7 @@
     </div>
   {:else}
     {#if !!icon}
-      <Icon name={icon} size={iconSize} />
+      <Icon name={icon} />
     {:else}
       <slot />
     {/if}
@@ -255,8 +252,6 @@
       --button-border-radius, 
       var(--button-default--icon-border-radius)
     );
-    height: var(--button-icon-height) !important;
-    width: var(--button-icon-width) !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -271,6 +266,10 @@
     font-weight: var(
       --button-font-weight,
       var(--button-default-font-weight)
+    );
+    border-radius: var(
+      --button-border-radius, 
+      var(--button-default-icon-border-radius)
     );
   }
 

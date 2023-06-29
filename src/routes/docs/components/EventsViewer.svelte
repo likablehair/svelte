@@ -75,7 +75,7 @@
 
   .element {
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    background-color: var(--global-thin-contrast-color);
+    background-color: rgb(var(--global-color-background-200));
     padding: 1rem;
     border-radius: .5rem;
   }
@@ -109,8 +109,8 @@
   }
 
   .properties-table thead tr {
-    background-color: var(--global-primary-color);
-    color: var(--global-background-color);
+    background-color: rgb(var(--global-color-primary-500));
+    color: rgb(var(--global-color-grey-50));
     text-align: left;
   }
 
@@ -124,11 +124,11 @@
   }
 
   .properties-table tbody tr:nth-of-type(even) {
-    background-color: var(--global-background-color);
+    background-color: rgb(var(--global-color-background-300));
   }
 
   .properties-table tbody tr:last-of-type {
-    border-bottom: 2px solid var(--global-primary-color);
+    border-bottom: 2px solid rgb(var(--global-color-primary-500));
   }
 
 </style>

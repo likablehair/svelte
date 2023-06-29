@@ -85,87 +85,87 @@
   ]}
   styleProps={[
     {
-      name: '_padding',
+      name: '--simple-textfield-padding',
       description: 'Padding css property',
       type: 'string',
       default: '0.65rem 1rem 0.65rem 1rem'
     }, {
-      name: '_width',
+      name: '--simple-textfield-width',
       description: 'Width css property',
       type: 'string',
       default: '280px'
     }, {
-      name: '_height',
+      name: '--simple-textfield-height',
       description: 'Height css property',
       type: 'string',
       default: 'null'
     }, {
-      name: '_backgroundColor',
+      name: '--simple-textfield-background-color',
       description: 'background-color css property',
       type: 'string',
       default: 'rgb(244 244 245/1)'
     }, {
-      name: '_borderRadius',
+      name: '--simple-textfield-border-radius',
       description: 'border-radius css property',
       type: 'string',
       default: '9999px'
     }, {
-      name: '_boxShadow',
+      name: '--simple-textfield-box-shadow',
       description: 'box-shadow css property',
       type: 'string',
       default: 'none'
     }, {
-      name: '_transition',
+      name: '--simple-textfield-transition',
       description: 'css transition time',
       type: 'string',
       default: '0.2s'
     }, {
-      name: '_fontSize',
+      name: '--simple-textfield-font-size',
       description: 'font-size css property',
       type: 'string',
       default: '0.9rem'
     }, {
-      name: '_fontWeight',
+      name: '--simple-textfield-font-weight',
       description: 'font-weight css property',
       type: 'string',
       default: 'normal'
     }, {
-      name: '_focusBackgroundColor',
+      name: '--simple-textfield-focus-background-color',
       description: 'background color of the input field when focused',
       type: 'string',
       default: '_backgroundColor'
     }, {
-      name: '_focusBoxShadow',
+      name: '--simple-textfield-focus-box-shadow',
       description: 'box-shadow of the input field when focused',
       type: 'string',
       default: 'rgba(100, 100, 111, 0.4) 0px 4px 25px 0px'
     }, {
-      name: '_outerGap',
+      name: '--simple-textfield-outer-gap',
       description: 'Gap between the container and outer icons (or slots)',
       type: 'string',
       default: '8px'
     }, {
-      name: '_innerGap',
+      name: '--simple-textfield-inner-gap',
       description: 'Gap between the field and inner icons (or slots)',
       type: 'string',
       default: '8px'
     }, {
-      name: '_hintFontSize',
+      name: '--simple-textfield-hint-font-size',
       description: 'Font size of the hint',
       type: 'string',
       default: '0.75rem'
     }, {
-      name: '_hintColor',
+      name: '--simple-textfield-hint-color',
       description: 'Text color of the hint',
       type: 'string',
       default: 'grey'
     }, {
-      name: '_hintMarginLeft',
+      name: '--simple-textfield-hint-margin-left',
       description: 'margin-left css proprty of the hint',
       type: 'string',
       default: '20px'
     }, {
-      name: '_marginBottom',
+      name: '--simple-textfield-margin-bottom',
       description: 'The space between the input field and the hint',
       type: 'string',
       default: '5px'

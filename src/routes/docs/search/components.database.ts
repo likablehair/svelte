@@ -61,12 +61,22 @@ let list: {
     description: 'A dialog for peace',
     status: 'stable',
     url: '/docs/components/simple-components/Dialog'
-    }, {
-      title: 'DatePicker',
-      description: 'Day to change, day to stick to the habits',
-      status: 'stable',
-      url: '/docs/components/simple-components/DatePicker'
-    }
+  }, {
+    title: 'DatePicker',
+    description: 'Day to change, day to stick to the habits',
+    status: 'stable',
+    url: '/docs/components/simple-components/DatePicker'
+  }, {
+    title: 'Autocomplete',
+    description: 'Autocompletion out of the limits.',
+    status: 'stable',
+    url: '/docs/components/simple-components/Autocomplete'
+  }, {
+    title: 'Chip',
+    description: 'Cheap Chip.',
+    status: 'stable',
+    url: '/docs/components/simple-components/Chip'
+  }
 ]
 
 export default lodash.sortBy(list, 'title')

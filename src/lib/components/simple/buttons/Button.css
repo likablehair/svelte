@@ -3,7 +3,7 @@
   --button-default-cursor: pointer;
   --button-default-padding: 8px;
   --button-default-border-radius: .5rem;
-  --button-default-icon-border-radius: 50%;
+  --button-default-icon-border-radius: 9999px;
   --button-default-color: rgb(var(--global-color-grey-50));
   --button-default-text-color: rgb(var(--global-color-contrast-900));
   --button-default-icon-color: rgb(var(--global-color-contrast-900));

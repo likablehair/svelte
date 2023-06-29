@@ -1,18 +1,17 @@
 <script lang="ts">
+  import './Chip.css'
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import Button from "$lib/components/simple/buttons/Button.svelte";
   import { createEventDispatcher } from "svelte";
 
   export let close = false,
     closeIcon = "mdi-close-circle",
-    color = "blue",
-    textColor = "white",
     disabled = false,
     filter = false,
     filterIcon = "mdi-check",
     label = false,
     outlined = false,
-    size = 12;
+    buttonTabIndex: number | null = null
 
   const dispatch = createEventDispatcher();
 
@@ -27,9 +26,6 @@
 
 <div
   class="chip"
-  style:border-radius={label ? "5px" : "100px"}
-  style:background-color={color}
-  style:color={outlined ? color : textColor}
   class:label
   class:outlined
   class:disabled
@@ -38,19 +34,23 @@
 >
   {#if filter}
     <div class="icon-before">
-      <Icon name={filterIcon} {size} />
+      <Icon name={filterIcon} />
     </div>
   {/if}
-  <div class="text" style:font-size="{size}pt" style:line-height="{size}pt">
+  <div 
+    class="text" 
+  >
     <slot />
   </div>
   {#if close}
     <div class="icon-after">
       <Button
         icon={closeIcon}
-        iconSize={size}
-        type="icon"
-        hoverBackgroundColor="none"
+        buttonType="icon"
+        tabindex={buttonTabIndex}
+        --button-background-color="transparent"
+        --button-padding="0px"
+        --button-color="var(--chip-color, var(--chip-default-color))"
         on:click={handleCloseClick}
       />
     </div>
@@ -62,10 +62,59 @@
     text-align: center;
     display: flex;
     align-items: center;
+    min-height: var(
+      --chip-min-height,
+      var(--chip-default-min-height)
+    );
+    height: var(
+      --chip-height,
+      var(--chip-default-height)
+    );
+    padding: var(
+      --chip-padding,
+      var(--chip-default-padding)
+    );
+    cursor: var(
+      --chip-cursor,
+      var(--chip-default-cursor)
+    );
   }
+
+  .chip:not(.outlined) {
+    background-color: var(
+      --chip-background-color,
+      var(--chip-default-background-color)
+    );
+    color: var(
+      --chip-color,
+      var(--chip-default-color)
+    );
+  }
+
+  .chip:not(.outlined):hover {
+    background-color: var(
+      --chip-hover-background-color,
+      var(--chip-default-hover-background-color)
+    );
+  }
+
+  .chip:not(.label) {
+    border-radius: var(
+      --chip-border-radius,
+      var(--chip-default-border-radius)
+    );
+  }
+
+  .label {
+    border-radius: var(
+      --chip-border-radius,
+      var(--chip-default-label-border-radius)
+    );
+  }
+
   .icon-after {
     float: right;
-    margin-left: -10px;
+    margin-left: 10px;
   }
   .icon-before {
     float: left;
@@ -74,15 +123,23 @@
   .text {
     display: inline-block;
     vertical-align: middle;
-    margin-left: 20px;
-    margin-right: 20px;
-    margin-bottom: 3px;
-    cursor: default;
     user-select: none;
+    font-size: var(
+      --chip-font-size,
+      var(--chip-default-font-size)
+    );
+    line-height: var(
+      --chip-line-height,
+      var(--chip-default-line-height)
+    );
   }
   .outlined {
     background: transparent !important;
     border: solid 1px;
+    background-color: var(
+      --chip-background-color,
+      var(--chip-default-outlined-background-color)
+    );
   }
   .disabled {
     pointer-events: none;

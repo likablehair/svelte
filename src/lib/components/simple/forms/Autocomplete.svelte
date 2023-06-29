@@ -5,52 +5,40 @@
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     data?: any;
   };
-
-  import type { VariantOptions } from "./Textfield.svelte";
 </script>
 
 <script lang="ts">
+  import './Autocomplete.css'
+
+  let clazz: {
+    activator?: string,
+    menu?: string
+  } = {};
+	export { clazz as class };
+
+  /* 
+    Styles:
+    
+    --autocomplete-selected-item-background-color
+    --autocomplete-selected-item-color
+    --autocomplete-focused-item-background-color
+    --autocomplete-focused-item-color
+  */
+
   export let values: Item[] = [],
     items: Item[],
     searchFunction: ((item: Item, searchText: string) => boolean) | undefined =
       undefined,
     multiple = false,
     disabled = false,
+    placeholder = "",
     width = "auto",
     height = "auto",
     maxWidth: string | undefined = undefined,
-    // textfield
-    textFieldLabel = "",
-    textFieldPlaceholder = "",
-    textFieldColor: string | null = null,
-    textFieldVariant: VariantOptions = "boxed",
-    textFieldMaxWidth = "min(100px, 90%)",
-    textFieldMinWidth: string | undefined = undefined,
-    textFieldHeight = "auto",
-    textFieldTextColor = "black",
-    textFieldBorderWeight = "2px",
-    textFieldBorderRadius = "5px",
-    textFieldBorderColor: string | null = null,
-    textFieldFocusBorderColor: string | null = null,
-    textFieldFocusedBoxShadow: string | undefined = undefined,
-    textFieldBackgroundColor: string | null = null,
-    textFieldPadding: string | undefined = undefined,
-    textFieldPaddingLeft: string | undefined = undefined,
-    textFieldPaddingRight: string | undefined = undefined,
-    textFieldPaddingBottom: string | undefined = undefined,
-    textFieldPaddingTop: string | undefined = undefined,
-    textFieldFontSize: string | undefined = undefined,
+
     // menu
-    menuBackgroundColor = "#FFF",
-    menuBoxShadow = "rgba(149, 157, 165, 0.2) 0px 8px 24px",
-    menuBorderRadius = "5px",
-    focusItemBackgroundColor = "#EEEEEE",
-    selectedItemBackgroundColor = "#D0D0D0",
-    border = "1px solid black",
-    borderRadius = "5px",
-    chipColor = "#D0D0D0",
-    chipTextColor = "black",
-    chipHeight = "30px";
+    menuBoxShadow = "rgb(var(--global-color-background-300), .5) 0px 2px 4px",
+    menuBorderRadius = "5px"
 
   let dispatch = createEventDispatcher<{
     change: {
@@ -87,6 +75,18 @@
     });
   }
 
+  function pop() {
+    let poppedElement = values.pop()
+    values = [...values]
+    refreshMenuWidth()
+
+    dispatch("change", {
+      unselect: poppedElement,
+      select: undefined,
+      selection: values,
+    });
+  }
+
   function toggle(item: Item) {
     const alreadyPresent =
       values.findIndex((i) => i.value === item.value) != -1;
@@ -99,14 +99,19 @@
     menuHeight = "auto",
     menuOpened = false,
     refreshPosition = false;
+
   function openMenu() {
     refreshMenuWidth();
     menuOpened = true;
   }
 
   function refreshMenuWidth() {
-    menuWidth = activator.offsetWidth + "px";
-    refreshPosition = true;
+    setTimeout(() => {
+      menuWidth = activator.offsetWidth + "px";
+      setTimeout(() => {
+        refreshPosition = true;
+      }, 1);
+    }, 1);
   }
 
   let activator: HTMLElement,
@@ -121,7 +126,8 @@
   }
 
   let menuElement: HTMLElement;
-  function handleWindowKeyDown(event: KeyboardEvent) {
+  function handleWindowKeyDown(event: KeyboardEvent) { 
+    console.log(event.key)
     if (
       event.key == "ArrowDown" &&
       (focusedIndex === undefined || focusedIndex < filteredItems.length - 1)
@@ -136,6 +142,12 @@
       else focusedIndex -= 1;
     } else if (event.key == "Enter" && focusedIndex != undefined) {
       toggle(filteredItems[focusedIndex]);
+    } else if(event.key == 'Backspace' && searchText == '') {
+      pop()
+    } else if(event.key == 'Escape' || event.key == 'Tab') {
+      searchText = ''
+      input.blur()
+      menuOpened = false
     }
   }
 
@@ -163,10 +175,10 @@
     filteredItems = items;
   }
 
-  import Textfield from "$lib/components/simple/forms/Textfield.svelte";
   import Chip from "$lib/components/simple/navigation/Chip.svelte";
   import Menu from "$lib/components/simple/common/Menu.svelte";
   import { createEventDispatcher } from "svelte";
+  import SimpleTextField from "./SimpleTextField.svelte";
 </script>
 
 <svelte:window />
@@ -179,55 +191,40 @@
   style:opacity={disabled ? "50%" : "100%"}
   on:click={handleContainerClick}
   on:keypress={handleContainerClick}
+  class={clazz.activator || ''}
 >
   <slot name="selection-container">
     <div
       class="selection-container"
-      style:border
-      style:border-radius={borderRadius}
     >
       {#each values as selection}
         <slot name="selection" {selection}>
-          <div style:height={chipHeight}>
+          <div tabindex="-1">
             <Chip
-              color={chipColor}
-              textColor={chipTextColor}
               close={true}
-              label={true}
-              on:close={() => unselect(selection)}>{selection.label}</Chip
-            >
+              on:close={() => unselect(selection)}
+              --chip-default-border-radius="var(--autocomplete-border-radius, var(--autocomplete-default-border-radius))"
+              buttonTabIndex={-1}
+            >{selection.label}</Chip>
           </div>
         </slot>
       {/each}
 
-      <Textfield
-        label={textFieldLabel}
-        placeholder={textFieldPlaceholder}
-        color={textFieldColor}
+      <SimpleTextField
+        --simple-textfield-max-width="min(200px, 90%)"
+        --simple-textfield-height="auto"
+        --simple-textfield-padding="0px"
+        --simple-textfield-background-color="rgb(1, 1, 1, 0)"
+        --simple-textfield-default-margin-bottom="0px"
+        --simple-textfield-default-margin-left="10px"
         bind:value={searchText}
-        variant={textFieldVariant}
-        maxWidth={textFieldMaxWidth}
-        minWidth={textFieldMinWidth}
-        textColor={textFieldTextColor}
-        borderWeight={textFieldBorderWeight}
-        borderRadius={textFieldBorderRadius}
-        borderColor={textFieldBorderColor}
-        focusBorderColor={textFieldFocusBorderColor}
-        focusedBoxShadow={textFieldFocusedBoxShadow}
-        backgroundColor={textFieldBackgroundColor}
-        padding={textFieldPadding}
-        paddingLeft={textFieldPaddingLeft}
-        paddingRight={textFieldPaddingRight}
-        paddingBottom={textFieldPaddingBottom}
-        paddingTop={textFieldPaddingTop}
-        fontSize={textFieldFontSize}
-        height={textFieldHeight}
-        {disabled}
         on:focus={handleTextFieldFocus}
         on:blur={handleTextFieldBlur}
         on:keydown={handleWindowKeyDown}
-        bind:inputElement={input}
-      />
+        {disabled}
+        placeholder={placeholder}
+        bind:input={input}
+      ></SimpleTextField>
     </div>
   </slot>
 </div>
@@ -235,18 +232,21 @@
 <slot name="menu">
   <Menu
     {activator}
-    width={menuWidth || ""}
-    height={menuHeight}
-    maxHeight="300px"
-    boxShadow={menuBoxShadow}
-    borderRadius={menuBorderRadius}
+    _width={menuWidth || ""}
+    _height={menuHeight}
+    _maxHeight="300px"
+    _boxShadow={menuBoxShadow}
+    _borderRadius={menuBorderRadius}
     bind:open={menuOpened}
     anchor="bottom-center"
     closeOnClickOutside
     bind:refreshPosition
     bind:menuElement
   >
-    <div style:background-color={menuBackgroundColor}>
+    <div 
+      class={clazz.menu || ''}
+      style:background-color="rgb(var(--global-color-background-100))"
+    >
       {#each filteredItems as item, index}
         <slot
           name="item"
@@ -257,8 +257,6 @@
           }) != -1}
         >
           <div
-            style:--autocomplete-selected-item-background-color={selectedItemBackgroundColor}
-            style:--autocomplete-focus-item-background-color={focusItemBackgroundColor}
             class:selection-item={true}
             class:focused={index == focusedIndex}
             class:selected={values.findIndex((i) => {
@@ -279,8 +277,28 @@
   .selection-container {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 5px;
-    padding: 5px;
+    border: var(
+      --autocomplete-border,
+      var(--autocomplete-default-border)
+    );
+    background-color: var(
+      --autocomplete-background-color,
+      var(--autocomplete-default-background-color)
+    );
+    border-radius: var(
+      --autocomplete-border-radius,
+      var(--autocomplete-default-border-radius)
+    );
+    padding: var(
+      --autocomplete-paddding,
+      var(--autocomplete-default-padding)
+    );
+    min-height: var(
+      --autocomplete-min-height,
+      var(--autocomplete-default-min-height)
+    )
   }
 
   .selection-item {
@@ -288,14 +306,35 @@
   }
 
   .selection-item.selected {
-    background-color: var(--autocomplete-selected-item-background-color);
+    background-color: var(
+      --autocomplete-selected-item-background-color,
+      var(--autocomplete-default-selected-item-background-color)
+    );
+    color: var(
+      --autocomplete-selected-item-color,
+      var(--autocomplete-default-selected-item-color)
+    );
   }
 
-  .selection-item.focused {
-    background-color: var(--autocomplete-focus-item-background-color);
+  .selection-item.focused:not(.selected) {
+    background-color: var(
+      --autocomplete-focused-item-background-color,
+      var(--autocomplete-default-focused-item-background-color)
+    );
+    color: var(
+      --autocomplete-focused-item-color,
+      var(--autocomplete-default-focused-item-color)
+    );
   }
 
-  .selection-item:hover {
-    background-color: var(--autocomplete-focus-item-background-color);
+  .selection-item:hover:not(.selected):not(.focused) {
+    background-color: var(
+      --autocomplete-hover-item-background-color,
+      var(--autocomplete-default-hover-item-background-color)
+    );
+    color: var(
+      --autocomplete-hover-item-color,
+      var(--autocomplete-default-hover-item-color)
+    );
   }
 </style>

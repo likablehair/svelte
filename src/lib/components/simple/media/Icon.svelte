@@ -1,7 +1,5 @@
 <script lang="ts">
   export let name: string,
-    size = 15,
-    color = "",
     click = false;
 
   let clazz = "";
@@ -11,18 +9,23 @@
 </script>
 
 <span
-  style:font-size={size + "pt"}
-  style:color
   class="icon mdi {name} {clazz}"
+  class:click
   on:click
   on:keypress
-  style:cursor={click ? "pointer" : "default"}
-  style:pointer-events={click ? "auto" : "none"}
 />
 
 <style>
   .icon {
-    font-size: var(--size);
-    color: var(--color);
+    font-size: var(--icon-size);
+    color: var(--icon-color);
+  }
+  .icon.click {
+    cursor: var(--icon-cursor, pointer);
+    pointer-events: var(--icon-pointer-events, auto);
+  }
+  .icon.click:not(.click) {
+    cursor: var(--icon-cursor, default);
+    pointer-events: var(--icon-pointer-events, none);
   }
 </style>

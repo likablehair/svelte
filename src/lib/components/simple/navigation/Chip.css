@@ -1,0 +1,14 @@
+:root {
+  --chip-default-border-radius: 9999px;
+  --chip-default-label-border-radius: 5px;
+  --chip-default-min-height: 2rem;
+  --chip-default-padding: 2px 10px;
+  --chip-default-background-color: rgb(var(--global-color-primary-500));
+  --chip-default-outlined-background-color: transparent;
+  --chip-default-color: rgb(var(--global-color-grey-50));
+  --chip-default-outlined-color: rgb(var(--global-color-primary-500));
+  --chip-default-font-size: inherit;
+  --chip-default-line-height: inherit;
+  --chip-default-cursor: pointer;
+  --chip-default-hover-background-color: rgb(var(--global-color-primary-600))
+}

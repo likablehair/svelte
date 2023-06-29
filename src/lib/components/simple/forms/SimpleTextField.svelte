@@ -1,24 +1,39 @@
 <script lang="ts">
+  import './SimpleTextField.css'
   import Icon from "../media/Icon.svelte";
 
+  let clazz: {
+    container?: string,
+    row?: string,
+    hint?: string,
+    input?: string
+  } = {};
+	export { clazz as class };
 
-  export let _padding: string | null = null,
-    _width: string | null = null,
-    _height: string | null = null,
-    _backgroundColor: string | null = null,
-    _borderRadius: string | null = null,
-    _boxShadow: string | null = null,
-    _focusBackgroundColor: string | null = null,
-    _focusBoxShadow: string | null = null,
-    _transition: string | null = null,
-    _fontSize: string | null = null,
-    _fontWeight: string | null = null,
-    _outerGap: string | null = null,
-    _innerGap: string | null = null,
-    _hintFontSize: string | null = null,
-    _hintColor: string | null = null,
-    _hintMarginLeft: string | null = null,
-    _marginBottom: string | null = null
+  /* 
+    Styles:
+    
+    --simple-textfield-padding
+    --simple-textfield-height
+    --simple-textfield-width
+    --simple-textfield-max-width
+    --simple-textfield-color
+    --simple-textfield-background-color
+    --simple-textfield-border-radius
+    --simple-textfield-box-shadow
+    --simple-textfield-focus-background-color
+    --simple-textfield-focus-box-shadow
+    --simple-textfield-transition
+    --simple-textfield-font-size
+    --simple-textfield-font-weight
+    --simple-textfield-outer-gap
+    --simple-textfield-inner-gap
+    --simple-textfield-hint-font-size
+    --simple-textfield-hint-color
+    --simple-textfield-hint-margin-left
+    --simple-textfield-margin-bottom
+    --simple-textfield-margin-left
+  */
 
   export let value: string | number | undefined = undefined,
     type: "text" | "password" | "number" = "text",
@@ -29,41 +44,25 @@
     appendInnerIcon: string | undefined = undefined,
     prependIcon: string | undefined = undefined,
     prependInnerIcon: string | undefined = undefined,
-    iconSize: number = 12,
-    hint: string | undefined = undefined
+    iconSize: string = "12pt",
+    hint: string | undefined = undefined,
+    input: HTMLElement | undefined = undefined
 
 </script>
 
 <div
-  class="textfield-container"
-  style:--simple-textfield-padding={_padding}
-  style:--simple-textfield-height={_height}
-  style:--simple-textfield-width={_width}
-  style:--simple-textfield-background-color={_backgroundColor}
-  style:--simple-textfield-border-radius={_borderRadius}
-  style:--simple-textfield-box-shadow={_boxShadow}
-  style:--simple-textfield-focus-background-color={_focusBackgroundColor}
-  style:--simple-textfield-focus-box-shadow={_focusBoxShadow}
-  style:--simple-textfield-transition={_transition}
-  style:--simple-textfield-font-size={_fontSize}
-  style:--simple-textfield-font-weight={_fontWeight}
-  style:--simple-textfield-outer-gap={_outerGap}
-  style:--simple-textfield-inner-gap={_innerGap}
-  style:--simple-textfield-hint-font-size={_hintFontSize}
-  style:--simple-textfield-hint-color={_hintColor}
-  style:--simple-textfield-hint-margin-left={_hintMarginLeft}
-  style:--simple-textfield-margin-bottom={_marginBottom}
+  class="textfield-container {clazz.container || ''}"
 >
-  <div class="row">
+  <div class="row {clazz.row}">
     <slot name="prepend" {prependIcon} {iconSize}>
       {#if !!prependIcon}
-          <Icon name={prependIcon} size={iconSize}></Icon>
+        <Icon name={prependIcon} --icon-size={iconSize}></Icon>
       {/if}
     </slot>
     <div class="textfield">
       <slot name="prepend-inner" {prependInnerIcon} {iconSize}>
         {#if !!prependInnerIcon}
-          <Icon name={prependInnerIcon} size={iconSize}></Icon>
+          <Icon name={prependInnerIcon} --icon-size={iconSize}></Icon>
         {/if}
       </slot>
       {#if type == "text"}
@@ -80,6 +79,8 @@
           on:keydown
           on:keypress
           on:keyup
+          class={clazz.input || ''}
+          bind:this={input}
         />
       {:else if type == "password"}
         <input
@@ -95,6 +96,8 @@
           on:keydown
           on:keypress
           on:keyup
+          class={clazz.input || ''}
+          bind:this={input}
         />
       {:else if type == "number"}
         <input
@@ -110,21 +113,23 @@
           on:keydown
           on:keypress
           on:keyup
+          class={clazz.input || ''}
+          bind:this={input}
         />
       {/if}
       <slot name="append-inner" {appendInnerIcon} {iconSize}>
         {#if !!appendInnerIcon}
-          <Icon name={appendInnerIcon} size={iconSize}></Icon>
+          <Icon name={appendInnerIcon} --icon-size={iconSize}></Icon>
         {/if}
       </slot>
     </div>
     <slot name="append" {appendIcon} {iconSize}>
       {#if !!appendIcon}
-        <Icon name={appendIcon} size={iconSize}></Icon>
+        <Icon name={appendIcon} --icon-size={iconSize}></Icon>
       {/if}
     </slot>
   </div>
-  <div class="row">
+  <div class="row {clazz.hint || ''}">
     <slot name="hint">
       {#if !!hint}
         <span class="hint">{hint}</span>
@@ -134,11 +139,32 @@
 </div>
 
 <style>
+  .textfield-container {
+    max-width: var(
+      --simple-textfield-max-width,
+      var(--simple-textfield-default-max-width)
+    );
+    width: var(
+      --simple-textfield-width,
+      var(--simple-textfield-default-width)
+    );
+  }
+
   .row {
     display: flex;
     align-items: center;
-    gap: var(--simple-textfield-outer-gap, 8px);
-    margin-bottom: var(--simple-textfield-margin-bottom, 5px);
+    gap: var(
+      --simple-textfield-outer-gap, 
+      var(--simple-textfield-default-outer-gap)
+    );
+    margin-bottom: var(
+      --simple-textfield-margin-bottom,
+      var(--simple-textfield-default-margin-bottom)
+    );
+    margin-left: var(
+      --simple-textfield-margin-left,
+      var(--simple-textfield-default-margin-left)
+    );
   }
 
   .row:last-of-type {
@@ -146,35 +172,86 @@
   }
 
   .hint {
-    margin-left: var(--simple-textfield-hint-margin-left, 20px);
-    font-size: var(--simple-textfield-hint-font-size, 0.75rem);
-    color: var(--simple-textfield-hint-color, grey);
+    margin-left: var(
+      --simple-textfield-hint-margin-left, 
+      var(--simple-textfield-default-hint-margin-left)
+    );
+    font-size: var(
+      --simple-textfield-hint-font-size, 
+      var(--simple-textfield-default-hint-font-size)
+    );
+    color: var(
+      --simple-textfield-hint-color,
+      var(--simple-textfield-default-hint-color)
+    );
   }
 
   .textfield {
-    padding: var(--simple-textfield-padding, 0.65rem 1rem 0.65rem 1rem);
-    width: var(--simple-textfield-width, 280px);
-    height: var(--simple-textfield-height);
-    background-color: var(--simple-textfield-background-color, rgb(244 244 245/1));
+    padding: var(
+      --simple-textfield-padding,
+      var(--simple-textfield-default-padding)
+    );
+    height: var(
+      --simple-textfield-height,
+      var(--simple-textfield-default-height)
+    );
+    background-color: var(
+      --simple-textfield-background-color,
+      var(--simple-textfield-default-background-color)
+    );
     border: none;
-    border-radius: var(--simple-textfield-border-radius, 9999px);
-    box-shadow: var(--simple-textfield-box-shadow, none);
-    transition: var(--simple-textfield-transition, 0.2s);
-    gap: var(--simple-textfield-inner-gap, 8px);
+    border-radius: var(
+      --simple-textfield-border-radius,
+      var(--simple-textfield-default-border-radius)
+    );
+    box-shadow: var(
+      --simple-textfield-box-shadow,
+      var(--simple-textfield-default-box-shadow)
+    );
+    transition: var(
+      --simple-textfield-transition,
+      var(--simple-textfield-default-transition)
+    );
+    gap: var(
+      --simple-textfield-inner-gap,
+      var(--simple-textfield-default-inner-gap)
+    );
     display: flex;
   }
 
   .textfield:focus-within {
-    background-color: var(--simple-textfield-focus-background-color, var(--simple-textfield-background-color, rgb(244 244 245/1)));
-    box-shadow: var(--simple-textfield-focus-box-shadow, rgba(100, 100, 111, 0.4) 0px 4px 25px 0px);
+    background-color: var(
+      --simple-textfield-focus-background-color, 
+      var(
+        --simple-textfield-default-focus-background-color,
+        var(
+          --simple-textfield-background-color,
+          var(--simple-textfield-default-background-color)
+        )
+      )
+    );
+    box-shadow: var(
+      --simple-textfield-focus-box-shadow, 
+      var(--simple-textfield-default-focus-box-shadow)
+    );
   }
 
   input {
     outline: none;
     width: 100%;
     background-color: transparent;
-    font-size: var(--simple-textfield-font-size, .9rem);
-    font-weight: var(--simple-textfield-font-weight, normal);
+    font-size: var(
+      --simple-textfield-font-size, 
+      var(--simple-textfield-default-font-size)
+    );
+    font-weight: var(
+      --simple-textfield-font-weight,
+      var(--simple-textfield-default-font-weight)
+    );
+    color: var(
+      --simple-textfield-color,
+      var(--simple-textfield-default-color)
+    );
     border: none
   }
 </style>

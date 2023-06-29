@@ -1,0 +1,17 @@
+:root {
+  --simple-textfield-default-padding: 0.65rem 1rem 0.65rem 1rem;
+  --simple-textfield-default-width: 280px;
+  --simple-textfield-default-background-color: rgb(var(--global-color-background-300), .5);
+  --simple-textfield-default-border-radius: 9999px;
+  --simple-textfield-default-box-shadow: none;
+  --simple-textfield-default-transition: .2s;
+  --simple-textfield-default-font-size: .9rem;
+  --simple-textfield-default-font-weight: normal;
+  --simple-textfield-default-outer-gap: 8px;
+  --simple-textfield-default-inner-gap: 8px;
+  --simple-textfield-default-hint-font-size: .75rem;
+  --simple-textfield-default-hint-color: rgb(var(--global-color-contrast-500), .5);
+  --simple-textfield-default-hint-margin-left: 20px;
+  --simple-textfield-default-margin-bottom: 5px;
+  --simple-textfield-default-color: rgb(var(--global-color-contrast-900))
+}
