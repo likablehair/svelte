@@ -35,6 +35,7 @@
     width = "auto",
     height = "auto",
     maxWidth: string | undefined = undefined,
+    openingId: string = "autocomplete-menu",
 
     // menu
     menuBoxShadow = "rgb(var(--global-color-background-300), .5) 0px 2px 4px",
@@ -127,7 +128,6 @@
 
   let menuElement: HTMLElement;
   function handleWindowKeyDown(event: KeyboardEvent) { 
-    console.log(event.key)
     if (
       event.key == "ArrowDown" &&
       (focusedIndex === undefined || focusedIndex < filteredItems.length - 1)
@@ -242,6 +242,7 @@
     closeOnClickOutside
     bind:refreshPosition
     bind:menuElement
+    bind:openingId={openingId}
   >
     <div 
       class={clazz.menu || ''}

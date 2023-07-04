@@ -39,10 +39,12 @@
       duration: 100,
       y: 10,
     },
-    menuElement: HTMLElement | undefined = undefined;
+    menuElement: HTMLElement | undefined = undefined,
+    openingId: string | undefined = undefined;
 
   let zIndex = 50,
-    currentUid: string = createId();
+    currentUid: string = createId(),
+    closeController: HTMLElement;
 
   function calculateMenuPosition(params: {
     activator: HTMLElement;
@@ -97,6 +99,21 @@
   }
 
   $: if (open) {
+    if(!!openingId) {
+      const controllers = document.querySelectorAll(`[data-operation="close"][data-opening-id="${openingId}"]`)
+      for(let k = 0; k < controllers.length; k += 1) {
+        if(controllers[k] !== closeController) {
+          const clickEvent = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window
+          })
+
+          controllers[k].dispatchEvent(clickEvent)
+        }
+      }
+    }
+
     let otherMenus: NodeListOf<HTMLElement> =
       document.querySelectorAll("[data-menu=true]");
     let otherDialogs: NodeListOf<HTMLElement> =
@@ -173,8 +190,20 @@
     return getPositionedAncestor(elem.parentElement)
   }
 
+  function handleCloseControllerClick() {
+    open = false
+  }
+
 </script>
 
+<div 
+  class="controller" 
+  data-operation="close" 
+  data-opening-id={openingId} 
+  on:click={handleCloseControllerClick} 
+  on:keypress={handleCloseControllerClick}
+  bind:this={closeController}
+></div>
 {#if open}
   <div
     bind:this={menuElement}
@@ -196,3 +225,9 @@
     <slot />
   </div>
 {/if}
+
+<style>
+  .controller {
+    visibility: hidden;
+  }
+</style>
