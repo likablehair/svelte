@@ -11,7 +11,7 @@
   } = {};
 	export { clazz as class };
 
-  export let selectedDate: Date | undefined = undefined,
+  export let selectedDate: Date | undefined | null = undefined,
     visibleMonth: number = new Date().getMonth(),
     visibleYear: number = new Date().getFullYear(),
     locale: Locale = "it",

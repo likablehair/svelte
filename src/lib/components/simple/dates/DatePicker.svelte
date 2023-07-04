@@ -6,6 +6,7 @@
   import MonthSelector from "./MonthSelector.svelte";
   import Calendar from "./Calendar.svelte";
   import Button from "$lib/components/simple/buttons/Button.svelte";
+  import { createEventDispatcher } from 'svelte';
 
   let clazz: {
     container?: string,
@@ -16,12 +17,23 @@
 
   export let selectedYear: number = new Date().getFullYear(),
     selectedMonth: number = new Date().getMonth(),
-    selectedDate: Date = new Date(),
+    selectedDate: Date | null = new Date(),
+    visibleMonth: number = selectedMonth,
+    visibleYear: number = selectedYear,
     view: "year" | "month" | "day" = "day",
     locale: Locale = "it",
     selectableYears: number[] = [...Array(150).keys()].map(
       (i) => i + (new Date().getFullYear() - 75)
     )
+
+  let dispatch = createEventDispatcher<{
+    'year-click': {
+      year: number
+    },
+    'month-click': {
+      month: number
+    }
+  }>()
 
   let selectorText: string | undefined = undefined;
   let elementDisabled: "year" | "date" = "date";
@@ -30,35 +42,35 @@
   $: {
     selectorText =
       view == "day"
-        ? getMonthName(selectedMonth, locale) + " " + selectedYear
-        : selectedYear.toString();
+        ? getMonthName(visibleMonth, locale) + " " + visibleYear
+        : visibleYear.toString();
   }
   $: elementDisabled = view == "year" ? "year" : "date";
 
   function next() {
     if (view == "day") {
-      if (selectedMonth == 11) {
-        selectedMonth = 0;
-        selectedYear += 1;
+      if (visibleMonth == 11) {
+        visibleMonth = 0;
+        visibleYear += 1;
       } else {
-        selectedMonth += 1;
+        visibleMonth += 1;
       }
     } else {
-      if (selectedYear != selectableYears[selectableYears.length - 1])
-        selectedYear++;
+      if (visibleYear != selectableYears[selectableYears.length - 1])
+        visibleYear++;
     }
   }
 
   function previous() {
     if (view == "day") {
-      if (selectedMonth == 0) {
-        selectedMonth = 11;
-        selectedYear -= 1;
+      if (visibleMonth == 0) {
+        visibleMonth = 11;
+        visibleYear -= 1;
       } else {
-        selectedMonth -= 1;
+        visibleMonth -= 1;
       }
     } else {
-      if (selectedYear != selectableYears[0]) selectedYear--;
+      if (visibleYear != selectableYears[0]) visibleYear--;
     }
   }
 
@@ -68,10 +80,16 @@
   }
 
   function handleYearChange() {
+    dispatch('year-click', {
+      year: selectedYear
+    })
     view = "month";
   }
 
   function handleMonthChange() {
+    dispatch('month-click', {
+      month: selectedMonth
+    })
     view = "day";
   }
 </script>
@@ -89,7 +107,7 @@
       }}
       on:keypress={() => {
         view = "year";
-      }}>{selectedYear}</span
+      }}>{visibleYear}</span
     >
     <h2
       class:disabled={elementDisabled == "date"}
@@ -100,7 +118,9 @@
         view = "day";
       }}
     >
-      {dateToString(selectedDate, "dayAndMonth", locale)}
+      {#if !!selectedDate}
+        {dateToString(selectedDate, "dayAndMonth", locale)}
+      {/if}
     </h2>
   </div>
   <div class="body">
@@ -110,7 +130,7 @@
           <Button
             --button-background-color="transparent"
             buttonType="icon"
-            iconSize={25}
+            --icon-size="25pt"
             icon="mdi-chevron-left"
             on:click={previous}
           />
@@ -129,7 +149,7 @@
           <Button
             --button-background-color="transparent"
             buttonType="icon"
-            iconSize={25}
+            --icon-size="25pt"
             icon="mdi-chevron-right"
             on:click={next}
           />
@@ -140,14 +160,14 @@
       <MonthSelector
         --month-selector-height="calc((var(--date-picker-height, var(--date-picker-default-height)) / 8 * 5) - 10px)"
         --month-selector-width="var(--date-picker-width, var(--date-picker-default-width))"
-        bind:selectedMonth
+        bind:selectedMonth={visibleMonth}
         on:click={handleMonthChange}
         {locale}
       />
     {:else if view == "year"}
       <YearSelector
         --year-selector-height="calc(var(--date-picker-height, var(--date-picker-default-height)) / 8 * 6)"
-        bind:selectedYear
+        bind:selectedYear={visibleYear}
         {selectableYears}
         on:click={handleYearChange}
       />
@@ -155,8 +175,8 @@
       <Calendar
         --calendar-height="calc((var(--date-picker-height, var(--date-picker-default-height)) / 8 * 5) - 10px)"
         --calendar-width="var(--date-picker-width, var(--date-picker-default-width))"
-        bind:visibleMonth={selectedMonth}
-        bind:visibleYear={selectedYear}
+        bind:visibleMonth={visibleMonth}
+        bind:visibleYear={visibleYear}
         bind:selectedDate
         {locale}
         on:day-click

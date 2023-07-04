@@ -47,7 +47,6 @@
     iconSize: string = "12pt",
     hint: string | undefined = undefined,
     input: HTMLElement | undefined = undefined
-
 </script>
 
 <div
@@ -79,6 +78,7 @@
           on:keydown
           on:keypress
           on:keyup
+          on:change
           class={clazz.input || ''}
           bind:this={input}
         />
@@ -96,6 +96,7 @@
           on:keydown
           on:keypress
           on:keyup
+          on:change
           class={clazz.input || ''}
           bind:this={input}
         />
@@ -113,6 +114,7 @@
           on:keydown
           on:keypress
           on:keyup
+          on:change
           class={clazz.input || ''}
           bind:this={input}
         />

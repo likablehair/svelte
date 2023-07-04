@@ -36,6 +36,7 @@
     "@sveltejs/kit": "^1.5.0",
     "@sveltejs/package": "^2.0.0",
     "@types/lodash": "^4.14.192",
+    "@types/luxon": "^3.3.0",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "eslint": "^8.28.0",
@@ -59,7 +60,9 @@
     "esm-env": "^1.0.0",
     "highlight.js": "^11.7.0",
     "highlightjs-svelte": "^1.0.6",
-    "lodash": "^4.17.21"
+    "imask": "^7.1.0-alpha.0",
+    "lodash": "^4.17.21",
+    "luxon": "^3.3.0"
   },
   "typesVersions": {
     ">4.0": {
