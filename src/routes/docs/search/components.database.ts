@@ -67,6 +67,11 @@ let list: {
     status: 'stable',
     url: '/docs/components/simple-components/DatePicker'
   }, {
+    title: 'DatePickerTextField',
+    description: 'If you want a date, you\'ll have a date.',
+    status: 'stable',
+    url: '/docs/components/simple-components/DatePickerTextField'
+  }, {
     title: 'Autocomplete',
     description: 'Autocompletion out of the limits.',
     status: 'stable',

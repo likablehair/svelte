@@ -36,7 +36,8 @@
 
   page.subscribe(() => {
     if(autoDetectUrl) {
-      selected = getMenuNameMatchingUrl({ menus: menus })
+      const results = getMenuNameMatchingUrl({ menus: menus })
+      selected = results.name
     }
   })
 
@@ -87,21 +88,37 @@
 
   function getMenuNameMatchingUrl(params: {
     menus: Menu[]
-  }): string | number | undefined {
+  }): {
+    name: string | number | undefined,
+    matchType: 'startsWith' | 'equal' | undefined
+  } {
+    let foundName: string | number | undefined = undefined
+    let foundMatchType: 'startsWith' | 'equal' | undefined = undefined
+
     for(let i = 0; i < params.menus.length; i += 1) {
       let currentMenu = params.menus[i]
 
       if(!!currentMenu.children) {
-        let foundName = getMenuNameMatchingUrl({ menus: currentMenu.children })
-        if(foundName !== undefined) return foundName
-      } 
+        let found = getMenuNameMatchingUrl({ menus: currentMenu.children })
+        if(found.name !== undefined) {
+          foundName = found.name
+          foundMatchType = found.matchType
+        }
+      }
       
-      if(!!currentMenu.url && $page.url.pathname.startsWith(currentMenu.url)) {
-        return currentMenu.name
+      if(!!currentMenu.url && $page.url.pathname === currentMenu.url) {
+        foundName = currentMenu.name
+        foundMatchType = 'equal'
+      } else if(foundMatchType !== 'equal' && !!currentMenu.url && $page.url.pathname.startsWith(currentMenu.url)) {
+        foundName = currentMenu.name
+        foundMatchType = 'startsWith'
       }
     }
 
-    return undefined
+    return {
+      name: foundName,
+      matchType: foundMatchType
+    }
   }
 
   function handleUrlClick(e: Event, menu: Menu) {
