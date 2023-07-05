@@ -1,4 +1,5 @@
 <script lang="ts">
+  import '../../../../lib/css/main.css'
   import GlobalSearchTextField from "$lib/components/composed/search/GlobalSearchTextField.svelte";
   import StableDividedSideBarLayout from "$lib/components/layouts/StableDividedSideBarLayout.svelte";
   import SidebarMenuList from "$lib/components/simple/lists/SidebarMenuList.svelte";
@@ -9,7 +10,7 @@
   import colors from  "../../stores/colors";
   import { beforeNavigate, goto } from "$app/navigation";
   import componentDatabase from '../../search/components.database'
-  import CollapsibleSideBarLayout from "$lib/components/layouts/CollapsibleSideBarLayout.svelte";
+  import CollapsibleSideBarLayout from "$lib/components/layouts/NewCollapsibleSideBarLayout.svelte";
 
   let searchDialogOpened: boolean = false,
     drawerOpened: boolean = false
@@ -49,33 +50,33 @@
   partialLogo={logoPartial}
   menuItems={[
     {
-      id: 'home',
+      name: 'home',
       icon: "mdi-home",
-      name: "Home"
+      label: "Home"
     }, {
-      id: 'registry',
+      name: 'registry',
       icon: "mdi-domain",
-      name: "Elezioni"
+      label: "Elezioni"
     }, {
       marginTop: "20px",
       marginBottom: "20px",
       divider: true
     }, {
-      id: 'registration',
+      name: 'registration',
       icon: "mdi-clipboard-outline",
-      name: "Raccolta dati"
+      label: "Raccolta dati"
     }, {
-      id: 'monitor',
+      name: 'monitor',
       icon: "mdi-checkbox-marked-outline",
-      name: "Monitor"
+      label: "Monitor"
     }, {
       marginTop: "10px",
       marginBottom: "100px",
-      divider: false
+      divider: true
     }, {
-      id: 'settings',
+      name: 'settings',
       icon: "mdi-cog-outline",
-      name: "Configurazioni"
+      label: "Configurazioni"
     }
   ]}
 >

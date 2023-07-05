@@ -1,0 +1,7 @@
+:root {
+  --selectable-menu-list-default-divider-background-color: rgb(var(--global-color-background-500));
+  --selectable-menu-list-default-divider-height: 1px;
+  --selectable-menu-list-default-icon-gap: 10px;
+  --selectable-menu-list-default-spacing: 10px;
+  --selectable-menu-list-default-selected-color: rgb(var(--global-color-primary-500));
+}

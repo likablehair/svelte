@@ -181,14 +181,7 @@
       class:collapsed={drawerCollapsed}
     >
       <div
-        class="overlay"
-        on:click={handleOverlayClick}
-        on:keypress={handleOverlayClick}
-        class:visible={drawerOpened}
-      ></div>
-      <div
         style:padding={_pagePadding}
-        class:blurred={drawerOpened}
       >
         <slot>Content</slot>
       </div>
@@ -235,6 +228,12 @@
     overflow: hidden;
     white-space: nowrap;
     background-color: var(--collapsible-side-bar-layout-sidebar-background-color);
+  }
+
+  @media (max-width: 1023.98px) {
+  	.side-bar-content {
+      visibility: hidden
+    }
   }
 
   .side-bar.collapsed {
