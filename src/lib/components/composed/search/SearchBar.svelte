@@ -56,12 +56,12 @@
       placeholder="Find something..." 
       maxlength="512" 
       tabindex="0"
-      class="input {clazz.input}"
       bind:this={input}
       bind:value={value}
       on:input
       on:change
       on:keydown
+      class="input {clazz.input}"
     />
   </slot>
 </div>

@@ -70,13 +70,13 @@
 <button
   type={type}
   style:position
-  class="button no-select {clazz || ''}"
   class:button-default={buttonType === "default"}
   class:button-text={buttonType === "text"}
   class:button-icon={buttonType === "icon"}
   on:click={handleClick}
   on:keypress={handleKeyPress}
   tabindex={tabindex}
+  class="button no-select {clazz || ''}"
 >
   {#if loading}
     <div

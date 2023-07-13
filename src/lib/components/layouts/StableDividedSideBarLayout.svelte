@@ -52,12 +52,12 @@
     class={clazz.container || ''}
   >
     <header 
-      class="side-bar {clazz.header}"
       class:opened={drawerOpened}
+      class="side-bar {clazz.header}"
     >
       <div 
-        class="header-toolbar"
         class:opened-drawer={drawerOpened}
+        class="header-toolbar"
       >
         <slot name="menu">
           <div class="inner-menu">
@@ -84,10 +84,10 @@
     </header>
     <div class="main-section {clazz.mainSection || ''}">
       <div 
-        class="overlay {clazz.overlay || ''}"
         on:click={handleOverlayClick}
         on:keypress={handleOverlayClick}
         class:visible={drawerOpened}
+        class="overlay {clazz.overlay || ''}"
       ></div>
       <div
         class="content"
