@@ -6,6 +6,7 @@
   let clazz: {
     container?: string,
     row?: string,
+    field?: string,
     hint?: string,
     input?: string
   } = {};
@@ -59,7 +60,7 @@
         <Icon name={prependIcon} --icon-size={iconSize}></Icon>
       {/if}
     </slot>
-    <div class="textfield">
+    <div class="textfield {clazz.field || ''}">
       <slot name="prepend-inner" {prependInnerIcon} {iconSize}>
         {#if !!prependInnerIcon}
           <Icon name={prependInnerIcon} --icon-size={iconSize}></Icon>
@@ -220,6 +221,7 @@
       var(--simple-textfield-default-inner-gap)
     );
     display: flex;
+    flex-grow: 1;
   }
 
   .textfield:focus-within {
