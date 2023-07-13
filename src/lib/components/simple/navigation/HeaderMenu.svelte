@@ -1,4 +1,5 @@
 <script lang="ts">
+  import '$lib/css/main.css'
   import './HeaderMenu.css'
   import Button from "$lib/components/simple/buttons/Button.svelte";
   import Drawer from "$lib/components/simple/navigation/Drawer.svelte";

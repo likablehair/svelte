@@ -1,4 +1,5 @@
 <script lang="ts">
+  import '$lib/css/main.css'
   import './LinkButton.css'
   import { createEventDispatcher } from "svelte";
   import Icon from "../media/Icon.svelte";
@@ -27,7 +28,6 @@
     href: string,
     prependIcon: string | undefined = undefined,
     appendIcon: string | undefined = undefined,
-    iconSize: number | undefined = undefined,
     target: string | undefined = undefined
   
   const dispatch = createEventDispatcher<{
@@ -62,15 +62,15 @@
   rel={target == '_blank' ? 'noreferrer' : undefined}
   class="link {clazz}"
 >
-  <slot name="prepend" {prependIcon} {iconSize}>
+  <slot name="prepend" {prependIcon}>
     {#if !!prependIcon}
-      <Icon name={prependIcon} size={iconSize}></Icon>
+      <Icon name={prependIcon}></Icon>
     {/if}
   </slot>
   <slot></slot>
-  <slot name="append" {appendIcon} {iconSize}>
+  <slot name="append" {appendIcon}>
     {#if !!appendIcon}
-      <Icon name={appendIcon} size={iconSize}></Icon>
+      <Icon name={appendIcon}></Icon>
     {/if}
   </slot>
 </a>

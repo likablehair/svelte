@@ -1,4 +1,5 @@
 <script lang="ts">
+  import '$lib/css/main.css'
   import './DatePicker.css'
   import { getMonthName, dateToString } from "./utils";
   import type { Locale } from "./utils";

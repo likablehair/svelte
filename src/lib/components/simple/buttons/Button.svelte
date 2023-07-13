@@ -1,4 +1,5 @@
 <script lang="ts">
+  import '$lib/css/main.css'
   import './Button.css'
 
   let clazz: string = '';

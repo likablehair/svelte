@@ -1,19 +1,11 @@
 <script lang="ts">
-  import '../../../../lib/css/main.css'
-  import GlobalSearchTextField from "$lib/components/composed/search/GlobalSearchTextField.svelte";
-  import StableDividedSideBarLayout from "$lib/components/layouts/StableDividedSideBarLayout.svelte";
-  import SidebarMenuList from "$lib/components/simple/lists/SidebarMenuList.svelte";
-  import Navigator from "$lib/components/simple/navigation/Navigator.svelte";
   import logo from '../../logo.svg'
   import logoPartial from  '../../logo_partial.svg'
   import "../../../../app.css";
-  import colors from  "../../stores/colors";
   import { beforeNavigate, goto } from "$app/navigation";
-  import componentDatabase from '../../search/components.database'
-  import CollapsibleSideBarLayout from "$lib/components/layouts/NewCollapsibleSideBarLayout.svelte";
+  import CollapsibleSideBarLayout from "$lib/components/layouts/CollapsibleSideBarLayout.svelte";
 
-  let searchDialogOpened: boolean = false,
-    drawerOpened: boolean = false
+  let drawerOpened: boolean = false
 
   beforeNavigate(() => {
     drawerOpened = false
@@ -36,11 +28,6 @@
       }
       return el
     })
-  }
-
-  async function handleSearchSelect(event: CustomEvent<{element: { data?: { url: string }}}>) {
-    if(!!event.detail.element.data) goto(event.detail.element.data.url)
-    searchDialogOpened = false
   }
 </script>
 

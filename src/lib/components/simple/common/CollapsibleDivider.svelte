@@ -1,4 +1,5 @@
 <script lang="ts">
+  import '$lib/css/main.css'
   import './CollapsibleDivider.css'
   import { createEventDispatcher } from "svelte";
   import Icon from "../media/Icon.svelte";

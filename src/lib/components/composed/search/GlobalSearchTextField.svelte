@@ -1,4 +1,5 @@
 <script lang="ts">
+  import '$lib/css/main.css'
   import './GlobalSearchTextField.css'
   import Dialog from '$lib/components/simple/dialogs/Dialog.svelte'
   import { createEventDispatcher, onMount } from 'svelte';

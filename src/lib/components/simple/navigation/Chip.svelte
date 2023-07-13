@@ -1,4 +1,5 @@
 <script lang="ts">
+  import '$lib/css/main.css'
   import './Chip.css'
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import Button from "$lib/components/simple/buttons/Button.svelte";

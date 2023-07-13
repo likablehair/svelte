@@ -9,6 +9,7 @@
 </script>
 
 <script lang="ts">
+  import '$lib/css/main.css'
   import './SidebarMenuList.css'
   import { page } from "$app/stores";
 

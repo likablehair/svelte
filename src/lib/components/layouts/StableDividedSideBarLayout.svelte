@@ -1,4 +1,5 @@
 <script lang="ts">
+  import '$lib/css/main.css'
   import './StableDividedSideBarLayout.css'
   import MediaQuery from "$lib/components/simple/common/MediaQuery.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte"

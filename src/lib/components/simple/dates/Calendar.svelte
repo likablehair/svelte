@@ -1,4 +1,5 @@
 <script lang="ts">
+  import '$lib/css/main.css'
   import './Calendar.css'
   import { fly } from "svelte/transition";
   import { getDateRowsStats, getDaysNames } from "./utils";

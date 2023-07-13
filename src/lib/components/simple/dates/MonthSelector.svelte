@@ -1,4 +1,5 @@
 <script lang="ts">
+  import '$lib/css/main.css'
   import './MonthSelector.css'
   import type { Locale } from "./utils";
   import { getMonthName } from "./utils";

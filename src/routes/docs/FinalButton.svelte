@@ -18,7 +18,6 @@
       <LinkButton
         href={previousUrl}
         prependIcon="mdi-arrow-left"
-        iconSize={14}
       >Previous</LinkButton>
       <div class="link-title">{previousText}</div>
     </div>
@@ -28,7 +27,6 @@
       <LinkButton
         href={nextUrl}
         appendIcon="mdi-arrow-right"
-        iconSize={14}
       >Next</LinkButton>
       <div class="link-title">{nextText}</div>
     </div>

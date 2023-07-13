@@ -1,6 +1,4 @@
 <script lang="ts">
-  import '../../lib/css/main.css'
-  
   import GlobalSearchTextField from "$lib/components/composed/search/GlobalSearchTextField.svelte";
   import StableDividedSideBarLayout from "$lib/components/layouts/StableDividedSideBarLayout.svelte";
   import SidebarMenuList from "$lib/components/simple/lists/SidebarMenuList.svelte";

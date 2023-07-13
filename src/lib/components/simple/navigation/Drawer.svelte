@@ -1,4 +1,5 @@
 <script lang="ts">
+  import '$lib/css/main.css'
   import './Drawer.css'
   import Navigator from "$lib/components/simple/navigation/Navigator.svelte";
   import type { Item } from "$lib/components/simple/navigation/Navigator.svelte";
