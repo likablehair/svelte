@@ -10,7 +10,7 @@
 </script>
 
 <script lang="ts">
-  import '$lib/css/main.css'
+  import '../../../css/main.css'
   import './SearchResults.css'
   import SelectableVerticalList from "$lib/components/simple/lists/SelectableVerticalList.svelte";
 

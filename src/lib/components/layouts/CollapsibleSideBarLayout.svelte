@@ -1,5 +1,5 @@
 <script lang="ts">
-  import '$lib/css/main.css'
+  import '../../css/main.css'
   import './CollapsibleSideBarLayout.css'
   import { createEventDispatcher } from "svelte";
   import CollapsibleDivider from "../simple/common/CollapsibleDivider.svelte";

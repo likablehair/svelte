@@ -1,5 +1,5 @@
 <script lang="ts">
-  import '$lib/css/main.css'
+  import '../../../css/main.css'
   import './SimpleTextField.css'
   import Icon from "../media/Icon.svelte";
 

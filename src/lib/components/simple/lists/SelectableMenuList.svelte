@@ -19,7 +19,7 @@
 </script>
 
 <script lang="ts">
-  import '$lib/css/main.css'
+  import '../../../css/main.css'
   import './SelectableMenuList.css'
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import { createEventDispatcher } from 'svelte';

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import '$lib/css/main.css'
+  import '../../../css/main.css'
   import './YearSelector.css'
   import { scrollAtCenter } from "$lib/components/simple/common/scroller";
   import { createEventDispatcher, onMount } from "svelte";

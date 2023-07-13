@@ -8,7 +8,7 @@
 </script>
 
 <script lang="ts">
-  import '$lib/css/main.css'
+  import '../../../css/main.css'
   import './Autocomplete.css'
 
   let clazz: {
