@@ -1,0 +1,14 @@
+:root {
+  --collapsible-divider-default-margin-right: .0rem;
+  --collapsible-divider-default-margin-left: .5rem;
+  --collapsible-divider-default-margin-top: .5rem;
+  --collapsible-divider-default-margin-bottom: .5rem;
+  --collapsible-divider-default-background-color: rgb(var(--global-color-contrast-500), .5);
+  --collapsible-divider-default-line-border-radius: .5rem;
+  --collapsible-divider-default-line-height: .1rem;
+  --collapsible-divider-default-button-border-radius: 9999px;
+  --collapsible-divider-default-button-border: .1rem solid;
+  --collapsible-divider-default-button-border-color: rgb(var(--global-color-contrast-500), .5);
+  --collapsible-divider-default-button-height: 25px;
+  --collapsible-divider-default-button-width: 25px;
+}

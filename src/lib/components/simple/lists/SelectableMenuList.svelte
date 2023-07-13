@@ -3,7 +3,8 @@
     divider: true,
     marginTop?: string,
     marginBottom?: string,
-    marginRight?: string
+    marginRight?: string,
+    marginLeft?: string
   }
 
   type Item = {
@@ -58,15 +59,21 @@
           on:keypress={() => { if(!item.divider) handleItemClick(item) }}
         >
           <div class="menu-icon">
-            <Icon name={item.icon}></Icon>
+            <Icon 
+              name={item.icon}
+              --icon-default-size="1.5rem"
+            ></Icon>
           </div>
-          <div class="menu-name">{item.label}</div>
+          {#if !collapsed}
+            <div class="menu-name">{item.label}</div>
+          {/if}
         </li>
       {:else}
         <div
           style:margin-top={item.marginTop}
           style:margin-bottom={item.marginBottom}
           style:margin-right={item.marginRight}
+          style:margin-left={item.marginLeft}
           class="divider"
         ></div>
       {/if}
@@ -77,11 +84,12 @@
 <style>
   ul {
     list-style: none;
-    padding-left: 1rem;
+    padding-left: 0rem;
     position: relative;
     line-height: 1rem;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     gap: var(
       --selectable-menu-list-spacing,
       var(--selectable-menu-list-default-spacing)
@@ -95,6 +103,11 @@
       var(--selectable-menu-list-default-icon-gap)
     );
     cursor: pointer;
+    padding-left: .8rem;
+  }
+
+  .menu-name {
+    white-space: nowrap;
   }
 
   .menu-row.disabled {

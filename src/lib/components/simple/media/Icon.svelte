@@ -17,8 +17,14 @@
 
 <style>
   .icon {
-    font-size: var(--icon-size);
-    color: var(--icon-color);
+    font-size: var(
+      --icon-size,
+      var(--icon-default-size)
+    );
+    color: var(
+      --icon-color,
+      var(--icon-default-color)
+    );
   }
   .icon.click {
     cursor: var(--icon-cursor, pointer);

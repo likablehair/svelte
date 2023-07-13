@@ -16,13 +16,18 @@
   }>()
 
   export let menuOpened: boolean = false,
-    openingId: string = 'date-picker-text-field'
+    openingId: string = 'date-picker-text-field',
+    pattern: string = "dd/MM/yyyy",
+    selectedMonth: number | undefined = undefined,
+    selectedYear: number | undefined = undefined,
+    visibleMonth: number | undefined = undefined,
+    visibleYear: number | undefined = undefined,
+    selectedDate: Date | undefined = undefined
 
   let activator: HTMLElement,
     refreshPosition = false,
     menuElement: HTMLElement,
     inputElement: HTMLElement,
-    pattern: string = "dd/MM/yyyy",
     mask: InputMask<typeof maskFactoryArgs> | { value: string | undefined } = {
       value: undefined
     },
@@ -62,12 +67,7 @@
           to: 59
         }
       }
-    },
-    selectedMonth: number | undefined = undefined,
-    selectedYear: number | undefined = undefined,
-    visibleMonth: number | undefined = undefined,
-    visibleYear: number | undefined = undefined,
-    selectedDate: Date | undefined = undefined
+    }
 
   function handleTextFieldFocus() {
     menuOpened = true

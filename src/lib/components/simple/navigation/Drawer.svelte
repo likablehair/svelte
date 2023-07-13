@@ -1,94 +1,26 @@
 <script lang="ts">
+  import './Drawer.css'
   import Navigator from "$lib/components/simple/navigation/Navigator.svelte";
   import type { Item } from "$lib/components/simple/navigation/Navigator.svelte";
 
   export let open = false,
     position: "left" | "top" | "right" | "bottom" = "left",
-    space = "200px",
-    openingSpeed = "0.3s",
-    overlaySpeed = "0.2s",
-    color: string | undefined = undefined,
     overlay = true,
-    backgroundColor: string | undefined = undefined,
-    overlayColor = "#282828",
-    overlayOpacity = "30%",
-    zIndex = 30,
     items: Item[] = [];
-
-  let height: string | undefined = undefined,
-    width: string | undefined = undefined,
-    top: string | undefined = undefined,
-    bottom: string | undefined = undefined,
-    left: string | undefined = undefined,
-    right: string | undefined = undefined;
 
   function handleClickOverlay() {
     open = false;
   }
-
-  $: if (position == "left") {
-    height = "100vh";
-    width = space;
-    top = "0px";
-    bottom = undefined;
-    right = undefined;
-
-    if (open) {
-      left = `0px`;
-    } else {
-      left = `-${space}`;
-    }
-  } else if (position == "right") {
-    height = "100vh";
-    width = space;
-    top = "0px";
-    bottom = undefined;
-    left = "auto";
-
-    if (open) {
-      right = `0px`;
-    } else {
-      right = `calc(0vw - ${space})`;
-    }
-  } else if (position == "top") {
-    height = space;
-    width = "100vw";
-    bottom = undefined;
-    left = "0px";
-    right = undefined;
-
-    if (open) {
-      top = `0px`;
-    } else {
-      top = `-${space}`;
-    }
-  } else if (position == "bottom") {
-    height = space;
-    width = "100vw";
-    top = "auto";
-    left = "0px";
-    right = undefined;
-
-    if (open) {
-      bottom = `0px`;
-    } else {
-      bottom = `calc(0vh - ${space})`;
-    }
-  }
 </script>
 
 <div
-  style:--drawer-opening-speed={openingSpeed}
   style:position="fixed"
-  style:height
-  style:width
-  style:top
-  style:bottom
-  style:left
-  style:right
-  style:background-color={backgroundColor}
-  style:z-index={zIndex}
-  style:color
+  class="container"
+  class:left={position == 'left'}
+  class:right={position == 'right'}
+  class:top={position == 'top'}
+  class:bottom={position == 'bottom'}
+  class:opened={open}
   class:animate-left={position == "left"}
   class:animate-right={position == "right"}
   class:animate-bottom={position == "bottom"}
@@ -118,15 +50,6 @@
   <div
     on:click={handleClickOverlay}
     on:keypress={handleClickOverlay}
-    style:z-index={open ? zIndex - 1 : -5}
-    style:position="fixed"
-    style:top="0px"
-    style:left="0px"
-    style:width="100vw"
-    style:height="100vh"
-    style:background-color={overlayColor}
-    style:--drawer-overlay-opacity={overlayOpacity}
-    style:--drawer-overlay-speed={overlaySpeed}
     class="overlay"
     class:overlay-active={open}
     class:overlay-hidden={!open}
@@ -135,30 +58,96 @@
 
 <style>
   .animate-left {
-    transition: left var(--drawer-opening-speed) cubic-bezier(0.4, 0, 0.2, 1);
+    transition: left var(--drawer-opening-speed, var(--drawer-default-opening-speed)) cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .animate-right {
-    transition: right var(--drawer-opening-speed) cubic-bezier(0.4, 0, 0.2, 1);
+    transition: right var(--drawer-opening-speed, var(--drawer-default-opening-speed)) cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .animate-bottom {
-    transition: bottom var(--drawer-opening-speed) cubic-bezier(0.4, 0, 0.2, 1);
+    transition: bottom var(--drawer-opening-speed, var(--drawer-default-opening-speed)) cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .animate-top {
-    transition: top var(--drawer-opening-speed) cubic-bezier(0.4, 0, 0.2, 1);
+    transition: top var(--drawer-opening-speed, var(--drawer-default-opening-speed)) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .container {
+    z-index: var(--drawer-z-index, var(--drawer-default-z-index));
+    background-color: var(
+      --drawer-background-color,
+      var(--drawer-default-background-color)
+    );
+    color: var(--drawer-color, var(--drawer-default-color));
   }
 
   .overlay {
-    transition: all var(--drawer-overlay-speed) cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--drawer-overlay-speed, var(--drawer-default-overlay-speed)) cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: var(
+      --drawer-overlay-background-color,
+      var(--drawer-default-overlay-background-color)
+    );
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 100vh;
   }
 
   .overlay-active {
-    opacity: var(--drawer-overlay-opacity);
+    opacity: var(
+      --drawer-overlay-opacity,
+      var(--drawer-default-overlay-opacity)
+    );
+    z-index: calc(var(--drawer-z-index, var(--drawer-default-z-index)) - 1);
   }
 
   .overlay-hidden {
     opacity: 0%;
+  }
+
+  .left {
+    left: calc(0px - var(--drawer-space, var(--drawer-default-space)));
+    width: var(--drawer-space, var(--drawer-default-space));
+    bottom: 0px;
+    top: 0px;
+  }
+
+  .left.opened {
+    left: 0px;
+  }
+
+  .right {
+    right: calc(0px - var(--drawer-space, var(--drawer-default-space)));
+    width: var(--drawer-space, var(--drawer-default-space));
+    bottom: 0px;
+    top: 0px;
+  }
+
+  .right.opened {
+    right: calc(0px);
+  }
+
+  .top {
+    left: 0px;
+    right: 0px;
+    height: var(--drawer-space, var(--drawer-default-space));
+    top: calc(0px - var(--drawer-space, var(--drawer-default-space)));
+  }
+
+  .top.opened {
+    top: 0px;
+  }
+
+  .bottom {
+    left: 0px;
+    right: 0px;
+    height: var(--drawer-space, var(--drawer-default-space));
+    bottom: calc(0px - var(--drawer-space, var(--drawer-default-space)));
+  }
+
+  .bottom.opened {
+    bottom: 0px;
   }
 </style>

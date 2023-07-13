@@ -1,0 +1,9 @@
+:root {
+  --drawer-default-space: 20rem;
+  --drawer-default-opening-speed: .3s;
+  --drawer-default-overlay-speed: .2s;
+  --drawer-default-overlay-opacity: 50%;
+  --drawer-default-overlay-background-color: rgb(var(--global-color-grey-900));
+  --drawer-default-z-index: 30;
+  --drawer-background-color: rgb(var(--global-color-background-200))
+}
