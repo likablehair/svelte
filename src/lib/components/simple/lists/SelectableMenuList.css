@@ -4,4 +4,6 @@
   --selectable-menu-list-default-icon-gap: 10px;
   --selectable-menu-list-default-spacing: 1.5rem;
   --selectable-menu-list-default-selected-color: rgb(var(--global-color-primary-400));
+  --selectable-menu-list-default-margin-block-start: 1rem;
+  --selectable-menu-list-default-margin-block-end: 1rem;
 }

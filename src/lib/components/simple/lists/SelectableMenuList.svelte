@@ -95,6 +95,14 @@
       --selectable-menu-list-spacing,
       var(--selectable-menu-list-default-spacing)
     );
+    margin-block-start: var(
+      --selectable-menu-list-margin-block-start,
+      var(--selectable-menu-list-default-margin-block-start)
+    );
+    margin-block-end: var(
+      --selectable-menu-list-margin-block-end,
+      var(--selectable-menu-list-default-margin-block-end)
+    );
   }
 
   .menu-row {

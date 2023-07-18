@@ -80,12 +80,18 @@
         <div 
           slot="drawer" 
           style:padding="0px 10px 10px 0px"
+          style:height="100%"
+          style:display="flex"
+          style:flex-direction="column"
         >
           <SelectableMenuList
             items={menuItems}
             collapsed={false}
             selected={selectedMenuElementName}
           ></SelectableMenuList>
+          <div class="sidebar-footer">
+            <slot name="sidebar-footer" collapsed={false}></slot>
+          </div>
         </div>
       </HeaderMenu>
     </div>
