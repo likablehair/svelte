@@ -64,7 +64,7 @@
         on:change={handleCollpsabledDividerChange}
       ></CollapsibleDivider>
       <div class="sidebar-footer">
-        <slot name="sidebar-footer" collapsed={drawerCollapsed}></slot>
+        <slot name="sidebar-footer" collapsed={drawerCollapsed} drawer={false}></slot>
       </div>
     </div>
     <div class="header-menu">
@@ -90,7 +90,7 @@
             selected={selectedMenuElementName}
           ></SelectableMenuList>
           <div class="sidebar-footer">
-            <slot name="sidebar-footer" collapsed={false}></slot>
+            <slot name="sidebar-footer" collapsed={false} drawer={true}></slot>
           </div>
         </div>
       </HeaderMenu>
