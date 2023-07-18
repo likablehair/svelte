@@ -10,25 +10,6 @@
   beforeNavigate(() => {
     drawerOpened = false
   })
-
-  async function search(params: { searchText: string }): Promise<{ title: string, name: string, subtitle: string, data?: any }[]> {
-    let response = await fetch('/docs/search?text=' + params.searchText)
-    let results = await response.json()
-    return results.map((el: {
-      title: string,
-      name: string,
-      data?: any,
-      url?: string,
-      description: string,
-      subtitle?: string
-    }) => {
-      el.subtitle = el.url
-      el.data = {
-        url: el.url
-      }
-      return el
-    })
-  }
 </script>
 
 <CollapsibleSideBarLayout
@@ -64,6 +45,12 @@
       Pagina
     </div>
   </div>
+  <svelte:fragment slot="sidebar-footer" let:collapsed>
+    <div style:display="flex" style:flex-direction="column" style:height="100%">
+      <div style:flex-grow="1">sidebar-footer: collapsed: {collapsed}</div>
+      <div>in fondo</div>
+    </div>
+  </svelte:fragment>
 </CollapsibleSideBarLayout>
 
 <style>

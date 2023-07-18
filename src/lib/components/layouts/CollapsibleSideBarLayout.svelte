@@ -63,6 +63,9 @@
         bind:collapsed={drawerCollapsed}
         on:change={handleCollpsabledDividerChange}
       ></CollapsibleDivider>
+      <div class="sidebar-footer">
+        <slot name="sidebar-footer" collapsed={drawerCollapsed}></slot>
+      </div>
     </div>
     <div class="header-menu">
       <HeaderMenu
@@ -106,6 +109,8 @@
       var(--collapsible-side-bar-layout-default-sidebar-width)
     );
     transition: width .3s cubic-bezier(0.075, 0.82, 0.165, 1);
+    display: flex;
+    flex-direction: column;
   }
 
   .sidebar.collapsed {
@@ -149,6 +154,7 @@
   .logo-container {
     padding-left: 16px;
     padding-top: 10px;
+    padding-bottom: 10px;
     transition-property: width padding-left;
     transition-timing-function: cubic-bezier(.4,0,.2,1);
     transition-duration: var(--collapsible-side-bar-layout-collapse-transition-time);
@@ -172,5 +178,9 @@
 
   .header-logo-container img {
     height: 3rem;
+  }
+
+  .sidebar-footer {
+    flex-grow: 1;
   }
 </style>
