@@ -52,7 +52,7 @@ export { default as ProductCard } from './components/composed/shop/ProductCard.s
 export { default as ProductsGrid } from './components/composed/shop/ProductsGrid.svelte'
 
 export { default as mediaQuery } from './stores/mediaQuery'
-export { default as theme } from './stores/theme'
+export { default as theme, toggleTheme, setTheme } from './stores/theme'
 
 export { default as SimpleTimeLine } from './components/simple/timeline/SimpleTimeLine.svelte'
 
