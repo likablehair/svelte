@@ -87,8 +87,6 @@ export function toggleTheme() {
 let styleTag: HTMLStyleElement
 theme.subscribe(value => {
   if(BROWSER) {
-
-
     if (!value.disabled) {
       const headTag = document.getElementsByTagName('head')[0];
       styleTag = document.createElement("style");
