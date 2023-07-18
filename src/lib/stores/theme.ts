@@ -15,12 +15,22 @@ export type Shades = {
 }
 
 type Colors = Record<string, {
-  background?: Shades,
-  contrast?: Shades,
-  primary?: Shades,
-  secondary?: Shades,
-  error?: Shades,
-  warning?: Shades,
+  dark: {
+    background?: Shades,
+    contrast?: Shades,
+    primary?: Shades,
+    secondary?: Shades,
+    error?: Shades,
+    warning?: Shades,
+  },
+  light: {
+    background?: Shades,
+    contrast?: Shades,
+    primary?: Shades,
+    secondary?: Shades,
+    error?: Shades,
+    warning?: Shades,
+  }
 }>
 
 type ThemeStore = {
@@ -31,8 +41,8 @@ type ThemeStore = {
 }
 
 const theme = writable<ThemeStore>({
-  active: 'light',
-  disabled: true,
+  active: 'default',
+  disabled: false,
   dark: false
 });
 
@@ -46,6 +56,16 @@ if(BROWSER) {
     })
   } else if (savedTheme == 'light') {
     document.documentElement.classList.add("light")
+    theme.update((v) => {
+      v.dark = false
+      return v
+    })
+  } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    theme.update((v) => {
+      v.dark = true
+      return v
+    })
+  } else {
     theme.update((v) => {
       v.dark = false
       return v
@@ -93,7 +113,7 @@ theme.subscribe(value => {
   
       let styleBuilder = `:root {`
       if(!!value.colors) {
-        const activeTheme = value.active || 'light'
+        const activeTheme = value.active || 'default'
         if(!!value.colors[activeTheme]) {
           for (const [colorType, shades] of Object.entries(value.colors[activeTheme])) {
             for(const [shade, color] of Object.entries(shades)) {
