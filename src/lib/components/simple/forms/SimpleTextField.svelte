@@ -47,6 +47,7 @@
     prependIcon: string | undefined = undefined,
     prependInnerIcon: string | undefined = undefined,
     iconSize: string = "12pt",
+    name: string | undefined = undefined,
     hint: string | undefined = undefined,
     input: HTMLElement | undefined = undefined
 </script>
@@ -81,6 +82,7 @@
           on:keypress
           on:keyup
           on:change
+          name={name}
           class={clazz.input || ''}
           bind:this={input}
         />
@@ -99,6 +101,7 @@
           on:keypress
           on:keyup
           on:change
+          name={name}
           class={clazz.input || ''}
           bind:this={input}
         />
@@ -117,6 +120,7 @@
           on:keypress
           on:keyup
           on:change
+          name={name}
           class={clazz.input || ''}
           bind:this={input}
         />
@@ -135,6 +139,7 @@
           on:keypress
           on:keyup
           on:change
+          name={name}
           class={clazz.input || ''}
           bind:this={input}
         />
@@ -153,6 +158,7 @@
           on:keypress
           on:keyup
           on:change
+          name={name}
           class={clazz.input || ''}
           bind:this={input}
         />
