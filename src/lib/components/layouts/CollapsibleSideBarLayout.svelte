@@ -164,6 +164,7 @@
     transition-property: width padding-left;
     transition-timing-function: cubic-bezier(.4,0,.2,1);
     transition-duration: var(--collapsible-side-bar-layout-collapse-transition-time);
+    overflow: hidden;
   }
 
   .logo-container.collapsed {

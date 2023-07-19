@@ -38,7 +38,7 @@
   */
 
   export let value: string | number | undefined = undefined,
-    type: "text" | "password" | "number" = "text",
+    type: "text" | "password" | "number" | "time" | "date" = "text",
     placeholder: string | undefined = undefined,
     disabled: boolean = false,
     readonly: boolean = false,
@@ -107,6 +107,42 @@
           bind:value={value}
           placeholder={placeholder}
           type="number"
+          disabled={disabled}
+          readonly={readonly}
+          on:change
+          on:input
+          on:focus
+          on:blur
+          on:keydown
+          on:keypress
+          on:keyup
+          on:change
+          class={clazz.input || ''}
+          bind:this={input}
+        />
+      {:else if type == "time"}
+        <input
+          bind:value={value}
+          placeholder={placeholder}
+          type="time"
+          disabled={disabled}
+          readonly={readonly}
+          on:change
+          on:input
+          on:focus
+          on:blur
+          on:keydown
+          on:keypress
+          on:keyup
+          on:change
+          class={clazz.input || ''}
+          bind:this={input}
+        />
+      {:else if type == "date"}
+        <input
+          bind:value={value}
+          placeholder={placeholder}
+          type="date"
           disabled={disabled}
           readonly={readonly}
           on:change
@@ -262,4 +298,9 @@
     );
     border: none
   }
+
+  ::-webkit-calendar-picker-indicator {
+    opacity: 0;
+  }
+
 </style>
