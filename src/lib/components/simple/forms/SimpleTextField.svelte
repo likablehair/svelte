@@ -203,7 +203,10 @@
       --simple-textfield-background-color,
       var(--simple-textfield-default-background-color)
     );
-    border: none;
+    border: var(
+      --simple-textfield-border,
+      var(--simple-textfield-default-border)
+    );
     border-radius: var(
       --simple-textfield-border-radius,
       var(--simple-textfield-default-border-radius)
