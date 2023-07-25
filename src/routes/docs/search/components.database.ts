@@ -81,6 +81,11 @@ let list: {
     description: 'Cheap Chip.',
     status: 'stable',
     url: '/docs/components/simple-components/Chip'
+  }, {
+    title: 'TabSwitcher',
+    description: 'Switch to a new tab, switch to a new life.',
+    status: 'stable',
+    url: '/docs/components/simple-components/TabSwitcher'
   }
 ]
 

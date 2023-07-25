@@ -8,15 +8,20 @@
 
 <script lang="ts">
   import { afterUpdate, onMount } from "svelte";
+  import './TabSwitcher.css'
+
+  let clazz: {
+    container?: string,
+    tabs?: string,
+    selected?: string,
+    bookmark?: string,
+    guide?: string
+  } = {};
+	export { clazz as class };
 
   export let tabs: Tab[] = [],
     selected: string | undefined = undefined,
-    mandatory = true,
-    width: string | undefined = undefined,
-    color = "rgb(51 65 85)",
-    bookmarkColor: string | undefined = undefined,
-    horizontalGuideColor = "rgb(51 65 85)",
-    margin = "12px";
+    mandatory = true
 
   let tabButtons: Record<string, HTMLElement> = {};
   onMount(() => {
@@ -77,23 +82,12 @@
 </script>
 
 <div
-  style:position="relative"
-  style:display="flex"
-  style:flex-wrap="nowrap"
-  style:overflow="auto"
-  style:width
+  class="{clazz.container || ''} tabs-container"
 >
   {#each tabs as tab}
     <div
-      style:word-break="keep-all"
-      style:white-spaces="nowrap"
-      style:-webkit-tap-highlight-color="rgba(0,0,0,0)"
-      style:cursor="pointer"
-      style:margin-left={margin}
-      style:margin-right={margin}
-      style:padding="8px"
-      style:--tab-switcher-color={color}
       class:selected-tab={tab.name == selected}
+      class="tab-label {clazz.tabs || ''} {tab.name == selected ? clazz.selected || '' : ''}"
       on:click={(event) => handleTabClick(tab, event)}
       on:keypress={(event) => handleTabKeypress(tab, event)}
       bind:this={tabButtons[tab.name]}
@@ -113,19 +107,34 @@
   <span
     style:left={bookmarkLeft + "px"}
     style:width={bookmarkWidth + "px"}
-    style:--tab-switcher-bookmark-color={bookmarkColor || color}
-    class="bookmark"
+    class="{clazz.bookmark || ''} bookmark"
   />
   <span
-    style:--tab-switcher-horizontal-guide-color={horizontalGuideColor || color}
-    style:width
-    class="horizontal-guide"
+    class="{clazz.guide || ''} horizontal-guide"
   />
 </div>
 
 <style>
+  .tabs-container {
+    position: relative;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow: auto;
+    gap: var(
+      --tab-switcher-gap,
+      var(--tab-switcher-default-gap)
+    );
+    width: var(
+      --tab-switcher-width,
+      var(--tab-switcher-default-width)
+    );
+  }
+
   .selected-tab {
-    color: var(--tab-switcher-color, rgb(51 65 85));
+    color: var(
+      --tab-switcher-selected-color,
+      var(--tab-switcher-default-selected-color)
+    );
   }
 
   .horizontal-guide {
@@ -133,8 +142,23 @@
     z-index: 5;
     bottom: 0px;
     height: 1px;
-    background-color: var(--tab-switcher-horizontal-guide-color, rgb(51 65 85));
+    background-color: var(
+      --tab-switcher-guide-color,
+      var(--tab-switcher-default-guide-color)
+    );
     opacity: 20%;
+    width: var(
+      --tab-switcher-width,
+      var(--tab-switcher-default-width)
+    );
+  }
+
+  .tab-label {
+    word-break: keep-all;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    cursor: pointer;
+    padding: 8px;
   }
 
   .bookmark {
@@ -145,7 +169,7 @@
     z-index: 10;
     background-color: var(
       --tab-switcher-bookmark-color,
-      var(--tab-switcher-color, rgb(51 65 85))
+      var(--tab-switcher-default-bookmark-color)
     );
     transition: left 400ms, width 400ms;
   }

@@ -1,0 +1,7 @@
+:root {
+  --tab-switcher-default-selected-color: rgb(var(--global-color-primary-400));
+  --tab-switcher-default-guide-color: rgb(var(--global-color-contrast-200));
+  --tab-switcher-default-bookmark-color: rgb(var(--global-color-primary-400));
+  --tab-switcher-default-gap: 1rem;
+  --tab-switcher-default-width: 100%;
+}
