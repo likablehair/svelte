@@ -12,6 +12,7 @@ export { default as Calendar } from './components/simple/dates/Calendar.svelte'
 export { default as DatePicker } from './components/simple/dates/DatePicker.svelte'
 export { default as MonthSelector } from './components/simple/dates/MonthSelector.svelte'
 export { default as TimePickerTextField } from './components/simple/dates/TimePickerTextField.svelte'
+export { default as DatePickerTextField } from './components/simple/dates/DatePickerTextField.svelte'
 export { default as YearSelector } from './components/simple/dates/YearSelector.svelte'
 
 export { default as Dialog } from './components/simple/dialogs/Dialog.svelte'
