@@ -138,6 +138,7 @@
 
 <div 
   bind:this={activator}
+  style:width="fit-content"
 >
   <SimpleTextField
     bind:value={mask.value}
@@ -145,12 +146,26 @@
     on:keypress={handleInputChange}
     bind:input={inputElement}
   >
-    <svelte:fragment slot="prepend-inner">
-      <Icon 
-        name="mdi-calendar"
-        click
-        on:click={() => menuOpened = !menuOpened}
-      ></Icon>
+    <svelte:fragment slot="prepend-inner" let:prependInnerIcon let:iconSize>
+      <slot name="prepend-inner" {prependInnerIcon} {iconSize}>
+        <Icon 
+          name="mdi-calendar"
+          click
+          on:click={() => menuOpened = !menuOpened}
+        ></Icon>
+      </slot>
+    </svelte:fragment>
+    <svelte:fragment slot="append-inner" let:appendInnerIcon let:iconSize>
+      <slot name="append-inner" {appendInnerIcon} {iconSize}>
+      </slot>
+    </svelte:fragment>
+    <svelte:fragment slot="prepend" let:prependIcon let:iconSize>
+      <slot name="append-inner" {prependIcon} {iconSize}>
+      </slot>
+    </svelte:fragment>
+    <svelte:fragment slot="append" let:appendIcon let:iconSize>
+      <slot name="append-inner" {appendIcon} {iconSize}>
+      </slot>
     </svelte:fragment>
   </SimpleTextField>
 </div>
