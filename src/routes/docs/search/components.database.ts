@@ -86,6 +86,11 @@ let list: {
     description: 'Switch to a new tab, switch to a new life.',
     status: 'stable',
     url: '/docs/components/simple-components/TabSwitcher'
+  }, {
+    title: 'ColorInvertedSelector',
+    description: 'A selector with inversion.',
+    status: 'stable',
+    url: '/docs/components/simple-components/ColorInvertedSelector'
   }
 ]
 

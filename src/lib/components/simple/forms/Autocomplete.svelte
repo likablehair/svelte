@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
   export type Item = {
-    value: string;
-    label?: string;
+    value: string | number;
+    label?: string | number;
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     data?: any;
   };
@@ -170,7 +170,7 @@
     focusedIndex = undefined;
     filteredItems = items.filter((it) => {
       if (searchFunction) return searchFunction(it, searchText);
-      else return it.label?.toLowerCase().includes(searchText.toLowerCase());
+      else return it.label?.toString().toLowerCase().includes(searchText.toLowerCase());
     });
   } else {
     filteredItems = items;

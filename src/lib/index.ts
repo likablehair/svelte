@@ -28,6 +28,10 @@ export { default as SimpleTextField } from './components/simple/forms/SimpleText
 export { default as VerticalSwitch } from './components/simple/forms/VerticalSwitch.svelte'
 export { default as VerticalTextSwitch } from './components/simple/forms/VerticalTextSwitch.svelte'
 
+export { default as ColorInvertedSelector } from './components/simple/lists/ColorInvertedSelector.svelte'
+export { default as SelectableMenuList } from './components/simple/lists/SelectableMenuList.svelte'
+export { default as SidebarMenuList } from './components/simple/lists/SidebarMenuList.svelte'
+
 export { default as CircularLoader } from './components/simple/loaders/CircularLoader.svelte'
 export { default as Skeleton } from './components/simple/loaders/Skeleton.svelte'
 
