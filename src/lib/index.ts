@@ -6,7 +6,6 @@ export { default as IntersectionObserver } from './components/simple/common/Inte
 export { default as MediaQuery } from './components/simple/common/MediaQuery.svelte'
 export { default as Menu } from './components/simple/common/Menu.svelte'
 export { scrollAtCenter as scrollAtCenter } from './components/simple/common/scroller'
-export { default as SimpleTable } from './components/simple/lists/SimpleTable.svelte'
 
 export { default as Calendar } from './components/simple/dates/Calendar.svelte'
 export { default as DatePicker } from './components/simple/dates/DatePicker.svelte'
@@ -31,6 +30,7 @@ export { default as VerticalTextSwitch } from './components/simple/forms/Vertica
 export { default as ColorInvertedSelector } from './components/simple/lists/ColorInvertedSelector.svelte'
 export { default as SelectableMenuList } from './components/simple/lists/SelectableMenuList.svelte'
 export { default as SidebarMenuList } from './components/simple/lists/SidebarMenuList.svelte'
+export { default as SimpleTable } from './components/simple/lists/SimpleTable.svelte'
 
 export { default as CircularLoader } from './components/simple/loaders/CircularLoader.svelte'
 export { default as Skeleton } from './components/simple/loaders/Skeleton.svelte'
@@ -55,6 +55,8 @@ export { default as ProgressBar } from './components/simple/progress/ProgressBar
 
 export { default as ProductCard } from './components/composed/shop/ProductCard.svelte'
 export { default as ProductsGrid } from './components/composed/shop/ProductsGrid.svelte'
+
+export { default as PaginatedTable } from './components/composed/list/PaginatedTable.svelte'
 
 export { default as mediaQuery } from './stores/mediaQuery'
 export { default as theme, toggleTheme, setTheme } from './stores/theme'

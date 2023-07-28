@@ -194,7 +194,7 @@
   on:keypress={handleContainerClick}
   class={clazz.activator || ''}
 >
-  <slot name="selection-container">
+  <slot name="selection-container" {values} {searchText} {disabled} {activator}>
     <div
       class="selection-container"
     >

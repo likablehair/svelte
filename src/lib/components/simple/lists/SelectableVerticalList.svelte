@@ -12,15 +12,7 @@
   import keyboarder from "$lib/utils/keyboarder";
   import { createEventDispatcher, onMount } from "svelte";
 
-  export let elementPadding: string = ".75rem 1rem .75rem 1rem",
-    elementCursor: string = "pointer",
-    width: string | undefined = undefined,
-    maxWidth: string | undefined = undefined,
-    height: string | undefined = undefined,
-    maxHeight: string | undefined = undefined,
-    selectionBackgrounColor: string = "rgb(var(--global-color-background-300))",
-    selectionColor: string = "inherit",
-    activeKeyboard: boolean = false,
+  export let activeKeyboard: boolean = false,
     loopSelection: boolean = true,
     selected: string | number | undefined = undefined,
     elements: Element[] = []
@@ -87,14 +79,6 @@
 <ul
   class="list"
   role="listbox"
-  style:--selectable-vertical-list-element-padding={elementPadding}
-  style:--selectable-vertical-list-element-cursor={elementCursor}
-  style:--selectable-vertical-list-selection-background-color={selectionBackgrounColor}
-  style:--selectable-vertical-list-selection-color={selectionColor}
-  style:width={width}
-  style:max-width={maxWidth}
-  style:height={height}
-  style:max-height={maxHeight}
 >
   {#each elements as element, index (element.name)}
     <li
@@ -134,11 +118,45 @@
 
 <style>
   .list {
+    --selectable-vertical-list-default-element-padding: .75rem 1rem .75rem 1rem;
+    --selectable-vertical-list-default-element-cursor: pointer;
+    --selectable-vertical-list-default-selection-background-color: rgb(var(--global-color-background-300));
+    --selectable-vertical-list-default-selection-color: inherit;
+    --selectable-vertical-list-default-element-border-radius: 0px;
+    --selectable-vertical-list-default-padding: 0px;
+
     display: flex;
     flex-direction: column;
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: var(
+      --selectable-vertical-list-padding,
+      var(--selectable-vertical-list-default-padding)
+    );
+    height: var(
+      --selectable-vertical-list-height,
+      var(--selectable-vertical-list-default-height)
+    );
+    max-height: var(
+      --selectable-vertical-list-max-height,
+      var(--selectable-vertical-list-default-max-height)
+    );
+    min-height: var(
+      --selectable-vertical-list-min-height,
+      var(--selectable-vertical-list-default-min-height)
+    );
+    width: var(
+      --selectable-vertical-list-width,
+      var(--selectable-vertical-list-default-width)
+    );
+    max-width: var(
+      --selectable-vertical-list-max-width,
+      var(--selectable-vertical-list-default-max-width)
+    );
+    min-width: var(
+      --selectable-vertical-list-min-width,
+      var(--selectable-vertical-list-default-min-width)
+    );
   }
 
   .title {
@@ -152,12 +170,28 @@
   }
 
   .element {
-    padding: var(--selectable-vertical-list-element-padding);
-    cursor: var(--selectable-vertical-list-element-cursor);
+    padding: var(
+      --selectable-vertical-list-element-padding,
+      var(--selectable-vertical-list-default-element-padding)
+    );
+    cursor: var(
+      --selectable-vertical-list-element-cursor,
+      var(--selectable-vertical-list-default-element-cursor)
+    );
+    border-radius: var(
+      --selectable-vertical-list-element-border-radius,
+      var(--selectable-vertical-list-default-element-border-radius)
+    );
   }
 
   .element[aria-selected=true] {
-    background-color: var(--selectable-vertical-list-selection-background-color);
-    color: var(--selectable-vertical-list-selection-color)
+    background-color: var(
+      --selectable-vertical-list-selection-background-color,
+      var(--selectable-vertical-list-default-selection-background-color)
+    );
+    color: var(
+      --selectable-vertical-list-selection-color,
+      var(--selectable-vertical-list-default-selection-color)
+    )
   }
 </style>
