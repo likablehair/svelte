@@ -120,6 +120,7 @@
       var(--stable-divided-side-bar-layout-default-side-bar-padding)
     );
     z-index: 10;
+    overflow: auto;
   }
 
   .overlay {

@@ -6,7 +6,7 @@ export { default as IntersectionObserver } from './components/simple/common/Inte
 export { default as MediaQuery } from './components/simple/common/MediaQuery.svelte'
 export { default as Menu } from './components/simple/common/Menu.svelte'
 export { scrollAtCenter as scrollAtCenter } from './components/simple/common/scroller'
-export { default as SimpleTable } from './components/simple/common/SimpleTable.svelte'
+export { default as SimpleTable } from './components/simple/lists/SimpleTable.svelte'
 
 export { default as Calendar } from './components/simple/dates/Calendar.svelte'
 export { default as DatePicker } from './components/simple/dates/DatePicker.svelte'

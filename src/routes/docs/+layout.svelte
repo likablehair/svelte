@@ -50,6 +50,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>Likable Components</title>
+</svelte:head>
+
 <StableDividedSideBarLayout
   bind:drawerOpened={drawerOpened}
 >

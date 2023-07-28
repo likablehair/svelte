@@ -91,6 +91,11 @@ let list: {
     description: 'A selector with inversion.',
     status: 'stable',
     url: '/docs/components/simple-components/ColorInvertedSelector'
+  }, {
+    title: 'SimpleTable',
+    description: 'Grid beutiful view.',
+    status: 'stable',
+    url: '/docs/components/simple-components/SimpleTable'
   }
 ]
 
