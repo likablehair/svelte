@@ -14,6 +14,7 @@
 
   export let activeKeyboard: boolean = false,
     loopSelection: boolean = true,
+    focused: string | number | undefined = undefined,
     selected: string | number | undefined = undefined,
     elements: Element[] = []
 
@@ -27,43 +28,46 @@
   }>()
 
   $: selectedIndex = elements.findIndex((el) => el.name == selected)
+  $: focusedIndex = elements.findIndex((el) => el.name == focused)
 
   function handleKeypress(params: {key: string}) {
     if(activeKeyboard && elements.length > 0) {
       if(params.key == 'ArrowDown') {
         let newIndex
-        if((selectedIndex === undefined || selectedIndex === -1) || (loopSelection && selectedIndex >= (elements.length - 1))) {
-          selected = elements[0].name
+        if((focusedIndex === undefined || focusedIndex === -1) || (loopSelection && focusedIndex >= (elements.length - 1))) {
+          focused = elements[0].name
           newIndex = 0
-        } else if(selectedIndex < (elements.length - 1)) {
-          selected = elements[selectedIndex + 1].name
-          newIndex = selectedIndex + 1
+        } else if(focusedIndex < (elements.length - 1)) {
+          focused = elements[focusedIndex + 1].name
+          newIndex = focusedIndex + 1
         }
 
         if(newIndex !== undefined) dispatch('focus', { element: elements[newIndex] })
       } else if(params.key == 'ArrowUp') {
         let newIndex
-        if((selectedIndex === undefined || selectedIndex === -1) || (loopSelection && selectedIndex <= 0)) {
-          selected = elements[elements.length - 1].name
+        if((focusedIndex === undefined || focusedIndex === -1) || (loopSelection && focusedIndex <= 0)) {
+          focused = elements[elements.length - 1].name
           newIndex = elements.length - 1
-        } else if(selectedIndex > 0) {
-          selected = elements[selectedIndex - 1].name
-          newIndex = selectedIndex - 1
+        } else if(focusedIndex > 0) {
+          focused = elements[focusedIndex - 1].name
+          newIndex = focusedIndex - 1
         }
 
         if(newIndex !== undefined) dispatch('focus', { element: elements[newIndex] })
-      } else if(params.key == 'Enter' && selectedIndex !== -1) {
-        dispatch('select', { element: elements[selectedIndex] })
+      } else if(params.key == 'Enter' && focusedIndex !== -1) {
+        selected = elements[focusedIndex].name
+        dispatch('select', { element: elements[focusedIndex] })
       }
     }
   }
 
   function handleElementClick(element: Element) {
+    selected = element.name
     dispatch('select', { element })
   }
 
   function handleElementMouseover(element: Element) {
-    selected = element.name
+    focused = element.name
     dispatch('focus', { element })
   }
 
@@ -83,6 +87,7 @@
   {#each elements as element, index (element.name)}
     <li
       class="element"
+      class:focused={focused == element.name}
       aria-selected={selected == element.name}
       on:mouseover={() => handleElementMouseover(element)}
       on:focus={() => handleElementMouseover(element)}
@@ -91,11 +96,13 @@
     >
       <slot 
         name="element"
+        focused={focused == element.name}
         selected={selected == element.name}
       >
         <div class="title">
           <slot 
             name="title"
+            focused={focused == element.name}
             selected={selected == element.name}
             element={element}
           >
@@ -105,6 +112,7 @@
         <div class="description">
           <slot 
             name="description"
+            focused={focused == element.name}
             selected={selected == element.name}
             element={element}
           >
@@ -122,6 +130,8 @@
     --selectable-vertical-list-default-element-cursor: pointer;
     --selectable-vertical-list-default-selection-background-color: rgb(var(--global-color-background-300));
     --selectable-vertical-list-default-selection-color: inherit;
+    --selectable-vertical-list-default-focus-background-color: rgb(var(--global-color-background-300), .5);
+    --selectable-vertical-list-default-focus-color: inherit;
     --selectable-vertical-list-default-element-border-radius: 0px;
     --selectable-vertical-list-default-padding: 0px;
 
@@ -182,6 +192,17 @@
       --selectable-vertical-list-element-border-radius,
       var(--selectable-vertical-list-default-element-border-radius)
     );
+  }
+
+  .element.focused {
+    background-color: var(
+      --selectable-vertical-list-focus-background-color,
+      var(--selectable-vertical-list-default-focus-background-color)
+    );
+    color: var(
+      --selectable-vertical-list-focus-color,
+      var(--selectable-vertical-list-default-focus-color)
+    )
   }
 
   .element[aria-selected=true] {
