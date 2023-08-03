@@ -9,6 +9,7 @@
   --button-default-icon-color: rgb(var(--global-color-contrast-900));
   --button-default-background-color: rgb(var(--global-color-primary-500));
   --button-default-hover-background-color: rgb(var(--global-color-primary-600));
+  --button-default-hover-color: rgb(var(--global-color-grey-50));
   --button-default-text-background-color: transparent;
   --button-default-text-hover-background-color: rgb(var(--global-color-primary-500), 0.2);
   --button-default-active-background-color: rgb(var(--global-color-primary-500));

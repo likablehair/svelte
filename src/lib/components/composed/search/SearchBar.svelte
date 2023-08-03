@@ -61,6 +61,8 @@
       on:input
       on:change
       on:keydown
+      on:focus
+      on:blur
       class="input {clazz.input}"
     />
   </slot>

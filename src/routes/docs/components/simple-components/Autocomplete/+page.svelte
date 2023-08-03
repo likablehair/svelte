@@ -25,6 +25,7 @@
   <Autocomplete
     items={items}
     multiple
+    maxVisibleChips={2}
   ></Autocomplete>
 </div>
 <h2>Props</h2>

@@ -200,6 +200,10 @@
       --button-hover-background-color,
       var(--button-default-hover-background-color)
     );
+    color: var(
+      --button-hover-color,
+      var(--button-default-hover-color)
+    );
   }
 
   .button-default:active {

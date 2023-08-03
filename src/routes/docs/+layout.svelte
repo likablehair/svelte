@@ -8,6 +8,7 @@
   import { beforeNavigate, goto } from "$app/navigation";
   import componentDatabase from './search/components.database'
   import theme, { toggleTheme } from "$lib/stores/theme";
+    import { filter } from "lodash";
 
   theme.update((currentTheme) => {
     currentTheme.disabled = false
@@ -99,17 +100,29 @@
               name: 'simpleComponents',
               disabled: true,
               url: '/docs/components/simple-components',
-              children: componentDatabase.map((el) => {
-                return {
-                  title: el.title,
-                  name: el.title,
-                  url: el.url
-                }
-              })
+              children: componentDatabase.filter(el => {
+                  return el.type == 'simple'
+                }).map((el) => {
+                  return {
+                    title: el.title,
+                    name: el.title,
+                    url: el.url
+                  }
+                })
             }, {
               title: 'Composed components',
               name: 'composedComponents',
+              disabled: true,
               url: '/docs/components/composed-components',
+              children: componentDatabase.filter(el => {
+                  return el.type == 'composed'
+                }).map((el) => {
+                  return {
+                    title: el.title,
+                    name: el.title,
+                    url: el.url
+                  }
+                })
             }, {
               title: 'Layouts',
               name: 'layouts',

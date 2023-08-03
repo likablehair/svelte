@@ -16,7 +16,8 @@
     _maxHeight: string | undefined = undefined,
     _overflow = "auto",
     _boxShadow: string | undefined = undefined,
-    _borderRadius: string | undefined = undefined
+    _borderRadius: string | undefined = undefined,
+    _activatorGap: number = 5
 
   export let open = false,
     refreshPosition = false,
@@ -56,7 +57,7 @@
           let { left: activatorLeft, top: activatorTop } =
             params.activator.getBoundingClientRect();
           let activatorHeight = params.activator.offsetHeight;
-          _top = activatorTop + window.scrollY + activatorHeight;
+          _top = activatorTop + window.scrollY + activatorHeight + _activatorGap;
           _left = activatorLeft + window.scrollX;
         } else if (anchor == "bottom-center") {
           let { left: activatorLeft, top: activatorTop } =
@@ -65,7 +66,7 @@
           let activatorWidth = params.activator.offsetWidth;
           let menuWidth = params.menuElement.offsetWidth;
 
-          _top = activatorTop + window.scrollY + activatorHeight;
+          _top = activatorTop + window.scrollY + activatorHeight + _activatorGap;
           _left = activatorLeft + window.scrollX;
           if (menuWidth > activatorWidth) {
             _left = _left - (menuWidth - activatorWidth) / 2;

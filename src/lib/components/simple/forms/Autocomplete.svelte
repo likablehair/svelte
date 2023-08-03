@@ -10,6 +10,7 @@
 <script lang="ts">
   import '../../../css/main.css'
   import './Autocomplete.css'
+  import { scrollInMenu } from '../common/scroller';
 
   let clazz: {
     activator?: string,
@@ -28,7 +29,7 @@
 
   export let values: Item[] = [],
     items: Item[],
-    searchFunction: ((item: Item, searchText: string) => boolean) | undefined =
+    searchFunction: ((item: Item, searchText: string | undefined) => boolean) | undefined =
       undefined,
     multiple = false,
     disabled = false,
@@ -37,6 +38,8 @@
     height = "auto",
     maxWidth: string | undefined = undefined,
     openingId: string = "autocomplete-menu",
+    searchText: string | undefined = undefined,
+    maxVisibleChips: number | undefined = undefined,
 
     // menu
     menuBoxShadow = "rgb(var(--global-color-background-300), .5) 0px 2px 4px",
@@ -150,6 +153,12 @@
       input.blur()
       menuOpened = false
     }
+
+    if(focusedIndex !== undefined) {
+      let child = menuElement.querySelector<HTMLElement>('.item-' + focusedIndex)
+      
+      if(!!child) scrollInMenu(menuElement, child, 'instant')
+    }
   }
 
   let input: HTMLElement;
@@ -164,17 +173,18 @@
     }
   }
 
-  let searchText: string,
-    filteredItems: Item[] = items;
+  let filteredItems: Item[] = items;
   $: if (searchText) {
     focusedIndex = undefined;
     filteredItems = items.filter((it) => {
       if (searchFunction) return searchFunction(it, searchText);
-      else return it.label?.toString().toLowerCase().includes(searchText.toLowerCase());
+      else return !!searchText && it.label?.toString().toLowerCase().includes((searchText).toLowerCase());
     });
   } else {
     filteredItems = items;
   }
+
+  $: notVisibleChipNumber = Math.max(values.length - (maxVisibleChips || 0), 0)
 
   import Chip from "$lib/components/simple/navigation/Chip.svelte";
   import Menu from "$lib/components/simple/common/Menu.svelte";
@@ -194,11 +204,11 @@
   on:keypress={handleContainerClick}
   class={clazz.activator || ''}
 >
-  <slot name="selection-container" {values} {searchText} {disabled} {activator}>
+  <slot name="selection-container" {values} {searchText} {disabled} {openMenu}>
     <div
       class="selection-container"
     >
-      {#each values as selection}
+      {#each values.slice(0, maxVisibleChips) as selection}
         <slot name="selection" {selection}>
           <div tabindex="-1">
             <Chip
@@ -210,6 +220,11 @@
           </div>
         </slot>
       {/each}
+      {#if maxVisibleChips !== undefined && notVisibleChipNumber > 0}
+        <slot name="exceedCounter" {notVisibleChipNumber} {maxVisibleChips} {values} {searchText} {disabled}>
+          <div class="not-visible-chip-number">+ {notVisibleChipNumber}</div>
+        </slot>
+      {/if}
 
       <SimpleTextField
         --simple-textfield-max-width="min(200px, 90%)"
@@ -220,8 +235,11 @@
         --simple-textfield-default-margin-left="10px"
         bind:value={searchText}
         on:focus={handleTextFieldFocus}
+        on:focus
         on:blur={handleTextFieldBlur}
+        on:blur
         on:keydown={handleWindowKeyDown}
+        on:keydown
         {disabled}
         placeholder={placeholder}
         bind:input={input}
@@ -250,26 +268,28 @@
       style:background-color="rgb(var(--global-color-background-100))"
     >
       {#each filteredItems as item, index}
-        <slot
-          name="item"
-          {item}
-          {index}
-          selected={values.findIndex((i) => {
-            return i.value == item.value;
-          }) != -1}
-        >
-          <div
-            class:selection-item={true}
-            class:focused={index == focusedIndex}
-            class:selected={values.findIndex((i) => {
+        <div class="item-{index}">
+          <slot
+            name="item"
+            {item}
+            {index}
+            selected={values.findIndex((i) => {
               return i.value == item.value;
             }) != -1}
-            on:click={() => toggle(item)}
-            on:keypress={() => toggle(item)}
           >
-            {item.label}
-          </div>
-        </slot>
+            <div
+              class:selection-item={true}
+              class:focused={index == focusedIndex}
+              class:selected={values.findIndex((i) => {
+                return i.value == item.value;
+              }) != -1}
+              on:click={() => toggle(item)}
+              on:keypress={() => toggle(item)}
+            >
+              {item.label}
+            </div>
+          </slot>
+        </div>
       {/each}
     </div>
   </Menu>
@@ -338,5 +358,10 @@
       --autocomplete-hover-item-color,
       var(--autocomplete-default-hover-item-color)
     );
+  }
+
+  .not-visible-chip-number {
+    opacity: 50%;
+    cursor: pointer;
   }
 </style>

@@ -36,7 +36,8 @@
     let searchBarInput: HTMLElement,
       searchText: string | undefined = undefined,
       searchResults: Result[] | undefined = undefined,
-      searchLoading: boolean = false
+      searchLoading: boolean = false,
+      searchBarFocused: boolean = false
 
     let dispatch = createEventDispatcher<{
       'toggle-search-dialog': {
@@ -141,6 +142,8 @@
             bind:value={searchText}
             on:input={search}
             on:keydown={handleKeydown}
+            on:focus={() => searchBarFocused = true}
+            on:blur={() => searchBarFocused = false}
           ></SearchBar>
         </slot>
         {#if !!searchText}
@@ -154,7 +157,7 @@
               --search-results-border-radius="0 0 .5rem .5rem"
               loading={searchLoading}
               results={searchResults}
-              activeKeyboard
+              activeKeyboard={searchBarFocused}
               on:select
             ></SearchResults>
           </slot>
