@@ -131,7 +131,7 @@
   }
 
   let menuElement: HTMLElement;
-  function handleWindowKeyDown(event: KeyboardEvent) { 
+  function handleKeyDown(event: { key: string }) { 
     if (
       event.key == "ArrowDown" &&
       (focusedIndex === undefined || focusedIndex < filteredItems.length - 1)
@@ -150,11 +150,11 @@
       pop()
     } else if(event.key == 'Escape' || event.key == 'Tab') {
       searchText = ''
-      input.blur()
+      if(!!input) input.blur()
       menuOpened = false
     }
 
-    if(focusedIndex !== undefined) {
+    if(focusedIndex !== undefined && !!menuElement) {
       let child = menuElement.querySelector<HTMLElement>('.item-' + focusedIndex)
       
       if(!!child) scrollInMenu(menuElement, child, 'instant')
@@ -164,7 +164,7 @@
   let input: HTMLElement;
   function handleContainerClick() {
     if (!menuOpened) {
-      input.focus();
+      if(!!input) input.focus();
 
       // had to timeout because it was catching click outside
       setTimeout(() => {
@@ -204,7 +204,7 @@
   on:keypress={handleContainerClick}
   class={clazz.activator || ''}
 >
-  <slot name="selection-container" {values} {searchText} {disabled} {openMenu}>
+  <slot name="selection-container" {values} {searchText} {disabled} {openMenu} {handleKeyDown}>
     <div
       class="selection-container"
     >
@@ -238,7 +238,7 @@
         on:focus
         on:blur={handleTextFieldBlur}
         on:blur
-        on:keydown={handleWindowKeyDown}
+        on:keydown={handleKeyDown}
         on:keydown
         {disabled}
         placeholder={placeholder}
@@ -263,12 +263,12 @@
     bind:menuElement
     bind:openingId={openingId}
   >
-    <div 
+    <ul 
       class={clazz.menu || ''}
       style:background-color="rgb(var(--global-color-background-100))"
     >
       {#each filteredItems as item, index}
-        <div class="item-{index}">
+        <li class="item-{index}">
           <slot
             name="item"
             {item}
@@ -289,13 +289,19 @@
               {item.label}
             </div>
           </slot>
-        </div>
+        </li>
       {/each}
-    </div>
+    </ul>
   </Menu>
 </slot>
 
 <style>
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
   .selection-container {
     display: flex;
     flex-wrap: wrap;

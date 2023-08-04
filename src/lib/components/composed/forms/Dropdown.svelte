@@ -13,7 +13,8 @@
     multiple: boolean = false,
     searchText: string | undefined = undefined,
     maxVisibleChips: number | undefined = undefined,
-    placeholder: string = "Seleziona"
+    placeholder: string = "Seleziona",
+    icon: string | undefined = undefined
 
   $: generatedLabel = values.length == 1 ? values[0].label : `${values.length} Selezionati`
 
@@ -32,25 +33,39 @@
   bind:maxVisibleChips
   searchFunction={() => true}
 >
-  <svelte:fragment slot="selection-container" let:openMenu>
+  <svelte:fragment slot="selection-container" let:openMenu let:handleKeyDown>
     <Button 
       --button-default-background-color="transparent"
       --button-default-border="2px solid rgb(var(--global-color-primary-400))"
       --button-default-color="rgb(var(--global-color-contrast-800))"
       on:click={openMenu}
+      on:keydown={(event) => {
+        handleKeyDown(event.detail.nativeEvent)
+        if(event.detail.nativeEvent.key == 'ArrowDown' || event.detail.nativeEvent.key == 'ArrowUp') {
+          event.detail.nativeEvent.stopPropagation()
+          event.detail.nativeEvent.preventDefault()
+        }
+      }}
     >
       <slot name="label" {values} {items} {searchText}>
         <div class="label">
+          {#if !!icon}
+            <Icon name={icon}></Icon>
+          {/if}
           {#if values.length == 0}
-            {placeholder}
-            <Icon name="mdi-chevron-down"></Icon>
+            <div class="space-between">
+              <div>{placeholder}</div>
+              <Icon name="mdi-chevron-down"></Icon>
+            </div>
           {:else}
-            {generatedLabel}
-            <Icon 
-              name="mdi-close"
-              click
-              on:click={handleCloseClick}
-            ></Icon>
+            <div class="space-between">
+              <div>{generatedLabel}</div>
+              <Icon 
+                name="mdi-close"
+                click
+                on:click={handleCloseClick}
+              ></Icon>
+            </div>
           {/if}
         </div>
       </slot>
@@ -61,9 +76,16 @@
 <style>
   .label {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     gap: 10px;
     width: 130px;
+  }
+
+  .space-between {
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 </style>

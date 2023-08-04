@@ -45,6 +45,9 @@
     keypress: {
       nativeEvent: KeyboardEvent;
     };
+    keydown: {
+      nativeEvent: KeyboardEvent;
+    };
   }>();
 
   function handleClick(event: MouseEvent) {
@@ -57,6 +60,13 @@
   function handleKeyPress(event: KeyboardEvent) {
     if (disabled) return;
     dispatch("keypress", {
+      nativeEvent: event,
+    });
+  }
+
+  function handleKeyDown(event: KeyboardEvent) {
+    if (disabled) return;
+    dispatch("keydown", {
       nativeEvent: event,
     });
   }
@@ -75,6 +85,7 @@
   class:button-icon={buttonType === "icon"}
   on:click={handleClick}
   on:keypress={handleKeyPress}
+  on:keydown={handleKeyDown}
   tabindex={tabindex}
   class="button no-select {clazz || ''}"
 >
@@ -210,6 +221,13 @@
     background-color: var(
       --button-active-background-color,
       var(--button-default-active-background-color)
+    );
+  }
+
+  .button-default:focus {
+    background-color: var(
+      --button-focus-background-color,
+      var(--button-default-focus-background-color)
     );
   }
 

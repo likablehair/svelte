@@ -8,14 +8,36 @@
   import "../common/materialDesign.css";
 </script>
 
-<span
-  class="icon mdi {name} {clazz}"
-  class:click
-  on:click
-  on:keypress
-/>
+{#if click}
+  <button
+    on:click
+    on:keypress
+    class="{clazz}"
+  >
+    <span
+      class="icon mdi {name} {clazz}"
+    />
+  </button>
+{:else}
+  <span
+    class="icon mdi {name} {clazz}"
+    class:click
+    on:click
+    on:keypress
+  />
+{/if}
 
 <style>
+  button {
+    background: none; 
+    border: none; 
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    outline: inherit;
+  }
+
   .icon {
     font-size: var(
       --icon-size,

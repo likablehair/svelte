@@ -33,6 +33,7 @@
 <h2>Example</h2>
 <div class="example">
   <Dropdown
+    icon="mdi-apple"
     {items}
   ></Dropdown>
   <Dropdown 
