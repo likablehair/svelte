@@ -4,7 +4,7 @@ let list: {
   title: string,
   description: string,
   status: 'stable' | 'beta' | 'deprecated',
-  type: 'composed' | 'simple',
+  type: 'composed' | 'simple' | 'layout',
   url: string
 }[] = [
   {
@@ -127,7 +127,19 @@ let list: {
     status: 'beta',
     type: 'composed',
     url: '/docs/components/composed-components/Dropdown'
-  }
+  }, {
+    title: 'StableDividedSideBarLayout',
+    description: 'Layout of this doc.',
+    status: 'beta',
+    type: 'layout',
+    url: '/docs/components/layouts/StableDividedSideBarLayout'
+  }, {
+    title: 'UnstableDividedSideBarLayout',
+    description: 'Layout so unstable.',
+    status: 'beta',
+    type: 'layout',
+    url: '/docs/components/layouts/UnstableDividedSideBarLayout'
+  },
 ]
 
 export default lodash.sortBy(list, 'title')

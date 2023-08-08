@@ -8,7 +8,6 @@
   import { beforeNavigate, goto } from "$app/navigation";
   import componentDatabase from './search/components.database'
   import theme, { toggleTheme } from "$lib/stores/theme";
-    import { filter } from "lodash";
 
   theme.update((currentTheme) => {
     currentTheme.disabled = false
@@ -126,7 +125,17 @@
             }, {
               title: 'Layouts',
               name: 'layouts',
+              disabled: true,
               url: '/docs/components/layouts',
+              children: componentDatabase.filter(el => {
+                  return el.type == 'layout'
+                }).map((el) => {
+                  return {
+                    title: el.title,
+                    name: el.title,
+                    url: el.url
+                  }
+                })
             },
           ]
         }
