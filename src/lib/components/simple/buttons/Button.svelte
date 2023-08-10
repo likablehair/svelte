@@ -88,6 +88,7 @@
   on:keydown={handleKeyDown}
   tabindex={tabindex}
   class="button no-select {clazz || ''}"
+  {...$$restProps}
 >
   {#if loading}
     <div

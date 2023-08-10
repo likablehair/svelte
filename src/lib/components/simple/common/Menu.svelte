@@ -41,6 +41,7 @@
       y: 10,
     },
     menuElement: HTMLElement | undefined = undefined,
+    flipOnOverflow: boolean = false,
     openingId: string | undefined = undefined;
 
   let zIndex = 50,
@@ -84,6 +85,16 @@
           window.innerWidth + window.scrollX - (menuElement?.offsetWidth || 0),
           0
         );
+      }
+
+      if(flipOnOverflow && !!params.activator) {
+        if (
+          window.innerHeight + window.scrollY <
+          (_top || 0) + (menuElement?.offsetHeight || 0)
+        ) {
+          let { top: activatorTop } = params.activator.getBoundingClientRect();
+          _top = activatorTop + window.scrollY - _activatorGap - (menuElement?.offsetHeight || 0)
+        }
       }
 
       if(!!positionedAncestor) {
@@ -195,7 +206,13 @@
     open = false
   }
 
+  function handleWindowScroll() {
+    if(open && !!menuElement && !!activator) calculateMenuPosition({ menuElement, activator })
+  }
+
 </script>
+
+<svelte:window on:scroll={handleWindowScroll} ></svelte:window>
 
 <div 
   class="controller" 

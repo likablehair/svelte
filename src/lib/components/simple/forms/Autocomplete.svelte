@@ -262,6 +262,7 @@
     bind:refreshPosition
     bind:menuElement
     bind:openingId={openingId}
+    flipOnOverflow
   >
     <ul 
       class={clazz.menu || ''}

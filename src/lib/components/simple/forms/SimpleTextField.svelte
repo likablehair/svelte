@@ -85,6 +85,7 @@
           name={name}
           class={clazz.input || ''}
           bind:this={input}
+          {...$$restProps}
         />
       {:else if type == "password"}
         <input
@@ -104,6 +105,7 @@
           name={name}
           class={clazz.input || ''}
           bind:this={input}
+          {...$$restProps}
         />
       {:else if type == "number"}
         <input
@@ -123,6 +125,7 @@
           name={name}
           class={clazz.input || ''}
           bind:this={input}
+          {...$$restProps}
         />
       {:else if type == "time"}
         <input
@@ -142,6 +145,7 @@
           name={name}
           class={clazz.input || ''}
           bind:this={input}
+          {...$$restProps}
         />
       {:else if type == "date"}
         <input
@@ -161,6 +165,7 @@
           name={name}
           class={clazz.input || ''}
           bind:this={input}
+          {...$$restProps}
         />
       {/if}
       <slot name="append-inner" {appendInnerIcon} {iconSize}>
