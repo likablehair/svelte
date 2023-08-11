@@ -8,6 +8,7 @@
   export let open: boolean = false,
     activator: HTMLElement,
     drawerPosition: ComponentProps<Drawer>['position'] = 'bottom',
+    menuAnchor: ComponentProps<Menu>['anchor'] = 'bottom-center',
     _boxShadow: string = "rgb(var(--global-color-grey-900), .5) 0px 2px 4px",
     _height: string = "fit-content",
     _maxHeight: string | undefined = undefined,
@@ -20,6 +21,7 @@
     <Drawer
       bind:open={open}
       bind:position={drawerPosition}
+      on:item-click
     >
       <slot isDrawer={true} isMenu={false}></slot>
     </Drawer>
@@ -33,6 +35,7 @@
       _maxHeight={_maxHeight}
       _minWidth={_minWidth}
       _borderRadius={_bordeRadius}
+      anchor={menuAnchor}
     >
       <slot isDrawer={false} isMenu={true}></slot>
     </Menu>

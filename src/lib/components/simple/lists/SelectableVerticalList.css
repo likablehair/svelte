@@ -1,0 +1,13 @@
+:root {
+  --selectable-vertical-list-default-element-padding: .75rem 1rem .75rem 1rem;
+  --selectable-vertical-list-default-element-cursor: pointer;
+  --selectable-vertical-list-default-selection-background-color: rgb(var(--global-color-background-300));
+  --selectable-vertical-list-default-selection-color: inherit;
+  --selectable-vertical-list-default-focus-background-color: rgb(var(--global-color-background-300), .5);
+  --selectable-vertical-list-default-focus-color: inherit;
+  --selectable-vertical-list-default-element-border-radius: 0px;
+  --selectable-vertical-list-default-element-height: auto;
+  --selectable-vertical-list-default-padding: 0px;
+  --selectable-vertical-list-default-title-font-size: 1.2rem;
+  --selectable-vertical-list-default-description-font-size: .875rem;
+}

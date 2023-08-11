@@ -104,6 +104,12 @@ let list: {
     type: 'simple',
     url: '/docs/components/simple-components/Drawer'
   }, {
+    title: 'SelectableVerticalList',
+    description: 'Vertical horizon, selectable soul.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/SelectableVerticalList'
+  }, {
     title: 'TabSwitcher',
     description: 'Switch to a new tab, switch to a new life.',
     status: 'stable',
@@ -139,6 +145,12 @@ let list: {
     status: 'beta',
     type: 'composed',
     url: '/docs/components/composed-components/MenuOrDrawer'
+  }, {
+    title: 'MenuOrDrawerOptions',
+    description: 'If a menu does not have an option is not a menu.',
+    status: 'beta',
+    type: 'composed',
+    url: '/docs/components/composed-components/MenuOrDrawerOptions'
   }, {
     title: 'StableDividedSideBarLayout',
     description: 'Layout of this doc.',

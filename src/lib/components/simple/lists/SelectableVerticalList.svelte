@@ -3,14 +3,22 @@
     title: string | number,
     name: string | number,
     description?: string,
+    icon?: string,
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     data?: any;
+    style?: {
+      color?: string,
+      backgroundColor?: string
+    }
   };
 </script>
 
 <script lang="ts">
+  import '../../../css/main.css'
+  import './SelectableVerticalList.css'
   import keyboarder from "$lib/utils/keyboarder";
   import { createEventDispatcher, onMount } from "svelte";
+    import Icon from '../media/Icon.svelte';
 
   export let activeKeyboard: boolean = false,
     loopSelection: boolean = true,
@@ -27,7 +35,6 @@
     }
   }>()
 
-  $: selectedIndex = elements.findIndex((el) => el.name == selected)
   $: focusedIndex = elements.findIndex((el) => el.name == focused)
 
   function handleKeypress(params: {key: string}) {
@@ -93,31 +100,43 @@
       on:focus={() => handleElementMouseover(element)}
       on:click={() => handleElementClick(element)}
       on:keypress={() => handleElementClick(element)}
+      style:color={element.style?.color}
+      style:background-color={element.style?.backgroundColor}
     >
       <slot 
         name="element"
         focused={focused == element.name}
         selected={selected == element.name}
       >
-        <div class="title">
-          <slot 
-            name="title"
-            focused={focused == element.name}
-            selected={selected == element.name}
-            element={element}
-          >
-            {element.title}
-          </slot>
-        </div>
-        <div class="description">
-          <slot 
-            name="description"
-            focused={focused == element.name}
-            selected={selected == element.name}
-            element={element}
-          >
-            {element.description || ''}
-          </slot>
+        {#if !!element.icon}
+          <Icon 
+            name={element.icon} 
+            --icon-default-size="20px"
+          ></Icon>
+        {/if}
+        <div class="title-description-container">
+          <div class="title">
+            <slot 
+              name="title"
+              focused={focused == element.name}
+              selected={selected == element.name}
+              element={element}
+            >
+              {element.title}
+            </slot>
+          </div>
+          {#if !!element.description}  
+            <div class="description">
+              <slot 
+                name="description"
+                focused={focused == element.name}
+                selected={selected == element.name}
+                element={element}
+              >
+                {element.description || ''}
+              </slot>
+            </div>
+          {/if}
         </div>
       </slot>
     </li>
@@ -126,15 +145,6 @@
 
 <style>
   .list {
-    --selectable-vertical-list-default-element-padding: .75rem 1rem .75rem 1rem;
-    --selectable-vertical-list-default-element-cursor: pointer;
-    --selectable-vertical-list-default-selection-background-color: rgb(var(--global-color-background-300));
-    --selectable-vertical-list-default-selection-color: inherit;
-    --selectable-vertical-list-default-focus-background-color: rgb(var(--global-color-background-300), .5);
-    --selectable-vertical-list-default-focus-color: inherit;
-    --selectable-vertical-list-default-element-border-radius: 0px;
-    --selectable-vertical-list-default-padding: 0px;
-
     display: flex;
     flex-direction: column;
     list-style: none;
@@ -170,13 +180,18 @@
   }
 
   .title {
-    font-size: 1.1rem;
+    font-size: var(
+      --selectable-vertical-list-title-font-size,
+      var(--selectable-vertical-list-default-title-font-size)
+    );
   }
 
   .description {
-    font-size: .875rem;
+    font-size: var(
+      --selectable-vertical-list-description-font-size,
+      var(--selectable-vertical-list-default-description-font-size)
+    );
     margin-top: 0.2rem;
-
   }
 
   .element {
@@ -192,6 +207,22 @@
       --selectable-vertical-list-element-border-radius,
       var(--selectable-vertical-list-default-element-border-radius)
     );
+    height: var(
+      --selectable-vertical-list-element-height,
+      var(--selectable-vertical-list-default-element-height)
+    );
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .title-description-container {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
   }
 
   .element.focused {
