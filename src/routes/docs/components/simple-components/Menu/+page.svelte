@@ -20,6 +20,15 @@
   function handleListClick(menuLabel: string) {
     // e.detail.nativeEvent.stopPropagation()
     secondMenuOpened[menuLabel] = true
+    thirdMenuOpened = {}
+  }
+
+  let thirdActivators: Record<string, HTMLElement> = {}
+  let thirdMenuOpened: Record<string, boolean> = {}
+
+  function handleSubMenuClick(menuLabel: string) {
+    // e.detail.nativeEvent.stopPropagation()
+    thirdMenuOpened[menuLabel] = true
   }
 </script>
 
@@ -74,6 +83,29 @@
     _boxShadow="rgba(149, 157, 165, 0.2) 0px 8px 24px"
     closeOnClickOutside
     openingId="second-menu"
+    flipOnOverflow
+  >
+    <div 
+      style:height="100px"
+      bind:this={thirdActivators[menuLabel]}
+      on:click={() => handleSubMenuClick(menuLabel)}
+      on:keypress={() => handleSubMenuClick(menuLabel)}
+    >
+      {menuLabel}
+    </div>
+  </Menu>
+{/each}
+
+{#each ['this', 'is', 'a', 'menu', '!'] as menuLabel}
+  <Menu
+    _width="140px"
+    activator={thirdActivators[menuLabel]}
+    bind:open={thirdMenuOpened[menuLabel]}
+    anchor="bottom-center"
+    _borderRadius="10px"
+    _boxShadow="rgba(149, 157, 165, 0.2) 0px 8px 24px"
+    closeOnClickOutside
+    openingId="third-menu"
     flipOnOverflow
   >
     <div style:height="100px">
