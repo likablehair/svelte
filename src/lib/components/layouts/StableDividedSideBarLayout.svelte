@@ -119,6 +119,10 @@
       --stable-divided-side-bar-layout-side-bar-padding,
       var(--stable-divided-side-bar-layout-default-side-bar-padding)
     );
+    background-color: var(
+      --stable-divided-side-bar-layout-side-bar-background-color,
+      var(--stable-divided-side-bar-layout-default-side-bar-background-color)
+    );
     z-index: 10;
     overflow: auto;
   }

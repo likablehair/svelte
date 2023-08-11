@@ -13,4 +13,5 @@
   --stable-divided-side-bar-layout-default-drawer-background-color:
     rgb(var(--global-color-background-50));
   --stable-divided-side-bar-layout-default-drawer-width: 24rem;
+  --stable-divided-side-bar-layout-default-side-bar-background-color: rgb(var(--global-color-background-100));
 }

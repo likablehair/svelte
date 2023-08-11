@@ -1,6 +1,6 @@
 <script lang="ts">
   import Button from "$lib/components/simple/buttons/Button.svelte";
-    import Menu from "$lib/components/simple/common/Menu.svelte";
+  import Menu from "$lib/components/simple/common/Menu.svelte";
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import colors from "../../../stores/colors"
   import PropsViewer from "../../PropsViewer.svelte";
@@ -12,6 +12,14 @@
   function handleButtonClick(e: CustomEvent) {
     e.detail.nativeEvent.stopPropagation()
     menuOpened = !menuOpened
+  }
+
+  let secondActivators: Record<string, HTMLElement> = {}
+  let secondMenuOpened: Record<string, boolean> = {}
+
+  function handleListClick(menuLabel: string) {
+    // e.detail.nativeEvent.stopPropagation()
+    secondMenuOpened[menuLabel] = true
   }
 </script>
 
@@ -44,15 +52,35 @@
   <div class="menu-content">
     <div class="list-container">
       <ul>
-        <li>This</li>
-        <li>is</li>
-        <li>a</li>
-        <li>Menu</li>
-        <li>!</li>
+        {#each ['this', 'is', 'a', 'menu', '!'] as menuLabel}
+          <li
+            bind:this={secondActivators[menuLabel]} 
+            on:click={() => handleListClick(menuLabel)}
+            on:keypress={() => handleListClick(menuLabel)}
+          >{menuLabel}</li>
+        {/each}
       </ul>
     </div>
   </div>
 </Menu>
+
+{#each ['this', 'is', 'a', 'menu', '!'] as menuLabel}
+  <Menu
+    _width="160px"
+    activator={secondActivators[menuLabel]}
+    bind:open={secondMenuOpened[menuLabel]}
+    anchor="right-center"
+    _borderRadius="10px"
+    _boxShadow="rgba(149, 157, 165, 0.2) 0px 8px 24px"
+    closeOnClickOutside
+    openingId="second-menu"
+    flipOnOverflow
+  >
+    <div style:height="100px">
+      {menuLabel}
+    </div>
+  </Menu>
+{/each}
 
 <h2>Props</h2>
 <PropsViewer
@@ -178,10 +206,10 @@
   }
 
   li:nth-child(even) {
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: rgb(var(--global-color-background-300));
   }
 
   .menu-content {
-    background-color: white;
+    background-color: transparent;
   }
 </style>

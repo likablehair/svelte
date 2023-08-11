@@ -22,7 +22,7 @@
   export let open = false,
     refreshPosition = false,
     activator: HTMLElement | undefined = undefined,
-    anchor: "bottom" | "bottom-center" = "bottom",
+    anchor: "bottom" | "bottom-center" | "right-center" = "bottom",
     closeOnClickOutside = false,
     inAnimation: (
       node: Element,
@@ -42,6 +42,7 @@
     },
     menuElement: HTMLElement | undefined = undefined,
     flipOnOverflow: boolean = false,
+    stayInViewport: boolean = false,
     openingId: string | undefined = undefined;
 
   let zIndex = 50,
@@ -74,17 +75,22 @@
           } else {
             _left = _left + (activatorWidth - menuWidth) / 2;
           }
-        }
-      }
+        } else if (anchor == 'right-center') {
+          let { left: activatorLeft, top: activatorTop } =
+            params.activator.getBoundingClientRect();
+          let activatorHeight = params.activator.offsetHeight;
+          let activatorWidth = params.activator.offsetWidth;
+          let menuWidth = params.menuElement.offsetWidth;
+          let menuHeight = params.menuElement.offsetHeight;
 
-      if (
-        window.innerWidth + window.scrollX <
-        (_left || 0) + (menuElement?.offsetWidth || 0)
-      ) {
-        _left = Math.max(
-          window.innerWidth + window.scrollX - (menuElement?.offsetWidth || 0),
-          0
-        );
+          _top = activatorTop + window.scrollY + (activatorHeight / 2) - (menuHeight / 2);
+          _left = activatorLeft + window.scrollX + activatorWidth + _activatorGap;
+          // if (menuWidth > activatorWidth) {
+          //   _left = _left - (menuWidth - activatorWidth) / 2;
+          // } else {
+          //   _left = _left + (activatorWidth - menuWidth) / 2;
+          // }
+        }
       }
 
       if(flipOnOverflow && !!params.activator) {
@@ -94,6 +100,26 @@
         ) {
           let { top: activatorTop } = params.activator.getBoundingClientRect();
           _top = activatorTop + window.scrollY - _activatorGap - (menuElement?.offsetHeight || 0)
+        }
+
+        if (
+          window.innerWidth + window.scrollX <
+          (_left || 0) + (menuElement?.offsetWidth || 0)
+        ) {
+          let { left: activatorLeft } = params.activator.getBoundingClientRect();
+          _left = activatorLeft + window.scrollX - _activatorGap - (menuElement?.offsetWidth || 0)
+        }
+      }
+
+      if(stayInViewport) {
+        if (
+          window.innerWidth + window.scrollX <
+          (_left || 0) + (menuElement?.offsetWidth || 0)
+        ) {
+          _left = Math.max(
+            window.innerWidth + window.scrollX - (menuElement?.offsetWidth || 0),
+            0
+          );
         }
       }
 
@@ -206,13 +232,13 @@
     open = false
   }
 
-  function handleWindowScroll() {
+  function handleWindowScrollOrResize() {
     if(open && !!menuElement && !!activator) calculateMenuPosition({ menuElement, activator })
   }
 
 </script>
 
-<svelte:window on:scroll={handleWindowScroll} ></svelte:window>
+<svelte:window on:scroll={handleWindowScrollOrResize} on:resize={handleWindowScrollOrResize} ></svelte:window>
 
 <div 
   class="controller" 
