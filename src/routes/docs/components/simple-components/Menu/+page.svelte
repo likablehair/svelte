@@ -18,7 +18,6 @@
   let secondMenuOpened: Record<string, boolean> = {}
 
   function handleListClick(menuLabel: string) {
-    // e.detail.nativeEvent.stopPropagation()
     secondMenuOpened[menuLabel] = true
     thirdMenuOpened = {}
   }
@@ -27,7 +26,6 @@
   let thirdMenuOpened: Record<string, boolean> = {}
 
   function handleSubMenuClick(menuLabel: string) {
-    // e.detail.nativeEvent.stopPropagation()
     thirdMenuOpened[menuLabel] = true
   }
 </script>

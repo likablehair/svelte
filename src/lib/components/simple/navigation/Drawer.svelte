@@ -106,6 +106,7 @@
 
   .overlay-hidden {
     opacity: 0%;
+    z-index: -1;
   }
 
   .left {

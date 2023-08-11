@@ -1,0 +1,40 @@
+<script lang="ts">
+  import '../../../css/main.css'
+  import Drawer from '$lib/components/simple/navigation/Drawer.svelte';
+  import Menu from '$lib/components/simple/common/Menu.svelte';
+  import MediaQuery from '$lib/components/simple/common/MediaQuery.svelte';
+  import type { ComponentProps } from 'svelte';
+
+  export let open: boolean = false,
+    activator: HTMLElement,
+    drawerPosition: ComponentProps<Drawer>['position'] = 'bottom',
+    _boxShadow: string = "rgb(var(--global-color-grey-900), .5) 0px 2px 4px",
+    _height: string = "fit-content",
+    _maxHeight: string | undefined = undefined,
+    _minWidth: string = "100px",
+    _bordeRadius: string = "5px";
+</script>
+
+<MediaQuery let:mAndDown>
+  {#if mAndDown}
+    <Drawer
+      bind:open={open}
+      bind:position={drawerPosition}
+    >
+      <slot isDrawer={true} isMenu={false}></slot>
+    </Drawer>
+  {:else}
+    <Menu
+      bind:activator={activator}
+      bind:open={open}
+      closeOnClickOutside
+      _boxShadow={_boxShadow}
+      _height={_height}
+      _maxHeight={_maxHeight}
+      _minWidth={_minWidth}
+      _borderRadius={_bordeRadius}
+    >
+      <slot isDrawer={false} isMenu={true}></slot>
+    </Menu>
+  {/if}
+</MediaQuery>

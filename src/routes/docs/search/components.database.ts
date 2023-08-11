@@ -98,6 +98,12 @@ let list: {
     type: 'simple',
     url: '/docs/components/simple-components/Chip'
   }, {
+    title: 'Drawer',
+    description: 'Drop your things in this drawer.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Drawer'
+  }, {
     title: 'TabSwitcher',
     description: 'Switch to a new tab, switch to a new life.',
     status: 'stable',
@@ -124,9 +130,15 @@ let list: {
   }, {
     title: 'Dropdown',
     description: 'Easily drop your things down.',
-    status: 'beta',
+    status: 'stable',
     type: 'composed',
     url: '/docs/components/composed-components/Dropdown'
+  }, {
+    title: 'MenuOrDrawer',
+    description: 'Put all the menus in the drawer please.',
+    status: 'beta',
+    type: 'composed',
+    url: '/docs/components/composed-components/MenuOrDrawer'
   }, {
     title: 'StableDividedSideBarLayout',
     description: 'Layout of this doc.',

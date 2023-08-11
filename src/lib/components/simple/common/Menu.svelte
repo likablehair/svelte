@@ -14,6 +14,7 @@
     _width: string = 'auto',
     _height: string = 'auto',
     _maxHeight: string | undefined = undefined,
+    _minWidth: string | undefined = undefined,
     _overflow = "auto",
     _boxShadow: string | undefined = undefined,
     _borderRadius: string | undefined = undefined,
@@ -262,6 +263,7 @@
     style:height={_height}
     style:max-height={_maxHeight}
     style:width={_width}
+    style:min-width={_minWidth}
     style:overflow={_overflow}
     in:inAnimation={inAnimationConfig}
     out:outAnimation={outAnimationConfig}

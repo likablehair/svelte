@@ -35,7 +35,8 @@
     loading = false,
     icon: string | undefined = undefined,
     tabindex: number | null = null,
-    disabled = false
+    disabled = false,
+    buttonElement: HTMLElement | undefined = undefined
 
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher<{
@@ -88,6 +89,7 @@
   on:keydown={handleKeyDown}
   tabindex={tabindex}
   class="button no-select {clazz || ''}"
+  bind:this={buttonElement}
   {...$$restProps}
 >
   {#if loading}
