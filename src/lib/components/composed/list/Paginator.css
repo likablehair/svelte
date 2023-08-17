@@ -1,0 +1,4 @@
+:root {
+  --paginator-default-selected-background-color: rgb(var(--global-color-primary-500));
+  --paginator-default-selected-color: rgb(var(--global-color-grey-100))
+}

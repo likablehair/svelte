@@ -40,14 +40,22 @@
   let:isDrawer
   --drawer-default-space={`${Math.min(elements?.length || 0, 5) * 56}px`}
 >
-  <SelectableVerticalList
-    bind:selected
-    bind:focused
-    bind:elements
-    --selectable-vertical-list-default-width={isDrawer ? '100%' : 'auto'}
-    --selectable-vertical-list-default-element-height={isDrawer ? '56px' : 'auto'}
-    --selectable-vertical-list-default-title-font-size="1rem"
-    on:select={() => open = false}
-    on:select
-  ></SelectableVerticalList>
+  <div class="selectable-list-wrapper">
+    <SelectableVerticalList
+      bind:selected
+      bind:focused
+      bind:elements
+      --selectable-vertical-list-default-width={isDrawer ? '100%' : 'auto'}
+      --selectable-vertical-list-default-element-height={isDrawer ? '56px' : 'auto'}
+      --selectable-vertical-list-default-title-font-size="null"
+      on:select={() => open = false}
+      on:select
+    ></SelectableVerticalList>
+  </div>
 </MenuOrDrawer>
+
+<style>
+  .selectable-list-wrapper {
+    background-color: rgb(var(--global-color-background-100));
+  }
+</style>

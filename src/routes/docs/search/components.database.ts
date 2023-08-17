@@ -128,6 +128,12 @@ let list: {
     type: 'simple',
     url: '/docs/components/simple-components/SimpleTable'
   }, {
+    title: 'Paginator',
+    description: 'One page at a time.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Paginator'
+  }, {
     title: 'AsyncAutocomplete',
     description: 'Autocomplete in different time and space.',
     status: 'stable',

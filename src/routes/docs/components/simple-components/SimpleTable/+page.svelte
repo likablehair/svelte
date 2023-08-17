@@ -20,6 +20,7 @@
         value: 'productName',
         label: 'Product Name',
         type: 'string',
+        sortable: true,
       }, {
         value: 'progress',
         label: 'Progress',
@@ -28,6 +29,7 @@
         value: 'rating',
         label: 'Rating',
         type: 'custom',
+        sortable: true,
       }
     ]}
     items={[

@@ -81,6 +81,7 @@
       var(--drawer-default-background-color)
     );
     color: var(--drawer-color, var(--drawer-default-color));
+    overflow: var(--drawer-overflow, var(--drawer-default-overflow));
   }
 
   .overlay {

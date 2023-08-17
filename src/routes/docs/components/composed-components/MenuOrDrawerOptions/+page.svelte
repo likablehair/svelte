@@ -31,7 +31,12 @@
       elements={[
         {name: 'new', title: 'Nuovo', icon: 'mdi-plus' },
         {name: 'edit', title: 'Modifica', icon: 'mdi-pencil'},
-        {name: 'delete', title: 'Elimina', icon: 'mdi-delete', style: { color: 'rgb(var(--global-color-error-400))' }}
+        {name: 'delete', title: 'Elimina', icon: 'mdi-delete', style: { color: 'rgb(var(--global-color-error-400))' }},
+        {name: 'edit1', title: 'Modifica', icon: 'mdi-pencil'},
+        {name: 'edit2', title: 'Modifica', icon: 'mdi-pencil'},
+        {name: 'edit3', title: 'Modifica', icon: 'mdi-pencil'},
+        {name: 'edit4', title: 'Modifica', icon: 'mdi-pencil'},
+        {name: 'edit5', title: 'Modifica', icon: 'mdi-pencil'}
       ]}
     ></MenuOrDrawerOptions>
   {/if}

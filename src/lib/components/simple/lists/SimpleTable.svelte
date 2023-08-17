@@ -1,12 +1,13 @@
 <script context="module" lang="ts">
   export type Header = {
-    value: string;
-    label: string;
-    type: "boolean" | "string" | "number" | "date" | "custom";
-    width?: string;
-    minWidth?: string;
+    value: string
+    label: string
+    type: "boolean" | "string" | "number" | "date" | "custom"
+    width?: string
+    minWidth?: string
+    sortable?: boolean
     /* eslint-disable  @typescript-eslint/no-explicit-any */
-    data?: { [key: string]: any };
+    data?: { [key: string]: any }
   };
 </script>
 
@@ -14,9 +15,35 @@
   import '../../../css/main.css'
   import './SimpleTable.css'
   import { dateToString } from "$lib/components/simple/dates/utils";
+  import Icon from '../media/Icon.svelte';
+  import { createEventDispatcher } from 'svelte';
+
+  const dispatch = createEventDispatcher<{
+    'sort': {
+      sortedBy: string | undefined,
+      sortDirection: string
+    }
+  }>()
 
   export let headers: Header[] = [],
-    items: { [key: string]: any }[] = []
+    items: { [key: string]: any }[] = [],
+    sortedBy: string | undefined = undefined,
+    sortDirection: 'asc' | 'desc' = 'asc'
+
+  function handleHeaderClick(header: Header) {
+    if(!!sortedBy && header.value == sortedBy) {
+      if(sortDirection == 'asc') sortDirection = 'desc'
+      else if(sortDirection == 'desc') {
+        sortedBy = undefined
+      }
+    } else {
+      sortedBy = header.value
+      sortDirection = 'asc'
+    }
+    dispatch('sort', {
+      sortedBy, sortDirection
+    })
+  }
 </script>
 
 {#if !!items && Array.isArray(items)}
@@ -28,9 +55,29 @@
             <th 
               style:width={head.width} 
               style:min-width={head.minWidth}
+              class:sortable={head.sortable}
+              on:click={() => handleHeaderClick(head)}
             >
               <slot name="header" {head}>
-                {head.label}
+                <span class="header-label">
+                  <slot name="headerLabel">
+                    {head.label}
+                  </slot>
+                </span>
+                {#if head.sortable}
+                  <span 
+                    class="header-sort-icon"
+                    class:active={sortedBy == head.value}
+                    class:asc={sortDirection == 'asc'}
+                    class:desc={sortDirection == 'desc'}
+                  >
+                    {#if sortDirection == 'asc'}
+                      <Icon name="mdi-arrow-up"></Icon>
+                    {:else}
+                      <Icon name="mdi-arrow-down"></Icon>
+                    {/if}
+                  </span>
+                {/if}
               </slot>
             </th>
           {/each}
@@ -76,17 +123,6 @@
 
 <style>
   .simple-table-container {
-    --simple-table-default-background-color: transparent;
-    --simple-table-default-header-background-color: rgb(var(--global-color-background-400), .8);
-    --simple-table-default-separator-color: rgb(var(--global-color-background-400));
-    --simple-table-default-header-height: 30px;
-    --simple-table-default-header-border-radius: 5px;
-    --simple-table-default-width: 100%;
-    --simple-table-default-row-height: 60px;
-    --simple-table-default-row-hover-background-color: rgb(var(--global-color-background-400), .2);
-    --simple-table-default-header-padding: .2rem .5rem;
-    --simple-table-default-header-font-weight: 700;
-
     width: var(
       --simple-table-width,
       var(--simple-table-default-width)
@@ -136,7 +172,32 @@
     font-weight: var(
       --simple-table-header-font-weight,
       var(--simple-table-default-header-font-weight)
-    )
+    );
+  }
+
+  .thead th.sortable {
+    cursor: pointer;
+    transition: all .1s ease-in;
+    user-select: none;
+  }
+
+  .thead th.sortable:hover {
+    color: var(
+      --simple-table-header-hover-color,
+      var(--simple-table-default-hover-color)
+    );
+  }
+
+  .header-label {
+    margin-right: 5px;
+  }
+
+  .header-sort-icon {
+    display: none;
+  }
+
+  .header-sort-icon.active {
+    display: inline;
   }
 
   .thead th:first-child {

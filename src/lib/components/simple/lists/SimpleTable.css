@@ -1,0 +1,13 @@
+:root {
+  --simple-table-default-hover-color: rgb(var(--global-color-contrast-800), .7);
+  --simple-table-default-background-color: transparent;
+  --simple-table-default-header-background-color: rgb(var(--global-color-background-400), .8);
+  --simple-table-default-separator-color: rgb(var(--global-color-background-400));
+  --simple-table-default-header-height: 30px;
+  --simple-table-default-header-border-radius: 5px;
+  --simple-table-default-width: 100%;
+  --simple-table-default-row-height: 60px;
+  --simple-table-default-row-hover-background-color: rgb(var(--global-color-background-400), .2);
+  --simple-table-default-header-padding: .2rem .5rem;
+  --simple-table-default-header-font-weight: 700;
+}
