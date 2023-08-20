@@ -84,6 +84,7 @@
   class:button-default={buttonType === "default"}
   class:button-text={buttonType === "text"}
   class:button-icon={buttonType === "icon"}
+  class:disabled={disabled}
   on:click={handleClick}
   on:keypress={handleKeyPress}
   on:keydown={handleKeyDown}
@@ -209,7 +210,19 @@
     );
   }
 
-  .button-default:hover {
+  .button-default.disabled {
+    cursor: not-allowed;
+    background-color: var(
+      --button-disabled-background-color,
+      var(--button-default-disabled-background-color)
+    );
+    color: var(
+      --button-disabled-color,
+      var(--button-default-disabled-color)
+    );
+  }
+
+  .button-default:hover:not(.disabled) {
     background-color: var(
       --button-hover-background-color,
       var(--button-default-hover-background-color)
@@ -220,14 +233,14 @@
     );
   }
 
-  .button-default:active {
+  .button-default:active:not(.disabled) {
     background-color: var(
       --button-active-background-color,
       var(--button-default-active-background-color)
     );
   }
 
-  .button-default:focus {
+  .button-default:focus:not(.disabled) {
     background-color: var(
       --button-focus-background-color,
       var(--button-default-focus-background-color)

@@ -21,6 +21,13 @@
       --button-max-width="90vw"
     >Text Button</Button>
   </div>
+  <div class="example">
+    <Button
+      disabled={true}
+      --button-width="200px"
+      --button-max-width="90vw"
+    >Disabled Button</Button>
+  </div>
 </form>
 <h2>Props</h2>
 <PropsViewer
