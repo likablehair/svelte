@@ -2,5 +2,10 @@
   --color-inverted-selector-default-background-color: rgb(var(--global-color-background-200));
   --color-inverted-selector-default-selected-background-color: rgb(var(--global-color-primary-400));
   --color-inverted-selector-default-selected-color: rgb(var(--global-color-grey-50));
-  --color-inverted-selector-default-vertical-gap: 10px;
+  --color-inverted-selector-default-vertical-gap: 8px;
+  --color-inverted-selector-default-icon-gap: 8px;
+  --color-inverted-selector-default-selected-font-weight: 700;
+  --color-inverted-selector-default-element-padding: 8px 8px 8px 16px;
+  --color-inverted-selector-default-element-border-radius: 5px;
+  --color-inverted-selector-default-hover-background-color: rgb(var(--global-color-primary-500), .3)
 }

@@ -5,6 +5,7 @@
   import Icon from "$lib/components/simple/media/Icon.svelte"
   import { createEventDispatcher } from "svelte";
   import { clickOutside } from '$lib/utils/clickOutside';
+  import ColorInvertedSelector, { type Option } from '../simple/lists/ColorInvertedSelector.svelte';
 
   let clazz: {
     container?: string,
@@ -30,7 +31,9 @@
   */
 
   export let drawerOpened: boolean = false,
-    expandOn: 'hover' | 'click' | 'none' = 'hover'
+    expandOn: 'hover' | 'click' | 'none' = 'hover',
+    options: Option[] = [],
+    selectedIndex: number | undefined = undefined
 
   let dispatch = createEventDispatcher<{
     'drawer-change': {
@@ -79,7 +82,7 @@
       </slot>
     </nav>
     <header
-      class:opened={drawerOpened || sidebarExpanded}
+      class:opened={(mAndDown && drawerOpened) || sidebarExpanded}
       on:mouseleave={() => {if(expandOn == 'hover') sidebarExpanded = false}}
       on:mouseenter={() => {if(expandOn == 'hover') sidebarExpanded = true}}
       on:click={() => {if(expandOn == 'click') sidebarExpanded = true}}
@@ -89,8 +92,36 @@
       class="side-bar {clazz.header}"
     >
       <div class="side-bar-content">
-        <slot name="sidebar" hamburgerVisible={mAndDown}>
-          Sidebar
+        <slot name="sidebar" hamburgerVisible={mAndDown} {sidebarExpanded}>
+          <div class="sidebar-container">
+            <div class="logo-and-menu">
+              <slot name="logo" hamburgerVisible={mAndDown} {sidebarExpanded}>
+                <div class="logo">logo</div>
+              </slot>
+              <slot name="menu" hamburgerVisible={mAndDown} {sidebarExpanded}>
+                <div 
+                  class="menu-container"
+                  class:expanded={sidebarExpanded}
+                >
+                  <ColorInvertedSelector
+                    options={options}
+                    selectedIndex={selectedIndex}
+                    --color-inverted-selector-default-background-color="transparent"
+                    --color-inverted-selector-default-font-size="1.2rem"
+                    --color-inverted-selector-default-icon-gap="1.2rem"
+                    --color-inverted-selector-default-element-height="3rem"
+                    --color-inverted-selector-default-element-padding="8px 8px 8px 11px"
+                    --color-inverted-selector-default-element-border-radius="16px"
+                    --color-inverted-selector-default-selected-font-weight="400"
+                    --icon-default-size="1.3rem"
+                    deletable={false}
+                  ></ColorInvertedSelector>
+                </div>
+              </slot>
+            </div>
+            <slot name="user" hamburgerVisible={mAndDown} {sidebarExpanded}>
+            </slot>
+          </div>
         </slot>
       </div>
     </header>
@@ -122,9 +153,9 @@
       --unstable-divided-side-bar-layout-side-bar-width, 
       var(--unstable-divided-side-bar-layout-default-side-bar-width)
     );
-    border-right: 1px solid var(
-      --unstable-divided-side-bar-layout-side-bar-border-color,
-      var(--unstable-divided-side-bar-layout-default-side-bar-border-color)
+    border-right: var(
+      --unstable-divided-side-bar-layout-side-bar-border,
+      var(--unstable-divided-side-bar-layout-default-side-bar-border)
     );
     top: 0;
     bottom: 0;
@@ -200,14 +231,14 @@
       bottom: 0;
       right: 0;
       z-index: -100;
-      transition-property: backdrop-filter;
+      transition-property: all;
       transition-timing-function: cubic-bezier(.4,0,.2,1);
       transition-duration: .15s;
       display: block;
     }
 
     .overlay.visible {
-      background-color: hsla(240,5%,65%,.2);
+      background-color: rgb(var(--global-color-grey-900), .5);
       backdrop-filter: blur(4px);
       z-index: 20;
     }
@@ -223,9 +254,9 @@
       --unstable-divided-side-bar-layout-side-bar-width,
       var(--unstable-divided-side-bar-layout-default-side-bar-width)
     );
-    border-bottom: 1px solid var(
-      --unstable-divided-side-bar-layout-header-menu-border-color,
-      var(--unstable-divided-side-bar-layout-default-header-menu-border-color)
+    border-bottom: var(
+      --unstable-divided-side-bar-layout-header-menu-border,
+      var(--unstable-divided-side-bar-layout-default-header-menu-border)
     );
     backdrop-filter: blur(4px);
     background-color: var(
@@ -275,6 +306,10 @@
     transition: all .2s cubic-bezier(.4,0,.2,1);
   }
 
+  .menu-container {
+    transition: padding .2s cubic-bezier(0.075, 0.82, 0.165, 1);
+  }
+
   @media (max-width: 1024px) {
   	.main-section {
       padding-left: 0;
@@ -282,6 +317,14 @@
 
     .blurred {
       backdrop-filter: blur(4px);
+    }
+
+    .sidebar-container {
+      height: calc(100dvh - 3.5rem);
+    }
+
+    .logo {
+      display: none;
     }
   }
 
@@ -291,6 +334,14 @@
         --unstable-divided-side-bar-layout-side-bar-hover-width, 
         var(--unstable-divided-side-bar-layout-default-side-bar-hover-width)
       );
+    }
+
+    .menu-container.expanded {
+      padding: 1rem;
+    }
+
+    .sidebar-container {
+      height: 100dvh;
     }
   }
 
@@ -314,4 +365,20 @@
     border: 0 solid #e5e7eb;
   }
 
+  .sidebar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: space-between;
+  }
+
+  .logo-and-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .logo {
+    height: 3.5rem;
+  }
 </style>
