@@ -206,7 +206,7 @@
       --global-search-text-field-padding,
       var(--global-search-text-field-default-padding)
     );
-    border: 0 solid #e5e7eb;
+    border: 0 solid white;
     cursor: pointer;
     transition-property: box-shadow;
     transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);

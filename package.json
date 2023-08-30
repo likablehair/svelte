@@ -62,6 +62,7 @@
     "highlightjs-svelte": "^1.0.6",
     "imask": "^7.1.0-alpha.0",
     "lodash": "^4.17.21",
-    "luxon": "^3.3.0"
+    "luxon": "^3.3.0",
+    "svelte-chartjs": "^3.1.2"
   }
 }

@@ -169,7 +169,13 @@ let list: {
     status: 'beta',
     type: 'layout',
     url: '/docs/components/layouts/UnstableDividedSideBarLayout'
-  },
+  }, {
+    title: 'GanymedeLineChart',
+    description: 'Ganymede Line Chart',
+    status: 'beta',
+    type: 'simple',
+    url: '/docs/components/simple-components/GanymedeLineChart'
+  }
 ]
 
 export default lodash.sortBy(list, 'title')
