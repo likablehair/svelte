@@ -55,7 +55,7 @@
 <div
   class="textfield-container {clazz.container || ''}"
 >
-  <div class="row {clazz.row}">
+  <div class="row {clazz.row || ''}">
     <slot name="prepend" {prependIcon} {iconSize}>
       {#if !!prependIcon}
         <Icon name={prependIcon} --icon-size={iconSize}></Icon>
