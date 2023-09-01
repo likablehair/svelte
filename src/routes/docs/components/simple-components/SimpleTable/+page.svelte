@@ -4,6 +4,7 @@
   
   import SimpleTable from "$lib/components/simple/lists/SimpleTable.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
+  import { DateTime } from "luxon";
 </script>
 
 <h1>SimpleTable</h1>
@@ -12,6 +13,25 @@
 <div class="example">
   <SimpleTable 
     headers={[
+      // {
+      //   value: 'true',
+      //   label: 'New customer',
+      //   type: 'checkbox',
+      //   additionalParams :{ 
+      //     checkboxColor:'white',
+      //     checkboxSize:'2.1rem'
+      //   }
+      // }, 
+       {
+        value: 'active',
+        label: 'Active',
+        type: 'icon',
+        additionalParams :{ 
+          iconName:'mdi-check',
+          iconColor:'green',
+          iconSize:'2.1rem'
+        }
+      }, 
       {
         value: 'businessName',
         label: 'Business name',
@@ -30,24 +50,60 @@
         label: 'Rating',
         type: 'custom',
         sortable: true,
+      },
+      {
+        value: 'startDate',
+        label: 'Start date [toISO]',
+        type: 'date',
+        additionalParams :{ 
+          dateFormat:'toISO'
+        }
+      },
+      {
+        value: 'startDate',
+        label: 'Start date [toLocaleString]',
+        type: 'date',
+        additionalParams :{ 
+          dateFormat:'toLocaleString'
+        }
+      },
+      {
+        value: 'startDate',
+        label: 'Start date [setLocale]',
+        type: 'date',
+        additionalParams :{ 
+          dateFormat:'setLocale'
+        }
+      },
+      {
+        value: 'startDate',
+        label: 'Start date [fromISO]',
+        type: 'date',
+        additionalParams :{ 
+          dateFormat:'fromISO'
+        }
       }
+    
     ]}
     items={[
       {
         businessName: 'GQ Creators',
         productName: 'Data Protection',
         progress: '339 sold',
-        rating: 5
+        rating: 5,
+        startDate: DateTime.now()
       }, {
         businessName: 'Dribblers Agency',
         productName: 'Job Search',
         progress: '212 sold',
-        rating: 4.5
+        rating: 4.5,
+        startDate: DateTime.now()
       }, {
         businessName: 'Popular My',
         productName: 'Financial Transactions',
         progress: '94 sold',
-        rating: 4.2
+        rating: 4.2,
+        startDate: DateTime.now()
       },
     ]}
   >

@@ -1,13 +1,36 @@
 <script context="module" lang="ts">
+
+  // export type HeaderTypeAdvanced =  {
+  //       key:  "boolean" | "string" | "number" | "date" | "custom" | 'icon' | 'checkbox';
+  //       params:{
+  //         iconName:'mdi-account',
+  //         iconColor:'white',
+  //         iconSize:'2.1rem'
+  //       }
+  //     }
+  export type HeaderType = "boolean" | "string" | "number" | "date" | "custom" | 'icon' | 'checkbox';
+
+  export type HeaderFormat = "toISO" | "toISODate" | "toLocaleString" | 'setLocale' | 'fromISO';
+
+  export type AdditionalParams = {
+    dateFormat?: HeaderFormat ;
+    iconName?: string,
+    iconColor?: string,
+    iconSize?: string,
+    checkboxColor?: string,
+    checkboxSize?: string
+  };
+
   export type Header = {
-    value: string
-    label: string
-    type: "boolean" | "string" | "number" | "date" | "custom"
-    width?: string
-    minWidth?: string
-    sortable?: boolean
+    value: string;
+    label: string;
+    type: HeaderType;
+    additionalParams?: AdditionalParams;
+    width?: string;
+    minWidth?: string;
+    sortable?: boolean;
     /* eslint-disable  @typescript-eslint/no-explicit-any */
-    data?: { [key: string]: any }
+    data?: { [key: string]: any };
   };
 </script>
 
@@ -16,7 +39,11 @@
   import './SimpleTable.css'
   import { dateToString } from "$lib/components/simple/dates/utils";
   import Icon from '../media/Icon.svelte';
+  import Checkbox from '../forms/Checkbox.svelte';
   import { createEventDispatcher } from 'svelte';
+  import { includes } from 'lodash'
+  import { DateTime } from 'luxon';
+  
 
   const dispatch = createEventDispatcher<{
     'sort': {
@@ -28,7 +55,7 @@
   export let headers: Header[] = [],
     items: { [key: string]: any }[] = [],
     sortedBy: string | undefined = undefined,
-    sortDirection: 'asc' | 'desc' = 'asc'
+    sortDirection: 'asc' | 'desc' = 'asc';
 
   function handleHeaderClick(header: Header) {
     if(!!sortedBy && header.value == sortedBy) {
@@ -44,16 +71,44 @@
       sortedBy, sortDirection
     })
   }
+
+function formatDate(dateTime: DateTime, format?: HeaderFormat): string | null  {
+  const _format = format || 'toISO';
+
+  const formatFunctions: Record<HeaderFormat, () => string | null> = {
+    toLocaleString: () => dateTime.toLocaleString(),
+    toISO: () =>  dateTime.toISO(),
+    toISODate: () => dateTime.toISODate(),
+    setLocale: () => dateTime.setLocale('it').toFormat('yyyy MM dd'),
+    fromISO: () =>   DateTime.fromISO(dateTime.toISO()).toFormat('ff') 
+  };
+
+  return formatFunctions[_format]();
+}
+
+  function handleFormatDateHeader(dateTime: DateTime, format?: HeaderFormat) {
+    
+    const formattedDate = formatDate(dateTime, format);
+    return formattedDate
+  }
+
+  function handleCheckboxValue(value: any) {
+    console.log(value)
+    return true
+  }
+
+
+
 </script>
 
 {#if !!items && Array.isArray(items)}
-  <div class="simple-table-container" >
+  <div class="simple-table-container">
     <table class="table">
       <thead class="thead">
         <tr>
           {#each headers as head}
-            <th 
-              style:width={head.width} 
+            <th
+              style:width={head.width}
               style:min-width={head.minWidth}
               class:sortable={head.sortable}
               on:click={() => handleHeaderClick(head)}
@@ -65,16 +120,16 @@
                   </slot>
                 </span>
                 {#if head.sortable}
-                  <span 
+                  <span
                     class="header-sort-icon"
                     class:active={sortedBy == head.value}
-                    class:asc={sortDirection == 'asc'}
-                    class:desc={sortDirection == 'desc'}
+                    class:asc={sortDirection == "asc"}
+                    class:desc={sortDirection == "desc"}
                   >
-                    {#if sortDirection == 'asc'}
-                      <Icon name="mdi-arrow-up"></Icon>
+                    {#if sortDirection == "asc"}
+                      <Icon name="mdi-arrow-up" />
                     {:else}
-                      <Icon name="mdi-arrow-down"></Icon>
+                      <Icon name="mdi-arrow-down" />
                     {/if}
                   </span>
                 {/if}
@@ -102,8 +157,13 @@
                     {item}
                   />
                 {:else if header.type == "date"}
-                  {dateToString(item[header.value], "dayAndHours", "it")}
-                {:else}
+                  {handleFormatDateHeader(item[header.value], header.additionalParams?.dateFormat )}
+                {:else if header.type == "icon"}
+                    <Icon  --icon-color={header.additionalParams?.iconColor}  
+                           --icon-size={header.additionalParams?.iconSize} 
+                           name={header.additionalParams?.iconName || ''}/>
+                <!-- {:else if header.type == "checkbox"} <Checkbox  bind:value={handleCheckboxValue(item[header.value])} disabled ></Checkbox>     -->
+                {:else} 
                   {item[header.value]}
                 {/if}
               </td>
@@ -123,10 +183,7 @@
 
 <style>
   .simple-table-container {
-    width: var(
-      --simple-table-width,
-      var(--simple-table-default-width)
-    );
+    width: var(--simple-table-width, var(--simple-table-default-width));
     min-width: var(
       --simple-table-min-width,
       var(--simple-table-default-min-width)
@@ -135,10 +192,7 @@
       --simple-table-max-width,
       var(--simple-table-default-max-width)
     );
-    height: var(
-      --simple-table-height,
-      var(--simple-table-default-height)
-    );
+    height: var(--simple-table-height, var(--simple-table-default-height));
     min-height: var(
       --simple-table-min-height,
       var(--simple-table-default-min-height)
@@ -177,7 +231,7 @@
 
   .thead th.sortable {
     cursor: pointer;
-    transition: all .1s ease-in;
+    transition: all 0.1s ease-in;
     user-select: none;
   }
 
@@ -240,7 +294,7 @@
       --simple-table-row-height,
       var(--simple-table-default-row-height)
     );
-    transition: background-color .1s ease-in-out;
+    transition: background-color 0.1s ease-in-out;
   }
 
   .item-tr:hover {
