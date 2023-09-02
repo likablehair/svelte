@@ -133,7 +133,7 @@
       {#if totalElements !== undefined}
         <slot name="rangeDescriptor" {page} {maxPage} {rowsPerPage} {totalElements}>
           <div class="range-descriptor">
-            {page} viewing {((page || 1) - 1) * rowsPerPage} - {(page || 1) * rowsPerPage} of {totalElements}
+            viewing {((page || 1) - 1) * rowsPerPage} - {(page || 1) * rowsPerPage} of {totalElements}
           </div>
         </slot>
       {/if}
