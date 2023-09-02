@@ -57,7 +57,8 @@
     icon="mdi-chevron-double-left"
     on:click={hardPrevious}
     --button-default-background-color="transparent"
-    --button-default-focus-background-color="transparent"
+    --button-default-focus-background-color="rgb(var(--global-color-primary-500), .3)"
+    --button-default-focus-color="rgb(var(--global-color-contrast-900))"
     --button-default-hover-background-color="rgb(var(--global-color-primary-500))"
     --button-default-box-shadow="none"
     --button-default-color="rgb(var(--global-color-contrast-900))"
@@ -66,7 +67,8 @@
     icon="mdi-chevron-left"
     on:click={previousPage}
     --button-default-background-color="transparent"
-    --button-default-focus-background-color="transparent"
+    --button-default-focus-background-color="rgb(var(--global-color-primary-500), .3)"
+    --button-default-focus-color="rgb(var(--global-color-contrast-900))"
     --button-default-hover-background-color="rgb(var(--global-color-primary-500))"
     --button-default-box-shadow="none"
     --button-default-color="rgb(var(--global-color-contrast-900))"
@@ -75,7 +77,8 @@
     <Button
       on:click={() => goToPage(page - 1)}
       --button-default-background-color="transparent"
-      --button-default-focus-background-color="transparent"
+      --button-default-focus-background-color="rgb(var(--global-color-primary-500), .3)"
+      --button-default-focus-color="rgb(var(--global-color-contrast-900))"
       --button-default-hover-background-color="rgb(var(--global-color-primary-500))"
       --button-default-box-shadow="none"
       --button-default-color="rgb(var(--global-color-contrast-900))"
@@ -92,7 +95,8 @@
     <Button
       on:click={() => goToPage(page + 1)}
       --button-default-background-color="transparent"
-      --button-default-focus-background-color="transparent"
+      --button-default-focus-background-color="rgb(var(--global-color-primary-500), .3)"
+      --button-default-focus-color="rgb(var(--global-color-contrast-900))"
       --button-default-hover-background-color="rgb(var(--global-color-primary-500))"
       --button-default-box-shadow="none"
       --button-default-color="rgb(var(--global-color-contrast-900))"
@@ -103,7 +107,8 @@
     on:click={nextPage}
     icon="mdi-chevron-right"
     --button-default-background-color="transparent"
-    --button-default-focus-background-color="transparent"
+    --button-default-focus-background-color="rgb(var(--global-color-primary-500), .3)"
+    --button-default-focus-color="rgb(var(--global-color-contrast-900))"
     --button-default-hover-background-color="rgb(var(--global-color-primary-500))"
     --button-default-box-shadow="none"
     --button-default-color="rgb(var(--global-color-contrast-900))"
@@ -113,7 +118,8 @@
       on:click={hardNext}
       icon="mdi-chevron-double-right"
       --button-default-background-color="transparent"
-      --button-default-focus-background-color="transparent"
+      --button-default-focus-background-color="rgb(var(--global-color-primary-500), .3)"
+      --button-default-focus-color="rgb(var(--global-color-contrast-900))"
       --button-default-hover-background-color="rgb(var(--global-color-primary-500))"
       --button-default-box-shadow="none"
       --button-default-color="rgb(var(--global-color-contrast-900))"

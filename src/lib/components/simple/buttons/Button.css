@@ -14,6 +14,7 @@
   --button-default-text-hover-background-color: rgb(var(--global-color-primary-500), 0.2);
   --button-default-active-background-color: rgb(var(--global-color-primary-500));
   --button-default-focus-background-color: rgb(var(--global-color-primary-500));
+  --button-default-focus-color: rgb(var(--global-color-grey-50));
   --button-default-disabled-background-color: rgb(var(--global-color-primary-500), .6);
   --button-default-disabled-color: rgb(var(--global-color-grey-50), .6);
   --button-default-text-active-background-color: rgb(var(--global-color-primary-500), 0.4);

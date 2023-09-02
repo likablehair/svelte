@@ -216,7 +216,7 @@
           name: 'instagram',
           url: 'https://instagram.com/likablehair?igshid=YmMyMTA2M2Y='
         }, { 
-          icon: 'mdi-white-balance-sunny',
+          icon: $theme.dark ? 'mdi-white-balance-sunny' : 'mdi-moon-waning-crescent',
           name: 'theme'
         },
       ]}
