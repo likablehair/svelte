@@ -1,7 +1,7 @@
 {
   "name": "@likable-hair/svelte",
   "description": "A Svelte component for likablehair",
-  "version": "3.0.19",
+  "version": "3.0.20",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build && npm run package",
