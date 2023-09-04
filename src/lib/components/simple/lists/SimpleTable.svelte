@@ -1,35 +1,17 @@
 <script context="module" lang="ts">
-    
-  export type HeaderColumnDateFormat = "toISO" | "toISODate" | "toLocaleString" | 'setLocale' | 'fromISO'
   
-  export type ColumnDate = {
-      key: "date",
-      params: {
-        format?: HeaderColumnDateFormat,
-      }
-  }
-
-  export type ColumnIcon = {
-      key: "icon",
-      params: {
-          name: string,
-          color: string,
-          size: string
-      }
-  }
-
-  export type HeaderTypeAdvanced =  ColumnDate | ColumnIcon
-  export type HeaderType = "boolean" | "string" | "number"  | "custom" | 'checkbox';
+  export type HeaderTypeAdvanced =  ColumnDate | ColumnIcon | ColumnCheckBox | ColumnCostom 
+  export type HeaderType = ColumnBoolean | ColumnString | ColumnNumber 
 
   export type Header = {
-    value: string;
-    label: string;
-    type: HeaderType | HeaderTypeAdvanced; 
-    width?: string;
-    minWidth?: string;
-    sortable?: boolean;
+    value: string
+    label: string
+    type: HeaderType | HeaderTypeAdvanced
+    width?: string
+    minWidth?: string
+    sortable?: boolean
     /* eslint-disable  @typescript-eslint/no-explicit-any */
-    data?: { [key: string]: any };
+    data?: { [key: string]: any }
   };
 </script>
 
@@ -41,7 +23,8 @@
   import Checkbox from '../forms/Checkbox.svelte';
   import { createEventDispatcher } from 'svelte';
   import { includes } from 'lodash'
-  import { DateTime } from 'luxon';
+  import type { DateTime } from 'luxon';
+  import type { ColumnBoolean, ColumnCheckBox, ColumnCostom, ColumnDate, ColumnDateParams, ColumnIcon, ColumnNumber, ColumnString } from './columnTypes';
 
   
 
@@ -72,43 +55,9 @@
     })
   }
 
-  
-  function isHeaderTypeDate(header: Header) {
-    return typeof header.type === 'object' && header.type.key === "date";
+  function formatDate(dateTime: DateTime, dateFormat: ColumnDateParams): string  {
+   return dateTime.setLocale(dateFormat.locale).toFormat(dateFormat.format)
   }
-  function isHeaderTypeIcon(header: Header) {
-    return typeof header.type === 'object' && header.type.key === "icon";
-  }
-
-  function formatDate(dateTime: DateTime, format?: HeaderColumnDateFormat): string | null  {
-    const _format = format || 'toISO';
-    console.log(dateTime)
-    if(!!dateTime) {    
-      const formatFunctions: Record<HeaderColumnDateFormat, () => string | null> = {
-      toLocaleString: () =>  dateTime.toLocaleString(),
-      toISO: () =>  dateTime.toISO(),
-      toISODate: () => dateTime.toISODate(),
-      setLocale: () => dateTime.setLocale('it').toFormat('yyyy MM dd'),
-      fromISO: () =>   DateTime.fromISO(dateTime.toISO()).toFormat('ff') 
-      };  
-
-      return formatFunctions[_format](); 
-    } 
-    else return null;  
-
-  }
-
-  function handleFormatDateHeader(dateTime: DateTime, format?: HeaderColumnDateFormat) {
-    
-    const formattedDate = formatDate(dateTime, format);
-    return formattedDate
-  }
-
-  function handleCheckboxValue(value: any) {
-    return true
-  }
-
-
 
 </script>
 
@@ -159,7 +108,7 @@
           <tr class="item-tr">
             {#each headers as header, j}
               <td>
-                {#if header.type == "custom"}
+                {#if header.type.key == "custom"}
                   <slot
                     name="custom"
                     index={i}
@@ -167,10 +116,9 @@
                     {header}
                     {item}
                   />
-                {:else if  typeof header.type === 'object' 
-                       &&  header.type.key == "date"}
-                  {handleFormatDateHeader(item[header.value], header.type.params?.format)}
-                {:else if  typeof header.type === 'object' &&  header.type.key == "icon"}
+                {:else if  header.type.key == "date"}
+                  {formatDate(item[header.value], header.type.params)}
+                {:else if header.type.key == "icon"}
                     <Icon 
                      --icon-color={header.type.params?.color }  
                      --icon-size={header.type.params?.size} 

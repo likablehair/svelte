@@ -3,6 +3,8 @@
   import PropsViewer from "../../PropsViewer.svelte";
   
   import SimpleTable from "$lib/components/simple/lists/SimpleTable.svelte";
+  import type { ColumnBoolean, ColumnCheckBox, ColumnCostom, ColumnDate, ColumnIcon, ColumnNumber, ColumnString } from "$lib/components/simple/lists/columnTypes";
+
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import { DateTime } from "luxon";
 </script>
@@ -37,59 +39,60 @@
       {
         value: 'businessName',
         label: 'Business name',
-        type: 'string',
+        type:   {
+          key:"string"
+        },
       }, {
         value: 'productName',
         label: 'Product Name',
-        type: 'string',
+        type:   {
+          key:"string"
+        },
         sortable: true,
       }, {
         value: 'progress',
         label: 'Progress',
-        type: 'string',
+        type:   {
+          key:"string"
+        },
       }, {
         value: 'rating',
         label: 'Rating',
-        type: 'custom',
+        type:   {
+          key:"custom"
+        },
         sortable: true,
       },
       {
         value: 'startDate',
-        label: 'Start date [toISO]',
+        label: 'Start date ',
         type: {
           key:'date',
           params :{ 
-            format:'toISO',
+            locale: 'it',
+            format: 'dd/MM/yyyy',
           }
         }
       },
       {
         value: 'startDate',
-        label: 'Start date [toLocaleString]',
+        label: 'Active date [toLocaleString]',
         type: {
           key:'date',
           params :{ 
-            format:'toLocaleString',
+            locale: 'en',
+            format: 'MM-dd-yy',
           }
         }
-      },
+      },   
       {
         value: 'startDate',
-        label: 'Start date [setLocale]',
+        label: 'End date ',
         type: {
           key:'date',
           params :{ 
-            format:'setLocale',
-          }
-        }
-      },    
-      {
-        value: 'startDate',
-        label: 'Start date [fromISO]',
-        type: {
-          key:'date',
-          params :{ 
-            format:'fromISO',
+            locale: 'it',
+            format: "HH 'ore e' mm 'minuti",
           }
         }
       },    
