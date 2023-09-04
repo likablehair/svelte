@@ -14,6 +14,8 @@
     searchText: string | undefined = undefined,
     maxVisibleChips: number | undefined = undefined,
     placeholder: string = "Seleziona",
+    clearable: boolean = true,
+    mandatory: boolean = true,
     icon: string | undefined = undefined
 
   $: generatedLabel = values.length == 1 ? values[0].label : `${values.length} Selezionati`
@@ -31,11 +33,15 @@
   bind:searchText
   bind:multiple
   bind:maxVisibleChips
+  bind:mandatory
   searchFunction={() => true}
+  on:change
 >
   <svelte:fragment slot="selection-container" let:openMenu let:handleKeyDown>
     <Button 
       --button-default-background-color="transparent"
+      --button-default-focus-background-color="rgb(var(--global-color-primary-400), .3)"
+      --button-default-focus-color="rgb(var(--global-color-contrast-900))"
       --button-default-border="2px solid rgb(var(--global-color-primary-400))"
       --button-default-color="rgb(var(--global-color-contrast-800))"
       on:click={openMenu}
@@ -60,11 +66,13 @@
           {:else}
             <div class="space-between">
               <div>{generatedLabel}</div>
-              <Icon 
-                name="mdi-close"
-                click
-                on:click={handleCloseClick}
-              ></Icon>
+              {#if clearable}  
+                <Icon 
+                  name="mdi-close"
+                  click
+                  on:click={handleCloseClick}
+                ></Icon>
+              {/if}
             </div>
           {/if}
         </div>
@@ -79,7 +87,9 @@
     justify-content: flex-start;
     align-items: center;
     gap: 10px;
-    width: 130px;
+    width: 100%;
+    text-overflow: ellipsis;
+    white-space: pre;
   }
 
   .space-between {
@@ -87,5 +97,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
   }
 </style>

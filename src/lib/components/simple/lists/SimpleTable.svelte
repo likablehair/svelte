@@ -28,6 +28,14 @@
 
   
 
+  let clazz: {
+    container?: string,
+    header?: string,
+    row?: string,
+    cell?: string
+  } = {};
+	export { clazz as class };
+
   const dispatch = createEventDispatcher<{
     'sort': {
       sortedBy: string | undefined,
@@ -62,9 +70,9 @@
 </script>
 
 {#if !!items && Array.isArray(items)}
-  <div class="simple-table-container">
+  <div class="simple-table-container {clazz.container || ''}" >
     <table class="table">
-      <thead class="thead">
+      <thead class="thead {clazz.header || ''}">
         <tr>
           {#each headers as head}
             <th
@@ -105,9 +113,9 @@
       </thead>
       <tbody>
         {#each items as item, i}
-          <tr class="item-tr">
+          <tr class="item-tr {clazz.row || ''}">
             {#each headers as header, j}
-              <td>
+              <td class="{clazz.cell || ''}">
                 {#if header.type.key == "custom"}
                   <slot
                     name="custom"
@@ -131,7 +139,7 @@
               </td>
             {/each}
             {#if $$slots.rowActions || $$slots.append}
-              <td>
+              <td class="{clazz.cell || ''}">
                 <slot name="rowActions" index={i} {item} />
                 <slot name="append" index={i} {item} />
               </td>

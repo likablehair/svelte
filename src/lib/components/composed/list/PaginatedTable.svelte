@@ -1,152 +1,176 @@
-<!-- <script lang="ts" context="module">
-  export type Header = {
-    value: string;
-    label: string;
-    type: "boolean" | "string" | "number" | "date" | "custom";
-    width?: string;
-    minWidth?: string;
-    data?: { [key: string]: any };
-  };
+<script lang="ts" context="module">
+  import SimpleTable from "$lib/components/simple/lists/SimpleTable.svelte";
+  import Icon from "$lib/components/simple/media/Icon.svelte";
+  import Paginator from "$lib/components/composed/list/Paginator.svelte";
+  import Dropdown from "$lib/components/composed/forms/Dropdown.svelte";
+  import { createEventDispatcher, type ComponentProps } from "svelte";
+
+  type ArrayElement<ArrayType extends readonly unknown[]> = 
+    ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+
+  export type Header = ArrayElement<NonNullable<ComponentProps<SimpleTable>['headers']>>;
 </script>
 
 <script lang="ts">
-  import { onMount } from 'svelte';
-	import type { Filter } from '$lib/types/filter';
-	import StandardPaginator from './StandardPaginator.svelte';
-	import StandardSelect from './StandardSelect.svelte';
-	import StandardTable from "./StandardTable.svelte";
+  let clazz: {
+    simpleTable?: ComponentProps<SimpleTable>['class']
+  } = {};
+	export { clazz as class };
 
-  export let headers: Header[] = [],
-    filters: Filter[] = [],
-    width: string = "auto",
-    page: number = 1,
-    perPage: number = 20,
-    perPageOptions: number[] = [20, 50, 100],
-    reload: boolean = false,
-    loading: boolean = false,
-    loadingText: string = "Caricamento ...",
-    noDataText: string = "Nessun elemento disponibile",
-    fetcher: (params: {
-      page: number,
-      perPage: number,
-      filters: Filter[]
-    }) => Promise<{
-      data: any[],
-      meta: PaginationData
-    }>
+  export let headers: ComponentProps<SimpleTable>['headers'] = [],
+    items: ComponentProps<SimpleTable>['items'] = [],
+    sortedBy: ComponentProps<SimpleTable>['sortedBy'] = undefined,
+    sortDirection: ComponentProps<SimpleTable>['sortDirection'] = undefined,
+    page: NonNullable<ComponentProps<Paginator>['page']> = 1,
+    maxPage: ComponentProps<Paginator>['maxPage'] = undefined,
+    rowsPerPageOptions: ComponentProps<Dropdown>['items'] = [
+      { label: '20', value: 20 },
+      { label: '50', value: 50 },
+      { label: '100', value: 100 },
+    ],
+    hideRowsPerPage: boolean = false,
+    totalElements: number | undefined = undefined,
+    rowsPerPage: number = 20
 
-  let items: { [key: string]: any }[] = [],
-    maxPage: number | undefined = undefined
-
-  onMount(() => {
-    loadRows()
-  })
-
-  async function loadRows() {
-    if(!!fetcher) {
-      loading = true
-      let results = await fetcher({page, perPage, filters})
-
-      items = results.data
-      page = results.meta.currentPage
-      maxPage = results.meta.lastPage
-      loading = false
+  let dispatch = createEventDispatcher<{
+    paginationChange: {
+      rowsPerPage: number,
+      page: number
     }
+  }>()
+
+  let rowsPerPageSelection: ComponentProps<Dropdown>['values'] = []
+
+  $: rowsPerPageSelection = [
+    { label: rowsPerPage.toString(), value: rowsPerPage }
+  ]
+
+  $: if(totalElements !== undefined) maxPage = Math.max(Math.round(totalElements/rowsPerPage), 1)
+
+  function handleRowsPerPageChange(e: CustomEvent<{ selection: ComponentProps<Dropdown>['items']}>) {
+    rowsPerPage = Number(e.detail.selection?.[0].value)
+    handlePaginationChange()
   }
 
   function handlePaginationChange() {
-    loadRows()
-  }
-
-  function handlePerPageChange() {
-    page = 1
-    loadRows()
-  }
-
-  $: perPageOptionsFormatted = perPageOptions.map((el) => {
-    return {
-      value: el,
-      text: el.toString()
-    }
-  })
-  $: if(reload) {
-    loadRows().then(() => {
-      reload = false
+    dispatch('paginationChange', {
+      rowsPerPage, page
     })
   }
-
-  $: filters && loadRows()
-
 </script>
 
-<div class="top-actions">
-
-</div>
-<div class="table">
-  <StandardTable
-    headers={headers}
-    width={width}
-    items={items}
+<div class="paginated-table">
+  <SimpleTable
+    bind:headers
+    bind:class={clazz.simpleTable}
+    bind:items
+    bind:sortedBy
+    bind:sortDirection
+    on:sort
   >
-    <svelte:fragment slot="appendLastColumn" let:item>
-      <slot name="appendLastColumn" item={item}></slot>
+    <svelte:fragment slot="header" let:head>
+      <slot name="header" {head} >
+        <span class="header-label">
+          <slot name="headerLabel">
+            {head.label}
+          </slot>
+        </span>
+        {#if head.sortable}
+          <span 
+            class="header-sort-icon"
+            class:active={sortedBy == head.value}
+            class:asc={sortDirection == 'asc'}
+            class:desc={sortDirection == 'desc'}
+          >
+            {#if sortDirection == 'asc'}
+              <Icon name="mdi-arrow-up"></Icon>
+            {:else}
+              <Icon name="mdi-arrow-down"></Icon>
+            {/if}
+          </span>
+        {/if}
+      </slot>
     </svelte:fragment>
-
-    <svelte:fragment slot="customColumn" let:item let:header>
-      <slot name="customColumn" item={item} header={header}></slot>
+    <svelte:fragment 
+      slot="custom" 
+      let:columnIndex 
+      let:index 
+      let:header 
+      let:item
+    >
+      <slot name="custom" {index} {columnIndex} {header} {item}/>
     </svelte:fragment>
-  </StandardTable>
-  {#if loading}
-    <div class="loading-text">
-      {loadingText}
-    </div>
-  {:else if items.length == 0}
-    <div class="no-data">
-      {noDataText}
-    </div>
-  {/if}
-</div>
-<div class="footer">
-  <div>
-    <StandardSelect
-      bind:value={perPage}
-      options={perPageOptionsFormatted}
-      on:change={handlePerPageChange}
-    ></StandardSelect>
-  </div>
-  <div>
-    <StandardPaginator
-      bind:page={page}
-      bind:maxPage={maxPage}
-      on:change={handlePaginationChange}
-    ></StandardPaginator>
+    <svelte:fragment slot="rowActions" let:index let:item>
+      <slot name="rowActions" {index} {item} />
+    </svelte:fragment>
+    <svelte:fragment slot="append" let:index let:item>
+      <slot name="append" {index} {item} />
+    </svelte:fragment>
+  </SimpleTable>
+  <div class="footer">
+    <slot 
+      name="footer"
+      {hideRowsPerPage}
+      {rowsPerPageOptions}
+      {rowsPerPageSelection}
+      {totalElements}
+      {page}
+      {maxPage}
+      {rowsPerPage}
+      {handlePaginationChange}
+    >
+      {#if !hideRowsPerPage}
+        <Dropdown
+          placeholder="Per pagina"
+          clearable={false}
+          mandatory={true}
+          bind:items={rowsPerPageOptions}
+          bind:values={rowsPerPageSelection}
+          --button-default-width="90px"
+          on:change={handleRowsPerPageChange}
+        ></Dropdown>
+      {/if}
+      {#if totalElements !== undefined}
+        <slot name="rangeDescriptor" {page} {maxPage} {rowsPerPage} {totalElements}>
+          <div class="range-descriptor">
+            viewing {((page || 1) - 1) * rowsPerPage} - {(page || 1) * rowsPerPage} of {totalElements}
+          </div>
+        </slot>
+      {/if}
+      <Paginator
+        bind:page
+        bind:maxPage
+        on:change={handlePaginationChange}
+      ></Paginator>
+    </slot>
   </div>
 </div>
 
 <style>
+  .paginated-table {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .header-sort-icon {
+    display: none;
+  }
+
+  .header-sort-icon.active {
+    display: inline;
+  }
+
+  .range-descriptor {
+    font-size: .7rem;
+  }
+
   .footer {
     display: flex;
     justify-content: space-between;
-    margin-top: 10px;
-  }
-
-  .loading-text {
-    height: 200px;
-    max-height: 100vh;
-    display: flex;
-    justify-content: center;
     align-items: center;
-    color: var(--global-light-contrast-color);
-    font-size: .9rem;
+    width: 100%;
   }
-
-  .no-data {
-    height: 200px;
-    max-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--global-light-contrast-color);
-    font-size: .9rem;
-  }
-</style> -->
+</style>

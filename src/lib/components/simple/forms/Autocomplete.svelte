@@ -33,6 +33,7 @@
       undefined,
     multiple = false,
     disabled = false,
+    mandatory = false,
     placeholder = "",
     width = "auto",
     height = "auto",
@@ -56,6 +57,7 @@
   function select(item: Item) {
     const alreadyPresent =
       values.findIndex((i) => i.value === item.value) != -1;
+
     if (!alreadyPresent) {
       if (multiple) values = [...values, item];
       else values = [item];
@@ -70,6 +72,7 @@
   }
 
   function unselect(item: Item) {
+    if(values.length == 1 && mandatory) return
     values = values.filter((i) => i.value != item.value);
     refreshMenuWidth();
 
@@ -81,6 +84,7 @@
   }
 
   function pop() {
+    if(values.length == 1 && mandatory) return
     let poppedElement = values.pop()
     values = [...values]
     refreshMenuWidth()

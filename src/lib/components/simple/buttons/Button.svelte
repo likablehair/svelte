@@ -245,6 +245,10 @@
       --button-focus-background-color,
       var(--button-default-focus-background-color)
     );
+    color: var(
+      --button-focus-color,
+      var(--button-default-focus-color)
+    );
   }
 
   .button-text {

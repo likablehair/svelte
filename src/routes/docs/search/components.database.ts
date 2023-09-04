@@ -134,6 +134,12 @@ let list: {
     type: 'simple',
     url: '/docs/components/simple-components/Paginator'
   }, {
+    title: 'PaginatedTable',
+    description: 'Table and pagination agreement.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/PaginatedTable'
+  }, {
     title: 'AsyncAutocomplete',
     description: 'Autocomplete in different time and space.',
     status: 'stable',
