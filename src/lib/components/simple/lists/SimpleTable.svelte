@@ -79,6 +79,7 @@
   function isHeaderTypeIcon(header: Header) {
     return typeof header.type === 'object' && header.type.key === "icon";
   }
+
   function formatDate(dateTime: DateTime, format?: HeaderColumnDateFormat): string | null  {
     const _format = format || 'toISO';
     console.log(dateTime)
@@ -104,7 +105,6 @@
   }
 
   function handleCheckboxValue(value: any) {
-    console.log(value)
     return true
   }
 
@@ -167,12 +167,15 @@
                     {header}
                     {item}
                   />
-                {:else if  typeof header.type === 'object' &&  header.type.key == "date"}
+                {:else if  typeof header.type === 'object' 
+                       &&  header.type.key == "date"}
                   {handleFormatDateHeader(item[header.value], header.type.params?.format)}
                 {:else if  typeof header.type === 'object' &&  header.type.key == "icon"}
-                    <Icon  --icon-color={header.type.params?.color }  
-                           --icon-size={header.type.params?.size} 
-                           name={header.type.params?.name || ''}/>
+                    <Icon 
+                     --icon-color={header.type.params?.color }  
+                     --icon-size={header.type.params?.size} 
+                      name={header.type.params?.name || ''}
+                    />
                 <!-- {:else if header.type == "checkbox"} <Checkbox  bind:value={handleCheckboxValue(item[header.value])} disabled ></Checkbox>     -->
                 {:else} 
                   {item[header.value]}
