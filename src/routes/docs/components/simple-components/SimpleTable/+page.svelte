@@ -25,11 +25,13 @@
        {
         value: 'active',
         label: 'Active',
-        type: 'icon',
-        additionalParams :{ 
-          iconName:'mdi-check',
-          iconColor:'green',
-          iconSize:'2.1rem'
+        type: {
+          key:'icon',
+          params :{ 
+            name:'mdi-check',
+            color:'green',
+            size:'2.1rem'
+          }
         }
       }, 
       {
@@ -54,36 +56,43 @@
       {
         value: 'startDate',
         label: 'Start date [toISO]',
-        type: 'date',
-        additionalParams :{ 
-          dateFormat:'toISO'
+        type: {
+          key:'date',
+          params :{ 
+            format:'toISO',
+          }
         }
       },
       {
         value: 'startDate',
         label: 'Start date [toLocaleString]',
-        type: 'date',
-        additionalParams :{ 
-          dateFormat:'toLocaleString'
+        type: {
+          key:'date',
+          params :{ 
+            format:'toLocaleString',
+          }
         }
       },
       {
         value: 'startDate',
         label: 'Start date [setLocale]',
-        type: 'date',
-        additionalParams :{ 
-          dateFormat:'setLocale'
+        type: {
+          key:'date',
+          params :{ 
+            format:'setLocale',
+          }
         }
-      },
+      },    
       {
         value: 'startDate',
         label: 'Start date [fromISO]',
-        type: 'date',
-        additionalParams :{ 
-          dateFormat:'fromISO'
+        type: {
+          key:'date',
+          params :{ 
+            format:'fromISO',
+          }
         }
-      }
-    
+      },    
     ]}
     items={[
       {

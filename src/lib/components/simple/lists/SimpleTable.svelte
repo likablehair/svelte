@@ -1,31 +1,30 @@
 <script context="module" lang="ts">
+    
+  export type HeaderColumnDateFormat = "toISO" | "toISODate" | "toLocaleString" | 'setLocale' | 'fromISO'
+  
+  export type ColumnDate = {
+      key: "date",
+      params: {
+        format?: HeaderColumnDateFormat,
+      }
+  }
 
-  // export type HeaderTypeAdvanced =  {
-  //       key:  "boolean" | "string" | "number" | "date" | "custom" | 'icon' | 'checkbox';
-  //       params:{
-  //         iconName:'mdi-account',
-  //         iconColor:'white',
-  //         iconSize:'2.1rem'
-  //       }
-  //     }
-  export type HeaderType = "boolean" | "string" | "number" | "date" | "custom" | 'icon' | 'checkbox';
+  export type ColumnIcon = {
+      key: "icon",
+      params: {
+          name: string,
+          color: string,
+          size: string
+      }
+  }
 
-  export type HeaderFormat = "toISO" | "toISODate" | "toLocaleString" | 'setLocale' | 'fromISO';
-
-  export type AdditionalParams = {
-    dateFormat?: HeaderFormat ;
-    iconName?: string,
-    iconColor?: string,
-    iconSize?: string,
-    checkboxColor?: string,
-    checkboxSize?: string
-  };
+  export type HeaderTypeAdvanced =  ColumnDate | ColumnIcon
+  export type HeaderType = "boolean" | "string" | "number"  | "custom" | 'checkbox';
 
   export type Header = {
     value: string;
     label: string;
-    type: HeaderType;
-    additionalParams?: AdditionalParams;
+    type: HeaderType | HeaderTypeAdvanced; 
     width?: string;
     minWidth?: string;
     sortable?: boolean;
@@ -43,6 +42,7 @@
   import { createEventDispatcher } from 'svelte';
   import { includes } from 'lodash'
   import { DateTime } from 'luxon';
+
   
 
   const dispatch = createEventDispatcher<{
@@ -72,21 +72,32 @@
     })
   }
 
-function formatDate(dateTime: DateTime, format?: HeaderFormat): string | null  {
-  const _format = format || 'toISO';
+  
+  function isHeaderTypeDate(header: Header) {
+    return typeof header.type === 'object' && header.type.key === "date";
+  }
+  function isHeaderTypeIcon(header: Header) {
+    return typeof header.type === 'object' && header.type.key === "icon";
+  }
+  function formatDate(dateTime: DateTime, format?: HeaderColumnDateFormat): string | null  {
+    const _format = format || 'toISO';
+    console.log(dateTime)
+    if(!!dateTime) {    
+      const formatFunctions: Record<HeaderColumnDateFormat, () => string | null> = {
+      toLocaleString: () =>  dateTime.toLocaleString(),
+      toISO: () =>  dateTime.toISO(),
+      toISODate: () => dateTime.toISODate(),
+      setLocale: () => dateTime.setLocale('it').toFormat('yyyy MM dd'),
+      fromISO: () =>   DateTime.fromISO(dateTime.toISO()).toFormat('ff') 
+      };  
 
-  const formatFunctions: Record<HeaderFormat, () => string | null> = {
-    toLocaleString: () => dateTime.toLocaleString(),
-    toISO: () =>  dateTime.toISO(),
-    toISODate: () => dateTime.toISODate(),
-    setLocale: () => dateTime.setLocale('it').toFormat('yyyy MM dd'),
-    fromISO: () =>   DateTime.fromISO(dateTime.toISO()).toFormat('ff') 
-  };
+      return formatFunctions[_format](); 
+    } 
+    else return null;  
 
-  return formatFunctions[_format]();
-}
+  }
 
-  function handleFormatDateHeader(dateTime: DateTime, format?: HeaderFormat) {
+  function handleFormatDateHeader(dateTime: DateTime, format?: HeaderColumnDateFormat) {
     
     const formattedDate = formatDate(dateTime, format);
     return formattedDate
@@ -156,12 +167,12 @@ function formatDate(dateTime: DateTime, format?: HeaderFormat): string | null  {
                     {header}
                     {item}
                   />
-                {:else if header.type == "date"}
-                  {handleFormatDateHeader(item[header.value], header.additionalParams?.dateFormat )}
-                {:else if header.type == "icon"}
-                    <Icon  --icon-color={header.additionalParams?.iconColor}  
-                           --icon-size={header.additionalParams?.iconSize} 
-                           name={header.additionalParams?.iconName || ''}/>
+                {:else if  typeof header.type === 'object' &&  header.type.key == "date"}
+                  {handleFormatDateHeader(item[header.value], header.type.params?.format)}
+                {:else if  typeof header.type === 'object' &&  header.type.key == "icon"}
+                    <Icon  --icon-color={header.type.params?.color }  
+                           --icon-size={header.type.params?.size} 
+                           name={header.type.params?.name || ''}/>
                 <!-- {:else if header.type == "checkbox"} <Checkbox  bind:value={handleCheckboxValue(item[header.value])} disabled ></Checkbox>     -->
                 {:else} 
                   {item[header.value]}
