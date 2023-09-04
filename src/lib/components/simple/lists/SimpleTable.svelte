@@ -1,12 +1,16 @@
 <script context="module" lang="ts">
-  
-  export type HeaderTypeAdvanced =  ColumnDate | ColumnIcon | ColumnCheckBox | ColumnCostom 
-  export type HeaderType = ColumnBoolean | ColumnString | ColumnNumber 
+  export type HeaderType = ColumnBoolean | 
+    ColumnString | 
+    ColumnNumber | 
+    ColumnDate | 
+    ColumnIcon | 
+    ColumnCheckBox | 
+    ColumnCostom 
 
   export type Header = {
     value: string
     label: string
-    type: HeaderType | HeaderTypeAdvanced
+    type: HeaderType
     width?: string
     minWidth?: string
     sortable?: boolean
@@ -18,15 +22,10 @@
 <script lang="ts">
   import '../../../css/main.css'
   import './SimpleTable.css'
-  import { dateToString } from "$lib/components/simple/dates/utils";
   import Icon from '../media/Icon.svelte';
-  import Checkbox from '../forms/Checkbox.svelte';
   import { createEventDispatcher } from 'svelte';
-  import { includes } from 'lodash'
   import type { DateTime } from 'luxon';
-  import type { ColumnBoolean, ColumnCheckBox, ColumnCostom, ColumnDate, ColumnDateParams, ColumnIcon, ColumnNumber, ColumnString } from './columnTypes';
-
-  
+  import type { ColumnBoolean, ColumnCheckBox, ColumnCostom, ColumnDate, ColumnIcon, ColumnNumber, ColumnString } from './columnTypes';
 
   let clazz: {
     container?: string,
@@ -63,8 +62,8 @@
     })
   }
 
-  function formatDate(dateTime: DateTime, dateFormat: ColumnDateParams): string  {
-   return dateTime.setLocale(dateFormat.locale).toFormat(dateFormat.format)
+  function formatDate(dateTime: DateTime, dateFormat: ColumnDate['params']): string  {
+    return dateTime.setLocale(dateFormat.locale).toFormat(dateFormat.format)
   }
 
 </script>
@@ -132,7 +131,6 @@
                      --icon-size={header.type.params?.size} 
                       name={header.type.params?.name || ''}
                     />
-                <!-- {:else if header.type == "checkbox"} <Checkbox  bind:value={handleCheckboxValue(item[header.value])} disabled ></Checkbox>     -->
                 {:else} 
                   {item[header.value]}
                 {/if}
