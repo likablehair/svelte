@@ -3,7 +3,10 @@
   import PropsViewer from "../../PropsViewer.svelte";
   
   import SimpleTable from "$lib/components/simple/lists/SimpleTable.svelte";
+  import type { ColumnBoolean, ColumnCheckBox, ColumnCostom, ColumnDate, ColumnIcon, ColumnNumber, ColumnString } from "$lib/components/simple/lists/columnTypes";
+
   import Icon from "$lib/components/simple/media/Icon.svelte";
+  import { DateTime } from "luxon";
 </script>
 
 <h1>SimpleTable</h1>
@@ -12,42 +15,107 @@
 <div class="example">
   <SimpleTable 
     headers={[
+      // {
+      //   value: 'true',
+      //   label: 'New customer',
+      //   type: 'checkbox',
+      //   additionalParams :{ 
+      //     checkboxColor:'white',
+      //     checkboxSize:'2.1rem'
+      //   }
+      // }, 
+       {
+        value: 'active',
+        label: 'Active',
+        type: {
+          key:'icon',
+          params :{ 
+            name:'mdi-check',
+            color:'green',
+            size:'2.1rem'
+          }
+        }
+      }, 
       {
         value: 'businessName',
         label: 'Business name',
-        type: 'string',
+        type:   {
+          key:"string"
+        },
       }, {
         value: 'productName',
         label: 'Product Name',
-        type: 'string',
+        type:   {
+          key:"string"
+        },
         sortable: true,
       }, {
         value: 'progress',
         label: 'Progress',
-        type: 'string',
+        type:   {
+          key:"string"
+        },
       }, {
         value: 'rating',
         label: 'Rating',
-        type: 'custom',
+        type:   {
+          key:"custom"
+        },
         sortable: true,
-      }
+      },
+      {
+        value: 'startDate',
+        label: 'Start date ',
+        type: {
+          key:'date',
+          params :{ 
+            locale: 'it',
+            format: 'dd/MM/yyyy',
+          }
+        }
+      },
+      {
+        value: 'startDate',
+        label: 'Active date [toLocaleString]',
+        type: {
+          key:'date',
+          params :{ 
+            locale: 'en',
+            format: 'MM-dd-yy',
+          }
+        }
+      },   
+      {
+        value: 'startDate',
+        label: 'End date ',
+        type: {
+          key:'date',
+          params :{ 
+            locale: 'it',
+            format: "HH 'ore e' mm 'minuti",
+          }
+        }
+      },    
     ]}
     items={[
       {
         businessName: 'GQ Creators',
         productName: 'Data Protection',
         progress: '339 sold',
-        rating: 5
+        rating: 5,
+        startDate: DateTime.now()
       }, {
         businessName: 'Dribblers Agency',
         productName: 'Job Search',
         progress: '212 sold',
-        rating: 4.5
+        rating: 4.5,
+        startDate: DateTime.now()
       }, {
         businessName: 'Popular My',
         productName: 'Financial Transactions',
         progress: '94 sold',
-        rating: 4.2
+        rating: 4.2,
+        startDate: DateTime.now()
       },
     ]}
   >

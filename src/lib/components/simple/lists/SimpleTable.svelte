@@ -1,8 +1,12 @@
 <script context="module" lang="ts">
+  
+  export type HeaderTypeAdvanced =  ColumnDate | ColumnIcon | ColumnCheckBox | ColumnCostom 
+  export type HeaderType = ColumnBoolean | ColumnString | ColumnNumber 
+
   export type Header = {
     value: string
     label: string
-    type: "boolean" | "string" | "number" | "date" | "custom"
+    type: HeaderType | HeaderTypeAdvanced
     width?: string
     minWidth?: string
     sortable?: boolean
@@ -16,7 +20,13 @@
   import './SimpleTable.css'
   import { dateToString } from "$lib/components/simple/dates/utils";
   import Icon from '../media/Icon.svelte';
+  import Checkbox from '../forms/Checkbox.svelte';
   import { createEventDispatcher } from 'svelte';
+  import { includes } from 'lodash'
+  import type { DateTime } from 'luxon';
+  import type { ColumnBoolean, ColumnCheckBox, ColumnCostom, ColumnDate, ColumnDateParams, ColumnIcon, ColumnNumber, ColumnString } from './columnTypes';
+
+  
 
   let clazz: {
     container?: string,
@@ -36,7 +46,7 @@
   export let headers: Header[] = [],
     items: { [key: string]: any }[] = [],
     sortedBy: string | undefined = undefined,
-    sortDirection: 'asc' | 'desc' = 'asc'
+    sortDirection: 'asc' | 'desc' = 'asc';
 
   function handleHeaderClick(header: Header) {
     if(!!sortedBy && header.value == sortedBy) {
@@ -52,6 +62,11 @@
       sortedBy, sortDirection
     })
   }
+
+  function formatDate(dateTime: DateTime, dateFormat: ColumnDateParams): string  {
+   return dateTime.setLocale(dateFormat.locale).toFormat(dateFormat.format)
+  }
+
 </script>
 
 {#if !!items && Array.isArray(items)}
@@ -60,8 +75,8 @@
       <thead class="thead {clazz.header || ''}">
         <tr>
           {#each headers as head}
-            <th 
-              style:width={head.width} 
+            <th
+              style:width={head.width}
               style:min-width={head.minWidth}
               class:sortable={head.sortable}
               on:click={() => handleHeaderClick(head)}
@@ -73,16 +88,16 @@
                   </slot>
                 </span>
                 {#if head.sortable}
-                  <span 
+                  <span
                     class="header-sort-icon"
                     class:active={sortedBy == head.value}
-                    class:asc={sortDirection == 'asc'}
-                    class:desc={sortDirection == 'desc'}
+                    class:asc={sortDirection == "asc"}
+                    class:desc={sortDirection == "desc"}
                   >
-                    {#if sortDirection == 'asc'}
-                      <Icon name="mdi-arrow-up"></Icon>
+                    {#if sortDirection == "asc"}
+                      <Icon name="mdi-arrow-up" />
                     {:else}
-                      <Icon name="mdi-arrow-down"></Icon>
+                      <Icon name="mdi-arrow-down" />
                     {/if}
                   </span>
                 {/if}
@@ -101,7 +116,7 @@
           <tr class="item-tr {clazz.row || ''}">
             {#each headers as header, j}
               <td class="{clazz.cell || ''}">
-                {#if header.type == "custom"}
+                {#if header.type.key == "custom"}
                   <slot
                     name="custom"
                     index={i}
@@ -109,9 +124,16 @@
                     {header}
                     {item}
                   />
-                {:else if header.type == "date"}
-                  {dateToString(item[header.value], "dayAndHours", "it")}
-                {:else}
+                {:else if  header.type.key == "date"}
+                  {formatDate(item[header.value], header.type.params)}
+                {:else if header.type.key == "icon"}
+                    <Icon 
+                     --icon-color={header.type.params?.color }  
+                     --icon-size={header.type.params?.size} 
+                      name={header.type.params?.name || ''}
+                    />
+                <!-- {:else if header.type == "checkbox"} <Checkbox  bind:value={handleCheckboxValue(item[header.value])} disabled ></Checkbox>     -->
+                {:else} 
                   {item[header.value]}
                 {/if}
               </td>
@@ -131,10 +153,7 @@
 
 <style>
   .simple-table-container {
-    width: var(
-      --simple-table-width,
-      var(--simple-table-default-width)
-    );
+    width: var(--simple-table-width, var(--simple-table-default-width));
     min-width: var(
       --simple-table-min-width,
       var(--simple-table-default-min-width)
@@ -143,10 +162,7 @@
       --simple-table-max-width,
       var(--simple-table-default-max-width)
     );
-    height: var(
-      --simple-table-height,
-      var(--simple-table-default-height)
-    );
+    height: var(--simple-table-height, var(--simple-table-default-height));
     min-height: var(
       --simple-table-min-height,
       var(--simple-table-default-min-height)
@@ -185,7 +201,7 @@
 
   .thead th.sortable {
     cursor: pointer;
-    transition: all .1s ease-in;
+    transition: all 0.1s ease-in;
     user-select: none;
   }
 
@@ -248,7 +264,7 @@
       --simple-table-row-height,
       var(--simple-table-default-row-height)
     );
-    transition: background-color .1s ease-in-out;
+    transition: background-color 0.1s ease-in-out;
   }
 
   .item-tr:hover {
