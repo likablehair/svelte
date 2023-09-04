@@ -140,6 +140,12 @@ let list: {
     type: 'composed',
     url: '/docs/components/composed-components/PaginatedTable'
   }, {
+    title: 'Filters',
+    description: 'Make it easy, make it filter.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/Filters'
+  }, {
     title: 'AsyncAutocomplete',
     description: 'Autocomplete in different time and space.',
     status: 'stable',

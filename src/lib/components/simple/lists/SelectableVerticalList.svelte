@@ -18,7 +18,7 @@
   import './SelectableVerticalList.css'
   import keyboarder from "$lib/utils/keyboarder";
   import { createEventDispatcher, onMount } from "svelte";
-    import Icon from '../media/Icon.svelte';
+  import Icon from '../media/Icon.svelte';
 
   export let activeKeyboard: boolean = false,
     loopSelection: boolean = true,

@@ -58,6 +58,8 @@ export { default as ProductsGrid } from './components/composed/shop/ProductsGrid
 
 export { default as PaginatedTable } from './components/composed/list/PaginatedTable.svelte'
 
+export { default as Filters } from './components/composed/search/Filters.svelte'
+
 export { default as mediaQuery } from './stores/mediaQuery'
 export { default as theme, toggleTheme, setTheme } from './stores/theme'
 
