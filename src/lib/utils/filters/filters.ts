@@ -9,7 +9,7 @@ type MultiStringFilter = {
 type StringFilter = {
   type: 'string',
   column: string,
-  value: string | undefined,
+  value?: string,
   mode?: 'equal' | 'like' | 'ilike'
 }
 

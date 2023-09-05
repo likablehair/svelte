@@ -2,34 +2,57 @@
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
   import PaginatedTable from "$lib/components/composed/list/PaginatedTable.svelte";
-</script>
+  import type {Filter} from "$lib/utils/filters/filters"
+  import type { Header } from "$lib/components/simple/lists/SimpleTable.svelte";
+  import Icon from "$lib/components/simple/media/Icon.svelte";
 
-<h1>PaginatedTable</h1>
-<ComponentSubtitle>Table and pagination agreement.</ComponentSubtitle>
-<h2>Example</h2>
-<div class="example">
-  <PaginatedTable
-    headers={[
+  let headers : Header[] =[
       {
         value: 'businessName',
         label: 'Business name',
-        type: 'string',
+        type: {
+          key:"string"
+        }
       }, {
         value: 'productName',
         label: 'Product Name',
-        type: 'string',
+        type: {
+          key:"string"
+        },
         sortable: true,
       }, {
         value: 'progress',
         label: 'Progress',
-        type: 'string',
+        type: {
+          key:"string"
+        },
       }, {
         value: 'rating',
         label: 'Rating',
-        type: 'custom',
+        type: {
+          key:"custom"
+        },     
         sortable: true,
       }
-    ]}
+    ]
+    
+  let filters: Filter[] | undefined  = [{
+    label: "Business name",
+    active: false,
+    type: 'string',
+    name: "businessName",
+    column: "businessName"
+  }]
+    
+</script>
+
+<h1>PaginatedTable With Filter Panel</h1>
+<ComponentSubtitle>Table and pagination agreement with filter.</ComponentSubtitle>
+<h2>Example</h2>
+<div class="example">
+  <PaginatedTable
+    filters={filters}
+    headers={headers}
     items={[
       {
         businessName: 'GQ Creators',
@@ -49,7 +72,14 @@
       },
     ]}
     totalElements={40}
-  ></PaginatedTable>
+  >
+  <svelte:fragment slot="custom" let:header let:item>
+    {#if header.value == 'rating'}
+      {item.rating}
+      <Icon name="mdi-star" --icon-color="green"></Icon>
+    {/if}
+  </svelte:fragment>
+</PaginatedTable>
 </div>
 <h2>Props</h2>
 <PropsViewer

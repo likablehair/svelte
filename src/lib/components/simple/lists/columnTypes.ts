@@ -30,7 +30,7 @@ export type ColumnNumber = {
   params?: {}
 };
 
-export type ColumnCostom = {
+export type ColumnCustom = {
   key: "custom"
   params?: {}
 };

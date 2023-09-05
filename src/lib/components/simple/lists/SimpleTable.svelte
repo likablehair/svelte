@@ -5,7 +5,7 @@
     ColumnDate | 
     ColumnIcon | 
     ColumnCheckBox | 
-    ColumnCostom 
+    ColumnCustom 
 
   export type Header = {
     value: string
@@ -25,7 +25,7 @@
   import Icon from '../media/Icon.svelte';
   import { createEventDispatcher } from 'svelte';
   import type { DateTime } from 'luxon';
-  import type { ColumnBoolean, ColumnCheckBox, ColumnCostom, ColumnDate, ColumnIcon, ColumnNumber, ColumnString } from './columnTypes';
+  import type { ColumnBoolean, ColumnCheckBox, ColumnCustom, ColumnDate, ColumnIcon, ColumnNumber, ColumnString } from './columnTypes';
 
   let clazz: {
     container?: string,

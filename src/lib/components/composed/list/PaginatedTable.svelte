@@ -12,6 +12,10 @@
 </script>
 
 <script lang="ts">
+  import { SimpleTextField } from "$lib";
+  import Filters from "../search/Filters.svelte";
+  import SearchBar from "../search/SearchBar.svelte";
+
   let clazz: {
     simpleTable?: ComponentProps<SimpleTable>['class']
   } = {};
@@ -30,7 +34,11 @@
     ],
     hideRowsPerPage: boolean = false,
     totalElements: number | undefined = undefined,
-    rowsPerPage: number = 20
+    rowsPerPage: number = 20,
+    filters:  ComponentProps<Filters>['filters'] = []
+
+    let searchBarInput: HTMLElement,
+      searchText: string | undefined = undefined
 
   let dispatch = createEventDispatcher<{
     paginationChange: {
@@ -57,9 +65,31 @@
       rowsPerPage, page
     })
   }
+
+  function handleAddFilter() {
+    console.log('pippo')
+  }
+
+
 </script>
 
 <div class="paginated-table">
+  <div class="filter-container">
+    <div class="searchbar-text">
+      <SearchBar
+        placeholder="Type something to search..."      
+        bind:input={searchBarInput}
+        bind:value={searchText}
+      ></SearchBar>
+    </div>
+    <div class="searchbar-actions">
+      <Filters
+        bind:filters
+        on:addFilterClick={handleAddFilter}>
+    </Filters>
+    </div>
+  </div>
+
   <SimpleTable
     bind:headers
     bind:class={clazz.simpleTable}
@@ -152,7 +182,6 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
-    align-items: center;
   }
 
   .header-sort-icon {
@@ -173,4 +202,12 @@
     align-items: center;
     width: 100%;
   }
+
+  .filter-container {
+    display: flex;
+    align-items: left;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
 </style>

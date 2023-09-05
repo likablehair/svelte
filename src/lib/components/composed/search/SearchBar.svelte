@@ -24,7 +24,8 @@
   */
 
   export let input: HTMLElement | undefined = undefined,
-    value: string | undefined = undefined
+    value: string | undefined = undefined,
+    placeholder: string | undefined = undefined
 </script>
 
 <div
@@ -53,7 +54,7 @@
       autocapitalize="off" 
       enterkeyhint="search" 
       spellcheck="false" 
-      placeholder="Find something..." 
+      placeholder={placeholder} 
       maxlength="512" 
       tabindex="0"
       bind:this={input}
