@@ -13,8 +13,10 @@
 
 <script lang="ts">
   import { SimpleTextField } from "$lib";
+  import FilterSlots from "../search/FilterSlots.svelte";
   import Filters from "../search/Filters.svelte";
   import SearchBar from "../search/SearchBar.svelte";
+  import type { Filter } from "$lib/utils/filters/filters";
 
   let clazz: {
     simpleTable?: ComponentProps<SimpleTable>['class']
@@ -35,10 +37,15 @@
     hideRowsPerPage: boolean = false,
     totalElements: number | undefined = undefined,
     rowsPerPage: number = 20,
-    filters:  ComponentProps<Filters>['filters'] = []
+    filters:  ComponentProps<Filters>['filters'] = [],
+    openExtendAppliedFilterLabel: string= "Mostra filtri applicati",
+    closeExtendAppliedFilterLabel: string = "Nascondi filtri applicati",
+    extendAppliedFilterLabel: string = closeExtendAppliedFilterLabel
 
     let searchBarInput: HTMLElement,
-      searchText: string | undefined = undefined
+      searchText: string | undefined = undefined,
+      showAppliedFilter : boolean = true,
+      filterSlots: { label: string }[] = []
 
   let dispatch = createEventDispatcher<{
     paginationChange: {
@@ -52,7 +59,9 @@
   $: rowsPerPageSelection = [
     { label: rowsPerPage.toString(), value: rowsPerPage }
   ]
-
+  
+  
+  
   $: if(totalElements !== undefined) maxPage = Math.max(Math.round(totalElements/rowsPerPage), 1)
 
   function handleRowsPerPageChange(e: CustomEvent<{ selection: ComponentProps<Dropdown>['items']}>) {
@@ -67,7 +76,18 @@
   }
 
   function handleAddFilter() {
-    console.log('pippo')
+  }
+
+  function handleApplyFilter(filterApplied:CustomEvent<Filter>) {    
+    let _filterApplied = {
+      label: filterApplied.detail.label
+    }
+    filterSlots = [...filterSlots, _filterApplied]
+  }
+
+  function handleAppliedFilterClick(){
+    showAppliedFilter = !showAppliedFilter
+    extendAppliedFilterLabel = !!showAppliedFilter ? closeExtendAppliedFilterLabel : openExtendAppliedFilterLabel
   }
 
 
@@ -75,20 +95,30 @@
 
 <div class="paginated-table">
   <div class="filter-container">
-    <div class="searchbar-text">
+    <div>
       <SearchBar
         placeholder="Type something to search..."      
         bind:input={searchBarInput}
         bind:value={searchText}
       ></SearchBar>
+      {#if (filterSlots.length > 0)}
+      <div class="extend-filter-applyed" on:keypress={handleAppliedFilterClick} on:click={handleAppliedFilterClick}>{extendAppliedFilterLabel}</div>
+      {/if}
+      {#if (showAppliedFilter && filterSlots.length > 0)}
+        <FilterSlots bind:filterSlots >
+        </FilterSlots>
+      {/if}
     </div>
-    <div class="searchbar-actions">
+    <div>
       <Filters
         bind:filters
-        on:addFilterClick={handleAddFilter}>
+        on:addFilterClick={handleAddFilter}
+        on:applyFilterClick={handleApplyFilter}>
+        <slot>ciao</slot>
     </Filters>
     </div>
   </div>
+
 
   <SimpleTable
     bind:headers
@@ -208,6 +238,14 @@
     align-items: left;
     justify-content: space-between;
     gap: 10px;
+  }
+
+  .extend-filter-applyed{
+    font-size: 0.7em;
+  }
+  .extend-filter-applyed:hover{
+      cursor: pointer;
+   
   }
 
 </style>

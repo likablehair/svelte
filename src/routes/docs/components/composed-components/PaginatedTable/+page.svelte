@@ -42,6 +42,13 @@
     type: 'string',
     name: "businessName",
     column: "businessName"
+  }, 
+  {
+    label: "Product name",
+    active: false,
+    type: 'string',
+    name: "productName",
+    column: "productName"
   }]
     
 </script>
