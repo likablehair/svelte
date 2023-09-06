@@ -13,7 +13,7 @@
 
 <script lang="ts">
   import { SimpleTextField } from "$lib";
-  import FilterSlots from "../search/FilterSlots.svelte";
+
   import Filters from "../search/Filters.svelte";
   import SearchBar from "../search/SearchBar.svelte";
   import type { Filter } from "$lib/utils/filters/filters";
@@ -37,15 +37,10 @@
     hideRowsPerPage: boolean = false,
     totalElements: number | undefined = undefined,
     rowsPerPage: number = 20,
-    filters:  ComponentProps<Filters>['filters'] = [],
-    openExtendAppliedFilterLabel: string= "Mostra filtri applicati",
-    closeExtendAppliedFilterLabel: string = "Nascondi filtri applicati",
-    extendAppliedFilterLabel: string = closeExtendAppliedFilterLabel
+    filters:  ComponentProps<Filters>['filters'] = []
 
-    let searchBarInput: HTMLElement,
-      searchText: string | undefined = undefined,
-      showAppliedFilter : boolean = true,
-      filterSlots: { label: string }[] = []
+  let searchBarInput: HTMLElement,
+    searchText: string | undefined = undefined
 
   let dispatch = createEventDispatcher<{
     paginationChange: {
@@ -78,48 +73,28 @@
   function handleAddFilter() {
   }
 
-  function handleApplyFilter(filterApplied:CustomEvent<Filter>) {    
-    let _filterApplied = {
-      label: filterApplied.detail.label
-    }
-    filterSlots = [...filterSlots, _filterApplied]
-  }
-
-  function handleAppliedFilterClick(){
-    showAppliedFilter = !showAppliedFilter
-    extendAppliedFilterLabel = !!showAppliedFilter ? closeExtendAppliedFilterLabel : openExtendAppliedFilterLabel
-  }
 
 
 </script>
 
 <div class="paginated-table">
-  <div class="filter-container">
-    <div>
+  <div class="">
+    <slot>
       <SearchBar
         placeholder="Type something to search..."      
         bind:input={searchBarInput}
         bind:value={searchText}
-      ></SearchBar>
-      {#if (filterSlots.length > 0)}
-      <div class="extend-filter-applyed" on:keypress={handleAppliedFilterClick} on:click={handleAppliedFilterClick}>{extendAppliedFilterLabel}</div>
-      {/if}
-      {#if (showAppliedFilter && filterSlots.length > 0)}
-        <FilterSlots bind:filterSlots >
-        </FilterSlots>
-      {/if}
-    </div>
-    <div>
+        >
+      </SearchBar>
+    </slot>
+    <div class="filter-container">
       <Filters
         bind:filters
         on:addFilterClick={handleAddFilter}
-        on:applyFilterClick={handleApplyFilter}>
-        <slot>ciao</slot>
+        >
     </Filters>
-    </div>
-  </div>
-
-
+  </div>  
+</div>
   <SimpleTable
     bind:headers
     bind:class={clazz.simpleTable}
@@ -167,6 +142,7 @@
       <slot name="append" {index} {item} />
     </svelte:fragment>
   </SimpleTable>
+
   <div class="footer">
     <slot 
       name="footer"
@@ -234,18 +210,12 @@
   }
 
   .filter-container {
+    margin-top: 10px;
     display: flex;
     align-items: left;
-    justify-content: space-between;
+    flex-direction: row;
     gap: 10px;
   }
 
-  .extend-filter-applyed{
-    font-size: 0.7em;
-  }
-  .extend-filter-applyed:hover{
-      cursor: pointer;
-   
-  }
 
 </style>

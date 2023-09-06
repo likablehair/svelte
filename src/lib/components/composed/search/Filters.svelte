@@ -17,38 +17,42 @@
   import type { Filter } from '$lib/utils/filters/filters';
   import SelectableVerticalList from '$lib/components/simple/lists/SelectableVerticalList.svelte';
   import SimpleTextField from '$lib/components/simple/forms/SimpleTextField.svelte';
+  import Chip from '$lib/components/simple/navigation/Chip.svelte';
 
-  export let addFilterLabel: string = "Filters",
-    columnSelectableLabel: string = "Columns",
-    filters: Filter[] = [],
-    columns: Column[] = [],
+  export let 
+    addFilterLabel: string = "Filters",
+    counterFilterLabel: number = 0,
+    filters: Filter[] = [{
+      name:"customerName", 
+      label:"Customer Name", 
+      active:true, 
+      type:"string", 
+      column:"customerName", 
+      value: "",
+      mode: 'ilike'
+    }],
     cancelFilterLabel : string = "Cancel",
-    applyFilterLabel : string = "Apply Filter"
-    
+    applyFilterLabel : string = "Apply Filter",
+    openExtendAppliedFilterLabel: string= "Mostra filtri applicati",
+    closeExtendAppliedFilterLabel: string = "Nascondi filtri applicati",
+    extendAppliedFilterLabel: string = closeExtendAppliedFilterLabel
 
   let dispatch = createEventDispatcher<{
     'addFilterClick': undefined,
     'selectFilterClick': undefined,
-    'applyFilterClick': Filter
   }>()
 
   let open: boolean = false,
-    activator: HTMLElement;
+    activator: HTMLElement,
+    filterSlots: { label: string, value: string| undefined }[] = [],
+    showAppliedFilter : boolean = true
+
 
   function handleAddFilterClick() {
     dispatch('addFilterClick')
     open = true
   }
 
-  function handleExtraActions() {
-
-  }
-
-  $: columnsOption = columns.map((c) => {
-    return {
-      title: c.label
-    }
-  })
 
   $: filterOptions = filters.map((f) => {
     return {
@@ -66,10 +70,7 @@
   let singleFilterActivator:  HTMLElement | undefined
   let singleFilterMenuOpened: boolean = false
 
-
-  let columnFilterActivator:  HTMLElement | undefined
-  let columnFilterMenuOpened: boolean = false
-  
+  let selectedFilter : Filter | undefined = undefined
   $: selectedFilter = selected === undefined ? undefined : filters.find((f) => {return f.name === selected})
 
   function handleFilterSelection(e: CustomEvent) {
@@ -77,31 +78,49 @@
     selected = e.detail.element.name
   }
 
-  function handleColumnSelectionClick(e: CustomEvent) {
-    columnFilterMenuOpened = true;
-  }
-
-  function handleExtraActionsClick(e: CustomEvent) {
-   
-  }
-
-  function handleColumnSelection(e: CustomEvent) {
-
-  }
-
   function handleCancelFilterClick(e: CustomEvent) {
     open = false
     singleFilterMenuOpened = false;
   }
 
-  function handleApplyFilterClick(e: CustomEvent) {
-    dispatch('applyFilterClick', selectedFilter )
-    open = false
-    singleFilterMenuOpened = false;
+  function handleApplyFilterClick() {
+    counterFilterLabel++;
+    if(!!selectedFilter && selectedFilter.type == "string") {
+      let _filterApplied = {
+        label: selectedFilter.label,
+        value: selectedFilter?.value
+      }
+      filterSlots = [...filterSlots, _filterApplied]
+      open = false
+      singleFilterMenuOpened = false;
+    }
+  }
+  
+  function handleAppliedFilterClick(){
+    showAppliedFilter = !showAppliedFilter
+    extendAppliedFilterLabel = !!showAppliedFilter ? closeExtendAppliedFilterLabel : openExtendAppliedFilterLabel
   }
 
-</script>
+  function handleRemoveFilter (){
+    filterSlots.pop()    
+    filterSlots = filterSlots
+  }
 
+
+
+</script>
+ {#if filterSlots.length > 0}
+  <div class="extend-filter-applyed" on:keypress={handleAppliedFilterClick} on:click={handleAppliedFilterClick}>{extendAppliedFilterLabel}</div>
+{/if}
+{#if showAppliedFilter}
+<div class="filter-slots-container">
+  {#each filterSlots as filterSlot}  
+      <div class="filter-slot">
+        <Chip label close on:close={handleRemoveFilter}><b>{filterSlot.label}</b> uguale a <b>{filterSlot.value}</b> </Chip>
+      </div>
+  {/each}
+</div>
+{/if}
 
 <div 
   class="filter-button"
@@ -112,19 +131,7 @@
     on:click={handleAddFilterClick}
   >
     <Icon name="mdi-filter"></Icon>
-    {addFilterLabel}
-  </Button>
-  <Button
-    on:click={handleColumnSelectionClick}
-   >
-    <Icon name="mdi-table-column-plus-after"></Icon>
-    {columnSelectableLabel}
-  </Button>
-  <Button
-    on:click={handleExtraActionsClick}
-   >
-    <Icon name=" mdi-dots-vertical"></Icon>
-    
+    {addFilterLabel}  {#if filterSlots.length> 0 } ({counterFilterLabel}) {/if}
   </Button>
   
 </div>
@@ -184,49 +191,48 @@
       openingId="second-menu"
       flipOnOverflow
     >
-      <div style:height="160px" style:background-color="rgb(var(--global-color-background-200))" >
+      <div style:min-height="160px" style:background-color="rgb(var(--global-color-background-200))" >
         <div class="filter-title">
             Filtra per {selectedFilter?.label}
         </div>
 
         <div class="sub-filter-container">
-            <div class="filter-conditions">
-            </div>
             
-            <SimpleTextField 
-              class={{ }}
-              type="text"
-              placeholder={selectedFilter?.label}
-              appendInnerIcon="mdi-check"
-            ></SimpleTextField>
+            {#if !!selectedFilter && selectedFilter.type === "string"}
+              <SimpleTextField 
+                bind:value={selectedFilter.value}
+                class={{ }}
+                type="text"
+                placeholder={selectedFilter?.label}
+                appendInnerIcon="mdi-check"
+              ></SimpleTextField>
+            {/if}
 
             <div class="sub-filter-button">
-
               <Button
               --button-background-color="rgb(var(--global-color-background-200))"
+              --button-color="rgb(var(--global-color-contrast-900))"
               on:click={handleCancelFilterClick}
               >
-              {cancelFilterLabel}
+                {cancelFilterLabel}
+              </Button>
+
+              <Button
+              --button-min-width="100px"
+              on:click={handleApplyFilterClick}
+              >
+              {applyFilterLabel}
               
             </Button>
-
-            
-            <Button
-            --button-min-width="100px"
-            --button-background-color="rgb(var(--global-color))"
-            on:click={handleApplyFilterClick}
-            >
-            {applyFilterLabel}
-            
-          </Button>
           </div>
             
         </div>
       </div>
     </Menu>
-
   {/if}
 </MediaQuery>
+
+
 
 <style>
   .filter-button {
@@ -244,10 +250,7 @@
     flex-direction: column;
     align-items: left;
     margin: 10%;
-  }
-
-  .filter-conditions{
-    display: flex;
+    gap:20px;
   }
 
   .sub-filter-button {
@@ -255,6 +258,26 @@
     column-gap: 10px;
     flex-direction: row;
     align-items: start;
+    margin: 10px;
   }
 
+  .filter-slots-container {
+    display: flex;
+    align-items: flex-start;
+    column-gap: 10px;
+  }
+
+  .filter-slot {
+    font-size: 0.70rem;
+    font-weight: 0;
+  }
+  
+  .extend-filter-applyed{
+    left: 0;
+    top:0;
+    font-size: 0.7em;
+  }
+  .extend-filter-applyed:hover{
+      cursor: pointer;
+  }
 </style>
