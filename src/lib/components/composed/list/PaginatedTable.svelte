@@ -12,11 +12,8 @@
 </script>
 
 <script lang="ts">
-  import { SimpleTextField } from "$lib";
-
   import Filters from "../search/Filters.svelte";
   import SearchBar from "../search/SearchBar.svelte";
-  import type { Filter } from "$lib/utils/filters/filters";
 
   let clazz: {
     simpleTable?: ComponentProps<SimpleTable>['class']
@@ -78,22 +75,19 @@
 </script>
 
 <div class="paginated-table">
-  <div class="">
-    <slot>
-      <SearchBar
+    
+  <SearchBar
         placeholder="Type something to search..."      
         bind:input={searchBarInput}
         bind:value={searchText}
         >
-      </SearchBar>
-    </slot>
+    </SearchBar>
     <div class="filter-container">
       <Filters
         bind:filters
         on:addFilterClick={handleAddFilter}
         >
     </Filters>
-  </div>  
 </div>
   <SimpleTable
     bind:headers

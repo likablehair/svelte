@@ -41,14 +41,16 @@
     active: false,
     type: 'string',
     name: "businessName",
-    column: "businessName"
+    column: "businessName",
+    mode: 'like'
   }, 
   {
     label: "Product name",
     active: false,
     type: 'string',
     name: "productName",
-    column: "productName"
+    column: "productName",
+    mode: 'like'
   }]
     
 </script>

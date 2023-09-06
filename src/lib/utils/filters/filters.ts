@@ -6,6 +6,15 @@ type MultiStringFilter = {
   operator?: 'or' | 'and'
 }
 
+
+type ChoiceFilter = {
+  type: 'choice',
+  column: string,
+  value?: string,
+  operator?: 'or' | 'and'
+  options: any[]
+}
+
 type StringFilter = {
   type: 'string',
   column: string,
@@ -18,7 +27,7 @@ export type Filter = {
   active: boolean,
   hidden?: boolean,
   label: string
-} & (StringFilter | MultiStringFilter)
+} & (StringFilter | MultiStringFilter | ChoiceFilter)
 
 
 export default class Converter {

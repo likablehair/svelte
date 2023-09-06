@@ -18,6 +18,7 @@
   import SelectableVerticalList from '$lib/components/simple/lists/SelectableVerticalList.svelte';
   import SimpleTextField from '$lib/components/simple/forms/SimpleTextField.svelte';
   import Chip from '$lib/components/simple/navigation/Chip.svelte';
+  import Checkbox from '$lib/components/simple/forms/Checkbox.svelte';
 
   export let 
     addFilterLabel: string = "Filters",
@@ -35,7 +36,8 @@
     applyFilterLabel : string = "Apply Filter",
     openExtendAppliedFilterLabel: string= "Mostra filtri applicati",
     closeExtendAppliedFilterLabel: string = "Nascondi filtri applicati",
-    extendAppliedFilterLabel: string = closeExtendAppliedFilterLabel
+    extendAppliedFilterLabel: string = closeExtendAppliedFilterLabel,
+    filterTitleLabel: string = "Filtra per "
 
   let dispatch = createEventDispatcher<{
     'addFilterClick': undefined,
@@ -44,7 +46,7 @@
 
   let open: boolean = false,
     activator: HTMLElement,
-    filterSlots: { label: string, value: string| undefined }[] = [],
+    filterSlots: Filter  [] = [],
     showAppliedFilter : boolean = true
 
 
@@ -87,9 +89,16 @@
     counterFilterLabel++;
     if(!!selectedFilter && selectedFilter.type == "string") {
       let _filterApplied = {
-        label: selectedFilter.label,
-        value: selectedFilter?.value
+        name: selectedFilter.name, 
+        label: selectedFilter.label, 
+        active: selectedFilter.active, 
+        type: selectedFilter.type, 
+        column: selectedFilter.column, 
+        value: selectedFilter?.value,
+        mode: selectedFilter.mode
       }
+
+
       filterSlots = [...filterSlots, _filterApplied]
       open = false
       singleFilterMenuOpened = false;
@@ -110,13 +119,23 @@
 
 </script>
  {#if filterSlots.length > 0}
-  <div class="extend-filter-applyed" on:keypress={handleAppliedFilterClick} on:click={handleAppliedFilterClick}>{extendAppliedFilterLabel}</div>
+  <div 
+    class="extend-filter-applyed" 
+    on:keypress={handleAppliedFilterClick} 
+    on:click={handleAppliedFilterClick}>
+    {extendAppliedFilterLabel}
+  </div>
 {/if}
 {#if showAppliedFilter}
 <div class="filter-slots-container">
   {#each filterSlots as filterSlot}  
       <div class="filter-slot">
-        <Chip label close on:close={handleRemoveFilter}><b>{filterSlot.label}</b> uguale a <b>{filterSlot.value}</b> </Chip>
+        {#if !!filterSlot && filterSlot.type === "string" }
+          <Chip label close on:close={handleRemoveFilter}>
+            <b> {filterSlot.label} </b> 
+            {filterSlot.mode}  <b>{filterSlot.value}</b> 
+          </Chip>
+        {/if}
       </div>
   {/each}
 </div>
@@ -193,7 +212,7 @@
     >
       <div style:min-height="160px" style:background-color="rgb(var(--global-color-background-200))" >
         <div class="filter-title">
-            Filtra per {selectedFilter?.label}
+            {filterTitleLabel} {selectedFilter?.label}
         </div>
 
         <div class="sub-filter-container">
@@ -207,6 +226,12 @@
                 appendInnerIcon="mdi-check"
               ></SimpleTextField>
             {/if}
+<!-- 
+            {#if !!selectedFilter && selectedFilter.type === "choice"}
+              {#each selectedFilter.options as option }
+                <Checkbox /> {option}
+              {/each}
+            {/if} -->
 
             <div class="sub-filter-button">
               <Button
