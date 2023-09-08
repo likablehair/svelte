@@ -82,12 +82,12 @@
   function handleInputChange() {
     setTimeout(() => {
       const typedValue = mask.value
-  
+
       if(!!typedValue) {
         // find day of month
         const dayOfMonthIndex = pattern.indexOf('dd')
         const dayOfMonth = typedValue.substring(dayOfMonthIndex, dayOfMonthIndex + 2)
-        
+
         // find month
         const monthIndex = pattern.indexOf('MM')
         const oneBasedMonth = typedValue.substring(monthIndex, monthIndex + 2)
@@ -95,7 +95,7 @@
           selectedMonth = Number(oneBasedMonth) - 1
           visibleMonth = selectedMonth
         }
-  
+
         // find year
         const yearIndex = pattern.indexOf('yyyy')
         const year = typedValue.substring(yearIndex, yearIndex + 4)
@@ -103,7 +103,7 @@
           selectedYear = Number(year)
           visibleYear = selectedYear
         }
-  
+
         if(typedValue.length == pattern.length) {
           selectedDate = DateTime.fromObject({
             day: Number(dayOfMonth),
@@ -115,7 +115,7 @@
     }, 30);
   }
 
-  function handleDateSelect(ev: CustomEvent<{ 
+  function handleDateSelect(ev: CustomEvent<{
     dateStat: DateStat
   }>) {
     if(!!selectedDate) {
@@ -136,7 +136,7 @@
   }
 </script>
 
-<div 
+<div
   bind:this={activator}
   style:width="fit-content"
 >
@@ -148,7 +148,7 @@
   >
     <svelte:fragment slot="prepend-inner" let:prependInnerIcon let:iconSize>
       <slot name="prepend-inner" {prependInnerIcon} {iconSize}>
-        <Icon 
+        <Icon
           name="mdi-calendar"
           click
           on:click={() => menuOpened = !menuOpened}

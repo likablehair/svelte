@@ -18,9 +18,9 @@
   } = {};
 	export { clazz as class };
 
-  /* 
+  /*
     Styles:
-    
+
     --autocomplete-selected-item-background-color
     --autocomplete-selected-item-color
     --autocomplete-focused-item-background-color
@@ -41,6 +41,7 @@
     openingId: string = "autocomplete-menu",
     searchText: string | undefined = undefined,
     maxVisibleChips: number | undefined = undefined,
+    menuOpened: boolean = false,
 
     // menu
     menuBoxShadow = "rgb(var(--global-color-background-300), .5) 0px 2px 4px",
@@ -106,7 +107,6 @@
 
   let menuWidth: string | undefined = undefined,
     menuHeight = "auto",
-    menuOpened = false,
     refreshPosition = false;
 
   function openMenu() {
@@ -135,7 +135,7 @@
   }
 
   let menuElement: HTMLElement;
-  function handleKeyDown(event: { key: string }) { 
+  function handleKeyDown(event: { key: string }) {
     if (
       event.key == "ArrowDown" &&
       (focusedIndex === undefined || focusedIndex < filteredItems.length - 1)
@@ -160,7 +160,7 @@
 
     if(focusedIndex !== undefined && !!menuElement) {
       let child = menuElement.querySelector<HTMLElement>('.item-' + focusedIndex)
-      
+
       if(!!child) scrollInMenu(menuElement, child, 'instant')
     }
   }
@@ -268,7 +268,7 @@
     bind:openingId={openingId}
     flipOnOverflow
   >
-    <ul 
+    <ul
       class={clazz.menu || ''}
       style:background-color="rgb(var(--global-color-background-100))"
     >

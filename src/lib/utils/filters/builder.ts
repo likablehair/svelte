@@ -68,6 +68,7 @@ export default class Builder {
     second?: string | number | Date,
     third?: string | number | Date,
   ): Builder {
+
     if (!!third) {
       if (!!second && typeof first == 'string' && typeof second == 'string') {
         this.modifiers.push({

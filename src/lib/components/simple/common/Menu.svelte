@@ -241,11 +241,11 @@
 
 <svelte:window on:scroll={handleWindowScrollOrResize} on:resize={handleWindowScrollOrResize} ></svelte:window>
 
-<div 
-  class="controller" 
-  data-operation="close" 
-  data-opening-id={openingId} 
-  on:click={handleCloseControllerClick} 
+<div
+  class="controller"
+  data-operation="close"
+  data-opening-id={openingId}
+  on:click={handleCloseControllerClick}
   on:keypress={handleCloseControllerClick}
   bind:this={closeController}
 ></div>

@@ -1,9 +1,16 @@
 import Builder from "./builder"
 
+export const StringModes = ['equal', 'like', 'ilike'] as const
+export type StringMode = typeof StringModes[number]
+
+export const DateModes = ['equal', 'greater', 'lower', 'between'] as const
+export type DateMode = typeof DateModes[number]
+
 type MultiStringFilter = {
   type: 'multiString',
   columns: string[],
-  operator?: 'or' | 'and'
+  operator?: 'or' | 'and',
+  value?: string
 }
 
 
@@ -19,15 +26,24 @@ type StringFilter = {
   type: 'string',
   column: string,
   value?: string,
-  mode?: 'equal' | 'like' | 'ilike'
+  mode?: StringMode
+}
+
+type DateFilter = {
+  type: 'date',
+  column: string,
+  value?: Date,
+  secondValue?: Date,
+  mode?: DateMode
 }
 
 export type Filter = {
   name: string,
   active: boolean,
   hidden?: boolean,
-  label: string
-} & (StringFilter | MultiStringFilter | ChoiceFilter)
+  label: string,
+  advanced?: boolean
+} & (StringFilter | MultiStringFilter | ChoiceFilter | DateFilter)
 
 
 export default class Converter {
@@ -44,7 +60,10 @@ export default class Converter {
       const filter = params.filters[i]
 
       if(filter.type == 'string') {
+        console.log('applying string filter')
         this.applyStringFilter({ builder, filter })
+      } else if(filter.type == 'date') {
+        this.applyDateFilter({ builder, filter })
       }
     }
 
@@ -63,6 +82,26 @@ export default class Converter {
       params.builder.where(params.filter.column, 'ilike', params.filter.value)
     } else {
       params.builder.where(params.filter.column, '=', params.filter.value)
+    }
+
+    return params.builder
+  }
+
+  private applyDateFilter(params: {
+    builder: Builder,
+    filter: DateFilter
+  }): Builder {
+    if(params.filter.value === undefined) return params.builder
+
+    if(params.filter.mode == 'equal') {
+      params.builder.where(params.filter.column, '=', params.filter.value)
+    } else if (params.filter.mode == 'greater') {
+      params.builder.where(params.filter.column, '>', params.filter.value)
+    } else if (params.filter.mode == 'lower') {
+      params.builder.where(params.filter.column, '<', params.filter.value)
+    } else if (params.filter.mode == 'between' && !!params.filter.secondValue) {
+      params.builder.where(params.filter.column, '>', params.filter.value)
+      params.builder.where(params.filter.column, '<', params.filter.secondValue)
     }
 
     return params.builder
