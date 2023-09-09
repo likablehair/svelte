@@ -8,7 +8,25 @@
 <ComponentSubtitle>Make it easy, make it filter.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
-  <Filters></Filters>
+  <Filters
+    filters={[
+      {
+        name:"customerName",
+        label:"Customer Name",
+        type:"string",
+        column:"customerName",
+        mode: 'ilike',
+        advanced: false
+      }, {
+        name:"date",
+        label:"Date",
+        type:"date",
+        column:"date",
+        mode: 'equal',
+        advanced: true
+      }
+    ]}
+  ></Filters>
 </div>
 <h2>Props</h2>
 <PropsViewer

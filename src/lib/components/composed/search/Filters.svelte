@@ -2,7 +2,7 @@
   export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
   export type Column ={
     label: string,
-  }
+  };
 </script>
 
 <script lang="ts">
@@ -16,43 +16,18 @@
   import { createEventDispatcher, type ComponentProps } from 'svelte';
   import type { DateMode, Filter, StringMode } from '$lib/utils/filters/filters';
   import SelectableVerticalList from '$lib/components/simple/lists/SelectableVerticalList.svelte';
-  import SimpleTextField from '$lib/components/simple/forms/SimpleTextField.svelte';
   import Chip from '$lib/components/simple/navigation/Chip.svelte';
-  import Checkbox from '$lib/components/simple/forms/Checkbox.svelte';
   import Converter, { DateModes, StringModes } from '$lib/utils/filters/filters';
-  import DatePicker from '$lib/components/simple/dates/DatePicker.svelte';
   import type { Locale } from '$lib/components/simple/dates/utils';
-  import DatePickerTextField from '$lib/components/simple/dates/DatePickerTextField.svelte';
-    import Dropdown, { type Item } from '../forms/Dropdown.svelte';
+  import Validator from '$lib/utils/filters/validator';
+  import FilterEditor from './FilterEditor.svelte';
 
   export let
     addFilterLabel: string = "Filters",
-    counterFilterLabel: number = 0,
-    filters: Filter[] = [{
-      name:"customerName",
-      label:"Customer Name",
-      active:true,
-      type:"string",
-      column:"customerName",
-      value: "",
-      mode: 'ilike',
-      advanced: false
-    }, {
-      name:"date",
-      label:"Date",
-      active:true,
-      type:"date",
-      column:"date",
-      value: new Date(),
-      secondValue: new Date(),
-      mode: 'equal',
-      advanced: true
-    }],
+    filters: Filter[] = [],
     cancelFilterLabel : string = "Cancel",
     applyFilterLabel : string = "Apply Filter",
-    openExtendAppliedFilterLabel: string= "Mostra filtri applicati",
-    closeExtendAppliedFilterLabel: string = "Nascondi filtri applicati",
-    extendAppliedFilterLabel: string = closeExtendAppliedFilterLabel,
+    showActiveFilters: boolean = true,
     filterTitleLabel: string = "Filtra per ",
     dateLocale: Locale = 'it',
     betweenSeparator: string = "e"
@@ -64,19 +39,18 @@
   let dispatch = createEventDispatcher<{
     'addFilterClick': undefined,
     'selectFilterClick': undefined,
+    'removeFilterClick': {
+      filter: Filter
+    }
   }>()
 
   let open: boolean = false,
-    activator: HTMLElement,
-    filterSlots: Filter  [] = [],
-    showAppliedFilter : boolean = true
-
+    activator: HTMLElement
 
   function handleAddFilterClick() {
     dispatch('addFilterClick')
     open = true
   }
-
 
   $: filterOptions = filters.map((f) => {
     return {
@@ -91,120 +65,82 @@
   $: if(!!focused && !open) focused = undefined
 
 
+  let filterOptionsListActivator: HTMLElement | undefined
   let singleFilterActivator:  HTMLElement | undefined
+  let singleFilterMenuAnchor: 'right-center' | 'bottom-center' = 'right-center'
   let singleFilterMenuOpened: boolean = false
 
   let selectedFilter : Filter | undefined = undefined
-  $: selectedFilter = selected === undefined ? undefined : filters.find((f) => {return f.name === selected})
+  $: selectedFilterIndex = filters.findIndex((f) => { return f.name === selected })
+  $: selectedFilter = selected === undefined ? undefined : filters[selectedFilterIndex]
 
   function handleFilterSelection(e: CustomEvent) {
+    singleFilterActivator = filterOptionsListActivator
+    singleFilterMenuAnchor = 'right-center'
     singleFilterMenuOpened = true;
     selected = e.detail.element.name
   }
 
-  function handleCancelFilterClick(e: CustomEvent) {
+  function handleCancelFilterClick() {
     open = false
     singleFilterMenuOpened = false;
   }
 
   function handleApplyFilterClick() {
     if(!!selectedFilter) {
-      counterFilterLabel++;
-
-      let newFilter: Filter = {...selectedFilter}
-
-      if(!!advancedModeSelectedOptions) {
-        if(newFilter.type == 'string') {
-          newFilter.mode = advancedModeSelectedOptions[0].value as StringMode
-        } else if(newFilter.type == 'date') {
-          newFilter.mode = advancedModeSelectedOptions[0].value as DateMode
-        }
-      }
-
-      filterSlots = [...filterSlots, newFilter]
-
-      let filterConverter = new Converter()
-
-      let builder = filterConverter.createBuilder({
-        filters: filterSlots
-      })
-
       open = false
       singleFilterMenuOpened = false;
     }
   }
 
+  $: activeFilters = filters.filter((f) => f.active)
 
-  function handleAppliedFilterClick(){
-    showAppliedFilter = !showAppliedFilter
-    extendAppliedFilterLabel = !!showAppliedFilter ? closeExtendAppliedFilterLabel : openExtendAppliedFilterLabel
+  function handleRemoveFilter(filter: { name: string }) {
+    let filterIndex = filters.findIndex((f) => f.name === filter.name)
+    filters[filterIndex].active = false
+    dispatch('removeFilterClick', { filter: filters[filterIndex] })
   }
 
-  function handleRemoveFilter (index: number){
-    filterSlots.splice(index, 1)
-    filterSlots = filterSlots
+  let activeFiltersActivators: Record<string, HTMLElement> = {}
+  function handleActiveFilterClick(filter: { name: string }) {
+    singleFilterActivator = activeFiltersActivators[filter.name]
+    singleFilterMenuAnchor = 'bottom-center'
+    singleFilterMenuOpened = true;
+    selected = filter.name
   }
-
-
-  let advancedModeOptions: Item[],
-    advancedModeSelectedOptions: Item[] | undefined
-
-  $: if(!!selectedFilter) {
-    let modes
-    if(selectedFilter.type == 'string') {
-      modes = StringModes
-    } else if(selectedFilter.type == 'date') {
-      modes = DateModes
-    }
-
-    if(!!modes) {
-      advancedModeOptions = modes.map(mode => {
-        return {
-          value: mode,
-          label: mode
-        }
-      })
-    }
-  }
-
-  $: if(!selectedFilter?.advanced) {
-    advancedModeSelectedOptions = undefined
-  }
-
-
-  $: applyFilterDisabled = !selectedFilter || !selectedFilter.value || (selectedFilter.advanced && (!advancedModeSelectedOptions || advancedModeSelectedOptions.length === 0)) || (selectedFilter.type == 'date' && selectedFilter.advanced && selectedFilter.mode == 'between' && !selectedFilter.secondValue)
-
 </script>
 
-{#if filterSlots.length > 0}
-  <div
-    class="extend-filter-applyed"
-    on:keypress={handleAppliedFilterClick}
-    on:click={handleAppliedFilterClick}>
-    {extendAppliedFilterLabel}
-  </div>
-{/if}
-{#if showAppliedFilter}
-<div class="filter-slots-container">
-  {#each filterSlots as filterSlot, i}
-      <div class="filter-slot">
-        {#if !!filterSlot && filterSlot.type === "string" }
-          <Chip label close on:close={() => handleRemoveFilter(i)}>
-            <b> {filterSlot.label} </b>
-            {filterSlot.mode}  <b>{filterSlot.value}</b>
-          </Chip>
-        {:else if !!filterSlot && filterSlot.type === "date"}
-          <Chip label close on:close={() => handleRemoveFilter(i)}>
-            <b> {filterSlot.label} </b>
-            {filterSlot.mode}  <b>{filterSlot.value?.toLocaleDateString(dateLocale)}</b>
-            {#if filterSlot.advanced && filterSlot.mode=="between"}
-              {betweenSeparator} <b>{filterSlot.secondValue?.toLocaleDateString(dateLocale)}</b>
+
+{#if showActiveFilters}
+  <div class="active-filters-container">
+    {#each activeFilters as filter}
+      <div 
+        class="filter-slot" 
+        bind:this={activeFiltersActivators[filter.name]}
+      >
+        <Chip 
+          label 
+          close 
+          on:close={() => handleRemoveFilter(filter)}
+          on:click={() => handleActiveFilterClick(filter)}
+        >
+          {#if filter.type === "string" }
+          <b>{filter.label}</b> {filter.mode}  <b>{filter.value}</b>
+          {:else if filter.type === "date"}
+            <b>{filter.label}</b>
+            {#if filter.mode == 'between'}
+              {filter.mode}  <b>{filter.from?.toLocaleDateString(dateLocale)}</b>
+              {betweenSeparator} <b>{filter.to?.toLocaleDateString(dateLocale)}</b>
+            {:else}
+              {filter.mode}  <b>{filter.value?.toLocaleDateString(dateLocale)}</b>
             {/if}
-          </Chip>
-        {/if}
+          {:else}
+            {filter.label}
+          {/if}
+        </Chip>
       </div>
-  {/each}
-</div>
+    {/each}
+  </div>
 {/if}
 
 <div
@@ -216,7 +152,10 @@
     on:click={handleAddFilterClick}
   >
     <Icon name="mdi-filter"></Icon>
-    {addFilterLabel}  {#if filterSlots.length> 0 } ({counterFilterLabel}) {/if}
+    {addFilterLabel} 
+    {#if activeFilters.length > 0 } 
+      ({activeFilters.length})
+    {/if}
   </Button>
 
 </div>
@@ -250,21 +189,22 @@
       _borderRadius="5px"
       anchor="bottom"
     >
-    <div
-      style:background-color="rgb(var(--global-color-background-200))"
-      bind:this={singleFilterActivator} >
-      <SelectableVerticalList
-        bind:selected
-        bind:focused
-        bind:elements={filterOptions}
-        --selectable-vertical-list-default-width="100%"
-        --selectable-vertical-list-default-element-height="56px"
-        --selectable-vertical-list-default-title-font-size="null"
-        on:select={handleFilterSelection}
+      <div
+        style:background-color="rgb(var(--global-color-background-200))"
+        bind:this={filterOptionsListActivator} 
       >
-      </SelectableVerticalList>
-    </div>
+        <SelectableVerticalList
+          bind:selected
+          bind:focused
+          bind:elements={filterOptions}
+          --selectable-vertical-list-default-width="100%"
+          --selectable-vertical-list-default-element-height="56px"
+          --selectable-vertical-list-default-title-font-size="null"
+          on:select={handleFilterSelection}
+        ></SelectableVerticalList>
+      </div>
     </Menu>
+
     <Menu
       _width="350px"
       _borderRadius="10px"
@@ -272,88 +212,33 @@
       _overflow="unset"
       activator={singleFilterActivator}
       bind:open={singleFilterMenuOpened}
-      anchor="right-center"
+      anchor={singleFilterMenuAnchor}
       closeOnClickOutside
       openingId="second-menu"
       flipOnOverflow
     >
-      <div style:min-height="160px" on:click={() => { calendarOpened = false; calendarOpened2 = false; selectOpened = false }} on:keydown style:border-radius="10px" style:overflow="auto" style:height="100%" style:background-color="rgb(var(--global-color-background-200))" >
+      <div 
+        style:min-height="160px" 
+        on:click={() => { calendarOpened = false; calendarOpened2 = false; selectOpened = false }} 
+        on:keydown={() => { calendarOpened = false; calendarOpened2 = false; selectOpened = false }}
+        style:border-radius="10px" 
+        style:overflow="auto"
+        style:height="100%" 
+        style:background-color="rgb(var(--global-color-background-200))" 
+      >
         <div class="filter-title">
-            {filterTitleLabel} {selectedFilter?.label}
+          {filterTitleLabel} {selectedFilter?.label}
         </div>
 
-        <div class="sub-filter-container">
-          {#if !!selectedFilter && selectedFilter.advanced}
-            <div class="advanced-mode">
-              <div class="label">
-                {selectedFilter.name[0].toUpperCase() + selectedFilter.name.slice(1)}
-              </div>
-              <div class="advaced-mode-selector" on:click|stopPropagation={() => {calendarOpened = false; calendarOpened2 = false}} on:keydown>
-                <Dropdown
-                  items={advancedModeOptions}
-                  bind:values={advancedModeSelectedOptions}
-                  bind:menuOpened={selectOpened}
-                  on:change={() => { selectOpened = false }}
-                ></Dropdown>
-              </div>
-            </div>
-          {/if}
-
-          {#if !!selectedFilter && (!selectedFilter.advanced || (!!advancedModeSelectedOptions && advancedModeSelectedOptions.length > 0))}
-            {#if !!selectedFilter && selectedFilter.type === "string"}
-              <SimpleTextField
-                bind:value={selectedFilter.value}
-                class={{ }}
-                type="text"
-                placeholder={selectedFilter?.label}
-                appendInnerIcon="mdi-check"
-              ></SimpleTextField>
-            {:else if !!selectedFilter && selectedFilter.type === "date"}
-              <div on:click|stopPropagation={() => {selectOpened = false}} on:keydown style:width="fit-content">
-                <DatePickerTextField
-                bind:selectedDate={selectedFilter.value}
-                bind:menuOpened={calendarOpened}
-                on:day-click={() => { calendarOpened = false }}
-                ></DatePickerTextField>
-              </div>
-            {/if}
-          {/if}
-
-          {#if !!selectedFilter && selectedFilter.advanced && selectedFilter.type=='date' && (!!advancedModeSelectedOptions && advancedModeSelectedOptions.length > 0) && advancedModeSelectedOptions[0].value == 'between'}
-            <div on:click|stopPropagation={() => {selectOpened = false}} on:keydown style:width="fit-content">
-              <DatePickerTextField
-              bind:selectedDate={selectedFilter.secondValue}
-              bind:menuOpened={calendarOpened2}
-              on:day-click={() => { calendarOpened2 = false }}
-              ></DatePickerTextField>
-            </div>
-          {/if}
-<!--
-          {#if !!selectedFilter && selectedFilter.type === "choice"}
-            {#each selectedFilter.options as option }
-              <Checkbox /> {option}
-            {/each}
-          {/if} -->
-
-          <div class="sub-filter-button">
-            <Button
-              --button-background-color="rgb(var(--global-color-background-200))"
-              --button-color="rgb(var(--global-color-contrast-900))"
-              on:click={handleCancelFilterClick}
-            >
-              {cancelFilterLabel}
-            </Button>
-
-            <Button
-              --button-min-width="100px"
-              on:click={handleApplyFilterClick}
-              disabled={applyFilterDisabled}
-            >
-              {applyFilterLabel}
-
-            </Button>
-          </div>
-        </div>
+        {#if !!selectedFilter}
+          <FilterEditor
+            bind:filter={selectedFilter}
+            bind:applyFilterLabel
+            bind:cancelFilterLabel
+            on:cancel={handleCancelFilterClick}
+            on:apply={handleApplyFilterClick}
+          ></FilterEditor>
+        {/if}
       </div>
     </Menu>
   {/if}
@@ -366,52 +251,17 @@
     display: flex;
     column-gap: 10px;
   }
+
   .filter-title{
     display: flex;
     justify-content: center;
     margin-top: 10px;
   }
 
-  .sub-filter-container {
-    display: flex;
-    flex-direction: column;
-    align-items: left;
-    gap:10px;
-    margin: 5%;
-  }
-
-  .sub-filter-button {
-    display: flex;
-    column-gap: 10px;
-    flex-direction: row;
-    align-items: start;
-    margin: 10px;
-  }
-
-  .filter-slots-container {
+  .active-filters-container {
     display: flex;
     align-items: flex-start;
     column-gap: 10px;
-  }
-
-  .filter-slot {
-    font-size: 0.70rem;
-    font-weight: 0;
-  }
-
-  .extend-filter-applyed{
-    left: 0;
-    top:0;
-    font-size: 0.7em;
-  }
-  .extend-filter-applyed:hover{
-      cursor: pointer;
-  }
-
-  .advanced-mode {
-    display: flex;
-    gap: 10px;
-    align-items: center;
   }
 
 </style>

@@ -231,6 +231,10 @@
       --button-hover-color,
       var(--button-default-hover-color)
     );
+    box-shadow: var(
+      --button-hover-box-shadow,
+      var(--button-default-hover-box-shadow)
+    );
   }
 
   .button-default:active:not(.disabled) {

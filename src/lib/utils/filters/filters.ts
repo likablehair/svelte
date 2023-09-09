@@ -32,14 +32,20 @@ type StringFilter = {
 type DateFilter = {
   type: 'date',
   column: string,
-  value?: Date,
-  secondValue?: Date,
-  mode?: DateMode
-}
+} & (
+  {
+    mode: 'between',
+    from?: Date,
+    to?: Date
+  } | {
+    mode: 'equal' | 'greater' | 'lower',
+    value?: Date,
+  }
+)
 
 export type Filter = {
   name: string,
-  active: boolean,
+  active?: boolean,
   hidden?: boolean,
   label: string,
   advanced?: boolean
@@ -91,17 +97,15 @@ export default class Converter {
     builder: Builder,
     filter: DateFilter
   }): Builder {
-    if(params.filter.value === undefined) return params.builder
-
-    if(params.filter.mode == 'equal') {
+    if (params.filter.mode == 'equal' && !!params.filter.value) {
       params.builder.where(params.filter.column, '=', params.filter.value)
-    } else if (params.filter.mode == 'greater') {
+    } else if (params.filter.mode == 'greater' && !!params.filter.value) {
       params.builder.where(params.filter.column, '>', params.filter.value)
-    } else if (params.filter.mode == 'lower') {
+    } else if (params.filter.mode == 'lower' && !!params.filter.value) {
       params.builder.where(params.filter.column, '<', params.filter.value)
-    } else if (params.filter.mode == 'between' && !!params.filter.secondValue) {
-      params.builder.where(params.filter.column, '>', params.filter.value)
-      params.builder.where(params.filter.column, '<', params.filter.secondValue)
+    } else if (params.filter.mode == 'between' && !!params.filter.from && !!params.filter.to) {
+      params.builder.where(params.filter.column, '>', params.filter.from)
+      params.builder.where(params.filter.column, '<', params.filter.to)
     }
 
     return params.builder

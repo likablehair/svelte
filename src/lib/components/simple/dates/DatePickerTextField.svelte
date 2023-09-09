@@ -22,7 +22,8 @@
     selectedYear: number | undefined = undefined,
     visibleMonth: number | undefined = undefined,
     visibleYear: number | undefined = undefined,
-    selectedDate: Date | undefined = undefined
+    selectedDate: Date | undefined = undefined,
+    placeholder: string | undefined = undefined
 
   let activator: HTMLElement,
     refreshPosition = false,
@@ -145,6 +146,7 @@
     on:focus={handleTextFieldFocus}
     on:keypress={handleInputChange}
     bind:input={inputElement}
+    bind:placeholder
   >
     <svelte:fragment slot="prepend-inner" let:prependInnerIcon let:iconSize>
       <slot name="prepend-inner" {prependInnerIcon} {iconSize}>
