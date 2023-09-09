@@ -1,8 +1,5 @@
 <script lang="ts" context="module">
   export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
-  export type Column ={
-    label: string,
-  };
 </script>
 
 <script lang="ts">
