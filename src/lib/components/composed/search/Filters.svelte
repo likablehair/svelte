@@ -107,54 +107,55 @@
   }
 </script>
 
-
-{#if showActiveFilters}
-  <div class="active-filters-container">
-    {#each activeFilters as filter}
-      <div 
-        class="filter-slot" 
-        bind:this={activeFiltersActivators[filter.name]}
-      >
-        <Chip 
-          label 
-          close 
-          on:close={() => handleRemoveFilter(filter)}
-          on:click={() => handleActiveFilterClick(filter)}
+<div class="filters-container">
+  {#if showActiveFilters}
+    <div class="active-filters-container">
+      {#each activeFilters as filter}
+        <div
+          class="filter-slot"
+          bind:this={activeFiltersActivators[filter.name]}
         >
-          {#if filter.type === "string" }
-          <b>{filter.label}</b> {filter.mode}  <b>{filter.value}</b>
-          {:else if filter.type === "date"}
-            <b>{filter.label}</b>
-            {#if filter.mode == 'between'}
-              {filter.mode}  <b>{filter.from?.toLocaleDateString(dateLocale)}</b>
-              {betweenSeparator} <b>{filter.to?.toLocaleDateString(dateLocale)}</b>
+          <Chip
+            label
+            close
+            on:close={() => handleRemoveFilter(filter)}
+            on:click={() => handleActiveFilterClick(filter)}
+          >
+            {#if filter.type === "string" }
+            <b>{filter.label}</b> {filter.mode}  <b>{filter.value}</b>
+            {:else if filter.type === "date"}
+              <b>{filter.label}</b>
+              {#if filter.mode == 'between'}
+                {filter.mode}  <b>{filter.from?.toLocaleDateString(dateLocale)}</b>
+                {betweenSeparator} <b>{filter.to?.toLocaleDateString(dateLocale)}</b>
+              {:else}
+                {filter.mode}  <b>{filter.value?.toLocaleDateString(dateLocale)}</b>
+              {/if}
             {:else}
-              {filter.mode}  <b>{filter.value?.toLocaleDateString(dateLocale)}</b>
+              {filter.label}
             {/if}
-          {:else}
-            {filter.label}
-          {/if}
-        </Chip>
-      </div>
-    {/each}
-  </div>
-{/if}
+          </Chip>
+        </div>
+      {/each}
+    </div>
+  {/if}
 
-<div
-  class="filter-button"
-  bind:this={activator}
->
-  <Button
-    --button-color="var(--chip-color, var(--chip-default-color))"
-    on:click={handleAddFilterClick}
+  <div
+    class="filter-button"
+    bind:this={activator}
   >
-    <Icon name="mdi-filter"></Icon>
-    {addFilterLabel} 
-    {#if activeFilters.length > 0 } 
-      ({activeFilters.length})
-    {/if}
-  </Button>
+    <Button
+      --button-color="var(--chip-color, var(--chip-default-color))"
+      on:click={handleAddFilterClick}
+    >
+      <Icon name="mdi-filter"></Icon>
+      {addFilterLabel}
+      {#if activeFilters.length > 0 }
+        ({activeFilters.length})
+      {/if}
+    </Button>
 
+  </div>
 </div>
 
 <MediaQuery let:mAndDown>
@@ -188,7 +189,9 @@
     >
       <div
         style:background-color="rgb(var(--global-color-background-200))"
-        bind:this={filterOptionsListActivator} 
+        bind:this={filterOptionsListActivator}
+        on:click|stopPropagation
+        on:keydown
       >
         <SelectableVerticalList
           bind:selected
@@ -214,14 +217,14 @@
       openingId="second-menu"
       flipOnOverflow
     >
-      <div 
-        style:min-height="160px" 
-        on:click={() => { calendarOpened = false; calendarOpened2 = false; selectOpened = false }} 
-        on:keydown={() => { calendarOpened = false; calendarOpened2 = false; selectOpened = false }}
-        style:border-radius="10px" 
+      <div
+        style:min-height="160px"
+        on:click
+        on:keydown
+        style:border-radius="10px"
         style:overflow="auto"
-        style:height="100%" 
-        style:background-color="rgb(var(--global-color-background-200))" 
+        style:height="100%"
+        style:background-color="rgb(var(--global-color-background-200))"
       >
         <div class="filter-title">
           {filterTitleLabel} {selectedFilter?.label}
@@ -259,6 +262,12 @@
     display: flex;
     align-items: flex-start;
     column-gap: 10px;
+  }
+
+  .filters-container {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
   }
 
 </style>

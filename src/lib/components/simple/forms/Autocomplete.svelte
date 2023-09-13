@@ -42,7 +42,6 @@
     searchText: string | undefined = undefined,
     maxVisibleChips: number | undefined = undefined,
     menuOpened: boolean = false,
-
     // menu
     menuBoxShadow = "rgb(var(--global-color-background-300), .5) 0px 2px 4px",
     menuBorderRadius = "5px"

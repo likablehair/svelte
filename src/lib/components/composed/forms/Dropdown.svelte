@@ -17,7 +17,8 @@
     clearable: boolean = true,
     mandatory: boolean = true,
     icon: string | undefined = undefined,
-    menuOpened: boolean = false
+    menuOpened: boolean = false,
+    openingId: string | undefined = undefined
 
   $: generatedLabel = values.length == 1 ? values[0].label : `${values.length} Selezionati`
 
@@ -38,6 +39,7 @@
   searchFunction={() => true}
   on:change
   bind:menuOpened
+  bind:openingId
 >
   <svelte:fragment slot="selection-container" let:openMenu let:handleKeyDown>
     <Button

@@ -29,9 +29,6 @@
     }
   }
 
-  let calendarOpened: boolean = false,
-    calendarOpened2: boolean = false,
-    selectOpened: boolean = false
 
   let advancedModeOptions: Item[],
     advancedModeSelectedOptions: Item[] | undefined
@@ -58,6 +55,9 @@
     advancedModeSelectedOptions = undefined
   }
 
+  let dropdownOpened: boolean = false,
+    calendarOpened: boolean = false
+
   // TODO I don't like that there is a singlo dropdow to handle all filter advance mode.
   // In some case would be necessary to handle more than one selection and this code
   // could become non sense
@@ -65,6 +65,8 @@
     if(!!advancedModeSelectedOptions && advancedModeSelectedOptions.length > 0 && !!filter) {
       if(filter.type == 'date') filter.mode = advancedModeSelectedOptions[0].value as DateMode
     }
+
+    dropdownOpened = false;
   }
 
   $: applyFilterDisabled = !Validator.isValid(filter)
@@ -78,59 +80,63 @@
         <div class="label">
           {filter.name[0].toUpperCase() + filter.name.slice(1)}
         </div>
-        <div class="advaced-mode-selector" on:click|stopPropagation={() => {calendarOpened = false; calendarOpened2 = false}} on:keydown>
+        <div class="advaced-mode-selector" on:click|stopPropagation on:keypress>
           <Dropdown
             items={advancedModeOptions}
             bind:values={advancedModeSelectedOptions}
-            bind:menuOpened={selectOpened}
             on:change={handleAdvancedModeSelection}
+            bind:menuOpened={dropdownOpened}
+            openingId="advanced-filter"
           ></Dropdown>
         </div>
       </div>
     {/if}
 
-    {#if !filter.advanced || (!!advancedModeSelectedOptions && advancedModeSelectedOptions.length > 0)}
-      {#if filter.type === "string" }
-        <SimpleTextField
-          bind:value={filter.value}
-          type="text"
-          placeholder={filter?.label}
-          --simple-textfield-width="100%"
-        ></SimpleTextField>
-      {:else if filter.type === "date" && filter.mode !== 'between'}
-        <div 
-          on:click|stopPropagation={() => {selectOpened = false}} 
-          on:keydown style:width="fit-content"
-        >
-          <DatePickerTextField
-          bind:selectedDate={filter.value}
-          bind:menuOpened={calendarOpened}
-          on:day-click={() => { calendarOpened = false }}
-          ></DatePickerTextField>
-        </div>
-      {:else if filter.type === "date" && filter.mode === 'between'}
-        <div 
-          on:click|stopPropagation={() => {selectOpened = false}} 
-          on:keydown 
-          style:width="fit-content"
-        >
-          <DatePickerTextField
-            bind:selectedDate={filter.from}
-            bind:menuOpened={calendarOpened}
-            on:day-click={() => { calendarOpened = false }}
-            placeholder="Dalla data"
-          ></DatePickerTextField>
-        </div>
-        <div on:click|stopPropagation={() => {selectOpened = false}} on:keydown style:width="fit-content">
-          <DatePickerTextField
-            bind:selectedDate={filter.to}
-            bind:menuOpened={calendarOpened2}
-            on:day-click={() => { calendarOpened2 = false }}
-            placeholder="Alla data"
-          ></DatePickerTextField>
-        </div>
+    <div class="fields" style:width="fit-content" on:click|stopPropagation on:keypress>
+      {#if !filter.advanced || (!!advancedModeSelectedOptions && advancedModeSelectedOptions.length > 0)}
+        {#if filter.type === "string" }
+          <SimpleTextField
+            bind:value={filter.value}
+            type="text"
+            placeholder={filter?.label}
+            --simple-textfield-width="100%"
+          ></SimpleTextField>
+        {:else if filter.type === "date" && filter.mode !== 'between'}
+          <div
+            style:width="fit-content"
+          >
+            <DatePickerTextField
+              bind:selectedDate={filter.value}
+              openingId="advanced-filter"
+              bind:menuOpened={calendarOpened}
+              on:day-click={() => {calendarOpened = false}}
+            ></DatePickerTextField>
+          </div>
+        {:else if filter.type === "date" && filter.mode === 'between'}
+          <div
+            style:width="fit-content"
+          >
+            <DatePickerTextField
+              bind:selectedDate={filter.from}
+              openingId="advanced-filter"
+              placeholder="Dalla data"
+              bind:menuOpened={calendarOpened}
+              on:day-click={() => {calendarOpened = false}}
+            ></DatePickerTextField>
+          </div>
+          <div style:width="fit-content">
+            <DatePickerTextField
+              bind:selectedDate={filter.to}
+              openingId="advanced-filter"
+              placeholder="Alla data"
+              bind:menuOpened={calendarOpened}
+              on:day-click={() => {calendarOpened = false}}
+            ></DatePickerTextField>
+          </div>
+        {/if}
       {/if}
-    {/if}
+    </div>
+
     <div class="sub-filter-button">
       <Button
         --button-background-color="transparent"
