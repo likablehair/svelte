@@ -9,7 +9,8 @@
     style?: {
       color?: string,
       backgroundColor?: string
-    }
+    },
+    appendIcon?: string
   };
 </script>
 
@@ -24,13 +25,20 @@
     loopSelection: boolean = true,
     focused: string | number | undefined = undefined,
     selected: string | number | undefined = undefined,
-    elements: Element[] = []
+    elements: Element[] = [],
+    centered: boolean = false,
+    bicolor: boolean = false,
+    appendIconSize: string = "20pt"
 
   let dispatch = createEventDispatcher<{
     'select': {
       element: Element
     },
     'focus': {
+      element: Element
+    },
+    'iconClick': {
+      index: number,
       element: Element
     }
   }>()
@@ -85,6 +93,14 @@
       keyboarder.off(handleKeypress)
     }
   })
+
+  function handleIconClick(index: number, element: Element) {
+    dispatch('iconClick', {
+      index,
+      element
+    })
+  }
+
 </script>
 
 <ul
@@ -94,6 +110,7 @@
   {#each elements as element, index (element.name)}
     <li
       class="element"
+      class:bicolor
       class:focused={focused == element.name}
       aria-selected={selected == element.name}
       on:mouseover={() => handleElementMouseover(element)}
@@ -103,20 +120,19 @@
       style:color={element.style?.color}
       style:background-color={element.style?.backgroundColor}
     >
-      <slot 
+      <slot
         name="element"
         focused={focused == element.name}
         selected={selected == element.name}
       >
         {#if !!element.icon}
-          <Icon 
-            name={element.icon} 
-            --icon-default-size="20px"
+          <Icon
+            name={element.icon}
           ></Icon>
         {/if}
-        <div class="title-description-container">
+        <div class="title-description-container" class:centered>
           <div class="title">
-            <slot 
+            <slot
               name="title"
               focused={focused == element.name}
               selected={selected == element.name}
@@ -125,9 +141,9 @@
               {element.title}
             </slot>
           </div>
-          {#if !!element.description}  
+          {#if !!element.description}
             <div class="description">
-              <slot 
+              <slot
                 name="description"
                 focused={focused == element.name}
                 selected={selected == element.name}
@@ -138,6 +154,18 @@
             </div>
           {/if}
         </div>
+        {#if !!element.appendIcon}
+          <div
+            class="append"
+            on:click|stopPropagation={() => {handleIconClick(index, element)}}
+            on:keypress
+          >
+            <Icon
+              name={element.appendIcon}
+              --icon-size={appendIconSize}
+            ></Icon>
+          </div>
+        {/if}
       </slot>
     </li>
   {/each}
@@ -194,6 +222,17 @@
     margin-top: 0.2rem;
   }
 
+  .bicolor:nth-child(even) {
+    background-color: var(
+      --selectable-vertical-list-focus-background-color,
+      var(--selectable-vertical-list-default-focus-background-color)
+    );
+    color: var(
+      --selectable-vertical-list-focus-color,
+      var(--selectable-vertical-list-default-focus-color)
+    )
+  }
+
   .element {
     padding: var(
       --selectable-vertical-list-element-padding,
@@ -215,6 +254,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .title-description-container {
@@ -246,5 +286,17 @@
       var(--selectable-vertical-list-default-selection-color)
     )
   }
-  
+
+
+  .centered {
+    width: 100%;
+    text-align: center;
+  }
+
+  .append {
+    padding: 10px 20px 10px 20px;
+    position: absolute;
+    right: 0;
+  }
+
 </style>

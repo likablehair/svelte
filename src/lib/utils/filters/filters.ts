@@ -66,7 +66,6 @@ export default class Converter {
       const filter = params.filters[i]
 
       if(filter.type == 'string') {
-        console.log('applying string filter')
         this.applyStringFilter({ builder, filter })
       } else if(filter.type == 'date') {
         this.applyDateFilter({ builder, filter })

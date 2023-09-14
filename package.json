@@ -3,6 +3,7 @@
   "description": "A Svelte component for likablehair",
   "version": "3.0.20",
   "scripts": {
+    "host": "vite --host",
     "dev": "vite dev",
     "build": "vite build && npm run package",
     "preview": "vite preview",

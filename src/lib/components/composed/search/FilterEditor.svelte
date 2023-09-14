@@ -56,7 +56,8 @@
   }
 
   let dropdownOpened: boolean = false,
-    calendarOpened: boolean = false
+    calendarOpened: boolean = false,
+    calendarOpened2: boolean = false
 
   // TODO I don't like that there is a singlo dropdow to handle all filter advance mode.
   // In some case would be necessary to handle more than one selection and this code
@@ -129,8 +130,8 @@
               bind:selectedDate={filter.to}
               openingId="advanced-filter"
               placeholder="Alla data"
-              bind:menuOpened={calendarOpened}
-              on:day-click={() => {calendarOpened = false}}
+              bind:menuOpened={calendarOpened2}
+              on:day-click={() => {calendarOpened2 = false}}
             ></DatePickerTextField>
           </div>
         {/if}

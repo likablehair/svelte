@@ -18,6 +18,8 @@
   import type { Locale } from '$lib/components/simple/dates/utils';
   import Validator from '$lib/utils/filters/validator';
   import FilterEditor from './FilterEditor.svelte';
+    import MobileFilterEditor from './MobileFilterEditor.svelte';
+    import { fly, slide } from 'svelte/transition';
 
   export let
     addFilterLabel: string = "Filters",
@@ -29,10 +31,6 @@
     dateLocale: Locale = 'it',
     betweenSeparator: string = "e"
 
-  let calendarOpened: boolean = false,
-    calendarOpened2: boolean = false,
-    selectOpened: boolean = false
-
   let dispatch = createEventDispatcher<{
     'addFilterClick': undefined,
     'selectFilterClick': undefined,
@@ -42,24 +40,35 @@
   }>()
 
   let open: boolean = false,
+    mobileOpen: boolean = false,
     activator: HTMLElement
 
   function handleAddFilterClick() {
     dispatch('addFilterClick')
     open = true
+    mobileOpen = true
   }
 
   $: filterOptions = filters.map((f) => {
     return {
       title: f.label,
-      name: f.name,
+      name: f.name
     }
   })
 
+  $: deletableFilterOptions = filters.map((f) => {
+    return {
+      title: f.label,
+      name: f.name,
+      appendIcon: f.active ? 'mdi-delete' : undefined
+    }
+  })
 
   let selected: ArrayElement<NonNullable<ComponentProps<SelectableVerticalList>['elements']>>['name'] | undefined
   let focused: ArrayElement<NonNullable<ComponentProps<SelectableVerticalList>['elements']>>['name'] | undefined
   $: if(!!focused && !open) focused = undefined
+
+  let filterOpened: 'edit' | 'new' = 'new'
 
 
   let filterOptionsListActivator: HTMLElement | undefined
@@ -71,21 +80,29 @@
   $: selectedFilterIndex = filters.findIndex((f) => { return f.name === selected })
   $: selectedFilter = selected === undefined ? undefined : filters[selectedFilterIndex]
 
-  function handleFilterSelection(e: CustomEvent) {
-    singleFilterActivator = filterOptionsListActivator
-    singleFilterMenuAnchor = 'right-center'
-    singleFilterMenuOpened = true;
-    selected = e.detail.element.name
+  function handleFilterSelection(e: CustomEvent, mobile: boolean = false) {
+    if(mobile) {
+      selected = e.detail.element.name
+      singleFilterMenuOpened = true;
+    } else {
+      singleFilterActivator = filterOptionsListActivator
+      singleFilterMenuAnchor = 'right-center'
+      singleFilterMenuOpened = true;
+      selected = e.detail.element.name
+      filterOpened = 'new'
+    }
   }
 
   function handleCancelFilterClick() {
     open = false
+    mobileOpen = false
     singleFilterMenuOpened = false;
   }
 
   function handleApplyFilterClick() {
     if(!!selectedFilter) {
       open = false
+      mobileOpen = false
       singleFilterMenuOpened = false;
     }
   }
@@ -103,8 +120,27 @@
     singleFilterActivator = activeFiltersActivators[filter.name]
     singleFilterMenuAnchor = 'bottom-center'
     singleFilterMenuOpened = true;
+    mobileOpen=true
     selected = filter.name
+    filterOpened = 'edit'
   }
+
+  function handleMobileBackTap() {
+    closeFilterMenu(0)
+  }
+
+  function closeFilterMenu(delay: number) {
+    setTimeout(() => {
+      singleFilterMenuOpened = false
+    }, delay)
+  }
+
+  function handleDeleteIconClick(e: CustomEvent) {
+    let filterIndex = e.detail.index
+    filters[filterIndex].active = false
+    dispatch('removeFilterClick', { filter: filters[filterIndex] })
+  }
+
 </script>
 
 <div class="filters-container">
@@ -157,23 +193,52 @@
 
   </div>
 </div>
-
 <MediaQuery let:mAndDown>
   {#if mAndDown}
     <Drawer
-      bind:open={open}
+      bind:open={mobileOpen}
       position="bottom"
-      on:item-click
+      on:close={() => {closeFilterMenu(200)}}
+      --drawer-border-radius="20px"
+      --drawer-margin="5px"
     >
-      <SelectableVerticalList
-        bind:selected
-        bind:focused
-        bind:elements={filterOptions}
-        --selectable-vertical-list-default-width="100%"
-        --selectable-vertical-list-default-element-height="56px"
-        --selectable-vertical-list-default-title-font-size="null"
-        on:select={handleFilterSelection}
-      ></SelectableVerticalList>
+      <div class="drawer-content">
+        {#if !!selectedFilter && singleFilterMenuOpened}
+          <div class="drawer-filter-detail" style:height="100%" in:fly={{delay: 100, duration: 100, x: 200}} out:fly={{duration: 100, x: -200}}>
+            <MobileFilterEditor
+              bind:filter={selectedFilter}
+              bind:applyFilterLabel
+              bind:cancelFilterLabel
+              on:apply={handleApplyFilterClick}
+              on:backClick={handleMobileBackTap}
+              on:cancelClick={() => {mobileOpen = false; closeFilterMenu(200)}}
+            >
+              <div slot="title">
+                <div class="mobile-title">
+                  {selectedFilter?.label}
+                </div>
+              </div>
+            </MobileFilterEditor>
+          </div>
+        {:else}
+          <div class="drawer-filter-list" style:margin-top="20px" style:height="100%" out:fly={{duration: 100, x: -200}} in:fly={{duration: 100, x: 200, delay: 100}}>
+            <SelectableVerticalList
+              bind:selected
+              bind:focused
+              bind:elements={deletableFilterOptions}
+              --selectable-vertical-list-default-width="100%"
+              --selectable-vertical-list-default-element-height="56px"
+              --selectable-vertical-list-default-title-font-size="null"
+              on:select={(e) => {handleFilterSelection(e, true)}}
+              centered
+              bicolor
+              appendIconSize="18pt"
+              on:iconClick={handleDeleteIconClick}
+              --icon-color="rgb(var(--global-color-error-400))"
+            ></SelectableVerticalList>
+          </div>
+        {/if}
+      </div>
     </Drawer>
   {:else}
     <Menu
@@ -186,6 +251,7 @@
       _minWidth="10vw"
       _borderRadius="5px"
       anchor="bottom"
+      openingId="select-filter"
     >
       <div
         style:background-color="rgb(var(--global-color-background-200))"
@@ -214,8 +280,8 @@
       bind:open={singleFilterMenuOpened}
       anchor={singleFilterMenuAnchor}
       closeOnClickOutside
-      openingId="second-menu"
       flipOnOverflow
+      openingId={ filterOpened == 'edit' ? "select-filter" : ""}
     >
       <div
         style:min-height="160px"
@@ -247,10 +313,6 @@
 
 
 <style>
-  .filter-button {
-    display: flex;
-    column-gap: 10px;
-  }
 
   .filter-title{
     display: flex;
@@ -261,7 +323,8 @@
   .active-filters-container {
     display: flex;
     align-items: flex-start;
-    column-gap: 10px;
+    flex-wrap: wrap;
+    gap: 5px
   }
 
   .filters-container {
@@ -270,4 +333,7 @@
     align-items: stretch;
   }
 
+  .drawer-content{
+    height: 100%;
+  }
 </style>

@@ -8,6 +8,8 @@
   import { DateTime } from 'luxon'
   import { createEventDispatcher } from 'svelte';
   import type { DateStat } from './utils';
+    import MediaQuery from '../common/MediaQuery.svelte';
+    import Dialog from '../dialogs/Dialog.svelte';
 
   let dispatch = createEventDispatcher<{
     'day-click': {
@@ -23,7 +25,8 @@
     visibleMonth: number | undefined = undefined,
     visibleYear: number | undefined = undefined,
     selectedDate: Date | undefined = undefined,
-    placeholder: string | undefined = undefined
+    placeholder: string | undefined = undefined,
+    mobileDialog: boolean = true
 
   let activator: HTMLElement,
     refreshPosition = false,
@@ -70,8 +73,10 @@
       }
     }
 
-  function handleTextFieldFocus() {
-    menuOpened = true
+  function handleTextFieldFocus(mobile: boolean) {
+    if(!mobile || !mobileDialog) {
+      menuOpened = true
+    }
   }
 
   onMount(() => {
@@ -137,65 +142,90 @@
   }
 </script>
 
-<div
-  bind:this={activator}
-  style:width="fit-content"
->
-  <SimpleTextField
-    bind:value={mask.value}
-    on:focus={handleTextFieldFocus}
-    on:keypress={handleInputChange}
-    bind:input={inputElement}
-    bind:placeholder
-  >
-    <svelte:fragment slot="prepend-inner" let:prependInnerIcon let:iconSize>
-      <slot name="prepend-inner" {prependInnerIcon} {iconSize}>
-        <Icon
-          name="mdi-calendar"
-          click
-          on:click={() => menuOpened = !menuOpened}
-        ></Icon>
-      </slot>
-    </svelte:fragment>
-    <svelte:fragment slot="append-inner" let:appendInnerIcon let:iconSize>
-      <slot name="append-inner" {appendInnerIcon} {iconSize}>
-      </slot>
-    </svelte:fragment>
-    <svelte:fragment slot="prepend" let:prependIcon let:iconSize>
-      <slot name="append-inner" {prependIcon} {iconSize}>
-      </slot>
-    </svelte:fragment>
-    <svelte:fragment slot="append" let:appendIcon let:iconSize>
-      <slot name="append-inner" {appendIcon} {iconSize}>
-      </slot>
-    </svelte:fragment>
-  </SimpleTextField>
-</div>
-
-<Menu
-  {activator}
-  _width={"300px"}
-  _boxShadow={"rgb(var(--global-color-background-300), .5) 0px 2px 4px"}
-  _borderRadius={"5px"}
-  bind:open={menuOpened}
-  anchor="bottom-center"
-  closeOnClickOutside
-  bind:refreshPosition
-  bind:menuElement
-  bind:openingId={openingId}
->
+<MediaQuery let:mAndDown>
   <div
-    style:background-color="rgb(var(--global-color-background-100))"
+    bind:this={activator}
   >
-    <DatePicker
-      bind:selectedDate={selectedDate}
-      bind:selectedMonth={selectedMonth}
-      bind:selectedYear={selectedYear}
-      bind:visibleMonth
-      bind:visibleYear
-      on:day-click={handleDateSelect}
-      on:year-click={handleYearSelect}
-      on:month-click={handleMonthSelect}
-    ></DatePicker>
+    <SimpleTextField
+      bind:value={mask.value}
+      on:focus={() => handleTextFieldFocus(mAndDown)}
+      on:keypress={handleInputChange}
+      bind:input={inputElement}
+      bind:placeholder
+    >
+      <svelte:fragment slot="prepend-inner" let:prependInnerIcon let:iconSize>
+        <slot name="prepend-inner" {prependInnerIcon} {iconSize}>
+          <Icon
+            name="mdi-calendar"
+            click
+            on:click={() => menuOpened = !menuOpened}
+          ></Icon>
+        </slot>
+      </svelte:fragment>
+      <svelte:fragment slot="append-inner" let:appendInnerIcon let:iconSize>
+        <slot name="append-inner" {appendInnerIcon} {iconSize}>
+        </slot>
+      </svelte:fragment>
+      <svelte:fragment slot="prepend" let:prependIcon let:iconSize>
+        <slot name="append-inner" {prependIcon} {iconSize}>
+        </slot>
+      </svelte:fragment>
+      <svelte:fragment slot="append" let:appendIcon let:iconSize>
+        <slot name="append-inner" {appendIcon} {iconSize}>
+        </slot>
+      </svelte:fragment>
+    </SimpleTextField>
   </div>
-</Menu>
+
+  {#if mAndDown && mobileDialog}
+    <Dialog
+      bind:open={menuOpened}
+    >
+      <div
+        style:background-color="rgb(var(--global-color-background-100))"
+        style:width="300px"
+        style:border-radius="10px"
+      >
+        <DatePicker
+          bind:selectedDate={selectedDate}
+          bind:selectedMonth={selectedMonth}
+          bind:selectedYear={selectedYear}
+          bind:visibleMonth
+          bind:visibleYear
+          on:day-click={handleDateSelect}
+          on:year-click={handleYearSelect}
+          on:month-click={handleMonthSelect}
+        ></DatePicker>
+      </div>
+    </Dialog>
+  {:else}
+    <Menu
+      {activator}
+      _width={"300px"}
+      _boxShadow={"rgb(var(--global-color-background-300), .5) 0px 2px 4px"}
+      _borderRadius={"5px"}
+      bind:open={menuOpened}
+      anchor="bottom-center"
+      closeOnClickOutside
+      bind:refreshPosition
+      bind:menuElement
+      bind:openingId={openingId}
+    >
+      <div
+        style:background-color="rgb(var(--global-color-background-100))"
+      >
+        <DatePicker
+          bind:selectedDate={selectedDate}
+          bind:selectedMonth={selectedMonth}
+          bind:selectedYear={selectedYear}
+          bind:visibleMonth
+          bind:visibleYear
+          on:day-click={handleDateSelect}
+          on:year-click={handleYearSelect}
+          on:month-click={handleMonthSelect}
+        ></DatePicker>
+      </div>
+    </Menu>
+  {/if}
+</MediaQuery>
+
