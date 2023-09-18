@@ -32,11 +32,17 @@
     }
   }
 
+  let step: 'advanced' | 'editor'
 
   let tmpFilter: Filter | undefined
 
   function initTmpFilter() {
     tmpFilter = structuredClone(filter)
+    if(!!tmpFilter && tmpFilter.advanced) {
+      step = 'advanced'
+    } else {
+      step = "editor"
+    }
   }
 
   $: if(!!filter) {
@@ -90,7 +96,8 @@
 
   let canRenderOptions: boolean = true
 
-  let step: 'advanced' | 'editor' = (!!tmpFilter && tmpFilter.advanced) ? 'advanced' : 'editor'
+
+  $: console.log(step)
 
   $: applyFilterDisabled = !Validator.isValid(tmpFilter)
 
