@@ -24,6 +24,20 @@
         column:"date",
         mode: 'equal',
         advanced: true
+      }, {
+        name: "testNumber",
+        label: "test number",
+        type: "number",
+        column: "testNumber",
+        mode: 'greater',
+        advanced: false
+      }, {
+        name: "testNumberAdvanced",
+        label: "test number advanced",
+        type: "number",
+        column: "testNumberAdvanced",
+        mode: 'greater',
+        advanced: true
       }
     ]}
   ></Filters>

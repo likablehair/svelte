@@ -3,8 +3,10 @@ import Builder from "./builder"
 export const StringModes = ['equal', 'like', 'ilike'] as const
 export type StringMode = typeof StringModes[number]
 
-export const DateModes = ['equal', 'greater', 'lower', 'between'] as const
-export type DateMode = typeof DateModes[number]
+export const GenericModes = ['equal', 'greater', 'lower', 'between'] as const
+export type DateMode = typeof GenericModes[number]
+
+export type NumberMode = typeof GenericModes[number]
 
 type MultiStringFilter = {
   type: 'multiString',
@@ -43,13 +45,27 @@ type DateFilter = {
   }
 )
 
+type NumberFilter = {
+  type: 'number',
+  column: string
+} & (
+  {
+    mode: 'between',
+    from?: number,
+    to?: number
+  } | {
+    mode: 'equal' | 'greater' | 'lower',
+    value?: number,
+  }
+)
+
 export type Filter = {
   name: string,
   active?: boolean,
   hidden?: boolean,
   label: string,
   advanced?: boolean
-} & (StringFilter | MultiStringFilter | ChoiceFilter | DateFilter)
+} & (StringFilter | MultiStringFilter | ChoiceFilter | DateFilter | NumberFilter)
 
 
 export default class Converter {
@@ -69,6 +85,8 @@ export default class Converter {
         this.applyStringFilter({ builder, filter })
       } else if(filter.type == 'date') {
         this.applyDateFilter({ builder, filter })
+      } else if(filter.type == 'number') {
+        this.applyNumberFilter({ builder, filter })
       }
     }
 
@@ -106,6 +124,14 @@ export default class Converter {
       params.builder.where(params.filter.column, '>', params.filter.from)
       params.builder.where(params.filter.column, '<', params.filter.to)
     }
+
+    return params.builder
+  }
+
+  private applyNumberFilter(params: {
+    builder: Builder,
+    filter: NumberFilter
+  }): Builder {
 
     return params.builder
   }

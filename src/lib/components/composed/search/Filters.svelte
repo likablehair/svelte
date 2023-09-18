@@ -14,12 +14,11 @@
   import type { DateMode, Filter, StringMode } from '$lib/utils/filters/filters';
   import SelectableVerticalList from '$lib/components/simple/lists/SelectableVerticalList.svelte';
   import Chip from '$lib/components/simple/navigation/Chip.svelte';
-  import Converter, { DateModes, StringModes } from '$lib/utils/filters/filters';
   import type { Locale } from '$lib/components/simple/dates/utils';
   import Validator from '$lib/utils/filters/validator';
   import FilterEditor from './FilterEditor.svelte';
-    import MobileFilterEditor from './MobileFilterEditor.svelte';
-    import { fly, slide } from 'svelte/transition';
+  import MobileFilterEditor from './MobileFilterEditor.svelte';
+  import { fly } from 'svelte/transition';
 
   export let
     addFilterLabel: string = "Filters",
@@ -80,6 +79,7 @@
   $: selectedFilterIndex = filters.findIndex((f) => { return f.name === selected })
   $: selectedFilter = selected === undefined ? undefined : filters[selectedFilterIndex]
 
+
   function handleFilterSelection(e: CustomEvent, mobile: boolean = false) {
     if(mobile) {
       selected = e.detail.element.name
@@ -101,6 +101,7 @@
 
   function handleApplyFilterClick() {
     if(!!selectedFilter) {
+      filters[selectedFilterIndex] = selectedFilter
       open = false
       mobileOpen = false
       singleFilterMenuOpened = false;
@@ -157,18 +158,23 @@
             on:close={() => handleRemoveFilter(filter)}
             on:click={() => handleActiveFilterClick(filter)}
           >
-            {#if filter.type === "string" }
-            <b>{filter.label}</b> {filter.mode}  <b>{filter.value}</b>
+            <b>{filter.label}</b>
+            {#if filter.type === "string" && filter.value != undefined}
+              {filter.mode}  <b>{filter.value}</b>
             {:else if filter.type === "date"}
-              <b>{filter.label}</b>
-              {#if filter.mode == 'between'}
+              {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
                 {filter.mode}  <b>{filter.from?.toLocaleDateString(dateLocale)}</b>
                 {betweenSeparator} <b>{filter.to?.toLocaleDateString(dateLocale)}</b>
-              {:else}
+              {:else if filter.mode != 'between' && filter.value != undefined}
                 {filter.mode}  <b>{filter.value?.toLocaleDateString(dateLocale)}</b>
               {/if}
-            {:else}
-              {filter.label}
+            {:else if filter.type == "number"}
+              {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
+                {filter.mode}  <b>{filter.from}</b>
+                {betweenSeparator} <b>{filter.to}</b>
+              {:else if filter.mode != 'between' && filter.value != undefined}
+                {filter.mode}  <b>{filter.value}</b>
+              {/if}
             {/if}
           </Chip>
         </div>

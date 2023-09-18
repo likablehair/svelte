@@ -8,6 +8,10 @@ export default class Validator {
       if(filter.mode == 'between') return !!filter.from && !!filter.to
       else return !!filter.value
     } else if(filter.type == 'multiString') return !!filter.value
+    else if(filter.type == 'number') {
+      if(filter.mode == 'between') return filter.from != undefined && filter.to != undefined
+      else return filter.value != undefined
+    }
     else return false
   }
 }

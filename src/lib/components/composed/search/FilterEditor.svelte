@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { Filter } from "$lib/utils/filters/filters";
+  import type { Filter, NumberMode, StringMode } from "$lib/utils/filters/filters";
   import Dropdown, { type Item } from "../forms/Dropdown.svelte";
-  import { DateModes, StringModes } from '$lib/utils/filters/filters';
+  import { GenericModes, StringModes } from '$lib/utils/filters/filters';
   import type { DateMode } from "$lib/utils/filters/filters";
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
   import DatePickerTextField from "$lib/components/simple/dates/DatePickerTextField.svelte";
@@ -11,7 +11,20 @@
 
   export let filter: Filter | undefined = undefined,
     cancelFilterLabel : string = "Cancel",
-    applyFilterLabel : string = "Apply Filter"
+    applyFilterLabel : string = "Apply Filter",
+    betweenFromLabel: string = "From",
+    betweenToLabel: string = "To"
+
+
+  let tmpFilter: Filter | undefined
+
+  function initTmpFilter() {
+    tmpFilter = structuredClone(filter)
+  }
+
+  $: if(!!filter) {
+    initTmpFilter()
+  }
 
   let dispatch = createEventDispatcher<{
     'apply': undefined,
@@ -23,7 +36,8 @@
   }
 
   function handleApplyFilterClick() {
-    if(!!filter) {
+    if(!!filter && !!tmpFilter) {
+      filter = structuredClone(tmpFilter)
       filter.active = true
       dispatch('apply')
     }
@@ -33,12 +47,14 @@
   let advancedModeOptions: Item[],
     advancedModeSelectedOptions: Item[] | undefined
 
-  $: if(!!filter) {
+  $: if(!!tmpFilter) {
     let modes
-    if(filter.type == 'string') {
+    if(tmpFilter.type == 'string') {
       modes = StringModes
-    } else if(filter.type == 'date') {
-      modes = DateModes
+    } else if(tmpFilter.type == 'date') {
+      modes = GenericModes
+    } else if(tmpFilter.type == 'number') {
+      modes = GenericModes
     }
 
     if(!!modes) {
@@ -51,7 +67,7 @@
     }
   }
 
-  $: if(!filter?.advanced) {
+  $: if(!tmpFilter?.advanced) {
     advancedModeSelectedOptions = undefined
   }
 
@@ -63,18 +79,20 @@
   // In some case would be necessary to handle more than one selection and this code
   // could become non sense
   function handleAdvancedModeSelection() {
-    if(!!advancedModeSelectedOptions && advancedModeSelectedOptions.length > 0 && !!filter) {
-      if(filter.type == 'date') filter.mode = advancedModeSelectedOptions[0].value as DateMode
+    if(!!advancedModeSelectedOptions && advancedModeSelectedOptions.length > 0 && !!tmpFilter) {
+      if(tmpFilter.type == 'date') tmpFilter.mode = advancedModeSelectedOptions[0].value as DateMode
+      else if(tmpFilter.type == 'number') tmpFilter.mode = advancedModeSelectedOptions[0].value as NumberMode
+      else if(tmpFilter.type == 'string') tmpFilter.mode = advancedModeSelectedOptions[0].value as StringMode
     }
 
     dropdownOpened = false;
   }
 
-  $: applyFilterDisabled = !Validator.isValid(filter)
+  $: applyFilterDisabled = !Validator.isValid(tmpFilter)
 </script>
 
 
-{#if !!filter}
+{#if !!filter && !!tmpFilter}
   <div class="filter-editor">
     {#if filter.advanced}
       <div class="advanced-mode">
@@ -94,45 +112,75 @@
     {/if}
 
     <div class="fields" style:width="fit-content" on:click|stopPropagation on:keypress>
-      {#if !filter.advanced || (!!advancedModeSelectedOptions && advancedModeSelectedOptions.length > 0)}
-        {#if filter.type === "string" }
+      {#if !tmpFilter.advanced || (!!advancedModeSelectedOptions && advancedModeSelectedOptions.length > 0)}
+        {#if tmpFilter.type === "string" }
           <SimpleTextField
-            bind:value={filter.value}
+            bind:value={tmpFilter.value}
             type="text"
-            placeholder={filter?.label}
+            placeholder={tmpFilter?.label}
             --simple-textfield-width="100%"
           ></SimpleTextField>
-        {:else if filter.type === "date" && filter.mode !== 'between'}
+        {:else if tmpFilter.type === "date" && tmpFilter.mode !== 'between'}
           <div
             style:width="fit-content"
           >
             <DatePickerTextField
-              bind:selectedDate={filter.value}
+              bind:selectedDate={tmpFilter.value}
               openingId="advanced-filter"
               bind:menuOpened={calendarOpened}
               on:day-click={() => {calendarOpened = false}}
             ></DatePickerTextField>
           </div>
-        {:else if filter.type === "date" && filter.mode === 'between'}
+        {:else if tmpFilter.type === "number" && tmpFilter.mode !== 'between'}
+          <div
+            style:width="fit-content"
+          >
+            <SimpleTextField
+              bind:value={tmpFilter.value}
+              type="number"
+              placeholder={tmpFilter?.label}
+              --simple-textfield-width="100%"
+            ></SimpleTextField>
+          </div>
+        {:else if tmpFilter.type === "date" && tmpFilter.mode === 'between'}
           <div
             style:width="fit-content"
           >
             <DatePickerTextField
-              bind:selectedDate={filter.from}
+              bind:selectedDate={tmpFilter.from}
               openingId="advanced-filter"
-              placeholder="Dalla data"
+              placeholder={betweenFromLabel}
               bind:menuOpened={calendarOpened}
               on:day-click={() => {calendarOpened = false}}
             ></DatePickerTextField>
           </div>
           <div style:width="fit-content">
             <DatePickerTextField
-              bind:selectedDate={filter.to}
+              bind:selectedDate={tmpFilter.to}
               openingId="advanced-filter"
-              placeholder="Alla data"
+              placeholder={betweenToLabel}
               bind:menuOpened={calendarOpened2}
               on:day-click={() => {calendarOpened2 = false}}
             ></DatePickerTextField>
+          </div>
+        {:else if tmpFilter.type === "number" && tmpFilter.mode === 'between'}
+          <div
+            style:width="fit-content"
+          >
+            <SimpleTextField
+              bind:value={tmpFilter.from}
+              type="number"
+              placeholder={betweenFromLabel}
+              --simple-textfield-width="100%"
+            ></SimpleTextField>
+          </div>
+          <div style:width="fit-content">
+            <SimpleTextField
+              bind:value={tmpFilter.to}
+              type="number"
+              placeholder={betweenToLabel}
+              --simple-textfield-width="100%"
+            ></SimpleTextField>
           </div>
         {/if}
       {/if}
