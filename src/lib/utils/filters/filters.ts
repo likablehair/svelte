@@ -8,6 +8,9 @@ export type DateMode = typeof GenericModes[number]
 
 export type NumberMode = typeof GenericModes[number]
 
+export const SelectModes = ['equal', 'different'] as const
+export type SelectMode = typeof SelectModes[number]
+
 type MultiStringFilter = {
   type: 'multiString',
   columns: string[],
@@ -59,13 +62,21 @@ type NumberFilter = {
   }
 )
 
+type SelectFilter = {
+  type: 'select',
+  column: string,
+  mode: SelectMode,
+  items: { value: string | number, label: string }[]
+  values?: { value: string | number, label?: string | number }[]
+}
+
 export type Filter = {
   name: string,
   active?: boolean,
   hidden?: boolean,
   label: string,
   advanced?: boolean
-} & (StringFilter | MultiStringFilter | ChoiceFilter | DateFilter | NumberFilter)
+} & (StringFilter | MultiStringFilter | ChoiceFilter | DateFilter | NumberFilter | SelectFilter)
 
 
 export default class Converter {
@@ -87,6 +98,8 @@ export default class Converter {
         this.applyDateFilter({ builder, filter })
       } else if(filter.type == 'number') {
         this.applyNumberFilter({ builder, filter })
+      } else if(filter.type == 'select') {
+        this.applySelectFilter({ builder, filter })
       }
     }
 
@@ -132,6 +145,35 @@ export default class Converter {
     builder: Builder,
     filter: NumberFilter
   }): Builder {
+    if(params.filter.mode == 'equal' && !!params.filter.value) {
+      params.builder.where(params.filter.column, '=', params.filter.value)
+    } else if(params.filter.mode == 'greater' && !!params.filter.value) {
+      params.builder.where(params.filter.column, '>', params.filter.value)
+    } else if(params.filter.mode == 'lower' && !!params.filter.value) {
+      params.builder.where(params.filter.column, '<', params.filter.value)
+    } else if(params.filter.mode == 'between' && !!params.filter.from && !!params.filter.to) {
+      params.builder.where(params.filter.column, '>', params.filter.from)
+      params.builder.where(params.filter.column, '<', params.filter.to)
+    }
+    return params.builder
+  }
+
+  private applySelectFilter(params: {
+    builder: Builder,
+    filter: SelectFilter
+  }): Builder {
+    if(!!params.filter.values && params.filter.values.length > 0) {
+      if(params.filter.mode == 'equal') {
+        params.builder.where(params.filter.column, '=', params.filter.values[0].value)
+        for(let i = 1; i < params.filter.values.length; i += 1) {
+          params.builder.orWhere(params.filter.column, '=', params.filter.values[i].value)
+        }
+      } else {
+        for(let i = 0; i < params.filter.values.length; i += 1) {
+          params.builder.whereNot(params.filter.column, '=', params.filter.values[i].value)
+        }
+      }
+    }
 
     return params.builder
   }

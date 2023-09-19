@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { Filter, NumberMode, StringMode } from "$lib/utils/filters/filters";
-  import { GenericModes, StringModes } from '$lib/utils/filters/filters';
+  import type { Filter, NumberMode, SelectMode, StringMode } from "$lib/utils/filters/filters";
+  import { GenericModes, SelectModes, StringModes } from '$lib/utils/filters/filters';
   import type { DateMode } from "$lib/utils/filters/filters";
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
   import DatePickerTextField from "$lib/components/simple/dates/DatePickerTextField.svelte";
@@ -10,6 +10,7 @@
   import SelectableVerticalList, { type Element } from "$lib/components/simple/lists/SelectableVerticalList.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import { fly } from "svelte/transition";
+    import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
 
   export let filter: Filter | undefined = undefined,
     cancelFilterLabel : string = "Cancel",
@@ -61,6 +62,8 @@
       modes = GenericModes
     } else if(tmpFilter.type == 'number') {
       modes = GenericModes
+    } else if(tmpFilter.type == 'select') {
+      modes = SelectModes
     }
 
     if(!!modes) {
@@ -88,6 +91,7 @@
       if(tmpFilter.type == 'date') tmpFilter.mode = advancedModeSelectedOption as DateMode
       else if(tmpFilter.type == 'string') tmpFilter.mode = advancedModeSelectedOption as StringMode
       else if(tmpFilter.type == 'number') tmpFilter.mode = advancedModeSelectedOption as NumberMode
+      else if(tmpFilter.type == 'select') tmpFilter.mode = advancedModeSelectedOption as SelectMode
 
       step = 'editor'
       canRenderOptions = false
@@ -96,8 +100,6 @@
 
   let canRenderOptions: boolean = true
 
-
-  $: console.log(step)
 
   $: applyFilterDisabled = !Validator.isValid(tmpFilter)
 
@@ -125,7 +127,6 @@
   function handleCancelClick() {
     dispatch('cancelClick')
   }
-
 
 </script>
 
@@ -232,6 +233,20 @@
                     ></SimpleTextField>
                   </div>
                 </div>
+              {:else if tmpFilter.type == 'select'}
+                <div style:width="100%">
+                  <Autocomplete
+                    on:close
+                    --drawer-margin="5px 5px -10px 5px"
+                    mobileDrawer
+                    bind:values={tmpFilter.values}
+                    items={tmpFilter.items}
+                    multiple
+                    maxVisibleChips={4}
+                    --simple-textfield-width="0px"
+                    --simple-text-field-margin-left="0px"
+                  ></Autocomplete>
+                </div>
               {/if}
             </div>
           </div>
@@ -254,7 +269,7 @@
                 --button-padding="10px 0px 10px 0px"
                 --button-background-color="rgb(var(--global-color-grey-50))"
                 --button-color="rgb(var(--global-color-primary-500))"
-                --button-border-radius="0px 0px 10px 10px"
+                --button-border-radius="0px 0px 0px 0px"
                 on:click={handleCancelClick}
               >{cancelFilterLabel}</Button>
             </div>
@@ -320,6 +335,10 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+  }
+
+  .header {
+    margin-bottom: 20px;
   }
 
 </style>

@@ -13,7 +13,7 @@
     _height: string = "fit-content",
     _maxHeight: string | undefined = undefined,
     _minWidth: string = "100px",
-    _bordeRadius: string = "5px";
+    _borderRadius: string = "5px";
 </script>
 
 <MediaQuery let:mAndDown>
@@ -21,6 +21,7 @@
     <Drawer
       bind:open={open}
       bind:position={drawerPosition}
+      on:close
       on:item-click
     >
       <slot isDrawer={true} isMenu={false}></slot>
@@ -34,7 +35,7 @@
       _height={_height}
       _maxHeight={_maxHeight}
       _minWidth={_minWidth}
-      _borderRadius={_bordeRadius}
+      _borderRadius={_borderRadius}
       anchor={menuAnchor}
     >
       <slot isDrawer={false} isMenu={true}></slot>

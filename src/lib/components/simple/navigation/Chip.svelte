@@ -20,7 +20,8 @@
     dispatch("click");
   }
 
-  function handleCloseClick() {
+  function handleCloseClick(e: CustomEvent) {
+    e.detail.nativeEvent.stopPropagation()
     dispatch("close");
   }
 </script>
@@ -38,8 +39,8 @@
       <Icon name={filterIcon} />
     </div>
   {/if}
-  <div 
-    class="text" 
+  <div
+    class="text"
   >
     <slot />
   </div>
@@ -52,7 +53,8 @@
         --button-background-color="transparent"
         --button-padding="0px"
         --button-color="var(--chip-color, var(--chip-default-color))"
-        on:click={handleCloseClick}
+        on:click
+        ={handleCloseClick}
       />
     </div>
   {/if}

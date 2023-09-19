@@ -12,6 +12,9 @@ export default class Validator {
       if(filter.mode == 'between') return filter.from != undefined && filter.to != undefined
       else return filter.value != undefined
     }
+    else if(filter.type == 'select') {
+      return filter.values != undefined && filter.values.length > 0
+    }
     else return false
   }
 }

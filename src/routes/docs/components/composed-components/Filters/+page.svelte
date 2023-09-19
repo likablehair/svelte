@@ -38,6 +38,48 @@
         column: "testNumberAdvanced",
         mode: 'greater',
         advanced: true
+      }, {
+        name: "testSelect",
+        label: "test select",
+        type: "select",
+        column: "testSelect",
+        advanced: false,
+        mode: "equal",
+        items: [
+          {
+            value: 1,
+            label: 'test 1'
+          },
+          {
+            value: 2,
+            label: 'test 2'
+          },
+          {
+            value: 3,
+            label: 'test 3'
+          }
+        ]
+      }, {
+        name: "testSelectAdvanced",
+        label: "test select advanced",
+        type: "select",
+        column: "testSelectAdvanced",
+        advanced: true,
+        mode: "equal",
+        items: [
+          {
+            value: 1,
+            label: 'test 1'
+          },
+          {
+            value: 2,
+            label: 'test 2'
+          },
+          {
+            value: 3,
+            label: 'test 3'
+          }
+        ]
       }
     ]}
   ></Filters>

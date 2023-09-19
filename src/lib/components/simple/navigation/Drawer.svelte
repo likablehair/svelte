@@ -16,7 +16,12 @@
 
   function handleClickOverlay() {
     open = false;
+    overlay = false;
     dispatch('close')
+  }
+
+  $: if(open) {
+    overlay = true
   }
 </script>
 

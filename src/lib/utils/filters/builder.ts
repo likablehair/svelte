@@ -35,7 +35,7 @@ export default class Builder {
     second?: string | number | Date,
     third?: string | number | Date
   ): Builder {
-    return this.applyWhereClause('and', first, second, third)
+    return this.applyWhereClause('andNot', first, second, third)
   }
 
   public orWhere(callback: (builder: Builder) => void): Builder

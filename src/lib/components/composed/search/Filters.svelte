@@ -175,6 +175,19 @@
               {:else if filter.mode != 'between' && filter.value != undefined}
                 {filter.mode}  <b>{filter.value}</b>
               {/if}
+            {:else if filter.type == 'select' && !!filter.values && filter.values.length > 0}
+              {filter.mode} <b>{filter.values[0].label}</b>
+              {#if filter.values.length >= 2}
+                <span class="more-items">+{filter.values.length - 1}
+                  <span class="more-tooltip">
+                    <ul>
+                      {#each filter.values as value}
+                        <li>{value.label}</li>
+                      {/each}
+                    </ul>
+                  </span>
+                </span>
+              {/if}
             {/if}
           </Chip>
         </div>
@@ -205,8 +218,8 @@
       bind:open={mobileOpen}
       position="bottom"
       on:close={() => {closeFilterMenu(200)}}
-      --drawer-border-radius="20px"
-      --drawer-margin="5px"
+      --drawer-border-radius="20px 20px 0px 0px"
+      --drawer-margin="5px 5px 0px 5px"
     >
       <div class="drawer-content">
         {#if !!selectedFilter && singleFilterMenuOpened}
@@ -342,4 +355,48 @@
   .drawer-content{
     height: 100%;
   }
+
+  .more-items {
+    position: relative;
+    padding: 2px 8px 2px 8px;
+    border-radius: 20px;
+    margin-left: 5px;
+    background-color: rgb(var(--global-color-grey-50));
+    color: rgb(var(--global-color-primary-500));
+    font-weight: 800;
+    font-size: .7rem;
+  }
+
+  .more-tooltip {
+    visibility: hidden;
+    min-width: 120px;
+    width: fit-content;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    text-align: left;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    position: absolute;
+    background-color: rgb(var(--global-color-background-200));
+    color: rgb(var(--global-color-background-950));
+    z-index: 100;
+  }
+
+  .more-tooltip ul {
+    list-style-type: none;
+    padding-left: 0px;
+    margin-left: 20px;
+    margin-right: 20px
+  }
+
+
+  .more-items:hover .more-tooltip {
+    visibility: visible;
+    opacity: 1;
+  }
+
 </style>
