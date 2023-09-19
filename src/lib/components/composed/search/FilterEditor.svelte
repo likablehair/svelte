@@ -9,13 +9,13 @@
   import { createEventDispatcher } from "svelte";
   import Validator from "$lib/utils/filters/validator";
     import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
+    import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
 
   export let filter: Filter | undefined = undefined,
     cancelFilterLabel : string = "Cancel",
     applyFilterLabel : string = "Apply Filter",
     betweenFromLabel: string = "From",
     betweenToLabel: string = "To"
-
 
   let tmpFilter: Filter | undefined
 
@@ -63,6 +63,8 @@
       modes = GenericModes
     } else if(tmpFilter.type == 'select') {
       modes = SelectModes
+    } else if(tmpFilter.type == 'bool') {
+      modes = undefined
     }
 
     if(!!modes) {
@@ -99,7 +101,11 @@
 
   $: applyFilterDisabled = !Validator.isValid(tmpFilter)
 
-
+  $: if(!!tmpFilter && tmpFilter.type == 'bool') {
+    if(tmpFilter.value === undefined) {
+      tmpFilter.value = false
+    }
+  }
 
 </script>
 
@@ -201,6 +207,15 @@
               placeholder={betweenToLabel}
               --simple-textfield-width="100%"
             ></SimpleTextField>
+          </div>
+        {:else if tmpFilter.type == 'bool'}
+          <div class="bool-filter">
+            <Checkbox
+              bind:value={tmpFilter.value}
+            ></Checkbox>
+            <span style:margin-left="10px">
+              {tmpFilter.desctiprion}
+            </span>
           </div>
         {/if}
       {/if}

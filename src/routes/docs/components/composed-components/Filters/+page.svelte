@@ -80,6 +80,13 @@
             label: 'test 3'
           }
         ]
+      }, {
+        name: "testBool",
+        label: "test bool",
+        type: "bool",
+        column: "testBool",
+        mode: "equal",
+        desctiprion: "include only if column is true"
       }
     ]}
   ></Filters>

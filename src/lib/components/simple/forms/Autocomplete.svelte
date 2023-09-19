@@ -188,13 +188,13 @@
     filteredItems = items;
   }
 
-  $: notVisibleChipNumber = Math.max(values.length - (maxVisibleChips || 0), 0)
+  $: notVisibleChipNumber = Math.max((values.length || 0) - (maxVisibleChips || 0), 0)
 
   import Chip from "$lib/components/simple/navigation/Chip.svelte";
   import Menu from "$lib/components/simple/common/Menu.svelte";
   import { createEventDispatcher } from "svelte";
   import SimpleTextField from "./SimpleTextField.svelte";
-    import MenuOrDrawer from '$lib/components/composed/common/MenuOrDrawer.svelte';
+  import MenuOrDrawer from '$lib/components/composed/common/MenuOrDrawer.svelte';
 </script>
 
 <svelte:window />

@@ -11,6 +11,7 @@
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import { fly } from "svelte/transition";
     import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
+    import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
 
   export let filter: Filter | undefined = undefined,
     cancelFilterLabel : string = "Cancel",
@@ -126,6 +127,13 @@
 
   function handleCancelClick() {
     dispatch('cancelClick')
+  }
+
+
+  $: if(!!tmpFilter && tmpFilter.type == 'bool') {
+    if(tmpFilter.value === undefined) {
+      tmpFilter.value = false
+    }
   }
 
 </script>
@@ -246,6 +254,15 @@
                     --simple-textfield-width="0px"
                     --simple-text-field-margin-left="0px"
                   ></Autocomplete>
+                </div>
+              {:else if tmpFilter.type == 'bool'}
+                <div class="bool-filter">
+                  <Checkbox
+                    bind:value={tmpFilter.value}
+                  ></Checkbox>
+                  <span style:margin-left="10px">
+                    {tmpFilter.desctiprion}
+                  </span>
                 </div>
               {/if}
             </div>

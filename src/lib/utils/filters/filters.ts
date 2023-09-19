@@ -70,13 +70,22 @@ type SelectFilter = {
   values?: { value: string | number, label?: string | number }[]
 }
 
+type BoolFilter = {
+  type: 'bool',
+  column: string,
+  mode: 'equal',
+  value?: boolean
+  advanced?: false
+  desctiprion: string
+}
+
 export type Filter = {
   name: string,
   active?: boolean,
   hidden?: boolean,
   label: string,
   advanced?: boolean
-} & (StringFilter | MultiStringFilter | ChoiceFilter | DateFilter | NumberFilter | SelectFilter)
+} & (StringFilter | MultiStringFilter | ChoiceFilter | DateFilter | NumberFilter | SelectFilter | BoolFilter)
 
 
 export default class Converter {
@@ -100,6 +109,8 @@ export default class Converter {
         this.applyNumberFilter({ builder, filter })
       } else if(filter.type == 'select') {
         this.applySelectFilter({ builder, filter })
+      } else if(filter.type == 'bool') {
+        this.applyBooleanFilter({ builder, filter })
       }
     }
 
@@ -173,6 +184,17 @@ export default class Converter {
           params.builder.whereNot(params.filter.column, '=', params.filter.values[i].value)
         }
       }
+    }
+
+    return params.builder
+  }
+
+  private applyBooleanFilter(params: {
+    builder: Builder,
+    filter: BoolFilter
+  }): Builder {
+    if(params.filter.value !== undefined) {
+      params.builder.where(params.filter.column, '=', params.filter.value)
     }
 
     return params.builder

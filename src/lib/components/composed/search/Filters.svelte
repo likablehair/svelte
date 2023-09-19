@@ -28,7 +28,9 @@
     showActiveFilters: boolean = true,
     filterTitleLabel: string = "Filtra per ",
     dateLocale: Locale = 'it',
-    betweenSeparator: string = "e"
+    betweenSeparator: string = "e",
+    trueString: string = "vero",
+    falseString: string = "falso"
 
   let dispatch = createEventDispatcher<{
     'addFilterClick': undefined,
@@ -188,6 +190,8 @@
                   </span>
                 </span>
               {/if}
+            {:else if filter.type == 'bool' && filter.value !== undefined}
+                <b>{filter.value ? trueString : falseString}</b>
             {/if}
           </Chip>
         </div>
@@ -266,7 +270,6 @@
       closeOnClickOutside
       _boxShadow="rgb(var(--global-color-grey-900), .5) 0px 2px 4px"
       _height="fit-content"
-      _maxHeight="300px"
       _minWidth="10vw"
       _borderRadius="5px"
       anchor="bottom"
