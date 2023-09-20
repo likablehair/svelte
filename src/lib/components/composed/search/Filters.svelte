@@ -1,5 +1,9 @@
 <script lang="ts" context="module">
   export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+
+  export type LabelMapper = {
+    [label: string]: {extended?: string, short: string}
+  }
 </script>
 
 <script lang="ts">
@@ -11,26 +15,83 @@
   import Button from '$lib/components/simple/buttons/Button.svelte';
   import Icon from '$lib/components/simple/media/Icon.svelte';
   import { createEventDispatcher, type ComponentProps } from 'svelte';
-  import type { DateMode, Filter, StringMode } from '$lib/utils/filters/filters';
+  import type { Filter } from '$lib/utils/filters/filters';
   import SelectableVerticalList from '$lib/components/simple/lists/SelectableVerticalList.svelte';
   import Chip from '$lib/components/simple/navigation/Chip.svelte';
   import type { Locale } from '$lib/components/simple/dates/utils';
-  import Validator from '$lib/utils/filters/validator';
   import FilterEditor from './FilterEditor.svelte';
   import MobileFilterEditor from './MobileFilterEditor.svelte';
   import { fly } from 'svelte/transition';
 
   export let
-    addFilterLabel: string = "Filters",
     filters: Filter[] = [],
-    cancelFilterLabel : string = "Cancel",
-    applyFilterLabel : string = "Apply Filter",
+    lang: 'it' | 'en' = 'en',
+    addFilterLabel: string = lang == 'en' ? "Filters" : "Filtri",
+    cancelFilterLabel : string = lang == 'en' ? "Cancel" : "Annulla",
+    applyFilterLabel : string = lang == 'en' ? "Apply filter" : "Applica filtro",
     showActiveFilters: boolean = true,
-    filterTitleLabel: string = "Filtra per ",
-    dateLocale: Locale = 'it',
-    betweenSeparator: string = "e",
-    trueString: string = "vero",
-    falseString: string = "falso"
+    filterTitleLabel: string = lang == 'en' ? "Filter by" : "Filtra per",
+    dateLocale: Locale = 'en',
+    betweenSeparator: string = lang == 'en' ? "and" : "e",
+    trueString: string = lang == 'en' ? "true" : "vero",
+    falseString: string = lang == 'en' ? "false" : "falso",
+    // TODO create global translation mechanism
+    labelsMapper: LabelMapper = lang == 'en' ? {
+      'equal': {
+        extended: 'equal to',
+        short: 'equal'
+      },
+      'like': {
+        short: 'includes'
+      },
+      'ilike': {
+        short: 'includes'
+      },
+      'greater': {
+        short: 'greater',
+        extended: 'greater than'
+      },
+      'lower': {
+        short: 'lower',
+        extended: 'lower than'
+      },
+      'between': {
+        short: 'between',
+        extended: 'is between'
+      },
+      'different': {
+        short: 'different',
+        extended: 'different from'
+      }
+    } : {
+      'equal': {
+        extended: 'uguale a',
+        short: 'uguale'
+      },
+      'like': {
+        short: 'include'
+      },
+      'ilike': {
+        short: 'include'
+      },
+      'greater': {
+        short: 'maggiore',
+        extended: 'maggiore di'
+      },
+      'lower': {
+        short: 'minore',
+        extended: 'minore di'
+      },
+      'between': {
+        short: 'compreso',
+        extended: 'è compreso'
+      },
+      'different': {
+        short: 'diverso',
+        extended: 'diverso da'
+      }
+    }
+
 
   let dispatch = createEventDispatcher<{
     'addFilterClick': undefined,
@@ -177,32 +238,33 @@
                 <b>{filter.label}</b>
               </span>
               {#if filter.type === "string" && filter.value != undefined}
-                {filter.mode}
+                {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
                 <span class="truncate-text inline-truncated">
                   <b>{filter.value}</b>
                 </span>
               {:else if filter.type === "date"}
                 {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
-                  {filter.mode}
+                  {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
                   <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
                   {betweenSeparator}
                   <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
                 {:else if filter.mode != 'between' && filter.value != undefined}
-                  {filter.mode}
+                  {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
                   <span class="truncate-text inline-truncated"><b>{filter.value?.toLocaleDateString(dateLocale)}</b></span>
                 {/if}
               {:else if filter.type == "number"}
                 {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
-                  {filter.mode}
+                  {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
                   <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
                   {betweenSeparator}
                   <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
                 {:else if filter.mode != 'between' && filter.value != undefined}
-                  {filter.mode}
+                  {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
                   <span class="truncate-text inline-truncated"><b>{filter.value}</b></span>
                 {/if}
               {:else if filter.type == 'select' && !!filter.values && filter.values.length > 0}
-                {filter.mode} <span class="truncate-text inline-truncated"><b>{filter.values[0].label}</b></span>
+                {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
+                <span class="truncate-text inline-truncated"><b>{filter.values[0].label}</b></span>
                 {#if filter.values.length >= 2}
                   <span class="more-items">+{filter.values.length - 1}
                     <!--TODO create tooltip component-->
@@ -278,6 +340,8 @@
               on:apply={handleApplyFilterClick}
               on:backClick={handleMobileBackTap}
               on:cancelClick={() => {mobileOpen = false; closeFilterMenu(200)}}
+              {lang}
+              {labelsMapper}
             >
               <div slot="title">
                 <div class="mobile-title">
@@ -368,6 +432,8 @@
             bind:cancelFilterLabel
             on:cancel={handleCancelFilterClick}
             on:apply={handleApplyFilterClick}
+            {lang}
+            {labelsMapper}
           ></FilterEditor>
         {/if}
       </div>

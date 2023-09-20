@@ -9,6 +9,7 @@
 <h2>Example</h2>
 <div class="example">
   <Filters
+    lang="it"
     filters={[
       {
         name:"customerName",

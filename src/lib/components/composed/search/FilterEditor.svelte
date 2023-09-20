@@ -10,12 +10,15 @@
   import Validator from "$lib/utils/filters/validator";
     import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
     import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
+    import type { LabelMapper } from "./Filters.svelte";
 
   export let filter: Filter | undefined = undefined,
-    cancelFilterLabel : string = "Cancel",
-    applyFilterLabel : string = "Apply Filter",
-    betweenFromLabel: string = "From",
-    betweenToLabel: string = "To"
+    lang: 'en' | 'it' = 'en',
+    cancelFilterLabel : string = lang == 'en' ? "Cancel" : "Annulla",
+    applyFilterLabel : string = lang == 'en' ? "Apply filter" : "Applica filter",
+    betweenFromLabel: string = lang == 'en' ? "From" : "Da",
+    betweenToLabel: string = lang == 'en' ? "To" : "A",
+    labelsMapper: LabelMapper
 
   let tmpFilter: Filter | undefined
 
@@ -29,7 +32,7 @@
       if((tmpFilter.mode == 'between' && tmpFilter.from !== undefined && tmpFilter.to !== undefined) || tmpFilter.value !== undefined || (tmpFilter.type == 'select' && tmpFilter.values !== undefined && tmpFilter.values.length > 0)) {
         advancedModeSelectedOptions = [{
           //@ts-ignore
-          value: tmpFilter.mode, label: tmpFilter.mode
+          value: tmpFilter.mode, label: labelsMapper[tmpFilter.mode].short || tmpFilter.mode
         }]
       }
     }
@@ -80,7 +83,7 @@
       advancedModeOptions = modes.map(mode => {
         return {
           value: mode,
-          label: mode
+          label: labelsMapper[mode].short || mode
         }
       })
     }

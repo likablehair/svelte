@@ -12,13 +12,16 @@
   import { fly } from "svelte/transition";
     import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
     import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
+    import type { LabelMapper } from "./Filters.svelte";
 
   export let filter: Filter | undefined = undefined,
-    cancelFilterLabel : string = "Cancel",
-    applyFilterLabel : string = "Apply Filter",
+    lang: 'it' | 'en' = 'en',
+    cancelFilterLabel : string = lang == 'en' ? "Cancel" : "Annulla",
+    applyFilterLabel : string = lang == 'en' ? "Apply filter" : "Applica filtro",
     backIcon: string = "mdi-arrow-left",
-    betweenFromLabel: string = "From",
-    betweenToLabel: string = "To"
+    betweenFromLabel: string = lang == 'en' ? "From" : "Da",
+    betweenToLabel: string = lang == 'en' ? "To" : "A",
+    labelsMapper: LabelMapper
 
   let dispatch = createEventDispatcher<{
     'apply': undefined,
@@ -82,11 +85,12 @@
     if(!!modes) {
       advancedModeOptions = modes.map(mode => {
         return {
-          title: mode,
+          title: labelsMapper[mode].short || mode,
           name: mode
         }
       })
     }
+
   }
 
   $: if(!tmpFilter?.advanced) {
@@ -198,6 +202,7 @@
                       bind:selectedDate={tmpFilter.value}
                       openingId="advanced-filter"
                       bind:menuOpened={calendarOpened}
+                      placeholder={tmpFilter.label}
                       on:day-click={() => {calendarOpened = false}}
                       --simple-textfield-width="100%"
                     ></DatePickerTextField>
