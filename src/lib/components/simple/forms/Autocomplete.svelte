@@ -283,14 +283,14 @@
               name="item"
               {item}
               {index}
-              selected={values.findIndex((i) => {
+              selected={(values || []).findIndex((i) => {
                 return i.value == item.value;
               }) != -1}
             >
               <div
                 class:selection-item={true}
                 class:focused={index == focusedIndex}
-                class:selected={values.findIndex((i) => {
+                class:selected={(values || []).findIndex((i) => {
                   return i.value == item.value;
                 }) != -1}
                 on:click={() => toggle(item)}
@@ -323,14 +323,14 @@
               name="item"
               {item}
               {index}
-              selected={values.findIndex((i) => {
+              selected={(values || []).findIndex((i) => {
                 return i.value == item.value;
               }) != -1}
             >
               <div
                 class:selection-item={true}
                 class:focused={index == focusedIndex}
-                class:selected={values.findIndex((i) => {
+                class:selected={(values || []).findIndex((i) => {
                   return i.value == item.value;
                 }) != -1}
                 on:click={() => toggle(item)}

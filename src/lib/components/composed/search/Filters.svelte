@@ -115,6 +115,18 @@
   function handleRemoveFilter(filter: { name: string }) {
     let filterIndex = filters.findIndex((f) => f.name === filter.name)
     filters[filterIndex].active = false
+    if(Object.keys(filters[filterIndex]).includes('value')) {
+      //@ts-ignore
+      filters[filterIndex].value = undefined
+    }
+    if(Object.keys(filters[filterIndex]).includes('from')) {
+      //@ts-ignore
+      filters[filterIndex].from = undefined
+    }
+    if(Object.keys(filters[filterIndex]).includes('to')) {
+      //@ts-ignore
+      filters[filterIndex].to = undefined
+    }
     dispatch('removeFilterClick', { filter: filters[filterIndex] })
   }
 
@@ -140,94 +152,114 @@
 
   function handleDeleteIconClick(e: CustomEvent) {
     let filterIndex = e.detail.index
-    filters[filterIndex].active = false
-    dispatch('removeFilterClick', { filter: filters[filterIndex] })
+    let name = filters[filterIndex].name
+    handleRemoveFilter({name})
   }
 
 </script>
 
-<div class="filters-container">
-  {#if showActiveFilters}
-    <div class="active-filters-container">
-      {#each activeFilters as filter}
-        <div
-          class="filter-slot"
-          bind:this={activeFiltersActivators[filter.name]}
-        >
-          <Chip
-            label
-            close
-            on:close={() => handleRemoveFilter(filter)}
-            on:click={() => handleActiveFilterClick(filter)}
-          >
-            <span class="truncate-text inline-truncated" style:max-width="160px">
-              <b>{filter.label}</b>
-            </span>
-            {#if filter.type === "string" && filter.value != undefined}
-              {filter.mode}
-              <span class="truncate-text inline-truncated">
-                <b>{filter.value}</b>
-              </span>
-            {:else if filter.type === "date"}
-              {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
-                {filter.mode}
-                <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
-                {betweenSeparator}
-                <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
-              {:else if filter.mode != 'between' && filter.value != undefined}
-                {filter.mode}
-                <span class="truncate-text inline-truncated"><b>{filter.value?.toLocaleDateString(dateLocale)}</b></span>
-              {/if}
-            {:else if filter.type == "number"}
-              {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
-                {filter.mode}
-                <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
-                {betweenSeparator}
-                <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
-              {:else if filter.mode != 'between' && filter.value != undefined}
-                {filter.mode}
-                <span class="truncate-text inline-truncated"><b>{filter.value}</b></span>
-              {/if}
-            {:else if filter.type == 'select' && !!filter.values && filter.values.length > 0}
-              {filter.mode} <span class="truncate-text inline-truncated"><b>{filter.values[0].label}</b></span>
-              {#if filter.values.length >= 2}
-                <span class="more-items">+{filter.values.length - 1}
-                  <span class="more-tooltip">
-                    <ul>
-                      {#each filter.values as value}
-                        <li><div class="truncate-text">{value.label}</div></li>
-                      {/each}
-                    </ul>
-                  </span>
-                </span>
-              {/if}
-            {:else if filter.type == 'bool' && filter.value !== undefined}
-                <b>{filter.value ? trueString : falseString}</b>
-            {/if}
-          </Chip>
-        </div>
-      {/each}
-    </div>
-  {/if}
-
-  <div
-    class="filter-button"
-    bind:this={activator}
-  >
-    <Button
-      --button-color="var(--chip-color, var(--chip-default-color))"
-      on:click={handleAddFilterClick}
-    >
-      <Icon name="mdi-filter"></Icon>
-      {addFilterLabel}
-      {#if activeFilters.length > 0 }
-        ({activeFilters.length})
-      {/if}
-    </Button>
-
-  </div>
-</div>
 <MediaQuery let:mAndDown>
+  <div class="filters-wrapper" class:mobile={mAndDown}>
+    <div class="filters-container" class:mobile={mAndDown}>
+      {#if showActiveFilters}
+        {#each activeFilters as filter}
+          <div
+            class="filter-slot"
+            bind:this={activeFiltersActivators[filter.name]}
+          >
+            <Chip
+              label
+              close
+              on:close={() => handleRemoveFilter(filter)}
+              on:click={() => handleActiveFilterClick(filter)}
+            >
+              <span class="truncate-text inline-truncated" style:max-width="160px">
+                <b>{filter.label}</b>
+              </span>
+              {#if filter.type === "string" && filter.value != undefined}
+                {filter.mode}
+                <span class="truncate-text inline-truncated">
+                  <b>{filter.value}</b>
+                </span>
+              {:else if filter.type === "date"}
+                {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
+                  {filter.mode}
+                  <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
+                  {betweenSeparator}
+                  <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
+                {:else if filter.mode != 'between' && filter.value != undefined}
+                  {filter.mode}
+                  <span class="truncate-text inline-truncated"><b>{filter.value?.toLocaleDateString(dateLocale)}</b></span>
+                {/if}
+              {:else if filter.type == "number"}
+                {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
+                  {filter.mode}
+                  <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
+                  {betweenSeparator}
+                  <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
+                {:else if filter.mode != 'between' && filter.value != undefined}
+                  {filter.mode}
+                  <span class="truncate-text inline-truncated"><b>{filter.value}</b></span>
+                {/if}
+              {:else if filter.type == 'select' && !!filter.values && filter.values.length > 0}
+                {filter.mode} <span class="truncate-text inline-truncated"><b>{filter.values[0].label}</b></span>
+                {#if filter.values.length >= 2}
+                  <span class="more-items">+{filter.values.length - 1}
+                    <!--TODO create tooltip component-->
+                    <span class="more-tooltip">
+                      <ul>
+                        {#each filter.values as value}
+                          <li><div class="truncate-text">{value.label}</div></li>
+                        {/each}
+                      </ul>
+                    </span>
+                  </span>
+                {/if}
+              {:else if filter.type == 'bool' && filter.value !== undefined}
+                  <b>{filter.value ? trueString : falseString}</b>
+              {/if}
+            </Chip>
+          </div>
+        {/each}
+      {/if}
+      {#if !mAndDown}
+        <div
+          class="filter-button"
+          bind:this={activator}
+        >
+          <Button
+            --button-color="var(--chip-color, var(--chip-default-color))"
+            on:click={handleAddFilterClick}
+          >
+            <Icon name="mdi-filter"></Icon>
+            {addFilterLabel}
+            {#if activeFilters.length > 0 }
+              ({activeFilters.length})
+            {/if}
+          </Button>
+
+        </div>
+      {/if}
+    </div>
+    {#if mAndDown}
+      <div
+        class="filter-button"
+        bind:this={activator}
+      >
+        <Button
+          --button-color="var(--chip-color, var(--chip-default-color))"
+          on:click={handleAddFilterClick}
+        >
+          <Icon name="mdi-filter"></Icon>
+          {addFilterLabel}
+          {#if activeFilters.length > 0 }
+            ({activeFilters.length})
+          {/if}
+        </Button>
+
+      </div>
+    {/if}
+  </div>
   {#if mAndDown}
     <Drawer
       bind:open={mobileOpen}
@@ -354,17 +386,34 @@
     margin-left: 10px;
   }
 
-  .active-filters-container {
-    display: flex;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 5px
+  .filter-slot {
+    flex-shrink: 0;
+    flex-grow: 0;
   }
 
   .filters-container {
     display: flex;
-    gap: 10px;
-    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .filters-container.mobile {
+    flex-wrap: nowrap;
+    overflow: scroll;
+  }
+
+  .filters-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    max-width: 100%;
+  }
+
+  .filter-button {
+    flex-shrink: 0;
+    flex-grow: 0;
+    height: fit-content;
   }
 
   .drawer-content{

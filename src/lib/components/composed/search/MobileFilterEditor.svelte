@@ -41,11 +41,23 @@
   function initTmpFilter() {
     tmpFilter = structuredClone(filter)
     if(!!tmpFilter && tmpFilter.advanced) {
-      step = 'advanced'
+      if(['string', 'number', 'date', 'select'].includes(tmpFilter.type) && Object.keys(tmpFilter).includes('mode')) {
+        //@ts-ignore
+        if((tmpFilter.mode == 'between' && tmpFilter.from !== undefined && tmpFilter.to !== undefined) || tmpFilter.value !== undefined || (tmpFilter.type == 'select' && tmpFilter.values !== undefined && tmpFilter.values.length > 0)) {
+          step = 'editor'
+          //@ts-ignore
+          advancedModeSelectedOption = tmpFilter.mode
+        } else {
+          step = 'advanced'
+        }
+      } else {
+        step = 'advanced'
+      }
     } else {
       step = "editor"
     }
   }
+
 
   $: if(!!filter) {
     initTmpFilter()
@@ -129,7 +141,6 @@
     dispatch('cancelClick')
   }
 
-
   $: if(!!tmpFilter && tmpFilter.type == 'bool') {
     if(tmpFilter.value === undefined) {
       tmpFilter.value = false
@@ -196,7 +207,7 @@
                 <SimpleTextField
                   bind:value={tmpFilter.value}
                   type="number"
-                  placeholder={betweenFromLabel}
+                  placeholder={tmpFilter.label}
                   --simple-textfield-width="100%"
                 ></SimpleTextField>
               {:else if tmpFilter.type === "date" && tmpFilter.mode === 'between'}
@@ -253,6 +264,7 @@
                     maxVisibleChips={4}
                     --simple-textfield-width="0px"
                     --simple-text-field-margin-left="0px"
+                    --autocomplete-options-max-width="100%"
                   ></Autocomplete>
                 </div>
               {:else if tmpFilter.type == 'bool'}

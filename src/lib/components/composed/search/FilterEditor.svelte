@@ -19,9 +19,22 @@
 
   let tmpFilter: Filter | undefined
 
+  let advancedModeOptions: Item[],
+    advancedModeSelectedOptions: Item[] | undefined
+
   function initTmpFilter() {
     tmpFilter = structuredClone(filter)
+    if(!!tmpFilter && ['string', 'number', 'date', 'select'].includes(tmpFilter.type) && Object.keys(tmpFilter).includes('mode')) {
+      //@ts-ignore
+      if((tmpFilter.mode == 'between' && tmpFilter.from !== undefined && tmpFilter.to !== undefined) || tmpFilter.value !== undefined || (tmpFilter.type == 'select' && tmpFilter.values !== undefined && tmpFilter.values.length > 0)) {
+        advancedModeSelectedOptions = [{
+          //@ts-ignore
+          value: tmpFilter.mode, label: tmpFilter.mode
+        }]
+      }
+    }
   }
+
 
   function closeDropDown() {
     dropdownOpened = false
@@ -48,10 +61,6 @@
       dispatch('apply')
     }
   }
-
-
-  let advancedModeOptions: Item[],
-    advancedModeSelectedOptions: Item[] | undefined
 
   $: if(!!tmpFilter) {
     let modes
