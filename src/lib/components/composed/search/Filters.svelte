@@ -188,6 +188,7 @@
       //@ts-ignore
       filters[filterIndex].to = undefined
     }
+    singleFilterMenuOpened = false
     dispatch('removeFilterClick', { filter: filters[filterIndex] })
   }
 
