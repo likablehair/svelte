@@ -10,5 +10,6 @@
   --chip-default-font-size: inherit;
   --chip-default-line-height: inherit;
   --chip-default-cursor: pointer;
-  --chip-default-hover-background-color: rgb(var(--global-color-primary-600))
+  --chip-default-hover-background-color: rgb(var(--global-color-primary-600));
+  --chip-default-text-max-width: 200px
 }

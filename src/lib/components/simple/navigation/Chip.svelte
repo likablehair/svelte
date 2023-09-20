@@ -12,7 +12,8 @@
     filterIcon = "mdi-check",
     label = false,
     outlined = false,
-    buttonTabIndex: number | null = null
+    buttonTabIndex: number | null = null,
+    truncateText: boolean = false
 
   const dispatch = createEventDispatcher();
 
@@ -41,6 +42,7 @@
   {/if}
   <div
     class="text"
+    class:truncate={truncateText}
   >
     <slot />
   </div>
@@ -82,6 +84,14 @@
       var(--chip-default-cursor)
     );
   }
+
+  .truncate {
+    max-width: var(--chip-text-max-width, var(--chip-default-text-max-width));
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
 
   .chip:not(.outlined) {
     background-color: var(

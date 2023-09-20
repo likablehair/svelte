@@ -19,7 +19,7 @@
         advanced: false
       }, {
         name:"date",
-        label:"Date",
+        label:"Date dsadasdasdsdasdasdasdsadasdasdasd",
         type:"date",
         column:"date",
         mode: 'equal',
@@ -40,7 +40,7 @@
         advanced: true
       }, {
         name: "testSelect",
-        label: "test select",
+        label: "test select dsadsadsadasdsadsadasdasda",
         type: "select",
         column: "testSelect",
         advanced: false,
@@ -48,15 +48,15 @@
         items: [
           {
             value: 1,
-            label: 'test 1'
+            label: 'test 1dsadasdasdadadsadsadsadasdadasdasdasdasdadddads'
           },
           {
             value: 2,
-            label: 'test 2'
+            label: 'test 2ewqeqwewqeqwewqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq'
           },
           {
             value: 3,
-            label: 'test 3'
+            label: 'test 3ewqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq'
           }
         ]
       }, {
@@ -77,6 +77,28 @@
           },
           {
             value: 3,
+            label: 'test 3'
+          }, {
+            value: 6,
+            label: 'test 1'
+          },
+          {
+            value: 7,
+            label: 'test 2'
+          },
+          {
+            value: 8,
+            label: 'test 3'
+          }, {
+            value: 9,
+            label: 'test 1'
+          },
+          {
+            value: 10,
+            label: 'test 2'
+          },
+          {
+            value: 11,
             label: 'test 3'
           }
         ]

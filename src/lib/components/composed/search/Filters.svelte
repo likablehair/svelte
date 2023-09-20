@@ -160,31 +160,42 @@
             on:close={() => handleRemoveFilter(filter)}
             on:click={() => handleActiveFilterClick(filter)}
           >
-            <b>{filter.label}</b>
+            <span class="truncate-text inline-truncated" style:max-width="160px">
+              <b>{filter.label}</b>
+            </span>
             {#if filter.type === "string" && filter.value != undefined}
-              {filter.mode}  <b>{filter.value}</b>
+              {filter.mode}
+              <span class="truncate-text inline-truncated">
+                <b>{filter.value}</b>
+              </span>
             {:else if filter.type === "date"}
               {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
-                {filter.mode}  <b>{filter.from?.toLocaleDateString(dateLocale)}</b>
-                {betweenSeparator} <b>{filter.to?.toLocaleDateString(dateLocale)}</b>
+                {filter.mode}
+                <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
+                {betweenSeparator}
+                <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
               {:else if filter.mode != 'between' && filter.value != undefined}
-                {filter.mode}  <b>{filter.value?.toLocaleDateString(dateLocale)}</b>
+                {filter.mode}
+                <span class="truncate-text inline-truncated"><b>{filter.value?.toLocaleDateString(dateLocale)}</b></span>
               {/if}
             {:else if filter.type == "number"}
               {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
-                {filter.mode}  <b>{filter.from}</b>
-                {betweenSeparator} <b>{filter.to}</b>
+                {filter.mode}
+                <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
+                {betweenSeparator}
+                <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
               {:else if filter.mode != 'between' && filter.value != undefined}
-                {filter.mode}  <b>{filter.value}</b>
+                {filter.mode}
+                <span class="truncate-text inline-truncated"><b>{filter.value}</b></span>
               {/if}
             {:else if filter.type == 'select' && !!filter.values && filter.values.length > 0}
-              {filter.mode} <b>{filter.values[0].label}</b>
+              {filter.mode} <span class="truncate-text inline-truncated"><b>{filter.values[0].label}</b></span>
               {#if filter.values.length >= 2}
                 <span class="more-items">+{filter.values.length - 1}
                   <span class="more-tooltip">
                     <ul>
                       {#each filter.values as value}
-                        <li>{value.label}</li>
+                        <li><div class="truncate-text">{value.label}</div></li>
                       {/each}
                     </ul>
                   </span>
@@ -340,6 +351,7 @@
     display: flex;
     justify-content: center;
     margin-top: 10px;
+    margin-left: 10px;
   }
 
   .active-filters-container {
@@ -373,6 +385,7 @@
   .more-tooltip {
     visibility: hidden;
     min-width: 120px;
+    max-width: 300px;
     width: fit-content;
     border-radius: 6px;
     padding: 5px 0;
@@ -400,6 +413,18 @@
   .more-items:hover .more-tooltip {
     visibility: visible;
     opacity: 1;
+  }
+
+  .truncate-text {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .inline-truncated {
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 240px;
   }
 
 </style>

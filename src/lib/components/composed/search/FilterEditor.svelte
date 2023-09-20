@@ -115,7 +115,7 @@
     {#if filter.advanced}
       <div class="advanced-mode">
         <div class="label">
-          {filter.name[0].toUpperCase() + filter.name.slice(1)}
+          {filter.label[0].toUpperCase() + filter.label.slice(1)}
         </div>
         <div class="advaced-mode-selector" on:click|stopPropagation on:keypress>
           <Dropdown
@@ -266,4 +266,12 @@
     gap: 10px;
     align-items: center;
   }
+
+  .label {
+    max-width: 200px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
 </style>

@@ -188,7 +188,7 @@
     filteredItems = items;
   }
 
-  $: notVisibleChipNumber = Math.max((values.length || 0) - (maxVisibleChips || 0), 0)
+  $: notVisibleChipNumber = Math.max((values?.length || 0) - (maxVisibleChips || 0), 0)
 
   import Chip from "$lib/components/simple/navigation/Chip.svelte";
   import Menu from "$lib/components/simple/common/Menu.svelte";
@@ -213,7 +213,7 @@
     <div
       class="selection-container"
     >
-      {#each values.slice(0, maxVisibleChips) as selection}
+      {#each (values || []).slice(0, maxVisibleChips) as selection}
         <slot name="selection" {selection}>
           <div tabindex="-1">
             <Chip
@@ -221,7 +221,10 @@
               on:close={() => unselect(selection)}
               --chip-default-border-radius="var(--autocomplete-border-radius, var(--autocomplete-default-border-radius))"
               buttonTabIndex={-1}
-            >{selection.label}</Chip>
+              truncateText
+            >
+              {selection.label}
+            </Chip>
           </div>
         </slot>
       {/each}
@@ -379,6 +382,10 @@
 
   .selection-item {
     padding: 10px;
+    max-width: var(--autocomplete-options-max-width, var(--autocomplete-default-options-max-width));
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   .selection-item.selected {
