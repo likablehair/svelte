@@ -5,7 +5,7 @@
   import Dropdown from "$lib/components/composed/forms/Dropdown.svelte";
   import { createEventDispatcher, type ComponentProps } from "svelte";
 
-  type ArrayElement<ArrayType extends readonly unknown[]> = 
+  type ArrayElement<ArrayType extends readonly unknown[]> =
     ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
   export type Header = ArrayElement<NonNullable<ComponentProps<SimpleTable>['headers']>>;
@@ -14,6 +14,8 @@
 <script lang="ts">
   import Filters from "../search/Filters.svelte";
   import SearchBar from "../search/SearchBar.svelte";
+    import type Builder from "$lib/utils/filters/builder";
+    import Converter from "$lib/utils/filters/filters";
 
   let clazz: {
     simpleTable?: ComponentProps<SimpleTable>['class']
@@ -34,7 +36,8 @@
     hideRowsPerPage: boolean = false,
     totalElements: number | undefined = undefined,
     rowsPerPage: number = 20,
-    filters:  ComponentProps<Filters>['filters'] = []
+    filters:  ComponentProps<Filters>['filters'] = [],
+    searchBarColumns: string[] | undefined = undefined
 
   let searchBarInput: HTMLElement,
     searchText: string | undefined = undefined
@@ -43,6 +46,9 @@
     paginationChange: {
       rowsPerPage: number,
       page: number
+    },
+    filtersChange: {
+      builder: Builder
     }
   }>()
 
@@ -51,9 +57,9 @@
   $: rowsPerPageSelection = [
     { label: rowsPerPage.toString(), value: rowsPerPage }
   ]
-  
-  
-  
+
+
+
   $: if(totalElements !== undefined) maxPage = Math.max(Math.round(totalElements/rowsPerPage), 1)
 
   function handleRowsPerPageChange(e: CustomEvent<{ selection: ComponentProps<Dropdown>['items']}>) {
@@ -67,27 +73,51 @@
     })
   }
 
-  function handleAddFilter() {
+  function handleSearchChange(searchText: string | undefined) {
+    let converter = new Converter()
+    let builder: Builder
+    builder = converter.createBuilder({
+      filters: filters || []
+    })
+
+    if(!!searchText && !!searchBarColumns && searchBarColumns.length > 0) {
+      builder.where(b => {
+        b.where(searchBarColumns![0], 'like', searchText)
+        for(let i = 1; i < searchBarColumns!.length; i += 1) {
+          b.orWhere(searchBarColumns![i], 'like', searchText)
+        }
+      })
+    }
+
+    dispatch('filtersChange', {
+      builder
+    })
   }
 
+  $: handleSearchChange(searchText)
+
+  function handleFiltersChange() {
+    handleSearchChange(searchText)
+  }
 
 
 </script>
 
 <div class="paginated-table">
-    
+
   <SearchBar
-        placeholder="Type something to search..."      
-        bind:input={searchBarInput}
-        bind:value={searchText}
-        >
-    </SearchBar>
-    <div class="filter-container">
-      <Filters
-        bind:filters
-        on:addFilterClick={handleAddFilter}
-        >
-    </Filters>
+    placeholder="Type something to search..."
+    bind:input={searchBarInput}
+    bind:value={searchText}
+  >
+  </SearchBar>
+  <div class="filter-container">
+    <Filters
+      bind:filters
+      on:applyFilter={handleFiltersChange}
+      on:removeFilter={handleFiltersChange}
+    >
+  </Filters>
 </div>
   <SimpleTable
     bind:headers
@@ -105,7 +135,7 @@
           </slot>
         </span>
         {#if head.sortable}
-          <span 
+          <span
             class="header-sort-icon"
             class:active={sortedBy == head.value}
             class:asc={sortDirection == 'asc'}
@@ -120,11 +150,11 @@
         {/if}
       </slot>
     </svelte:fragment>
-    <svelte:fragment 
-      slot="custom" 
-      let:columnIndex 
-      let:index 
-      let:header 
+    <svelte:fragment
+      slot="custom"
+      let:columnIndex
+      let:index
+      let:header
       let:item
     >
       <slot name="custom" {index} {columnIndex} {header} {item}/>
@@ -138,7 +168,7 @@
   </SimpleTable>
 
   <div class="footer">
-    <slot 
+    <slot
       name="footer"
       {hideRowsPerPage}
       {rowsPerPageOptions}

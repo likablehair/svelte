@@ -2,15 +2,11 @@
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
   import Filters from "$lib/components/composed/search/Filters.svelte";
-</script>
+    import { filter } from "lodash";
+    import Converter, { type Filter } from "$lib/utils/filters/filters";
+    import type Builder from "$lib/utils/filters/builder";
 
-<h1>Filters</h1>
-<ComponentSubtitle>Make it easy, make it filter.</ComponentSubtitle>
-<h2>Example</h2>
-<div class="example">
-  <Filters
-    lang="it"
-    filters={[
+  let filters: Filter[] = [
       {
         name:"customerName",
         label:"Customer Name",
@@ -111,7 +107,27 @@
         mode: "equal",
         desctiprion: "include only if column is true"
       }
-    ]}
+    ]
+
+  function handleFilterEdit() {
+    if(!!filters) {
+      let converter = new Converter()
+      let builder: Builder
+      builder = converter.createBuilder({
+        filters
+      })
+    }
+  }
+</script>
+
+<h1>Filters</h1>
+<ComponentSubtitle>Make it easy, make it filter.</ComponentSubtitle>
+<h2>Example</h2>
+<div class="example">
+  <Filters
+    lang="it"
+    bind:filters
+    on:applyFilter={handleFilterEdit}
   ></Filters>
 </div>
 <h2>Props</h2>

@@ -95,8 +95,8 @@
 
   let dispatch = createEventDispatcher<{
     'addFilterClick': undefined,
-    'selectFilterClick': undefined,
-    'removeFilterClick': {
+    'applyFilter': undefined,
+    'removeFilter': {
       filter: Filter
     }
   }>()
@@ -168,6 +168,7 @@
       open = false
       mobileOpen = false
       singleFilterMenuOpened = false;
+      dispatch('applyFilter')
     }
   }
 
@@ -189,7 +190,7 @@
       filters[filterIndex].to = undefined
     }
     singleFilterMenuOpened = false
-    dispatch('removeFilterClick', { filter: filters[filterIndex] })
+    dispatch('removeFilter', { filter: filters[filterIndex] })
   }
 
   let activeFiltersActivators: Record<string, HTMLElement> = {}

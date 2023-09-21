@@ -175,14 +175,18 @@ export default class Converter {
   }): Builder {
     if(!!params.filter.values && params.filter.values.length > 0) {
       if(params.filter.mode == 'equal') {
-        params.builder.where(params.filter.column, '=', params.filter.values[0].value)
-        for(let i = 1; i < params.filter.values.length; i += 1) {
-          params.builder.orWhere(params.filter.column, '=', params.filter.values[i].value)
-        }
+        params.builder.where(b => {
+          b.where(params.filter.column, '=', params.filter.values![0].value)
+          for(let i = 1; i < params.filter.values!.length; i += 1) {
+            b.orWhere(params.filter.column, '=', params.filter.values![i].value)
+          }
+        })
       } else {
-        for(let i = 0; i < params.filter.values.length; i += 1) {
-          params.builder.whereNot(params.filter.column, '=', params.filter.values[i].value)
-        }
+        params.builder.where(b => {
+          for(let i = 0; i < params.filter.values!.length; i += 1) {
+            b.whereNot(params.filter.column, '=', params.filter.values![i].value)
+          }
+        })
       }
     }
 
@@ -199,4 +203,5 @@ export default class Converter {
 
     return params.builder
   }
+
 }

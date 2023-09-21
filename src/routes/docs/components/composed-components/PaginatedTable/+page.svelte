@@ -5,6 +5,8 @@
   import type {Filter} from "$lib/utils/filters/filters"
   import type { Header } from "$lib/components/simple/lists/SimpleTable.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
+    import type Builder from "$lib/utils/filters/builder";
+    import Converter from "$lib/utils/filters/filters";
 
   let headers : Header[] =[
       {
@@ -31,11 +33,11 @@
         label: 'Rating',
         type: {
           key:"custom"
-        },     
+        },
         sortable: true,
       }
     ]
-    
+
   let filters: Filter[] | undefined  = [{
     label: "Business name",
     active: false,
@@ -43,7 +45,7 @@
     name: "businessName",
     column: "businessName",
     mode: 'like'
-  }, 
+  },
   {
     label: "Product name",
     active: false,
@@ -51,8 +53,34 @@
     name: "productName",
     column: "productName",
     mode: 'like'
-  }]
-    
+  },
+  {
+    label: 'Rating',
+    active: false,
+    type: 'select',
+    column: 'rating',
+    mode: 'equal',
+    advanced: true,
+    name: 'rating',
+    items: [
+      {
+        label: "5",
+        value: 5
+      },
+      {
+        label: "4.5",
+        value: 4.5
+      }
+    ]
+  }
+]
+
+
+  function handleFiltersChange(e: CustomEvent) {
+    let filterBuilder: Builder = e.detail.builder
+    console.log(filterBuilder.toJson())
+  }
+
 </script>
 
 <h1>PaginatedTable With Filter Panel</h1>
@@ -80,7 +108,9 @@
         rating: 4.2
       },
     ]}
+    searchBarColumns={['businessName', 'productName']}
     totalElements={40}
+    on:filtersChange={handleFiltersChange}
   >
   <svelte:fragment slot="custom" let:header let:item>
     {#if header.value == 'rating'}
