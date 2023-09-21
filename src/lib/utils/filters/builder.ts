@@ -17,11 +17,11 @@ export default class Builder {
   public where(callback: (builder: Builder) => void): Builder
   public where(key: Record<string, string | number | Date>): Builder
   public where(key: string, value: string | number | Date): Builder
-  public where(key: string, operator: string, value: string | number | Date): Builder
+  public where(key: string, operator: string, value: string | number | Date | boolean): Builder
   public where(
     first: string | Record<string, string | number | Date> | ((builder: Builder) => void),
     second?: string | number | Date,
-    third?: string | number | Date
+    third?: string | number | Date | boolean
   ): Builder {
     return this.applyWhereClause('and', first, second, third)
   }
@@ -35,7 +35,7 @@ export default class Builder {
     second?: string | number | Date,
     third?: string | number | Date
   ): Builder {
-    return this.applyWhereClause('and', first, second, third)
+    return this.applyWhereClause('andNot', first, second, third)
   }
 
   public orWhere(callback: (builder: Builder) => void): Builder
@@ -66,8 +66,9 @@ export default class Builder {
     logicalOperator: 'and' | 'or' | 'andNot' | 'orNot',
     first: string | Record<string, string | number | Date> | ((builder: Builder) => void),
     second?: string | number | Date,
-    third?: string | number | Date,
+    third?: string | number | Date | boolean,
   ): Builder {
+
     if (!!third) {
       if (!!second && typeof first == 'string' && typeof second == 'string') {
         this.modifiers.push({

@@ -18,7 +18,7 @@ type SimpleWhere = {
   logicalOperator?: 'and' | 'or' | 'andNot' | 'orNot',
   key: string,
   operator?: string,
-  value: string | number | Date
+  value: string | number | Date | boolean
 }
 
 type InWhere = {

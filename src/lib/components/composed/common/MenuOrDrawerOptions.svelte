@@ -19,7 +19,7 @@
     _height: string = "fit-content",
     _maxHeight: string | undefined = undefined,
     _minWidth: string = "100px",
-    _bordeRadius: string = "5px";
+    _borderRadius: string = "5px";
 
   let selected: ArrayElement<NonNullable<ComponentProps<SelectableVerticalList>['elements']>>['name'] | undefined
   let focused: ArrayElement<NonNullable<ComponentProps<SelectableVerticalList>['elements']>>['name'] | undefined
@@ -36,7 +36,7 @@
   {_height}
   {_maxHeight}
   {_minWidth}
-  {_bordeRadius}
+  {_borderRadius}
   let:isDrawer
   --drawer-default-space={`${Math.min(elements?.length || 0, 5) * 56}px`}
 >

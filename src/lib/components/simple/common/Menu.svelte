@@ -154,9 +154,9 @@
     }
 
     let otherMenus: NodeListOf<HTMLElement> =
-      document.querySelectorAll("[data-menu=true]");
+      document.querySelectorAll("[data-menu]");
     let otherDialogs: NodeListOf<HTMLElement> =
-      document.querySelectorAll("[data-dialog=true]");
+      document.querySelectorAll("[data-dialog]");
 
     let maxZIndex: number | undefined = undefined;
     if (otherDialogs.length > 0) {
@@ -167,7 +167,6 @@
     }
 
     if (otherMenus.length > 0) {
-      let maxZIndex: number;
       otherMenus.forEach((menu) => {
         if (!maxZIndex || maxZIndex < Number(menu.style.zIndex))
           maxZIndex = Number(menu.style.zIndex);
@@ -237,15 +236,34 @@
     if(open && !!menuElement && !!activator) calculateMenuPosition({ menuElement, activator })
   }
 
+  function handleMenuClick(e: MouseEvent, zIndex: number) {
+    let otherMenus: NodeListOf<HTMLElement> = document.querySelectorAll(`[data-menu]`)
+    otherMenus.forEach(m => {
+      let uid = m.getAttribute('data-uid')
+      if(uid !== currentUid && Number(m.style.zIndex) > zIndex) {
+        let controller = document.querySelector(`[data-operation="close"][data-uid="${uid}"]`)
+        if(!!controller) {
+          const clickEvent = new MouseEvent('click', {
+              bubbles: false,
+              cancelable: true,
+              view: window
+            })
+          controller.dispatchEvent(clickEvent)
+        }
+      }
+    })
+  }
+
 </script>
 
 <svelte:window on:scroll={handleWindowScrollOrResize} on:resize={handleWindowScrollOrResize} ></svelte:window>
 
-<div 
-  class="controller" 
-  data-operation="close" 
-  data-opening-id={openingId} 
-  on:click={handleCloseControllerClick} 
+<div
+  class="controller"
+  data-operation="close"
+  data-opening-id={openingId}
+  data-uid={currentUid}
+  on:click={handleCloseControllerClick}
   on:keypress={handleCloseControllerClick}
   bind:this={closeController}
 ></div>
@@ -267,6 +285,8 @@
     style:overflow={_overflow}
     in:inAnimation={inAnimationConfig}
     out:outAnimation={outAnimationConfig}
+    on:click={(e) => handleMenuClick(e, zIndex)}
+    on:keydown
   >
     <slot />
   </div>

@@ -3,7 +3,6 @@
   import PropsViewer from "../../PropsViewer.svelte";
   
   import SimpleTable from "$lib/components/simple/lists/SimpleTable.svelte";
-  import type { ColumnBoolean, ColumnCheckBox, ColumnCostom, ColumnDate, ColumnIcon, ColumnNumber, ColumnString } from "$lib/components/simple/lists/columnTypes";
 
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import { DateTime } from "luxon";

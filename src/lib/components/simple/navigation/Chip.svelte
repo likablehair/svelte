@@ -12,7 +12,8 @@
     filterIcon = "mdi-check",
     label = false,
     outlined = false,
-    buttonTabIndex: number | null = null
+    buttonTabIndex: number | null = null,
+    truncateText: boolean = false
 
   const dispatch = createEventDispatcher();
 
@@ -20,7 +21,8 @@
     dispatch("click");
   }
 
-  function handleCloseClick() {
+  function handleCloseClick(e: CustomEvent) {
+    e.detail.nativeEvent.stopPropagation()
     dispatch("close");
   }
 </script>
@@ -38,8 +40,9 @@
       <Icon name={filterIcon} />
     </div>
   {/if}
-  <div 
-    class="text" 
+  <div
+    class="text"
+    class:truncate={truncateText}
   >
     <slot />
   </div>
@@ -52,7 +55,8 @@
         --button-background-color="transparent"
         --button-padding="0px"
         --button-color="var(--chip-color, var(--chip-default-color))"
-        on:click={handleCloseClick}
+        on:click
+        ={handleCloseClick}
       />
     </div>
   {/if}
@@ -80,6 +84,14 @@
       var(--chip-default-cursor)
     );
   }
+
+  .truncate {
+    max-width: var(--chip-text-max-width, var(--chip-default-text-max-width));
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
 
   .chip:not(.outlined) {
     background-color: var(

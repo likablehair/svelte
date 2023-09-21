@@ -3,14 +3,25 @@
   import './Drawer.css'
   import Navigator from "$lib/components/simple/navigation/Navigator.svelte";
   import type { Item } from "$lib/components/simple/navigation/Navigator.svelte";
+    import { createEventDispatcher } from 'svelte';
 
   export let open = false,
     position: "left" | "top" | "right" | "bottom" = "left",
     overlay = true,
     items: Item[] = [];
 
+  const dispatch = createEventDispatcher<{
+    'close': {}
+  }>()
+
   function handleClickOverlay() {
     open = false;
+    overlay = false;
+    dispatch('close')
+  }
+
+  $: if(open) {
+    overlay = true
   }
 </script>
 
@@ -82,6 +93,8 @@
     );
     color: var(--drawer-color, var(--drawer-default-color));
     overflow: var(--drawer-overflow, var(--drawer-default-overflow));
+    border-radius: var(--drawer-border-radius);
+    margin: var(--drawer-margin);
   }
 
   .overlay {

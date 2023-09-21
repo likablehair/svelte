@@ -9,9 +9,9 @@
   } = {};
 	export { clazz as class };
 
-  /* 
+  /*
     Styles:
-    
+
     --search-bar-ring-color
     --search-bar-background-color
     --search-bar-border-radius
@@ -24,7 +24,8 @@
   */
 
   export let input: HTMLElement | undefined = undefined,
-    value: string | undefined = undefined
+    value: string | undefined = undefined,
+    placeholder: string | undefined = undefined
 </script>
 
 <div
@@ -45,16 +46,16 @@
   </slot>
   <slot name="input">
     <input
-      aria-autocomplete="both" 
-      aria-labelledby="search-content" 
-      id="search-content" 
-      autocomplete="off" 
-      autocorrect="off" 
-      autocapitalize="off" 
-      enterkeyhint="search" 
-      spellcheck="false" 
-      placeholder="Find something..." 
-      maxlength="512" 
+      aria-autocomplete="both"
+      aria-labelledby="search-content"
+      id="search-content"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      enterkeyhint="search"
+      spellcheck="false"
+      placeholder={placeholder}
+      maxlength="512"
       tabindex="0"
       bind:this={input}
       bind:value={value}
@@ -113,6 +114,7 @@
       --search-bar-line-height,
       var(--search-bar-default-line-height)
     );
+    width: 100%;
     box-sizing: border-box;
     border: 0 solid #e5e7eb;
     outline: 2px solid transparent;

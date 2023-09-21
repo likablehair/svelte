@@ -1,24 +1,91 @@
 import Builder from "./builder"
 
+export const StringModes = ['equal', 'like', 'ilike'] as const
+export type StringMode = typeof StringModes[number]
+
+export const GenericModes = ['equal', 'greater', 'lower', 'between'] as const
+export type DateMode = typeof GenericModes[number]
+
+export type NumberMode = typeof GenericModes[number]
+
+export const SelectModes = ['equal', 'different'] as const
+export type SelectMode = typeof SelectModes[number]
+
 type MultiStringFilter = {
   type: 'multiString',
   columns: string[],
+  operator?: 'or' | 'and',
+  value?: string
+}
+
+
+type ChoiceFilter = {
+  type: 'choice',
+  column: string,
+  value?: string,
   operator?: 'or' | 'and'
+  options: any[]
 }
 
 type StringFilter = {
   type: 'string',
   column: string,
-  value: string | undefined,
-  mode?: 'equal' | 'like' | 'ilike'
+  value?: string,
+  mode?: StringMode
+}
+
+type DateFilter = {
+  type: 'date',
+  column: string,
+} & (
+  {
+    mode: 'between',
+    from?: Date,
+    to?: Date
+  } | {
+    mode: 'equal' | 'greater' | 'lower',
+    value?: Date,
+  }
+)
+
+type NumberFilter = {
+  type: 'number',
+  column: string
+} & (
+  {
+    mode: 'between',
+    from?: number,
+    to?: number
+  } | {
+    mode: 'equal' | 'greater' | 'lower',
+    value?: number,
+  }
+)
+
+type SelectFilter = {
+  type: 'select',
+  column: string,
+  mode: SelectMode,
+  items: { value: string | number, label: string }[]
+  values?: { value: string | number, label?: string | number }[]
+}
+
+type BoolFilter = {
+  type: 'bool',
+  column: string,
+  mode: 'equal',
+  value?: boolean
+  advanced?: false
+  desctiprion: string
 }
 
 export type Filter = {
   name: string,
-  active: boolean,
+  active?: boolean,
   hidden?: boolean,
-  label: string
-} & (StringFilter | MultiStringFilter)
+  label: string,
+  advanced?: boolean
+} & (StringFilter | MultiStringFilter | ChoiceFilter | DateFilter | NumberFilter | SelectFilter | BoolFilter)
 
 
 export default class Converter {
@@ -36,6 +103,14 @@ export default class Converter {
 
       if(filter.type == 'string') {
         this.applyStringFilter({ builder, filter })
+      } else if(filter.type == 'date') {
+        this.applyDateFilter({ builder, filter })
+      } else if(filter.type == 'number') {
+        this.applyNumberFilter({ builder, filter })
+      } else if(filter.type == 'select') {
+        this.applySelectFilter({ builder, filter })
+      } else if(filter.type == 'bool') {
+        this.applyBooleanFilter({ builder, filter })
       }
     }
 
@@ -58,4 +133,75 @@ export default class Converter {
 
     return params.builder
   }
+
+  private applyDateFilter(params: {
+    builder: Builder,
+    filter: DateFilter
+  }): Builder {
+    if (params.filter.mode == 'equal' && !!params.filter.value) {
+      params.builder.where(params.filter.column, '=', params.filter.value)
+    } else if (params.filter.mode == 'greater' && !!params.filter.value) {
+      params.builder.where(params.filter.column, '>', params.filter.value)
+    } else if (params.filter.mode == 'lower' && !!params.filter.value) {
+      params.builder.where(params.filter.column, '<', params.filter.value)
+    } else if (params.filter.mode == 'between' && !!params.filter.from && !!params.filter.to) {
+      params.builder.where(params.filter.column, '>', params.filter.from)
+      params.builder.where(params.filter.column, '<', params.filter.to)
+    }
+
+    return params.builder
+  }
+
+  private applyNumberFilter(params: {
+    builder: Builder,
+    filter: NumberFilter
+  }): Builder {
+    if(params.filter.mode == 'equal' && !!params.filter.value) {
+      params.builder.where(params.filter.column, '=', params.filter.value)
+    } else if(params.filter.mode == 'greater' && !!params.filter.value) {
+      params.builder.where(params.filter.column, '>', params.filter.value)
+    } else if(params.filter.mode == 'lower' && !!params.filter.value) {
+      params.builder.where(params.filter.column, '<', params.filter.value)
+    } else if(params.filter.mode == 'between' && !!params.filter.from && !!params.filter.to) {
+      params.builder.where(params.filter.column, '>', params.filter.from)
+      params.builder.where(params.filter.column, '<', params.filter.to)
+    }
+    return params.builder
+  }
+
+  private applySelectFilter(params: {
+    builder: Builder,
+    filter: SelectFilter
+  }): Builder {
+    if(!!params.filter.values && params.filter.values.length > 0) {
+      if(params.filter.mode == 'equal') {
+        params.builder.where(b => {
+          b.where(params.filter.column, '=', params.filter.values![0].value)
+          for(let i = 1; i < params.filter.values!.length; i += 1) {
+            b.orWhere(params.filter.column, '=', params.filter.values![i].value)
+          }
+        })
+      } else {
+        params.builder.where(b => {
+          for(let i = 0; i < params.filter.values!.length; i += 1) {
+            b.whereNot(params.filter.column, '=', params.filter.values![i].value)
+          }
+        })
+      }
+    }
+
+    return params.builder
+  }
+
+  private applyBooleanFilter(params: {
+    builder: Builder,
+    filter: BoolFilter
+  }): Builder {
+    if(params.filter.value !== undefined) {
+      params.builder.where(params.filter.column, '=', params.filter.value)
+    }
+
+    return params.builder
+  }
+
 }

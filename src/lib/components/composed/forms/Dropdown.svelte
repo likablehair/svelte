@@ -11,12 +11,15 @@
   export let items: Item[] = [],
     values: Item[] = [],
     multiple: boolean = false,
+    lang: 'it' | 'en' = 'en',
     searchText: string | undefined = undefined,
     maxVisibleChips: number | undefined = undefined,
-    placeholder: string = "Seleziona",
+    placeholder: string = lang == 'en' ? "Select" : "Seleziona",
     clearable: boolean = true,
     mandatory: boolean = true,
-    icon: string | undefined = undefined
+    icon: string | undefined = undefined,
+    menuOpened: boolean = false,
+    openingId: string | undefined = undefined
 
   $: generatedLabel = values.length == 1 ? values[0].label : `${values.length} Selezionati`
 
@@ -36,9 +39,11 @@
   bind:mandatory
   searchFunction={() => true}
   on:change
+  bind:menuOpened
+  bind:openingId
 >
   <svelte:fragment slot="selection-container" let:openMenu let:handleKeyDown>
-    <Button 
+    <Button
       --button-default-background-color="transparent"
       --button-default-focus-background-color="rgb(var(--global-color-primary-400), .3)"
       --button-default-focus-color="rgb(var(--global-color-contrast-900))"
@@ -66,8 +71,8 @@
           {:else}
             <div class="space-between">
               <div>{generatedLabel}</div>
-              {#if clearable}  
-                <Icon 
+              {#if clearable}
+                <Icon
                   name="mdi-close"
                   click
                   on:click={handleCloseClick}
