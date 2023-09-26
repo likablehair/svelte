@@ -83,9 +83,13 @@
     mask = IMask(
       inputElement, maskFactoryArgs
     )
+
+    if(!!selectedDate) {
+      mask.value = DateTime.fromJSDate(selectedDate).toFormat(pattern)
+    }
   })
 
-  function handleInputChange() {
+  function handleInputChange(event: any) {
     setTimeout(() => {
       const typedValue = mask.value
 
@@ -149,7 +153,7 @@
     <SimpleTextField
       bind:value={mask.value}
       on:focus={() => handleTextFieldFocus(mAndDown)}
-      on:keypress={handleInputChange}
+      on:keydown={handleInputChange}
       bind:input={inputElement}
       bind:placeholder
     >

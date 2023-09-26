@@ -6,4 +6,5 @@
   --date-picker-default-header-color: rgb(var(--global-color-grey-50));
   --date-picker-default-box-shadow: 0 4px 6px -1px rgb(var(--global-color-contrast-300), .1),
     0 2px 4px -2px rgb(var(--global-color-contrast-300), .1);
+  --date-picker-default-overflow: hidden;
 }

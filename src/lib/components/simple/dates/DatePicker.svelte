@@ -201,6 +201,10 @@
       --date-picker-box-shadow,
       var(--date-picker-default-box-shadow)
     );
+    overflow: var(
+      --date-picker-overflow,
+      var(--date-picker-default-overflow)
+    );
   }
 
   .header {
