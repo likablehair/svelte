@@ -37,7 +37,8 @@
     totalElements: number | undefined = undefined,
     rowsPerPage: number = 20,
     filters:  ComponentProps<Filters>['filters'] = [],
-    searchBarColumns: string[] | undefined = undefined
+    searchBarColumns: string[] | undefined = undefined,
+    lang: 'it' | 'en' = 'en'
 
   let searchBarInput: HTMLElement,
     searchText: string | undefined = undefined
@@ -116,6 +117,7 @@
       bind:filters
       on:applyFilter={handleFiltersChange}
       on:removeFilter={handleFiltersChange}
+      {lang}
     >
   </Filters>
 </div>

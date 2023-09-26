@@ -69,7 +69,7 @@ export default class Builder {
     third?: string | number | Date | boolean,
   ): Builder {
 
-    if (!!third) {
+    if (third !== undefined) {
       if (!!second && typeof first == 'string' && typeof second == 'string') {
         this.modifiers.push({
           method: 'where',
