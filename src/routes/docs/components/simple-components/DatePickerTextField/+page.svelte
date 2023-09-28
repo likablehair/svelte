@@ -3,7 +3,7 @@
   import PropsViewer from "../../PropsViewer.svelte";
   import DatePickerTextField from "$lib/components/simple/dates/DatePickerTextField.svelte";
 
-  let date: Date | undefined = undefined
+  let date: Date | undefined = new Date()
 
   setTimeout(() => {
     date = new Date('2024-01-02')

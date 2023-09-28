@@ -120,6 +120,8 @@
             month: Number(oneBasedMonth),
             year: Number(year)
           }).toJSDate()
+        } else {
+          selectedDate = undefined
         }
       }
     }, 30);
@@ -143,6 +145,14 @@
 
   function handleMonthSelect() {
     mask.value = ''
+  }
+
+  $: if(!!selectedDate) {
+    setTimeout(() => {
+      if(!!selectedDate) {
+        mask.value = DateTime.fromJSDate(selectedDate).toFormat(pattern)
+      }
+    }, 30);
   }
 </script>
 
