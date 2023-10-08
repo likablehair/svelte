@@ -55,6 +55,7 @@
   }
 
   function handleMenuSelection(option: Option) {
+    sidebarExpanded = false
     drawerOpened = false
     dispatch('drawer-change', { opened: drawerOpened })
     dispatch('menu-select', {
