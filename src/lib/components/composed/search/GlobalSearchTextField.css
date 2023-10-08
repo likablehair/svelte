@@ -8,4 +8,5 @@
   --global-search-text-field-default-background-color: rgb(var(--global-color-background-100));
   --global-search-text-field-default-padding: 0rem 0.75rem 0rem 0.5rem;
   --global-search-text-field-default-font-size: .875rem;
+  --global-search-text-field-default-border-radius: 9999px;
 }

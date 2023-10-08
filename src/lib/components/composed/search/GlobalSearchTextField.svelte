@@ -201,7 +201,10 @@
       --global-search-text-field-background-color,
       var(--global-search-text-field-default-background-color)
     );
-    border-radius: 9999px;
+    border-radius: var(
+      --global-search-text-field-border-radius,
+      var(--global-search-text-field-default-border-radius)
+    );
     padding: var(
       --global-search-text-field-padding,
       var(--global-search-text-field-default-padding)
