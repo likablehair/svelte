@@ -39,6 +39,9 @@
     'drawer-change': {
       opened: boolean
     },
+    'menu-select': {
+      option: Option
+    }
   }>()
 
   function toggleMenu() {
@@ -49,6 +52,14 @@
   function handleOverlayClick() {
     drawerOpened = false
     dispatch('drawer-change', { opened: drawerOpened })
+  }
+
+  function handleMenuSelection(option: Option) {
+    drawerOpened = false
+    dispatch('drawer-change', { opened: drawerOpened })
+    dispatch('menu-select', {
+      option: option
+    })
   }
 
 
@@ -115,6 +126,7 @@
                     --color-inverted-selector-default-selected-font-weight="400"
                     --icon-default-size="1.3rem"
                     deletable={false}
+                    on:select={(e) => handleMenuSelection(e.detail.option)}
                   ></ColorInvertedSelector>
                 </div>
               </slot>
