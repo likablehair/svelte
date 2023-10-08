@@ -183,10 +183,16 @@ let list: {
     url: '/docs/components/layouts/UnstableDividedSideBarLayout'
   }, {
     title: 'GanymedeLineChart',
-    description: 'Ganymede Line Chart',
+    description: 'Ganymede Line Chart.',
     status: 'beta',
     type: 'simple',
     url: '/docs/components/simple-components/GanymedeLineChart'
+  }, {
+    title: 'DashboardGridShaper',
+    description: 'Shape new generation dashboards.',
+    status: 'beta',
+    type: 'simple',
+    url: '/docs/components/simple-components/DashboardGridShaper'
   }
 ]
 
