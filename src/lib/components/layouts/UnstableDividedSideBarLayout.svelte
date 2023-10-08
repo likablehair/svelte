@@ -97,8 +97,8 @@
       class:opened={(mAndDown && drawerOpened) || sidebarExpanded}
       on:mouseleave={() => {if(expandOn == 'hover') sidebarExpanded = false}}
       on:mouseenter={() => {if(expandOn == 'hover') sidebarExpanded = true}}
-      on:click={() => {if(expandOn == 'click') sidebarExpanded = true}}
-      on:keypress={() => {if(expandOn == 'click') sidebarExpanded = true}}
+      on:click={() => {if(expandOn == 'click' && !mAndDown) sidebarExpanded = true}}
+      on:keypress={() => {if(expandOn == 'click' && !mAndDown) sidebarExpanded = true}}
       use:clickOutside 
       on:clickoutside={() => {if(expandOn == 'click') sidebarExpanded = false}}
       class="side-bar {clazz.header}"

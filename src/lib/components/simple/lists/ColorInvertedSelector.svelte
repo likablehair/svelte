@@ -22,7 +22,8 @@
   let dispatch = createEventDispatcher<{
     'select': {
       option: Option,
-      selectedIndex: number | undefined
+      selectedIndex: number | undefined,
+      native: Event
     },
     'delete': {
       option: Option,
@@ -35,10 +36,11 @@
     deletable: boolean = true
 
 
-  function handleOptionClick(option: Option, index: number) {
+  function handleOptionClick(option: Option, index: number, e: Event) {
     dispatch('select', {
       option: option,
-      selectedIndex
+      selectedIndex,
+      native: e
     })
     
     selectedIndex = index
@@ -61,7 +63,7 @@
       <button
         class:selected={selectedIndex == index}
         class="element {clazz?.element || ''} {selectedIndex == index ? clazz.selected : ''}"
-        on:click={() => handleOptionClick(option, index)}
+        on:click={(e) => handleOptionClick(option, index, e)}
         on:keydown={() => { }}
       >
         <div class="icon-and-title">
