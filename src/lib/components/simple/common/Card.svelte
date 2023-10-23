@@ -8,7 +8,7 @@
     height: string | undefined = undefined,
     padding = "5px",
     borderRadius = "5px",
-    backgroundColor = "rgb(252, 252, 252)",
+    backgroundColor = "rgb(var(--global-color-background-200))",
     color: string | undefined = undefined,
     borderColor: string | undefined = undefined,
     borderWidth: string | undefined = undefined,
