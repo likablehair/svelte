@@ -193,6 +193,12 @@ let list: {
     status: 'beta',
     type: 'simple',
     url: '/docs/components/simple-components/DashboardGridShaper'
+  }, {
+    title: 'CountriesAutocomplete',
+    description: 'Every nation includes the flag.',
+    status: 'beta',
+    type: 'composed',
+    url: '/docs/components/composed-components/CountriesAutocomplete'
   }
 ]
 
