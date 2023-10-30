@@ -193,6 +193,12 @@ let list: {
     status: 'beta',
     type: 'simple',
     url: '/docs/components/simple-components/DashboardGridShaper'
+  }, {
+    title: 'ResultDialog',
+    description: 'Gives you the result of an action',
+    status: 'beta',
+    type: 'simple',
+    url: '/docs/components/simple-components/ResultDialog'
   }
 ]
 
