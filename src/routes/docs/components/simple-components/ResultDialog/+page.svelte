@@ -11,7 +11,7 @@
   import ResultFalseLoader from "$lib/components/simple/loaders/ResultFalseLoader.svelte";
 
   let dialogOpened = false
-  export let result = false
+  export let result:boolean = false
   export let correctResult:string = "Saved correctly!"
   export let wrongResult:string = "Error during saving!"
   export let correctResultMessage:string = "Thank you!"
