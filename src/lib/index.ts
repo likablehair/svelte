@@ -69,3 +69,5 @@ export { default as SimpleTimeLine } from './components/simple/timeline/SimpleTi
 export { default as CollapsibleSideBarLayout } from './components/layouts/CollapsibleSideBarLayout.svelte'
 export { default as StableDividedSideBarLayout } from './components/layouts/StableDividedSideBarLayout.svelte'
 export { default as UnstableDividedSideBarLayout } from './components/layouts/UnstableDividedSideBarLayout.svelte'
+
+export { default as Converter } from './utils/filters/filters'
