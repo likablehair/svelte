@@ -10,12 +10,13 @@
   import ResultTrueLoader from "$lib/components/simple/loaders/ResultTrueLoader.svelte";
   import ResultFalseLoader from "$lib/components/simple/loaders/ResultFalseLoader.svelte";
 
-  let dialogOpened = false
-  export let result:boolean = false
-  export let correctResult:string = "Saved correctly!"
-  export let wrongResult:string = "Error during saving!"
-  export let correctResultMessage:string = "Thank you!"
-  export let wrongResultMessage:string = "Please, retry!"
+  let dialogOpened = false;
+  export let result:boolean = false;
+  export let resultTitle:string = "Result";
+  export let correctResult:string = "Saved correctly!";
+  export let wrongResult:string = "Error during saving!";
+  export let correctResultMessage:string = "Thank you!";
+  export let wrongResultMessage:string = "Please, retry!";
 </script>
 
 <h1>Result Dialog Popup</h1>
@@ -39,7 +40,7 @@
       padding="30px"
       width="260px"
     >
-      <div class="card-header" slot="header" style:--example-card-header-color={$colors.primary}>Result</div>
+      <div class="card-header" slot="header" style:--example-card-header-color={$colors.primary}>{resultTitle}</div>
       <div class="card-body flex-center">
         {#if result}
           <ResultTrueLoader></ResultTrueLoader>
