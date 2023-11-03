@@ -60,6 +60,8 @@ export { default as PaginatedTable } from './components/composed/list/PaginatedT
 
 export { default as Filters } from './components/composed/search/Filters.svelte'
 export { default as GlobalSearchTextField } from './components/composed/search/GlobalSearchTextField.svelte'
+export { default as MenuOrDrawer } from './components/composed/common/MenuOrDrawer.svelte'
+export { default as MenuOrDrawerOptions } from './components/composed/common/MenuOrDrawerOptions.svelte'
 
 export { default as mediaQuery } from './stores/mediaQuery'
 export { default as theme, toggleTheme, setTheme } from './stores/theme'
