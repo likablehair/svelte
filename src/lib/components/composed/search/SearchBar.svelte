@@ -29,7 +29,7 @@
 </script>
 
 <div
-  class="container {clazz.container}"
+  class="search-bar-container {clazz.container}"
 >
   <slot name="icon">
     <svg
@@ -70,7 +70,7 @@
 </div>
 
 <style>
-  .container {
+  .search-bar-container {
     box-shadow: inset 0 0 0 1px var(
       --search-bar-ring-color,
       var(--search-bar-default-ring-color)

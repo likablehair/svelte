@@ -110,6 +110,7 @@
     ]}
     searchBarColumns={['businessName', 'productName']}
     totalElements={40}
+    searchBarVisible={false}
     on:filtersChange={handleFiltersChange}
   >
   <svelte:fragment slot="custom" let:header let:item>

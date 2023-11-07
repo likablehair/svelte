@@ -14,8 +14,8 @@
 <script lang="ts">
   import Filters from "../search/Filters.svelte";
   import SearchBar from "../search/SearchBar.svelte";
-    import type Builder from "$lib/utils/filters/builder";
-    import Converter from "$lib/utils/filters/filters";
+  import type Builder from "$lib/utils/filters/builder";
+  import Converter from "$lib/utils/filters/filters";
 
   let clazz: {
     simpleTable?: ComponentProps<SimpleTable>['class']
@@ -38,6 +38,7 @@
     rowsPerPage: number = 20,
     filters:  ComponentProps<Filters>['filters'] = [],
     searchBarColumns: string[] | undefined = undefined,
+    searchBarVisible: boolean = true,
     lang: 'it' | 'en' = 'en'
 
   let searchBarInput: HTMLElement,
@@ -105,22 +106,26 @@
 </script>
 
 <div class="paginated-table">
-
-  <SearchBar
-    placeholder="Type something to search..."
-    bind:input={searchBarInput}
-    bind:value={searchText}
-  >
-  </SearchBar>
+  {#if searchBarVisible}
+    <slot name="search-bar" {handleSearchChange}>
+      <SearchBar
+        placeholder="Type something to search..."
+        bind:input={searchBarInput}
+        bind:value={searchText}
+      >
+      </SearchBar>
+    </slot>
+  {/if}
   <div class="filter-container">
     <Filters
       bind:filters
       on:applyFilter={handleFiltersChange}
       on:removeFilter={handleFiltersChange}
       {lang}
+      buttonDisplay={true}
     >
-  </Filters>
-</div>
+    </Filters>
+  </div>
   <SimpleTable
     bind:headers
     bind:class={clazz.simpleTable}
@@ -182,15 +187,17 @@
       {handlePaginationChange}
     >
       {#if !hideRowsPerPage}
-        <Dropdown
-          placeholder="Per pagina"
-          clearable={false}
-          mandatory={true}
-          bind:items={rowsPerPageOptions}
-          bind:values={rowsPerPageSelection}
-          --button-default-width="90px"
-          on:change={handleRowsPerPageChange}
-        ></Dropdown>
+        <div class="per-page-dropdown">
+          <Dropdown
+            placeholder="Per pagina"
+            clearable={false}
+            mandatory={true}
+            bind:items={rowsPerPageOptions}
+            bind:values={rowsPerPageSelection}
+            --button-default-width="90px"
+            on:change={handleRowsPerPageChange}
+          ></Dropdown>
+        </div>
       {/if}
       {#if totalElements !== undefined}
         <slot name="rangeDescriptor" {page} {maxPage} {rowsPerPage} {totalElements}>
@@ -238,10 +245,16 @@
   .filter-container {
     margin-top: 10px;
     display: flex;
-    align-items: left;
+    align-items: center;
     flex-direction: row;
     gap: 10px;
+    width: 100%;
   }
-
+  
+  @media only screen and (max-width: 768px) {
+    .per-page-dropdown {
+      display: none;
+    }
+  }
 
 </style>

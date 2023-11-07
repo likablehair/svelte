@@ -52,7 +52,7 @@
   $: if(!!maxPage && page > maxPage) page = maxPage
 </script>
 
-<div class="container">
+<div class="paginator-container">
   <Button
     icon="mdi-chevron-double-left"
     on:click={hardPrevious}
@@ -128,7 +128,7 @@
 </div>
 
 <style>
-  .container {
+  .paginator-container {
     display: flex;
     align-items: center;
     gap: 5px;

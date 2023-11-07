@@ -169,6 +169,10 @@
       --simple-table-max-height,
       var(--simple-table-default-max-height)
     );
+    overflow-x: var(
+      --simple-table-overflow-x,
+      var(--simple-table-default-overflow-x)
+    );
   }
 
   .table {
