@@ -39,6 +39,7 @@
     filters:  ComponentProps<Filters>['filters'] = [],
     searchBarColumns: string[] | undefined = undefined,
     searchBarVisible: boolean = true,
+    buttonVisible: boolean = true,
     lang: 'it' | 'en' = 'en'
 
   let searchBarInput: HTMLElement,
@@ -122,7 +123,7 @@
       on:applyFilter={handleFiltersChange}
       on:removeFilter={handleFiltersChange}
       {lang}
-      buttonDisplay={true}
+      buttonDisplay={buttonVisible}
     >
     </Filters>
   </div>
@@ -250,7 +251,7 @@
     gap: 10px;
     width: 100%;
   }
-  
+
   @media only screen and (max-width: 768px) {
     .per-page-dropdown {
       display: none;
