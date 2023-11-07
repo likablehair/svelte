@@ -105,9 +105,6 @@
     mobileOpen: boolean = false,
     activator: HTMLElement
 
-  export let buttonLabel: string = 'Button label',
-    buttonDisplay: boolean = false
-
   function handleAddFilterClick() {
     dispatch('addFilterClick')
     open = true
@@ -326,15 +323,7 @@
 
       </div>
     {/if}
-    {#if buttonDisplay}
-      <div class="pagination-table-button">
-        <Button
-          on:click
-        >
-          {buttonLabel}
-        </Button>
-      </div>
-    {/if}
+    <slot name="append"></slot>
   </div>
   {#if mAndDown}
     <Drawer
@@ -488,9 +477,13 @@
     align-items: center;
     gap: 20px;
     max-width: 100%;
+    width: var(
+      --filters-wrapper-width,
+      var(--filters-default-wrapper-width)
+    )
   }
 
-  .filter-button, .pagination-table-button {
+  .filter-button {
     flex-shrink: 0;
     flex-grow: 0;
     height: fit-content;

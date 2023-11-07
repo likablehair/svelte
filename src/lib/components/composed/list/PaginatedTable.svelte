@@ -39,7 +39,6 @@
     filters:  ComponentProps<Filters>['filters'] = [],
     searchBarColumns: string[] | undefined = undefined,
     searchBarVisible: boolean = true,
-    buttonVisible: boolean = true,
     lang: 'it' | 'en' = 'en'
 
   let searchBarInput: HTMLElement,
@@ -60,8 +59,6 @@
   $: rowsPerPageSelection = [
     { label: rowsPerPage.toString(), value: rowsPerPage }
   ]
-
-
 
   $: if(totalElements !== undefined) maxPage = Math.max(Math.round(totalElements/rowsPerPage), 1)
 
@@ -122,9 +119,12 @@
       bind:filters
       on:applyFilter={handleFiltersChange}
       on:removeFilter={handleFiltersChange}
+      --filters-default-wrapper-width="100%"
       {lang}
-      buttonDisplay={buttonVisible}
-    >
+    > 
+      <svelte:fragment slot="append">
+        <slot name="filter-append"></slot>
+      </svelte:fragment>
     </Filters>
   </div>
   <SimpleTable
