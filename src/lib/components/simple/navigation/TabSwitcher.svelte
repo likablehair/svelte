@@ -37,6 +37,7 @@
   });
 
   import { createEventDispatcher } from "svelte";
+  import Icon from "../media/Icon.svelte";
   const dispatch = createEventDispatcher<{
     "tab-click": {
       nativeEvent: MouseEvent;
@@ -92,6 +93,9 @@
       on:keypress={(event) => handleTabKeypress(tab, event)}
       bind:this={tabButtons[tab.name]}
     >
+      {#if !!tab.icon}
+        <Icon name={tab.icon}></Icon>
+      {/if}
       {tab.label}
     </div>
   {/each}

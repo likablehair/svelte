@@ -11,9 +11,9 @@
 <div class="example">
   <TabSwitcher 
     tabs={[
-      { name: 'pippo', label: 'Pippo'},
-      { name: 'pluto', label: 'Pluto'},
-      { name: 'paperino', label: 'Paperino'},
+      { name: 'pippo', label: 'Pippo', icon: 'mdi-cog'},
+      { name: 'pluto', label: 'Pluto', icon: 'mdi-cog'},
+      { name: 'paperino', label: 'Paperino', icon: 'mdi-cog'},
     ]}
     selected="pippo"
   >Some chip</TabSwitcher>
