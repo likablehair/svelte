@@ -194,11 +194,11 @@ let list: {
     type: 'simple',
     url: '/docs/components/simple-components/DashboardGridShaper'
   }, {
-    title: 'ResultDialog',
-    description: 'Gives you the result of an action',
+    title: 'CountriesAutocomplete',
+    description: 'Every nation includes the flag.',
     status: 'beta',
-    type: 'simple',
-    url: '/docs/components/simple-components/ResultDialog'
+    type: 'composed',
+    url: '/docs/components/composed-components/CountriesAutocomplete'
   }
 ]
 

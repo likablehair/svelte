@@ -1,7 +1,7 @@
 {
   "name": "@likable-hair/svelte",
   "description": "A Svelte component for likablehair",
-  "version": "3.0.29",
+  "version": "3.0.31",
   "scripts": {
     "host": "vite --host",
     "dev": "vite dev",
@@ -59,6 +59,7 @@
   "dependencies": {
     "@paralleldrive/cuid2": "^2.2.0",
     "esm-env": "^1.0.0",
+    "flag-icons": "^6.11.1",
     "highlight.js": "^11.7.0",
     "highlightjs-svelte": "^1.0.6",
     "imask": "^7.1.0-alpha.0",

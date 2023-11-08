@@ -223,7 +223,9 @@
               buttonTabIndex={-1}
               truncateText
             >
-              {selection.label}
+              <slot name="chip-label" {selection}>
+                {selection.label}
+              </slot>
             </Chip>
           </div>
         </slot>
@@ -296,7 +298,9 @@
                 on:click={() => toggle(item)}
                 on:keypress={() => toggle(item)}
               >
-                {item.label}
+                <slot name="item-label" {item}>
+                  {item.label}
+                </slot>
               </div>
             </slot>
           </li>
@@ -336,7 +340,9 @@
                 on:click={() => toggle(item)}
                 on:keypress={() => toggle(item)}
               >
-                {item.label}
+                <slot name="item-label" {item}>
+                  {item.label}
+                </slot>
               </div>
             </slot>
           </li>

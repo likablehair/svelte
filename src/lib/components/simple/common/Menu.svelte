@@ -60,17 +60,18 @@
           let { left: activatorLeft, top: activatorTop } =
             params.activator.getBoundingClientRect();
           let activatorHeight = params.activator.offsetHeight;
-          _top = activatorTop + window.scrollY + activatorHeight + _activatorGap;
-          _left = activatorLeft + window.scrollX;
+          let { top: fixedParentTop, left: fixedParentLeft } = getParentInstanceFromViewport(activator?.parentElement);
+          _top = activatorTop + window.scrollY + activatorHeight + _activatorGap - fixedParentTop;
+          _left = activatorLeft + window.scrollX - fixedParentLeft;
         } else if (anchor == "bottom-center") {
           let { left: activatorLeft, top: activatorTop } =
             params.activator.getBoundingClientRect();
           let activatorHeight = params.activator.offsetHeight;
           let activatorWidth = params.activator.offsetWidth;
           let menuWidth = params.menuElement.offsetWidth;
-
-          _top = activatorTop + window.scrollY + activatorHeight + _activatorGap;
-          _left = activatorLeft + window.scrollX;
+          let { top: fixedParentTop, left: fixedParentLeft } = getParentInstanceFromViewport(activator?.parentElement);
+          _top = activatorTop + window.scrollY + activatorHeight + _activatorGap - fixedParentTop;
+          _left = activatorLeft + window.scrollX - fixedParentLeft;
           if (menuWidth > activatorWidth) {
             _left = _left - (menuWidth - activatorWidth) / 2;
           } else {
@@ -81,16 +82,11 @@
             params.activator.getBoundingClientRect();
           let activatorHeight = params.activator.offsetHeight;
           let activatorWidth = params.activator.offsetWidth;
-          let menuWidth = params.menuElement.offsetWidth;
           let menuHeight = params.menuElement.offsetHeight;
+          let { top: fixedParentTop, left: fixedParentLeft } = getParentInstanceFromViewport(activator?.parentElement);
 
-          _top = activatorTop + window.scrollY + (activatorHeight / 2) - (menuHeight / 2);
-          _left = activatorLeft + window.scrollX + activatorWidth + _activatorGap;
-          // if (menuWidth > activatorWidth) {
-          //   _left = _left - (menuWidth - activatorWidth) / 2;
-          // } else {
-          //   _left = _left + (activatorWidth - menuWidth) / 2;
-          // }
+          _top = activatorTop + window.scrollY + (activatorHeight / 2) - (menuHeight / 2) - fixedParentTop;
+          _left = activatorLeft + window.scrollX + activatorWidth + _activatorGap - fixedParentLeft;
         }
       }
 
@@ -230,6 +226,32 @@
 
   function handleCloseControllerClick() {
     open = false
+  }
+
+  function getParentInstanceFromViewport(activatorParent: HTMLElement | undefined | null): {
+    top: number
+    left: number
+  } {
+    let top = 0
+    let left = 0
+
+    while(!!activatorParent && activatorParent.nodeName.toLowerCase() !== 'html' && activatorParent.nodeName.toLowerCase() !== 'body') {
+      const currentParent = activatorParent.parentElement
+      if(!currentParent) break
+      
+      const computedStyle = getComputedStyle(currentParent)
+      const position = computedStyle.position;
+      const display = computedStyle.display;
+      
+      if((position === 'fixed' || position === 'absolute') && display === "flex") {
+        const boundingClientRect = activatorParent.getBoundingClientRect();
+        top = top + boundingClientRect.top
+        left = left + boundingClientRect.left
+      }
+
+      activatorParent = activatorParent.parentElement
+    }
+    return { top, left }
   }
 
   function handleWindowScrollOrResize() {
