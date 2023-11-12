@@ -39,6 +39,9 @@
     'sort': {
       sortedBy: string | undefined,
       sortDirection: string
+    },
+    'rowClick': {
+      item: { [key: string]: any }
     }
   }>()
 
@@ -59,6 +62,12 @@
     }
     dispatch('sort', {
       sortedBy, sortDirection
+    })
+  }
+
+  function handleRowClick(item: { [key: string]: any }) {
+    dispatch('rowClick', {
+      item
     })
   }
 
@@ -112,7 +121,10 @@
       </thead>
       <tbody>
         {#each items as item, i}
-          <tr class="item-tr {clazz.row || ''}">
+          <tr 
+            class="item-tr {clazz.row || ''}" 
+            on:click={() => handleRowClick(item)}
+          >
             {#each headers as header, j}
               <td class="{clazz.cell || ''}">
                 {#if header.type.key == "custom"}

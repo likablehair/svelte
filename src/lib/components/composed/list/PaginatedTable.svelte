@@ -134,6 +134,7 @@
     bind:sortedBy
     bind:sortDirection
     on:sort
+    on:rowClick
   >
     <svelte:fragment slot="header" let:head>
       <slot name="header" {head} >
