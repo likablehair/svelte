@@ -63,6 +63,10 @@ export { default as GlobalSearchTextField } from './components/composed/search/G
 export { default as MenuOrDrawer } from './components/composed/common/MenuOrDrawer.svelte'
 export { default as MenuOrDrawerOptions } from './components/composed/common/MenuOrDrawerOptions.svelte'
 
+export { default as FilterBuilder } from './utils/filters/builder'
+export { default as FilterConverter } from './utils/filters/filters'
+export { default as FilterValidator } from './utils/filters/validator'
+
 export { default as mediaQuery } from './stores/mediaQuery'
 export { default as theme, toggleTheme, setTheme } from './stores/theme'
 
