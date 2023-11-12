@@ -19,7 +19,9 @@
     searching: boolean = false,
     search: boolean = false,
     searchText: string | undefined = undefined,
-    maxVisibleChips: number | undefined = undefined
+    maxVisibleChips: number | undefined = undefined,
+    menuOpened: boolean = false,
+    mobileDrawer: boolean = false
 
   const searchTextValue = writable<string | undefined>(searchText)
   $: searchTextDebounce = debounceStore(searchTextValue, debounceTimeout)
@@ -50,6 +52,8 @@
   bind:searchText
   bind:multiple
   bind:maxVisibleChips
+  bind:menuOpened
+  bind:mobileDrawer
   searchFunction={() => true}
   on:change
 ></Autocomplete>
