@@ -323,6 +323,7 @@
 
       </div>
     {/if}
+    <slot name="append"></slot>
   </div>
   {#if mAndDown}
     <Drawer
@@ -476,6 +477,10 @@
     align-items: center;
     gap: 20px;
     max-width: 100%;
+    width: var(
+      --filters-wrapper-width,
+      var(--filters-default-wrapper-width)
+    )
   }
 
   .filter-button {

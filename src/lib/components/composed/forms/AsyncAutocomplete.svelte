@@ -51,4 +51,5 @@
   bind:multiple
   bind:maxVisibleChips
   searchFunction={() => true}
+  on:change
 ></Autocomplete>

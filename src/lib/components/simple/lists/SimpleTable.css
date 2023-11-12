@@ -10,4 +10,5 @@
   --simple-table-default-row-hover-background-color: rgb(var(--global-color-background-400), .2);
   --simple-table-default-header-padding: .2rem .5rem;
   --simple-table-default-header-font-weight: 700;
+  --simple-table-default-overflow-x: auto;
 }

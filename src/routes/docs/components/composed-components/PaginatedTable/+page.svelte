@@ -7,6 +7,7 @@
   import Icon from "$lib/components/simple/media/Icon.svelte";
     import type Builder from "$lib/utils/filters/builder";
     import Converter from "$lib/utils/filters/filters";
+  import Button from "$lib/components/simple/buttons/Button.svelte";
 
   let headers : Header[] =[
       {
@@ -110,6 +111,7 @@
     ]}
     searchBarColumns={['businessName', 'productName']}
     totalElements={40}
+    searchBarVisible={false}
     on:filtersChange={handleFiltersChange}
   >
   <svelte:fragment slot="custom" let:header let:item>
@@ -118,6 +120,11 @@
       <Icon name="mdi-star" --icon-color="green"></Icon>
     {/if}
   </svelte:fragment>
+  <div slot="filter-append" 
+    style:margin-left="auto"
+  >
+    <button>Ciao</button>
+  </div>
 </PaginatedTable>
 </div>
 <h2>Props</h2>
