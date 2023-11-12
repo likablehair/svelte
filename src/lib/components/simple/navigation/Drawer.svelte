@@ -27,7 +27,7 @@
 
 <div
   style:position="fixed"
-  class="container"
+  class="drawer-container"
   class:left={position == 'left'}
   class:right={position == 'right'}
   class:top={position == 'top'}
@@ -85,7 +85,7 @@
     transition: top var(--drawer-opening-speed, var(--drawer-default-opening-speed)) cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .container {
+  .drawer-container {
     z-index: var(--drawer-z-index, var(--drawer-default-z-index));
     background-color: var(
       --drawer-background-color,
