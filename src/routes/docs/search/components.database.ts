@@ -199,6 +199,12 @@ let list: {
     status: 'beta',
     type: 'composed',
     url: '/docs/components/composed-components/CountriesAutocomplete'
+  }, {
+    title: 'ResultDialog',
+    description: 'Gives you the result of an action',
+    status: 'beta',
+    type: 'simple',
+    url: '/docs/components/simple-components/ResultDialog'
   }
 ]
 
