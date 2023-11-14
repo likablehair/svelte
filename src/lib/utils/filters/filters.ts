@@ -84,7 +84,8 @@ export type Filter = {
   active?: boolean,
   hidden?: boolean,
   label: string,
-  advanced?: boolean
+  advanced?: boolean,
+  modify?: (params: { filter: Omit<Filter, 'modifier'> }) => Builder
 } & (StringFilter | MultiStringFilter | ChoiceFilter | DateFilter | NumberFilter | SelectFilter | BoolFilter)
 
 
@@ -111,6 +112,10 @@ export default class Converter {
         this.applySelectFilter({ builder, filter })
       } else if(filter.type == 'bool') {
         this.applyBooleanFilter({ builder, filter })
+      }
+
+      if(!!filter.modify) {
+        builder = filter.modify({ filter })
       }
     }
 
