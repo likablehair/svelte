@@ -36,6 +36,14 @@
     color: inherit;
     cursor: pointer;
     outline: inherit;
+    height: var(
+      --icon-container-height,
+      var(--icon-default-container-height)
+    );
+    width: var(
+      --icon-container-width,
+      var(--icon-default-container-width)
+    )
   }
 
   .icon {
