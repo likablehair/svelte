@@ -79,14 +79,22 @@ type BoolFilter = {
   desctiprion: string
 }
 
+type CustomFilter = {
+  type: 'custom',
+  data: any
+}
+
 export type Filter = {
   name: string,
   active?: boolean,
   hidden?: boolean,
   label: string,
   advanced?: boolean,
-  modify?: (params: { filter: Omit<Filter, 'modifier'> }) => Builder
-} & (StringFilter | MultiStringFilter | ChoiceFilter | DateFilter | NumberFilter | SelectFilter | BoolFilter)
+  modify?: (params: { 
+    filter: Omit<Filter, 'modifier'>,
+    builder: Builder
+  }) => Builder
+} & (StringFilter | MultiStringFilter | ChoiceFilter | DateFilter | NumberFilter | SelectFilter | BoolFilter | CustomFilter)
 
 
 export default class Converter {
@@ -102,7 +110,9 @@ export default class Converter {
     for(let i = 0; i < params.filters.length; i += 1) {
       const filter = params.filters[i]
 
-      if(filter.type == 'string') {
+      if (!!filter.modify) {
+        builder = filter.modify({ filter, builder })
+      } else if(filter.type == 'string') {
         this.applyStringFilter({ builder, filter })
       } else if(filter.type == 'date') {
         this.applyDateFilter({ builder, filter })
@@ -112,10 +122,6 @@ export default class Converter {
         this.applySelectFilter({ builder, filter })
       } else if(filter.type == 'bool') {
         this.applyBooleanFilter({ builder, filter })
-      }
-
-      if(!!filter.modify) {
-        builder = filter.modify({ filter })
       }
     }
 
