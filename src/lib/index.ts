@@ -71,6 +71,7 @@ export { default as FilterValidator } from './utils/filters/validator'
 
 export { default as mediaQuery } from './stores/mediaQuery'
 export { default as theme, toggleTheme, setTheme } from './stores/theme'
+export { default as debounce } from './stores/debounce'
 
 export { default as SimpleTimeLine } from './components/simple/timeline/SimpleTimeLine.svelte'
 
