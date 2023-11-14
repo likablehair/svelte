@@ -110,7 +110,7 @@ export default class Converter {
     for(let i = 0; i < params.filters.length; i += 1) {
       const filter = params.filters[i]
 
-      if(!!filter.active) continue
+      if(!filter.active) continue
 
       if (filter.type == 'custom' && !!filter.modify) {
         builder = filter.modify({ filter, builder })
