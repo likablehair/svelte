@@ -49,10 +49,11 @@
     maintainAspectRatio: boolean = true,
     showLegend: boolean = true,
     showYTicks: boolean = false,
-    showXTicks: boolean = false
+    showXTicks: boolean = false,
+    displayYGrid: boolean = true,
+    lineWidth: number = 1
 
   $: gridColor = 'rgb(' + (background || '200, 200, 200') + ', .3)'
-  $: console.log(gridColor)
 </script>
 
 <Line
@@ -86,11 +87,11 @@
         }
       },
       y: {
-        display: true,
+        display: displayYGrid,
         title: {
         },
         grid: {
-          lineWidth: 1,
+          lineWidth: lineWidth,
           color: gridColor
         },
         border: {
