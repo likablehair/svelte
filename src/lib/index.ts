@@ -35,6 +35,8 @@ export { default as SimpleTable } from './components/simple/lists/SimpleTable.sv
 export { default as CircularLoader } from './components/simple/loaders/CircularLoader.svelte'
 export { default as Skeleton } from './components/simple/loaders/Skeleton.svelte'
 
+export { default as AlertBanner } from './components/simple/notifiers/AlertBanner.svelte'
+
 export { default as AttachmentDownloader } from './components/simple/media/AttachmentDownloader.svelte'
 export { default as Avatar } from './components/simple/media/Avatar.svelte'
 export { default as Carousel } from './components/simple/media/Carousel.svelte'
