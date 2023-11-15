@@ -71,6 +71,8 @@ export { default as FilterBuilder } from './utils/filters/builder'
 export { default as FilterConverter } from './utils/filters/filters'
 export { default as FilterValidator } from './utils/filters/validator'
 
+export { default as GanymedeLineChart } from './components/simple/charts/GanymedeLineChart.svelte'
+
 export { default as mediaQuery } from './stores/mediaQuery'
 export { default as theme, toggleTheme, setTheme } from './stores/theme'
 export { default as debounce } from './stores/debounce'
