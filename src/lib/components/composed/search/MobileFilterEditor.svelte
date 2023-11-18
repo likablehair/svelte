@@ -167,7 +167,7 @@
     </div>
     <div class="filter-editor">
       {#if tmpFilter.advanced && step == 'advanced' && canRenderOptions}
-        <div class="advanced-mode" in:fly={{delay: 100, x: 200, duration: 100}} out:fly={{x: -200, duration: 100}}>
+        <div class="advanced-mode" in:fly|local={{delay: 100, x: 200, duration: 100}} out:fly|local={{x: -200, duration: 100}}>
           <div class="advanced-mode-selector" on:click|stopPropagation on:keypress>
             <SelectableVerticalList
               bind:selected={advancedModeSelectedOption}
@@ -182,7 +182,7 @@
           </div>
         </div>
       {:else if step == 'editor' && (!tmpFilter.advanced || !!advancedModeSelectedOption)}
-        <div class="editor" in:fly={{delay: 100, x: 200, duration: 100}} out:fly={{x: -200, duration: 100}}>
+        <div class="editor" in:fly|local={{delay: 100, x: 200, duration: 100}} out:fly|local={{x: -200, duration: 100}}>
           <div class="fields-container">
             <div class="fields"
               on:click|stopPropagation

@@ -305,8 +305,8 @@
     style:width={_width}
     style:min-width={_minWidth}
     style:overflow={_overflow}
-    in:inAnimation={inAnimationConfig}
-    out:outAnimation={outAnimationConfig}
+    in:inAnimation|local={inAnimationConfig}
+    out:outAnimation|local={outAnimationConfig}
     on:click={(e) => handleMenuClick(e, zIndex)}
     on:keydown
   >
