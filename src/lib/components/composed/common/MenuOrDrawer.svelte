@@ -11,6 +11,7 @@
     menuAnchor: ComponentProps<Menu>['anchor'] = 'bottom-center',
     _boxShadow: string = "rgb(var(--global-color-grey-900), .5) 0px 2px 4px",
     _height: string = "fit-content",
+    _width: string | undefined = undefined,
     _maxHeight: string | undefined = undefined,
     _minWidth: string = "100px",
     _borderRadius: string = "5px";
@@ -36,6 +37,7 @@
       _maxHeight={_maxHeight}
       _minWidth={_minWidth}
       _borderRadius={_borderRadius}
+      _width={_width || ""}
       anchor={menuAnchor}
     >
       <slot isDrawer={false} isMenu={true}></slot>

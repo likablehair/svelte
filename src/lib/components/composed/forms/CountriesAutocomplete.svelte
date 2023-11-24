@@ -10,7 +10,8 @@
   } = {};
 	export { clazz as class };
 
-  export let autocompleteProps: Omit<ComponentProps<Autocomplete>, 'items'> = {}
+  export let autocompleteProps: Omit<ComponentProps<Autocomplete>, 'items'> = {},
+    selected: Item[] = []
 
   let items: Item[] = [
     { value: "AD", label: "Andorra" },
@@ -267,6 +268,7 @@
 
 <Autocomplete
   items={items}
+  bind:values={selected}
   {...autocompleteProps}
 >
   <svelte:fragment 

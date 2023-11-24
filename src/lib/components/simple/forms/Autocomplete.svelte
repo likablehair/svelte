@@ -303,6 +303,7 @@
   {:else}
     <MenuOrDrawer
       {activator}
+      _width={menuWidth || ""}
       _height={menuHeight}
       _maxHeight="300px"
       _boxShadow={menuBoxShadow}
