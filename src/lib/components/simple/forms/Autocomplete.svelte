@@ -14,18 +14,10 @@
 
   let clazz: {
     activator?: string,
-    menu?: string
+    menu?: string,
+    simpleTextfield?: ComponentProps<SimpleTextField>['class']
   } = {};
 	export { clazz as class };
-
-  /*
-    Styles:
-
-    --autocomplete-selected-item-background-color
-    --autocomplete-selected-item-color
-    --autocomplete-focused-item-background-color
-    --autocomplete-focused-item-color
-  */
 
   export let values: Item[] = [],
     items: Item[],
@@ -192,7 +184,7 @@
 
   import Chip from "$lib/components/simple/navigation/Chip.svelte";
   import Menu from "$lib/components/simple/common/Menu.svelte";
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, type ComponentProps } from "svelte";
   import SimpleTextField from "./SimpleTextField.svelte";
   import MenuOrDrawer from '$lib/components/composed/common/MenuOrDrawer.svelte';
 </script>
@@ -235,12 +227,12 @@
           <div class="not-visible-chip-number">+ {notVisibleChipNumber}</div>
         </slot>
       {/if}
-
+      
       <SimpleTextField
         --simple-textfield-max-width="min(200px, 90%)"
         --simple-textfield-height="auto"
         --simple-textfield-padding="0px"
-        --simple-textfield-background-color="rgb(1, 1, 1, 0)"
+        --simple-textfield-default-background-color="rgb(1, 1, 1, 0)"
         --simple-textfield-default-margin-bottom="0px"
         --simple-textfield-default-margin-left="10px"
         bind:value={searchText}
@@ -253,6 +245,7 @@
         {disabled}
         placeholder={placeholder}
         bind:input={input}
+        class={clazz.simpleTextfield}
       ></SimpleTextField>
     </div>
   </slot>
@@ -377,13 +370,21 @@
       var(--autocomplete-default-border-radius)
     );
     padding: var(
-      --autocomplete-paddding,
+      --autocomplete-padding,
       var(--autocomplete-default-padding)
     );
     min-height: var(
       --autocomplete-min-height,
       var(--autocomplete-default-min-height)
-    )
+    );
+    transition: all .1s;
+  }
+
+  .selection-container:focus-within {
+    border: var(
+      --autocomplete-focus-border,
+      var(--autocomplete-default-focus-border)
+    );
   }
 
   .selection-item {

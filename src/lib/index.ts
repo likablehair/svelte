@@ -66,6 +66,7 @@ export { default as MenuOrDrawer } from './components/composed/common/MenuOrDraw
 export { default as MenuOrDrawerOptions } from './components/composed/common/MenuOrDrawerOptions.svelte'
 
 export { default as AsyncAutocomplete } from './components/composed/forms/AsyncAutocomplete.svelte'
+export { default as CountriesAutocomplete } from './components/composed/forms/CountriesAutocomplete.svelte'
 
 export { default as FilterBuilder } from './utils/filters/builder'
 export { default as FilterConverter } from './utils/filters/filters'

@@ -22,11 +22,22 @@
   <Autocomplete
     items={items}
   ></Autocomplete>
-  <Autocomplete
-    items={items}
-    multiple
-    maxVisibleChips={2}
-  ></Autocomplete>
+  <div style:font-size="">
+    <Autocomplete
+      items={items}
+      multiple
+      --chip-height="20px"
+      --chip-min-height="20px"
+      --chip-border-radius="8px"
+      --autocomplete-min-height="auto"
+      --autocomplete-padding="6px"
+      --autocomplete-background-color="transparent"
+      --autocomplete-border-radius="8px"
+      --autocomplete-border="1px solid rgb(var(--global-color-background-200))"
+      --autocomplete-focus-border="2px solid rgb(var(--global-color-primary-500))"
+      maxVisibleChips={2}
+    ></Autocomplete>
+  </div>
 </div>
 <h2>Props</h2>
 <PropsViewer

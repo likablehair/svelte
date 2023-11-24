@@ -11,6 +11,18 @@
   <h2>Example</h2>
   <div class="example">
     <CountriesAutocomplete></CountriesAutocomplete>
+    <CountriesAutocomplete
+      --chip-height="20px"
+      --chip-min-height="20px"
+      --chip-border-radius="8px"
+      --autocomplete-min-height="auto"
+      --autocomplete-padding="6px"
+      --autocomplete-background-color="transparent"
+      --autocomplete-border-radius="8px"
+      --autocomplete-border="1px solid rgb(var(--global-color-background-200))"
+      --autocomplete-focus-border="2px solid rgb(var(--global-color-primary-500))"
+      --countries-autocomplete-flag-icon-size=".8rem"
+    ></CountriesAutocomplete>
   </div>
   <h2>Props</h2>
   <PropsViewer
