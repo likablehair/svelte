@@ -1,5 +1,5 @@
 <script lang="ts">
-  import "$lib/css/flag-icons/css/flag-icons.min.css";
+  import '../../../css/flag-icons/css/flag-icons.min.css'
   import Autocomplete, {
     type Item,
   } from "$lib/components/simple/forms/Autocomplete.svelte";
