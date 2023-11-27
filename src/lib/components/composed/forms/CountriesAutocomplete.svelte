@@ -270,6 +270,11 @@
   items={items}
   bind:values={selected}
   {...autocompleteProps}
+  on:blur
+  on:close
+  on:focus
+  on:keydown
+  on:change
 >
   <svelte:fragment 
     slot="chip-label"
