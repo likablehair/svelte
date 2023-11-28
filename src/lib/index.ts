@@ -43,6 +43,7 @@ export { default as Carousel } from './components/simple/media/Carousel.svelte'
 export { default as DescriptiveAvatar } from './components/simple/media/DescriptiveAvatar.svelte'
 export { default as Gallery } from './components/simple/media/Gallery.svelte'
 export { default as Icon } from './components/simple/media/Icon.svelte'
+export { default as FlagIcon } from './components/simple/media/FlagIcon.svelte'
 export { default as Image } from './components/simple/media/Image.svelte'
 export { default as ImageGrid } from './components/simple/media/ImageGrid.svelte'
 

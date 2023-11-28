@@ -335,7 +335,12 @@
     >
       <div class="drawer-content">
         {#if !!selectedFilter && singleFilterMenuOpened}
-          <div class="drawer-filter-detail" style:height="100%" in:fly={{delay: 100, duration: 100, x: 200}} out:fly={{duration: 100, x: -200}}>
+          <div 
+            class="drawer-filter-detail" 
+            style:height="100%" 
+            in:fly|local={{delay: 100, duration: 100, x: 200}} 
+            out:fly|local={{duration: 100, x: -200}}
+          >
             <MobileFilterEditor
               bind:filter={selectedFilter}
               bind:applyFilterLabel
@@ -354,7 +359,13 @@
             </MobileFilterEditor>
           </div>
         {:else}
-          <div class="drawer-filter-list" style:margin-top="20px" style:height="100%" out:fly={{duration: 100, x: -200}} in:fly={{duration: 100, x: 200, delay: 100}}>
+          <div 
+            class="drawer-filter-list" 
+            style:margin-top="20px" 
+            style:height="100%" 
+            out:fly|local={{duration: 100, x: -200}} 
+            in:fly|local={{duration: 100, x: 200, delay: 100}}
+          >
             <SelectableVerticalList
               bind:selected
               bind:focused
