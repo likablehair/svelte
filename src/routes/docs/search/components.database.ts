@@ -199,6 +199,12 @@ let list: {
     status: 'beta',
     type: 'composed',
     url: '/docs/components/composed-components/CountriesAutocomplete'
+  }, {
+    title: 'FlagIcon',
+    description: 'No to racism.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/FlagIcon'
   }
 ]
 

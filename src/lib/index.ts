@@ -71,6 +71,7 @@ export { default as CountriesAutocomplete } from './components/composed/forms/Co
 export { default as FilterBuilder } from './utils/filters/builder'
 export { default as FilterConverter } from './utils/filters/filters'
 export { default as FilterValidator } from './utils/filters/validator'
+export { countriesList, countriesOptions, getCountryInfoByAlpha2 } from './utils/countries'
 
 export { default as GanymedeLineChart } from './components/simple/charts/GanymedeLineChart.svelte'
 
