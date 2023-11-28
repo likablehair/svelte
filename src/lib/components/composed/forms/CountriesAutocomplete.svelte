@@ -4,6 +4,7 @@
   } from "$lib/components/simple/forms/Autocomplete.svelte";
   import type { ComponentProps } from "svelte";
   import { countriesOptions } from '$lib/utils/countries';
+  import FlagIcon from "$lib/components/simple/media/FlagIcon.svelte";
 
   let clazz: {
     flagIcon?: string,
@@ -30,25 +31,20 @@
     slot="chip-label"
     let:selection
   >
-    <span 
-      class="flag-icon fi fi-{selection.value.toString().toLowerCase()} fis {clazz.flagIcon || ''}"
-    ></span>
+    <FlagIcon
+      alpha2={selection.value.toString().toLowerCase()}
+      class={clazz.flagIcon}
+    ></FlagIcon>
     {selection.label}
   </svelte:fragment>
   <svelte:fragment
     slot="item-label" 
     let:item
   >
-    <span 
-      class="flag-icon fi fi-{item.value.toString().toLowerCase()} fis {clazz.flagIcon || ''}"
-    ></span>
+    <FlagIcon
+      alpha2={item.value.toString().toLowerCase()}
+      class={clazz.flagIcon}
+    ></FlagIcon>
     {item.label}
   </svelte:fragment>
 </Autocomplete>
-
-<style>
-  .flag-icon {
-    border-radius: 4px;
-    font-size: var(--countries-autocomplete-flag-icon-size, 1.2rem);
-  }
-</style>
