@@ -278,7 +278,7 @@
                     bind:value={tmpFilter.value}
                   ></Checkbox>
                   <span style:margin-left="10px">
-                    {tmpFilter.desctiprion}
+                    {tmpFilter.description}
                   </span>
                 </div>
               {/if}

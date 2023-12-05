@@ -76,7 +76,7 @@ type BoolFilter = {
   mode: 'equal',
   value?: boolean
   advanced?: false
-  desctiprion: string
+  description: string
 }
 
 type CustomFilter = {

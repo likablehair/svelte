@@ -105,7 +105,7 @@
         type: "bool",
         column: "testBool",
         mode: "equal",
-        desctiprion: "include only if column is true"
+        description: "include only if column is true"
       }
     ]
 

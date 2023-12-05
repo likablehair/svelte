@@ -1,3 +1,5 @@
+export type WhereFilterValue = string | number | Date | boolean
+
 type GroupedWhere = {
   method: 'where',
   kind: 'grouped',
@@ -9,7 +11,7 @@ type ObjectWhere = {
   method: 'where',
   kind: 'object',
   logicalOperator?: 'and' | 'or' | 'andNot' | 'orNot',
-  values: Record<string, string | number | Date>
+  values: Record<string, WhereFilterValue>
 }
 
 type SimpleWhere = {
@@ -18,7 +20,7 @@ type SimpleWhere = {
   logicalOperator?: 'and' | 'or' | 'andNot' | 'orNot',
   key: string,
   operator?: string,
-  value: string | number | Date | boolean
+  value: WhereFilterValue | boolean
 }
 
 type InWhere = {
@@ -26,7 +28,7 @@ type InWhere = {
   kind: 'in',
   logicalOperator?: 'and' | 'or' | 'andNot' | 'orNot',
   key: string,
-  value: (string | number | Date)[]
+  value: (WhereFilterValue)[]
 }
 
 export type WhereModifier = SimpleWhere | ObjectWhere | GroupedWhere | InWhere

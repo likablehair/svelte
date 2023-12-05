@@ -1,5 +1,5 @@
 import type { JoinModifier } from "./modifiers/join"
-import type { WhereModifier } from "./modifiers/where"
+import type { WhereModifier, WhereFilterValue } from "./modifiers/where"
 
 export type Modifier = WhereModifier | JoinModifier
 
@@ -15,58 +15,58 @@ export default class Builder {
   }
 
   public where(callback: (builder: Builder) => void): Builder
-  public where(key: Record<string, string | number | Date>): Builder
-  public where(key: string, value: string | number | Date): Builder
-  public where(key: string, operator: string, value: string | number | Date | boolean): Builder
+  public where(key: Record<string, WhereFilterValue>): Builder
+  public where(key: string, value: WhereFilterValue): Builder
+  public where(key: string, operator: string, value: WhereFilterValue | boolean): Builder
   public where(
-    first: string | Record<string, string | number | Date> | ((builder: Builder) => void),
-    second?: string | number | Date,
-    third?: string | number | Date | boolean
+    first: string | Record<string, WhereFilterValue> | ((builder: Builder) => void),
+    second?: WhereFilterValue,
+    third?: WhereFilterValue | boolean
   ): Builder {
     return this.applyWhereClause('and', first, second, third)
   }
 
   public whereNot(callback: (builder: Builder) => void): Builder
-  public whereNot(key: Record<string, string | number | Date>): Builder
-  public whereNot(key: string, value: string | number | Date): Builder
-  public whereNot(key: string, operator: string, value: string | number | Date): Builder
+  public whereNot(key: Record<string, WhereFilterValue>): Builder
+  public whereNot(key: string, value: WhereFilterValue): Builder
+  public whereNot(key: string, operator: string, value: WhereFilterValue): Builder
   public whereNot(
-    first: string | Record<string, string | number | Date> | ((builder: Builder) => void),
-    second?: string | number | Date,
-    third?: string | number | Date
+    first: string | Record<string, WhereFilterValue> | ((builder: Builder) => void),
+    second?: WhereFilterValue,
+    third?: WhereFilterValue
   ): Builder {
     return this.applyWhereClause('andNot', first, second, third)
   }
 
   public orWhere(callback: (builder: Builder) => void): Builder
-  public orWhere(key: Record<string, string | number | Date>): Builder
-  public orWhere(key: string, value: string | number | Date): Builder
-  public orWhere(key: string, operator: string, value: string | number | Date): Builder
+  public orWhere(key: Record<string, WhereFilterValue>): Builder
+  public orWhere(key: string, value: WhereFilterValue): Builder
+  public orWhere(key: string, operator: string, value: WhereFilterValue): Builder
   public orWhere(
-    first: string | Record<string, string | number | Date> | ((builder: Builder) => void),
-    second?: string | number | Date,
-    third?: string | number | Date
+    first: string | Record<string, WhereFilterValue> | ((builder: Builder) => void),
+    second?: WhereFilterValue,
+    third?: WhereFilterValue
   ): Builder {
     return this.applyWhereClause('or', first, second, third)
   }
 
   public orWhereNot(callback: (builder: Builder) => void): Builder
-  public orWhereNot(key: Record<string, string | number | Date>): Builder
-  public orWhereNot(key: string, value: string | number | Date): Builder
-  public orWhereNot(key: string, operator: string, value: string | number | Date): Builder
+  public orWhereNot(key: Record<string, WhereFilterValue>): Builder
+  public orWhereNot(key: string, value: WhereFilterValue): Builder
+  public orWhereNot(key: string, operator: string, value: WhereFilterValue): Builder
   public orWhereNot(
-    first: string | Record<string, string | number | Date> | ((builder: Builder) => void),
-    second?: string | number | Date,
-    third?: string | number | Date
+    first: string | Record<string, WhereFilterValue> | ((builder: Builder) => void),
+    second?: WhereFilterValue,
+    third?: WhereFilterValue
   ): Builder {
     return this.applyWhereClause('orNot', first, second, third)
   }
 
   private applyWhereClause(
     logicalOperator: 'and' | 'or' | 'andNot' | 'orNot',
-    first: string | Record<string, string | number | Date> | ((builder: Builder) => void),
-    second?: string | number | Date,
-    third?: string | number | Date | boolean,
+    first: string | Record<string, WhereFilterValue> | ((builder: Builder) => void),
+    second?: WhereFilterValue,
+    third?: WhereFilterValue | boolean,
   ): Builder {
 
     if (third !== undefined) {
