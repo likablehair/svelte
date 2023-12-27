@@ -101,7 +101,7 @@
       on:keypress={() => {if(expandOn == 'click' && !mAndDown) sidebarExpanded = true}}
       use:clickOutside 
       on:clickoutside={() => {if(expandOn == 'click') sidebarExpanded = false}}
-      class="side-bar {clazz.header}"
+      class="side-bar {clazz.header || ''}"
     >
       <div class="side-bar-content">
         <slot name="sidebar" hamburgerVisible={mAndDown} {sidebarExpanded}>
@@ -179,7 +179,7 @@
       var(--unstable-divided-side-bar-layout-default-side-bar-padding)
     );
     z-index: 10;
-    overflow: auto;
+    overflow: clip;
     transition: all .2s cubic-bezier(.4,0,.2,1);
   }
 
