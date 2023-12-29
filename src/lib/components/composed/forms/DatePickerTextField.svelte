@@ -4,12 +4,18 @@
   import DatePicker from "$lib/components/simple/dates/DatePicker.svelte";
   import Menu from "$lib/components/simple/common/Menu.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
-  import { onMount } from 'svelte';
+  import { onMount, type ComponentProps } from 'svelte';
   import { DateTime } from 'luxon'
   import { createEventDispatcher } from 'svelte';
-  import type { DateStat } from './utils';
-    import MediaQuery from '../common/MediaQuery.svelte';
-    import Dialog from '../dialogs/Dialog.svelte';
+  import type { DateStat } from '../../simple/dates/utils';
+  import MediaQuery from '../../simple/common/MediaQuery.svelte';
+  import Dialog from '../../simple/dialogs/Dialog.svelte';
+
+  let clazz: {
+    activator?: string,
+    textfield?: ComponentProps<SimpleTextField>['class']
+  } = {};
+	export { clazz as class };
 
   let dispatch = createEventDispatcher<{
     'day-click': {
@@ -93,7 +99,7 @@
     setTimeout(() => {
       const typedValue = mask.value
 
-      if(!!typedValue) {
+      if(typedValue !== undefined && typedValue !== null) {
         // find day of month
         const dayOfMonthIndex = pattern.indexOf('dd')
         const dayOfMonth = typedValue.substring(dayOfMonthIndex, dayOfMonthIndex + 2)
@@ -159,36 +165,47 @@
 <MediaQuery let:mAndDown>
   <div
     bind:this={activator}
+    class="date-picker-activator {clazz.activator || ''}"
   >
-    <SimpleTextField
-      bind:value={mask.value}
-      on:focus={() => handleTextFieldFocus(mAndDown)}
-      on:keydown={handleInputChange}
-      bind:input={inputElement}
-      bind:placeholder
+    <slot 
+      name="activator"
+      {mask}
+      {handleTextFieldFocus}
+      {handleInputChange}
+      {inputElement}
+      {placeholder}
     >
-      <svelte:fragment slot="prepend-inner" let:prependInnerIcon let:iconSize>
-        <slot name="prepend-inner" {prependInnerIcon} {iconSize}>
-          <Icon
-            name="mdi-calendar"
-            click
-            on:click={() => menuOpened = !menuOpened}
-          ></Icon>
-        </slot>
-      </svelte:fragment>
-      <svelte:fragment slot="append-inner" let:appendInnerIcon let:iconSize>
-        <slot name="append-inner" {appendInnerIcon} {iconSize}>
-        </slot>
-      </svelte:fragment>
-      <svelte:fragment slot="prepend" let:prependIcon let:iconSize>
-        <slot name="append-inner" {prependIcon} {iconSize}>
-        </slot>
-      </svelte:fragment>
-      <svelte:fragment slot="append" let:appendIcon let:iconSize>
-        <slot name="append-inner" {appendIcon} {iconSize}>
-        </slot>
-      </svelte:fragment>
-    </SimpleTextField>
+      <SimpleTextField
+        bind:value={mask.value}
+        on:focus={() => handleTextFieldFocus(mAndDown)}
+        on:keydown={handleInputChange}
+        bind:input={inputElement}
+        bind:placeholder
+        class={clazz.textfield}
+      >
+        <svelte:fragment slot="prepend-inner" let:prependInnerIcon let:iconSize>
+          <slot name="prepend-inner" {prependInnerIcon} {iconSize}>
+            <Icon
+              name="mdi-calendar"
+              click
+              on:click={() => menuOpened = !menuOpened}
+            ></Icon>
+          </slot>
+        </svelte:fragment>
+        <svelte:fragment slot="append-inner" let:appendInnerIcon let:iconSize>
+          <slot name="append-inner" {appendInnerIcon} {iconSize}>
+          </slot>
+        </svelte:fragment>
+        <svelte:fragment slot="prepend" let:prependIcon let:iconSize>
+          <slot name="append-inner" {prependIcon} {iconSize}>
+          </slot>
+        </svelte:fragment>
+        <svelte:fragment slot="append" let:appendIcon let:iconSize>
+          <slot name="append-inner" {appendIcon} {iconSize}>
+          </slot>
+        </svelte:fragment>
+      </SimpleTextField>
+    </slot>
   </div>
 
   {#if mAndDown && mobileDialog}
@@ -242,4 +259,10 @@
     </Menu>
   {/if}
 </MediaQuery>
+
+<style>
+  .date-picker-activator {
+    width: fit-content;
+  }
+</style>
 

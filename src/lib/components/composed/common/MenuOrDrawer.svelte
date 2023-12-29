@@ -9,6 +9,8 @@
     activator: HTMLElement,
     drawerPosition: ComponentProps<Drawer>['position'] = 'bottom',
     menuAnchor: ComponentProps<Menu>['anchor'] = 'bottom-center',
+    stayInViewport: ComponentProps<Menu>['stayInViewport'] = true,
+    flipOnOverflow: ComponentProps<Menu>['flipOnOverflow'] = false,
     _boxShadow: string = "rgb(var(--global-color-grey-900), .5) 0px 2px 4px",
     _height: string = "fit-content",
     _width: string | undefined = undefined,
@@ -39,6 +41,8 @@
       _borderRadius={_borderRadius}
       _width={_width || ""}
       anchor={menuAnchor}
+      bind:stayInViewport={stayInViewport}
+      bind:flipOnOverflow={flipOnOverflow}
     >
       <slot isDrawer={false} isMenu={true}></slot>
     </Menu>

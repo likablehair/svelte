@@ -83,8 +83,14 @@ let list: {
     title: 'DatePickerTextField',
     description: 'If you want a date, you\'ll have a date.',
     status: 'stable',
-    type: 'simple',
+    type: 'composed',
     url: '/docs/components/simple-components/DatePickerTextField'
+  }, {
+    title: 'TimePicker',
+    description: 'Time to change, always time to change',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/TimePicker'
   }, {
     title: 'Autocomplete',
     description: 'Autocompletion out of the limits.',

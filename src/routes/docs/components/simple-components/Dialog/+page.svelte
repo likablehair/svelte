@@ -8,7 +8,7 @@
   import PropsViewer from "../../PropsViewer.svelte";
   import SlotsViewer from "../../SlotsViewer.svelte";
   import Menu from "$lib/components/simple/common/Menu.svelte";
-  import DatePickerTextField from "$lib/components/simple/dates/DatePickerTextField.svelte";
+  import DatePickerTextField from "$lib/components/composed/forms/DatePickerTextField.svelte";
 
   let dialogOpened = false
 

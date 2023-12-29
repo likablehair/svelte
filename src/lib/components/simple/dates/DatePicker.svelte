@@ -18,7 +18,7 @@
 
   export let selectedYear: number = new Date().getFullYear(),
     selectedMonth: number = new Date().getMonth(),
-    selectedDate: Date | null = new Date(),
+    selectedDate: Date | null | undefined = undefined,
     visibleMonth: number = selectedMonth,
     visibleYear: number = selectedYear,
     view: "year" | "month" | "day" = "day",
