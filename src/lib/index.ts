@@ -59,6 +59,9 @@ export { default as ProgressBar } from './components/simple/progress/ProgressBar
 export { default as ProductCard } from './components/composed/shop/ProductCard.svelte'
 export { default as ProductsGrid } from './components/composed/shop/ProductsGrid.svelte'
 
+export { default as ActivableButton } from './components/composed/buttons/ActivableButton.svelte'
+export { default as IconsDropdown } from './components/composed/forms/IconsDropdown.svelte'
+
 export { default as PaginatedTable } from './components/composed/list/PaginatedTable.svelte'
 
 export { default as Filters } from './components/composed/search/Filters.svelte'

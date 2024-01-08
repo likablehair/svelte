@@ -4,9 +4,19 @@
 </script>
 
 <script lang="ts">
+  import { cloneDeep } from "lodash";
   import Autocomplete from "../../../components/simple/forms/Autocomplete.svelte";
   import Button from '../../simple/buttons/Button.svelte'
   import Icon from '../../simple/media/Icon.svelte'
+  import { createEventDispatcher } from "svelte";
+
+  let dispatch = createEventDispatcher<{
+    change: {
+      unselect: Item | undefined;
+      select: Item | undefined;
+      selection: Item[];
+    }
+  }>()
 
   export let items: Item[] = [],
     values: Item[] = [],
@@ -19,14 +29,22 @@
     mandatory: boolean = true,
     icon: string | undefined = undefined,
     menuOpened: boolean = false,
-    openingId: string | undefined = undefined
+    openingId: string | undefined = undefined,
+    width: string | undefined = undefined
 
   $: generatedLabel = values.length == 1 ? values[0].label : `${values.length} Selezionati`
 
   function handleCloseClick(event: MouseEvent) {
     event.preventDefault()
     event.stopPropagation()
+    let valuesBefore = cloneDeep(values)
     values = []
+
+    dispatch('change', {
+      unselect: valuesBefore[0],
+      select: undefined,
+      selection: []
+    })
   }
 </script>
 
@@ -41,6 +59,7 @@
   on:change
   bind:menuOpened
   bind:openingId
+  bind:width
 >
   <svelte:fragment slot="selection-container" let:openMenu let:handleKeyDown>
     <Button
@@ -58,7 +77,16 @@
         }
       }}
     >
-      <slot name="label" {values} {items} {searchText}>
+      <slot 
+        name="label" 
+        {values} 
+        {items} 
+        {searchText} 
+        {generatedLabel} 
+        {placeholder} 
+        {clearable} 
+        {handleCloseClick}
+      >
         <div class="label">
           {#if !!icon}
             <Icon name={icon}></Icon>
@@ -83,6 +111,11 @@
         </div>
       </slot>
     </Button>
+  </svelte:fragment>
+  <svelte:fragment slot="item-label" let:item >
+    <slot name="item-label" {item}>
+      {item.label}
+    </slot>
   </svelte:fragment>
 </Autocomplete>
 

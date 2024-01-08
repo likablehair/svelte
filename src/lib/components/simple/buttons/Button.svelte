@@ -278,17 +278,48 @@
     );
   }
 
-  .button-text:hover {
+  .button-text.disabled {
+    cursor: not-allowed;
+    background-color: var(
+      --button-disabled-background-color,
+      var(--button-default-disabled-background-color)
+    );
+    color: var(
+      --button-disabled-color,
+      var(--button-default-disabled-color)
+    );
+  }
+
+  .button-text:hover:not(.disabled) {
     background-color: var(
       --button-hover-background-color,
       var(--button-default-text-hover-background-color)
     );
+    color: var(
+      --button-hover-color,
+      var(--button-default-text-hover-color)
+    );
   }
 
-  .button-text:active {
+  .button-text:active:not(.disabled) {
     background-color: var(
       --button-active-background-color,
       var(--button-default-text-active-background-color)
+    );
+    color: var(
+      --button-active-color,
+      var(--button-default-text-active-color)
+    );
+  }
+
+  .button-text:focus:not(.disabled) {
+    background-color: var(
+      --button-focus-background-color,
+      var(--button-default-text-focus-background-color)
+    );
+    color: var(
+      --button-focus-color,
+      var(--button-default-text-focus-color)
     );
   }
 

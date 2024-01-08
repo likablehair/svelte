@@ -211,6 +211,18 @@ let list: {
     status: 'stable',
     type: 'simple',
     url: '/docs/components/simple-components/FlagIcon'
+  }, {
+    title: 'ActivableButton',
+    description: 'Activate the power now.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/ActivableButton'
+  }, {
+    title: 'IconsDropdown',
+    description: 'Chose an icon from the list.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/IconsDropdown'
   }
 ]
 
