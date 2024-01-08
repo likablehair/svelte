@@ -9,6 +9,15 @@
 <script lang="ts">
   import Dropdown, { type Item } from "./Dropdown.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
+  import { createEventDispatcher } from "svelte";
+
+  let dispatch = createEventDispatcher<{
+    change: {
+      unselect: IconItem | undefined;
+      select: IconItem | undefined;
+      selection: IconItem[];
+    }
+  }>()
 
   export let items: IconItem[] = [],
     values: IconItem[] = [],
@@ -42,6 +51,20 @@
       icon: e.data.icon,
       data: e.data
     }))
+
+    dispatch('change', {
+      unselect: !!event.detail.unselect ? {
+        value: event.detail.unselect.value,
+        icon: event.detail.unselect.data.icon,
+        data: event.detail.unselect.data
+      } : undefined,
+      select: !!event.detail.select ? {
+        value: event.detail.select.value,
+        icon: event.detail.select.data.icon,
+        data: event.detail.select.data
+      } : undefined,
+      selection: values
+    })
   }
 </script>
 
