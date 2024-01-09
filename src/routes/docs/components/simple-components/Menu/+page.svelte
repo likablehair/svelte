@@ -48,13 +48,14 @@
   </div>
 </div>
 <Menu
-  _width="160px"
+  _width="250px"
   activator={activator}
   bind:open={menuOpened}
   anchor="bottom-center"
   _borderRadius="10px"
   _boxShadow="rgba(149, 157, 165, 0.2) 0px 8px 24px"
   closeOnClickOutside
+  stayInViewport
 >
   <div class="menu-content">
     <div class="list-container">

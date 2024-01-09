@@ -1,32 +1,29 @@
 <script lang="ts">
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
-  import DatePickerTextField from "$lib/components/composed/forms/DatePickerTextField.svelte";
-  import { DateTime } from "luxon";
+  import IconsDropdown, { type IconItem } from "$lib/components/composed/forms/IconsDropdown.svelte";
 
-  let date: Date | undefined = new Date()
+  let values: IconItem[] = []
 
-  setTimeout(() => {
-    date = DateTime.fromJSDate(date || new Date()).plus({ year: 1 }).toJSDate()
-  }, 2000);
+  $: console.log(values)
 </script>
 
-<h1>DatePickerTextField</h1>
-<ComponentSubtitle>If you want a date, you'll have a date.</ComponentSubtitle>
+<h1>IconsDropdown</h1>
+<ComponentSubtitle>Choose an icon from the list.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
   <div
     style:display="flex"
-    style:justify-content="center"
-    style:flex-direction="column"
-    style:align-items="center"
+    style:gap="2px"
   >
-    <div 
-      style:margin-bottom="16px"
-    >
-      {date}
-    </div>
-    <DatePickerTextField bind:selectedDate={date} />
+    <IconsDropdown
+      items={[
+        { value: 'align-left', icon: 'mdi-format-align-left'},
+        { value: 'align-right', icon: 'mdi-format-align-right'},
+        { value: 'align-center', icon: 'mdi-format-align-center'},
+      ]}
+      values={values}
+    ></IconsDropdown>
   </div>
 </div>
 <h2>Props</h2>
@@ -45,18 +42,19 @@
     //   type: 'string',
     //   default: 'undefined',
     //   description: 'The max width of the outer element'
-    // },
+    // }
   ]}
-/>
+></PropsViewer>
 <h2>Slots</h2>
 <h2>Events</h2>
 
 <style>
   .example {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 2px;
     margin-bottom: 20px;
   }
 </style>

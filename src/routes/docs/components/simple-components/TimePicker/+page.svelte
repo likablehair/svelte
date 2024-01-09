@@ -1,33 +1,14 @@
 <script lang="ts">
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
-  import DatePickerTextField from "$lib/components/composed/forms/DatePickerTextField.svelte";
-  import { DateTime } from "luxon";
-
-  let date: Date | undefined = new Date()
-
-  setTimeout(() => {
-    date = DateTime.fromJSDate(date || new Date()).plus({ year: 1 }).toJSDate()
-  }, 2000);
+  import TimePicker from "$lib/components/simple/dates/TimePicker.svelte";
 </script>
 
-<h1>DatePickerTextField</h1>
-<ComponentSubtitle>If you want a date, you'll have a date.</ComponentSubtitle>
+<h1>TimePicker</h1>
+<ComponentSubtitle>Time to change, always time to change.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
-  <div
-    style:display="flex"
-    style:justify-content="center"
-    style:flex-direction="column"
-    style:align-items="center"
-  >
-    <div 
-      style:margin-bottom="16px"
-    >
-      {date}
-    </div>
-    <DatePickerTextField bind:selectedDate={date} />
-  </div>
+  <TimePicker></TimePicker>
 </div>
 <h2>Props</h2>
 <PropsViewer
@@ -47,7 +28,7 @@
     //   description: 'The max width of the outer element'
     // },
   ]}
-/>
+></PropsViewer>
 <h2>Slots</h2>
 <h2>Events</h2>
 

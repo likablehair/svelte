@@ -11,7 +11,7 @@ export { default as Calendar } from './components/simple/dates/Calendar.svelte'
 export { default as DatePicker } from './components/simple/dates/DatePicker.svelte'
 export { default as MonthSelector } from './components/simple/dates/MonthSelector.svelte'
 export { default as TimePickerTextField } from './components/simple/dates/TimePickerTextField.svelte'
-export { default as DatePickerTextField } from './components/simple/dates/DatePickerTextField.svelte'
+export { default as DatePickerTextField } from './components/composed/forms/DatePickerTextField.svelte'
 export { default as YearSelector } from './components/simple/dates/YearSelector.svelte'
 
 export { default as Dialog } from './components/simple/dialogs/Dialog.svelte'
@@ -58,6 +58,9 @@ export { default as ProgressBar } from './components/simple/progress/ProgressBar
 
 export { default as ProductCard } from './components/composed/shop/ProductCard.svelte'
 export { default as ProductsGrid } from './components/composed/shop/ProductsGrid.svelte'
+
+export { default as ActivableButton } from './components/composed/buttons/ActivableButton.svelte'
+export { default as IconsDropdown } from './components/composed/forms/IconsDropdown.svelte'
 
 export { default as PaginatedTable } from './components/composed/list/PaginatedTable.svelte'
 

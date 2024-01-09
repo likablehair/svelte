@@ -3,16 +3,16 @@
   import { GenericModes, SelectModes, StringModes } from '$lib/utils/filters/filters';
   import type { DateMode } from "$lib/utils/filters/filters";
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
-  import DatePickerTextField from "$lib/components/simple/dates/DatePickerTextField.svelte";
+  import DatePickerTextField from "$lib/components/composed/forms/DatePickerTextField.svelte";
   import Button from "$lib/components/simple/buttons/Button.svelte";
   import { createEventDispatcher } from "svelte";
   import Validator from "$lib/utils/filters/validator";
   import SelectableVerticalList, { type Element } from "$lib/components/simple/lists/SelectableVerticalList.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import { fly } from "svelte/transition";
-    import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
-    import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
-    import type { LabelMapper } from "./Filters.svelte";
+  import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
+  import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
+  import type { LabelMapper } from "./Filters.svelte";
 
   export let filter: Filter | undefined = undefined,
     lang: 'it' | 'en' = 'en',

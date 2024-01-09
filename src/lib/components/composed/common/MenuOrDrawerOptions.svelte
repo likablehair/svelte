@@ -15,6 +15,8 @@
     drawerPosition: ComponentProps<Drawer>['position'] = 'bottom',
     menuAnchor: ComponentProps<Menu>['anchor'] = 'bottom-center',
     elements: ComponentProps<SelectableVerticalList>['elements'] = [],
+    stayInViewport: ComponentProps<MenuOrDrawer>['stayInViewport'] = true,
+    flipOnOverflow: ComponentProps<MenuOrDrawer>['flipOnOverflow'] = false,
     _boxShadow: string = "rgb(var(--global-color-grey-900), .5) 0px 2px 4px",
     _height: string = "fit-content",
     _maxHeight: string | undefined = undefined,
@@ -32,6 +34,8 @@
   bind:activator
   bind:drawerPosition
   bind:menuAnchor
+  bind:stayInViewport
+  bind:flipOnOverflow
   {_boxShadow}
   {_height}
   {_maxHeight}
