@@ -1,6 +1,6 @@
 import lodash from "lodash"
 
-let list: {
+const list: {
   title: string,
   description: string,
   status: 'stable' | 'beta' | 'deprecated',
@@ -129,7 +129,7 @@ let list: {
     url: '/docs/components/simple-components/ColorInvertedSelector'
   }, {
     title: 'SimpleTable',
-    description: 'Grid beutiful view.',
+    description: 'Grid beautiful view.',
     status: 'stable',
     type: 'simple',
     url: '/docs/components/simple-components/SimpleTable'
@@ -139,6 +139,12 @@ let list: {
     status: 'stable',
     type: 'simple',
     url: '/docs/components/simple-components/Paginator'
+  }, {
+    title: 'FileInput',
+    description: 'One input to control them.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/FileInput'
   }, {
     title: 'PaginatedTable',
     description: 'Table and pagination agreement.',
