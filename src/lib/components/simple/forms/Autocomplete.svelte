@@ -61,9 +61,9 @@
         select: item,
         selection: values,
       });
-
-      menuOpened = false
     }
+
+    if (!multiple) menuOpened = false
   }
 
   function unselect(item: Item) {
