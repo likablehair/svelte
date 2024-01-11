@@ -54,7 +54,7 @@
         yyyy: {
           mask: IMask.MaskedRange,
           from: 1970,
-          to: 2030
+          to: 2100
         },
         MM: {
           mask: IMask.MaskedRange,
