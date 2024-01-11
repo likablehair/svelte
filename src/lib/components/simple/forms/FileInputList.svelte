@@ -1,23 +1,17 @@
 <script lang="ts">
+  import "../../../css/main.css";
+  import "./FileInputList.css";
   import Button from "$lib/components/simple/buttons/Button.svelte";
   import FileInput from "$lib/components/simple/forms/FileInput.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
 
+  let clazz: string = "";
+  export { clazz as class };
+
   export let files: File[] = [],
-    persistOverUpload = true,
-    height = "100%",
-    width = "100%",
-    backgroundColor = "rgba(255,255,255,0)",
-    textColor = "rgba(0,0,0,0.7)",
-    rounded = true,
-    focusShadow: string | undefined = undefined,
-    dropAreaActive = true,
-    icon = "mdi-folder",
-    iconSize = 30,
-    selectedRowColor = "red",
-    selectedRowBackground = "rgba(0,0,0,0.1)",
-    hoverColor = "rgba(255,0,0,0.5)",
-    borderColor = "rgba(0, 0, 0, 0.2)";
+    persistOverUpload: boolean = true,
+    dropAreaActive: boolean = true,
+    icon: string = "mdi-folder";
 
   let fileActive: File | null = null;
 
@@ -39,20 +33,13 @@
   }
 </script>
 
-<div
-  class="card-container"
-  style:--file-input-list-hover-color={hoverColor}
-  style:--file-input-list-border-color={borderColor}
->
+<div class="card-container {clazz}">
   <FileInput
-    {persistOverUpload}
-    {height}
-    {width}
-    {backgroundColor}
-    {rounded}
     bind:files
-    {focusShadow}
-    {textColor}
+    {persistOverUpload}
+    --file-input-border-radius="var(--file-input-list-border-radius,var(--file-input-list-default-border-radius))"
+    --file-input-background-color="var(--file-input-list-background-color,var(--file-input-list-default-background-color))"
+    --file-input-color="var(--file-input-list-color,var(--file-input-list-default-color))"
   >
     <span
       slot="body"
@@ -78,11 +65,9 @@
                   handleFileMouseLeave();
                 }}
                 class:file-active={fileActive == file}
-                style:--selected-color={selectedRowColor}
-                style:--selected-background={selectedRowBackground}
               >
                 <td>
-                  <Icon name={icon} size={iconSize} />
+                  <Icon name={icon} />
                 </td>
                 <td class="file-name">
                   {file.name}
@@ -109,6 +94,11 @@
 </div>
 
 <style>
+  .body-span {
+    height: 100px;
+    width: 100%;
+    display: flex;
+  }
   .card-container {
     display: flex;
     justify-content: center;
@@ -116,13 +106,34 @@
     flex-direction: column;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
       Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    border-color: var(
+      --file-input-list-border-color,
+      var(--file-input-list-default-border-color)
+    );
+    height: var(--file-input-list-height,var(--file-input-list-default-height));
+    width: var(--file-input-list-background-width,var(--file-input-list-default-width));
   }
+
+  .card-container:hover {
+    color: var(
+      --file-input-list-hover-color,
+      var(--file-input-list-default-hover-color)
+    );
+  }
+  
   .body-container {
-    border: dotted var(--file-input-list-border-color);
-    border-radius: 5px;
-    box-sizing: border-box;
+    border: dotted;
+    border-color: var(
+      --file-input-list-border-color,
+      var(--file-input-list-default-border-color)
+    );
+    border-radius: var(
+      --file-input-list-border-radius,
+      var(--file-input-list-default-border-radius)
+    );
     width: calc(100% - 20px);
     height: calc(100% - 20px);
+    box-sizing: border-box;    
     margin: auto;
     position: relative;
     display: flex;
@@ -131,12 +142,26 @@
     transition: 0.2s;
     overflow-y: auto;
   }
+
   .active {
-    border-color: var(--file-input-list-hover-color);
+    border-color: var(
+      --file-input-list-selected-row-background,
+      var(--file-input-list-default-selected-row-background)
+    );
+    color: var(
+      --file-input-list-selected-row-color,
+      var(--file-input-list-default-selected-row-color)
+    );
   }
   .file-active {
-    color: var(--selected-color);
-    background-color: var(--selected-background);
+    color: var(
+      --file-input-list-selected-row-color,
+      var(--file-input-list-default-selected-row-color)
+    );
+    background-color: var(
+      --file-input-list-selected-row-background,
+      var(--file-input-list-default-selected-row-background)
+    );
   }
   .file-list {
     width: 100%;

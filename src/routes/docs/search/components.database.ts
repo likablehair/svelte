@@ -145,6 +145,12 @@ const list: {
     status: 'stable',
     type: 'simple',
     url: '/docs/components/simple-components/FileInput'
+  },{
+    title: 'FileInputList',
+    description: 'One list input to list control them.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/FileInputList'
   }, {
     title: 'PaginatedTable',
     description: 'Table and pagination agreement.',

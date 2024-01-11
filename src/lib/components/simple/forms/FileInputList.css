@@ -1,0 +1,12 @@
+:root {
+    --file-input-list-default-height : 100%;
+    --file-input-list-default-width : 100%;
+    --file-input-list-default-background-color : rgb(var(--global-color-background-300));
+    --file-input-list-default-color : rgb(var(--global-color-contrast-900));
+    --file-input-list-default-selected-row-color : rgb(var(--global-color-contrast-1000));
+    --file-input-list-default-selected-row-background : rgb(var(--global-color-background-500));
+    --file-input-list-default-hover-color : rgb(var(--global-color-contrast-900));
+    --file-input-list-default-border-color : rgb(var(--global-color-primary-100));
+    --file-input-list-default-border-radius : 5px
+}
+

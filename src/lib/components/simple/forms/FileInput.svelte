@@ -14,11 +14,11 @@
     --file-input-default-color
     --file-input-default-background-color
     --file-input-default-focus-shadow
+    --file-input-border-radius
   */
 
   export let files: File[] | undefined = undefined,
     persistOverUpload : boolean = true,
-    rounded : boolean = true,
     disabled : boolean = false;
     
   let inputElement: HTMLElement | undefined = undefined;
@@ -85,7 +85,6 @@
   on:mouseenter={() => highlight(true)}
   on:mouseleave={() => highlight(false)}
   class:disabled
-  class:rounded
   class="drop-area {clazz}"
 >
   <slot name="body" active={dropAreaActive}>
@@ -103,6 +102,10 @@
 
 <style>
   .drop-area {
+    border-radius: var(
+      --file-input-border-radius,
+      var(--file-input-default-border-radius)
+    );
     height: var(
       --file-input-height,
       var(--file-input-default-height)
@@ -138,8 +141,5 @@
       --file-input-focus-shadow,
       var(--file-input-default-focus-shadow)
       );
-  }
-  .rounded {
-    border-radius: 5px;
   }
 </style>
