@@ -61,6 +61,8 @@
         select: item,
         selection: values,
       });
+
+      menuOpened = false
     }
   }
 
