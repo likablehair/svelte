@@ -33,8 +33,8 @@
     selectedDate: Date | undefined = undefined,
     placeholder: string | undefined = undefined,
     mobileDialog: boolean = true,
-    maxYearInRange: number = 1970,
-    minYearInRange: number = 2100
+    maxYearInRange: number = 2100,
+    minYearInRange: number = 1970
 
 
   let activator: HTMLElement,
