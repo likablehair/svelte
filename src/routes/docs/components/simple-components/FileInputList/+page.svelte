@@ -11,7 +11,9 @@
 <h2>Example</h2>
 <div class="example">
   <FileInputList 
-    --file-input-list-border-radius="10px"
+  --file-input-list-height="100%"
+  --file-input-list-width="100%"
+  --file-input-list-border-radius="10px"
   />
 </div>
 <h2>Props</h2>
@@ -127,6 +129,6 @@
 <style>
   .example {
     height: 200px;
-    width: auto;
+    width: 100%;
   }
 </style>

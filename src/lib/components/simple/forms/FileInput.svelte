@@ -18,6 +18,7 @@
   */
 
   export let files: File[] | undefined = undefined,
+    placeholder: string | undefined = undefined,
     persistOverUpload : boolean = true,
     disabled : boolean = false;
     
@@ -82,13 +83,11 @@
   on:drop|preventDefault={(e) => {
     if (!disabled) handleFileDrop(e);
   }}
-  on:mouseenter={() => highlight(true)}
-  on:mouseleave={() => highlight(false)}
   class:disabled
   class="drop-area {clazz}"
 >
   <slot name="body" active={dropAreaActive}>
-    <span> Drop file here or click to upload </span>
+    <span> { placeholder || 'Drop file here or click to upload'} </span>
   </slot>
 
   <input
@@ -129,6 +128,7 @@
     cursor: pointer;
     transition: 0.2s;
   }
+
   .disabled {
     opacity: 0.5;
     cursor: default;
@@ -136,10 +136,10 @@
   .drop-area > input {
     display: none;
   }
-  .drop-area:hover:not(.disabled) {
+  .drop-area:hover:not(.disabled) {    
     box-shadow: var(
-      --file-input-focus-shadow,
-      var(--file-input-default-focus-shadow)
-      );
+    --file-input-focus-shadow,
+    var(--file-input-default-focus-shadow)
+    );
   }
 </style>

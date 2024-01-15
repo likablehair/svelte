@@ -1,6 +1,5 @@
 :root {
-  --file-input-default-height: 100%;
-  --file-input-default-width: 100%;
+  --file-input-default-height: 64px;
   --file-input-default-background-color: rgb(var(--global-color-background-300));
   --file-input-default-color: rgb(var(--global-color-contrast-900));
   --file-input-default-focus-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 #0000, 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);

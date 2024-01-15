@@ -34,6 +34,7 @@
     searchText: string | undefined = undefined,
     maxVisibleChips: number | undefined = undefined,
     menuOpened: boolean = false,
+    closeOnSelect: boolean = false,
     // menu
     menuBoxShadow = "rgb(var(--global-color-background-300), .5) 0px 2px 4px",
     menuBorderRadius = "5px",
@@ -63,7 +64,7 @@
       });
     }
 
-    if (!multiple) menuOpened = false
+    if (!multiple && closeOnSelect) menuOpened = false
   }
 
   function unselect(item: Item) {
