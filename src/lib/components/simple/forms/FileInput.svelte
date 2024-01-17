@@ -1,17 +1,27 @@
 <script lang="ts">
+  import '../../../css/main.css'
+  import './FileInput.css'
   import { createEventDispatcher } from "svelte";
 
-  export let files: File[] | undefined = undefined,
-    persistOverUpload = true,
-    height = "100%",
-    width = "100%",
-    backgroundColor = "rgba(255,255,255,0)",
-    textColor = "black",
-    rounded = true,
-    disabled = false,
-    focusShadow =
-      "inset 0 0 0 1px rgb(255 255 255/0.1), 0 0 #0000, 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)";
+  let clazz: string = '';
+	export { clazz as class };
 
+  /*
+    Styles
+
+    --file-input-default-height
+    --file-input-default-width
+    --file-input-default-color
+    --file-input-default-background-color
+    --file-input-default-focus-shadow
+    --file-input-border-radius
+  */
+
+  export let files: File[] | undefined = undefined,
+    placeholder: string | undefined = undefined,
+    persistOverUpload : boolean = true,
+    disabled : boolean = false;
+    
   let inputElement: HTMLElement | undefined = undefined;
   let dropAreaActive = false;
 
@@ -65,7 +75,6 @@
 </script>
 
 <div
-  class="drop-area"
   on:click={() => inputElement?.click()}
   on:keypress={() => inputElement?.click()}
   on:dragover|preventDefault={() => highlight(true)}
@@ -74,18 +83,11 @@
   on:drop|preventDefault={(e) => {
     if (!disabled) handleFileDrop(e);
   }}
-  on:mouseenter={() => highlight(true)}
-  on:mouseleave={() => highlight(false)}
-  style:height
-  style:width
-  style:background-color={backgroundColor}
-  style:color={textColor}
-  class:rounded
   class:disabled
-  style:--file-input-focus-shadow={focusShadow}
+  class="drop-area {clazz}"
 >
   <slot name="body" active={dropAreaActive}>
-    <span> Drop file here or click to upload </span>
+    <span> { placeholder || 'Drop file here or click to upload'} </span>
   </slot>
 
   <input
@@ -99,6 +101,26 @@
 
 <style>
   .drop-area {
+    border-radius: var(
+      --file-input-border-radius,
+      var(--file-input-default-border-radius)
+    );
+    height: var(
+      --file-input-height,
+      var(--file-input-default-height)
+    );
+    width: var(
+      --file-input-width,
+      var(--file-input-default-width)
+    );
+    color: var(
+      --file-input-color,
+      var(--file-input-default-color)
+    );
+    background-color: var(
+      --file-input-background-color,
+      var(--file-input-default-background-color)
+    );
     display: flex;
     align-items: center;
     justify-content: center;
@@ -106,6 +128,7 @@
     cursor: pointer;
     transition: 0.2s;
   }
+
   .disabled {
     opacity: 0.5;
     cursor: default;
@@ -113,10 +136,10 @@
   .drop-area > input {
     display: none;
   }
-  .drop-area:hover:not(.disabled) {
-    box-shadow: var(--file-input-focus-shadow);
-  }
-  .rounded {
-    border-radius: 5px;
+  .drop-area:hover:not(.disabled) {    
+    box-shadow: var(
+    --file-input-focus-shadow,
+    var(--file-input-default-focus-shadow)
+    );
   }
 </style>
