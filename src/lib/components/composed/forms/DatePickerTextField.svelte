@@ -32,7 +32,10 @@
     visibleYear: number | undefined = undefined,
     selectedDate: Date | undefined = undefined,
     placeholder: string | undefined = undefined,
-    mobileDialog: boolean = true
+    mobileDialog: boolean = true,
+    maxYearInRange: number = 2100,
+    minYearInRange: number = 1970
+
 
   let activator: HTMLElement,
     refreshPosition = false,
@@ -53,8 +56,8 @@
       blocks: {
         yyyy: {
           mask: IMask.MaskedRange,
-          from: 1970,
-          to: 2030
+          from: minYearInRange,
+          to: maxYearInRange
         },
         MM: {
           mask: IMask.MaskedRange,

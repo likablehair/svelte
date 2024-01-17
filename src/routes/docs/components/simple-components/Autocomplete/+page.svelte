@@ -20,6 +20,7 @@
 <h2>Example</h2>
 <div class="example">
   <Autocomplete
+    closeOnSelect
     items={items}
   ></Autocomplete>
   <div style:font-size="">
