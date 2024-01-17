@@ -38,6 +38,12 @@ let list: {
     type: 'simple',
     url: '/docs/components/simple-components/Gesture'
   }, {
+    title: 'ProgressBar',
+    description: 'Makes some progress to get there.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/ProgressBar'
+  }, {
     title: 'IntersectionObserver',
     description: 'Get if there are intersection with the current viewport',
     status: 'stable',
@@ -166,15 +172,21 @@ let list: {
   }, {
     title: 'MenuOrDrawer',
     description: 'Put all the menus in the drawer please.',
-    status: 'beta',
+    status: 'stable',
     type: 'composed',
     url: '/docs/components/composed-components/MenuOrDrawer'
   }, {
     title: 'MenuOrDrawerOptions',
     description: 'If a menu does not have an option is not a menu.',
-    status: 'beta',
+    status: 'stable',
     type: 'composed',
     url: '/docs/components/composed-components/MenuOrDrawerOptions'
+  }, {
+    title: 'ToolTip',
+    description: 'A tip for the tool.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/ToolTip'
   }, {
     title: 'StableDividedSideBarLayout',
     description: 'Layout of this doc.',

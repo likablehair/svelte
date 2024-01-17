@@ -1,0 +1,7 @@
+:root {
+  --progress-bar-default-background-color: rgb(var(--global-color-background-300), .3);
+  --progress-bar-default-highlight-color: rgb(var(--global-color-primary-500));
+  --progress-bar-default-height: 5px;
+  --progress-bar-default-width: 100%;
+  --progress-bar-default-border-radius: 2px;
+}
