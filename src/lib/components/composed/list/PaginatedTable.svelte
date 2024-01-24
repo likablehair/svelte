@@ -39,6 +39,7 @@
     filters:  ComponentProps<Filters>['filters'] = [],
     searchBarColumns: string[] | undefined = undefined,
     searchBarVisible: boolean = true,
+    searchBarPlaceholder: string = "Type something to search...",
     lang: 'it' | 'en' = 'en'
 
   let searchBarInput: HTMLElement,
@@ -107,7 +108,7 @@
   {#if searchBarVisible}
     <slot name="search-bar" {handleSearchChange}>
       <SearchBar
-        placeholder="Type something to search..."
+        placeholder={searchBarPlaceholder}
         bind:input={searchBarInput}
         bind:value={searchText}
       >
@@ -121,7 +122,7 @@
       on:removeFilter={handleFiltersChange}
       --filters-default-wrapper-width="100%"
       {lang}
-    > 
+    >
       <svelte:fragment slot="append">
         <slot name="filter-append"></slot>
       </svelte:fragment>
