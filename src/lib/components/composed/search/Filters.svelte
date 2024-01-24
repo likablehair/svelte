@@ -35,6 +35,7 @@
     betweenSeparator: string = lang == 'en' ? "and" : "e",
     trueString: string = lang == 'en' ? "true" : "vero",
     falseString: string = lang == 'en' ? "false" : "falso",
+    customFiltersValid: { [filterName: string]: boolean } = {},
     // TODO create global translation mechanism
     labelsMapper: LabelMapper = lang == 'en' ? {
       'equal': {
@@ -335,10 +336,10 @@
     >
       <div class="drawer-content">
         {#if !!selectedFilter && singleFilterMenuOpened}
-          <div 
-            class="drawer-filter-detail" 
-            style:height="100%" 
-            in:fly|local={{delay: 100, duration: 100, x: 200}} 
+          <div
+            class="drawer-filter-detail"
+            style:height="100%"
+            in:fly|local={{delay: 100, duration: 100, x: 200}}
             out:fly|local={{duration: 100, x: -200}}
           >
             <MobileFilterEditor
@@ -350,20 +351,26 @@
               on:cancelClick={() => {mobileOpen = false; closeFilterMenu(200)}}
               {lang}
               {labelsMapper}
+              forceApplyValid={!!customFiltersValid[selectedFilter.name]}
             >
               <div slot="title">
                 <div class="mobile-title">
                   {selectedFilter?.label}
                 </div>
               </div>
+
+              <svelte:fragment slot="custom" let:filter>
+                <slot name="custom-mobile" {filter}></slot>
+              </svelte:fragment>
+
             </MobileFilterEditor>
           </div>
         {:else}
-          <div 
-            class="drawer-filter-list" 
-            style:margin-top="20px" 
-            style:height="100%" 
-            out:fly|local={{duration: 100, x: -200}} 
+          <div
+            class="drawer-filter-list"
+            style:margin-top="20px"
+            style:height="100%"
+            out:fly|local={{duration: 100, x: -200}}
             in:fly|local={{duration: 100, x: 200, delay: 100}}
           >
             <SelectableVerticalList
@@ -448,7 +455,12 @@
             on:apply={handleApplyFilterClick}
             {lang}
             {labelsMapper}
-          ></FilterEditor>
+            forceApplyValid={!!customFiltersValid[selectedFilter.name]}
+          >
+            <svelte:fragment slot="custom" let:filter>
+              <slot name="custom" {filter}></slot>
+            </svelte:fragment>
+          </FilterEditor>
         {/if}
       </div>
     </Menu>

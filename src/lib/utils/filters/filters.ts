@@ -83,7 +83,8 @@ type CustomFilter = {
   type: 'custom',
   modify: (params: {
     filter: Omit<Filter, 'modifier'>,
-    builder: Builder
+    builder: Builder,
+    value: any
   }) => Builder,
   data?: any
 }
@@ -103,7 +104,8 @@ export default class Converter {
   }
 
   public createBuilder(params: {
-    filters: Filter[]
+    filters: Filter[],
+    customFiltersValues?: {[filterName: string]: any}
   }): Builder {
     let builder = new Builder()
 
@@ -112,8 +114,8 @@ export default class Converter {
 
       if(!filter.active) continue
 
-      if (filter.type == 'custom' && !!filter.modify) {
-        builder = filter.modify({ filter, builder })
+      if (filter.type == 'custom' && !!filter.modify && !!params.customFiltersValues && params.customFiltersValues[filter.name] !== undefined) {
+        builder = filter.modify({ filter, builder, value: params.customFiltersValues[filter.name] })
       } else if(filter.type == 'string') {
         this.applyStringFilter({ builder, filter })
       } else if(filter.type == 'date') {
