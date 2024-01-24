@@ -40,6 +40,8 @@
     searchBarColumns: string[] | undefined = undefined,
     searchBarVisible: boolean = true,
     searchBarPlaceholder: string = "Type something to search...",
+    customFiltersValid: {[filterName: string]: boolean} = {},
+    customFiltersValues: {[filterName: string]: any} | undefined = undefined,
     lang: 'it' | 'en' = 'en'
 
   let searchBarInput: HTMLElement,
@@ -78,7 +80,8 @@
     let converter = new Converter()
     let builder: Builder
     builder = converter.createBuilder({
-      filters: filters || []
+      filters: filters || [],
+      customFiltersValues
     })
 
     if(!!searchText && !!searchBarColumns && searchBarColumns.length > 0) {
@@ -122,9 +125,16 @@
       on:removeFilter={handleFiltersChange}
       --filters-default-wrapper-width="100%"
       {lang}
+      {customFiltersValid}
     >
       <svelte:fragment slot="append">
         <slot name="filter-append"></slot>
+      </svelte:fragment>
+      <svelte:fragment slot="custom" let:filter>
+        <slot name="custom-filter" {filter}></slot>
+      </svelte:fragment>
+      <svelte:fragment slot="custom-mobile" let:filter>
+        <slot name="custom-filter-mobile" {filter}></slot>
       </svelte:fragment>
     </Filters>
   </div>

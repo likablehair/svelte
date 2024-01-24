@@ -8,6 +8,8 @@
     import type Builder from "$lib/utils/filters/builder";
     import Converter from "$lib/utils/filters/filters";
   import Button from "$lib/components/simple/buttons/Button.svelte";
+    import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
+    import { filter } from "lodash";
 
   let headers : Header[] =[
       {
@@ -73,13 +75,31 @@
         value: 4.5
       }
     ]
+  },
+  {
+    type: "custom",
+    label: "Product category",
+    name: "productCategory",
+    modify: ({builder, filter, value}) => {
+      return builder.join('categories', q => {
+        q.on('product.categoryId', 'category.id')
+      }).where('categories.name', value)
+    }
   }
 ]
-
 
   function handleFiltersChange(e: CustomEvent) {
     let filterBuilder: Builder = e.detail.builder
     console.log(filterBuilder.toJson())
+  }
+
+  let customFiltersValues: {[filterName: string]: any} = {},
+    customFiltersValid: {[filterName: string]: boolean} = {}
+
+  function checkFilterValidity(filterName: string) {
+    if(filterName == 'productCategory') {
+      customFiltersValid['productCategory'] = !!customFiltersValues['productCategory']
+    }
   }
 
 </script>
@@ -113,14 +133,23 @@
     totalElements={40}
     searchBarVisible={false}
     on:filtersChange={handleFiltersChange}
+    {customFiltersValid}
+    {customFiltersValues}
   >
+  <svelte:fragment slot="custom-filter" let:filter>
+    {#if !!filter}
+      {#if filter.name == 'productCategory'}
+        <SimpleTextField bind:value={customFiltersValues['productCategory']} on:input={() => checkFilterValidity('productCategory')}></SimpleTextField>
+      {/if}
+    {/if}
+  </svelte:fragment>
   <svelte:fragment slot="custom" let:header let:item>
     {#if header.value == 'rating'}
       {item.rating}
       <Icon name="mdi-star" --icon-color="green"></Icon>
     {/if}
   </svelte:fragment>
-  <div slot="filter-append" 
+  <div slot="filter-append"
     style:margin-left="auto"
   >
     <button>Ciao</button>
