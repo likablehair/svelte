@@ -247,6 +247,12 @@ const list: {
     status: 'stable',
     type: 'composed',
     url: '/docs/components/composed-components/IconsDropdown'
+  }, {
+    title: 'TreeEditor',
+    description: 'Save the trees.',
+    status: 'beta',
+    type: 'composed',
+    url: '/docs/components/composed-components/TreeEditor'
   }
 ]
 
