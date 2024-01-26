@@ -5,11 +5,8 @@
   import type {Filter} from "$lib/utils/filters/filters"
   import type { Header } from "$lib/components/simple/lists/SimpleTable.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
-    import type Builder from "$lib/utils/filters/builder";
-    import Converter from "$lib/utils/filters/filters";
-  import Button from "$lib/components/simple/buttons/Button.svelte";
-    import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
-    import { filter } from "lodash";
+  import type Builder from "$lib/utils/filters/builder";
+  import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
 
   let headers : Header[] =[
       {
@@ -47,7 +44,7 @@
     type: 'string',
     name: "businessName",
     column: "businessName",
-    mode: 'like'
+    mode: 'contains'
   },
   {
     label: "Product name",
@@ -55,6 +52,7 @@
     type: 'string',
     name: "productName",
     column: "productName",
+    advanced: true,
     mode: 'like'
   },
   {

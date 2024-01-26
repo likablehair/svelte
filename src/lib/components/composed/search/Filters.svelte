@@ -48,6 +48,9 @@
       'ilike': {
         short: 'includes'
       },
+      'contains': {
+        short: 'contains'
+      },
       'greater': {
         short: 'greater',
         extended: 'greater than'
@@ -74,6 +77,9 @@
       },
       'ilike': {
         short: 'include'
+      },
+      'contains': {
+        short: 'contiene'
       },
       'greater': {
         short: 'maggiore',

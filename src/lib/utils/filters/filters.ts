@@ -1,6 +1,6 @@
 import Builder from "./builder"
 
-export const StringModes = ['equal', 'like', 'ilike'] as const
+export const StringModes = ['equal', 'like', 'ilike', 'contains'] as const
 export type StringMode = typeof StringModes[number]
 
 export const GenericModes = ['equal', 'greater', 'lower', 'between'] as const
@@ -142,6 +142,8 @@ export default class Converter {
       params.builder.where(params.filter.column, 'like', params.filter.value)
     } else if (params.filter.mode == 'ilike') {
       params.builder.where(params.filter.column, 'ilike', params.filter.value)
+    } else if (params.filter.mode == 'contains') {
+      params.builder.where(params.filter.column, 'ilike', `%${params.filter.value}%`)
     } else {
       params.builder.where(params.filter.column, '=', params.filter.value)
     }
