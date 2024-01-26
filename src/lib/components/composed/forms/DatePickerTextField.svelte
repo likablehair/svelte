@@ -21,7 +21,9 @@
     'day-click': {
       dateStat: DateStat
     },
-    input: { }
+    input: {
+      datetime: Date | undefined
+    }
   }>()
 
   export let menuOpened: boolean = false,
@@ -134,7 +136,9 @@
           selectedDate = undefined
         }
 
-        dispatch('input')
+        dispatch('input', {
+          datetime: selectedDate
+        })
       }
     }, 30);
   }
