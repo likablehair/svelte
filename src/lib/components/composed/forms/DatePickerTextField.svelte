@@ -20,7 +20,8 @@
   let dispatch = createEventDispatcher<{
     'day-click': {
       dateStat: DateStat
-    }
+    },
+    input: { }
   }>()
 
   export let menuOpened: boolean = false,
@@ -132,6 +133,8 @@
         } else {
           selectedDate = undefined
         }
+
+        dispatch('input')
       }
     }, 30);
   }
