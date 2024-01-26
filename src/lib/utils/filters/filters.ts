@@ -1,6 +1,6 @@
 import Builder from "./builder"
 
-export const StringModes = ['equal', 'like', 'ilike'] as const
+export const StringModes = ['equal', 'like', 'ilike', 'contains'] as const
 export type StringMode = typeof StringModes[number]
 
 export const GenericModes = ['equal', 'greater', 'lower', 'between'] as const
@@ -83,7 +83,8 @@ type CustomFilter = {
   type: 'custom',
   modify: (params: {
     filter: Omit<Filter, 'modifier'>,
-    builder: Builder
+    builder: Builder,
+    value: any
   }) => Builder,
   data?: any
 }
@@ -103,7 +104,8 @@ export default class Converter {
   }
 
   public createBuilder(params: {
-    filters: Filter[]
+    filters: Filter[],
+    customFiltersValues?: {[filterName: string]: any}
   }): Builder {
     let builder = new Builder()
 
@@ -112,8 +114,8 @@ export default class Converter {
 
       if(!filter.active) continue
 
-      if (filter.type == 'custom' && !!filter.modify) {
-        builder = filter.modify({ filter, builder })
+      if (filter.type == 'custom' && !!filter.modify && !!params.customFiltersValues && params.customFiltersValues[filter.name] !== undefined) {
+        builder = filter.modify({ filter, builder, value: params.customFiltersValues[filter.name] })
       } else if(filter.type == 'string') {
         this.applyStringFilter({ builder, filter })
       } else if(filter.type == 'date') {
@@ -140,6 +142,8 @@ export default class Converter {
       params.builder.where(params.filter.column, 'like', params.filter.value)
     } else if (params.filter.mode == 'ilike') {
       params.builder.where(params.filter.column, 'ilike', params.filter.value)
+    } else if (params.filter.mode == 'contains') {
+      params.builder.where(params.filter.column, 'ilike', `%${params.filter.value}%`)
     } else {
       params.builder.where(params.filter.column, '=', params.filter.value)
     }

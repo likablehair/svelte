@@ -18,7 +18,8 @@
     applyFilterLabel : string = lang == 'en' ? "Apply filter" : "Applica filter",
     betweenFromLabel: string = lang == 'en' ? "From" : "Da",
     betweenToLabel: string = lang == 'en' ? "To" : "A",
-    labelsMapper: LabelMapper
+    labelsMapper: LabelMapper,
+    forceApplyValid: boolean = false
 
   let tmpFilter: Filter | undefined
 
@@ -26,7 +27,7 @@
     advancedModeSelectedOptions: Item[] | undefined
 
   function initTmpFilter() {
-    tmpFilter = structuredClone(filter)
+    tmpFilter = filter === undefined ? undefined : {...filter}
     if(!!tmpFilter && ['string', 'number', 'date', 'select'].includes(tmpFilter.type) && Object.keys(tmpFilter).includes('mode')) {
       //@ts-ignore
       if((tmpFilter.mode == 'between' && tmpFilter.from !== undefined && tmpFilter.to !== undefined) || tmpFilter.value !== undefined || (tmpFilter.type == 'select' && tmpFilter.values !== undefined && tmpFilter.values.length > 0)) {
@@ -59,7 +60,7 @@
 
   function handleApplyFilterClick() {
     if(!!filter && !!tmpFilter) {
-      filter = structuredClone(tmpFilter)
+      filter = {...tmpFilter}
       filter.active = true
       dispatch('apply')
     }
@@ -111,7 +112,7 @@
     dropdownOpened = false;
   }
 
-  $: applyFilterDisabled = !Validator.isValid(tmpFilter)
+  $: applyFilterDisabled = !Validator.isValid(tmpFilter) && !forceApplyValid
 
   $: if(!!tmpFilter && tmpFilter.type == 'bool') {
     if(tmpFilter.value === undefined) {
@@ -229,6 +230,8 @@
               {tmpFilter.description}
             </span>
           </div>
+        {:else if tmpFilter.type == 'custom'}
+          <slot name="custom" filter={tmpFilter}></slot>
         {/if}
       {/if}
     </div>

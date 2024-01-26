@@ -21,7 +21,8 @@
     backIcon: string = "mdi-arrow-left",
     betweenFromLabel: string = lang == 'en' ? "From" : "Da",
     betweenToLabel: string = lang == 'en' ? "To" : "A",
-    labelsMapper: LabelMapper
+    labelsMapper: LabelMapper,
+    forceApplyValid: boolean = false
 
   let dispatch = createEventDispatcher<{
     'apply': undefined,
@@ -31,7 +32,7 @@
 
   function handleApplyFilterClick() {
     if(!!filter && !!tmpFilter) {
-      filter = structuredClone(tmpFilter)
+      filter = {...tmpFilter}
       filter.active = true
       dispatch('apply')
     }
@@ -42,7 +43,7 @@
   let tmpFilter: Filter | undefined
 
   function initTmpFilter() {
-    tmpFilter = structuredClone(filter)
+    tmpFilter = filter === undefined ? undefined : {...filter}
     if(!!tmpFilter && tmpFilter.advanced) {
       if(['string', 'number', 'date', 'select'].includes(tmpFilter.type) && Object.keys(tmpFilter).includes('mode')) {
         //@ts-ignore
@@ -118,7 +119,7 @@
   let canRenderOptions: boolean = true
 
 
-  $: applyFilterDisabled = !Validator.isValid(tmpFilter)
+  $: applyFilterDisabled = !Validator.isValid(tmpFilter) && !forceApplyValid
 
   function handleModeBackClick() {
     dispatch('backClick')
@@ -281,6 +282,8 @@
                     {tmpFilter.description}
                   </span>
                 </div>
+              {:else if tmpFilter.type == 'custom'}
+                <slot name="custom" filter={tmpFilter}></slot>
               {/if}
             </div>
           </div>
