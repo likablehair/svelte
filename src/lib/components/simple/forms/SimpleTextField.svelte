@@ -9,7 +9,7 @@
     field?: string,
     hint?: string,
     input?: string
-  } = {};
+  } | undefined = {};
 	export { clazz as class };
 
   /* 
@@ -53,15 +53,15 @@
 </script>
 
 <div
-  class="textfield-container {clazz.container || ''}"
+  class="textfield-container {clazz?.container || ''}"
 >
-  <div class="row {clazz.row || ''}">
+  <div class="row {clazz?.row || ''}">
     <slot name="prepend" {prependIcon} {iconSize}>
       {#if !!prependIcon}
         <Icon name={prependIcon} --icon-size={iconSize}></Icon>
       {/if}
     </slot>
-    <div class="textfield {clazz.field || ''}">
+    <div class="textfield {clazz?.field || ''}">
       <slot name="prepend-inner" {prependInnerIcon} {iconSize}>
         {#if !!prependInnerIcon}
           <Icon name={prependInnerIcon} --icon-size={iconSize}></Icon>
@@ -83,7 +83,7 @@
           on:keyup
           on:change
           name={name}
-          class={clazz.input || ''}
+          class={clazz?.input || ''}
           bind:this={input}
           {...$$restProps}
         />
@@ -103,7 +103,7 @@
           on:keyup
           on:change
           name={name}
-          class={clazz.input || ''}
+          class={clazz?.input || ''}
           bind:this={input}
           {...$$restProps}
         />
@@ -123,7 +123,7 @@
           on:keyup
           on:change
           name={name}
-          class={clazz.input || ''}
+          class={clazz?.input || ''}
           bind:this={input}
           {...$$restProps}
         />
@@ -143,7 +143,7 @@
           on:keyup
           on:change
           name={name}
-          class={clazz.input || ''}
+          class={clazz?.input || ''}
           bind:this={input}
           {...$$restProps}
         />
@@ -163,7 +163,7 @@
           on:keyup
           on:change
           name={name}
-          class={clazz.input || ''}
+          class={clazz?.input || ''}
           bind:this={input}
           {...$$restProps}
         />
@@ -180,7 +180,7 @@
       {/if}
     </slot>
   </div>
-  <div class="row {clazz.hint || ''}">
+  <div class="row {clazz?.hint || ''}">
     <slot name="hint">
       {#if !!hint}
         <span class="hint">{hint}</span>
