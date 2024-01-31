@@ -4,7 +4,7 @@
   import hljsSvelte from 'highlightjs-svelte';
   import 'highlight.js/styles/github.css';
   import './dracula.css'
-  import { escape } from 'lodash'
+  import lodash from 'lodash'
 
 
   export let 
@@ -63,5 +63,5 @@
         style:padding-bottom="1rem"
         style:font-size="1rem"
         style:line-height="1.5rem"
-      >{@html escape(code)}</code></pre></div>
+      >{@html lodash.escape(code)}</code></pre></div>
 </div>

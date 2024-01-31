@@ -2,7 +2,6 @@
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
   import Filters from "$lib/components/composed/search/Filters.svelte";
-  import { divide, filter } from "lodash";
   import Converter, { type Filter } from "$lib/utils/filters/filters";
   import type Builder from "$lib/utils/filters/builder";
     import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";

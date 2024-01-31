@@ -22,7 +22,7 @@
   import { onMount, createEventDispatcher } from 'svelte';
   import TreeEditorItem from './TreeEditorItem.svelte';
   import { createId } from '@paralleldrive/cuid2';
-  import { cloneDeep } from 'lodash';
+  import lodash from 'lodash';
 
   let dispatch = createEventDispatcher<{
     'change': {
@@ -77,7 +77,7 @@
   }
 
   async function sortTree() {
-    let clonedItems = cloneDeep(items)
+    let clonedItems = lodash.cloneDeep(items)
     let sortedItems = sortSubTree(clonedItems, items, sortable, 'main')
 
     dispatch('change', {

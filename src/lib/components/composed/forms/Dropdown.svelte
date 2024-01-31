@@ -4,7 +4,7 @@
 </script>
 
 <script lang="ts">
-  import { cloneDeep } from "lodash";
+  import lodash from "lodash";
   import Autocomplete from "../../../components/simple/forms/Autocomplete.svelte";
   import Button from '../../simple/buttons/Button.svelte'
   import Icon from '../../simple/media/Icon.svelte'
@@ -37,7 +37,7 @@
   function handleCloseClick(event: MouseEvent) {
     event.preventDefault()
     event.stopPropagation()
-    let valuesBefore = cloneDeep(values)
+    let valuesBefore = lodash.cloneDeep(values)
     values = []
 
     dispatch('change', {
