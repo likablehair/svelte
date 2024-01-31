@@ -1,7 +1,7 @@
 {
   "name": "@likable-hair/svelte",
   "description": "A Svelte component for likablehair",
-  "version": "3.0.62",
+  "version": "3.0.63",
   "scripts": {
     "host": "vite --host",
     "dev": "vite dev",
@@ -28,7 +28,7 @@
     "dist"
   ],
   "peerDependencies": {
-    "svelte": "^3.54.0"
+    "svelte": "^4.2.9"
   },
   "devDependencies": {
     "@orama/orama": "^1.0.0-beta.7",
@@ -47,7 +47,7 @@
     "prettier": "^2.8.0",
     "prettier-plugin-svelte": "^2.8.1",
     "publint": "^0.1.9",
-    "svelte": "^3.54.0",
+    "svelte": "^4.2.9",
     "svelte-check": "^3.0.1",
     "tslib": "^2.4.1",
     "typescript": "^4.9.3",

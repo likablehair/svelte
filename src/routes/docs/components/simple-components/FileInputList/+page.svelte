@@ -33,8 +33,8 @@
     },{
       name: "icon",
       type: "string",
-      default: "mdi-folder",
-      description: "Folder icon to use. See { https://pictogrammers.com/library/mdi }",
+      default: "mdi-file-document",
+      description: "File icon to use. See { https://pictogrammers.com/library/mdi }",
     },
     {
       name: "persistOverUpload",

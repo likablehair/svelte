@@ -11,7 +11,7 @@
   export let files: File[] = [],
     persistOverUpload: boolean = true,
     dropAreaActive: boolean = true,
-    icon: string = "mdi-folder";
+    icon: string = "mdi-file-document";
 
   let fileActive: File | null = null;
 
@@ -79,6 +79,7 @@
                 </td>
                 <td style:width="10%" style:margin-right="10px">
                   <Button
+                    buttonType="text"
                     icon="mdi-close"
                     on:click={(e) => {
                       e.detail.nativeEvent.stopPropagation();
