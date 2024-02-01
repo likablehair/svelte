@@ -7,7 +7,7 @@
   --unstable-divided-side-bar-layout-default-header-menu-height: 3.5rem;
   --unstable-divided-side-bar-layout-default-header-menu-border: none;
   --unstable-divided-side-bar-layout-default-header-menu-padding: 0rem 2rem 0rem 2rem;
-  --unstable-divided-side-bar-layout-default-inner-header-menu-background-color: rgb(var(--global-color-background-100), .5);
+  --unstable-divided-side-bar-layout-default-inner-header-menu-background-color: var(--global-color-background-100);
   --unstable-divided-side-bar-layout-default-drawer-background-color: rgb(var(--global-color-background-100));
   --unstable-divided-side-bar-layout-default-drawer-width: 24rem;
 }
