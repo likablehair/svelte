@@ -74,6 +74,7 @@ export { default as MenuOrDrawerOptions } from './components/composed/common/Men
 
 export { default as AsyncAutocomplete } from './components/composed/forms/AsyncAutocomplete.svelte'
 export { default as CountriesAutocomplete } from './components/composed/forms/CountriesAutocomplete.svelte'
+export { default as Dropdown } from './components/composed/forms/Dropdown.svelte'
 
 export { default as FilterBuilder } from './utils/filters/builder'
 export { default as FilterConverter } from './utils/filters/filters'
