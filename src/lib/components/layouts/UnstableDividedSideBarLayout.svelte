@@ -258,7 +258,10 @@
   }
 
   .header-toolbar {
-    position: fixed;
+    position: var(
+      --unstable-divided-side-bar-layout-header-menu-position,
+      var(--unstable-divided-side-bar-layout-default-header-menu-position)
+    );
     height: var(
       --unstable-divided-side-bar-layout-header-menu-height,
       var(--unstable-divided-side-bar-layout-default-header-menu-height)
