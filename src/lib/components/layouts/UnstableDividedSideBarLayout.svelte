@@ -319,12 +319,18 @@
 
   .main-section {
     padding-left: var(
-      --unstable-divided-side-bar-layout-side-bar-width,
-      var(--unstable-divided-side-bar-layout-default-side-bar-width)
+      --unstable-divided-side-bar-layout-content-padding-left,
+      var(
+        --unstable-divided-side-bar-layout-side-bar-width,
+        var(--unstable-divided-side-bar-layout-default-side-bar-width)
+      )
     );
     padding-top: var(
-      --unstable-divided-side-bar-layout-header-menu-height,
-      var(--unstable-divided-side-bar-layout-default-header-menu-height,)
+      --unstable-divided-side-bar-layout-content-padding-top,
+      var(
+        --unstable-divided-side-bar-layout-header-menu-height,
+        var(--unstable-divided-side-bar-layout-default-header-menu-height,)
+      )
     );
     transition: all .2s cubic-bezier(.4,0,.2,1);
   }
