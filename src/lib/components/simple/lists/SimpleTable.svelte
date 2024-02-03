@@ -139,10 +139,22 @@
                   {formatDate(item[header.value], header.type.params)}
                 {:else if header.type.key == "icon"}
                     <Icon 
-                     --icon-color={header.type.params?.color }  
-                     --icon-size={header.type.params?.size} 
+                      --icon-color={header.type.params?.color }  
+                      --icon-size={header.type.params?.size} 
                       name={header.type.params?.name || ''}
                     />
+                {:else if header.type.key == 'string'}
+                  {#if item[header.value] !== undefined && item[header.value] !== null}
+                    {item[header.value]}
+                  {:else if !!header.type.params?.nullText}
+                    {#if typeof header.type.params.nullText == 'function'}
+                      {header.type.params.nullText(item)}
+                    {:else}
+                      {header.type.params.nullText}
+                    {/if}
+                  {:else}
+                    {item[header.value]}
+                  {/if}
                 {:else} 
                   {item[header.value]}
                 {/if}

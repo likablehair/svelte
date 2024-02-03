@@ -271,7 +271,10 @@
       --unstable-divided-side-bar-layout-header-menu-border,
       var(--unstable-divided-side-bar-layout-default-header-menu-border)
     );
-    backdrop-filter: blur(4px);
+    backdrop-filter: var(
+      --unstable-divided-side-bar-layout-header-menu-backdrop-filter,
+      var(--unstable-divided-side-bar-layout-default-header-menu-backdrop-filter)
+    );
     background-color: var(
       --unstable-divided-side-bar-layout-inner-header-menu-background-color,
       rgb(var(--unstable-divided-side-bar-layout-default-inner-header-menu-background-color), .5)

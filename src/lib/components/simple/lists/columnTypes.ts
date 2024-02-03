@@ -10,8 +10,8 @@ export type ColumnIcon = {
   key: "icon"
   params: {
     name: string
-    color: string
-    size: string
+    color?: string
+    size?: string
   }
 }
 
@@ -22,7 +22,11 @@ export type ColumnBoolean = {
 
 export type ColumnString = {
   key: "string"
-  params?: {}
+  params?: {
+    nullText?: string | ((value: {
+      [key: string]: any;
+    }) => string)
+  }
 };
 
 export type ColumnNumber = {

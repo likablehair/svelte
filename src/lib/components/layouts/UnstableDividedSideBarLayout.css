@@ -10,4 +10,5 @@
   --unstable-divided-side-bar-layout-default-inner-header-menu-background-color: var(--global-color-background-100);
   --unstable-divided-side-bar-layout-default-drawer-background-color: rgb(var(--global-color-background-100));
   --unstable-divided-side-bar-layout-default-drawer-width: 24rem;
+  --unstable-divided-side-bar-layout-default-header-menu-backdrop-filter: blur(4px)
 }
