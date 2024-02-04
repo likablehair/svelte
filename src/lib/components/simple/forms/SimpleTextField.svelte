@@ -42,6 +42,7 @@
     placeholder: string | undefined = undefined,
     disabled: boolean = false,
     readonly: boolean = false,
+    id: string | undefined = undefined,
     appendIcon: string | undefined = undefined,
     appendInnerIcon: string | undefined = undefined,
     prependIcon: string | undefined = undefined,
@@ -72,6 +73,7 @@
           bind:value={value}
           placeholder={placeholder}
           type="text"
+          id={id}
           disabled={disabled}
           readonly={readonly}
           on:change
@@ -92,6 +94,7 @@
           bind:value={value}
           placeholder={placeholder}
           type="password"
+          id={id}
           disabled={disabled}
           readonly={readonly}
           on:change
@@ -112,6 +115,7 @@
           bind:value={value}
           placeholder={placeholder}
           type="number"
+          id={id}
           disabled={disabled}
           readonly={readonly}
           on:change
@@ -132,6 +136,7 @@
           bind:value={value}
           placeholder={placeholder}
           type="time"
+          id={id}
           disabled={disabled}
           readonly={readonly}
           on:change
@@ -152,6 +157,7 @@
           bind:value={value}
           placeholder={placeholder}
           type="date"
+          id={id}
           disabled={disabled}
           readonly={readonly}
           on:change

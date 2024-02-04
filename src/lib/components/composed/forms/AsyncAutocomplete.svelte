@@ -14,6 +14,7 @@
     searcher: (params: {
       searchText: string
     }) => Promise<Item[]>,
+    placeholder: string | undefined = undefined,
     searchThreshold: number = 2,
     debounceTimeout: number = 500,
     searching: boolean = false,
@@ -21,7 +22,8 @@
     searchText: string | undefined = undefined,
     maxVisibleChips: number | undefined = undefined,
     menuOpened: boolean = false,
-    mobileDrawer: boolean = false
+    mobileDrawer: boolean = false,
+    closeOnSelect: boolean = false
 
   const searchTextValue = writable<string | undefined>(searchText)
   $: searchTextDebounce = debounceStore(searchTextValue, debounceTimeout)
@@ -54,6 +56,8 @@
   bind:maxVisibleChips
   bind:menuOpened
   bind:mobileDrawer
+  bind:placeholder
+  bind:closeOnSelect
   searchFunction={() => true}
   on:change
 ></Autocomplete>

@@ -30,6 +30,7 @@ export { default as TreeEditor } from './components/simple/forms/TreeEditor.svel
 
 export { default as ColorInvertedSelector } from './components/simple/lists/ColorInvertedSelector.svelte'
 export { default as SelectableMenuList } from './components/simple/lists/SelectableMenuList.svelte'
+export { default as SelectableVerticalList } from './components/simple/lists/SelectableVerticalList.svelte'
 export { default as SidebarMenuList } from './components/simple/lists/SidebarMenuList.svelte'
 export { default as SimpleTable } from './components/simple/lists/SimpleTable.svelte'
 
