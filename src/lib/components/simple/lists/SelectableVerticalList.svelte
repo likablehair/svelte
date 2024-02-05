@@ -234,6 +234,7 @@
   }
 
   .element {
+    position: relative;
     padding: var(
       --selectable-vertical-list-element-padding,
       var(--selectable-vertical-list-default-element-padding)
