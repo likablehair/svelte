@@ -3,6 +3,9 @@
   import PropsViewer from "../../PropsViewer.svelte";
 
   import Dropdown, { type Item } from "$lib/components/composed/forms/Dropdown.svelte";
+    import Dialog from "$lib/components/simple/dialogs/Dialog.svelte";
+    import Button from "$lib/components/simple/buttons/Button.svelte";
+
 
   let items: Item[] = [
     { value: 'orange', label: 'Orange' },
@@ -25,7 +28,8 @@
     { value: 'lemon', label: 'Lemon' },
     { value: 'lime', label: 'Lime' },
     { value: 'coconut', label: 'Coconut' }
-  ]
+  ],
+  dialogOpened: boolean = false
 </script>
 
 <h1>Dropdown</h1>
@@ -40,7 +44,37 @@
     {items}
     multiple={true}
   ></Dropdown>
+
+  <div style:position="relative" style:height="400px" style:overflow="auto" style:width="80vw">
+    <div style:height="500px">lorem</div>
+    <div 
+      style:position="sticky" 
+      style:top="0px"
+    >
+      <Dropdown 
+        {items}
+        multiple={true}
+      ></Dropdown>
+    </div>
+    <div style:height="500px">lorem</div>
+  </div>
 </div>
+<Button on:click={() => dialogOpened = true}>Apri dialog</Button>
+<Dialog
+  bind:open={dialogOpened}
+>
+  <div
+    style:background-color="rgb(var(--global-color-background-200))"
+    style:border-radius="8px"
+    style:height="200px"
+    style:width="300px"
+  >
+    <Dropdown 
+      {items}
+      multiple={true}
+    ></Dropdown>
+  </div>
+</Dialog>
 <h2>Props</h2>
 <PropsViewer
   props={[

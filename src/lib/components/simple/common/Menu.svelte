@@ -60,18 +60,37 @@
           let { left: activatorLeft, top: activatorTop } =
             params.activator.getBoundingClientRect();
           let activatorHeight = params.activator.offsetHeight;
-          let { top: fixedParentTop, left: fixedParentLeft } = getParentInstanceFromViewport(activator?.parentElement);
-          _top = activatorTop + window.scrollY + activatorHeight + _activatorGap - fixedParentTop;
-          _left = activatorLeft + window.scrollX - fixedParentLeft;
+          _top = activatorTop + activatorHeight + _activatorGap;
+          _left = activatorLeft;
+
+          let { top: fixedParentTop, left: fixedParentLeft, element } = getParentInstanceFromViewport(activator?.parentElement);
+          if(!!element) {
+            _top = _top - fixedParentTop;
+            _left = _left - fixedParentLeft
+          } else {
+            _top = _top + window.scrollY;
+            _left = _left + window.scrollX
+          }
         } else if (anchor == "bottom-center") {
           let { left: activatorLeft, top: activatorTop } =
             params.activator.getBoundingClientRect();
           let activatorHeight = params.activator.offsetHeight;
           let activatorWidth = params.activator.offsetWidth;
           let menuWidth = params.menuElement.offsetWidth;
-          let { top: fixedParentTop, left: fixedParentLeft } = getParentInstanceFromViewport(activator?.parentElement);
-          _top = activatorTop + window.scrollY + activatorHeight + _activatorGap - fixedParentTop;
-          _left = activatorLeft + window.scrollX - fixedParentLeft;
+
+          _top = activatorTop + activatorHeight + _activatorGap;
+          _left = activatorLeft;
+
+          let { top: fixedParentTop, left: fixedParentLeft, element } = getParentInstanceFromViewport(activator?.parentElement);
+          if(!!element) {
+            _top = _top - fixedParentTop;
+            _left = _left - fixedParentLeft
+          } else {
+            _top = _top + window.scrollY;
+            _left = _left + window.scrollX
+          }
+
+
           if (menuWidth > activatorWidth) {
             _left = _left - (menuWidth - activatorWidth) / 2;
           } else {
@@ -220,7 +239,7 @@
 
   function getPositionedAncestor(elem: HTMLElement | null): HTMLElement | null {
     if (!elem) return null
-    if (['fixed', 'absolute'].includes(getComputedStyle(elem).position)) return elem
+    if (['fixed', 'absolute', 'sticky'].includes(getComputedStyle(elem).position)) return elem
     return getPositionedAncestor(elem.parentElement)
   }
 
@@ -230,10 +249,12 @@
 
   function getParentInstanceFromViewport(activatorParent: HTMLElement | undefined | null): {
     top: number
-    left: number
+    left: number,
+    element?: HTMLElement
   } {
     let top = 0
     let left = 0
+    let fixedParentElement: HTMLElement | undefined = undefined
 
     while(!!activatorParent && activatorParent.nodeName.toLowerCase() !== 'html' && activatorParent.nodeName.toLowerCase() !== 'body') {
       const currentParent = activatorParent.parentElement
@@ -247,15 +268,20 @@
         const boundingClientRect = activatorParent.getBoundingClientRect();
         top = top + boundingClientRect.top
         left = left + boundingClientRect.left
+        fixedParentElement = activatorParent
       }
 
       activatorParent = activatorParent.parentElement
     }
-    return { top, left }
+    return { top, left, element: fixedParentElement }
   }
 
   function handleWindowScrollOrResize() {
-    if(open && !!menuElement && !!activator) calculateMenuPosition({ menuElement, activator })
+    if(open && !!menuElement && !!activator) {
+      let elem = getPositionedAncestor(menuElement.parentElement)
+      if(!!elem && getComputedStyle(elem).position == 'sticky') return
+      calculateMenuPosition({ menuElement, activator })
+    }
   }
 
   function handleMenuClick(e: MouseEvent, zIndex: number) {
@@ -295,7 +321,7 @@
     data-menu
     data-uid={currentUid}
     style:z-index={zIndex}
-    style:position="absolute"
+    style:position={!!positionedAncestor && getComputedStyle(positionedAncestor).position == 'sticky' ? 'sticky' : 'absolute'}
     style:top={_top + "px"}
     style:box-shadow={_boxShadow}
     style:border-radius={_borderRadius}

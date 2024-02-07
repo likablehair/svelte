@@ -9,6 +9,8 @@
   let menuOpened = false
   let activator
 
+  let stickyActivator: HTMLElement
+
   function handleButtonClick(e: CustomEvent) {
     e.detail.nativeEvent.stopPropagation()
     menuOpened = !menuOpened
@@ -47,6 +49,7 @@
     </Button>
   </div>
 </div>
+
 <Menu
   _width="250px"
   activator={activator}
@@ -223,6 +226,7 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
+    flex-direction: column;
   }
 
   ul {
