@@ -63,33 +63,34 @@
           _top = activatorTop + activatorHeight + _activatorGap;
           _left = activatorLeft;
 
-          let { top: fixedParentTop, left: fixedParentLeft, element } = getParentInstanceFromViewport(activator?.parentElement);
-          if(!!element) {
-            _top = _top - fixedParentTop;
+          let { top: fixedParentTop, left: fixedParentLeft, fixedParent, validStickyParent } = getParentInstanceFromViewport(activator?.parentElement);
+          console.log(validStickyParent)
+          if(!!fixedParent) {
+            _top = _top - fixedParentTop
             _left = _left - fixedParentLeft
-          } else {
-            _top = _top + window.scrollY;
+          } else if(!validStickyParent) {
+            _top = _top + window.scrollY
             _left = _left + window.scrollX
           }
+
         } else if (anchor == "bottom-center") {
           let { left: activatorLeft, top: activatorTop } =
             params.activator.getBoundingClientRect();
           let activatorHeight = params.activator.offsetHeight;
           let activatorWidth = params.activator.offsetWidth;
           let menuWidth = params.menuElement.offsetWidth;
-
           _top = activatorTop + activatorHeight + _activatorGap;
           _left = activatorLeft;
 
-          let { top: fixedParentTop, left: fixedParentLeft, element } = getParentInstanceFromViewport(activator?.parentElement);
-          if(!!element) {
-            _top = _top - fixedParentTop;
+          let { top: fixedParentTop, left: fixedParentLeft, fixedParent, validStickyParent } = getParentInstanceFromViewport(activator?.parentElement);
+          console.log(validStickyParent)
+          if(!!fixedParent) {
+            _top = _top - fixedParentTop
             _left = _left - fixedParentLeft
-          } else {
-            _top = _top + window.scrollY;
+          } else if(!validStickyParent) {
+            _top = _top + window.scrollY
             _left = _left + window.scrollX
           }
-
 
           if (menuWidth > activatorWidth) {
             _left = _left - (menuWidth - activatorWidth) / 2;
@@ -249,12 +250,15 @@
 
   function getParentInstanceFromViewport(activatorParent: HTMLElement | undefined | null): {
     top: number
-    left: number,
-    element?: HTMLElement
+    left: number
+    fixedParent?: HTMLElement,
+    validStickyParent?: HTMLElement
   } {
     let top = 0
     let left = 0
-    let fixedParentElement: HTMLElement | undefined = undefined
+    let fixedParent: HTMLElement | undefined = undefined
+    let stickyParent: HTMLElement | undefined = !!activatorParent && getComputedStyle(activatorParent).position === 'sticky' ? activatorParent : undefined
+    let isStickyValid: boolean = false
 
     while(!!activatorParent && activatorParent.nodeName.toLowerCase() !== 'html' && activatorParent.nodeName.toLowerCase() !== 'body') {
       const currentParent = activatorParent.parentElement
@@ -268,20 +272,25 @@
         const boundingClientRect = activatorParent.getBoundingClientRect();
         top = top + boundingClientRect.top
         left = left + boundingClientRect.left
-        fixedParentElement = activatorParent
+        fixedParent = activatorParent
+      }
+
+      if(position === 'sticky') {
+        stickyParent = activatorParent
+      }
+
+      if(position === 'relative' && !!stickyParent) {
+        isStickyValid = true
       }
 
       activatorParent = activatorParent.parentElement
+
     }
-    return { top, left, element: fixedParentElement }
+    return { top, left, fixedParent, validStickyParent: isStickyValid ? stickyParent : undefined }
   }
 
   function handleWindowScrollOrResize() {
-    if(open && !!menuElement && !!activator) {
-      let elem = getPositionedAncestor(menuElement.parentElement)
-      if(!!elem && getComputedStyle(elem).position == 'sticky') return
-      calculateMenuPosition({ menuElement, activator })
-    }
+    if(open && !!menuElement && !!activator) calculateMenuPosition({ menuElement, activator })
   }
 
   function handleMenuClick(e: MouseEvent, zIndex: number) {
@@ -321,7 +330,7 @@
     data-menu
     data-uid={currentUid}
     style:z-index={zIndex}
-    style:position={!!positionedAncestor && getComputedStyle(positionedAncestor).position == 'sticky' ? 'sticky' : 'absolute'}
+    style:position="absolute"
     style:top={_top + "px"}
     style:box-shadow={_boxShadow}
     style:border-radius={_borderRadius}
