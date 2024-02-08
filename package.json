@@ -1,7 +1,7 @@
 {
   "name": "@likable-hair/svelte",
   "description": "A Svelte component for likablehair",
-  "version": "3.0.69",
+  "version": "3.0.70",
   "scripts": {
     "host": "vite --host",
     "dev": "vite dev",
