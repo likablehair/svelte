@@ -35,6 +35,16 @@
 <h1>Dropdown</h1>
 <ComponentSubtitle>Easily drop your things down.</ComponentSubtitle>
 <h2>Example</h2>
+<div 
+  style:position="sticky" 
+  style:top="70px"
+>
+  <Dropdown 
+    {items}
+    multiple={true}
+  ></Dropdown>
+</div>
+<div style:height="150px">lorem</div>
 <div class="example">
   <Dropdown
     icon="mdi-apple"

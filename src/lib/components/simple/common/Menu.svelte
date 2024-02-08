@@ -64,7 +64,6 @@
           _left = activatorLeft;
 
           let { top: fixedParentTop, left: fixedParentLeft, fixedParent, validStickyParent } = getParentInstanceFromViewport(activator?.parentElement);
-          console.log(validStickyParent)
           if(!!fixedParent) {
             _top = _top - fixedParentTop
             _left = _left - fixedParentLeft
@@ -83,7 +82,6 @@
           _left = activatorLeft;
 
           let { top: fixedParentTop, left: fixedParentLeft, fixedParent, validStickyParent } = getParentInstanceFromViewport(activator?.parentElement);
-          console.log(validStickyParent)
           if(!!fixedParent) {
             _top = _top - fixedParentTop
             _left = _left - fixedParentLeft
@@ -146,9 +144,16 @@
         if(!_left) _left = 0
         if(!_top) _top = 0
 
+        _left = _left - (positionedAncestorLeft + window.scrollX)
+        _top = _top - (positionedAncestorTop + window.scrollY)
 
-        _left = _left - (positionedAncestorLeft)
-        _top = _top - (positionedAncestorTop)
+        if(!!activator) {
+          let { validStickyParent } = getParentInstanceFromViewport(activator?.parentElement)
+          if(!!validStickyParent) {
+            _left = _left + window.scrollX
+            _top = _top + window.scrollY
+          }
+        }
       }
     }
   }
