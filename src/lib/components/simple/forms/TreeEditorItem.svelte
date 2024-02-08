@@ -14,6 +14,13 @@
     },
     'end': {
       ev: Sortable.SortableEvent
+    },
+    'input': {
+      item: Item,
+      inputData?: any
+    },
+    'click': {
+      item: Item
     }
   }>()
 
@@ -24,7 +31,11 @@
     animationDuration: number = 150,
     expanded: boolean | undefined = true,
     subItems: Item[] = [],
-    sortable: Sortable | undefined = undefined
+    sortable: Sortable | undefined = undefined,
+    collapsable: boolean = true,
+    editable: boolean = true,
+    data: any = undefined,
+    updateItem: ((params: { item: Item, inputData?: any }) => Item) | undefined = undefined
 
   let subItemList: HTMLElement,
     mounted: boolean = false
@@ -53,7 +64,24 @@
     })
   }
 
+  let currentItem: Item
+  $: currentItem = {
+    id,
+    title,
+    expanded,
+    sortable,
+    children: subItems,
+    data: data
+  }
+
   $: if(!!subItems) initSortable()
+
+  function doUpdateItem(item: Item, inputData: any) {
+    if(!updateItem) return
+
+    let newItem = updateItem({ item, inputData })
+    dispatch('input', { item: newItem })
+  }
 </script>
 
 <li 
@@ -67,17 +95,32 @@
         name="mdi-dots-grid"
       ></Icon>
     </div>
-    <div class="button-container" class:reversed={expanded}>
-      <Button
-        buttonType="text"
-        on:click={() => expanded = !expanded}
-      >
-        <Icon
-          name="mdi-chevron-down"
-        ></Icon>
-      </Button>
-    </div>
-    {title}
+    {#if collapsable}
+      <div class="button-container" class:reversed={expanded}>
+        <Button
+          buttonType="text"
+          on:click={() => expanded = !expanded}
+        >
+          <Icon
+            name="mdi-chevron-down"
+          ></Icon>
+        </Button>
+      </div>
+    {/if}
+    {#if editable}
+      <input 
+        bind:value={title}
+        on:input|stopPropagation={(e) => {
+          dispatch('input', {  
+            item: currentItem
+          })
+        }}
+      />
+    {:else}
+      {title}
+    {/if}
+    <slot name="append" item={currentItem} {doUpdateItem}>
+    </slot>
   </div>
   <ul 
     class="list-container" 
@@ -90,8 +133,23 @@
           title={subItem.title}
           group={group}
           animationDuration={animationDuration}
+          data={subItem.data}
+          bind:collapsable
           bind:subItems={subItem.children}
           bind:sortable={subItem.sortable}
+          on:input={(e) => {
+            if(e.detail.item.id == subItem.id) {
+              subItem = e.detail.item
+              if(!!updateItem) subItem = updateItem({ item: e.detail.item, inputData: e.detail.inputData })
+            }
+
+            dispatch('input', {
+              item: subItem,
+              inputData: e.detail.inputData
+            })
+          }}
+          on:input
+          on:click
         ></svelte:self>
       {/each}
     {/if}
@@ -138,5 +196,14 @@
 
   .button-container.reversed {
     transform: rotate(-90deg);
+  }
+
+  input {
+    outline: none;
+    background-color: transparent;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
+    border: none
   }
 </style>

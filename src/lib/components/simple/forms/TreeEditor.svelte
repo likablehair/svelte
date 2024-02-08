@@ -19,7 +19,7 @@
 
 <script lang="ts">
   import Sortable from 'sortablejs';
-  import { onMount, createEventDispatcher } from 'svelte';
+  import { onMount, createEventDispatcher, type ComponentProps } from 'svelte';
   import TreeEditorItem from './TreeEditorItem.svelte';
   import { createId } from '@paralleldrive/cuid2';
   import lodash from 'lodash';
@@ -27,24 +27,18 @@
   let dispatch = createEventDispatcher<{
     'change': {
       items: Item[]
-    }
+    },
+    'input': {
+      item: Item
+    },
   }>()
-
-  // let newItems: Item[] = []
-  // for (let i = 0; i < fromParentChildren.length; i++) {
-  //   const child = fromParentChildren[i];
-  //   let sortableId = child.attributes.getNamedItem('data-sortable-id')?.value
-  //   if(!!sortableId) {
-  //     let item = searchInTree(items, sortableId)
-  //     if(!!item) {
-  //       newItems.push(item)
-  //     }
-  //   }
-  // }
 
   export let items: Item[] = [],
     groupName: string = createId(),
-    cleanItems: CleanItem[] = convertItemsInClean(items)
+    cleanItems: CleanItem[] = convertItemsInClean(items),
+    collapsable: boolean = true,
+    editable: boolean = true,
+    updateItem: ComponentProps<TreeEditorItem>['updateItem'] = ({ item }) => { return item }
 
   let itemList: HTMLElement,
     sortable: Sortable | undefined = undefined,
@@ -162,10 +156,25 @@
         title={item.title}
         id={item.id}
         group={groupName}
+        data={item.data}
+        bind:updateItem
+        bind:collapsable
+        bind:editable
         bind:subItems={item.children}
         bind:expanded={item.expanded}
         bind:sortable={item.sortable}
         on:end={handleEnd}
+        on:input={(e) => {
+          if(e.detail.item.id == item.id) {
+            item = e.detail.item
+            if(!!updateItem) item = updateItem({ item: e.detail.item, inputData: e.detail.inputData })
+          }
+
+          dispatch('input', {
+            item
+          })
+        }}
+        on:click
       ></TreeEditorItem>
     {/each}
   </ul>
