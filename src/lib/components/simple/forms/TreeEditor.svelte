@@ -175,7 +175,12 @@
           })
         }}
         on:click
-      ></TreeEditorItem>
+      >
+        <svelte:fragment slot="append" let:item let:doUpdateItem >
+          <slot name="append" item={item} {doUpdateItem}>
+          </slot>
+        </svelte:fragment>
+      </TreeEditorItem>
     {/each}
   </ul>
 {/key}
