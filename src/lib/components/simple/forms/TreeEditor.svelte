@@ -29,7 +29,8 @@
       items: Item[]
     },
     'input': {
-      item: Item
+      item: Item,
+      items: Item[]
     },
   }>()
 
@@ -171,7 +172,8 @@
           }
 
           dispatch('input', {
-            item
+            item,
+            items
           })
         }}
         on:click
@@ -195,7 +197,8 @@
                 }, {})
 
                 dispatch('input', {  
-                  item: item
+                  item,
+                  items
                 })
               }}
             />
