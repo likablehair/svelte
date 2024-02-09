@@ -67,7 +67,7 @@
           if(!!fixedParent) {
             _top = _top - fixedParentTop
             _left = _left - fixedParentLeft
-          } else if(!validStickyParent) {
+          } else if(!validStickyParent && !fixedParent) {
             _top = _top + window.scrollY
             _left = _left + window.scrollX
           }
@@ -85,7 +85,7 @@
           if(!!fixedParent) {
             _top = _top - fixedParentTop
             _left = _left - fixedParentLeft
-          } else if(!validStickyParent) {
+          } else if(!validStickyParent && !fixedParent) {
             _top = _top + window.scrollY
             _left = _left + window.scrollX
           }
@@ -148,8 +148,8 @@
         _top = _top - (positionedAncestorTop + window.scrollY)
 
         if(!!activator) {
-          let { validStickyParent } = getParentInstanceFromViewport(activator?.parentElement)
-          if(!!validStickyParent) {
+          let { validStickyParent, fixedParent } = getParentInstanceFromViewport(activator?.parentElement)
+          if(!!validStickyParent || !!fixedParent) {
             _left = _left + window.scrollX
             _top = _top + window.scrollY
           }
