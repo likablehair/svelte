@@ -104,7 +104,7 @@
           on:click={() => expanded = !expanded}
         >
           <Icon
-            name="mdi-chevron-down"
+            name="mdi-chevron-right"
           ></Icon>
         </Button>
       </div>
@@ -194,6 +194,7 @@
   ul {
     min-height: 10px;
     list-style: none;
+    padding-inline-start: 30px;
   }
 
   .card-container {
@@ -229,7 +230,7 @@
   }
 
   .button-container.reversed {
-    transform: rotate(-90deg);
+    transform: rotate(90deg);
   }
 
   input {
