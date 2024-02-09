@@ -165,11 +165,13 @@
     bind:items={$items}
     bind:cleanItems={cleanItems}
     updateItem={(params) => {
-      console.log(params.inputData)
       return params.item
     }}
-    on:click={(e) => console.log('click', e.detail.item)}
-  ></TreeEditor>
+  >
+    <div slot="append" let:item >
+      append
+    </div>
+  </TreeEditor>
   <div class="descriptor">
     {JSON.stringify(cleanItems)}
   </div>

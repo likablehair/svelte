@@ -77,9 +77,11 @@
   $: if(!!subItems) initSortable()
 
   function doUpdateItem(item: Item, inputData: any) {
-    if(!updateItem) return
+    let newItem = item
+    if(!!updateItem) {
+      newItem = updateItem({ item, inputData })
+    }
 
-    let newItem = updateItem({ item, inputData })
     dispatch('input', { item: newItem })
   }
 </script>
@@ -108,19 +110,25 @@
       </div>
     {/if}
     {#if editable}
-      <input 
-        bind:value={title}
-        on:input|stopPropagation={(e) => {
-          dispatch('input', {  
-            item: currentItem
-          })
-        }}
-      />
+      <slot name="title" item={currentItem} {doUpdateItem}>
+        <input 
+          bind:value={title}
+          on:input|stopPropagation={(e) => {
+            dispatch('input', {  
+              item: currentItem
+            })
+          }}
+        />
+      </slot>
     {:else}
       {title}
     {/if}
-    <slot name="append" item={currentItem} {doUpdateItem}>
-    </slot>
+    {#if !!$$slots.append}
+      <div style:margin-left="auto">
+        <slot name="append" item={currentItem} {doUpdateItem}>
+        </slot>
+      </div>
+    {/if}
   </div>
   <ul 
     class="list-container" 
@@ -150,7 +158,33 @@
           }}
           on:input
           on:click
-        ></svelte:self>
+        >
+          <svelte:fragment slot="append" let:item let:doUpdateItem >
+            <slot name="append" item={item} {doUpdateItem}>
+            </slot>
+          </svelte:fragment>
+          <svelte:fragment slot="title" let:item let:doUpdateItem>
+            <slot name="title" item={item} {doUpdateItem}>
+              <input 
+                value={item.title}
+                on:input|stopPropagation={(e) => {
+                  // @ts-ignore
+                  const { value } = e.target
+                  
+                  item.title = value
+                  doUpdateItem({
+                    ...item,
+                    title: value
+                  }, {})
+
+                  dispatch('input', {  
+                    item: item
+                  })
+                }}
+              />
+            </slot>
+          </svelte:fragment>
+        </svelte:self>
       {/each}
     {/if}
   </ul>

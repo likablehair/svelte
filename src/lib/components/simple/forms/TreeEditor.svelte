@@ -180,16 +180,45 @@
           <slot name="append" item={item} {doUpdateItem}>
           </slot>
         </svelte:fragment>
+        <svelte:fragment slot="title" let:item let:doUpdateItem>
+          <slot name="title" item={item} {doUpdateItem}>
+            <input 
+              value={item.title}
+              on:input|stopPropagation={(e) => {
+                // @ts-ignore
+                const { value } = e.target
+                
+                item.title = value
+                doUpdateItem({
+                  ...item,
+                  title: value
+                }, {})
+
+                dispatch('input', {  
+                  item: item
+                })
+              }}
+            />
+          </slot>
+        </svelte:fragment>
       </TreeEditorItem>
     {/each}
   </ul>
 {/key}
   
 <style>
-
   .main-ul {
     padding: 0px;
     padding-bottom: 30px;
     list-style: none;
+  }
+
+  input {
+    outline: none;
+    background-color: transparent;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
+    border: none
   }
 </style>
