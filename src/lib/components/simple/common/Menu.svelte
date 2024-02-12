@@ -118,6 +118,7 @@
         }
 
         if (
+          anchor == 'right-center' &&
           window.innerWidth + window.scrollX <
           (_left || 0) + (menuElement?.offsetWidth || 0)
         ) {

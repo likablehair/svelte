@@ -26,6 +26,7 @@
       --autocomplete-border="1px solid rgb(var(--global-color-background-200))"
       --autocomplete-focus-border="2px solid rgb(var(--global-color-primary-500))"
       --countries-autocomplete-flag-icon-size=".8rem"
+      autocompleteProps={{ mobileDrawer: true }}
     ></CountriesAutocomplete>
   </div>
   <div>
@@ -33,7 +34,9 @@
     <Dialog
       bind:open={dialog}
     >
-      <CountriesAutocomplete></CountriesAutocomplete>
+      <CountriesAutocomplete
+        autocompleteProps={{ mobileDrawer: true }}
+      ></CountriesAutocomplete>
     </Dialog>
   </div>
   <h2>Props</h2>

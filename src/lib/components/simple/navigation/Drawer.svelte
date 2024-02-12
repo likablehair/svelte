@@ -3,17 +3,19 @@
   import './Drawer.css'
   import Navigator from "$lib/components/simple/navigation/Navigator.svelte";
   import type { Item } from "$lib/components/simple/navigation/Navigator.svelte";
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher, onMount, beforeUpdate } from 'svelte';
   import Teleporter from '$lib/utils/teleporter';
   import Keyboarder, { type CallbackFunction } from '$lib/utils/keyboarder';
+  import { BROWSER } from 'esm-env';
 
   export let open = false,
     position: "left" | "top" | "right" | "bottom" = "left",
-    overlay = true,
+    overlay = false,
     items: Item[] = [],
     teleportedUid: string | undefined = undefined;
 
-  let drawerElement: HTMLElement
+  let drawerElement: HTMLElement,
+    localOpen: boolean = false
 
   const dispatch = createEventDispatcher<{
     'close': {}
@@ -52,12 +54,32 @@
     dispatch('close', {})
   }
 
-  $: if(open) {
-    overlay = true
-  }
+  let zIndex: number = 50
+  beforeUpdate(() => {
+    if(BROWSER && open && localOpen !== open) {
+      let otherDialogs: NodeListOf<HTMLElement> =
+        document.querySelectorAll("[data-dialog]");
+
+      let maxZIndex: number | undefined = undefined;
+      if (otherDialogs.length > 0) {
+        otherDialogs.forEach((dialog) => {
+          let computedStyle = getComputedStyle(dialog)
+          if (!maxZIndex || maxZIndex < Number(computedStyle.zIndex))
+            maxZIndex = Number(computedStyle.zIndex);
+        });
+      }
+
+      zIndex = Math.max(maxZIndex || 0, (zIndex - 2)) + 2
+
+      overlay = true
+      localOpen = true
+    } else if(BROWSER && !open && localOpen !== open) {
+      localOpen = false
+    }
+  })
 </script>
 
-<div class="drawer-container" bind:this={drawerElement}>
+<div class="drawer-container" bind:this={drawerElement} data-drawer={localOpen}>
   <div
     style:position="fixed"
     class="drawer-container"
@@ -65,13 +87,14 @@
     class:right={position == 'right'}
     class:top={position == 'top'}
     class:bottom={position == 'bottom'}
-    class:opened={open}
+    class:opened={localOpen}
     class:animate-left={position == "left"}
     class:animate-right={position == "right"}
     class:animate-bottom={position == "bottom"}
     class:animate-top={position == "top"}
+    style:z-index={zIndex + 1}
   >
-    <slot {open}>
+    <slot open={localOpen}>
       <div
         style:display="flex"
         style:justify-content="center"
@@ -96,8 +119,9 @@
       on:click={handleClickOverlay}
       on:keypress={handleClickOverlay}
       class="overlay"
-      class:overlay-active={open}
-      class:overlay-hidden={!open}
+      class:overlay-active={localOpen}
+      class:overlay-hidden={!localOpen}
+      style:z-index={zIndex}
     />
   {/if}
 </div>
@@ -120,7 +144,6 @@
   }
 
   .drawer-container {
-    z-index: var(--drawer-z-index, var(--drawer-default-z-index));
     background-color: var(
       --drawer-background-color,
       var(--drawer-default-background-color)
@@ -149,7 +172,6 @@
       --drawer-overlay-opacity,
       var(--drawer-default-overlay-opacity)
     );
-    z-index: calc(var(--drawer-z-index, var(--drawer-default-z-index)) - 1);
   }
 
   .overlay-hidden {
