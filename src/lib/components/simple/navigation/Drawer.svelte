@@ -3,21 +3,53 @@
   import './Drawer.css'
   import Navigator from "$lib/components/simple/navigation/Navigator.svelte";
   import type { Item } from "$lib/components/simple/navigation/Navigator.svelte";
-    import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
+  import Teleporter from '$lib/utils/teleporter';
+  import Keyboarder, { type CallbackFunction } from '$lib/utils/keyboarder';
 
   export let open = false,
     position: "left" | "top" | "right" | "bottom" = "left",
     overlay = true,
-    items: Item[] = [];
+    items: Item[] = [],
+    teleportedUid: string | undefined = undefined;
+
+  let drawerElement: HTMLElement
 
   const dispatch = createEventDispatcher<{
     'close': {}
   }>()
 
+  onMount(() => {
+    if(!teleportedUid) {
+      let tp = new Teleporter()
+      teleportedUid = tp.attachNode(drawerElement)
+    }
+
+    let keyboarderHandler: CallbackFunction = (params) => {
+      if(params.key == 'Escape' && open) closeDrawer()
+    }
+    Keyboarder.on(keyboarderHandler)
+
+    return () => {
+      if(!!teleportedUid) {
+        let tp = new Teleporter()
+        tp.destroyNode(teleportedUid)
+      }
+
+      Keyboarder.off(keyboarderHandler)
+    }
+  })
+
+  function closeDrawer() {
+    open = false;
+    overlay = false;
+    dispatch('close', {})
+  }
+
   function handleClickOverlay() {
     open = false;
     overlay = false;
-    dispatch('close')
+    dispatch('close', {})
   }
 
   $: if(open) {
@@ -25,48 +57,50 @@
   }
 </script>
 
-<div
-  style:position="fixed"
-  class="drawer-container"
-  class:left={position == 'left'}
-  class:right={position == 'right'}
-  class:top={position == 'top'}
-  class:bottom={position == 'bottom'}
-  class:opened={open}
-  class:animate-left={position == "left"}
-  class:animate-right={position == "right"}
-  class:animate-bottom={position == "bottom"}
-  class:animate-top={position == "top"}
->
-  <slot {open}>
-    <div
-      style:display="flex"
-      style:justify-content="center"
-      style:align-items="center"
-      style:margin-top={position == "left" || position == "right"
-        ? "10px"
-        : "0px"}
-      style:height={position == "top" || position == "bottom"
-        ? "100%"
-        : "fit-content"}
-    >
-      <Navigator
-        {items}
-        vertical={position == "right" || position == "left"}
-        on:item-click
-      />
-    </div>
-  </slot>
-</div>
-{#if overlay}
+<div class="drawer-container" bind:this={drawerElement}>
   <div
-    on:click={handleClickOverlay}
-    on:keypress={handleClickOverlay}
-    class="overlay"
-    class:overlay-active={open}
-    class:overlay-hidden={!open}
-  />
-{/if}
+    style:position="fixed"
+    class="drawer-container"
+    class:left={position == 'left'}
+    class:right={position == 'right'}
+    class:top={position == 'top'}
+    class:bottom={position == 'bottom'}
+    class:opened={open}
+    class:animate-left={position == "left"}
+    class:animate-right={position == "right"}
+    class:animate-bottom={position == "bottom"}
+    class:animate-top={position == "top"}
+  >
+    <slot {open}>
+      <div
+        style:display="flex"
+        style:justify-content="center"
+        style:align-items="center"
+        style:margin-top={position == "left" || position == "right"
+          ? "10px"
+          : "0px"}
+        style:height={position == "top" || position == "bottom"
+          ? "100%"
+          : "fit-content"}
+      >
+        <Navigator
+          {items}
+          vertical={position == "right" || position == "left"}
+          on:item-click
+        />
+      </div>
+    </slot>
+  </div>
+  {#if overlay}
+    <div
+      on:click={handleClickOverlay}
+      on:keypress={handleClickOverlay}
+      class="overlay"
+      class:overlay-active={open}
+      class:overlay-hidden={!open}
+    />
+  {/if}
+</div>
 
 <style>
   .animate-left {

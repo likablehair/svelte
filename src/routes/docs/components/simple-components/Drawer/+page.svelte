@@ -2,9 +2,12 @@
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
   import Drawer from "$lib/components/simple/navigation/Drawer.svelte";
+  import Dialog from "$lib/components/simple/dialogs/Dialog.svelte";
   import Button from "$lib/components/simple/buttons/Button.svelte";
 
-  let open: boolean = false
+  let open: boolean = false,
+    dialogOpened: boolean = false,
+    secondDrawerOpened: boolean = false
 
   function handleButtonClick() {
     open = true
@@ -22,9 +25,32 @@
   >
     Open drawer
   </Button>
+  <Button
+    width="200px"
+    maxWidth="90vw"
+    on:click={() => dialogOpened = true}
+  >
+    Open dialog
+  </Button>
   <Drawer
     bind:open={open}
   >pippo</Drawer>
+  <Dialog
+    bind:open={dialogOpened}
+  >
+    <div>
+      <Button
+        width="200px"
+        maxWidth="90vw"
+        on:click={() => secondDrawerOpened = true}
+      >
+        Open drawer
+      </Button>
+      <Drawer
+        bind:open={secondDrawerOpened}
+      >second</Drawer>
+    </div>
+  </Dialog>
 </div>
 <h2>Props</h2>
 <PropsViewer

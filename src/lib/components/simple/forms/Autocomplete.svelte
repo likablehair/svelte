@@ -35,8 +35,7 @@
     maxVisibleChips: number | undefined = undefined,
     menuOpened: boolean = false,
     closeOnSelect: boolean = !multiple,
-    emptySearchTextOnMenuClose: boolean = false,
-    emptySearchTextOnTextfieldBlur: boolean = true,
+    emptySearchTextOnMenuClose: boolean = true,
     // menu
     menuBoxShadow = "rgb(var(--global-color-background-300), .5) 0px 2px 4px",
     menuBorderRadius = "5px",
@@ -129,7 +128,6 @@
 
   function handleTextFieldBlur() {
     // closeMenu()
-    if(emptySearchTextOnTextfieldBlur) searchText = undefined
   }
 
   let menuElement: HTMLElement;
@@ -191,7 +189,7 @@
   $: if(!menuOpened && emptySearchTextOnMenuClose) {
     setTimeout(() => {
       if(!menuOpened && emptySearchTextOnMenuClose) searchText = undefined
-    }, 80);
+    }, 10);
   }
 
   import Chip from "$lib/components/simple/navigation/Chip.svelte";
