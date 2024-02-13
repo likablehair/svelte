@@ -55,13 +55,11 @@
       ghostClass: 'ghost-drag-element',
       onEnd(ev) {
         dispatch('end', { ev })
-        console.log('internal END')
       },
       onChange(ev) {
         dispatch('change', { ev })
       },
       onUpdate(ev) {
-        console.log('internal Update')
       }
     })
   }
