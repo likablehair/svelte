@@ -18,7 +18,10 @@
         children: [
           {
             id: 3,
-            title: 'ID 3'
+            title: 'ID 3',
+            children: [
+              { id: 'prova_a_muovermi', title: 'Prova a muovermi sopra' }
+            ]
           },
           {
             id: 4,
@@ -167,6 +170,7 @@
     updateItem={(params) => {
       return params.item
     }}
+    on:change={() => console.log('change')}
   >
     <div slot="append" let:item >
       append
