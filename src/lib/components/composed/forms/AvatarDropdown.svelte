@@ -13,7 +13,6 @@
 <script lang="ts">
   import lodash from "lodash";
   import Autocomplete from "../../../components/simple/forms/Autocomplete.svelte";
-  import Button from '../../simple/buttons/Button.svelte'
   import Icon from '../../simple/media/Icon.svelte'
   import { createEventDispatcher } from "svelte";
   import Avatar from "$lib/components/simple/media/Avatar.svelte";
@@ -30,26 +29,19 @@
   export let items: AvatarItem[] = [],
     values: AvatarItem[] = [],
     multiple: boolean = true,
-    lang: 'it' | 'en' = 'en',
-    searchText: string | undefined = undefined,
-    maxVisibleChips: number | undefined = undefined,
-    placeholder: string = lang == 'en' ? "Select" : "Seleziona",
-    clearable: boolean = true,
-    mandatory: boolean = true,
     menuOpened: boolean = false,
     openingId: string | undefined = undefined,
     width: string | undefined = undefined
 
-  function handleCloseClick(event: MouseEvent) {
-    event.preventDefault()
-    event.stopPropagation()
-    let valuesBefore = lodash.cloneDeep(values)
-    values = []
+  function handleCloseClick(params: { index: number }) {
+    let unselected = lodash.cloneDeep(values[params.index])
+    values.splice(params.index, 1)
+    values = [...values]
 
     dispatch('change', {
-      unselect: valuesBefore[0],
+      unselect: unselected,
       select: undefined,
-      selection: []
+      selection: values
     })
   }
 
@@ -72,10 +64,7 @@
 <Autocomplete
   bind:items={autocompleteItems}
   bind:values
-  bind:searchText
   bind:multiple
-  bind:maxVisibleChips
-  bind:mandatory
   searchFunction={() => true}
   on:change
   bind:menuOpened
@@ -98,10 +87,7 @@
       <slot 
         name="label" 
         {values} 
-        {items} 
-        {searchText} 
-        {placeholder} 
-        {clearable} 
+        {items}
         {handleCloseClick}
       >
         {#if values.length > 0}
@@ -121,8 +107,7 @@
                 ></Avatar>
                 <button 
                   on:click|stopPropagation={() => {
-                    values.splice(i, 1)
-                    values = [...values]
+                    handleCloseClick({ index: i })
                   }}
                   class="unstyled-button remove-button"
                 >
@@ -135,10 +120,7 @@
           <slot 
             name="no-values"
             {values} 
-            {items} 
-            {searchText} 
-            {placeholder} 
-            {clearable} 
+            {items}
             {handleCloseClick}
           >
             <Icon name="mdi-account-plus"></Icon>
