@@ -1,4 +1,5 @@
 :root {
+  --year-selector-default-max-height: 500px;
   --year-selector-default-height: 100%;
   --year-selector-default-width: 100%;
 }

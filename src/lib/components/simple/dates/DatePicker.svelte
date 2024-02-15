@@ -167,7 +167,7 @@
       />
     {:else if view == "year"}
       <YearSelector
-        --year-selector-height="calc(var(--date-picker-height, var(--date-picker-default-height)) / 8 * 6)"
+        --year-selector-height="calc(var(--date-picker-height, var(--date-picker-default-height)) - calc(var(--date-picker-height, var(--date-picker-default-height)) / 4))"
         bind:selectedYear={visibleYear}
         {selectableYears}
         on:click={handleYearChange}

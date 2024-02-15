@@ -13,6 +13,7 @@ export { default as MonthSelector } from './components/simple/dates/MonthSelecto
 export { default as TimePickerTextField } from './components/simple/dates/TimePickerTextField.svelte'
 export { default as DatePickerTextField } from './components/composed/forms/DatePickerTextField.svelte'
 export { default as YearSelector } from './components/simple/dates/YearSelector.svelte'
+export { default as YearPickerTextField } from './components/composed/forms/YearPickerTextField.svelte'
 
 export { default as Dialog } from './components/simple/dialogs/Dialog.svelte'
 

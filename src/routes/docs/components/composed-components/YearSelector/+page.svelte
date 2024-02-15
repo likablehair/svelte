@@ -1,0 +1,42 @@
+<script lang="ts">
+  import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
+  import PropsViewer from "../../PropsViewer.svelte";
+  import YearSelector from "$lib/components/simple/dates/YearSelector.svelte";
+</script>
+
+<h1>YearSelector</h1>
+<ComponentSubtitle>Select your year.</ComponentSubtitle>
+<h2>Example</h2>
+<div class="example">
+  <YearSelector></YearSelector>
+</div>
+<h2>Props</h2>
+<PropsViewer props={[
+    // {
+    //   name: 'type',
+    //   type: '"button" | "submit"',
+    //   description: "HTML type attribute",
+    //   default: "button"
+    // }
+  ]}
+  styleProps={[
+    // {
+    //   name: '--button-max-width',
+    //   type: 'string',
+    //   default: 'undefined',
+    //   description: 'The max width of the outer element'
+    // }
+  ]}
+></PropsViewer>
+<h2>Slots</h2>
+<h2>Events</h2>
+
+<style>
+  .example {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    margin-bottom: 20px;
+  }
+</style>

@@ -92,6 +92,12 @@ const list: {
     type: 'composed',
     url: '/docs/components/simple-components/DatePickerTextField'
   }, {
+    title: 'YearPickerTextField',
+    description: 'If you want a year, you\'ll have a year.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/YearPickerTextField'
+  }, {
     title: 'TimePicker',
     description: 'Time to change, always time to change',
     status: 'stable',
@@ -181,6 +187,12 @@ const list: {
     status: 'stable',
     type: 'composed',
     url: '/docs/components/composed-components/Dropdown'
+  }, {
+    title: 'YearSelector',
+    description: 'Select your year.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/YearSelector'
   }, {
     title: 'MenuOrDrawer',
     description: 'Put all the menus in the drawer please.',

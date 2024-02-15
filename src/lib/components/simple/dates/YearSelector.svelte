@@ -51,6 +51,8 @@
       <div bind:this={targetButtons[year]} style:width="100%">
         <Button
           --button-background-color={year == selectedYear ? "rgb(var(--global-color-primary-500))" : "trasparent"}
+          --button-active-background-color={year == selectedYear ? "rgb(var(--global-color-primary-500))" : "trasparent"}
+          --button-focus-background-color={year == selectedYear ? "rgb(var(--global-color-primary-500))" : "trasparent"}
           --button-hover-background-color={year == selectedYear ? "var(--button-background-color)" : "rgb(var(--global-color-primary-500), .2)"}
           --button-color={year == selectedYear ?  "rgb(var(--global-color-grey-50))" : undefined}
           --button-font-weight="500"
@@ -80,6 +82,10 @@
     height: var(
       --year-selector-height,
       var(--year-selector-default-height)
+    );
+    max-height: var(
+      --year-selector-max-height,
+      var(--year-selector-default-max-height)
     );
     width: var(
       --year-selector-width,
