@@ -32,6 +32,12 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/Card'
   }, {
+    title: 'Avatar',
+    description: 'Circle image.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Avatar'
+  }, {
     title: 'Gesture',
     description: 'Handle touch gesture movements',
     status: 'stable',

@@ -1,44 +1,42 @@
 <script lang="ts">
-  export let src: string,
-    alt = "",
-    width = "40px",
-    maxWidth: string | undefined = undefined,
-    minWidth: string | undefined = undefined,
-    height = "40px",
-    maxHeight: string | undefined = undefined,
-    minHeight: string | undefined = undefined,
-    lazyLoaded = false,
-    referrerpolicy: ReferrerPolicy | null | undefined = "no-referrer",
-    borderRadius = "50%";
+  import './Avatar.css'
+  import '../../../css/main.css'
 
-  import Image from "$lib/components/simple/media/Image.svelte";
+  export let src: string,
+    alt: string = "",
+    referrerpolicy: ReferrerPolicy | null | undefined = "no-referrer"
 </script>
 
-{#if lazyLoaded}
-  <Image
-    {src}
-    {width}
-    {maxWidth}
-    {minWidth}
-    {height}
-    {maxHeight}
-    {minHeight}
-    {borderRadius}
-    disableHover={true}
-    showSkeletonLoader={true}
-  />
-{:else}
-  <img
-    {src}
-    {alt}
-    style:width
-    style:max-width={maxWidth}
-    style:min-width={minWidth}
-    style:height
-    style:max-height={maxHeight}
-    style:min-height={minHeight}
-    style:border-radius={borderRadius}
-    style:object-fit="cover"
-    {referrerpolicy}
-  />
-{/if}
+
+<img
+  class="avatar"
+  {src}
+  {alt}
+  {referrerpolicy}
+/>
+
+<style>
+  .avatar {
+    width: var(
+      --avatar-width,
+      var(--avatar-default-width)
+    );
+    height: var(
+      --avatar-height,
+      var(--avatar-default-height)
+    );
+    min-width: var(--avatar-min-width);
+    max-width: var(--avatar-max-width);
+    height: var(
+      --avatar-height,
+      var(--avatar-default-height)
+    );
+    min-height: var(--avatar-min-height);
+    max-height: var(--avatar-max-height);
+    border-radius: var(
+      --avatar-border-radius,
+      var(--avatar-default-border-radius)
+    );
+    object-fit: cover;
+  }
+</style>
