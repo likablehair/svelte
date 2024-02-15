@@ -109,8 +109,8 @@
         </Button>
       </div>
     {/if}
-    {#if editable}
-      <slot name="title" item={currentItem} {doUpdateItem}>
+    <slot name="title" item={currentItem} {doUpdateItem}>
+      {#if editable}
         <input 
           bind:value={title}
           on:input|stopPropagation={(e) => {
@@ -119,10 +119,10 @@
             })
           }}
         />
-      </slot>
-    {:else}
-      {title}
-    {/if}
+      {:else}
+        {title}
+      {/if}
+    </slot>
     {#if !!$$slots.append}
       <div style:margin-left="auto">
         <slot name="append" item={currentItem} {doUpdateItem}>
