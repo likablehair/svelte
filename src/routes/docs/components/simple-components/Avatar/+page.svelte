@@ -12,6 +12,9 @@
   <Avatar
     src="/avatars/avatar1.jpeg"
   ></Avatar>
+  <Avatar
+    text="FP"
+  ></Avatar>
 </div>
 <h2>Props</h2>
 <PropsViewer

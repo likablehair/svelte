@@ -39,7 +39,8 @@
     // menu
     menuBoxShadow = "rgb(var(--global-color-background-300), .5) 0px 2px 4px",
     menuBorderRadius = "5px",
-    mobileDrawer: boolean = false
+    mobileDrawer: boolean = false,
+    menuWidth: string | undefined = undefined
 
   let dispatch = createEventDispatcher<{
     change: {
@@ -101,7 +102,7 @@
     else select(item);
   }
 
-  let menuWidth: string | undefined = undefined,
+  let localMenuWidth: string | undefined = undefined,
     menuHeight = "auto",
     refreshPosition = false;
 
@@ -112,11 +113,13 @@
 
   function refreshMenuWidth() {
     setTimeout(() => {
-      menuWidth = activator.offsetWidth + "px";
+      if(menuWidth !== undefined) localMenuWidth = menuWidth
+      else localMenuWidth = activator.offsetWidth + "px"
+      
       setTimeout(() => {
         refreshPosition = true;
-      }, 1);
-    }, 1);
+      }, 3);
+    }, 3);
   }
 
   let activator: HTMLElement,
@@ -210,6 +213,8 @@
   on:click={handleContainerClick}
   on:keypress={handleContainerClick}
   class={clazz.activator || ''}
+  role="button"
+  tabindex="0"
 >
   <slot name="selection-container" {values} {searchText} {disabled} {openMenu} {handleKeyDown}>
     <div
@@ -265,7 +270,7 @@
   {#if !mobileDrawer}
     <Menu
       {activator}
-      _width={menuWidth || ""}
+      _width={localMenuWidth || ""}
       _height={menuHeight}
       _maxHeight="300px"
       _boxShadow={menuBoxShadow}
@@ -300,6 +305,8 @@
                 }) != -1}
                 on:click={() => toggle(item)}
                 on:keypress={() => toggle(item)}
+                role="button"
+                tabindex="0"
               >
                 <slot name="item-label" {item}>
                   {item.label}
@@ -313,7 +320,7 @@
   {:else}
     <MenuOrDrawer
       {activator}
-      _width={menuWidth || ""}
+      _width={localMenuWidth || ""}
       _height={menuHeight}
       _maxHeight="300px"
       _boxShadow={menuBoxShadow}
@@ -343,6 +350,8 @@
                 }) != -1}
                 on:click={() => toggle(item)}
                 on:keypress={() => toggle(item)}
+                role="button"
+                tabindex="0"
               >
                 <slot name="item-label" {item}>
                   {item.label}

@@ -2,4 +2,7 @@
   --avatar-default-width: 40px;
   --avatar-default-height: 40px;
   --avatar-default-border-radius: 9999px;
+  --avatar-default-background-color: rgb(var(--global-color-primary-500));
+  --avatar-default-text-color: rgb(var(--global-color-grey-50));
+  --avatar-default-text-weight: 700;
 }

@@ -194,6 +194,12 @@ const list: {
     type: 'composed',
     url: '/docs/components/composed-components/Dropdown'
   }, {
+    title: 'AvatarDropdown',
+    description: 'Easily choose your avatar.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/AvatarDropdown'
+  }, {
     title: 'YearSelector',
     description: 'Select your year.',
     status: 'stable',
