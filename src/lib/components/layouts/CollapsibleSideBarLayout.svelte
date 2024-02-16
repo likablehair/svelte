@@ -88,6 +88,7 @@
             items={menuItems}
             collapsed={false}
             selected={selectedMenuElementName}
+            on:select={handleMenuSelect}
           ></SelectableMenuList>
           <div class="sidebar-footer">
             <slot name="sidebar-footer" collapsed={false} drawer={true}></slot>
