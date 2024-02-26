@@ -45,7 +45,6 @@
   }
 
   $: hours = buildUpHours
-  $: console.log(hours)
 </script>
 
 <div

@@ -1,12 +1,5 @@
 <script lang="ts">
   import { Line } from 'svelte-chartjs';
-
-  let background: string | undefined = undefined
-  onMount(() => {
-    let style = getComputedStyle(document.body);
-    background = style.getPropertyValue('--global-color-background-200');
-  })
-
   import {
     Chart as ChartJS,
     Title,
@@ -17,7 +10,7 @@
     PointElement,
     CategoryScale,
   } from 'chart.js';
-    import { onMount } from 'svelte';
+  import { onMount, type ComponentProps } from 'svelte';
 
   ChartJS.register(
     Title,
@@ -28,6 +21,16 @@
     PointElement,
     CategoryScale
   );
+
+  let background: string | undefined = undefined,
+    mounted: boolean = false,
+    zoomMounted: boolean = false
+
+  onMount(async () => {
+    let style = getComputedStyle(document.body);
+    background = style.getPropertyValue('--global-color-background-200');
+    mounted = true
+  })
 
 
   export let data: {
@@ -51,57 +54,91 @@
     showYTicks: boolean = false,
     showXTicks: boolean = false,
     displayYGrid: boolean = true,
-    lineWidth: number = 1
+    lineWidth: number = 1,
+    enableZoom: boolean = false,
+    resetZoom: boolean = false
 
   $: gridColor = 'rgb(' + (background || '200, 200, 200') + ', .3)'
-</script>
 
-<Line
-  bind:data={data}
-  options={{
-    indexAxis: horizontal ? 'y' : 'x',
-    responsive: responsive,
-    maintainAspectRatio: maintainAspectRatio,
-    plugins: {
-      legend: {
-        display: showLegend
-      }
-    },
-    interaction: {
-      intersect: false,
-    },
-    scales: {
-      x: {
-        display: true,
-        title: {
-          display: true
+  let chart: ComponentProps<Line>['chart']
+  $: if(!!chart && !!enableZoom && !!resetZoom) {
+    chart.resetZoom()
+    resetZoom = false
+  }
+
+  $: if(enableZoom && mounted) {
+    import('chartjs-plugin-zoom').then(({ default: zoomPlugin }) => {
+      ChartJS.register(zoomPlugin)
+      zoomMounted = true
+    })
+  }
+
+  let chartOptions: ComponentProps<Line>['options']
+  $: chartOptions = {
+      indexAxis: horizontal ? 'y' : 'x',
+      responsive: responsive,
+      maintainAspectRatio: maintainAspectRatio,
+      plugins: {
+        legend: {
+          display: showLegend
         },
-        grid: {
-          display: false
-        },
-        border: {
-          display: false
-        },
-        ticks: {
-          display: showYTicks
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: 'x',
+            modifierKey: 'ctrl',
+          },
+          zoom: {
+            drag: {
+              enabled: true
+            },
+            mode: 'x',
+          },
         }
       },
-      y: {
-        display: displayYGrid,
-        title: {
+      interaction: {
+        intersect: false,
+      },
+      scales: {
+        x: {
+          display: true,
+          title: {
+            display: true
+          },
+          grid: {
+            display: false
+          },
+          border: {
+            display: false
+          },
+          ticks: {
+            display: showYTicks
+          }
         },
-        grid: {
-          lineWidth: lineWidth,
-          color: gridColor
-        },
-        border: {
-          dash: [10,10],
-          display: false
-        },
-        ticks: {
-          display: showXTicks
+        y: {
+          display: displayYGrid,
+          title: {
+          },
+          grid: {
+            lineWidth: lineWidth,
+            color: gridColor
+          },
+          border: {
+            dash: [10,10],
+            display: false
+          },
+          ticks: {
+            display: showXTicks
+          }
         }
       }
     }
-  }}
-></Line>
+</script>
+
+{#if zoomMounted || !enableZoom}
+  <Line
+    bind:data={data}
+    options={chartOptions}
+    bind:chart={chart}
+  ></Line>
+{/if}

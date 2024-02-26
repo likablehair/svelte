@@ -88,7 +88,6 @@
 
   function handleFiltersChange(e: CustomEvent) {
     let filterBuilder: Builder = e.detail.builder
-    console.log(filterBuilder.toJson())
   }
 
   let customFiltersValues: {[filterName: string]: any} = {},

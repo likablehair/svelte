@@ -2,7 +2,10 @@
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
   import Paginator from "$lib/components/composed/list/Paginator.svelte";
-    import GanymedeLineChart from "$lib/components/simple/charts/GanymedeLineChart.svelte";
+  import GanymedeLineChart from "$lib/components/simple/charts/GanymedeLineChart.svelte";
+  import Button from "$lib/components/simple/buttons/Button.svelte";
+
+  let resetZoom: boolean = false
 </script>
 
 <h1>GanymedeLineChart</h1>
@@ -29,7 +32,12 @@
       ]
     }}
     showLegend={false}
+    enableZoom={true}
+    bind:resetZoom={resetZoom}
   ></GanymedeLineChart>
+  <Button
+    on:click={() => { resetZoom = true }}
+  >Reset zoom</Button>
 </div>
 <h2>Props</h2>
 <PropsViewer
@@ -56,6 +64,7 @@
 <style>
   .example {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 10px;
