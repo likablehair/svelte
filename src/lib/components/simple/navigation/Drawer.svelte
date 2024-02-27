@@ -12,7 +12,17 @@
     position: "left" | "top" | "right" | "bottom" = "left",
     overlay = false,
     items: Item[] = [],
-    teleportedUid: string | undefined = undefined;
+    teleportedUid: string | undefined = undefined,
+    _space: string | undefined = undefined,
+    _openingSpeed: string | undefined = undefined,
+    _backgroundColor: string | undefined = undefined,
+    _color: string | undefined = undefined,
+    _overflow: string | undefined = undefined,
+    _borderRadius: string | undefined = undefined,
+    _margin: string | undefined = undefined,
+    _overlaySpeed: string | undefined = undefined,
+    _overlayBackgroundColor: string | undefined = undefined,
+    _overlayOpacity: string | undefined = undefined
 
   let drawerElement: HTMLElement,
     localOpen: boolean = false
@@ -23,8 +33,14 @@
 
   onMount(() => {
     if(!teleportedUid) {
+      // let oldCssVars = {
+      //   '--drawer-space': getComputedStyle(drawerElement).getPropertyValue('--drawer-space')
+      // }
+
       let tp = new Teleporter()
       teleportedUid = tp.attachNode(drawerElement)
+
+      // drawerElement.style.setProperty('--drawer-space', oldCssVars['--drawer-space'])
     }
 
     let keyboarderHandler: CallbackFunction = (params) => {
@@ -79,7 +95,21 @@
   })
 </script>
 
-<div class="drawer-container" bind:this={drawerElement} data-drawer={localOpen}>
+<div 
+  class="drawer-container" 
+  bind:this={drawerElement} 
+  data-drawer={localOpen}
+  style:--drawer-space={_space}
+  style:--drawer-opening-speed={_openingSpeed}
+  style:--drawer-background-color={_backgroundColor}
+  style:--drawer-color={_color}
+  style:--drawer-overflow={_overflow}
+  style:--drawer-border-radius={_borderRadius}
+  style:--drawer-margin={_margin}
+  style:--drawer-overlay-speed={_overlaySpeed}
+  style:--drawer-overlay-background-color={_overlayBackgroundColor}
+  style:--drawer-overlay-opacity={_overlayOpacity}
+>
   <div
     style:position="fixed"
     class="drawer-container"

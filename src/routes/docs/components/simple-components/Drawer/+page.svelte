@@ -7,7 +7,8 @@
 
   let open: boolean = false,
     dialogOpened: boolean = false,
-    secondDrawerOpened: boolean = false
+    secondDrawerOpened: boolean = false,
+    largerDrawer: boolean = false
 
   function handleButtonClick() {
     open = true
@@ -28,6 +29,13 @@
   <Button
     width="200px"
     maxWidth="90vw"
+    on:click={() => largerDrawer = true}
+  >
+    Open larger drawer
+  </Button>
+  <Button
+    width="200px"
+    maxWidth="90vw"
     on:click={() => dialogOpened = true}
   >
     Open dialog
@@ -35,6 +43,11 @@
   <Drawer
     bind:open={open}
   >pippo</Drawer>
+  <Drawer
+    bind:open={largerDrawer}
+    _space="80vw"
+    _openingSpeed=".5s"
+  >larger drawer</Drawer>
   <Dialog
     bind:open={dialogOpened}
   >
