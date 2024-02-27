@@ -15,25 +15,34 @@
     buttonTabIndex: number | null = null,
     truncateText: boolean = false
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{
+    click: {
+      native: MouseEvent
+    },
+    close: {
+      native: MouseEvent
+    }
+  }>();
 
-  function handleChipClick() {
-    dispatch("click");
+  function handleChipClick(e: MouseEvent) {
+    dispatch("click", { native: e });
   }
 
   function handleCloseClick(e: CustomEvent) {
     e.detail.nativeEvent.stopPropagation()
-    dispatch("close");
+    dispatch("close", {
+      native: e.detail.nativeEvent
+    });
   }
 </script>
 
-<div
+<button
   class="chip"
   class:label
   class:outlined
   class:disabled
+  disabled={disabled}
   on:click={handleChipClick}
-  on:keypress={handleChipClick}
 >
   {#if filter}
     <div class="icon-before">
@@ -55,12 +64,14 @@
         --button-background-color="transparent"
         --button-padding="0px"
         --button-color="var(--chip-color, var(--chip-default-color))"
+        --button-default-icon-active-color="var(--chip-color, var(--chip-default-color))"
+        --button-default-focus-active-color="var(--chip-color, var(--chip-default-color))"
         on:click
         ={handleCloseClick}
       />
     </div>
   {/if}
-</div>
+</button>
 
 <style>
   .chip {
@@ -83,6 +94,13 @@
       --chip-cursor,
       var(--chip-default-cursor)
     );
+
+    outline: inherit;
+    background-image: none;
+    text-transform: none;
+    line-height: inherit;
+    border: none;
+    font: inherit;
   }
 
   .truncate {
