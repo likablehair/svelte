@@ -221,7 +221,7 @@
       class="selection-container"
     >
       {#each (values || []).slice(0, maxVisibleChips) as selection}
-        <slot name="selection" {selection}>
+        <slot name="selection" {selection} {unselect} >
           <div tabindex="-1">
             <Chip
               close={true}
