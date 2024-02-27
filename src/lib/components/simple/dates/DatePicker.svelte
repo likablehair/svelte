@@ -25,7 +25,8 @@
     locale: Locale = "it",
     selectableYears: number[] = [...Array(150).keys()].map(
       (i) => i + (new Date().getFullYear() - 75)
-    )
+    ),
+    skipTabs: boolean = false
 
   let dispatch = createEventDispatcher<{
     'year-click': {
@@ -101,16 +102,18 @@
   <div
     class="header {clazz.header || ''}"
   >
-    <span
+    <button
       class:disabled={elementDisabled == "year"}
       on:click={() => {
         view = "year";
       }}
       on:keypress={() => {
         view = "year";
-      }}>{visibleYear}</span
-    >
-    <h2
+      }}
+      class="unstyled year"
+      tabindex={skipTabs ? -1 : undefined}
+    >{visibleYear}</button>
+    <button
       class:disabled={elementDisabled == "date"}
       on:click={() => {
         view = "day";
@@ -118,11 +121,13 @@
       on:keypress={() => {
         view = "day";
       }}
+      class="unstyled day"
+      tabindex={skipTabs ? -1 : undefined}
     >
       {#if !!selectedDate}
         {dateToString(selectedDate, "dayAndMonth", locale)}
       {/if}
-    </h2>
+    </button>
   </div>
   <div class="body">
     {#if visibleSelector}
@@ -134,16 +139,19 @@
             --icon-size="25pt"
             icon="mdi-chevron-left"
             on:click={previous}
+            tabindex={skipTabs ? -1 : undefined}
           />
         </div>
         <div class="row-elem selector">
           {#key selectorText}
-            <div
+            <button
+              class="unstyled selector-text"
               on:click={SelectorHandler}
               on:keypress={SelectorHandler}
+              tabindex={skipTabs ? -1 : undefined}
             >
               {selectorText}
-            </div>
+            </button>
           {/key}
         </div>
         <div class="row-elem">
@@ -153,6 +161,7 @@
             --icon-size="25pt"
             icon="mdi-chevron-right"
             on:click={next}
+            tabindex={skipTabs ? -1 : undefined}
           />
         </div>
       </div>
@@ -219,17 +228,23 @@
       var(--date-picker-default-header-color)
     );
   }
-  .header > h2 {
+  .header > button.day {
     margin-left: 15px;
     margin-top: 5px;
     transition: 0.1s;
     opacity: 0.8;
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 700;
   }
-  .header > h2:hover {
+  .header > button.day:hover {
     opacity: 1;
     cursor: pointer;
   }
-  .header > span {
+  .header > button.day:focus, .header > button.day:active {
+    text-decoration: underline;
+  }
+  .header > button.year {
     display: inline-block;
     line-height: 100%;
     margin-left: 15px;
@@ -237,9 +252,12 @@
     opacity: 0.8;
     transition: 0.1s;
   }
-  .header > span:hover {
+  .header > button.year:hover {
     opacity: 1;
     cursor: pointer;
+  }
+  .header > button.year:focus, .header > button.year:active {
+    text-decoration: underline;
   }
   .selector-row {
     display: flex;
@@ -262,5 +280,19 @@
   .disabled {
     pointer-events: none;
     opacity: 1 !important;
+  }
+
+  .selector-text:active, .selector-text:focus {
+    color: rgb(var(--global-color-primary-500));
+  }
+
+  button.unstyled {
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
   }
 </style>

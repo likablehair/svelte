@@ -8,7 +8,7 @@
 <ComponentSubtitle>Day to change, day to stick to the habits.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
-  <DatePicker></DatePicker>
+  <DatePicker skipTabs></DatePicker>
 </div>
 <h2>Props</h2>
 <PropsViewer

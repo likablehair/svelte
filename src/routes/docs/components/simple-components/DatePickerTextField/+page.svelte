@@ -26,7 +26,10 @@
     >
       {date}
     </div>
-    <DatePickerTextField bind:selectedDate={date} />
+    <div class="h-flex">
+      <DatePickerTextField bind:selectedDate={date} />
+      <DatePickerTextField bind:selectedDate={date} />
+    </div>
   </div>
 </div>
 <h2>Props</h2>
@@ -58,5 +61,10 @@
     justify-content: center;
     gap: 10px;
     margin-bottom: 20px;
+  }
+
+  .h-flex {
+    display: flex;
+    gap: 8px
   }
 </style>

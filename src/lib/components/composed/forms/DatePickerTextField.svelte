@@ -199,6 +199,7 @@
               name="mdi-calendar"
               click
               on:click={() => menuOpened = !menuOpened}
+              tabindex={-1}
             ></Icon>
           </slot>
         </svelte:fragment>
@@ -236,6 +237,7 @@
           on:day-click={handleDateSelect}
           on:year-click={handleYearSelect}
           on:month-click={handleMonthSelect}
+          skipTabs
         ></DatePicker>
       </div>
     </Dialog>
@@ -264,6 +266,7 @@
           on:day-click={handleDateSelect}
           on:year-click={handleYearSelect}
           on:month-click={handleMonthSelect}
+          skipTabs
         ></DatePicker>
       </div>
     </Menu>

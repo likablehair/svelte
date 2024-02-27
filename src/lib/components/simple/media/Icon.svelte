@@ -1,6 +1,7 @@
 <script lang="ts">
   export let name: string,
-    click = false;
+    click = false,
+    tabindex: number | null | undefined = undefined;
 
   let clazz = "";
   export { clazz as class };
@@ -13,6 +14,7 @@
     on:click
     on:keypress
     class="{clazz}"
+    {tabindex}
   >
     <span
       class="icon mdi {name} {clazz}"
@@ -21,9 +23,6 @@
 {:else}
   <span
     class="icon mdi {name} {clazz}"
-    class:click
-    on:click
-    on:keypress
   />
 {/if}
 
@@ -44,6 +43,13 @@
       --icon-container-width,
       var(--icon-default-container-width)
     )
+  }
+
+  button:active, button:focus {
+    color: var(
+      --icon-active-color,
+      rgb(var(--global-color-primary-500))
+    );
   }
 
   .icon {

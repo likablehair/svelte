@@ -328,7 +328,7 @@
     outline: 0;
     border-radius: var(
       --button-border-radius, 
-      var(--button-default--icon-border-radius)
+      var(--button-default-icon-border-radius)
     );
     display: flex;
     align-items: center;
@@ -353,6 +353,20 @@
 
   .button-icon:hover {
     background-color: var(--button-hover-background-color, transparent);
+  }
+
+  .button-icon:active:not(.disabled) {
+    color: var(
+      --button-active-color,
+      var(--button-default-icon-active-color)
+    );
+  }
+
+  .button-icon:focus:not(.disabled) {
+    color: var(
+      --button-focus-color,
+      var(--button-default-icon-focus-color)
+    );
   }
 
   .no-select {
