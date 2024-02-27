@@ -118,8 +118,8 @@
       
       setTimeout(() => {
         refreshPosition = true;
-      }, 3);
-    }, 3);
+      }, 1);
+    }, 1);
   }
 
   let activator: HTMLElement,

@@ -201,7 +201,10 @@
     if (maxZIndex) zIndex = maxZIndex + 2;
   }
   $: if (!!_width && !!activator && !!menuElement) {
-    calculateMenuPosition({ activator, menuElement });
+    setTimeout(() => {
+      if(!!activator && !!menuElement) 
+        calculateMenuPosition({ activator, menuElement });
+    }, 1)
   }
   $: if (refreshPosition && !!activator && !!menuElement) {
     calculateMenuPosition({ activator, menuElement });
