@@ -403,7 +403,17 @@
   .selection-container:focus-within {
     border: var(
       --autocomplete-focus-border,
-      var(--autocomplete-default-focus-border)
+      var(
+        --autocomplete-default-focus-border,
+        var(
+          --autocomplete-border,
+          var(--autocomplete-default-border)
+        )
+      )
+    );
+    box-shadow: var(
+      --autocomplete-focus-box-shadow,
+      var(--autocomplete-default-focus-box-shadow)
     );
   }
 

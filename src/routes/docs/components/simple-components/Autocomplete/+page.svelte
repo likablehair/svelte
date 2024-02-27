@@ -35,7 +35,7 @@
       --autocomplete-background-color="transparent"
       --autocomplete-border-radius="8px"
       --autocomplete-border="1px solid rgb(var(--global-color-background-200))"
-      --autocomplete-focus-border="2px solid rgb(var(--global-color-primary-500))"
+      --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
       maxVisibleChips={2}
       mobileDrawer={true}
     ></Autocomplete>
