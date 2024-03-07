@@ -5,6 +5,7 @@ export { default as Gesture } from './components/simple/common/Gesture.svelte'
 export { default as IntersectionObserver } from './components/simple/common/IntersectionObserver.svelte'
 export { default as MediaQuery } from './components/simple/common/MediaQuery.svelte'
 export { default as Menu } from './components/simple/common/Menu.svelte'
+export { default as ToolTip } from './components/composed/common/ToolTip.svelte'
 export { scrollAtCenter as scrollAtCenter } from './components/simple/common/scroller'
 
 export { default as Calendar } from './components/simple/dates/Calendar.svelte'
