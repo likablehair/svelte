@@ -73,7 +73,7 @@
       inputElement, maskFactoryArgs
     )
 
-    if(selectedYear !== undefined) {
+    if(selectedYear !== undefined && selectedYear !== null) {
       mask.value = selectedYear.toString()
     }
   })
