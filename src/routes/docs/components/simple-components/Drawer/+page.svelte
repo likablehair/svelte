@@ -42,12 +42,28 @@
   </Button>
   <Drawer
     bind:open={open}
-  >pippo</Drawer>
+  >
+    <Button
+      width="200px"
+      maxWidth="90vw"
+      on:click={() => dialogOpened = true}
+    >
+      Open dialog
+    </Button>
+  </Drawer>
   <Drawer
     bind:open={largerDrawer}
     _space="80vw"
     _openingSpeed=".5s"
-  >larger drawer</Drawer>
+  >
+    <Button
+      width="200px"
+      maxWidth="90vw"
+      on:click={() => dialogOpened = true}
+    >
+      Open dialog
+    </Button>
+  </Drawer>
   <Dialog
     bind:open={dialogOpened}
   >

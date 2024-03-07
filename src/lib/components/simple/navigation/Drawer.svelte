@@ -109,6 +109,7 @@
   style:--drawer-overlay-speed={_overlaySpeed}
   style:--drawer-overlay-background-color={_overlayBackgroundColor}
   style:--drawer-overlay-opacity={_overlayOpacity}
+  style:--drawer-z-index={zIndex}
 >
   <div
     style:position="fixed"

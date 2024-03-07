@@ -49,11 +49,25 @@
         let otherDialogs: NodeListOf<HTMLElement> =
           document.querySelectorAll("[data-dialog=true]");
 
+        let maxZIndex = 0;
+
         if (otherDialogs.length > 0) {
-          let maxZIndex = 0;
           otherDialogs.forEach((dialog) => {
             let computedStyle = getComputedStyle(dialog)
             let currentZIndex = computedStyle.getPropertyValue('--dialog-z-index')
+            if (!maxZIndex || maxZIndex < Number(currentZIndex))
+              maxZIndex = Number(currentZIndex);
+          });
+          zIndex = maxZIndex + 2;
+        }
+
+        let otherDrawers: NodeListOf<HTMLElement> =
+          document.querySelectorAll("[data-drawer=true]");
+
+        if (otherDrawers.length > 0) {
+          otherDrawers.forEach((dialog) => {
+            let computedStyle = getComputedStyle(dialog)
+            let currentZIndex = computedStyle.getPropertyValue('--drawer-z-index')
             if (!maxZIndex || maxZIndex < Number(currentZIndex))
               maxZIndex = Number(currentZIndex);
           });
