@@ -128,7 +128,6 @@
     ]}
     searchBarColumns={['businessName', 'productName']}
     totalElements={40}
-    searchBarVisible={false}
     on:filtersChange={handleFiltersChange}
     {customFiltersValid}
     {customFiltersValues}
