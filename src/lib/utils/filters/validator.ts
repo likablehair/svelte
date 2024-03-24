@@ -16,7 +16,7 @@ export default class Validator {
       return filter.values != undefined && filter.values.length > 0
     }
     else if(filter.type == 'bool') {
-      return filter.value !== undefined
+      return filter.value === true
     }
     else return false
   }

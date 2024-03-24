@@ -10,137 +10,97 @@
 
   let filters: Filter[] = [
     {
-      name: "customerName",
-      label: "Customer Name",
+      name: "handlingType",
+      label: "Tipo movimento",
+      type: "select",
+      column: 'handlingType',
+      mode: 'equal',
+      items: [
+        {
+          label: 'Carico',
+          value: 'load'
+        },
+        {
+          label: 'Scarico',
+          value: 'unload'
+        },
+        {
+          label: 'Acquisto',
+          value: 'purhcase'
+        },
+        {
+          label: 'Vendita',
+          value: 'sale'
+        }
+      ],
+      advanced: false,
+    },
+    {
+      name: "customerSupplier",
+      label: "Cliente/Fornitore",
       type: "string",
-      column: "customerName",
-      mode: "ilike",
-      advanced: false,
+      column: 'customer',
+      mode: 'ilike',
+      advanced: false
     },
     {
-      name: "customTestNumber",
-      label: "Test custom filter number (>= 10)",
-      type: "custom",
-      active: false,
-      modify: ({ filter, builder, value }) => {
-        return builder.join('joined_table', q => {
-          q.on('table.id', 'joined_table.tableId')
-        }).where('joined_table.numberField', '>', value)
-      }
-    },
-    {
-      name: "date",
-      label: "Date dsadasdasdsdasdasdasdsadasdasdasd",
+      name: "handlingDate",
+      label: "Data movimento",
       type: "date",
-      column: "date",
+      column: "handlingDate",
+      mode: "between",
+      advanced: false,
+    },
+    {
+      name: "documentDate",
+      label: "Data documento",
+      type: "date",
+      column: "docDate",
       mode: "equal",
       advanced: true,
     },
     {
-      name: "testNumber",
-      label: "test number",
+      name: "productsNumber",
+      label: "Numero articoli",
       type: "number",
-      column: "testNumber",
-      mode: "greater",
+      column: "procutsNumber",
+      mode: "between",
       advanced: false,
     },
     {
-      name: "customTestString",
-      label: "Test custom filter string",
-      type: "custom",
-      active: false,
-      modify: ({ filter, builder, value }) => {
-        return builder.join('joined_table', q => {
-          q.on('table.id', 'joined_table.tableId')
-        }).where('joined_table.stringField', value)
-      }
-    },
-    {
-      name: "testNumberAdvanced",
-      label: "test number advanced",
-      type: "number",
-      column: "testNumberAdvanced",
-      mode: "greater",
-      advanced: true,
-    },
-    {
-      name: "testSelect",
-      label: "test select dsadsadsadasdsadsadasdasda",
+      name: "tags",
+      label: "Categorie/Tag",
       type: "select",
-      column: "testSelect",
+      column: "tags",
       advanced: false,
       mode: "equal",
       items: [
         {
-          value: 1,
-          label: "test 1dsadasdasdadadsadsadsadasdadasdasdasdasdadddads",
+          label: 'Prima categoria',
+          value: 'tag1'
         },
         {
-          value: 2,
-          label:
-            "test 2ewqeqwewqeqwewqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",
-        },
-        {
-          value: 3,
-          label:
-            "test 3ewqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqdasdasdsadsadsadsadadasqqqq",
-        },
+          label: 'Seconda categoria',
+          value: 'tag2'
+        }
       ],
     },
     {
-      name: "testSelectAdvanced",
-      label: "test select advanced",
-      type: "select",
-      column: "testSelectAdvanced",
-      advanced: true,
-      mode: "equal",
-      items: [
-        {
-          value: 1,
-          label: "test 1",
-        },
-        {
-          value: 2,
-          label: "test 2",
-        },
-        {
-          value: 3,
-          label: "test 3",
-        },
-        {
-          value: 6,
-          label: "test 1",
-        },
-        {
-          value: 7,
-          label: "test 2",
-        },
-        {
-          value: 8,
-          label: "test 3",
-        },
-        {
-          value: 9,
-          label: "test 1",
-        },
-        {
-          value: 10,
-          label: "test 2",
-        },
-        {
-          value: 11,
-          label: "test 3",
-        },
-      ],
-    },
-    {
-      name: "testBool",
-      label: "test bool",
+      name: "ddt",
+      label: "DDT creato",
       type: "bool",
-      column: "testBool",
+      column: "ddt",
       mode: "equal",
-      description: "include only if column is true",
+      description: "DDT creato",
     },
+    {
+      name: "underStock",
+      label: "Merce sottoscorta",
+      type: "bool",
+      column: "underStock",
+      mode: "equal",
+      description: "Merce sottoscorta",
+    }
   ];
 
   let customFiltersValues: {[filterName: string]: any} = {},
@@ -172,7 +132,29 @@
 <ComponentSubtitle>Make it easy, make it filter.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
-  <Filters lang="it" bind:filters on:applyFilter={handleFilterEdit} {customFiltersValid}>
+  <Filters lang="it" bind:filters on:applyFilter={handleFilterEdit} {customFiltersValid} showActiveFilters={true}>
+    <div slot="custom" let:filter>
+      {#if !!filter}
+        {#if filter.name == "customTestNumber"}
+          <SimpleTextField type="number" bind:value={customFiltersValues["customTestNumber"]} on:input={() => checkCustomFilterValidity("customTestNumber")}></SimpleTextField>
+        {:else if filter.name == "customTestString"}
+          <SimpleTextField bind:value={customFiltersValues["customTestString"]} on:input={() => checkCustomFilterValidity("customTestString")}></SimpleTextField>
+        {/if}
+      {/if}
+    </div>
+    <div slot="custom-mobile" let:filter>
+      {#if !!filter}
+        {#if filter.name == "customTestNumber"}
+          <SimpleTextField type="number" bind:value={customFiltersValues["customTestNumber"]} on:input={() => checkCustomFilterValidity("customTestNumber")}></SimpleTextField>
+        {:else if filter.name == "customTestString"}
+          <SimpleTextField bind:value={customFiltersValues["customTestString"]} on:input={() => checkCustomFilterValidity("customTestString")}></SimpleTextField>
+        {/if}
+      {/if}
+    </div>
+  </Filters>
+</div>
+<div class="example">
+  <Filters lang="it" bind:filters on:applyFilter={handleFilterEdit} {customFiltersValid} showActiveFilters={false} editFilterMode="multi-edit">
     <div slot="custom" let:filter>
       {#if !!filter}
         {#if filter.name == "customTestNumber"}

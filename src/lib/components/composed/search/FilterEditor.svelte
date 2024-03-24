@@ -11,17 +11,16 @@
   import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
   import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
   import type { LabelMapper } from "./Filters.svelte";
+    import Icon from "$lib/components/simple/media/Icon.svelte";
 
   export let filter: Filter | undefined = undefined,
     lang: 'en' | 'it' = 'en',
-    cancelFilterLabel : string = lang == 'en' ? "Cancel" : "Annulla",
-    applyFilterLabel : string = lang == 'en' ? "Apply filter" : "Applica filter",
     betweenFromLabel: string = lang == 'en' ? "From" : "Da",
     betweenToLabel: string = lang == 'en' ? "To" : "A",
     labelsMapper: LabelMapper,
-    forceApplyValid: boolean = false
-
-  let tmpFilter: Filter | undefined
+    forceApplyValid: boolean = false,
+    editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit',
+    tmpFilter: Filter | undefined = undefined
 
   let advancedModeOptions: Item[],
     advancedModeSelectedOptions: Item[] | undefined
@@ -58,7 +57,8 @@
     dispatch('cancel')
   }
 
-  function handleApplyFilterClick() {
+  function applyFilter() {
+    console.log(filter, tmpFilter, applyFilterDisabled)
     if(!!filter && !!tmpFilter) {
       filter = {...tmpFilter}
       filter.active = true
@@ -120,17 +120,23 @@
     }
   }
 
+  $: if(!!tmpFilter && tmpFilter.type == 'select') {
+    if(tmpFilter.values === undefined) {
+      tmpFilter.values = []
+    }
+  }
+
 </script>
 
 
 {#if !!filter && !!tmpFilter}
-  <div class="filter-editor">
+  <div class="filter-editor" style:margin={editFilterMode === 'one-edit' ? '5%' : '0'}>
     {#if filter.advanced}
       <div class="advanced-mode">
         <div class="label">
           {filter.label[0].toUpperCase() + filter.label.slice(1)}
         </div>
-        <div class="advaced-mode-selector" on:click|stopPropagation on:keypress>
+        <div class="advaced-mode-selector" on:click|stopPropagation on:keypress role="presentation" tabindex="-1">
           <Dropdown
             items={advancedModeOptions}
             bind:values={advancedModeSelectedOptions}
@@ -142,13 +148,13 @@
       </div>
     {/if}
 
-    <div class="fields" style:width="100%" on:click|stopPropagation on:keypress>
+    <div class="fields" style:width="100%" on:click|stopPropagation on:keypress role="presentation" tabindex="-1">
       {#if !tmpFilter.advanced || (!!advancedModeSelectedOptions && advancedModeSelectedOptions.length > 0)}
         {#if tmpFilter.type === "string" }
           <SimpleTextField
             bind:value={tmpFilter.value}
             type="text"
-            placeholder={tmpFilter?.label}
+            placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
             --simple-textfield-width="100%"
           ></SimpleTextField>
         {:else if tmpFilter.type === "date" && tmpFilter.mode !== 'between'}
@@ -159,14 +165,26 @@
               bind:menuOpened={calendarOpened}
               on:day-click={() => {calendarOpened = false}}
               --simple-textfield-width="100%"
-            ></DatePickerTextField>
+            >
+              <svelte:fragment slot="append-inner">
+                <Icon
+                  name="mdi-close-circle"
+                  click
+                  on:click={() => {
+                    if(!!tmpFilter && tmpFilter.type === 'date' && tmpFilter.mode !== 'between') {
+                      tmpFilter.value = undefined
+                    }
+                  }}
+                ></Icon>
+              </svelte:fragment>
+            </DatePickerTextField>
           </div>
         {:else if tmpFilter.type === "number" && tmpFilter.mode !== 'between'}
           <div>
             <SimpleTextField
               bind:value={tmpFilter.value}
               type="number"
-              placeholder={tmpFilter?.label}
+              placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
               --simple-textfield-width="100%"
             ></SimpleTextField>
           </div>
@@ -192,7 +210,19 @@
               bind:menuOpened={calendarOpened}
               on:day-click={() => {calendarOpened = false}}
               --simple-textfield-width="100%"
-            ></DatePickerTextField>
+            >
+              <svelte:fragment slot="append-inner">
+                <Icon
+                  name="mdi-close-circle"
+                  click
+                  on:click={() => {
+                    if(!!tmpFilter && tmpFilter.type === 'date' && tmpFilter.mode === 'between') {
+                      tmpFilter.from = undefined
+                    }
+                  }}
+                ></Icon>
+              </svelte:fragment>
+            </DatePickerTextField>
           </div>
           <div>
             <DatePickerTextField
@@ -202,7 +232,19 @@
               bind:menuOpened={calendarOpened2}
               on:day-click={() => {calendarOpened2 = false}}
               --simple-textfield-width="100%"
-            ></DatePickerTextField>
+            >
+              <svelte:fragment slot="append-inner">
+                <Icon
+                  name="mdi-close-circle"
+                  click
+                  on:click={() => {
+                    if(!!tmpFilter && tmpFilter.type === 'date' && tmpFilter.mode === 'between') {
+                      tmpFilter.to = undefined
+                    }
+                  }}
+                ></Icon>
+              </svelte:fragment>
+            </DatePickerTextField>
           </div>
         {:else if tmpFilter.type === "number" && tmpFilter.mode === 'between'}
           <div>
@@ -235,27 +277,7 @@
         {/if}
       {/if}
     </div>
-
-    <div class="sub-filter-button">
-      <Button
-        --button-background-color="transparent"
-        --button-hover-background-color="rgb(var(--global-color-primary-500))"
-        --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
-        --button-box-shadow="none"
-        on:click={handleCancelFilterClick}
-      >
-        {cancelFilterLabel}
-      </Button>
-
-      <Button
-        --button-min-width="100px"
-        on:click={handleApplyFilterClick}
-        disabled={applyFilterDisabled}
-      >
-        {applyFilterLabel}
-
-      </Button>
-    </div>
+    <slot name="filter-actions" {applyFilterDisabled}></slot>
   </div>
 {/if}
 
@@ -265,15 +287,6 @@
     flex-direction: column;
     align-items: left;
     gap:10px;
-    margin: 5%;
-  }
-
-  .sub-filter-button {
-    display: flex;
-    column-gap: 10px;
-    flex-direction: row;
-    align-items: start;
-    margin-top: 10px;
   }
 
   .advanced-mode {

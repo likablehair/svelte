@@ -101,6 +101,10 @@
     }
   })
 
+  $: if(!selectedDate) {
+    mask.value = ""
+  }
+
   function handleInputChange(event: any) {
     setTimeout(() => {
       const typedValue = mask.value
@@ -177,7 +181,7 @@
     bind:this={activator}
     class="date-picker-activator {clazz.activator || ''}"
   >
-    <slot 
+    <slot
       name="activator"
       {mask}
       {handleTextFieldFocus}
@@ -208,11 +212,11 @@
           </slot>
         </svelte:fragment>
         <svelte:fragment slot="prepend" let:prependIcon let:iconSize>
-          <slot name="append-inner" {prependIcon} {iconSize}>
+          <slot name="prepend" {prependIcon} {iconSize}>
           </slot>
         </svelte:fragment>
         <svelte:fragment slot="append" let:appendIcon let:iconSize>
-          <slot name="append-inner" {appendIcon} {iconSize}>
+          <slot name="append" {appendIcon} {iconSize}>
           </slot>
         </svelte:fragment>
       </SimpleTextField>

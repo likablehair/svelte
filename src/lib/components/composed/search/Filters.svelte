@@ -22,6 +22,8 @@
   import FilterEditor from './FilterEditor.svelte';
   import MobileFilterEditor from './MobileFilterEditor.svelte';
   import { fly } from 'svelte/transition';
+  import Dialog from '$lib/components/simple/dialogs/Dialog.svelte';
+  import MultiEditFiltersForm from './MultiEditFiltersForm.svelte';
 
   export let
     filters: Filter[] = [],
@@ -36,6 +38,7 @@
     trueString: string = lang == 'en' ? "true" : "vero",
     falseString: string = lang == 'en' ? "false" : "falso",
     customFiltersValid: { [filterName: string]: boolean } = {},
+    editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit',
     // TODO create global translation mechanism
     labelsMapper: LabelMapper = lang == 'en' ? {
       'equal': {
@@ -105,7 +108,8 @@
     'applyFilter': undefined,
     'removeFilter': {
       filter: Filter
-    }
+    },
+    'removeAllFilters': undefined
   }>()
 
   let open: boolean = false,
@@ -170,7 +174,9 @@
   }
 
   function handleApplyFilterClick() {
-    if(!!selectedFilter) {
+    if(!!selectedFilter && !!selectedTmpFilter) {
+      selectedFilter = {...selectedTmpFilter}
+      selectedFilter.active = true
       filters[selectedFilterIndex] = selectedFilter
       open = false
       mobileOpen = false
@@ -226,10 +232,57 @@
     handleRemoveFilter({name})
   }
 
+  function handleRemoveAllFilters(e?: MouseEvent) {
+    if(!!e) e.stopPropagation()
+    for(let i = 0; i < filters.length; i += 1) {
+      filters[i].active = false
+      if(Object.keys(filters[i]).includes('value')) {
+        //@ts-ignore
+        filters[i].value = undefined
+      }
+      if(Object.keys(filters[i]).includes('from')) {
+        //@ts-ignore
+        filters[i].from = undefined
+      }
+      if(Object.keys(filters[i]).includes('to')) {
+        //@ts-ignore
+        filters[i].to = undefined
+      }
+      if(Object.keys(filters[i]).includes('values')) {
+        //@ts-ignore
+        filters[i].values = undefined
+      }
+      singleFilterMenuOpened = false
+    }
+    filters = filters
+    dispatch('removeAllFilters')
+  }
+
+  let filtersValue: {[filterName: string]: any} = {}
+  function handleInputChange(e: Event, changeHandler: (filterName: string, newValue: any) => void, filterName: string) {
+    changeHandler(filterName, filtersValue[filterName])
+  }
+
+  function handleMultiEditApplyClick() {
+    open = false
+  }
+
+  function handleMultiEditCancelClick() {
+    open = false
+  }
+
+  function handleMultiEditRemoveClick() {
+    handleRemoveAllFilters()
+    open = false
+  }
+
+  let selectedTmpFilter: Filter | undefined = undefined
+
+
 </script>
 
 <MediaQuery let:mAndDown>
-  <div class="filters-wrapper" class:mobile={mAndDown}>
+  <div class="filters-wrapper" class:mobile={mAndDown} style:--filter-dot-size={activeFilters.length > 0 ? '22px' : '0px'} style:--filter-dot-content={activeFilters.length > 0 ? `"${activeFilters.length}"` : '""'}>
     <div class="filters-container" class:mobile={mAndDown}>
       {#if showActiveFilters}
         {#each activeFilters as filter}
@@ -302,11 +355,13 @@
             --button-color="var(--chip-color, var(--chip-default-color))"
             on:click={handleAddFilterClick}
           >
-            <Icon name="mdi-filter"></Icon>
-            {addFilterLabel}
-            {#if activeFilters.length > 0 }
-              ({activeFilters.length})
-            {/if}
+            <div class="filter-button-content">
+              <Icon name="mdi-filter"></Icon>
+              {addFilterLabel}
+              <div class="remove-filters" class:hidden={activeFilters.length <= 0}>
+                <Icon name="mdi-close-circle" click on:click={handleRemoveAllFilters}></Icon>
+              </div>
+            </div>
           </Button>
 
         </div>
@@ -321,11 +376,13 @@
           --button-color="var(--chip-color, var(--chip-default-color))"
           on:click={handleAddFilterClick}
         >
-          <Icon name="mdi-filter"></Icon>
-          {addFilterLabel}
-          {#if activeFilters.length > 0 }
-            ({activeFilters.length})
-          {/if}
+          <div class="filter-button-content">
+            <Icon name="mdi-filter"></Icon>
+            {addFilterLabel}
+            <div class="remove-filters" class:hidden={activeFilters.length <= 0}>
+              <Icon name="mdi-close-circle" click on:click={handleRemoveAllFilters}></Icon>
+            </div>
+          </div>
         </Button>
 
       </div>
@@ -398,84 +455,165 @@
       </div>
     </Drawer>
   {:else}
-    <Menu
-      bind:activator={activator}
-      bind:open={open}
-      closeOnClickOutside
-      _boxShadow="rgb(var(--global-color-grey-900), .5) 0px 2px 4px"
-      _height="fit-content"
-      _minWidth="10vw"
-      _borderRadius="5px"
-      anchor="bottom"
-      openingId="select-filter"
-    >
-      <div
-        style:background-color="rgb(var(--global-color-background-200))"
-        bind:this={filterOptionsListActivator}
-        on:click|stopPropagation
-        on:keydown
+    {#if editFilterMode === 'one-edit'}
+      <Menu
+        bind:activator={activator}
+        bind:open={open}
+        closeOnClickOutside
+        _boxShadow="rgb(var(--global-color-grey-900), .5) 0px 2px 4px"
+        _height="fit-content"
+        _minWidth="10vw"
+        _borderRadius="5px"
+        anchor="bottom"
+        openingId="select-filter"
       >
-        <SelectableVerticalList
-          bind:selected
-          bind:focused
-          bind:elements={filterOptions}
-          --selectable-vertical-list-default-width="100%"
-          --selectable-vertical-list-default-element-height="56px"
-          --selectable-vertical-list-default-title-font-size="null"
-          on:select={handleFilterSelection}
-        ></SelectableVerticalList>
-      </div>
-    </Menu>
-
-    <Menu
-      _width="350px"
-      _borderRadius="10px"
-      _boxShadow="rgb(var(--global-color-grey-900), .5) 0px 2px 4px"
-      _overflow="unset"
-      activator={singleFilterActivator}
-      bind:open={singleFilterMenuOpened}
-      anchor={singleFilterMenuAnchor}
-      closeOnClickOutside
-      flipOnOverflow
-      openingId={ filterOpened == 'edit' ? "select-filter" : ""}
-    >
-      <div
-        style:min-height="160px"
-        on:click
-        on:keydown
-        style:border-radius="10px"
-        style:overflow="auto"
-        style:height="100%"
-        style:background-color="rgb(var(--global-color-background-200))"
-      >
-        <div class="filter-title">
-          {filterTitleLabel} {selectedFilter?.label}
+        <div
+          style:background-color="rgb(var(--global-color-background-200))"
+          bind:this={filterOptionsListActivator}
+          on:click|stopPropagation
+          on:keydown
+          role="presentation"
+          tabindex="-1"
+        >
+          <SelectableVerticalList
+            bind:selected
+            bind:focused
+            bind:elements={filterOptions}
+            --selectable-vertical-list-default-width="100%"
+            --selectable-vertical-list-default-element-height="56px"
+            --selectable-vertical-list-default-title-font-size="null"
+            on:select={handleFilterSelection}
+          ></SelectableVerticalList>
         </div>
+      </Menu>
 
-        {#if !!selectedFilter}
-          <FilterEditor
-            bind:filter={selectedFilter}
-            bind:applyFilterLabel
-            bind:cancelFilterLabel
-            on:cancel={handleCancelFilterClick}
-            on:apply={handleApplyFilterClick}
-            {lang}
-            {labelsMapper}
-            forceApplyValid={!!customFiltersValid[selectedFilter.name]}
-          >
-            <svelte:fragment slot="custom" let:filter>
-              <slot name="custom" {filter}></slot>
-            </svelte:fragment>
-          </FilterEditor>
-        {/if}
-      </div>
-    </Menu>
+      <Menu
+        _width="350px"
+        _borderRadius="10px"
+        _boxShadow="rgb(var(--global-color-grey-900), .5) 0px 2px 4px"
+        _overflow="unset"
+        activator={singleFilterActivator}
+        bind:open={singleFilterMenuOpened}
+        anchor={singleFilterMenuAnchor}
+        closeOnClickOutside
+        flipOnOverflow
+        openingId={ filterOpened == 'edit' ? "select-filter" : ""}
+      >
+        <div
+          style:min-height="160px"
+          on:click
+          on:keydown
+          style:border-radius="10px"
+          style:overflow="auto"
+          style:height="100%"
+          style:background-color="rgb(var(--global-color-background-200))"
+          role="presentation"
+        >
+          <div class="filter-title">
+            {filterTitleLabel} {selectedFilter?.label}
+          </div>
+
+          {#if !!selectedFilter}
+            <FilterEditor
+              bind:filter={selectedFilter}
+              on:cancel={handleCancelFilterClick}
+              on:apply={handleApplyFilterClick}
+              {lang}
+              {labelsMapper}
+              forceApplyValid={!!customFiltersValid[selectedFilter.name]}
+              bind:tmpFilter={selectedTmpFilter}
+            >
+              <svelte:fragment slot="custom" let:filter>
+                <slot name="custom" {filter}></slot>
+              </svelte:fragment>
+              <svelte:fragment slot="filter-actions" let:applyFilterDisabled>
+                <div class="sub-filter-button">
+                  <Button
+                    --button-background-color="transparent"
+                    --button-hover-background-color="rgb(var(--global-color-primary-500))"
+                    --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
+                    --button-box-shadow="none"
+                    on:click={handleCancelFilterClick}
+                  >
+                    {cancelFilterLabel}
+                  </Button>
+
+                  <Button
+                    --button-min-width="100px"
+                    on:click={handleApplyFilterClick}
+                    disabled={applyFilterDisabled}
+                  >
+                    {applyFilterLabel}
+
+                  </Button>
+                </div>
+              </svelte:fragment>
+            </FilterEditor>
+          {/if}
+        </div>
+      </Menu>
+    {:else if editFilterMode === 'multi-edit'}
+      <Dialog
+        bind:open={open}
+      >
+        <MultiEditFiltersForm
+          bind:filters
+          {lang}
+          title={addFilterLabel}
+          {labelsMapper}
+          on:cancel={handleMultiEditCancelClick}
+          on:apply={handleMultiEditApplyClick}
+          on:remove={handleMultiEditRemoveClick}
+        >
+        </MultiEditFiltersForm>
+      </Dialog>
+    {/if}
   {/if}
 </MediaQuery>
 
 
-
 <style>
+
+  .sub-filter-button {
+    display: flex;
+    column-gap: 10px;
+    flex-direction: row;
+    align-items: start;
+    margin-top: 10px;
+  }
+
+  .filter-button-content {
+    display: flex;
+    gap: 10px
+  }
+
+  .filter-button-content .remove-filters {
+    margin: 0px 8px 0px 8px;
+    color: rgb(var(--global-color-primary-100));
+  }
+
+  .filter-button-content .remove-filters:hover {
+    color: white;
+  }
+
+  .filter-button-content .remove-filters.hidden {
+    display: none;
+  }
+
+  .filter-button::before {
+    content: var(--filter-dot-content, '0');
+    text-align: center;
+    font-size: .6rem;
+    background-color: rgb(var(--global-color-primary-100));
+    color: rgb(var(--global-color-contrast-700));
+    position: absolute;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    top: -40%;
+    left: calc(100% - 10px);
+    border-radius: 100px;
+    width: var(--filter-dot-size, 0px);
+    height: var(--filter-dot-size, 0px);
+  }
 
   .filter-title{
     display: flex;
@@ -516,6 +654,7 @@
     flex-shrink: 0;
     flex-grow: 0;
     height: fit-content;
+    position: relative;
   }
 
   .drawer-content{
