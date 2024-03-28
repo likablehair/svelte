@@ -258,26 +258,30 @@
     dispatch('removeAllFilters')
   }
 
-  let filtersValue: {[filterName: string]: any} = {}
-  function handleInputChange(e: Event, changeHandler: (filterName: string, newValue: any) => void, filterName: string) {
-    changeHandler(filterName, filtersValue[filterName])
-  }
+  //////////////////////// pass function through slot to set filter value and filter validity
+  // let filtersValue: {[filterName: string]: any} = {}
+  // function handleInputChange(e: Event, changeHandler: (filterName: string, newValue: any, newValidity: boolean) => void, filterName: string) {
+  //   changeHandler(filterName, filtersValue[filterName])
+  // }
 
   function handleMultiEditApplyClick() {
     open = false
+    mobileOpen = false
+    dispatch('applyFilter')
   }
 
   function handleMultiEditCancelClick() {
     open = false
+    mobileOpen = false
   }
 
   function handleMultiEditRemoveClick() {
     handleRemoveAllFilters()
     open = false
+    mobileOpen = false
   }
 
   let selectedTmpFilter: Filter | undefined = undefined
-
 
 </script>
 
@@ -310,6 +314,12 @@
                   <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
                   {betweenSeparator}
                   <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
+                {:else if filter.mode == 'between' && filter.from != undefined}
+                  {labelsMapper['greater'].extended || labelsMapper['greater'].short}
+                  <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
+                {:else if filter.mode == 'between' && filter.to != undefined}
+                  {labelsMapper['lower'].extended || labelsMapper['lower'].short}
+                  <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
                 {:else if filter.mode != 'between' && filter.value != undefined}
                   {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
                   <span class="truncate-text inline-truncated"><b>{filter.value?.toLocaleDateString(dateLocale)}</b></span>
@@ -319,6 +329,12 @@
                   {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
                   <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
                   {betweenSeparator}
+                  <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
+                {:else if filter.mode == 'between' && filter.from != undefined}
+                  {labelsMapper['greater'].extended || labelsMapper['greater'].short}
+                  <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
+                {:else if filter.mode == 'between' && filter.to != undefined}
+                  {labelsMapper['lower'].extended || labelsMapper['lower'].short}
                   <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
                 {:else if filter.mode != 'between' && filter.value != undefined}
                   {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
@@ -394,63 +410,109 @@
       bind:open={mobileOpen}
       position="bottom"
       on:close={() => {closeFilterMenu(200)}}
-      --drawer-border-radius="20px 20px 0px 0px"
-      --drawer-margin="5px 5px 0px 5px"
+      _borderRadius="20px 20px 0px 0px"
+      _margin="5px 5px 0px 5px"
     >
       <div class="drawer-content">
-        {#if !!selectedFilter && singleFilterMenuOpened}
-          <div
-            class="drawer-filter-detail"
-            style:height="100%"
-            in:fly|local={{delay: 100, duration: 100, x: 200}}
-            out:fly|local={{duration: 100, x: -200}}
-          >
-            <MobileFilterEditor
-              bind:filter={selectedFilter}
-              bind:applyFilterLabel
-              bind:cancelFilterLabel
-              on:apply={handleApplyFilterClick}
-              on:backClick={handleMobileBackTap}
-              on:cancelClick={() => {mobileOpen = false; closeFilterMenu(200)}}
-              {lang}
-              {labelsMapper}
-              forceApplyValid={!!customFiltersValid[selectedFilter.name]}
+        {#if editFilterMode === 'one-edit'}
+          {#if !!selectedFilter && singleFilterMenuOpened}
+            <div
+              class="drawer-filter-detail"
+              style:height="100%"
+              in:fly|local={{delay: 100, duration: 100, x: 200}}
+              out:fly|local={{duration: 100, x: -200}}
             >
-              <div slot="title">
-                <div class="mobile-title">
-                  {selectedFilter?.label}
+              <MobileFilterEditor
+                bind:filter={selectedFilter}
+                on:backClick={handleMobileBackTap}
+                {lang}
+                {labelsMapper}
+                forceApplyValid={!!customFiltersValid[selectedFilter.name]}
+                bind:tmpFilter={selectedTmpFilter}
+              >
+                <div slot="title">
+                  <div class="mobile-title">
+                    {selectedFilter?.label}
+                  </div>
                 </div>
-              </div>
 
-              <svelte:fragment slot="custom" let:filter>
-                <slot name="custom-mobile" {filter}></slot>
-              </svelte:fragment>
+                <svelte:fragment slot="custom" let:filter let:updateFunction>
+                  <slot name="custom-mobile" {filter} {updateFunction} {mAndDown}></slot>
+                </svelte:fragment>
 
-            </MobileFilterEditor>
-          </div>
-        {:else}
-          <div
-            class="drawer-filter-list"
-            style:margin-top="20px"
-            style:height="100%"
-            out:fly|local={{duration: 100, x: -200}}
-            in:fly|local={{duration: 100, x: 200, delay: 100}}
-          >
-            <SelectableVerticalList
-              bind:selected
-              bind:focused
-              bind:elements={deletableFilterOptions}
-              --selectable-vertical-list-default-width="100%"
-              --selectable-vertical-list-default-element-height="56px"
-              --selectable-vertical-list-default-title-font-size="null"
-              on:select={(e) => {handleFilterSelection(e, true)}}
-              centered
-              bicolor
-              appendIconSize="18pt"
-              on:iconClick={handleDeleteIconClick}
-              --icon-color="rgb(var(--global-color-error-400))"
-            ></SelectableVerticalList>
-          </div>
+                <svelte:fragment slot="filter-actions" let:applyFilterDisabled>
+                  <div class="btn">
+                    <Button
+                      --button-width="100%"
+                      --button-box-shadow="none"
+                      --button-height="30px"
+                      --button-padding="10px 0px 10px 0px"
+                      --button-border-radius="10px 10px 0px 0px"
+                      disabled={applyFilterDisabled}
+                      on:click={handleApplyFilterClick}
+                    >{applyFilterLabel}</Button>
+                  </div>
+                  <div class="btn">
+                    <Button
+                      --button-width="100%"
+                      --button-box-shadow="none"
+                      --button-padding="10px 0px 10px 0px"
+                      --button-background-color="rgb(var(--global-color-grey-50))"
+                      --button-color="rgb(var(--global-color-primary-500))"
+                      --button-border-radius="0px 0px 0px 0px"
+                      on:click={() => {mobileOpen = false; closeFilterMenu(200)}}
+                    >{cancelFilterLabel}</Button>
+                  </div>
+                </svelte:fragment>
+
+              </MobileFilterEditor>
+            </div>
+          {:else}
+            <div
+              class="drawer-filter-list"
+              style:margin-top="20px"
+              style:height="100%"
+              out:fly|local={{duration: 100, x: -200}}
+              in:fly|local={{duration: 100, x: 200, delay: 100}}
+            >
+              <SelectableVerticalList
+                bind:selected
+                bind:focused
+                bind:elements={deletableFilterOptions}
+                --selectable-vertical-list-default-width="100%"
+                --selectable-vertical-list-default-element-height="56px"
+                --selectable-vertical-list-default-title-font-size="null"
+                on:select={(e) => {handleFilterSelection(e, true)}}
+                centered
+                bicolor
+                appendIconSize="18pt"
+                on:iconClick={handleDeleteIconClick}
+                --icon-color="rgb(var(--global-color-error-400))"
+              ></SelectableVerticalList>
+            </div>
+          {/if}
+        {:else if editFilterMode === 'multi-edit'}
+            <div
+              class="drawer-multi-filter"
+              style:height="100%"
+            >
+              <MultiEditFiltersForm
+                bind:filters
+                {lang}
+                title={addFilterLabel}
+                {labelsMapper}
+                on:cancel={handleMultiEditCancelClick}
+                on:apply={handleMultiEditApplyClick}
+                on:remove={handleMultiEditRemoveClick}
+                let:mAndDown
+                let:updateMultiFilterValues
+              >
+                <!--
+                  <slot name="multi-filter-content" {mAndDown} {updateMultiFilterValues} {filters}></slot>
+                -->
+                <slot name="custom" slot="custom" let:mAndDown let:updateFunction let:filter {mAndDown} {updateFunction} {filter}></slot>
+              </MultiEditFiltersForm>
+            </div>
         {/if}
       </div>
     </Drawer>
@@ -516,15 +578,13 @@
           {#if !!selectedFilter}
             <FilterEditor
               bind:filter={selectedFilter}
-              on:cancel={handleCancelFilterClick}
-              on:apply={handleApplyFilterClick}
               {lang}
               {labelsMapper}
               forceApplyValid={!!customFiltersValid[selectedFilter.name]}
               bind:tmpFilter={selectedTmpFilter}
             >
-              <svelte:fragment slot="custom" let:filter>
-                <slot name="custom" {filter}></slot>
+              <svelte:fragment slot="custom" let:filter let:updateFunction>
+                <slot name="custom" {filter} {updateFunction} {mAndDown}></slot>
               </svelte:fragment>
               <svelte:fragment slot="filter-actions" let:applyFilterDisabled>
                 <div class="sub-filter-button">
@@ -564,7 +624,13 @@
           on:cancel={handleMultiEditCancelClick}
           on:apply={handleMultiEditApplyClick}
           on:remove={handleMultiEditRemoveClick}
+          let:mAndDown
+          let:updateMultiFilterValues
         >
+          <!--
+            <slot name="multi-filter-content" {mAndDown} {updateMultiFilterValues} {filters}></slot>
+          -->
+          <slot name="custom" slot="custom" let:mAndDown let:updateFunction let:filter {mAndDown} {updateFunction} {filter}></slot>
         </MultiEditFiltersForm>
       </Dialog>
     {/if}
@@ -604,7 +670,7 @@
     content: var(--filter-dot-content, '0');
     text-align: center;
     font-size: .6rem;
-    background-color: rgb(var(--global-color-primary-100));
+    background-color: rgb(var(--global-color-background-500));
     color: rgb(var(--global-color-contrast-700));
     position: absolute;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;

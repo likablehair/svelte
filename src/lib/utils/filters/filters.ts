@@ -86,6 +86,7 @@ type CustomFilter = {
     builder: Builder,
     value: any
   }) => Builder,
+  value?: any,
   data?: any
 }
 
@@ -161,9 +162,13 @@ export default class Converter {
       params.builder.where(params.filter.column, '>', params.filter.value)
     } else if (params.filter.mode == 'lower' && !!params.filter.value) {
       params.builder.where(params.filter.column, '<', params.filter.value)
-    } else if (params.filter.mode == 'between' && !!params.filter.from && !!params.filter.to) {
-      params.builder.where(params.filter.column, '>', params.filter.from)
-      params.builder.where(params.filter.column, '<', params.filter.to)
+    } else if (params.filter.mode == 'between') {
+      if(!!params.filter.from) {
+        params.builder.where(params.filter.column, '>', params.filter.from)
+      }
+      if(!!params.filter.to) {
+        params.builder.where(params.filter.column, '<', params.filter.to)
+      }
     }
 
     return params.builder
@@ -179,9 +184,13 @@ export default class Converter {
       params.builder.where(params.filter.column, '>', params.filter.value)
     } else if(params.filter.mode == 'lower' && !!params.filter.value) {
       params.builder.where(params.filter.column, '<', params.filter.value)
-    } else if(params.filter.mode == 'between' && !!params.filter.from && !!params.filter.to) {
-      params.builder.where(params.filter.column, '>', params.filter.from)
-      params.builder.where(params.filter.column, '<', params.filter.to)
+    } else if(params.filter.mode == 'between') {
+      if(!!params.filter.from) {
+        params.builder.where(params.filter.column, '>', params.filter.from)
+      }
+      if(!!params.filter.to) {
+        params.builder.where(params.filter.column, '<', params.filter.to)
+      }
     }
     return params.builder
   }

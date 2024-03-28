@@ -30,7 +30,8 @@
     icon: string | undefined = undefined,
     menuOpened: boolean = false,
     openingId: string | undefined = undefined,
-    width: string | undefined = undefined
+    width: string | undefined = undefined,
+    mobileDrawer: boolean = false
 
   $: generatedLabel = values.length == 1 ? values[0].label : `${values.length} Selezionati`
 
@@ -60,6 +61,7 @@
   bind:menuOpened
   bind:openingId
   bind:width
+  {mobileDrawer}
 >
   <svelte:fragment slot="selection-container" let:openMenu let:handleKeyDown>
     <Button
@@ -77,14 +79,14 @@
         }
       }}
     >
-      <slot 
-        name="label" 
-        {values} 
-        {items} 
-        {searchText} 
-        {generatedLabel} 
-        {placeholder} 
-        {clearable} 
+      <slot
+        name="label"
+        {values}
+        {items}
+        {searchText}
+        {generatedLabel}
+        {placeholder}
+        {clearable}
         {handleCloseClick}
       >
         <div class="label">

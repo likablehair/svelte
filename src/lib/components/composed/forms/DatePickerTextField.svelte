@@ -180,6 +180,7 @@
   <div
     bind:this={activator}
     class="date-picker-activator {clazz.activator || ''}"
+    style:width="var(--simple-textfield-width)"
   >
     <slot
       name="activator"

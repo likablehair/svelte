@@ -74,18 +74,32 @@
   beforeUpdate(() => {
     if(BROWSER && open && localOpen !== open) {
       let otherDialogs: NodeListOf<HTMLElement> =
-        document.querySelectorAll("[data-dialog]");
+      document.querySelectorAll("[data-dialog=true]");
 
-      let maxZIndex: number | undefined = undefined;
+      let maxZIndex = 0;
+
       if (otherDialogs.length > 0) {
         otherDialogs.forEach((dialog) => {
           let computedStyle = getComputedStyle(dialog)
-          if (!maxZIndex || maxZIndex < Number(computedStyle.zIndex))
-            maxZIndex = Number(computedStyle.zIndex);
+          let currentZIndex = computedStyle.getPropertyValue('--dialog-z-index')
+          if (!maxZIndex || maxZIndex < Number(currentZIndex))
+            maxZIndex = Number(currentZIndex);
         });
+        zIndex = maxZIndex + 2;
       }
 
-      zIndex = Math.max(maxZIndex || 0, (zIndex - 2)) + 2
+      let otherDrawers: NodeListOf<HTMLElement> =
+        document.querySelectorAll("[data-drawer=true]");
+
+      if (otherDrawers.length > 0) {
+        otherDrawers.forEach((dialog) => {
+          let computedStyle = getComputedStyle(dialog)
+          let currentZIndex = computedStyle.getPropertyValue('--drawer-z-index')
+          if (!maxZIndex || maxZIndex < Number(currentZIndex))
+            maxZIndex = Number(currentZIndex);
+        });
+        zIndex = maxZIndex + 2;
+      }
 
       overlay = true
       localOpen = true
@@ -95,9 +109,9 @@
   })
 </script>
 
-<div 
-  class="drawer-container" 
-  bind:this={drawerElement} 
+<div
+  class="drawer-container"
+  bind:this={drawerElement}
   data-drawer={localOpen}
   style:--drawer-space={_space}
   style:--drawer-opening-speed={_openingSpeed}
@@ -207,6 +221,7 @@
 
   .overlay-hidden {
     opacity: 0%;
+    display: none;
     z-index: -1;
   }
 

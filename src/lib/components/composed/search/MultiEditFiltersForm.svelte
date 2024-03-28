@@ -25,11 +25,17 @@
     'apply': undefined
   }>()
 
-  function updateCustomFilterValue(filterName: string, newValue: any) {
-    let filter = filters.find(f => f.name == filterName)
-    if(!filter) throw new Error('cannot find filter')
-    // filter.active = true
-    // filters = filters
+  function updateMultiFilterValues(filterName: string, newValue: any) {
+    let filter = tmpFilters[filterName]
+    if(!filter) throw new Error('cannot find filter with name ' + filterName)
+    if(filter.type == 'select') {
+      filter.values = newValue
+    } else if('mode' in filter && filter.mode == 'between') {
+      filter.to = newValue.to
+      filter.from = newValue.from
+    } else {
+      filter.value = newValue
+    }
   }
 
   function handleCancelFilterClick() {
@@ -54,47 +60,44 @@
 </script>
 
 <MediaQuery let:mAndDown>
-  <div class="form-container">
+  <div class="form-container" style:background-color={mAndDown ? 'transparent' : 'rgb(var(--global-color-background-100))'} style:width={mAndDown ? '100%' : '50vw'} style:box-sizing="border-box">
     <div class="header">
       <h1>{title}</h1>
     </div>
     <div class="body">
-      <slot name="content" {mAndDown} {updateCustomFilterValue}>
-        <div class="filters-container">
+      <slot {mAndDown} {updateMultiFilterValues}>
+        <div class="filters-container" style:grid-template-columns={mAndDown ? '1fr' : '1fr 1fr'}>
           {#each filters as filter, i}
-            {#if filter.type === 'custom'}
-              <slot name="custom"></slot>
-            {:else}
-              <div class="filter">
-                <slot name="filter" {filter} {updateCustomFilterValue} {mAndDown}>
-                  <div class="input">
-                    {#if !filter.advanced}
-                      <div class="label">
-                        {filter.label}
-                      </div>
-                    {/if}
-                    <div class="field">
-                      <FilterEditor
-                        bind:filter={filter}
-                        {lang}
-                        {labelsMapper}
-                        editFilterMode="multi-edit"
-                        {betweenFromLabel}
-                        {betweenToLabel}
-                        bind:tmpFilter={tmpFilters[filter.name]}
-                      ></FilterEditor>
-                    </div>
+            <div class="filter">
+              <div class="input">
+                {#if !filter.advanced && filter.type !== 'custom'}
+                  <div class="label">
+                    {filter.label}
                   </div>
-                </slot>
+                {/if}
+                <div class="field">
+                  <FilterEditor
+                    bind:filter={filter}
+                    {lang}
+                    {labelsMapper}
+                    editFilterMode="multi-edit"
+                    {betweenFromLabel}
+                    {betweenToLabel}
+                    bind:tmpFilter={tmpFilters[filter.name]}
+                    mobile={mAndDown}
+                  >
+                    <slot name="custom" slot="custom" let:updateFunction {updateFunction} {mAndDown} {filter}></slot>
+                  </FilterEditor>
+                </div>
               </div>
-            {/if}
+            </div>
           {/each}
         </div>
       </slot>
     </div>
     <div class="footer">
       <slot name="footer" {mAndDown}>
-        <div class="actions">
+        <div class="actions" style:padding-bottom={mAndDown ? '20px' : undefined}>
           <Button
             --button-color="rgb(var(--global-color-primary-400))"
             --button-background-color="transparent"
@@ -118,7 +121,6 @@
           <Button
             --button-min-width="100px"
             on:click={handleApplyFilterClick}
-            disabled={/*applyFilterDisabled*/ false}
           >
             {applyFilterLabel}
           </Button>
@@ -131,15 +133,13 @@
 <style>
 
   .form-container {
-    background-color: rgb(var(--global-color-background-100));
     border-radius: 10px;
-    width: 50vw;
     padding: 20px;
+    height: 100%;
   }
 
   .filters-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
     gap: 20px
   }
 

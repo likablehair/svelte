@@ -5,11 +5,11 @@ export default class Validator {
     if(!filter) return false
     else if(filter.type == 'string') return !!filter.value
     else if(filter.type == 'date') {
-      if(filter.mode == 'between') return !!filter.from && !!filter.to
+      if(filter.mode == 'between') return !!filter.from || !!filter.to
       else return !!filter.value
     } else if(filter.type == 'multiString') return !!filter.value
     else if(filter.type == 'number') {
-      if(filter.mode == 'between') return filter.from != undefined && filter.to != undefined
+      if(filter.mode == 'between') return filter.from != undefined || filter.to != undefined
       else return filter.value != undefined
     }
     else if(filter.type == 'select') {

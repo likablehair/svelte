@@ -60,6 +60,14 @@
       advanced: true,
     },
     {
+      name: 'testCustom',
+      label: 'Test custom',
+      type: 'custom',
+      modify: function({ filter, builder, value }) {
+        return builder
+      }
+    },
+    {
       name: "productsNumber",
       label: "Numero articoli",
       type: "number",
@@ -114,16 +122,8 @@
         filters,
         customFiltersValues
       });
+      console.log(builder.toJson())
     }
-  }
-
-  function checkCustomFilterValidity(filterName: string) {
-    if(filterName == 'customTestNumber') {
-      customFiltersValid['customTestNumber'] = customFiltersValues['customTestNumber'] !== undefined && Number(customFiltersValues['customTestNumber']) >= 10
-    } else if(filterName == 'customTestString') {
-      customFiltersValid['customTestString'] = !!customFiltersValues['customTestString']
-    }
-    customFiltersValid = customFiltersValid
   }
 
 </script>
@@ -132,47 +132,11 @@
 <ComponentSubtitle>Make it easy, make it filter.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
-  <Filters lang="it" bind:filters on:applyFilter={handleFilterEdit} {customFiltersValid} showActiveFilters={true}>
-    <div slot="custom" let:filter>
-      {#if !!filter}
-        {#if filter.name == "customTestNumber"}
-          <SimpleTextField type="number" bind:value={customFiltersValues["customTestNumber"]} on:input={() => checkCustomFilterValidity("customTestNumber")}></SimpleTextField>
-        {:else if filter.name == "customTestString"}
-          <SimpleTextField bind:value={customFiltersValues["customTestString"]} on:input={() => checkCustomFilterValidity("customTestString")}></SimpleTextField>
-        {/if}
-      {/if}
-    </div>
-    <div slot="custom-mobile" let:filter>
-      {#if !!filter}
-        {#if filter.name == "customTestNumber"}
-          <SimpleTextField type="number" bind:value={customFiltersValues["customTestNumber"]} on:input={() => checkCustomFilterValidity("customTestNumber")}></SimpleTextField>
-        {:else if filter.name == "customTestString"}
-          <SimpleTextField bind:value={customFiltersValues["customTestString"]} on:input={() => checkCustomFilterValidity("customTestString")}></SimpleTextField>
-        {/if}
-      {/if}
-    </div>
+  <Filters lang="it" bind:filters on:applyFilter={handleFilterEdit} on:removeAllFilters={handleFilterEdit} on:removeFilter={handleFilterEdit} {customFiltersValid} showActiveFilters={true}>
   </Filters>
 </div>
 <div class="example">
-  <Filters lang="it" bind:filters on:applyFilter={handleFilterEdit} {customFiltersValid} showActiveFilters={false} editFilterMode="multi-edit">
-    <div slot="custom" let:filter>
-      {#if !!filter}
-        {#if filter.name == "customTestNumber"}
-          <SimpleTextField type="number" bind:value={customFiltersValues["customTestNumber"]} on:input={() => checkCustomFilterValidity("customTestNumber")}></SimpleTextField>
-        {:else if filter.name == "customTestString"}
-          <SimpleTextField bind:value={customFiltersValues["customTestString"]} on:input={() => checkCustomFilterValidity("customTestString")}></SimpleTextField>
-        {/if}
-      {/if}
-    </div>
-    <div slot="custom-mobile" let:filter>
-      {#if !!filter}
-        {#if filter.name == "customTestNumber"}
-          <SimpleTextField type="number" bind:value={customFiltersValues["customTestNumber"]} on:input={() => checkCustomFilterValidity("customTestNumber")}></SimpleTextField>
-        {:else if filter.name == "customTestString"}
-          <SimpleTextField bind:value={customFiltersValues["customTestString"]} on:input={() => checkCustomFilterValidity("customTestString")}></SimpleTextField>
-        {/if}
-      {/if}
-    </div>
+  <Filters lang="it" bind:filters on:applyFilter={handleFilterEdit} on:removeAllFilters={handleFilterEdit} on:removeFilter={handleFilterEdit} {customFiltersValid} showActiveFilters={false} editFilterMode="multi-edit">
   </Filters>
 </div>
 <h2>Props</h2>

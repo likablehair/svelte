@@ -5,13 +5,11 @@
   import type { DateMode } from "$lib/utils/filters/filters";
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
   import DatePickerTextField from "$lib/components/composed/forms/DatePickerTextField.svelte";
-  import Button from "$lib/components/simple/buttons/Button.svelte";
-  import { createEventDispatcher } from "svelte";
   import Validator from "$lib/utils/filters/validator";
   import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
   import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
   import type { LabelMapper } from "./Filters.svelte";
-    import Icon from "$lib/components/simple/media/Icon.svelte";
+  import Icon from "$lib/components/simple/media/Icon.svelte";
 
   export let filter: Filter | undefined = undefined,
     lang: 'en' | 'it' = 'en',
@@ -20,7 +18,8 @@
     labelsMapper: LabelMapper,
     forceApplyValid: boolean = false,
     editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit',
-    tmpFilter: Filter | undefined = undefined
+    tmpFilter: Filter | undefined = undefined,
+    mobile: boolean = false
 
   let advancedModeOptions: Item[],
     advancedModeSelectedOptions: Item[] | undefined
@@ -46,24 +45,6 @@
   $: if(!!filter) {
     initTmpFilter()
     closeDropDown()
-  }
-
-  let dispatch = createEventDispatcher<{
-    'apply': undefined,
-    'cancel': undefined
-  }>()
-
-  function handleCancelFilterClick(e: CustomEvent) {
-    dispatch('cancel')
-  }
-
-  function applyFilter() {
-    console.log(filter, tmpFilter, applyFilterDisabled)
-    if(!!filter && !!tmpFilter) {
-      filter = {...tmpFilter}
-      filter.active = true
-      dispatch('apply')
-    }
   }
 
   $: if(!!tmpFilter) {
@@ -126,6 +107,13 @@
     }
   }
 
+  function updateFunction(newValue: SyntaxError, newValid: boolean) {
+    if(!!tmpFilter && tmpFilter.type == 'custom') {
+      tmpFilter.value = newValue
+      applyFilterDisabled = newValid
+    }
+  }
+
 </script>
 
 
@@ -143,6 +131,7 @@
             on:change={handleAdvancedModeSelection}
             bind:menuOpened={dropdownOpened}
             openingId="advanced-filter"
+            mobileDrawer={mobile}
           ></Dropdown>
         </div>
       </div>
@@ -199,6 +188,7 @@
               maxVisibleChips={2}
               --simple-textfield-width="0px"
               --simple-text-field-margin-left="0px"
+              mobileDrawer={mobile}
             ></Autocomplete>
           </div>
         {:else if tmpFilter.type === "date" && tmpFilter.mode === 'between'}
@@ -273,7 +263,7 @@
             </span>
           </div>
         {:else if tmpFilter.type == 'custom'}
-          <slot name="custom" filter={tmpFilter}></slot>
+          <slot name="custom" filter={tmpFilter} {updateFunction}></slot>
         {/if}
       {/if}
     </div>

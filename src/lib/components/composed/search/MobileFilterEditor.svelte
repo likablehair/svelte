@@ -16,31 +16,28 @@
 
   export let filter: Filter | undefined = undefined,
     lang: 'it' | 'en' = 'en',
-    cancelFilterLabel : string = lang == 'en' ? "Cancel" : "Annulla",
-    applyFilterLabel : string = lang == 'en' ? "Apply filter" : "Applica filtro",
     backIcon: string = "mdi-arrow-left",
     betweenFromLabel: string = lang == 'en' ? "From" : "Da",
     betweenToLabel: string = lang == 'en' ? "To" : "A",
     labelsMapper: LabelMapper,
-    forceApplyValid: boolean = false
+    forceApplyValid: boolean = false,
+    tmpFilter: Filter | undefined = undefined
 
   let dispatch = createEventDispatcher<{
-    'apply': undefined,
     'backClick': undefined,
     'cancelClick': undefined
   }>()
 
-  function handleApplyFilterClick() {
-    if(!!filter && !!tmpFilter) {
-      filter = {...tmpFilter}
-      filter.active = true
-      dispatch('apply')
-    }
-  }
+
+  // function handleApplyFilterClick() {
+  //   if(!!filter && !!tmpFilter) {
+  //     filter = {...tmpFilter}
+  //     filter.active = true
+  //     dispatch('apply')
+  //   }
+  // }
 
   let step: 'advanced' | 'editor'
-
-  let tmpFilter: Filter | undefined
 
   function initTmpFilter() {
     tmpFilter = filter === undefined ? undefined : {...filter}
@@ -121,6 +118,18 @@
 
   $: applyFilterDisabled = !Validator.isValid(tmpFilter) && !forceApplyValid
 
+  $: if(!!tmpFilter && tmpFilter.type == 'bool') {
+    if(tmpFilter.value === undefined) {
+      tmpFilter.value = false
+    }
+  }
+
+  $: if(!!tmpFilter && tmpFilter.type == 'select') {
+    if(tmpFilter.values === undefined) {
+      tmpFilter.values = []
+    }
+  }
+
   function handleModeBackClick() {
     dispatch('backClick')
   }
@@ -142,13 +151,10 @@
     if(!tmpFilter.to) tmpFilter.to = new Date()
   }
 
-  function handleCancelClick() {
-    dispatch('cancelClick')
-  }
-
-  $: if(!!tmpFilter && tmpFilter.type == 'bool') {
-    if(tmpFilter.value === undefined) {
-      tmpFilter.value = false
+  function updateFunction(newValue: SyntaxError, newValid: boolean) {
+    if(!!tmpFilter && tmpFilter.type == 'custom') {
+      tmpFilter.value = newValue
+      applyFilterDisabled = newValid
     }
   }
 
@@ -156,7 +162,7 @@
 
 <div class="container">
   {#if !!filter && !!tmpFilter}
-    <div class="header" on:click={step=="advanced" ? handleModeBackClick : handleEditorBackCLick} on:keypress>
+    <div class="header" on:click={step=="advanced" ? handleModeBackClick : handleEditorBackCLick} on:keypress role="presentation">
       <div class="back-link">
         <Icon
         name={backIcon}
@@ -169,7 +175,7 @@
     <div class="filter-editor">
       {#if tmpFilter.advanced && step == 'advanced' && canRenderOptions}
         <div class="advanced-mode" in:fly|local={{delay: 100, x: 200, duration: 100}} out:fly|local={{x: -200, duration: 100}}>
-          <div class="advanced-mode-selector" on:click|stopPropagation on:keypress>
+          <div class="advanced-mode-selector" on:click|stopPropagation on:keypress role="presentation">
             <SelectableVerticalList
               bind:selected={advancedModeSelectedOption}
               bind:elements={advancedModeOptions}
@@ -188,6 +194,7 @@
             <div class="fields"
               on:click|stopPropagation
               on:keypress
+              role="presentation"
             >
               {#if tmpFilter.type === "string" }
                 <SimpleTextField
@@ -283,33 +290,12 @@
                   </span>
                 </div>
               {:else if tmpFilter.type == 'custom'}
-                <slot name="custom" filter={tmpFilter}></slot>
+                <slot name="custom" filter={tmpFilter} {updateFunction}></slot>
               {/if}
             </div>
           </div>
           <div class="bottom-btn">
-            <div class="btn">
-              <Button
-                --button-width="100%"
-                --button-box-shadow="none"
-                --button-height="30px"
-                --button-padding="10px 0px 10px 0px"
-                --button-border-radius="10px 10px 0px 0px"
-                disabled={applyFilterDisabled}
-                on:click={handleApplyFilterClick}
-              >{applyFilterLabel}</Button>
-            </div>
-            <div class="btn">
-              <Button
-                --button-width="100%"
-                --button-box-shadow="none"
-                --button-padding="10px 0px 10px 0px"
-                --button-background-color="rgb(var(--global-color-grey-50))"
-                --button-color="rgb(var(--global-color-primary-500))"
-                --button-border-radius="0px 0px 0px 0px"
-                on:click={handleCancelClick}
-              >{cancelFilterLabel}</Button>
-            </div>
+            <slot name="filter-actions" {applyFilterDisabled}></slot>
           </div>
         </div>
       {/if}
