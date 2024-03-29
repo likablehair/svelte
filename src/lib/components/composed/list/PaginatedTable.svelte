@@ -109,14 +109,16 @@
 
 <div class="paginated-table">
   {#if searchBarVisible}
-    <slot name="search-bar" {handleSearchChange}>
-      <SearchBar
-        placeholder={searchBarPlaceholder}
-        bind:input={searchBarInput}
-        bind:value={searchText}
-      >
-      </SearchBar>
-    </slot>
+    <div class="search-bar-container">
+      <slot name="search-bar" {handleSearchChange}>
+        <SearchBar
+          placeholder={searchBarPlaceholder}
+          bind:input={searchBarInput}
+          bind:value={searchText}
+        >
+        </SearchBar>
+      </slot>
+    </div>
   {/if}
   <div class="filter-container">
     <Filters
@@ -233,7 +235,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: var(--paginated-table-gap, 24px);
   }
 
   .header-sort-icon {
@@ -256,12 +258,18 @@
   }
 
   .filter-container {
-    margin-top: 10px;
+    margin-top: var(--filters-container-margin-top, 10px);
     display: flex;
     align-items: center;
     flex-direction: row;
     gap: 10px;
     width: 100%;
+  }
+  .search-bar-container {
+    padding: var(
+      --search-bar-container-padding,
+      var(--search-bar-container-default-padding, 0)
+    );
   }
 
   @media only screen and (max-width: 768px) {
