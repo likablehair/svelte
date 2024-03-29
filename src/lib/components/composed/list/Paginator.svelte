@@ -2,9 +2,8 @@
 	import '../../../css/main.css'
   import './Paginator.css'
 
-  import Button from "$lib/components/simple/buttons/Button.svelte";
-
   import { createEventDispatcher } from "svelte";
+  import Icon from '$lib/components/simple/media/Icon.svelte';
   let dispatch = createEventDispatcher<{
     'change': {
       page: number
@@ -53,37 +52,19 @@
 </script>
 
 <div class="paginator-container">
-  <Button
-    icon="mdi-chevron-double-left"
+  <button
+    class="page-button"
     on:click={hardPrevious}
-    --button-default-background-color="transparent"
-    --button-default-focus-background-color="rgb(var(--global-color-primary-500), .3)"
-    --button-default-focus-color="rgb(var(--global-color-contrast-900))"
-    --button-default-hover-background-color="rgb(var(--global-color-primary-500))"
-    --button-default-box-shadow="none"
-    --button-default-color="rgb(var(--global-color-contrast-900))"
-  ></Button>
-  <Button
-    icon="mdi-chevron-left"
+  ><Icon name="mdi-chevron-double-left" /></button>
+  <button
+    class="page-button"
     on:click={previousPage}
-    --button-default-background-color="transparent"
-    --button-default-focus-background-color="rgb(var(--global-color-primary-500), .3)"
-    --button-default-focus-color="rgb(var(--global-color-contrast-900))"
-    --button-default-hover-background-color="rgb(var(--global-color-primary-500))"
-    --button-default-box-shadow="none"
-    --button-default-color="rgb(var(--global-color-contrast-900))"
-  ></Button>
+  ><Icon name="mdi-chevron-left" /></button>
   {#if page != 1}
-    <Button
+    <button
+      class="page-button"
       on:click={() => goToPage(page - 1)}
-      --button-default-background-color="transparent"
-      --button-default-focus-background-color="rgb(var(--global-color-primary-500), .3)"
-      --button-default-focus-color="rgb(var(--global-color-contrast-900))"
-      --button-default-hover-background-color="rgb(var(--global-color-primary-500))"
-      --button-default-box-shadow="none"
-      --button-default-color="rgb(var(--global-color-contrast-900))"
-      --button-default-padding=".5rem .8rem"
-    >{page - 1}</Button>
+    >{page - 1}</button>
   {/if}
   <div 
     class="page-button" 
@@ -92,42 +73,33 @@
     {page}
   </div>
   {#if !maxPage || (!!maxPage && page < maxPage)}
-    <Button
+    <button
+      class="page-button"
       on:click={() => goToPage(page + 1)}
-      --button-default-background-color="transparent"
-      --button-default-focus-background-color="rgb(var(--global-color-primary-500), .3)"
-      --button-default-focus-color="rgb(var(--global-color-contrast-900))"
-      --button-default-hover-background-color="rgb(var(--global-color-primary-500))"
-      --button-default-box-shadow="none"
-      --button-default-color="rgb(var(--global-color-contrast-900))"
-      --button-default-padding=".5rem .8rem"
-    >{page + 1}</Button>
+    >{page + 1}</button>
   {/if}
-  <Button
-    on:click={nextPage}
-    icon="mdi-chevron-right"
-    --button-default-background-color="transparent"
-    --button-default-focus-background-color="rgb(var(--global-color-primary-500), .3)"
-    --button-default-focus-color="rgb(var(--global-color-contrast-900))"
-    --button-default-hover-background-color="rgb(var(--global-color-primary-500))"
-    --button-default-box-shadow="none"
-    --button-default-color="rgb(var(--global-color-contrast-900))"
-  ></Button>
+    <button
+      class="page-button"
+      on:click={nextPage}
+    ><Icon name="mdi-chevron-right" /></button>
   {#if !!maxPage}
-    <Button
+    <button
+      class="page-button"
       on:click={hardNext}
-      icon="mdi-chevron-double-right"
-      --button-default-background-color="transparent"
-      --button-default-focus-background-color="rgb(var(--global-color-primary-500), .3)"
-      --button-default-focus-color="rgb(var(--global-color-contrast-900))"
-      --button-default-hover-background-color="rgb(var(--global-color-primary-500))"
-      --button-default-box-shadow="none"
-      --button-default-color="rgb(var(--global-color-contrast-900))"
-    ></Button>
+    ><Icon name="mdi-chevron-double-right" /></button>
   {/if}
 </div>
 
 <style>
+  button {
+	background: none;
+	color: inherit;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
+}
   .paginator-container {
     display: flex;
     align-items: center;
@@ -135,11 +107,26 @@
   }
 
   .page-button {
-    border-radius: 8px;
+    background-color: var(--page-button-background-color, transparent);
+    color: var(--page-button-color, rgb(var(--global-color-contrast-900)));
+    border-radius: var( --page-button-border-radius, 8px);
     display: flex;
     justify-content: center;
     align-content: center;
-    padding: .2rem .7rem;
+    padding: var(--page-button-padding, .2rem .7rem);
+  }
+  
+  .page-button:focus {
+    background-color: var(--page-button-focus-background-color, transparent);
+    color: var(--page-button-focus-color, rgb(var(--global-color-contrast-900)));
+  }
+  .page-button:hover {
+    background-color: var(--page-button-hover-background-color, rgb(var(--global-color-primary-500)));
+    border-radius: var( --page-button-hover-border-radius, 8px);
+  }
+  .page-button.selected {
+    background-color: rgb(var(--page-button-selected-background-color, var(--global-color-primary-500)));
+    padding: var(--page-button-selected-padding, .2rem .7rem);
   }
 
   .selected {
