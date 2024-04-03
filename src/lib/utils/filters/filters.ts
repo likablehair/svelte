@@ -13,6 +13,10 @@ export type SelectMode = typeof SelectModes[number]
 
 type MultiStringFilter = {
   type: 'multiString',
+  modify?: (params: {
+    builder: Builder,
+    value?: string
+  }) => Builder,
   columns: string[],
   operator?: 'or' | 'and',
   value?: string
@@ -21,6 +25,10 @@ type MultiStringFilter = {
 
 type ChoiceFilter = {
   type: 'choice',
+  modify?: (params: {
+    builder: Builder,
+    value?: string
+  }) => Builder,
   column: string,
   value?: string,
   operator?: 'or' | 'and'
@@ -29,6 +37,10 @@ type ChoiceFilter = {
 
 type StringFilter = {
   type: 'string',
+  modify?: (params: {
+    builder: Builder,
+    value?: string
+  }) => Builder,
   column: string,
   value?: string,
   mode?: StringMode
@@ -40,10 +52,18 @@ type DateFilter = {
 } & (
   {
     mode: 'between',
+    modify?: (params: {
+      builder: Builder,
+      value: { from?: Date, to?: Date }
+    }) => Builder,
     from?: Date,
     to?: Date
   } | {
     mode: 'equal' | 'greater' | 'lower',
+    modify?: (params: {
+      builder: Builder,
+      value?: Date
+    }) => Builder,
     value?: Date,
   }
 )
@@ -54,16 +74,29 @@ type NumberFilter = {
 } & (
   {
     mode: 'between',
+    modify?: (params: {
+      builder: Builder,
+      value: { from?: number, to?: number }
+    }) => Builder,
     from?: number,
     to?: number
   } | {
     mode: 'equal' | 'greater' | 'lower',
+    modify?: (params: {
+      builder: Builder,
+      value?: number
+    }) => Builder,
     value?: number,
   }
 )
 
 type SelectFilter = {
   type: 'select',
+  view?: 'toggle' | 'autocomplete',
+  modify?: (params: {
+    builder: Builder,
+    values?: { value: string | number, label?: string | number }[]
+  }) => Builder,
   column: string,
   mode: SelectMode,
   items: { value: string | number, label: string }[]
@@ -72,6 +105,10 @@ type SelectFilter = {
 
 type BoolFilter = {
   type: 'bool',
+  modify?: (params: {
+    builder: Builder,
+    value?: boolean
+  }) => Builder,
   column: string,
   mode: 'equal',
   value?: boolean
@@ -82,9 +119,8 @@ type BoolFilter = {
 type CustomFilter = {
   type: 'custom',
   modify: (params: {
-    filter: Omit<Filter, 'modifier'>,
     builder: Builder,
-    value: any
+    value?: any
   }) => Builder,
   value?: any,
   data?: any
@@ -96,7 +132,7 @@ export type Filter = {
   hidden?: boolean,
   label: string,
   advanced?: boolean,
-} & (StringFilter | MultiStringFilter | ChoiceFilter | DateFilter | NumberFilter | SelectFilter | BoolFilter | CustomFilter)
+} & (StringFilter | MultiStringFilter | ChoiceFilter | DateFilter | NumberFilter | SelectFilter | BoolFilter | CustomFilter )
 
 
 export default class Converter {
@@ -105,8 +141,7 @@ export default class Converter {
   }
 
   public createBuilder(params: {
-    filters: Filter[],
-    customFiltersValues?: {[filterName: string]: any}
+    filters: Filter[]
   }): Builder {
     let builder = new Builder()
 
@@ -115,8 +150,16 @@ export default class Converter {
 
       if(!filter.active) continue
 
-      if (filter.type == 'custom' && !!filter.modify && !!params.customFiltersValues && params.customFiltersValues[filter.name] !== undefined) {
-        builder = filter.modify({ filter, builder, value: params.customFiltersValues[filter.name] })
+      if (!!filter.modify) {
+        if('value' in filter && filter.value !== undefined) {
+          builder = filter.modify({ builder, value: filter.value })
+        } else if ('values' in filter && filter.values !== undefined) {
+          builder = filter.modify({ builder, values: filter.values })
+        } else if (filter.type === 'date' && ('from' in filter || 'to' in filter)) {
+          builder = filter.modify({ builder, value: { from: filter.from, to: filter.to } })
+        } else if (filter.type === 'number' && ('from' in filter || 'to' in filter)) {
+          builder = filter.modify({ builder, value: { from: filter.from, to: filter.to } })
+        }
       } else if(filter.type == 'string') {
         this.applyStringFilter({ builder, filter })
       } else if(filter.type == 'date') {

@@ -10,6 +10,9 @@
   import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
   import type { LabelMapper } from "./Filters.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
+    import Switch from "$lib/components/simple/forms/Switch.svelte";
+    import VerticalSwitch from "$lib/components/simple/forms/VerticalSwitch.svelte";
+    import ToggleList from "$lib/components/simple/forms/ToggleList.svelte";
 
   export let filter: Filter | undefined = undefined,
     lang: 'en' | 'it' = 'en',
@@ -107,12 +110,6 @@
     }
   }
 
-  function updateFunction(newValue: SyntaxError, newValid: boolean) {
-    if(!!tmpFilter && tmpFilter.type == 'custom') {
-      tmpFilter.value = newValue
-      applyFilterDisabled = newValid
-    }
-  }
 
 </script>
 
@@ -177,7 +174,7 @@
               --simple-textfield-width="100%"
             ></SimpleTextField>
           </div>
-        {:else if tmpFilter.type === "select"}
+        {:else if tmpFilter.type === "select" && (tmpFilter.view === undefined || tmpFilter.view === 'autocomplete')}
           <div
             style:width="100%"
           >
@@ -190,6 +187,16 @@
               --simple-text-field-margin-left="0px"
               mobileDrawer={mobile}
             ></Autocomplete>
+          </div>
+        {:else if tmpFilter.type === "select" && (tmpFilter.view === 'toggle')}
+          <div
+            style:width="100%"
+          >
+            <ToggleList
+              bind:values={tmpFilter.values}
+              items={tmpFilter.items}
+              multiple
+            ></ToggleList>
           </div>
         {:else if tmpFilter.type === "date" && tmpFilter.mode === 'between'}
           <div>
@@ -263,11 +270,11 @@
             </span>
           </div>
         {:else if tmpFilter.type == 'custom'}
-          <slot name="custom" filter={tmpFilter} {updateFunction}></slot>
+          <slot name="custom" filter={tmpFilter}></slot>
         {/if}
       {/if}
     </div>
-    <slot name="filter-actions" {applyFilterDisabled}></slot>
+    <slot name="filter-actions" {applyFilterDisabled} filter={tmpFilter}></slot>
   </div>
 {/if}
 

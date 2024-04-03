@@ -4,7 +4,7 @@
   import Filters from "$lib/components/composed/search/Filters.svelte";
   import Converter, { type Filter } from "$lib/utils/filters/filters";
   import type Builder from "$lib/utils/filters/builder";
-    import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
+  import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
 
   let x = 2
 
@@ -13,6 +13,7 @@
       name: "handlingType",
       label: "Tipo movimento",
       type: "select",
+      view: 'toggle',
       column: 'handlingType',
       mode: 'equal',
       items: [
@@ -63,8 +64,8 @@
       name: 'testCustom',
       label: 'Test custom',
       type: 'custom',
-      modify: function({ filter, builder, value }) {
-        return builder
+      modify: function({builder, value }) {
+        return builder.where('test', value)
       }
     },
     {
@@ -108,22 +109,39 @@
       column: "underStock",
       mode: "equal",
       description: "Merce sottoscorta",
+      modify: function({ builder, value }) {
+        if(value) {
+          return builder
+            .join('stocks', q => q.on('products.id', 'stocks.productId'))
+            .whereColumn('stocks.qty', '<', 'products.minQty')
+        } else {
+          return builder
+        }
+      }
     }
   ];
-
-  let customFiltersValues: {[filterName: string]: any} = {},
-    customFiltersValid: {[filterName: string]: boolean} = {}
 
   function handleFilterEdit() {
     if (!!filters) {
       let converter = new Converter();
       let builder: Builder;
       builder = converter.createBuilder({
-        filters,
-        customFiltersValues
+        filters
       });
       console.log(builder.toJson())
     }
+  }
+
+  function handleCustomStringFilter(e: Event, filterName: string, updateFunction: (filterName: string, newValue: any) => void): void {
+    //@ts-ignore
+    updateFunction(filterName, e.target.value)
+  }
+
+  function handleSingleCustomFilter(e: Event, filterName: string, updateFunction: (filterName: string, newValue: any, newValid: boolean) => void): void {
+    //@ts-ignore
+    let newValue: string = e.target.value
+    let isValid = !!newValue && newValue.length > 2
+    updateFunction(filterName, newValue, isValid)
   }
 
 </script>
@@ -132,11 +150,38 @@
 <ComponentSubtitle>Make it easy, make it filter.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
-  <Filters lang="it" bind:filters on:applyFilter={handleFilterEdit} on:removeAllFilters={handleFilterEdit} on:removeFilter={handleFilterEdit} {customFiltersValid} showActiveFilters={true}>
+  <Filters lang="it" bind:filters on:applyFilter={handleFilterEdit} on:removeAllFilters={handleFilterEdit} on:removeFilter={handleFilterEdit} showActiveFilters={true}>
+    <svelte:fragment slot="custom-chip" let:filter>
+      {#if filter.name === 'testCustom'}
+        <span>Test custom filter equal to {filter.type === 'custom' ? filter.value : undefined}</span>
+      {/if}
+    </svelte:fragment>
+    <svelte:fragment slot="custom" let:updateFunction let:filter let:mAndDown>
+      <SimpleTextField
+        on:input={(e) => { handleSingleCustomFilter(e, filter.name, updateFunction) }}
+        value={filter.type === 'custom' ? filter.value : undefined}
+      ></SimpleTextField>
+    </svelte:fragment>
   </Filters>
 </div>
 <div class="example">
-  <Filters lang="it" bind:filters on:applyFilter={handleFilterEdit} on:removeAllFilters={handleFilterEdit} on:removeFilter={handleFilterEdit} {customFiltersValid} showActiveFilters={false} editFilterMode="multi-edit">
+  <Filters lang="it" bind:filters on:applyFilter={handleFilterEdit} on:removeAllFilters={handleFilterEdit} on:removeFilter={handleFilterEdit} showActiveFilters={false} editFilterMode="multi-edit">
+    <!-- <svelte:fragment slot="content" let:updateMultiFilterValues let:filters>
+      {#each filters as filter}
+        <div>{filter.name}</div>
+        {#if filter.type == 'string'}
+          <SimpleTextField
+            on:input={(e) => { handleCustomStringFilter(e, filter.name, updateMultiFilterValues) }}
+          ></SimpleTextField>
+        {/if}
+      {/each}
+    </svelte:fragment> -->
+    <svelte:fragment slot="custom" let:updateFunction let:filter let:mAndDown>
+      <SimpleTextField
+        on:input={(e) => { handleSingleCustomFilter(e, filter.name, updateFunction) }}
+        value={filter.type === 'custom' ? filter.value : undefined}
+      ></SimpleTextField>
+    </svelte:fragment>
   </Filters>
 </div>
 <h2>Props</h2>

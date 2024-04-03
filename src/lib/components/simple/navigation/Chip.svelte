@@ -167,6 +167,8 @@
   .outlined {
     background: transparent !important;
     border: solid 1px;
+    border-color: var(--chip-default-outlined-color);
+    color: var(--chip-default-outlined-color);
     background-color: var(
       --chip-background-color,
       var(--chip-default-outlined-background-color)

@@ -115,7 +115,7 @@
     setTimeout(() => {
       if(menuWidth !== undefined) localMenuWidth = menuWidth
       else localMenuWidth = activator.offsetWidth + "px"
-      
+
       setTimeout(() => {
         refreshPosition = true;
       }, 1);
@@ -242,7 +242,7 @@
           <div class="not-visible-chip-number">+ {notVisibleChipNumber}</div>
         </slot>
       {/if}
-      
+
       <SimpleTextField
         --simple-textfield-max-width="min(200px, 90%)"
         --simple-textfield-height="auto"

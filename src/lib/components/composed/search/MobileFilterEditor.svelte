@@ -13,6 +13,7 @@
   import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
   import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
   import type { LabelMapper } from "./Filters.svelte";
+    import ToggleList from "$lib/components/simple/forms/ToggleList.svelte";
 
   export let filter: Filter | undefined = undefined,
     lang: 'it' | 'en' = 'en',
@@ -151,12 +152,6 @@
     if(!tmpFilter.to) tmpFilter.to = new Date()
   }
 
-  function updateFunction(newValue: SyntaxError, newValid: boolean) {
-    if(!!tmpFilter && tmpFilter.type == 'custom') {
-      tmpFilter.value = newValue
-      applyFilterDisabled = newValid
-    }
-  }
 
 </script>
 
@@ -265,7 +260,7 @@
                     ></SimpleTextField>
                   </div>
                 </div>
-              {:else if tmpFilter.type == 'select'}
+              {:else if tmpFilter.type === "select" && (tmpFilter.view === undefined || tmpFilter.view === 'autocomplete')}
                 <div style:width="100%">
                   <Autocomplete
                     on:close
@@ -280,6 +275,14 @@
                     --autocomplete-options-max-width="100%"
                   ></Autocomplete>
                 </div>
+              {:else if tmpFilter.type === "select" && (tmpFilter.view === 'toggle')}
+                <div style:width="100%">
+                  <ToggleList
+                    bind:values={tmpFilter.values}
+                    items={tmpFilter.items}
+                    multiple
+                  ></ToggleList>
+                </div>
               {:else if tmpFilter.type == 'bool'}
                 <div class="bool-filter">
                   <Checkbox
@@ -290,12 +293,12 @@
                   </span>
                 </div>
               {:else if tmpFilter.type == 'custom'}
-                <slot name="custom" filter={tmpFilter} {updateFunction}></slot>
+                <slot name="custom" filter={tmpFilter}></slot>
               {/if}
             </div>
           </div>
           <div class="bottom-btn">
-            <slot name="filter-actions" {applyFilterDisabled}></slot>
+            <slot name="filter-actions" {applyFilterDisabled} filter={tmpFilter}></slot>
           </div>
         </div>
       {/if}

@@ -4,7 +4,7 @@ type GroupedWhere = {
   method: 'where',
   kind: 'grouped',
   logicalOperator?: 'and' | 'or' | 'andNot' | 'orNot',
-  children: (ObjectWhere | SimpleWhere | GroupedWhere | InWhere)[]
+  children: (ObjectWhere | SimpleWhere | GroupedWhere | InWhere | ColumnWhere)[]
 }
 
 type ObjectWhere = {
@@ -23,6 +23,15 @@ type SimpleWhere = {
   value: WhereFilterValue | boolean
 }
 
+type ColumnWhere = {
+  method: 'where',
+  kind: 'column',
+  logicalOperator?: 'and' | 'or',
+  key: string,
+  operator?: string,
+  column: string
+}
+
 type InWhere = {
   method: 'where',
   kind: 'in',
@@ -31,4 +40,4 @@ type InWhere = {
   value: (WhereFilterValue)[]
 }
 
-export type WhereModifier = SimpleWhere | ObjectWhere | GroupedWhere | InWhere
+export type WhereModifier = SimpleWhere | ObjectWhere | GroupedWhere | InWhere | ColumnWhere

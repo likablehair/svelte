@@ -23,7 +23,7 @@
   import MobileFilterEditor from './MobileFilterEditor.svelte';
   import { fly } from 'svelte/transition';
   import Dialog from '$lib/components/simple/dialogs/Dialog.svelte';
-  import MultiEditFiltersForm from './MultiEditFiltersForm.svelte';
+  import Validator from '$lib/utils/filters/validator';
 
   export let
     filters: Filter[] = [],
@@ -37,7 +37,6 @@
     betweenSeparator: string = lang == 'en' ? "and" : "e",
     trueString: string = lang == 'en' ? "true" : "vero",
     falseString: string = lang == 'en' ? "false" : "falso",
-    customFiltersValid: { [filterName: string]: boolean } = {},
     editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit',
     // TODO create global translation mechanism
     labelsMapper: LabelMapper = lang == 'en' ? {
@@ -165,6 +164,13 @@
       selected = e.detail.element.name
       filterOpened = 'new'
     }
+
+    let filter = filters.find(f => f.name === e.detail.element.name)
+    if(!!filter) {
+      if(filter.type === 'custom') {
+        customFilterApplyDisabled = filter.active === undefined || filter.active === false
+      }
+    }
   }
 
   function handleCancelFilterClick() {
@@ -190,30 +196,55 @@
   function handleRemoveFilter(filter: { name: string }) {
     let filterIndex = filters.findIndex((f) => f.name === filter.name)
     filters[filterIndex].active = false
+    let filterName = filter.name
     if(Object.keys(filters[filterIndex]).includes('value')) {
       //@ts-ignore
       filters[filterIndex].value = undefined
+      if(!!tmpFilters[filterName] && Object.keys(tmpFilters[filterName]).includes('value')) {
+        //@ts-ignore
+        tmpFilters[filterName].value = undefined
+      }
     }
     if(Object.keys(filters[filterIndex]).includes('from')) {
       //@ts-ignore
       filters[filterIndex].from = undefined
+      if(!!tmpFilters[filterName] && Object.keys(tmpFilters[filterName]).includes('from')) {
+        //@ts-ignore
+        tmpFilters[filterName].from = undefined
+      }
     }
     if(Object.keys(filters[filterIndex]).includes('to')) {
       //@ts-ignore
       filters[filterIndex].to = undefined
+      if(!!tmpFilters[filterName] && Object.keys(tmpFilters[filterName]).includes('to')) {
+        //@ts-ignore
+        tmpFilters[filterName].to = undefined
+      }
+    }
+    if(Object.keys(filters[filterIndex]).includes('values')) {
+      //@ts-ignore
+      filters[filterIndex].values = undefined
+      if(!!tmpFilters[filterName] && Object.keys(tmpFilters[filterName]).includes('values')) {
+        //@ts-ignore
+        tmpFilters[filterName].values = undefined
+      }
     }
     singleFilterMenuOpened = false
     dispatch('removeFilter', { filter: filters[filterIndex] })
   }
 
   let activeFiltersActivators: Record<string, HTMLElement> = {}
-  function handleActiveFilterClick(filter: { name: string }) {
+  function handleActiveFilterClick(filter: { name: string, type: 'custom' | string }) {
     singleFilterActivator = activeFiltersActivators[filter.name]
     singleFilterMenuAnchor = 'bottom-center'
     singleFilterMenuOpened = true;
     mobileOpen=true
     selected = filter.name
     filterOpened = 'edit'
+
+    if(filter.type === 'custom') {
+      customFilterApplyDisabled = false
+    }
   }
 
   function handleMobileBackTap() {
@@ -270,11 +301,6 @@
     dispatch('applyFilter')
   }
 
-  function handleMultiEditCancelClick() {
-    open = false
-    mobileOpen = false
-  }
-
   function handleMultiEditRemoveClick() {
     handleRemoveAllFilters()
     open = false
@@ -282,6 +308,58 @@
   }
 
   let selectedTmpFilter: Filter | undefined = undefined
+
+  let tmpFilters: {[filterName: string]: Filter} = {}
+
+  function handleApplyMultiFilterClick() {
+    for(let i = 0; i < filters.length; i += 1) {
+      if(!!filters[i] && !!tmpFilters[filters[i].name]) {
+        filters[i] = {...tmpFilters[filters[i].name]}
+        filters[i].active = filters[i].type !== 'custom' ? Validator.isValid(tmpFilters[filters[i].name]) : tmpFilters[filters[i].name].active
+      }
+    }
+    filters = filters
+    handleMultiEditApplyClick()
+  }
+
+  function updateMultiFilterValues(filterName: string, newValue: any) {
+    let filter = filters.find(f => f.name === filterName)
+    if(!filter) throw new Error('cannot find filter with name ' + filterName)
+    if(!tmpFilters[filterName]) tmpFilters[filterName] = {...filter}
+    let tmpFilter = tmpFilters[filterName]
+    if(tmpFilter.type == 'select') {
+      tmpFilter.values = newValue
+    } else if('mode' in tmpFilter && tmpFilter.mode == 'between') {
+      tmpFilter.to = newValue.to
+      tmpFilter.from = newValue.from
+    } else {
+      tmpFilter.value = newValue
+    }
+  }
+
+  let customToBeInitialized = true
+  $: if(customToBeInitialized && !!tmpFilters) initCustomTmpFilters()
+
+  function initCustomTmpFilters() {
+    let customFilters = filters.filter(f => f.type === 'custom')
+    for(const customFilter of customFilters) {
+      if(!tmpFilters[customFilter.name]) {
+        tmpFilters[customFilter.name] = { ...customFilter }
+      }
+    }
+    customToBeInitialized = false
+  }
+
+  let customFilterApplyDisabled: boolean = true
+  function updateFunction(filterName: string, newValue: any, newValid: boolean) {
+    let tmpFilter = tmpFilters[filterName]
+    if(!!tmpFilter && tmpFilter.type == 'custom') {
+      tmpFilter.value = newValue
+      tmpFilter.active = newValid
+      selectedTmpFilter = {...tmpFilter}
+      customFilterApplyDisabled = !newValid
+    }
+  }
 
 </script>
 
@@ -300,63 +378,67 @@
               on:close={() => handleRemoveFilter(filter)}
               on:click={() => handleActiveFilterClick(filter)}
             >
-              <span class="truncate-text inline-truncated" style:max-width="160px">
-                <b>{filter.label}</b>
-              </span>
-              {#if filter.type === "string" && filter.value != undefined}
-                {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                <span class="truncate-text inline-truncated">
-                  <b>{filter.value}</b>
+              {#if filter.type === 'custom'}
+                <slot name="custom-chip" {filter}></slot>
+              {:else}
+                <span class="truncate-text inline-truncated" style:max-width="160px">
+                  <b>{filter.label}</b>
                 </span>
-              {:else if filter.type === "date"}
-                {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
+                {#if filter.type === "string" && filter.value != undefined}
                   {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                  <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
-                  {betweenSeparator}
-                  <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
-                {:else if filter.mode == 'between' && filter.from != undefined}
-                  {labelsMapper['greater'].extended || labelsMapper['greater'].short}
-                  <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
-                {:else if filter.mode == 'between' && filter.to != undefined}
-                  {labelsMapper['lower'].extended || labelsMapper['lower'].short}
-                  <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
-                {:else if filter.mode != 'between' && filter.value != undefined}
-                  {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                  <span class="truncate-text inline-truncated"><b>{filter.value?.toLocaleDateString(dateLocale)}</b></span>
-                {/if}
-              {:else if filter.type == "number"}
-                {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
-                  {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                  <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
-                  {betweenSeparator}
-                  <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
-                {:else if filter.mode == 'between' && filter.from != undefined}
-                  {labelsMapper['greater'].extended || labelsMapper['greater'].short}
-                  <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
-                {:else if filter.mode == 'between' && filter.to != undefined}
-                  {labelsMapper['lower'].extended || labelsMapper['lower'].short}
-                  <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
-                {:else if filter.mode != 'between' && filter.value != undefined}
-                  {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                  <span class="truncate-text inline-truncated"><b>{filter.value}</b></span>
-                {/if}
-              {:else if filter.type == 'select' && !!filter.values && filter.values.length > 0}
-                {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                <span class="truncate-text inline-truncated"><b>{filter.values[0].label}</b></span>
-                {#if filter.values.length >= 2}
-                  <span class="more-items">+{filter.values.length - 1}
-                    <!--TODO create tooltip component-->
-                    <span class="more-tooltip">
-                      <ul>
-                        {#each filter.values as value}
-                          <li><div class="truncate-text">{value.label}</div></li>
-                        {/each}
-                      </ul>
-                    </span>
+                  <span class="truncate-text inline-truncated">
+                    <b>{filter.value}</b>
                   </span>
+                {:else if filter.type === "date"}
+                  {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
+                    {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
+                    <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
+                    {betweenSeparator}
+                    <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
+                  {:else if filter.mode == 'between' && filter.from != undefined}
+                    {labelsMapper['greater'].extended || labelsMapper['greater'].short}
+                    <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
+                  {:else if filter.mode == 'between' && filter.to != undefined}
+                    {labelsMapper['lower'].extended || labelsMapper['lower'].short}
+                    <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
+                  {:else if filter.mode != 'between' && filter.value != undefined}
+                    {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
+                    <span class="truncate-text inline-truncated"><b>{filter.value?.toLocaleDateString(dateLocale)}</b></span>
+                  {/if}
+                {:else if filter.type == "number"}
+                  {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
+                    {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
+                    <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
+                    {betweenSeparator}
+                    <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
+                  {:else if filter.mode == 'between' && filter.from != undefined}
+                    {labelsMapper['greater'].extended || labelsMapper['greater'].short}
+                    <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
+                  {:else if filter.mode == 'between' && filter.to != undefined}
+                    {labelsMapper['lower'].extended || labelsMapper['lower'].short}
+                    <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
+                  {:else if filter.mode != 'between' && filter.value != undefined}
+                    {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
+                    <span class="truncate-text inline-truncated"><b>{filter.value}</b></span>
+                  {/if}
+                {:else if filter.type == 'select' && !!filter.values && filter.values.length > 0}
+                  {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
+                  <span class="truncate-text inline-truncated"><b>{filter.values[0].label}</b></span>
+                  {#if filter.values.length >= 2}
+                    <span class="more-items">+{filter.values.length - 1}
+                      <!--TODO create tooltip component-->
+                      <span class="more-tooltip">
+                        <ul>
+                          {#each filter.values as value}
+                            <li><div class="truncate-text">{value.label}</div></li>
+                          {/each}
+                        </ul>
+                      </span>
+                    </span>
+                  {/if}
+                {:else if filter.type == 'bool' && filter.value !== undefined}
+                    <b>{filter.value ? trueString : falseString}</b>
                 {/if}
-              {:else if filter.type == 'bool' && filter.value !== undefined}
-                  <b>{filter.value ? trueString : falseString}</b>
               {/if}
             </Chip>
           </div>
@@ -427,7 +509,6 @@
                 on:backClick={handleMobileBackTap}
                 {lang}
                 {labelsMapper}
-                forceApplyValid={!!customFiltersValid[selectedFilter.name]}
                 bind:tmpFilter={selectedTmpFilter}
               >
                 <div slot="title">
@@ -435,12 +516,11 @@
                     {selectedFilter?.label}
                   </div>
                 </div>
-
-                <svelte:fragment slot="custom" let:filter let:updateFunction>
-                  <slot name="custom-mobile" {filter} {updateFunction} {mAndDown}></slot>
+                <svelte:fragment slot="custom" let:filter>
+                  <slot name="custom" {filter} {updateFunction} {mAndDown}></slot>
                 </svelte:fragment>
 
-                <svelte:fragment slot="filter-actions" let:applyFilterDisabled>
+                <svelte:fragment slot="filter-actions" let:applyFilterDisabled let:filter>
                   <div class="btn">
                     <Button
                       --button-width="100%"
@@ -448,7 +528,7 @@
                       --button-height="30px"
                       --button-padding="10px 0px 10px 0px"
                       --button-border-radius="10px 10px 0px 0px"
-                      disabled={applyFilterDisabled}
+                      disabled={!filter || (filter.type === 'custom' ? customFilterApplyDisabled : applyFilterDisabled)}
                       on:click={handleApplyFilterClick}
                     >{applyFilterLabel}</Button>
                   </div>
@@ -492,27 +572,75 @@
             </div>
           {/if}
         {:else if editFilterMode === 'multi-edit'}
-            <div
-              class="drawer-multi-filter"
-              style:height="100%"
-            >
-              <MultiEditFiltersForm
-                bind:filters
-                {lang}
-                title={addFilterLabel}
-                {labelsMapper}
-                on:cancel={handleMultiEditCancelClick}
-                on:apply={handleMultiEditApplyClick}
-                on:remove={handleMultiEditRemoveClick}
-                let:mAndDown
-                let:updateMultiFilterValues
-              >
-                <!--
-                  <slot name="multi-filter-content" {mAndDown} {updateMultiFilterValues} {filters}></slot>
-                -->
-                <slot name="custom" slot="custom" let:mAndDown let:updateFunction let:filter {mAndDown} {updateFunction} {filter}></slot>
-              </MultiEditFiltersForm>
+          <div
+            class="drawer-multi-filter"
+            style:height="100%"
+          >
+            <div class="form-container" style:background-color={mAndDown ? 'transparent' : 'rgb(var(--global-color-background-100))'} style:width={mAndDown ? '100%' : '50vw'} style:box-sizing="border-box">
+              <div class="header">
+                <h1>{addFilterLabel}</h1>
+              </div>
+              <div class="body">
+                <slot name="content" {mAndDown} {updateMultiFilterValues} {filters}>
+                  <div class="multi-filters-container" style:grid-template-columns={mAndDown ? '1fr' : '1fr 1fr'}>
+                    {#each filters as filter, i}
+                      <div class="filter">
+                        <div class="input">
+                          {#if !filter.advanced && filter.type !== 'custom'}
+                            <div class="label">
+                              {filter.label}
+                            </div>
+                          {/if}
+                          <div class="field">
+                            <FilterEditor
+                              bind:filter={filter}
+                              {lang}
+                              {labelsMapper}
+                              editFilterMode="multi-edit"
+                              bind:tmpFilter={tmpFilters[filter.name]}
+                              mobile={mAndDown}
+                            >
+                              <slot name="custom" slot="custom" {updateFunction} {mAndDown} {filter}></slot>
+                            </FilterEditor>
+                          </div>
+                        </div>
+                      </div>
+                    {/each}
+                  </div>
+                </slot>
+              </div>
+              <div class="footer">
+                <div class="actions" style:padding-bottom={mAndDown ? '20px' : undefined}>
+                  <Button
+                    --button-color="rgb(var(--global-color-primary-400))"
+                    --button-background-color="transparent"
+                    --button-hover-background-color="rgb(var(--global-color-primary-500))"
+                    --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
+                    --button-box-shadow="none"
+                    on:click={handleCancelFilterClick}
+                  >
+                    {cancelFilterLabel}
+                  </Button>
+                  <Button
+                    --button-color="rgb(var(--global-color-primary-400))"
+                    --button-background-color="transparent"
+                    --button-hover-background-color="rgb(var(--global-color-primary-500))"
+                    --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
+                    --button-box-shadow="none"
+                    on:click={handleMultiEditRemoveClick}
+                  >
+                    {lang == 'en' ? "Remove filters" : "Rimuovi filtri"}
+                  </Button>
+                  <Button
+                    --button-min-width="100px"
+                    on:click={handleApplyMultiFilterClick}
+                  >
+                    {applyFilterLabel}
+                  </Button>
+                </div>
+              </div>
             </div>
+          </div>
         {/if}
       </div>
     </Drawer>
@@ -580,13 +708,12 @@
               bind:filter={selectedFilter}
               {lang}
               {labelsMapper}
-              forceApplyValid={!!customFiltersValid[selectedFilter.name]}
               bind:tmpFilter={selectedTmpFilter}
             >
-              <svelte:fragment slot="custom" let:filter let:updateFunction>
+              <svelte:fragment slot="custom" let:filter>
                 <slot name="custom" {filter} {updateFunction} {mAndDown}></slot>
               </svelte:fragment>
-              <svelte:fragment slot="filter-actions" let:applyFilterDisabled>
+              <svelte:fragment slot="filter-actions" let:applyFilterDisabled let:filter>
                 <div class="sub-filter-button">
                   <Button
                     --button-background-color="transparent"
@@ -597,11 +724,10 @@
                   >
                     {cancelFilterLabel}
                   </Button>
-
                   <Button
                     --button-min-width="100px"
                     on:click={handleApplyFilterClick}
-                    disabled={applyFilterDisabled}
+                    disabled={!filter || (filter.type === 'custom' ? customFilterApplyDisabled : applyFilterDisabled)}
                   >
                     {applyFilterLabel}
 
@@ -616,22 +742,70 @@
       <Dialog
         bind:open={open}
       >
-        <MultiEditFiltersForm
-          bind:filters
-          {lang}
-          title={addFilterLabel}
-          {labelsMapper}
-          on:cancel={handleMultiEditCancelClick}
-          on:apply={handleMultiEditApplyClick}
-          on:remove={handleMultiEditRemoveClick}
-          let:mAndDown
-          let:updateMultiFilterValues
-        >
-          <!--
-            <slot name="multi-filter-content" {mAndDown} {updateMultiFilterValues} {filters}></slot>
-          -->
-          <slot name="custom" slot="custom" let:mAndDown let:updateFunction let:filter {mAndDown} {updateFunction} {filter}></slot>
-        </MultiEditFiltersForm>
+        <div class="form-container" style:background-color={mAndDown ? 'transparent' : 'rgb(var(--global-color-background-100))'} style:width={mAndDown ? '100%' : '50vw'} style:box-sizing="border-box">
+          <div class="header">
+            <h1>{addFilterLabel}</h1>
+          </div>
+          <div class="body">
+            <slot name="content" {mAndDown} {updateMultiFilterValues} {filters}>
+              <div class="multi-filters-container" style:grid-template-columns={mAndDown ? '1fr' : '1fr 1fr'}>
+                {#each filters as filter, i}
+                  <div class="filter" style:grid-column={filter.type === 'select' ? 'span 2' : 'auto'}>
+                    <div class="input">
+                      {#if !filter.advanced && filter.type !== 'custom'}
+                        <div class="label">
+                          {filter.label}
+                        </div>
+                      {/if}
+                      <div class="field">
+                        <FilterEditor
+                          bind:filter={filter}
+                          {lang}
+                          {labelsMapper}
+                          editFilterMode="multi-edit"
+                          bind:tmpFilter={tmpFilters[filter.name]}
+                          mobile={mAndDown}
+                        >
+                          <slot name="custom" slot="custom" {updateFunction} {mAndDown} {filter}></slot>
+                        </FilterEditor>
+                      </div>
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            </slot>
+          </div>
+          <div class="footer">
+            <div class="actions" style:padding-bottom={mAndDown ? '20px' : undefined}>
+              <Button
+                --button-color="rgb(var(--global-color-primary-400))"
+                --button-background-color="transparent"
+                --button-hover-background-color="rgb(var(--global-color-primary-500))"
+                --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
+                --button-box-shadow="none"
+                on:click={handleCancelFilterClick}
+              >
+                {cancelFilterLabel}
+              </Button>
+              <Button
+                --button-color="rgb(var(--global-color-primary-400))"
+                --button-background-color="transparent"
+                --button-hover-background-color="rgb(var(--global-color-primary-500))"
+                --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
+                --button-box-shadow="none"
+                on:click={handleMultiEditRemoveClick}
+              >
+                {lang == 'en' ? "Remove filters" : "Rimuovi filtri"}
+              </Button>
+              <Button
+                --button-min-width="100px"
+                on:click={handleApplyMultiFilterClick}
+              >
+                {applyFilterLabel}
+              </Button>
+            </div>
+          </div>
+        </div>
       </Dialog>
     {/if}
   {/if}
@@ -781,6 +955,44 @@
     display: inline-block;
     vertical-align: middle;
     max-width: 240px;
+  }
+
+
+  .form-container {
+    border-radius: 10px;
+    padding: 20px;
+    height: 100%;
+    max-height: 90vh;
+    overflow: scroll;
+  }
+
+  .multi-filters-container {
+    display: grid;
+    gap: 20px
+  }
+
+  .filter {
+    display: flex;
+    align-items: center;
+  }
+
+  .input {
+    width: 100%;
+  }
+
+  .input .label {
+    margin-bottom: 5px;
+  }
+
+  .footer {
+    margin-top: 40px;
+  }
+
+  .footer .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-right: 20px;
   }
 
 </style>
