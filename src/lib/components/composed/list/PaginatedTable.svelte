@@ -85,10 +85,11 @@
     })
 
     if(!!searchText && !!searchBarColumns && searchBarColumns.length > 0) {
+
       builder.where(b => {
-        b.where(searchBarColumns![0], 'like', searchText)
+        b.where(searchBarColumns![0], 'ilike', '%' + searchText + '%')
         for(let i = 1; i < searchBarColumns!.length; i += 1) {
-          b.orWhere(searchBarColumns![i], 'like', searchText)
+          b.orWhere(searchBarColumns![i], 'ilike', '%' + searchText + '%')
         }
       })
     }
