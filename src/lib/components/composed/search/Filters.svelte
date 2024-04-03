@@ -290,12 +290,6 @@
     dispatch('removeAllFilters')
   }
 
-  //////////////////////// pass function through slot to set filter value and filter validity
-  // let filtersValue: {[filterName: string]: any} = {}
-  // function handleInputChange(e: Event, changeHandler: (filterName: string, newValue: any, newValidity: boolean) => void, filterName: string) {
-  //   changeHandler(filterName, filtersValue[filterName])
-  // }
-
   function handleMultiEditApplyClick() {
     open = false
     mobileOpen = false
