@@ -24,6 +24,7 @@
   import { fly } from 'svelte/transition';
   import Dialog from '$lib/components/simple/dialogs/Dialog.svelte';
   import Validator from '$lib/utils/filters/validator';
+    import ToolTip from '../common/ToolTip.svelte';
 
   export let
     filters: Filter[] = [],
@@ -361,6 +362,8 @@
     }
   }
 
+  let moreItemsActivator: HTMLElement
+
 </script>
 
 <MediaQuery let:mAndDown>
@@ -425,16 +428,16 @@
                   {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
                   <span class="truncate-text inline-truncated"><b>{filter.values[0].label}</b></span>
                   {#if filter.values.length >= 2}
-                    <span class="more-items">+{filter.values.length - 1}
-                      <!--TODO create tooltip component-->
-                      <span class="more-tooltip">
+                    <span class="more-items" bind:this={moreItemsActivator}>+{filter.values.length - 1}</span>
+                    <ToolTip activator={moreItemsActivator}>
+                      <div class="more-tooltip-content">
                         <ul>
                           {#each filter.values as value}
                             <li><div class="truncate-text">{value.label}</div></li>
                           {/each}
                         </ul>
-                      </span>
-                    </span>
+                      </div>
+                    </ToolTip>
                   {/if}
                 {:else if filter.type == 'bool' && filter.value !== undefined}
                     <b>{filter.value ? trueString : falseString}</b>
@@ -912,37 +915,20 @@
     font-size: .7rem;
   }
 
-  .more-tooltip {
-    visibility: hidden;
-    min-width: 120px;
+  .more-tooltip-content {
     max-width: 300px;
+    text-overflow: ellipsis;
     width: fit-content;
     border-radius: 6px;
-    padding: 5px 0;
-    position: absolute;
+    padding: 10px 20px 10px 20px;
     text-align: left;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -60px;
-    opacity: 0;
-    transition: opacity 0.3s;
-    position: absolute;
     background-color: rgb(var(--global-color-background-200));
     color: rgb(var(--global-color-background-950));
-    z-index: 100;
   }
 
-  .more-tooltip ul {
-    list-style-type: none;
-    padding-left: 0px;
-    margin-left: 20px;
-    margin-right: 20px
-  }
-
-
-  .more-items:hover .more-tooltip {
-    visibility: visible;
-    opacity: 1;
+  .more-tooltip-content ul {
+    list-style: none;
+    padding: 0;
   }
 
   .truncate-text {
@@ -963,7 +949,7 @@
     padding: 20px;
     height: 100%;
     max-height: 90vh;
-    overflow: scroll;
+    overflow-y: auto;
   }
 
   .multi-filters-container {

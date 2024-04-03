@@ -182,6 +182,12 @@ const list: {
     type: 'composed',
     url: '/docs/components/composed-components/Filters'
   }, {
+    title: 'ToggleList',
+    description: 'List of toggle button',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/ToggleList'
+  }, {
     title: 'AsyncAutocomplete',
     description: 'Autocomplete in different time and space.',
     status: 'stable',

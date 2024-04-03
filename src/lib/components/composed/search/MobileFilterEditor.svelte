@@ -13,7 +13,7 @@
   import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
   import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
   import type { LabelMapper } from "./Filters.svelte";
-    import ToggleList from "$lib/components/simple/forms/ToggleList.svelte";
+    import ToggleList from "$lib/components/composed/forms/ToggleList.svelte";
 
   export let filter: Filter | undefined = undefined,
     lang: 'it' | 'en' = 'en',

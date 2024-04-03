@@ -10,9 +10,7 @@
   import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
   import type { LabelMapper } from "./Filters.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
-    import Switch from "$lib/components/simple/forms/Switch.svelte";
-    import VerticalSwitch from "$lib/components/simple/forms/VerticalSwitch.svelte";
-    import ToggleList from "$lib/components/simple/forms/ToggleList.svelte";
+  import ToggleList from "$lib/components/composed/forms/ToggleList.svelte";
 
   export let filter: Filter | undefined = undefined,
     lang: 'en' | 'it' = 'en',

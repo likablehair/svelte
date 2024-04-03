@@ -68,6 +68,7 @@ export { default as HorizontalStackedProgress } from './components/composed/prog
 export { default as ActivableButton } from './components/composed/buttons/ActivableButton.svelte'
 export { default as IconsDropdown } from './components/composed/forms/IconsDropdown.svelte'
 export { default as AvatarDropdown } from './components/composed/forms/AvatarDropdown.svelte'
+export { default as ToggleList } from './components/composed/forms/ToggleList.svelte'
 
 export { default as PaginatedTable } from './components/composed/list/PaginatedTable.svelte'
 

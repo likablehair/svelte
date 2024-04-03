@@ -42,6 +42,7 @@
   class:outlined
   class:disabled
   disabled={disabled}
+  tabindex={buttonTabIndex}
   on:click={handleChipClick}
 >
   {#if filter}
@@ -126,6 +127,28 @@
     background-color: var(
       --chip-hover-background-color,
       var(--chip-default-hover-background-color)
+    );
+  }
+
+  .chip:not(.outlined):focus {
+    background-color: var(
+      --chip-focus-background-color,
+      var(--chip-default-focus-background-color)
+    );
+  }
+
+  .chip.outlined:focus {
+    color: var(
+      --chip-outlined-focus-color,
+      var(--chip-default-outlined-focus-color)
+    );
+    border-color: var(
+      --chip-outlined-focus-color,
+      var(--chip-default-outlined-focus-color)
+    );
+    box-shadow: var(
+      --chip-outlined-focus-box-shadow,
+      var(--chip-default-outlined-focus-box-shadow)
     );
   }
 

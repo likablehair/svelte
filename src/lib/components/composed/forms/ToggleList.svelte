@@ -13,10 +13,7 @@
   export let values: Item[] = [],
     items: Item[],
     multiple = true,
-    disabled = false,
-    width = "auto",
-    height = "auto",
-    maxWidth: string | undefined = undefined
+    disabled = false
 
   let dispatch = createEventDispatcher<{
     change: {
@@ -68,10 +65,8 @@
 <svelte:window />
 
 <div
-  style:width
-  style:max-width={maxWidth}
-  style:height
-  style:opacity={disabled ? "50%" : "100%"}
+  class="toggle-container"
+  class:disabled
 >
     <div
       class="selection-container"
@@ -81,8 +76,9 @@
           <Chip
             outlined={values.findIndex(i => i.value === item.value) === -1}
             on:click={() => toggle(item)}
-            buttonTabIndex={-1}
+            buttonTabIndex={0}
             truncateText
+            --button-focus-color="red"
           >
             {item.label}
           </Chip>
@@ -99,6 +95,17 @@
     align-items: center;
     gap: 5px;
     transition: all .1s;
+  }
+
+  .toggle-container {
+    opacity: 100%;
+    width: var(--toggle-list-width, auto);
+    max-width: var(--toggle-list-max-width, auto);
+    height: var(--toggle-list-heigth, auto);
+  }
+
+  .toggle-container.disabled {
+    opacity: 50%;
   }
 
   .chip {
