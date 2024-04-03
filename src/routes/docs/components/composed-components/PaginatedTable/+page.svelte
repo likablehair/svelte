@@ -57,6 +57,7 @@
   },
   {
     label: 'Rating',
+    view: 'toggle',
     active: false,
     type: 'select',
     column: 'rating',
@@ -78,7 +79,7 @@
     type: "custom",
     label: "Product category",
     name: "productCategory",
-    modify: ({builder, filter, value}) => {
+    modify: ({builder, value}) => {
       return builder.join('categories', q => {
         q.on('product.categoryId', 'category.id')
       }).where('categories.name', value)
@@ -90,13 +91,11 @@
     let filterBuilder: Builder = e.detail.builder
   }
 
-  let customFiltersValues: {[filterName: string]: any} = {},
-    customFiltersValid: {[filterName: string]: boolean} = {}
-
-  function checkFilterValidity(filterName: string) {
-    if(filterName == 'productCategory') {
-      customFiltersValid['productCategory'] = !!customFiltersValues['productCategory']
-    }
+  function handleCustomInput(e: Event, filterName: string, updateFunction: (filterName: string, newValue: any, newValid: boolean) => void) {
+    //@ts-ignore
+    let newValue: string = e.target.value
+    let isValid = !!newValue && newValue.length > 2
+    updateFunction(filterName, newValue, isValid)
   }
 
 </script>
@@ -130,14 +129,18 @@
     totalElements={40}
     searchBarVisible={false}
     on:filtersChange={handleFiltersChange}
-    {customFiltersValid}
-    {customFiltersValues}
+    editFilterMode="multi-edit"
   >
-  <svelte:fragment slot="custom-filter" let:filter>
+  <svelte:fragment slot="custom-filter" let:filter let:updateFunction>
     {#if !!filter}
       {#if filter.name == 'productCategory'}
-        <SimpleTextField bind:value={customFiltersValues['productCategory']} on:input={() => checkFilterValidity('productCategory')}></SimpleTextField>
+        <SimpleTextField on:input={(e) => handleCustomInput(e, filter.name, updateFunction)}></SimpleTextField>
       {/if}
+    {/if}
+  </svelte:fragment>
+  <svelte:fragment slot="custom-filter-chip" let:filter>
+    {#if filter.name === 'productCategory'}
+      <span>Product category equal to {filter.type === 'custom' ? filter.value : undefined}</span>
     {/if}
   </svelte:fragment>
   <svelte:fragment slot="custom" let:header let:item>
