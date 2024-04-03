@@ -40,7 +40,7 @@
 </script>
 
 <MediaQuery let:mAndDown>
-  <div class="container">
+  <div>
     <div 
       class="sidebar"
       class:collapsed={drawerCollapsed}
