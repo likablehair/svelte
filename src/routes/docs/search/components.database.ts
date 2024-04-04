@@ -254,6 +254,12 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/GanymedeLineChart'
   }, {
+    title: 'GanymedePieChart',
+    description: 'Ganymede Pie Chart.',
+    status: 'beta',
+    type: 'simple',
+    url: '/docs/components/simple-components/GanymedePieChart'
+  }, {
     title: 'DashboardGridShaper',
     description: 'Shape new generation dashboards.',
     status: 'beta',
