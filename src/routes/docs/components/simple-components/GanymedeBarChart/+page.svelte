@@ -31,7 +31,10 @@
       ]
     }}
     showLegend={false}
+    showXTicks={true}
+    showYTicks={true}
     enableZoom={true}
+    lineWidth={0}
     bind:resetZoom={resetZoom}
   ></GanymedeBarChart>
   <Button
@@ -40,22 +43,8 @@
 </div>
 <h2>Props</h2>
 <PropsViewer
-  props={[
-    // {
-    //   name: 'type',
-    //   type: '"button" | "submit"',
-    //   description: "HTML type attribute",
-    //   default: "button"
-    // }
-  ]}
-  styleProps={[
-    // {
-    //   name: '--button-max-width',
-    //   type: 'string',
-    //   default: 'undefined',
-    //   description: 'The max width of the outer element'
-    // }
-  ]}
+  props={[]}
+  styleProps={[]}
 ></PropsViewer>
 <h2>Slots</h2>
 <h2>Events</h2>

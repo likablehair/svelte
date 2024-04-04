@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Bar } from 'svelte-chartjs'
+  import { theme } from '$lib';
   import {
     Chart as ChartJS,
     Title,
@@ -51,16 +52,24 @@
     resetZoom: boolean = false
 
   let mounted: boolean = false,
-    zoomMounted: boolean = false,
-    background: string | undefined = undefined
+    zoomMounted: boolean = false
 
   onMount(() => {
-    let style = getComputedStyle(document.body);
-    background = style.getPropertyValue('--global-color-background-200');
     mounted = true
   })
 
-  $: gridColor = 'rgb(' + (background || '200, 200, 200') + ', .3)'
+  let rgbTooltipColor: string | undefined = undefined
+  let rgbTooltipBackgroundColor: string | undefined = undefined
+  let rgbBackgroundColor: string | undefined = undefined
+
+  $: rgbTooltipColor = $theme.colors?.[$theme.active]['dark']['primary']['300']
+  $: rgbTooltipBackgroundColor = $theme.colors?.[$theme.active]['dark']['primary']['900']
+  $: rgbBackgroundColor = $theme.colors?.[$theme.active]['dark']['background']['200']
+
+  $: finalTooltipColor = !!rgbTooltipColor ? `rgb(${rgbTooltipColor}, .8)` : undefined
+  $: finalTooltipBackgroundColor = !!rgbTooltipBackgroundColor ? `rgb(${rgbTooltipBackgroundColor})` : undefined
+  $: finalBackgroundColor = !!rgbBackgroundColor ? `rgb(${rgbBackgroundColor}, .3)` : undefined  
+
 
   let chart: ComponentProps<Bar>['chart']
   $: if(!!chart && !!enableZoom && !!resetZoom) {
@@ -77,10 +86,25 @@
 
   let chartOptions: ComponentProps<Bar>['options']
   $: chartOptions = {
+      barPercentage: 0.9,
+      borderRadius: 2,
+      categoryPercentage: 0.3,
       indexAxis: horizontal ? 'y' : 'x',
       responsive: responsive,
       maintainAspectRatio: maintainAspectRatio,
       plugins: {
+        tooltip: {
+          displayColors: false,
+          titleColor: finalTooltipColor,
+          backgroundColor: finalTooltipBackgroundColor,
+          titleFont: {
+            size: 14
+          },
+          bodyFont: {
+            size: 14,
+            weight: "bold"
+          }
+        },
         legend: {
           display: showLegend
         },
@@ -123,7 +147,7 @@
           },
           grid: {
             lineWidth: lineWidth,
-            color: gridColor
+            color: finalBackgroundColor
           },
           border: {
             dash: [10,10],
