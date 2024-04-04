@@ -1,0 +1,13 @@
+:root {
+  --paginator-default-page-button-selected-background-color: rgb(var(--global-color-primary-500));
+  --paginator-default-page-button-selected-color: rgb(var(--global-color-grey-100));
+  --paginator-default-page-button-selected-padding: .2rem .7rem;
+  --paginator-default-page-button-hover-background-color: rgb(var(--global-color-primary-500));
+  --paginator-default-page-button-hover-border-radius: 8px;
+  --paginator-default-page-button-focus-color: rgb(var(--global-color-contrast-900));
+  --paginator-default-page-button-focus-background-color: transparent;
+  --paginator-default-page-button-padding: .2rem .7rem;
+  --paginator-default-page-button-border-radius: 8px;
+  --paginator-default-page-button-color: rgb(var(--global-color-contrast-900));
+  --paginator-default-page-button-background-color: transparent;
+}

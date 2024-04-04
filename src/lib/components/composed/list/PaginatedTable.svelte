@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
   import SimpleTable from "$lib/components/simple/lists/SimpleTable.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
-  import Paginator from "$lib/components/composed/list/Paginator.svelte";
+  import Paginator from "$lib/components/simple/lists/Paginator.svelte";
   import Dropdown from "$lib/components/composed/forms/Dropdown.svelte";
   import { createEventDispatcher, type ComponentProps } from "svelte";
 
@@ -109,12 +109,14 @@
 <div class="paginated-table">
   {#if searchBarVisible}
     <slot name="search-bar" {handleSearchChange}>
-      <SearchBar
-        placeholder={searchBarPlaceholder}
-        bind:input={searchBarInput}
-        bind:value={searchText}
-      >
-      </SearchBar>
+      <div class="search-bar-container">
+        <SearchBar
+          placeholder={searchBarPlaceholder}
+          bind:input={searchBarInput}
+          bind:value={searchText}
+        >
+        </SearchBar>
+      </div>
     </slot>
   {/if}
   <div class="filter-container">
@@ -255,12 +257,19 @@
   }
 
   .filter-container {
-    margin-top: 10px;
+    margin-top: var(--paginated-table-filter-container-margin-top, 10px);
     display: flex;
     align-items: center;
     flex-direction: row;
     gap: 10px;
     width: 100%;
+  }
+
+  .search-bar-container {
+    padding: var(
+      --paginated-table-search-bar-container-padding,
+      var(--paginated-table-search-bar-container-default-padding, 0)
+    );
   }
 
   @media only screen and (max-width: 768px) {
