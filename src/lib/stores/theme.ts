@@ -60,13 +60,6 @@ if (BROWSER) {
       v.active = "custom";
       return v;
     });
-  } else if (savedColor == "green") {
-    document.documentElement.classList.add("green");
-
-    theme.update((v) => {
-      v.active = "green";
-      return v;
-    });
   } else {
     document.documentElement.classList.add("default");
 
@@ -162,53 +155,48 @@ export function setColor(ct: (typeof colorNames)[number]) {
 let styleTag: HTMLStyleElement;
 theme.subscribe((value) => {
   if (BROWSER) {
-    if (
-      !value.colors?.[value.active] ||
-      !value.colors[value.active]["dark"] ||
-      !value.colors[value.active]["light"]
-    ) {
-      if (!value.colors) value.colors = {};
-      value.colors[value.active] = {
-        dark: {},
-        light: {},
-      };
+    if (!value.colors) value.colors = {};
+    value.colors[value.active] = {
+      dark: {},
+      light: {},
+    };
 
-      for (let i = 0; i < COLOR_TYPES.length; i++) {
-        if (!value.colors[value.active]["light"][COLOR_TYPES[i]])
-          value.colors[value.active]["light"][COLOR_TYPES[i]] = {};
-        if (!value.colors[value.active]["dark"][COLOR_TYPES[i]])
-          value.colors[value.active]["dark"][COLOR_TYPES[i]] = {};
-        for (let k = 0; k < COLOR_SHADES.length; k++) {
-          let rgbCodeLight = getComputedStyle(
+    for (let i = 0; i < COLOR_TYPES.length; i++) {
+      if (!value.colors[value.active]["light"][COLOR_TYPES[i]])
+        value.colors[value.active]["light"][COLOR_TYPES[i]] = {};
+      if (!value.colors[value.active]["dark"][COLOR_TYPES[i]])
+        value.colors[value.active]["dark"][COLOR_TYPES[i]] = {};
+      for (let k = 0; k < COLOR_SHADES.length; k++) {
+        let rgbCodeLight = getComputedStyle(
+          document.documentElement
+        ).getPropertyValue(
+          `--global-color-light-${COLOR_TYPES[i]}-${COLOR_SHADES[k]}`
+        );
+        
+        if (!rgbCodeLight && !value.dark)
+          rgbCodeLight = getComputedStyle(
             document.documentElement
           ).getPropertyValue(
-            `--global-color-light-${COLOR_TYPES[i]}-${COLOR_SHADES[k]}`
+            `--global-color-${COLOR_TYPES[i]}-${COLOR_SHADES[k]}`
           );
-          if (!rgbCodeLight && !value.dark)
-            rgbCodeLight = getComputedStyle(
-              document.documentElement
-            ).getPropertyValue(
-              `--global-color-${COLOR_TYPES[i]}-${COLOR_SHADES[k]}`
-            );
 
-          value.colors[value.active]["light"][COLOR_TYPES[i]][COLOR_SHADES[k]] =
-            rgbCodeLight;
+        value.colors[value.active]["light"][COLOR_TYPES[i]][COLOR_SHADES[k]] =
+          rgbCodeLight;
 
-          let rgbCodeDark = getComputedStyle(
+        let rgbCodeDark = getComputedStyle(
+          document.documentElement
+        ).getPropertyValue(
+          `--global-color-dark-${COLOR_TYPES[i]}-${COLOR_SHADES[k]}`
+        );
+        if (!rgbCodeDark && value.dark)
+          rgbCodeDark = getComputedStyle(
             document.documentElement
           ).getPropertyValue(
-            `--global-color-dark-${COLOR_TYPES[i]}-${COLOR_SHADES[k]}`
+            `--global-color-${COLOR_TYPES[i]}-${COLOR_SHADES[k]}`
           );
-          if (!rgbCodeDark && value.dark)
-            rgbCodeDark = getComputedStyle(
-              document.documentElement
-            ).getPropertyValue(
-              `--global-color-${COLOR_TYPES[i]}-${COLOR_SHADES[k]}`
-            );
 
-          value.colors[value.active]["dark"][COLOR_TYPES[i]][COLOR_SHADES[k]] =
-            rgbCodeDark;
-        }
+        value.colors[value.active]["dark"][COLOR_TYPES[i]][COLOR_SHADES[k]] =
+          rgbCodeDark;
       }
     }
 
@@ -230,7 +218,7 @@ theme.subscribe((value) => {
                 value.colors[activeTheme][modes[j] as "dark" | "light"]
               )) {
                 for (const [shade, color] of Object.entries(shades)) {
-                  styleBuilder += `--global-color-${modes[j]}-${colorType}-${shade}:${color};`;
+                  if (!!color) styleBuilder += `--global-color-${modes[j]}-${colorType}-${shade}:${color};`;
                 }
               }
             }
@@ -246,6 +234,7 @@ theme.subscribe((value) => {
       headTag.removeChild(styleTag);
     }
   }
+  console.log(value)
 });
 
 export default theme;

@@ -13,7 +13,6 @@
 
 <script lang="ts">
   import Code from "$lib/components/simple/typography/Code.svelte";
-  import colors from "../stores/colors";
   export let slots: Slot[] = []
 </script>
 
@@ -70,7 +69,7 @@
       style:font-size=".7rem"
       style:align-items="center"
       style:justify-content="center"
-      style:color={$colors.thinContrast}
+      style:color="rgb(var(--global-color-contrast-200))"
     >
       No data
     </div>
