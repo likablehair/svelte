@@ -26,7 +26,7 @@
   export let menus: Menu[],
     level: number = 0,
     selected: string | number | undefined = undefined,
-    bookmarkColor: string = "black",
+    bookmarkColor: string = "rgb(var(--global-color-primary-500))",
     color: string = "inherit",
     hoverColor: string = 'inherit',
     selectedTextColor: string = "inherit",

@@ -4,7 +4,6 @@
   import SidebarMenuList from "$lib/components/simple/lists/SidebarMenuList.svelte";
   import Navigator from "$lib/components/simple/navigation/Navigator.svelte";
   import "../../app.css";
-  import colors from  "./stores/colors";
   import { beforeNavigate, goto } from "$app/navigation";
   import componentDatabase from './search/components.database'
   import theme, { toggleTheme } from "$lib/stores/theme";
@@ -140,8 +139,6 @@
           ]
         }
       ]}
-      bookmarkColor={$colors.primary}
-      selectedTextColor={$colors.primary}
       autoDetectUrl
     ></SidebarMenuList>
   </div>

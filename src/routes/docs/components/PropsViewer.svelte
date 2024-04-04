@@ -8,7 +8,6 @@
 </script>
 
 <script lang="ts">
-  import colors from "../stores/colors";
   export let props: Prop[] = [],
     styleProps: Prop[] = []
 </script>
@@ -41,7 +40,7 @@
       style:font-size=".7rem"
       style:align-items="center"
       style:justify-content="center"
-      style:color={$colors.lightContrast}
+      style:color="rgb(var(--global-color-contrast-300))"
     >
       No data
     </div>
@@ -71,7 +70,7 @@
       style:font-size=".7rem"
       style:align-items="center"
       style:justify-content="center"
-      style:color={$colors.lightContrast}
+      style:color="rgb(var(--global-color-contrast-200))"
     >
       No data
     </div>
