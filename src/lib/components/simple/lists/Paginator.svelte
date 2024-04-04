@@ -101,59 +101,59 @@
   .page-button {
     background-color: var(
       --paginator-page-button-background-color,
-      var(--paginator-page-button-default-background-color)
+      var(--paginator-default-page-button-background-color)
     );
     color: var(
       --paginator-page-button-color,
-      var(--paginator-page-button-default-color)
+      var(--paginator-default-page-button-color)
     );
     border-radius: var(
       --paginator-page-button-border-radius,
-      var(--paginator-page-button-default-border-radius)
+      var(--paginator-default-page-button-border-radius)
     );
     display: flex;
     justify-content: center;
     align-content: center;
     padding: var(
       --paginator-page-button-padding,
-      var(--paginator-page-button-default-padding)
+      var(--paginator-default-page-button-padding)
     );
   }
 
   .page-button:focus {
     background-color: var(
       --paginator-page-button-focus-background-color,
-      var(--paginator-page-button-default-focus-background-color)
+      var(--paginator-default-page-button-focus-background-color)
     );
     color: var(
       --paginator-page-button-focus-color,
-      var(--paginator-page-button-default-focus-color)
+      var(--paginator-default-page-button-focus-color)
     );
   }
 
   .page-button:hover {
     background-color: var(
       --paginator-page-button-hover-background-color,
-      var(--paginator-page-button-default-hover-background-color)
+      var(--paginator-default-page-button-hover-background-color)
     );
     border-radius: var(
       --paginator-page-button-hover-border-radius,
-      var(--paginator-page-button-default-hover-border-radius)
+      var(--paginator-default-page-button-hover-border-radius)
     );
   }
 
   .selected {
     background-color: var(
       --paginator-page-button-selected-background-color,
-      var(--paginator-page-button-default-selected-background-color)
+      var(--paginator-default-page-button-selected-background-color)
     );
     color: var(
       --paginator-page-button-selected-color,
-      var(--paginator-page-button-default-selected-color)
+      var(--paginator-default-page-button-selected-color)
     );
     padding: var(
       --paginator-page-button-selected-padding,
-      var(--paginator-page-button-default-selected-padding)
+      var(--paginator-default-page-button-selected-padding)
     );
     cursor: default;
   }

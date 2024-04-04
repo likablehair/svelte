@@ -1,7 +1,6 @@
 <script lang="ts">
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
-  import Paginator from "$lib/components/composed/list/Paginator.svelte";
   import GanymedeLineChart from "$lib/components/simple/charts/GanymedeLineChart.svelte";
   import Button from "$lib/components/simple/buttons/Button.svelte";
 

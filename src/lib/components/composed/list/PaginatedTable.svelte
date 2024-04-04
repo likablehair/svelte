@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
   import SimpleTable from "$lib/components/simple/lists/SimpleTable.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
-  import Paginator from "$lib/components/composed/list/Paginator.svelte";
+  import Paginator from "$lib/components/simple/lists/Paginator.svelte";
   import Dropdown from "$lib/components/composed/forms/Dropdown.svelte";
   import { createEventDispatcher, type ComponentProps } from "svelte";
 

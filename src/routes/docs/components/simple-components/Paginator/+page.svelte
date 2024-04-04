@@ -1,7 +1,7 @@
 <script lang="ts">
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
-  import Paginator from "$lib/components/composed/list/Paginator.svelte";
+  import Paginator from "$lib/components/simple/lists/Paginator.svelte";
 </script>
 
 <h1>Paginator</h1>
