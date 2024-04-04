@@ -234,7 +234,6 @@ theme.subscribe((value) => {
       headTag.removeChild(styleTag);
     }
   }
-  console.log(value)
 });
 
 export default theme;
