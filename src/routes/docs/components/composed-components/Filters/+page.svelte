@@ -4,166 +4,144 @@
   import Filters from "$lib/components/composed/search/Filters.svelte";
   import Converter, { type Filter } from "$lib/utils/filters/filters";
   import type Builder from "$lib/utils/filters/builder";
-    import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
+  import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
 
   let x = 2
 
   let filters: Filter[] = [
     {
-      name: "customerName",
-      label: "Customer Name",
+      name: "handlingType",
+      label: "Tipo movimento",
+      type: "select",
+      view: 'toggle',
+      column: 'handlingType',
+      mode: 'equal',
+      items: [
+        {
+          label: 'Carico',
+          value: 'load'
+        },
+        {
+          label: 'Scarico',
+          value: 'unload'
+        },
+        {
+          label: 'Acquisto',
+          value: 'purhcase'
+        },
+        {
+          label: 'Vendita',
+          value: 'sale'
+        }
+      ],
+      advanced: false,
+    },
+    {
+      name: "customerSupplier",
+      label: "Cliente/Fornitore",
       type: "string",
-      column: "customerName",
-      mode: "ilike",
-      advanced: false,
+      column: 'customer',
+      mode: 'ilike',
+      advanced: false
     },
     {
-      name: "customTestNumber",
-      label: "Test custom filter number (>= 10)",
-      type: "custom",
-      active: false,
-      modify: ({ filter, builder, value }) => {
-        return builder.join('joined_table', q => {
-          q.on('table.id', 'joined_table.tableId')
-        }).where('joined_table.numberField', '>', value)
-      }
-    },
-    {
-      name: "date",
-      label: "Date dsadasdasdsdasdasdasdsadasdasdasd",
+      name: "handlingDate",
+      label: "Data movimento",
       type: "date",
-      column: "date",
+      column: "handlingDate",
+      mode: "between",
+      advanced: false,
+    },
+    {
+      name: "documentDate",
+      label: "Data documento",
+      type: "date",
+      column: "docDate",
       mode: "equal",
       advanced: true,
     },
     {
-      name: "testNumber",
-      label: "test number",
-      type: "number",
-      column: "testNumber",
-      mode: "greater",
-      advanced: false,
-    },
-    {
-      name: "customTestString",
-      label: "Test custom filter string",
-      type: "custom",
-      active: false,
-      modify: ({ filter, builder, value }) => {
-        return builder.join('joined_table', q => {
-          q.on('table.id', 'joined_table.tableId')
-        }).where('joined_table.stringField', value)
+      name: 'testCustom',
+      label: 'Test custom',
+      type: 'custom',
+      modify: function({builder, value }) {
+        return builder.where('test', value)
       }
     },
     {
-      name: "testNumberAdvanced",
-      label: "test number advanced",
+      name: "productsNumber",
+      label: "Numero articoli",
       type: "number",
-      column: "testNumberAdvanced",
-      mode: "greater",
-      advanced: true,
+      column: "procutsNumber",
+      mode: "between",
+      advanced: false,
     },
     {
-      name: "testSelect",
-      label: "test select dsadsadsadasdsadsadasdasda",
+      name: "tags",
+      label: "Categorie/Tag",
       type: "select",
-      column: "testSelect",
+      column: "tags",
       advanced: false,
       mode: "equal",
       items: [
         {
-          value: 1,
-          label: "test 1dsadasdasdadadsadsadsadasdadasdasdasdasdadddads",
+          label: 'Prima categoria',
+          value: 'tag1'
         },
         {
-          value: 2,
-          label:
-            "test 2ewqeqwewqeqwewqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",
-        },
-        {
-          value: 3,
-          label:
-            "test 3ewqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqdasdasdsadsadsadsadadasqqqq",
-        },
+          label: 'Seconda categoria',
+          value: 'tag2'
+        }
       ],
     },
     {
-      name: "testSelectAdvanced",
-      label: "test select advanced",
-      type: "select",
-      column: "testSelectAdvanced",
-      advanced: true,
-      mode: "equal",
-      items: [
-        {
-          value: 1,
-          label: "test 1",
-        },
-        {
-          value: 2,
-          label: "test 2",
-        },
-        {
-          value: 3,
-          label: "test 3",
-        },
-        {
-          value: 6,
-          label: "test 1",
-        },
-        {
-          value: 7,
-          label: "test 2",
-        },
-        {
-          value: 8,
-          label: "test 3",
-        },
-        {
-          value: 9,
-          label: "test 1",
-        },
-        {
-          value: 10,
-          label: "test 2",
-        },
-        {
-          value: 11,
-          label: "test 3",
-        },
-      ],
-    },
-    {
-      name: "testBool",
-      label: "test bool",
+      name: "ddt",
+      label: "DDT creato",
       type: "bool",
-      column: "testBool",
+      column: "ddt",
       mode: "equal",
-      description: "include only if column is true",
+      description: "DDT creato",
     },
+    {
+      name: "underStock",
+      label: "Merce sottoscorta",
+      type: "bool",
+      column: "underStock",
+      mode: "equal",
+      description: "Merce sottoscorta",
+      modify: function({ builder, value }) {
+        if(value) {
+          return builder
+            .join('stocks', q => q.on('products.id', 'stocks.productId'))
+            .whereColumn('stocks.qty', '<', 'products.minQty')
+        } else {
+          return builder
+        }
+      }
+    }
   ];
-
-  let customFiltersValues: {[filterName: string]: any} = {},
-    customFiltersValid: {[filterName: string]: boolean} = {}
 
   function handleFilterEdit() {
     if (!!filters) {
       let converter = new Converter();
       let builder: Builder;
       builder = converter.createBuilder({
-        filters,
-        customFiltersValues
+        filters
       });
+      console.log(builder.toJson())
     }
   }
 
-  function checkCustomFilterValidity(filterName: string) {
-    if(filterName == 'customTestNumber') {
-      customFiltersValid['customTestNumber'] = customFiltersValues['customTestNumber'] !== undefined && Number(customFiltersValues['customTestNumber']) >= 10
-    } else if(filterName == 'customTestString') {
-      customFiltersValid['customTestString'] = !!customFiltersValues['customTestString']
-    }
-    customFiltersValid = customFiltersValid
+  function handleCustomStringFilter(e: Event, filterName: string, updateFunction: (filterName: string, newValue: any) => void): void {
+    //@ts-ignore
+    updateFunction(filterName, e.target.value)
+  }
+
+  function handleSingleCustomFilter(e: Event, filterName: string, updateFunction: (filterName: string, newValue: any, newValid: boolean) => void): void {
+    //@ts-ignore
+    let newValue: string = e.target.value
+    let isValid = !!newValue && newValue.length > 2
+    updateFunction(filterName, newValue, isValid)
   }
 
 </script>
@@ -172,25 +150,38 @@
 <ComponentSubtitle>Make it easy, make it filter.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
-  <Filters lang="it" bind:filters on:applyFilter={handleFilterEdit} {customFiltersValid}>
-    <div slot="custom" let:filter>
-      {#if !!filter}
-        {#if filter.name == "customTestNumber"}
-          <SimpleTextField type="number" bind:value={customFiltersValues["customTestNumber"]} on:input={() => checkCustomFilterValidity("customTestNumber")}></SimpleTextField>
-        {:else if filter.name == "customTestString"}
-          <SimpleTextField bind:value={customFiltersValues["customTestString"]} on:input={() => checkCustomFilterValidity("customTestString")}></SimpleTextField>
-        {/if}
+  <Filters lang="it" bind:filters on:applyFilter={handleFilterEdit} on:removeAllFilters={handleFilterEdit} on:removeFilter={handleFilterEdit} showActiveFilters={true}>
+    <svelte:fragment slot="custom-chip" let:filter>
+      {#if filter.name === 'testCustom'}
+        <span>Test custom filter equal to {filter.type === 'custom' ? filter.value : undefined}</span>
       {/if}
-    </div>
-    <div slot="custom-mobile" let:filter>
-      {#if !!filter}
-        {#if filter.name == "customTestNumber"}
-          <SimpleTextField type="number" bind:value={customFiltersValues["customTestNumber"]} on:input={() => checkCustomFilterValidity("customTestNumber")}></SimpleTextField>
-        {:else if filter.name == "customTestString"}
-          <SimpleTextField bind:value={customFiltersValues["customTestString"]} on:input={() => checkCustomFilterValidity("customTestString")}></SimpleTextField>
+    </svelte:fragment>
+    <svelte:fragment slot="custom" let:updateFunction let:filter let:mAndDown>
+      <SimpleTextField
+        on:input={(e) => { handleSingleCustomFilter(e, filter.name, updateFunction) }}
+        value={filter.type === 'custom' ? filter.value : undefined}
+      ></SimpleTextField>
+    </svelte:fragment>
+  </Filters>
+</div>
+<div class="example">
+  <Filters lang="it" bind:filters on:applyFilter={handleFilterEdit} on:removeAllFilters={handleFilterEdit} on:removeFilter={handleFilterEdit} showActiveFilters={false} editFilterMode="multi-edit">
+    <!-- <svelte:fragment slot="content" let:updateMultiFilterValues let:filters>
+      {#each filters as filter}
+        <div>{filter.name}</div>
+        {#if filter.type == 'string'}
+          <SimpleTextField
+            on:input={(e) => { handleCustomStringFilter(e, filter.name, updateMultiFilterValues) }}
+          ></SimpleTextField>
         {/if}
-      {/if}
-    </div>
+      {/each}
+    </svelte:fragment> -->
+    <svelte:fragment slot="custom" let:updateFunction let:filter let:mAndDown>
+      <SimpleTextField
+        on:input={(e) => { handleSingleCustomFilter(e, filter.name, updateFunction) }}
+        value={filter.type === 'custom' ? filter.value : undefined}
+      ></SimpleTextField>
+    </svelte:fragment>
   </Filters>
 </div>
 <h2>Props</h2>

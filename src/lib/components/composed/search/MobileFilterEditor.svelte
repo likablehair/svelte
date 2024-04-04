@@ -13,34 +13,32 @@
   import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
   import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
   import type { LabelMapper } from "./Filters.svelte";
+    import ToggleList from "$lib/components/composed/forms/ToggleList.svelte";
 
   export let filter: Filter | undefined = undefined,
     lang: 'it' | 'en' = 'en',
-    cancelFilterLabel : string = lang == 'en' ? "Cancel" : "Annulla",
-    applyFilterLabel : string = lang == 'en' ? "Apply filter" : "Applica filtro",
     backIcon: string = "mdi-arrow-left",
     betweenFromLabel: string = lang == 'en' ? "From" : "Da",
     betweenToLabel: string = lang == 'en' ? "To" : "A",
     labelsMapper: LabelMapper,
-    forceApplyValid: boolean = false
+    forceApplyValid: boolean = false,
+    tmpFilter: Filter | undefined = undefined
 
   let dispatch = createEventDispatcher<{
-    'apply': undefined,
     'backClick': undefined,
     'cancelClick': undefined
   }>()
 
-  function handleApplyFilterClick() {
-    if(!!filter && !!tmpFilter) {
-      filter = {...tmpFilter}
-      filter.active = true
-      dispatch('apply')
-    }
-  }
+
+  // function handleApplyFilterClick() {
+  //   if(!!filter && !!tmpFilter) {
+  //     filter = {...tmpFilter}
+  //     filter.active = true
+  //     dispatch('apply')
+  //   }
+  // }
 
   let step: 'advanced' | 'editor'
-
-  let tmpFilter: Filter | undefined
 
   function initTmpFilter() {
     tmpFilter = filter === undefined ? undefined : {...filter}
@@ -121,6 +119,18 @@
 
   $: applyFilterDisabled = !Validator.isValid(tmpFilter) && !forceApplyValid
 
+  $: if(!!tmpFilter && tmpFilter.type == 'bool') {
+    if(tmpFilter.value === undefined) {
+      tmpFilter.value = false
+    }
+  }
+
+  $: if(!!tmpFilter && tmpFilter.type == 'select') {
+    if(tmpFilter.values === undefined) {
+      tmpFilter.values = []
+    }
+  }
+
   function handleModeBackClick() {
     dispatch('backClick')
   }
@@ -142,21 +152,12 @@
     if(!tmpFilter.to) tmpFilter.to = new Date()
   }
 
-  function handleCancelClick() {
-    dispatch('cancelClick')
-  }
-
-  $: if(!!tmpFilter && tmpFilter.type == 'bool') {
-    if(tmpFilter.value === undefined) {
-      tmpFilter.value = false
-    }
-  }
 
 </script>
 
 <div class="container">
   {#if !!filter && !!tmpFilter}
-    <div class="header" on:click={step=="advanced" ? handleModeBackClick : handleEditorBackCLick} on:keypress>
+    <div class="header" on:click={step=="advanced" ? handleModeBackClick : handleEditorBackCLick} on:keypress role="presentation">
       <div class="back-link">
         <Icon
         name={backIcon}
@@ -169,7 +170,7 @@
     <div class="filter-editor">
       {#if tmpFilter.advanced && step == 'advanced' && canRenderOptions}
         <div class="advanced-mode" in:fly|local={{delay: 100, x: 200, duration: 100}} out:fly|local={{x: -200, duration: 100}}>
-          <div class="advanced-mode-selector" on:click|stopPropagation on:keypress>
+          <div class="advanced-mode-selector" on:click|stopPropagation on:keypress role="presentation">
             <SelectableVerticalList
               bind:selected={advancedModeSelectedOption}
               bind:elements={advancedModeOptions}
@@ -188,6 +189,7 @@
             <div class="fields"
               on:click|stopPropagation
               on:keypress
+              role="presentation"
             >
               {#if tmpFilter.type === "string" }
                 <SimpleTextField
@@ -258,7 +260,7 @@
                     ></SimpleTextField>
                   </div>
                 </div>
-              {:else if tmpFilter.type == 'select'}
+              {:else if tmpFilter.type === "select" && (tmpFilter.view === undefined || tmpFilter.view === 'autocomplete')}
                 <div style:width="100%">
                   <Autocomplete
                     on:close
@@ -272,6 +274,14 @@
                     --simple-text-field-margin-left="0px"
                     --autocomplete-options-max-width="100%"
                   ></Autocomplete>
+                </div>
+              {:else if tmpFilter.type === "select" && (tmpFilter.view === 'toggle')}
+                <div style:width="100%">
+                  <ToggleList
+                    bind:values={tmpFilter.values}
+                    items={tmpFilter.items}
+                    multiple
+                  ></ToggleList>
                 </div>
               {:else if tmpFilter.type == 'bool'}
                 <div class="bool-filter">
@@ -288,28 +298,7 @@
             </div>
           </div>
           <div class="bottom-btn">
-            <div class="btn">
-              <Button
-                --button-width="100%"
-                --button-box-shadow="none"
-                --button-height="30px"
-                --button-padding="10px 0px 10px 0px"
-                --button-border-radius="10px 10px 0px 0px"
-                disabled={applyFilterDisabled}
-                on:click={handleApplyFilterClick}
-              >{applyFilterLabel}</Button>
-            </div>
-            <div class="btn">
-              <Button
-                --button-width="100%"
-                --button-box-shadow="none"
-                --button-padding="10px 0px 10px 0px"
-                --button-background-color="rgb(var(--global-color-grey-50))"
-                --button-color="rgb(var(--global-color-primary-500))"
-                --button-border-radius="0px 0px 0px 0px"
-                on:click={handleCancelClick}
-              >{cancelFilterLabel}</Button>
-            </div>
+            <slot name="filter-actions" {applyFilterDisabled} filter={tmpFilter}></slot>
           </div>
         </div>
       {/if}

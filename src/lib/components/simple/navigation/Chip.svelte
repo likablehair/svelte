@@ -42,6 +42,7 @@
   class:outlined
   class:disabled
   disabled={disabled}
+  tabindex={buttonTabIndex}
   on:click={handleChipClick}
 >
   {#if filter}
@@ -129,6 +130,28 @@
     );
   }
 
+  .chip:not(.outlined):focus {
+    background-color: var(
+      --chip-focus-background-color,
+      var(--chip-default-focus-background-color)
+    );
+  }
+
+  .chip.outlined:focus {
+    color: var(
+      --chip-outlined-focus-color,
+      var(--chip-default-outlined-focus-color)
+    );
+    border-color: var(
+      --chip-outlined-focus-color,
+      var(--chip-default-outlined-focus-color)
+    );
+    box-shadow: var(
+      --chip-outlined-focus-box-shadow,
+      var(--chip-default-outlined-focus-box-shadow)
+    );
+  }
+
   .chip:not(.label) {
     border-radius: var(
       --chip-border-radius,
@@ -167,6 +190,8 @@
   .outlined {
     background: transparent !important;
     border: solid 1px;
+    border-color: var(--chip-default-outlined-color);
+    color: var(--chip-default-outlined-color);
     background-color: var(
       --chip-background-color,
       var(--chip-default-outlined-background-color)

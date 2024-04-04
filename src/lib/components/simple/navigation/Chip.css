@@ -11,5 +11,8 @@
   --chip-default-line-height: inherit;
   --chip-default-cursor: pointer;
   --chip-default-hover-background-color: rgb(var(--global-color-primary-600));
-  --chip-default-text-max-width: 200px
+  --chip-default-focus-background-color: rgb(var(--global-color-primary-600));
+  --chip-default-outlined-focus-color: rgb(var(--global-color-primary-400));
+  --chip-default-text-max-width: 200px;
+  --chip-default-outlined-focus-box-shadow: 0px 0px 4px 2px rgba(var(--global-color-primary-400),0.1);
 }

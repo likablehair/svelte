@@ -62,6 +62,26 @@ export default class Builder {
     return this.applyWhereClause('orNot', first, second, third)
   }
 
+  public whereColumn(key: string, compareColumn: string): Builder
+  public whereColumn(key: string, operator: string, compareColumn: string): Builder
+  public whereColumn(
+    first: string,
+    second: string,
+    third?: string
+  ): Builder {
+    return this.applyWhereColumnClause('and', first, second, third)
+  }
+
+  public orWhereColumn(key: string, compareColumn: string): Builder
+  public orWhereColumn(key: string, operator: string, compareColumn: string): Builder
+  public orWhereColumn(
+    first: string,
+    second: string,
+    third?: string
+  ): Builder {
+    return this.applyWhereColumnClause('or', first, second, third)
+  }
+
   private applyWhereClause(
     logicalOperator: 'and' | 'or' | 'andNot' | 'orNot',
     first: string | Record<string, WhereFilterValue> | ((builder: Builder) => void),
@@ -105,6 +125,34 @@ export default class Builder {
         kind: 'grouped',
         logicalOperator,
         children: builder.modifiers.filter((el) => el.method == 'where') as WhereModifier[]
+      })
+    }
+    return this
+  }
+
+  private applyWhereColumnClause(
+    logicalOperator: 'and' | 'or',
+    first: string,
+    second: string,
+    third?: string,
+  ): Builder {
+
+    if (third !== undefined) {
+      this.modifiers.push({
+        method: 'where',
+        kind: 'column',
+        key: first,
+        operator: second,
+        column: third,
+        logicalOperator: logicalOperator
+      })
+    } else {
+      this.modifiers.push({
+        method: 'where',
+        kind: 'column',
+        key: first,
+        column: second,
+        logicalOperator: logicalOperator
       })
     }
     return this
