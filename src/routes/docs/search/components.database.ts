@@ -242,6 +242,12 @@ const list: {
     type: 'layout',
     url: '/docs/components/layouts/UnstableDividedSideBarLayout'
   }, {
+    title: 'GanymedeBarChart',
+    description: 'Ganymede Bar Chart.',
+    status: 'beta',
+    type: 'simple',
+    url: '/docs/components/simple-components/GanymedeBarChart'
+  }, {
     title: 'GanymedeLineChart',
     description: 'Ganymede Line Chart.',
     status: 'beta',
