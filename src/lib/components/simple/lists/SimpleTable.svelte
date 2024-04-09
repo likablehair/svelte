@@ -17,6 +17,18 @@
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     data?: { [key: string]: any }
   };
+
+  export interface Item {
+    [key: string]: any;
+  }
+
+  export type CalculateRowStyles = (item: Item) => {
+    backgroundColor?: string;
+    color?: string;
+    fontWeight?: string;
+  };
+
+  export type CalculateRowClasses = (item: Item) => string | undefined;
 </script>
 
 <script lang="ts">
@@ -28,10 +40,10 @@
   import type { ColumnBoolean, ColumnCheckBox, ColumnCustom, ColumnDate, ColumnIcon, ColumnNumber, ColumnString } from './columnTypes';
 
   let clazz: {
-    container?: string,
-    header?: string,
-    row?: string,
-    cell?: string
+    container?: string;
+    header?: string;
+    row?: string;
+    cell?: string;
   } = {};
 	export { clazz as class };
 
@@ -41,14 +53,17 @@
       sortDirection: string
     },
     'rowClick': {
-      item: { [key: string]: any }
+      item: Item
     }
   }>()
 
   export let headers: Header[] = [],
-    items: { [key: string]: any }[] = [],
+    items: Item[] = [],
     sortedBy: string | undefined = undefined,
-    sortDirection: 'asc' | 'desc' = 'asc';
+    sortDirection: "asc" | "desc" = "asc";
+
+  export let calculateRowStyles: CalculateRowStyles | undefined = undefined;
+  export let calculateRowClasses: CalculateRowClasses | undefined = undefined;
 
   function handleHeaderClick(header: Header) {
     if(!!sortedBy && header.value == sortedBy) {
@@ -74,11 +89,10 @@
   function formatDate(dateTime: DateTime, dateFormat: ColumnDate['params']): string  {
     return dateTime.setLocale(dateFormat.locale).toFormat(dateFormat.format)
   }
-
 </script>
 
 {#if !!items && Array.isArray(items)}
-  <div class="simple-table-container {clazz.container || ''}" >
+  <div class="simple-table-container {clazz.container || ''}">
     <table class="table">
       <thead class="thead {clazz.header || ''}">
         <tr>
@@ -121,9 +135,14 @@
       </thead>
       <tbody>
         {#each items as item, i}
-          <tr 
-            class="item-tr {clazz.row || ''}" 
+          {@const styles = !!calculateRowStyles ? calculateRowStyles(item) : {}}
+          {@const classes = !!calculateRowClasses ? calculateRowClasses(item) : ""}
+          <tr
+            class="item-tr {clazz.row || ''} {classes}"
             on:click={() => handleRowClick(item)}
+            style:background-color={styles.backgroundColor}
+            style:color={styles.color}
+            style:font-weight={styles.fontWeight}
           >
             {#each headers as header, j}
               <td class="{clazz.cell || ''}">
@@ -138,11 +157,11 @@
                 {:else if  header.type.key == "date"}
                   {formatDate(item[header.value], header.type.params)}
                 {:else if header.type.key == "icon"}
-                    <Icon 
-                      --icon-color={header.type.params?.color }  
-                      --icon-size={header.type.params?.size} 
-                      name={header.type.params?.name || ''}
-                    />
+                  <Icon
+                    --icon-color={header.type.params?.color}
+                    --icon-size={header.type.params?.size}
+                    name={header.type.params?.name || ""}
+                  />
                 {:else if header.type.key == 'string'}
                   {#if item[header.value] !== undefined && item[header.value] !== null}
                     {item[header.value]}

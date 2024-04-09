@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  import SimpleTable from "$lib/components/simple/lists/SimpleTable.svelte";
+  import SimpleTable, { type CalculateRowClasses, type CalculateRowStyles } from "$lib/components/simple/lists/SimpleTable.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import Paginator from "$lib/components/simple/lists/Paginator.svelte";
   import Dropdown from "$lib/components/composed/forms/Dropdown.svelte";
@@ -8,7 +8,9 @@
   type ArrayElement<ArrayType extends readonly unknown[]> =
     ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
-  export type Header = ArrayElement<NonNullable<ComponentProps<SimpleTable>['headers']>>;
+  export type Header = ArrayElement<
+    NonNullable<ComponentProps<SimpleTable>["headers"]>
+  >;
 </script>
 
 <script lang="ts">
@@ -20,7 +22,7 @@
   let clazz: {
     simpleTable?: ComponentProps<SimpleTable>['class']
   } = {};
-	export { clazz as class };
+  export { clazz as class };
 
   export let headers: ComponentProps<SimpleTable>['headers'] = [],
     items: ComponentProps<SimpleTable>['items'] = [],
@@ -42,6 +44,9 @@
     searchBarPlaceholder: string = "Type something to search...",
     lang: 'it' | 'en' = 'en',
     editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit'
+
+  export let calculateRowStyles: CalculateRowStyles | undefined = undefined;
+  export let calculateRowClasses: CalculateRowClasses | undefined = undefined;
 
   let searchBarInput: HTMLElement,
     searchText: string | undefined = undefined
@@ -147,6 +152,8 @@
     bind:sortDirection
     on:sort
     on:rowClick
+    {calculateRowStyles}
+    {calculateRowClasses}
   >
     <svelte:fragment slot="header" let:head>
       <slot name="header" {head} >

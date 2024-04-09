@@ -2,7 +2,7 @@
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
   import PaginatedTable from "$lib/components/composed/list/PaginatedTable.svelte";
-  import type {Filter} from "$lib/utils/filters/filters"
+  import type { Filter } from "$lib/utils/filters/filters";
   import type { Header } from "$lib/components/simple/lists/SimpleTable.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import type Builder from "$lib/utils/filters/builder";
@@ -13,28 +13,31 @@
         value: 'businessName',
         label: 'Business name',
         type: {
-          key:"string"
-        }
-      }, {
-        value: 'productName',
-        label: 'Product Name',
-        type: {
-          key:"string"
-        },
-        sortable: true,
-      }, {
-        value: 'progress',
-        label: 'Progress',
-        type: {
-          key:"string"
-        },
-      }, {
-        value: 'rating',
-        label: 'Rating',
-        type: {
-          key:"custom"
-        },
-        sortable: true,
+        key: "string",
+      },
+    },
+    {
+      value: "productName",
+      label: "Product Name",
+      type: {
+        key: "string",
+      },
+      sortable: true,
+    },
+    {
+      value: "progress",
+      label: "Progress",
+      type: {
+        key: "string",
+      },
+    },
+    {
+      value: "rating",
+      label: "Rating",
+      type: {
+        key: "custom",
+      },
+      sortable: true,
       }
     ]
 
@@ -98,6 +101,27 @@
     updateFunction(filterName, newValue, isValid)
   }
 
+  function calculateRowStyles(item: { [key: string]: any }): {
+    backgroundColor?: string;
+    color?: string;
+    fontWeight?: string;
+  } {
+    if (!!item.businessName && item.businessName == "GQ Creators") {
+      return {
+        backgroundColor: "rgba(var(--global-color-primary-300), 0.8)",
+        color: "#fff",
+        fontWeight: "900",
+      };
+    }
+    return {}
+  }
+
+  function calculateRowClasses(item: { [key: string]: any }): string | undefined {
+    if (!!item.businessName && item.businessName == "Popular My") {
+      return 'calculated-class'
+    }
+    return ''
+  }
 </script>
 
 <h1>PaginatedTable With Filter Panel</h1>
@@ -109,26 +133,30 @@
     headers={headers}
     items={[
       {
-        businessName: 'GQ Creators',
-        productName: 'Data Protection',
-        progress: '339 sold',
-        rating: 5
-      }, {
-        businessName: 'Dribblers Agency',
-        productName: 'Job Search',
-        progress: '212 sold',
-        rating: 4.5
-      }, {
-        businessName: 'Popular My',
-        productName: 'Financial Transactions',
-        progress: '94 sold',
-        rating: 4.2
+        businessName: "GQ Creators",
+        productName: "Data Protection",
+        progress: "339 sold",
+        rating: 5,
+      },
+      {
+        businessName: "Dribblers Agency",
+        productName: "Job Search",
+        progress: "212 sold",
+        rating: 4.5,
+      },
+      {
+        businessName: "Popular My",
+        productName: "Financial Transactions",
+        progress: "94 sold",
+        rating: 4.2,
       },
     ]}
     searchBarColumns={['businessName', 'productName']}
     totalElements={40}
     on:filtersChange={handleFiltersChange}
     editFilterMode="multi-edit"
+    {calculateRowStyles}
+    {calculateRowClasses}
   >
   <svelte:fragment slot="custom-filter" let:filter let:updateFunction>
     {#if !!filter}
@@ -184,5 +212,9 @@
     justify-content: center;
     gap: 10px;
     margin-bottom: 20px;
+  }
+
+  :global(.calculated-class) {
+    background-color: rgba(var(--global-color-contrast-200), 0.2);
   }
 </style>
