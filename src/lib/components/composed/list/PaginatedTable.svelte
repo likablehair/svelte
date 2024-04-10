@@ -43,7 +43,8 @@
     searchBarVisible: boolean = true,
     searchBarPlaceholder: string = "Type something to search...",
     lang: 'it' | 'en' = 'en',
-    dateLocale: 'it' | 'en' = lang,
+    editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit',
+    showActiveFilters: boolean = true
     editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit'
 
   export let calculateRowStyles: CalculateRowStyles | undefined = undefined;
@@ -134,7 +135,7 @@
       --filters-default-wrapper-width="100%"
       {lang}
       {editFilterMode}
-      {dateLocale}
+      {showActiveFilters}
     >
       <svelte:fragment slot="append">
         <slot name="filter-append"></slot>
