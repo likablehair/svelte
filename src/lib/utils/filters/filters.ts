@@ -207,10 +207,10 @@ export default class Converter {
       params.builder.where(params.filter.column, '<', params.filter.value)
     } else if (params.filter.mode == 'between') {
       if(!!params.filter.from) {
-        params.builder.where(params.filter.column, '>', params.filter.from)
+        params.builder.where(params.filter.column, '>=', params.filter.from)
       }
       if(!!params.filter.to) {
-        params.builder.where(params.filter.column, '<', params.filter.to)
+        params.builder.where(params.filter.column, '<=', params.filter.to)
       }
     }
 
@@ -229,10 +229,10 @@ export default class Converter {
       params.builder.where(params.filter.column, '<', params.filter.value)
     } else if(params.filter.mode == 'between') {
       if(!!params.filter.from) {
-        params.builder.where(params.filter.column, '>', params.filter.from)
+        params.builder.where(params.filter.column, '>=', params.filter.from)
       }
       if(!!params.filter.to) {
-        params.builder.where(params.filter.column, '<', params.filter.to)
+        params.builder.where(params.filter.column, '<=', params.filter.to)
       }
     }
     return params.builder
