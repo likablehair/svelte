@@ -159,6 +159,7 @@
     totalElements={40}
     on:filtersChange={handleFiltersChange}
     editFilterMode="multi-edit"
+    showActiveFilters={false}
     {calculateRowStyles}
     {calculateRowClasses}
   >
