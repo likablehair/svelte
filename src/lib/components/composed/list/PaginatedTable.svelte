@@ -45,7 +45,6 @@
     lang: 'it' | 'en' = 'en',
     editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit',
     showActiveFilters: boolean = true
-    editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit'
 
   export let calculateRowStyles: CalculateRowStyles | undefined = undefined;
   export let calculateRowClasses: CalculateRowClasses | undefined = undefined;
