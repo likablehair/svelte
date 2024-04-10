@@ -82,6 +82,15 @@
     ]
   },
   {
+    label: "Test date",
+    active: false,
+    type: 'date',
+    name: "testDate",
+    column: "testDate",
+    advanced: false,
+    mode: 'equal'
+  },
+  {
     type: "custom",
     label: "Product category",
     name: "productCategory",

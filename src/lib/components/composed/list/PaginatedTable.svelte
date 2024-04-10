@@ -45,6 +45,7 @@
     lang: 'it' | 'en' = 'en',
     editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit',
     showActiveFilters: boolean = true
+    editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit'
 
   export let calculateRowStyles: CalculateRowStyles | undefined = undefined;
   export let calculateRowClasses: CalculateRowClasses | undefined = undefined;
@@ -130,6 +131,7 @@
       bind:filters
       on:applyFilter={handleFiltersChange}
       on:removeFilter={handleFiltersChange}
+      on:removeAllFilters={handleFiltersChange}
       --filters-default-wrapper-width="100%"
       {lang}
       {editFilterMode}
