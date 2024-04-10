@@ -82,6 +82,22 @@ export default class Builder {
     return this.applyWhereColumnClause('or', first, second, third)
   }
 
+  public whereJsonSuperset(key: string, object: Object): Builder
+  public whereJsonSuperset(
+    first: string,
+    second: Object,
+  ): Builder {
+    return this.applyWhereJsonSupersetClause('and', first, second)
+  }
+
+  public orWhereJsonSuperset(key: string, object: Object): Builder
+  public orWhereJsonSuperset(
+    first: string,
+    second: Object
+  ): Builder {
+    return this.applyWhereJsonSupersetClause('or', first, second)
+  }
+
   private applyWhereClause(
     logicalOperator: 'and' | 'or' | 'andNot' | 'orNot',
     first: string | Record<string, WhereFilterValue> | ((builder: Builder) => void),
@@ -155,6 +171,21 @@ export default class Builder {
         logicalOperator: logicalOperator
       })
     }
+    return this
+  }
+
+  private applyWhereJsonSupersetClause(
+    logicalOperator: 'and' | 'or',
+    first: string,
+    second: Object,
+  ): Builder {
+    this.modifiers.push({
+      method: 'where',
+      kind: 'jsonSuperset',
+      key: first,
+      value: second,
+      logicalOperator: logicalOperator
+    })
     return this
   }
 

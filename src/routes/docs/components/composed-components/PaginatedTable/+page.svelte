@@ -47,7 +47,10 @@
     type: 'string',
     name: "businessName",
     column: "businessName",
-    mode: 'contains'
+    mode: 'contains',
+    modify: function({ builder, value }) {
+      return builder.whereJsonSuperset('products.categories', {data: [{name: "Tipologie Gomme", tags: {data: [{value: value, selected: true}]}}]})
+    }
   },
   {
     label: "Product name",
@@ -92,6 +95,7 @@
 
   function handleFiltersChange(e: CustomEvent) {
     let filterBuilder: Builder = e.detail.builder
+    console.log(filterBuilder)
   }
 
   function handleCustomInput(e: Event, filterName: string, updateFunction: (filterName: string, newValue: any, newValid: boolean) => void) {

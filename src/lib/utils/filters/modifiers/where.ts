@@ -4,7 +4,7 @@ type GroupedWhere = {
   method: 'where',
   kind: 'grouped',
   logicalOperator?: 'and' | 'or' | 'andNot' | 'orNot',
-  children: (ObjectWhere | SimpleWhere | GroupedWhere | InWhere | ColumnWhere)[]
+  children: (ObjectWhere | SimpleWhere | GroupedWhere | InWhere | ColumnWhere | WhereJsonSuperset)[]
 }
 
 type ObjectWhere = {
@@ -40,4 +40,12 @@ type InWhere = {
   value: (WhereFilterValue)[]
 }
 
-export type WhereModifier = SimpleWhere | ObjectWhere | GroupedWhere | InWhere | ColumnWhere
+type WhereJsonSuperset = {
+  method: 'where',
+  kind: 'jsonSuperset',
+  logicalOperator?: 'and' | 'or' | 'andNot' | 'orNot',
+  key: string,
+  value: Object
+}
+
+export type WhereModifier = SimpleWhere | ObjectWhere | GroupedWhere | InWhere | ColumnWhere | WhereJsonSuperset
