@@ -747,7 +747,7 @@
             <slot name="content" {mAndDown} {updateMultiFilterValues} {filters}>
               <div class="multi-filters-container" style:grid-template-columns={mAndDown ? '1fr' : '1fr 1fr'}>
                 {#each filters as filter, i}
-                  <div class="filter" style:grid-column={filter.type === 'select' ? 'span 2' : 'auto'}>
+                  <div class="filter" class:wide={filter.type === 'select' || filter.type === 'custom'}>
                     <div class="input">
                       {#if !filter.advanced && filter.type !== 'custom'}
                         <div class="label">
@@ -973,6 +973,14 @@
     justify-content: flex-end;
     gap: 10px;
     margin-right: 20px;
+  }
+
+  .multi-filters-container .filter {
+    grid-column: auto;
+  }
+
+  .multi-filters-container .filter.wide {
+    grid-column: span 2;
   }
 
 </style>
