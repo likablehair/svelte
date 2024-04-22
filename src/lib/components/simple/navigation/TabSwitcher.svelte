@@ -9,6 +9,7 @@
 <script lang="ts">
   import { afterUpdate, onMount } from "svelte";
   import './TabSwitcher.css'
+  import { BROWSER } from 'esm-env';
 
   let clazz: {
     container?: string,
@@ -71,15 +72,19 @@
   }
 
   function setBookmarkPosition() {
-    let tabButton: HTMLElement | undefined = selected
-      ? tabButtons[selected]
-      : undefined;
-
-    if (tabButton) {
-      bookmarkWidth = tabButton.offsetWidth - 10;
-      bookmarkLeft = tabButton.offsetLeft + 5;
+    if(BROWSER) {
+      let tabButton: HTMLElement | undefined = selected
+        ? tabButtons[selected]
+        : undefined;
+  
+      if (tabButton) {
+        bookmarkWidth = tabButton.offsetWidth - 10;
+        bookmarkLeft = tabButton.offsetLeft + 5;
+      }
     }
   }
+
+  $: if(!!selected) setBookmarkPosition()
 </script>
 
 <div
@@ -87,6 +92,7 @@
 >
   {#each tabs as tab}
     <div
+      role="presentation"
       class:selected-tab={tab.name == selected}
       class="tab-label {clazz.tabs || ''} {tab.name == selected ? clazz.selected || '' : ''}"
       on:click={(event) => handleTabClick(tab, event)}

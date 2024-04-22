@@ -3,7 +3,6 @@
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
   import SlotsViewer from "../../SlotsViewer.svelte";
-  import colors from "../../../stores/colors";
   import EventsViewer from "../../EventsViewer.svelte";
 
   import Textfield from "$lib/components/simple/forms/Textfield.svelte";
