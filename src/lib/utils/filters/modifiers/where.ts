@@ -1,10 +1,12 @@
+import type { Modifier } from "../builder"
+
 export type WhereFilterValue = string | number | Date | boolean
 
 type GroupedWhere = {
   method: 'where',
   kind: 'grouped',
   logicalOperator?: 'and' | 'or' | 'andNot' | 'orNot',
-  children: (ObjectWhere | SimpleWhere | GroupedWhere | InWhere | ColumnWhere | WhereJsonSuperset)[]
+  children: (ObjectWhere | SimpleWhere | GroupedWhere | InWhere | ColumnWhere | JsonSupersetWhere | InBuilderWhere | NullWhere)[]
 }
 
 type ObjectWhere = {
@@ -20,7 +22,7 @@ type SimpleWhere = {
   logicalOperator?: 'and' | 'or' | 'andNot' | 'orNot',
   key: string,
   operator?: string,
-  value: WhereFilterValue | boolean
+  value: WhereFilterValue
 }
 
 type ColumnWhere = {
@@ -40,7 +42,15 @@ type InWhere = {
   value: (WhereFilterValue)[]
 }
 
-type WhereJsonSuperset = {
+type InBuilderWhere = {
+  method: 'where',
+  kind: 'inBuilder',
+  logicalOperator?: 'and' | 'or' | 'andNot' | 'orNot',
+  key: string,
+  modifiers: Modifier[]
+}
+
+type JsonSupersetWhere = {
   method: 'where',
   kind: 'jsonSuperset',
   logicalOperator?: 'and' | 'or' | 'andNot' | 'orNot',
@@ -48,4 +58,11 @@ type WhereJsonSuperset = {
   value: Object
 }
 
-export type WhereModifier = SimpleWhere | ObjectWhere | GroupedWhere | InWhere | ColumnWhere | WhereJsonSuperset
+type NullWhere = {
+  method: 'where',
+  kind: 'null',
+  logicalOperator?: 'and' | 'or' | 'andNot' | 'orNot',
+  key: string
+}
+
+export type WhereModifier = SimpleWhere | ObjectWhere | GroupedWhere | InWhere | ColumnWhere | JsonSupersetWhere | InBuilderWhere | NullWhere

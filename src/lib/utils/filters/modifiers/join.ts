@@ -19,11 +19,11 @@ type InnerJoinModifier = {
   on: JoinModifierOnClause[]
 }
 
-type LeftJoinJsonModifier = {
+type LeftJoinModifier = {
   method: 'join'
   kind: 'left'
   table: string
   on: JoinModifierOnClause[]
 }
 
-export type JoinModifier = LeftJoinJsonModifier | InnerJoinModifier | RightJoinModifier
+export type JoinModifier = LeftJoinModifier | InnerJoinModifier | RightJoinModifier

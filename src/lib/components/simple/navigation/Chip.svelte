@@ -175,7 +175,9 @@
     margin-left: 10px;
   }
   .text {
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    gap: var(--chip-gap, var(--chip-default-gap));
     vertical-align: middle;
     user-select: none;
     font-size: var(
