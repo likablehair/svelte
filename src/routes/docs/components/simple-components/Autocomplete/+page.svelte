@@ -23,6 +23,12 @@
     closeOnSelect
     items={items}
   ></Autocomplete>
+  <Autocomplete
+    closeOnSelect
+    items={items}
+    disabled
+    placeholder="disabled"
+  ></Autocomplete>
   <div style:font-size="">
     <Autocomplete
       items={items}

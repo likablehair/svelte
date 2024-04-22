@@ -51,6 +51,8 @@
   }>();
 
   function select(item: Item) {
+    if(disabled) return
+
     const alreadyPresent =
       values.findIndex((i) => i.value === item.value) != -1;
 
@@ -70,6 +72,8 @@
   }
 
   function unselect(item: Item) {
+    if(disabled) return
+
     if(values.length == 1 && mandatory) return
     values = values.filter((i) => i.value != item.value);
     refreshMenuWidth();
@@ -125,6 +129,7 @@
   let activator: HTMLElement,
     focusedIndex: number | undefined = undefined;
   function handleTextFieldFocus() {
+    if(disabled) return
     focusedIndex = undefined;
     openMenu();
   }
@@ -135,6 +140,8 @@
 
   let menuElement: HTMLElement;
   function handleKeyDown(event: { key: string }) {
+    if(disabled) return
+
     if (
       event.key == "ArrowDown" &&
       (focusedIndex === undefined || focusedIndex < filteredItems.length - 1)
@@ -166,6 +173,8 @@
 
   let input: HTMLElement;
   function handleContainerClick() {
+    if(disabled) return
+    
     if (!menuOpened) {
       if(!!input) input.focus();
 
