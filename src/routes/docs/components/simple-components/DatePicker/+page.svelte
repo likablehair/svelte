@@ -9,6 +9,7 @@
 <h2>Example</h2>
 <div class="example">
   <DatePicker skipTabs></DatePicker>
+  <DatePicker skipTabs disabled></DatePicker>
 </div>
 <h2>Props</h2>
 <PropsViewer

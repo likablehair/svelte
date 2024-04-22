@@ -28,7 +28,7 @@
     </div>
     <div class="h-flex">
       <DatePickerTextField bind:selectedDate={date} />
-      <DatePickerTextField bind:selectedDate={date} />
+      <DatePickerTextField bind:selectedDate={date} disabled />
     </div>
   </div>
 </div>

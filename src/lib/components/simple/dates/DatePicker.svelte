@@ -26,7 +26,8 @@
     selectableYears: number[] = [...Array(150).keys()].map(
       (i) => i + (new Date().getFullYear() - 75)
     ),
-    skipTabs: boolean = false
+    skipTabs: boolean = false,
+    disabled: boolean = false
 
   let dispatch = createEventDispatcher<{
     'year-click': {
@@ -189,6 +190,7 @@
         bind:visibleYear={visibleYear}
         bind:selectedDate
         {locale}
+        disabled={disabled}
         on:day-click
       />
     {/if}

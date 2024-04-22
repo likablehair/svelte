@@ -16,9 +16,10 @@
     visibleMonth: number = new Date().getMonth(),
     visibleYear: number = new Date().getFullYear(),
     locale: Locale = "it",
-    showExtraMonthDays = true,
-    showHeader = true,
-    animationDuration = 200;
+    showExtraMonthDays: boolean = true,
+    showHeader: boolean = true,
+    animationDuration: number = 200,
+    disabled: boolean = false;
 
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher<{
@@ -30,6 +31,8 @@
   }>();
 
   function handleDayClick(dateStat: DateStat, extraMonth: boolean) {
+    if(disabled) return
+
     if (!extraMonth) {
       selectedDate = new Date(
         dateStat.year,
@@ -81,6 +84,7 @@
               class:not-selected={!selected}
               on:click={() => handleDayClick(day, extraMonth)}
               on:keydown={() => handleDayClick(day, extraMonth)}
+              role="presentation"
             >
               {day.dayOfMonth}
             </div>

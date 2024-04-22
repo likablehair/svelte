@@ -37,7 +37,8 @@
     placeholder: string | undefined = undefined,
     mobileDialog: boolean = true,
     maxYearInRange: number = 2100,
-    minYearInRange: number = 1970
+    minYearInRange: number = 1970,
+    disabled: boolean = false
 
 
   let activator: HTMLElement,
@@ -189,6 +190,7 @@
       {handleInputChange}
       {inputElement}
       {placeholder}
+      {disabled}
     >
       <SimpleTextField
         bind:value={mask.value}
@@ -197,6 +199,7 @@
         bind:input={inputElement}
         bind:placeholder
         class={clazz.textfield}
+        {disabled}
       >
         <svelte:fragment slot="prepend-inner" let:prependInnerIcon let:iconSize>
           <slot name="prepend-inner" {prependInnerIcon} {iconSize}>
@@ -243,6 +246,7 @@
           on:year-click={handleYearSelect}
           on:month-click={handleMonthSelect}
           skipTabs
+          {disabled}
         ></DatePicker>
       </div>
     </Dialog>
@@ -272,6 +276,7 @@
           on:year-click={handleYearSelect}
           on:month-click={handleMonthSelect}
           skipTabs
+          {disabled}
         ></DatePicker>
       </div>
     </Menu>
