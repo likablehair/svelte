@@ -3,7 +3,6 @@
   import Card from "$lib/components/simple/common/Card.svelte";
   import Dialog from "$lib/components/simple/dialogs/Dialog.svelte";
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
-  import colors from "../../../stores/colors"
   import EventsViewer from "../../EventsViewer.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
   import SlotsViewer from "../../SlotsViewer.svelte";
@@ -56,15 +55,12 @@
       padding="30px"
       width="350px"
     >
-      <div class="card-header" slot="header" style:--example-card-header-color={$colors.primary}>Peace</div>
+      <div class="card-header" slot="header">Peace</div>
       <div class="card-body">
         <span>"Peace begins with a smile"</span>
         <DatePickerTextField></DatePickerTextField>
         <div style:width="fit-content" bind:this={activator}>
           <Button
-            backgroundColor={$colors.primary}
-            color={$colors.background}
-            hoverBackgroundColor={$colors.secondary}
             width="200px"
             maxWidth="90vw"
             on:click={(e) => handleButtonClick(e)}
@@ -91,6 +87,7 @@
             <ul>
               {#each ['this', 'is', 'a', 'menu', '!'] as menuLabel}
                 <li
+                  role="presentation"
                   bind:this={secondActivators[menuLabel]} 
                   on:click={() => handleListClick(menuLabel)}
                   on:keypress={() => handleListClick(menuLabel)}
@@ -114,6 +111,7 @@
           flipOnOverflow
         >
           <div 
+            role="presentation"
             style:height="100px"
             bind:this={thirdActivators[menuLabel]}
             on:click={() => handleSubMenuClick(menuLabel)}
@@ -172,33 +170,33 @@
 ></PropsViewer>
 <h2>Slots</h2>
 <SlotsViewer
-    slots={[
-      {
-        name: 'top-right',
-        description: 'Space in the top-right conrner'
-      }, {
-        name: 'center-left',
-        description: 'Space vertically centered on the left'
-      }, {
-        name: 'center-left',
-        description: 'Space vertically centered on the right'
-      }, {
-        name: 'default',
-        description: 'Space vertically and horizontally centered'
-      }
-    ]}
+  slots={[
+    {
+      name: 'top-right',
+      description: 'Space in the top-right conrner'
+    }, {
+      name: 'center-left',
+      description: 'Space vertically centered on the left'
+    }, {
+      name: 'center-left',
+      description: 'Space vertically centered on the right'
+    }, {
+      name: 'default',
+      description: 'Space vertically and horizontally centered'
+    }
+  ]}
 ></SlotsViewer>
 <h2>Events</h2>
 <EventsViewer
-      events={[
-        {
-          name: 'click',
-          description: 'Native event triggered by the content of the Dialog'
-        }, {
-          name: 'keypress',
-          description: 'Native event triggered by the content of the Dialog'
-        }
-      ]}
+  events={[
+    {
+      name: 'click',
+      description: 'Native event triggered by the content of the Dialog'
+    }, {
+      name: 'keypress',
+      description: 'Native event triggered by the content of the Dialog'
+    }
+  ]}
 ></EventsViewer>
 
 <style>

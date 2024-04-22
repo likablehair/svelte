@@ -26,6 +26,12 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/TextField'
   }, {
+    title: 'Checkbox',
+    description: 'A simple checkbox',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Checkbox'
+  }, {
     title: 'Card',
     description: 'A card with header, body and footer. The body is scrollable and the header and footer are fixed',
     status: 'stable',

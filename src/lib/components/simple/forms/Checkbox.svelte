@@ -1,26 +1,13 @@
 <script lang="ts">
+  import './Checkbox.css'
+  import '../../../css/main.css'
+
   export let value = false,
     id: string | undefined = undefined,
-    disabled = false,
-    activeColor = "#275efe",
-    activeInnerColor = "#fff",
-    focusShadow = "2px rgba(39, 94, 254, 0.3)",
-    borderColor = "#bbc1e1",
-    borderHoverColor = "#275efe",
-    backgroundColor = "#fff",
-    disabledColor = "#f6f8ff",
-    disabledInnerColor = "#e1e6f9";
+    disabled = false;
 </script>
 
 <input
-  style:--checkbox-active-color={activeColor}
-  style:--checkbox-active-inner-color={activeInnerColor}
-  style:--checkbox-focus-shadow={focusShadow}
-  style:--checkbox-border-color={borderColor}
-  style:--checkbox-border-hover-color={borderHoverColor}
-  style:--checkbox-background-color={backgroundColor}
-  style:--checkbox-disabled-color={disabledColor}
-  style:--checkbox-disabled-inner-color={disabledInnerColor}
   {id}
   type="checkbox"
   bind:checked={value}
@@ -40,8 +27,14 @@
       position: relative;
       margin: 0;
       cursor: pointer;
-      border: 1px solid var(--bc, var(--checkbox-border-color));
-      background: var(--b, var(--checkbox-background-color));
+      border: 1px solid var(--bc, var(
+        --checkbox-border-color,
+        var(--checkbox-default-border-color)
+      ));
+      background: var(--b, var(
+        --checkbox-background-color,
+        var(--checkbox-default-background-color)
+      ));
       transition: background 0.3s, border-color 0.3s, box-shadow 0.2s;
       width: 21px;
       border-radius: 7px;
@@ -56,7 +49,10 @@
         opacity var(--d-o, 0.2s);
       width: 5px;
       height: 9px;
-      border: 2px solid var(--checkbox-active-inner-color);
+      border: 2px solid var(
+        --checkbox-active-inner-color,
+        var(--checkbox-default-active-inner-color)
+      );
       border-top: 0;
       border-left: 0;
       left: 7px;
@@ -65,9 +61,15 @@
       box-sizing: border-box;
     }
 
-    input[type="checkbox"]:checked {
-      --b: var(--checkbox-active-color);
-      --bc: var(--checkbox-active-color);
+    input[type="checkbox"]:checked:not(:disabled) {
+      --b: var(
+        --checkbox-active-color,
+        var(--checkbox-default-active-color)
+      );
+      --bc: var(
+        --checkbox-active-color,
+        var(--checkbox-default-active-color)
+      );
       --d-o: 0.3s;
       --d-t: 0.6s;
       --d-t-e: cubic-bezier(0.2, 0.85, 0.32, 1.2);
@@ -76,14 +78,31 @@
     }
 
     input[type="checkbox"]:disabled {
-      --b: var(--checkbox-disabled-color);
+      --b: var(
+        --checkbox-disabled-color,
+        var(--checkbox-default-disabled-color)
+      );
+      --bc: var(
+        --checkbox-disabled-active-color,
+        var(--checkbox-default-disabled-active-color)
+      );
       cursor: not-allowed;
-      opacity: 0.9;
+      opacity: 0.5;
     }
 
     input[type="checkbox"]:disabled:checked {
-      --b: var(--checkbox-disabled-inner-color);
-      --bc: var(--checkbox-border-color);
+      --b: var(
+        --checkbox-disabled-active-color,
+        var(--checkbox-default-disabled-active-color)
+      );
+      --bc: var(
+        --checkbox-border-color,
+        var(--checkbox-default-border-color)
+      );
+      --d-o: 0.3s;
+      --d-t: 0.6s;
+      --d-t-e: cubic-bezier(0.2, 0.85, 0.32, 1.2);
+      --o: .7;
       --r: 43deg;
     }
 
@@ -92,16 +111,25 @@
     }
 
     input[type="checkbox"]:hover:not(:checked):not(:disabled) {
-      --bc: var(--checkbox-border-hover-color);
+      --bc: var(
+        --checkbox-border-hover-color,
+        var(--checkbox-default-border-hover-color)
+      );
     }
     input[type="checkbox"]:focus {
-      box-shadow: 0 0 0 var(--checkbox-focus-shadow);
+      box-shadow: 0 0 0 var(
+        --checkbox-focus-shadow,
+        var(--checkbox-default-focus-shadow)
+      );
     }
 
-    input[type="checkbox"]:not(.switch):after {
+    input[type="checkbox"]:after {
       width: 5px;
       height: 9px;
-      border: 2px solid var(--checkbox-active-inner-color);
+      border: 2px solid var(
+        --checkbox-active-inner-color,
+        var(--checkbox-default-active-inner-color)
+      );
       border-top: 0;
       border-left: 0;
       left: 7px;

@@ -1,0 +1,11 @@
+:root {
+  --checkbox-default-active-color: rgb(var(--global-color-primary-500));
+  --checkbox-default-active-inner-color: rgb(var(--global-color-grey-50));
+  --checkbox-default-focus-shadow: 2px rgb(var(--global-color-primary-500), .3);
+  --checkbox-default-border-color: rgb(var(--global-color-contrast-300), .2);
+  --checkbox-default-border-hover-color: #275efe;
+  --checkbox-default-background-color: rgb(var(--global-color-background-200));
+  --checkbox-default-disabled-color: rgb(var(--global-color-background-200), .5);
+  --checkbox-default-disabled-active-color: rgb(var(--global-color-primary-500));
+  --checkbox-default-disabled-inner-color: rgb(var(--global-color-grey-50));
+}
