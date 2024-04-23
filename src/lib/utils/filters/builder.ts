@@ -1,7 +1,9 @@
 import type { JoinModifier } from "./modifiers/join"
 import type { WhereModifier, WhereFilterValue } from "./modifiers/where"
+import type { SelectModifier } from "./modifiers/select"
+import type { FromModifier } from "./modifiers/from"
 
-export type Modifier = WhereModifier | JoinModifier
+export type Modifier = WhereModifier | JoinModifier | SelectModifier | FromModifier
 
 export type JsonQuery = {
   modifiers: Modifier[]
@@ -98,6 +100,109 @@ export default class Builder {
     return this.applyWhereJsonSupersetClause('or', first, second)
   }
 
+  public whereIn(key: string, callback: (builder: Builder) => void): Builder
+  public whereIn(key: string, values: WhereFilterValue[]): Builder 
+  public whereIn(
+    key: string, 
+    second: ((builder: Builder) => void) | WhereFilterValue[]
+  ): Builder {
+    return this.applyWhereInClause('and', key, second)
+  }
+
+  public orWhereIn(key: string, callback: (builder: Builder) => void): Builder
+  public orWhereIn(key: string, values: WhereFilterValue[]): Builder 
+  public orWhereIn(
+    key: string, 
+    second: ((builder: Builder) => void) | WhereFilterValue[]
+  ): Builder {
+    return this.applyWhereInClause('or', key, second)
+  }
+
+  public notWhereIn(key: string, callback: (builder: Builder) => void): Builder
+  public notWhereIn(key: string, values: WhereFilterValue[]): Builder 
+  public notWhereIn(
+    key: string, 
+    second: ((builder: Builder) => void) | WhereFilterValue[]
+  ): Builder {
+    return this.applyWhereInClause('andNot', key, second)
+  }
+
+  public orNotWhereIn(key: string, callback: (builder: Builder) => void): Builder
+  public orNotWhereIn(key: string, values: WhereFilterValue[]): Builder 
+  public orNotWhereIn(
+    key: string, 
+    second: ((builder: Builder) => void) | WhereFilterValue[]
+  ): Builder {
+    return this.applyWhereInClause('orNot', key, second)
+  }
+
+  private applyWhereInClause(
+    logicalOperator: 'and' | 'or' | 'andNot' | 'orNot',
+    key: string,
+    second: WhereFilterValue[] | ((builder: Builder) => void)
+  ): Builder {
+    if(typeof second == 'function') {
+      let inBuilder = new Builder()
+      second(inBuilder)
+
+      this.modifiers.push({
+        method: 'where',
+        kind: 'inBuilder',
+        logicalOperator: logicalOperator,
+        key: key,
+        modifiers: inBuilder.modifiers
+      })
+    } else {
+      this.modifiers.push({
+        method: 'where',
+        kind: 'in',
+        logicalOperator: logicalOperator,
+        key: key,
+        value: second
+      })
+    }
+
+    return this
+  }
+  
+  public whereNull(
+    key: string
+  ): Builder {
+    return this.applyWhereNullClause('and', key)
+  }
+
+  public orWhereNull(
+    key: string
+  ): Builder {
+    return this.applyWhereNullClause('or', key)
+  }
+
+  public notWhereNull(
+    key: string
+  ): Builder {
+    return this.applyWhereNullClause('andNot', key)
+  }
+
+  public orNotWhereNull(
+    key: string
+  ): Builder {
+    return this.applyWhereNullClause('orNot', key)
+  }
+
+  private applyWhereNullClause(
+    logicalOperator: 'and' | 'or' | 'andNot' | 'orNot',
+    key: string
+  ): Builder {
+    this.modifiers.push({
+      method: 'where',
+      kind: 'null',
+      logicalOperator: logicalOperator,
+      key: key
+    })
+    return this
+  }
+
+
   private applyWhereClause(
     logicalOperator: 'and' | 'or' | 'andNot' | 'orNot',
     first: string | Record<string, WhereFilterValue> | ((builder: Builder) => void),
@@ -123,7 +228,7 @@ export default class Builder {
           logicalOperator
         })
       }
-    } else if (typeof first == 'string' && !!second) {
+    } else if (typeof first == 'string' && second !== undefined ) {      
       this.modifiers.push({
         method: 'where',
         kind: 'simple',
@@ -228,8 +333,23 @@ export default class Builder {
       modifiers: this.modifiers
     }
   }
-}
 
+  public select(fields: string | string[]) {
+    this.modifiers.push({
+      method: 'select',
+      fields: fields
+    })      
+    return this
+  }
+
+  public from(from: string) {
+    this.modifiers.push({
+      method: 'from',
+      from: from
+    })      
+    return this
+  }
+}
 
 import type { JoinModifierOnClause } from "./modifiers/join"
 
