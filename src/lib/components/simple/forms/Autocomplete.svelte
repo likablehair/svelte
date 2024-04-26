@@ -40,7 +40,7 @@
     menuBoxShadow = "rgb(var(--global-color-background-300), .5) 0px 2px 4px",
     menuBorderRadius = "5px",
     mobileDrawer: boolean = false,
-    menuWidth: string | undefined = undefined
+    menuWidth: string | undefined | null = undefined
 
   let dispatch = createEventDispatcher<{
     change: {
@@ -106,7 +106,7 @@
     else select(item);
   }
 
-  let localMenuWidth: string | undefined = undefined,
+  let localMenuWidth: string | undefined | null = undefined,
     menuHeight = "auto",
     refreshPosition = false;
 

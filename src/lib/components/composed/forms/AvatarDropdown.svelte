@@ -31,7 +31,9 @@
     multiple: boolean = true,
     menuOpened: boolean = false,
     openingId: string | undefined = undefined,
-    width: string | undefined = undefined
+    width: string | undefined = undefined,
+    disabled: boolean = false,
+    menuWidth: string | undefined | null = "144px"
 
   function handleCloseClick(params: { index: number }) {
     let unselected = lodash.cloneDeep(values[params.index])
@@ -70,7 +72,8 @@
   bind:menuOpened
   bind:openingId
   bind:width
-  menuWidth="144px"
+  bind:disabled
+  menuWidth={menuWidth}
 >
   <svelte:fragment slot="selection-container" let:openMenu let:handleKeyDown>
     <button
