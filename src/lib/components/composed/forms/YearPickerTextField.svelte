@@ -36,7 +36,6 @@
     minYearInRange: number = 1900,
     disabled: boolean = false
 
-
   let activator: HTMLElement,
     refreshPosition = false,
     menuElement: HTMLElement,
