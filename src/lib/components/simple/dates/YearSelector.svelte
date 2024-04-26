@@ -17,7 +17,8 @@
   export let selectedYear: number | undefined = undefined,
     selectableYears: number[] = [...Array(150).keys()].map(
       (i) => i + (new Date().getFullYear() - 75)
-    )
+    ),
+    disabled: boolean = false
 
   let container: HTMLElement,
     targetButtons: { [k: string]: HTMLElement } = {};
@@ -60,6 +61,7 @@
           --button-padding=".5rem 0px"
           buttonType="text"
           on:click={() => handleYearClick(year)}
+          disabled={disabled}
         >
           <slot name="label" {year}>
             <div
