@@ -21,7 +21,8 @@
 
   export let items: IconItem[] = [],
     values: IconItem[] = [],
-    clearable: boolean = false
+    clearable: boolean = false,
+    disabled: boolean = false
 
   let dropdownValues: Item[] = []
 
@@ -72,6 +73,7 @@
   items={dropDownItems}
   clearable={clearable}
   placeholder=""
+  bind:disabled
   bind:values={dropdownValues}
   on:change={handleChange}
   width="60px"

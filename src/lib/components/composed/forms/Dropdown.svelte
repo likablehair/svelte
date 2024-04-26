@@ -31,7 +31,8 @@
     menuOpened: boolean = false,
     openingId: string | undefined = undefined,
     width: string | undefined = undefined,
-    mobileDrawer: boolean = false
+    mobileDrawer: boolean = false,
+    disabled: boolean = false
 
   $: generatedLabel = values.length == 1 ? values[0].label : `${values.length} Selezionati`
 
@@ -56,6 +57,7 @@
   bind:multiple
   bind:maxVisibleChips
   bind:mandatory
+  bind:disabled
   searchFunction={() => true}
   on:change
   bind:menuOpened
