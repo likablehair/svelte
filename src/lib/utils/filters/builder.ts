@@ -2,8 +2,9 @@ import type { JoinModifier } from "./modifiers/join"
 import type { WhereModifier, WhereFilterValue } from "./modifiers/where"
 import type { SelectModifier } from "./modifiers/select"
 import type { FromModifier } from "./modifiers/from"
+import type { OrderByModifier } from "./modifiers/orderBy"
 
-export type Modifier = WhereModifier | JoinModifier | SelectModifier | FromModifier
+export type Modifier = WhereModifier | JoinModifier | SelectModifier | FromModifier | OrderByModifier
 
 export type JsonQuery = {
   modifiers: Modifier[]
@@ -349,6 +350,16 @@ export default class Builder {
     })      
     return this
   }
+  
+  public orderBy(sortBy: string, sortDirection: "asc" | "desc") {
+    this.modifiers.push({
+      method: 'orderBy',
+      sortBy: sortBy,
+      sortDirection: sortDirection
+    })      
+    return this
+  }
+  
 }
 
 import type { JoinModifierOnClause } from "./modifiers/join"
