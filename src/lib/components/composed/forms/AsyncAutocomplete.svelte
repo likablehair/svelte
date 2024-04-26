@@ -23,7 +23,8 @@
     maxVisibleChips: number | undefined = undefined,
     menuOpened: boolean = false,
     mobileDrawer: boolean = false,
-    closeOnSelect: boolean = false
+    closeOnSelect: boolean = false,
+    disabled: boolean = false
 
   const searchTextValue = writable<string | undefined>(searchText)
   $: searchTextDebounce = debounceStore(searchTextValue, debounceTimeout)
@@ -58,6 +59,7 @@
   bind:mobileDrawer
   bind:placeholder
   bind:closeOnSelect
+  bind:disabled
   searchFunction={() => true}
   on:change
 ></Autocomplete>
