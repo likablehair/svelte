@@ -66,7 +66,7 @@
   export let calculateRowClasses: CalculateRowClasses | undefined = undefined;
 
   function handleHeaderClick(header: Header) {
-    if(!!header.sortable && header.sortable) {
+    if(header.sortable) {
       if(!!sortedBy && header.value == sortedBy) {
         if(sortDirection == 'asc') sortDirection = 'desc'
         else if(sortDirection == 'desc') {
