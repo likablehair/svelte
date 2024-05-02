@@ -66,18 +66,20 @@
   export let calculateRowClasses: CalculateRowClasses | undefined = undefined;
 
   function handleHeaderClick(header: Header) {
-    if(!!sortedBy && header.value == sortedBy) {
-      if(sortDirection == 'asc') sortDirection = 'desc'
-      else if(sortDirection == 'desc') {
-        sortedBy = undefined
+    if(!!header.sortable && header.sortable) {
+      if(!!sortedBy && header.value == sortedBy) {
+        if(sortDirection == 'asc') sortDirection = 'desc'
+        else if(sortDirection == 'desc') {
+          sortedBy = undefined
+        }
+      } else {
+        sortedBy = header.value
+        sortDirection = 'asc'
       }
-    } else {
-      sortedBy = header.value
-      sortDirection = 'asc'
+      dispatch('sort', {
+        sortedBy, sortDirection
+      })
     }
-    dispatch('sort', {
-      sortedBy, sortDirection
-    })
   }
 
   function handleRowClick(item: { [key: string]: any }) {
