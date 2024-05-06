@@ -30,6 +30,7 @@
     width = "auto",
     height = "auto",
     maxWidth: string | undefined = undefined,
+    minWidth: string | undefined = "200px",
     openingId: string = "autocomplete-menu",
     searchText: string | undefined = undefined,
     maxVisibleChips: number | undefined = undefined,
@@ -204,6 +205,14 @@
     }, 10);
   }
 
+  $: if(!!input) {
+    if(!disabled && values.length != 0) {
+      input.style.width = Math.max(searchText?.length || 0, 1) + 'ch'
+    } else {
+      input.style.width = 'auto'
+    }
+  }
+
   import Chip from "$lib/components/simple/navigation/Chip.svelte";
   import Menu from "$lib/components/simple/common/Menu.svelte";
   import { createEventDispatcher, type ComponentProps } from "svelte";
@@ -217,6 +226,7 @@
   bind:this={activator}
   style:width
   style:max-width={maxWidth}
+  style:min-width={minWidth}
   style:height
   style:opacity={disabled ? "50%" : "100%"}
   on:click={handleContainerClick}
@@ -252,13 +262,14 @@
         </slot>
       {/if}
 
-      <SimpleTextField
-        --simple-textfield-max-width="min(200px, 90%)"
-        --simple-textfield-height="auto"
-        --simple-textfield-padding="0px"
-        --simple-textfield-default-background-color="rgb(1, 1, 1, 0)"
-        --simple-textfield-default-margin-bottom="0px"
-        --simple-textfield-default-margin-left="10px"
+      <input 
+        style:--simple-textfield-max-width="min(200px, 90%)"
+        style:--simple-textfield-height="auto"
+        style:--simple-textfield-padding="0px"
+        style:--simple-textfield-default-background-color="rgb(1, 1, 1, 0)"
+        style:--simple-textfield-default-margin-bottom="0px"
+        style:--simple-textfield-default-margin-left="10px"
+        class="autocomplete-input"
         bind:value={searchText}
         on:focus={handleTextFieldFocus}
         on:focus
@@ -268,9 +279,8 @@
         on:keydown
         {disabled}
         placeholder={placeholder}
-        bind:input={input}
-        class={clazz.simpleTextfield}
-      ></SimpleTextField>
+        bind:this={input}
+      />
     </div>
   </slot>
 </div>
@@ -470,5 +480,13 @@
   .not-visible-chip-number {
     opacity: 50%;
     cursor: pointer;
+  }
+
+  .autocomplete-input {
+    background-color: rgb(1, 1, 1, 0);
+    /* margin-left: 10px; */
+    outline: none;
+    border: none;
+    color: inherit;
   }
 </style>

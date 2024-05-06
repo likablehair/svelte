@@ -252,6 +252,7 @@
       --simple-textfield-height,
       var(--simple-textfield-default-height)
     );
+    width: fit-content;
     background-color: var(
       --simple-textfield-background-color,
       var(--simple-textfield-default-background-color)

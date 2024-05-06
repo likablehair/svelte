@@ -19,31 +19,47 @@
 <ComponentSubtitle>Autocompletion out of the limits.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
-  <Autocomplete
-    closeOnSelect
-    items={items}
-  ></Autocomplete>
-  <Autocomplete
-    closeOnSelect
-    items={items}
-    disabled
-    placeholder="disabled"
-  ></Autocomplete>
-  <div style:font-size="">
+  <div
+    style:display="flex"
+    style:gap="5px"
+  >
     <Autocomplete
+      closeOnSelect
       items={items}
-      multiple
-      --chip-height="20px"
-      --chip-min-height="20px"
-      --chip-border-radius="8px"
-      --autocomplete-min-height="auto"
-      --autocomplete-padding="6px"
-      --autocomplete-background-color="transparent"
-      --autocomplete-border-radius="8px"
-      --autocomplete-border="1px solid rgb(var(--global-color-background-200))"
-      --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
-      maxVisibleChips={2}
-      mobileDrawer={true}
+    ></Autocomplete>
+    <Autocomplete
+      closeOnSelect
+      items={items}
+      disabled
+      placeholder="disabled"
+    ></Autocomplete>
+    <div style:font-size="">
+      <Autocomplete
+        items={items}
+        multiple
+        --chip-height="20px"
+        --chip-min-height="20px"
+        --chip-border-radius="8px"
+        --autocomplete-min-height="auto"
+        --autocomplete-padding="6px"
+        --autocomplete-background-color="transparent"
+        --autocomplete-border-radius="8px"
+        --autocomplete-border="1px solid rgb(var(--global-color-background-200))"
+        --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
+        maxVisibleChips={2}
+        mobileDrawer={true}
+      ></Autocomplete>
+    </div>
+  </div>
+  <div>Fixed width</div>
+  <div>
+    <Autocomplete
+      closeOnSelect
+      items={items}
+      width="200px"
+      values={[
+        { value: 'orange', label: 'Orange' }
+      ]}
     ></Autocomplete>
   </div>
 </div>
@@ -123,6 +139,7 @@
 <style>
   .example {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 10px;
