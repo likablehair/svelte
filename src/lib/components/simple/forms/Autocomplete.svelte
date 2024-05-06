@@ -207,7 +207,7 @@
 
   $: if(!!input) {
     if(!disabled && values.length != 0) {
-      input.style.width = Math.max(searchText?.length || 0, 1) + 'ch'
+      input.style.width = Math.max(searchText?.length || placeholder?.length, 1) + 'ch'
     } else {
       input.style.width = 'auto'
     }
