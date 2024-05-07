@@ -6,6 +6,7 @@
   import { createEventDispatcher } from "svelte";
   import { clickOutside } from '$lib/utils/clickOutside';
   import ColorInvertedSelector, { type Option } from '../simple/lists/ColorInvertedSelector.svelte';
+  import { sidebarOpened } from '$lib/stores/layouts/unstableSidebarOpened';
 
   let clazz: {
     container?: string,
@@ -65,6 +66,8 @@
 
 
   let sidebarExpanded: boolean = false
+
+  $: $sidebarOpened = sidebarExpanded
 </script>
 
 <MediaQuery let:mAndDown>
@@ -102,6 +105,8 @@
       use:clickOutside 
       on:clickoutside={() => {if(expandOn == 'click') sidebarExpanded = false}}
       class="side-bar {clazz.header || ''}"
+      role="presentation"
+      tabindex="-1"
     >
       <div class="side-bar-content">
         <slot name="sidebar" hamburgerVisible={mAndDown} {sidebarExpanded}>

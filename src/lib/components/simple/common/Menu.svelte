@@ -8,6 +8,8 @@
     type SlideParams,
     type TransitionConfig,
   } from "svelte/transition";
+  
+  import { sidebarOpened } from '$lib/stores/layouts/unstableSidebarOpened';
 
   export let _top: number | undefined = undefined,
     _left: number | undefined = undefined,
@@ -298,7 +300,7 @@
     return { top, left, fixedParent, validStickyParent: isStickyValid ? stickyParent : undefined }
   }
 
-  function handleWindowScrollOrResize() {
+  function refreshMenuPosition() {
     if(open && !!menuElement && !!activator) calculateMenuPosition({ menuElement, activator })
   }
 
@@ -320,9 +322,11 @@
     })
   }
 
+  // TODO find a better way to update menu positions with animations
+  $: if($sidebarOpened !== undefined) setTimeout(refreshMenuPosition, 300)
 </script>
 
-<svelte:window on:scroll={handleWindowScrollOrResize} on:resize={handleWindowScrollOrResize} ></svelte:window>
+<svelte:window on:scroll={refreshMenuPosition} on:resize={refreshMenuPosition} ></svelte:window>
 
 <div
   class="controller"
@@ -332,6 +336,8 @@
   on:click={handleCloseControllerClick}
   on:keypress={handleCloseControllerClick}
   bind:this={closeController}
+  role="presentation"
+  tabindex="-1"
 ></div>
 {#if open}
   <div
