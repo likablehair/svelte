@@ -11,6 +11,7 @@
       backgroundColor?: string
     },
     appendIcon?: string
+    disabled?: boolean
   };
 </script>
 
@@ -112,6 +113,7 @@
       class="element"
       class:bicolor
       class:focused={focused == element.name}
+      class:disabled={element.disabled}
       aria-selected={selected == element.name}
       on:mouseover={() => handleElementMouseover(element)}
       on:focus={() => handleElementMouseover(element)}
@@ -286,6 +288,11 @@
       --selectable-vertical-list-selection-color,
       var(--selectable-vertical-list-default-selection-color)
     )
+  }
+
+  .element.disabled {
+    pointer-events: none;
+    opacity: 0.5;
   }
 
 

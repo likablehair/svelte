@@ -36,7 +36,8 @@
         {name: 'edit2', title: 'Modifica', icon: 'mdi-pencil'},
         {name: 'edit3', title: 'Modifica', icon: 'mdi-pencil'},
         {name: 'edit4', title: 'Modifica', icon: 'mdi-pencil'},
-        {name: 'edit5', title: 'Modifica', icon: 'mdi-pencil'}
+        {name: 'edit5', title: 'Modifica', icon: 'mdi-pencil'},
+        {name: 'disabled', title: 'Disabilitato', icon: 'mdi-pencil', disabled: true},
       ]}
     ></MenuOrDrawerOptions>
   {/if}
