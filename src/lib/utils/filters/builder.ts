@@ -151,7 +151,7 @@ export default class Builder {
         kind: 'inBuilder',
         logicalOperator: logicalOperator,
         key: key,
-        modifiers: inBuilder.modifiers
+        children: inBuilder.modifiers.filter((el) => el.method == 'where' || el.method == 'select') as (WhereModifier | SelectModifier)[]
       })
     } else {
       this.modifiers.push({
@@ -339,7 +339,7 @@ export default class Builder {
     this.modifiers.push({
       method: 'select',
       fields: fields
-    })      
+    })
     return this
   }
 
@@ -347,7 +347,7 @@ export default class Builder {
     this.modifiers.push({
       method: 'from',
       from: from
-    })      
+    })
     return this
   }
   
@@ -356,7 +356,7 @@ export default class Builder {
       method: 'orderBy',
       sortBy: sortBy,
       sortDirection: sortDirection
-    })      
+    })
     return this
   }
   

@@ -1,4 +1,5 @@
 import type { Modifier } from "../builder"
+import type { SelectModifier } from "./select"
 
 export type WhereFilterValue = string | number | Date | boolean
 
@@ -47,7 +48,7 @@ type InBuilderWhere = {
   kind: 'inBuilder',
   logicalOperator?: 'and' | 'or' | 'andNot' | 'orNot',
   key: string,
-  modifiers: Modifier[]
+  children: (ObjectWhere | SimpleWhere | GroupedWhere | InWhere | ColumnWhere | JsonSupersetWhere | InBuilderWhere | NullWhere | SelectModifier)[]
 }
 
 type JsonSupersetWhere = {
