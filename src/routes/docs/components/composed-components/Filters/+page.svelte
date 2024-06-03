@@ -118,6 +118,13 @@
           return builder
         }
       }
+    },
+    {
+      name: "overflowTest",
+      label: "Test datepicker overflow",
+      type: "date",
+      column: "test",
+      mode: "equal"
     }
   ];
 

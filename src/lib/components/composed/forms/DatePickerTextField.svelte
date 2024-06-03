@@ -38,7 +38,8 @@
     mobileDialog: boolean = true,
     maxYearInRange: number = 2100,
     minYearInRange: number = 1970,
-    disabled: boolean = false
+    disabled: boolean = false,
+    flipOnOverflow: boolean = true
 
 
   let activator: HTMLElement,
@@ -262,6 +263,7 @@
       bind:refreshPosition
       bind:menuElement
       bind:openingId={openingId}
+      {flipOnOverflow}
     >
       <div
         style:background-color="rgb(var(--global-color-background-100))"
