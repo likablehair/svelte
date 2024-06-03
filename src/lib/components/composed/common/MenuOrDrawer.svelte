@@ -16,7 +16,8 @@
     _width: string | undefined = undefined,
     _maxHeight: string | undefined = undefined,
     _minWidth: string = "100px",
-    _borderRadius: string = "5px";
+    _borderRadius: string = "5px",
+    openingId: string | undefined = undefined;
 </script>
 
 <MediaQuery let:mAndDown>
@@ -43,6 +44,7 @@
       anchor={menuAnchor}
       bind:stayInViewport={stayInViewport}
       bind:flipOnOverflow={flipOnOverflow}
+      bind:openingId
     >
       <slot isDrawer={false} isMenu={true}></slot>
     </Menu>
