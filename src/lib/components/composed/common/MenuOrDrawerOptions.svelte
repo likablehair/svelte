@@ -22,7 +22,7 @@
     _maxHeight: string | undefined = undefined,
     _minWidth: string = "100px",
     _borderRadius: string = "5px",
-    openingId: string | undefined = undefined;
+    openingId: ComponentProps<MenuOrDrawer>['openingId'] = undefined;
 
   let selected: ArrayElement<NonNullable<ComponentProps<SelectableVerticalList>['elements']>>['name'] | undefined
   let focused: ArrayElement<NonNullable<ComponentProps<SelectableVerticalList>['elements']>>['name'] | undefined

@@ -17,7 +17,7 @@
     _maxHeight: string | undefined = undefined,
     _minWidth: string = "100px",
     _borderRadius: string = "5px",
-    openingId: string | undefined = undefined;
+    openingId: ComponentProps<Menu>['openingId'] = undefined;
 </script>
 
 <MediaQuery let:mAndDown>
