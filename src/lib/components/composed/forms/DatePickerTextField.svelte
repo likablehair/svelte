@@ -263,7 +263,7 @@
       bind:refreshPosition
       bind:menuElement
       bind:openingId={openingId}
-      {flipOnOverflow}
+      flipOnOverflow={flipOnOverflow}
     >
       <div
         style:background-color="rgb(var(--global-color-background-100))"

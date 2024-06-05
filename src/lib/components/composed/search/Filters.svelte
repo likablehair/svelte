@@ -653,6 +653,7 @@
         _borderRadius="5px"
         anchor="bottom"
         openingId="select-filter"
+        flipOnOverflow
       >
         <div
           style:background-color="rgb(var(--global-color-background-200))"

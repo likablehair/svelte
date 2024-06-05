@@ -8,7 +8,7 @@
     type SlideParams,
     type TransitionConfig,
   } from "svelte/transition";
-  
+
   import { sidebarOpened } from '$lib/stores/layouts/unstableSidebarOpened';
 
   export let _top: number | undefined = undefined,
@@ -111,12 +111,9 @@
       }
 
       if(flipOnOverflow && !!params.activator) {
-        if (
-          window.innerHeight + window.scrollY <
-          (_top || 0) + (menuElement?.offsetHeight || 0)
-        ) {
-          let { top: activatorTop } = params.activator.getBoundingClientRect();
-          _top = activatorTop + window.scrollY - _activatorGap - (menuElement?.offsetHeight || 0)
+        let { top: activatorTopDistance } = params.activator.getBoundingClientRect()
+        if (window.innerHeight < activatorTopDistance + (menuElement?.offsetHeight || 0) + ((menuElement?.offsetHeight || 0) * 0.1)) {
+          _top = getTopDistance(params.activator) - _activatorGap - (menuElement?.offsetHeight || 0)
         }
 
         if (
@@ -161,7 +158,39 @@
     }
   }
 
+  function getTopDistance(elem: HTMLElement): number {
+    let positionedAncestor = getPositionedAncestor(elem)
+    if(!!positionedAncestor) {
+      let top: number = parseInt(getComputedStyle(positionedAncestor).top)
+      return (isNaN(top) ? 0 : top) + elem.offsetTop - calcScrollY(elem)
+    }
+    return window.scrollY + elem.getBoundingClientRect().top
+  }
+
+  function calcScrollY(elem: HTMLElement): number {
+    let parent = elem.parentElement
+    let scroll = 0
+    while(!!parent) {
+      scroll += parent.scrollTop
+      let parentPosition = getComputedStyle(parent).position
+      if(parentPosition === 'absolute' || parentPosition === 'fixed') break
+      parent = parent.parentElement
+    }
+    return scroll
+  }
+
+
   $: if (open) {
+    if(!!activator) {
+      let parent = activator.parentElement
+      while(!!parent) {
+        let parentPosition = getComputedStyle(parent).position
+        parent.addEventListener('scroll', refreshMenuPosition)
+        if(parentPosition == 'absolute' || parentPosition == 'fixed') break
+        parent = parent.parentElement
+      }
+    }
+
     if(!!openingId) {
       const controllers = document.querySelectorAll(`[data-operation="close"][data-opening-id="${openingId}"]`)
       for(let k = 0; k < controllers.length; k += 1) {
@@ -204,7 +233,7 @@
   }
   $: if (!!_width && !!activator && !!menuElement) {
     setTimeout(() => {
-      if(!!activator && !!menuElement) 
+      if(!!activator && !!menuElement)
         calculateMenuPosition({ activator, menuElement });
     }, 1)
   }
@@ -274,11 +303,11 @@
     while(!!activatorParent && activatorParent.nodeName.toLowerCase() !== 'html' && activatorParent.nodeName.toLowerCase() !== 'body') {
       const currentParent = activatorParent.parentElement
       if(!currentParent) break
-      
+
       const computedStyle = getComputedStyle(currentParent)
       const position = computedStyle.position;
       const display = computedStyle.display;
-      
+
       if((position === 'fixed' || position === 'absolute') && display === "flex") {
         const boundingClientRect = activatorParent.getBoundingClientRect();
         top = top + boundingClientRect.top
@@ -341,6 +370,7 @@
 ></div>
 {#if open}
   <div
+    role="presentation"
     bind:this={menuElement}
     data-menu
     data-uid={currentUid}
