@@ -149,6 +149,7 @@
               bind:menuOpened={calendarOpened}
               on:day-click={() => {calendarOpened = false}}
               --simple-textfield-width="100%"
+              flipOnOverflow
             >
               <svelte:fragment slot="append-inner">
                 <Icon
@@ -227,6 +228,7 @@
               bind:menuOpened={calendarOpened2}
               on:day-click={() => {calendarOpened2 = false}}
               --simple-textfield-width="100%"
+              flipOnOverflow
             >
               <svelte:fragment slot="append-inner">
                 <Icon

@@ -362,7 +362,7 @@
 
 <MediaQuery let:mAndDown>
   <div class="filters-wrapper" class:mobile={mAndDown} style:--filter-dot-size={activeFilters.length > 0 ? '22px' : '0px'} style:--filter-dot-content={activeFilters.length > 0 ? `"${activeFilters.length}"` : '""'}>
-    <div class="filters-container" class:mobile={mAndDown}>
+    <div class="filters-container" class:mobile={mAndDown} class:hidden={mAndDown && (!showActiveFilters || activeFilters.length == 0)}>
       {#if showActiveFilters}
         {#each activeFilters as filter}
           <div
@@ -653,6 +653,7 @@
         _borderRadius="5px"
         anchor="bottom"
         openingId="select-filter"
+        flipOnOverflow
       >
         <div
           style:background-color="rgb(var(--global-color-background-200))"
@@ -981,6 +982,10 @@
 
   .multi-filters-container .filter.wide {
     grid-column: span 2;
+  }
+
+  .hidden {
+    display: none;
   }
 
 </style>

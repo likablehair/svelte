@@ -118,6 +118,13 @@
           return builder
         }
       }
+    },
+    {
+      name: "overflowTest",
+      label: "Test datepicker overflow",
+      type: "date",
+      column: "test",
+      mode: "equal"
     }
   ];
 
@@ -149,7 +156,7 @@
 <h1>Filters</h1>
 <ComponentSubtitle>Make it easy, make it filter.</ComponentSubtitle>
 <h2>Example</h2>
-<div class="example">
+<div class="example" style:margin-top="1000px" style:margin-bottom="500px">
   <Filters lang="it" bind:filters on:applyFilter={handleFilterEdit} on:removeAllFilters={handleFilterEdit} on:removeFilter={handleFilterEdit} showActiveFilters={true}>
     <svelte:fragment slot="custom-chip" let:filter>
       {#if filter.name === 'testCustom'}
@@ -164,7 +171,7 @@
     </svelte:fragment>
   </Filters>
 </div>
-<div class="example">
+<div class="example" style:margin-top="500px" style:margin-bottom="500px">
   <Filters lang="it" bind:filters on:applyFilter={handleFilterEdit} on:removeAllFilters={handleFilterEdit} on:removeFilter={handleFilterEdit} showActiveFilters={false} editFilterMode="multi-edit">
     <!-- <svelte:fragment slot="content" let:updateMultiFilterValues let:filters>
       {#each filters as filter}
