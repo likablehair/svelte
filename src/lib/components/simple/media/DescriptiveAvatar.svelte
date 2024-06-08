@@ -170,8 +170,15 @@
 
   .title {
     font-size: var(
-      --descriptive-avatar-font-size,
-      var(--descriptive-avatar-default-font-size)
+      --descriptive-avatar-title-font-size,
+      var(--descriptive-avatar-default-title-font-size)
+    )
+  }
+
+  .subtitle {
+    font-size: var(
+      --descriptive-avatar-subtitle-font-size,
+      var(--descriptive-avatar-default-subtitle-font-size)
     )
   }
 
