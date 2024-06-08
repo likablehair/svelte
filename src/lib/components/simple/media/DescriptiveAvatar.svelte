@@ -31,6 +31,7 @@
         {#if !!title}
           <div 
             class="font-bold title"
+            class:text-start={direction == 'row' && !reverse}
             class:text-center={direction == 'column'}
             class:text-end={direction == 'row' && reverse}
           >{title}</div>
@@ -38,6 +39,7 @@
         {#if !!subtitle}
           <div 
             class="subtitle"
+            class:text-start={direction == 'row' && !reverse}
             class:text-center={direction == 'column'}
             class:text-end={direction == 'row' && reverse}
           >{subtitle}</div>
@@ -166,6 +168,10 @@
 
   .text-end {
     text-align: end;
+  }
+
+  .text-end {
+    text-align: start;
   }
 
   .title {
