@@ -44,6 +44,12 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/Avatar'
   }, {
+    title: 'DescriptiveAvatar',
+    description: 'Circle Image with description',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/DescriptiveAvatar' 
+  }, {
     title: 'Gesture',
     description: 'Handle touch gesture movements',
     status: 'stable',

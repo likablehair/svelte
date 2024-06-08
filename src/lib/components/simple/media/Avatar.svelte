@@ -1,15 +1,28 @@
 <script lang="ts">
   import './Avatar.css'
   import '../../../css/main.css'
+  import { BROWSER } from 'esm-env';
 
   export let src: string | undefined = undefined,
     alt: string = "",
     text: string | undefined = undefined,
-    referrerpolicy: ReferrerPolicy | null | undefined = "no-referrer"
+    referrerpolicy: ReferrerPolicy | null | undefined = "no-referrer",
+    imageLoadingStatus: 'error' | 'success' = 'success'
+
+  $: if(!!src && BROWSER) {
+    let image = new Image()
+    image.src = src
+    image.onload = () => {
+      imageLoadingStatus = 'success'
+    }
+    image.onerror = () => {
+      imageLoadingStatus = 'error'
+    }
+  }
 </script>
 
 
-{#if !!src}
+{#if !!src && imageLoadingStatus == 'success'}
   <img
     class="avatar"
     {src}
@@ -17,7 +30,9 @@
     {referrerpolicy}
   />
 {:else}
-  <div class="avatar">{text}</div>
+  <slot>
+    <div class="avatar">{text || ''}</div>
+  </slot>
 {/if}
 
 <style>

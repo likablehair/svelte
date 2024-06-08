@@ -1,0 +1,6 @@
+:root {
+  --descriptive-avatar-default-image-gap: 8px;
+  --descriptive-avatar-default-text-gap: 2px;
+  --descriptive-avatar-default-font-size: 1.1rem;
+  --descriptive-avatar-default-cursor: pointer;
+}

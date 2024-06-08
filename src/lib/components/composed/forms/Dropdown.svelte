@@ -31,6 +31,8 @@
     menuOpened: boolean = false,
     openingId: string | undefined = undefined,
     width: string | undefined = undefined,
+    minWidth: string | undefined = undefined,
+    menuWidth: string | undefined = width,
     mobileDrawer: boolean = false,
     disabled: boolean = false
 
@@ -64,6 +66,8 @@
   bind:openingId
   bind:width
   {mobileDrawer}
+  bind:minWidth
+  bind:menuWidth
 >
   <svelte:fragment slot="selection-container" let:openMenu let:handleKeyDown>
     <Button

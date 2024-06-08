@@ -1,34 +1,53 @@
 <script lang="ts">
-  export let src: string,
+  import './DescriptiveAvatar.css'
+  import '../../../css/main.css'
+  import Avatar from "$lib/components/simple/media/Avatar.svelte";
+
+  export let src: string | undefined = undefined,
     title: string | undefined = undefined,
-    description: string | undefined = undefined,
+    subtitle: string | undefined = undefined,
+    avatarText: string | undefined = !title ? undefined : title.substring(0, 2).toUpperCase(),
     direction: "row" | "column" = "row",
     reverse = false,
-    avatarSpacing = "10px",
-    width: string | undefined = undefined,
-    maxWidth: string | undefined = undefined,
-    minWidth: string | undefined = undefined,
-    height: string | undefined = undefined,
-    maxHeight: string | undefined = undefined,
-    minHeight: string | undefined = undefined,
-    lazyLoaded = false,
-    borderRadius = "50%",
     referrerpolicy: ReferrerPolicy | null | undefined = "no-referrer";
-
-  let textAlignment: "left" | "right" | "center";
-
-  $: if (direction == "column") {
-    textAlignment = "center";
-  } else if (reverse) {
-    textAlignment = "right";
-  } else {
-    textAlignment = "left";
-  }
-
-  import Avatar from "$lib/components/simple/media/Avatar.svelte";
 </script>
 
-<div
+<div 
+  class="flex image-gapped items-center clickable"
+  class:flex-col={direction == 'column'}
+  class:flex-reverse={direction == 'row' && reverse}
+  class:flex-col-reverse={direction == 'column' && reverse}
+  role="presentation"
+  on:click
+>
+  <Avatar
+    {src}
+    {referrerpolicy}
+    bind:text={avatarText}
+  ></Avatar>
+  {#if !!title || !!subtitle}
+    <slot {title} {subtitle} {avatarText} {src}>
+      <div class="flex flex-col text-gapped">
+        {#if !!title}
+          <div 
+            class="font-bold title"
+            class:text-center={direction == 'column'}
+            class:text-end={direction == 'row' && reverse}
+          >{title}</div>
+        {/if}
+        {#if !!subtitle}
+          <div 
+            class="subtitle"
+            class:text-center={direction == 'column'}
+            class:text-end={direction == 'row' && reverse}
+          >{subtitle}</div>
+        {/if}
+      </div>
+    </slot>
+  {/if}
+</div>
+
+<!-- <div
   style:align-items="center"
   style:flex-direction={reverse ? direction + "-reverse" : direction}
   class="descriptive-avatar-container"
@@ -75,9 +94,9 @@
       </div>
     {/if}
   </div>
-</div>
+</div> -->
 
-<style>
+<!-- <style>
   .descriptive-avatar-container {
     width: fit-content;
     display: flex;
@@ -99,5 +118,67 @@
   .description {
     font-size: 10pt;
     font-weight: 300;
+  }
+</style> -->
+
+<style>
+  .flex {
+    display: flex;
+  }
+
+  .flex-col {
+    flex-direction: column;
+  }
+
+  .flex-reverse {
+    flex-direction: row-reverse;
+  }
+
+  .flex-col-reverse {
+    flex-direction: column-reverse;
+  }
+
+  .image-gapped {
+    gap: var(
+      --descriptive-avatar-image-gap,
+      var(--descriptive-avatar-default-image-gap)
+    )
+  }
+
+  .text-gapped {
+    gap: var(
+      --descriptive-avatar-text-gap,
+      var(--descriptive-avatar-default-text-gap)
+    )
+  }
+
+  .font-bold {
+    font-weight: bold;
+  }
+
+  .items-center {
+    align-items: center;
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .text-end {
+    text-align: end;
+  }
+
+  .title {
+    font-size: var(
+      --descriptive-avatar-font-size,
+      var(--descriptive-avatar-default-font-size)
+    )
+  }
+
+  .clickable {
+    cursor: var(
+      --descriptive-avatar-cursor,
+      var(--descriptive-avatar-default-cursor)
+    );
   }
 </style>

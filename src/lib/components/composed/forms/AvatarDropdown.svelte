@@ -32,6 +32,7 @@
     menuOpened: boolean = false,
     openingId: string | undefined = undefined,
     width: string | undefined = undefined,
+    minWidth: string | undefined = 'auto',
     disabled: boolean = false,
     menuWidth: string | undefined | null = "144px"
 
@@ -72,6 +73,7 @@
   bind:menuOpened
   bind:openingId
   bind:width
+  bind:minWidth
   bind:disabled
   menuWidth={menuWidth}
 >

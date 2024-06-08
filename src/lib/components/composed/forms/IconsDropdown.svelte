@@ -22,7 +22,10 @@
   export let items: IconItem[] = [],
     values: IconItem[] = [],
     clearable: boolean = false,
-    disabled: boolean = false
+    disabled: boolean = false,
+    width: string | undefined = "auto",
+    minWidth: string | undefined = "auto",
+    menuWidth: string | undefined = "60px"
 
   let dropdownValues: Item[] = []
 
@@ -76,7 +79,9 @@
   bind:disabled
   bind:values={dropdownValues}
   on:change={handleChange}
-  width="60px"
+  {width}
+  {minWidth}
+  {menuWidth}
 >
   <svelte:fragment slot="label" let:generatedLabel let:values let:placeholder let:clearable let:handleCloseClick>
     {#if values.length == 0}
