@@ -10,4 +10,5 @@
   --autocomplete-default-padding: 0.5rem .5rem .5rem .5rem;
   --autocomplete-default-border-radius: 1.5rem;
   --autocomplete-default-options-max-width: 100%;
+  --autocomplete-default-input-margin-left: 4px;
 }

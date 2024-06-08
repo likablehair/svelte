@@ -263,12 +263,6 @@
       {/if}
 
       <input 
-        style:--simple-textfield-max-width="min(200px, 90%)"
-        style:--simple-textfield-height="auto"
-        style:--simple-textfield-padding="0px"
-        style:--simple-textfield-default-background-color="rgb(1, 1, 1, 0)"
-        style:--simple-textfield-default-margin-bottom="0px"
-        style:--simple-textfield-default-margin-left="10px"
         class="autocomplete-input"
         bind:value={searchText}
         on:focus={handleTextFieldFocus}
@@ -484,7 +478,10 @@
 
   .autocomplete-input {
     background-color: rgb(1, 1, 1, 0);
-    /* margin-left: 10px; */
+    margin-left: var(
+      --autocomplete-input-margin-left,
+      var(--autocomplete-default-input-margin-left)
+    );
     outline: none;
     border: none;
     color: inherit;
