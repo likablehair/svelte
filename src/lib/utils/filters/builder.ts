@@ -3,6 +3,7 @@ import type { WhereModifier, WhereFilterValue } from "./modifiers/where"
 import type { SelectModifier } from "./modifiers/select"
 import type { FromModifier } from "./modifiers/from"
 import type { OrderByModifier } from "./modifiers/orderBy"
+import lodash from "lodash";
 
 export type Modifier = WhereModifier | JoinModifier | SelectModifier | FromModifier | OrderByModifier
 
@@ -11,10 +12,14 @@ export type JsonQuery = {
 }
 
 export default class Builder {
-  private modifiers: Modifier[] = []
+  private _modifiers: Modifier[] = []
 
   constructor() {
-    this.modifiers = []
+    this._modifiers = []
+  }
+
+  public get modifiers() {
+    return lodash.cloneDeep(this._modifiers)
   }
 
   public where(callback: (builder: Builder) => void): Builder
@@ -146,15 +151,15 @@ export default class Builder {
       let inBuilder = new Builder()
       second(inBuilder)
 
-      this.modifiers.push({
+      this._modifiers.push({
         method: 'where',
         kind: 'inBuilder',
         logicalOperator: logicalOperator,
         key: key,
-        children: inBuilder.modifiers.filter((el) => el.method == 'where' || el.method == 'select') as (WhereModifier | SelectModifier)[]
+        children: inBuilder._modifiers.filter((el) => el.method == 'where' || el.method == 'select') as (WhereModifier | SelectModifier)[]
       })
     } else {
-      this.modifiers.push({
+      this._modifiers.push({
         method: 'where',
         kind: 'in',
         logicalOperator: logicalOperator,
@@ -194,7 +199,7 @@ export default class Builder {
     logicalOperator: 'and' | 'or' | 'andNot' | 'orNot',
     key: string
   ): Builder {
-    this.modifiers.push({
+    this._modifiers.push({
       method: 'where',
       kind: 'null',
       logicalOperator: logicalOperator,
@@ -213,7 +218,7 @@ export default class Builder {
 
     if (third !== undefined) {
       if (!!second && typeof first == 'string' && typeof second == 'string') {
-        this.modifiers.push({
+        this._modifiers.push({
           method: 'where',
           kind: 'simple',
           key: first,
@@ -222,7 +227,7 @@ export default class Builder {
           logicalOperator: logicalOperator
         })
       } else if (typeof first == 'object') {
-        this.modifiers.push({
+        this._modifiers.push({
           method: 'where',
           kind: 'object',
           values: first,
@@ -230,7 +235,7 @@ export default class Builder {
         })
       }
     } else if (typeof first == 'string' && second !== undefined ) {      
-      this.modifiers.push({
+      this._modifiers.push({
         method: 'where',
         kind: 'simple',
         key: first,
@@ -240,13 +245,13 @@ export default class Builder {
     } else if (typeof first == 'function') {
       let builder = new Builder()
       first(builder)
-      if (!builder.modifiers.every(el => el.method == 'where')) throw new Error('inconsistent json query from where callback')
+      if (!builder._modifiers.every(el => el.method == 'where')) throw new Error('inconsistent json query from where callback')
 
-      this.modifiers.push({
+      this._modifiers.push({
         method: 'where',
         kind: 'grouped',
         logicalOperator,
-        children: builder.modifiers.filter((el) => el.method == 'where') as WhereModifier[]
+        children: builder._modifiers.filter((el) => el.method == 'where') as WhereModifier[]
       })
     }
     return this
@@ -260,7 +265,7 @@ export default class Builder {
   ): Builder {
 
     if (third !== undefined) {
-      this.modifiers.push({
+      this._modifiers.push({
         method: 'where',
         kind: 'column',
         key: first,
@@ -269,7 +274,7 @@ export default class Builder {
         logicalOperator: logicalOperator
       })
     } else {
-      this.modifiers.push({
+      this._modifiers.push({
         method: 'where',
         kind: 'column',
         key: first,
@@ -285,7 +290,7 @@ export default class Builder {
     first: string,
     second: Object,
   ): Builder {
-    this.modifiers.push({
+    this._modifiers.push({
       method: 'where',
       kind: 'jsonSuperset',
       key: first,
@@ -319,8 +324,52 @@ export default class Builder {
     return this
   }
 
+  public hasModifier(builderCallback: (builder: Builder) => Builder): boolean {
+    let parameterBuilder = new Builder()
+    parameterBuilder = builderCallback(parameterBuilder)
+
+    for (let i = 0; i < parameterBuilder._modifiers.length; i += 1) {
+      let modifierToSearch = parameterBuilder._modifiers[i]
+      let found = false
+      for(let k = 0; k < this._modifiers.length; k += 1) {
+        let currentModifier = this._modifiers[k]
+
+        found = lodash.isEqual(modifierToSearch, currentModifier)
+        if(found) break
+      }
+
+      if(!found) return false
+    }
+    return true
+  }
+
+  public hasWhereOnColumn(column: string, modifiers: Modifier[] | undefined = undefined): boolean {
+    return (modifiers || this._modifiers).some((m) => {
+      return m.method == 'where' && 
+        (
+          (
+            m.kind == 'column' && m.key == column
+          ) || (
+            m.kind == 'grouped' && this.hasWhereOnColumn(column, m.children)
+          ) || (
+            m.kind == 'in' && m.key == column
+          ) || (
+            m.kind == 'inBuilder' && this.hasWhereOnColumn(column, m.children)
+          ) || (
+            m.kind == 'jsonSuperset' && m.key == column
+          ) || (
+            m.kind == 'null' && m.key == column
+          ) || (
+            m.kind == 'object' && Object.keys(m.values).includes(column)
+          ) || (
+            m.kind == 'simple' && m.key == column
+          )
+        )
+    })
+  }
+
   private applyJoinClause(kind: 'right' | 'left' | 'inner', table: string, on: JoinModifierOnClause[]) {
-    this.modifiers.push({
+    this._modifiers.push({
       method: 'join',
       kind: kind,
       on: on,
@@ -331,12 +380,12 @@ export default class Builder {
 
   public toJson(): JsonQuery {
     return {
-      modifiers: this.modifiers
+      modifiers: this._modifiers
     }
   }
 
   public select(fields: string | string[]) {
-    this.modifiers.push({
+    this._modifiers.push({
       method: 'select',
       fields: fields
     })
@@ -344,7 +393,7 @@ export default class Builder {
   }
 
   public from(from: string) {
-    this.modifiers.push({
+    this._modifiers.push({
       method: 'from',
       from: from
     })
@@ -352,7 +401,7 @@ export default class Builder {
   }
   
   public orderBy(sortBy: string, sortDirection: "asc" | "desc") {
-    this.modifiers.push({
+    this._modifiers.push({
       method: 'orderBy',
       sortBy: sortBy,
       sortDirection: sortDirection

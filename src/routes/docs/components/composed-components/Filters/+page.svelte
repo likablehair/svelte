@@ -72,7 +72,7 @@
       name: "productsNumber",
       label: "Numero articoli",
       type: "number",
-      column: "procutsNumber",
+      column: "productsNumber",
       mode: "between",
       advanced: false,
     },
@@ -136,6 +136,9 @@
         filters
       });
       console.log(builder.toJson())
+
+      console.log('modifiers', builder.modifiers)
+      console.log('where on productsNumber', builder.hasWhereOnColumn('productsNumber'))
     }
   }
 
@@ -150,7 +153,6 @@
     let isValid = !!newValue && newValue.length > 2
     updateFunction(filterName, newValue, isValid)
   }
-
 </script>
 
 <h1>Filters</h1>

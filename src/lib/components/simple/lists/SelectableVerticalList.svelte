@@ -4,7 +4,6 @@
     name: string | number,
     description?: string,
     icon?: string,
-    /* eslint-disable  @typescript-eslint/no-explicit-any */
     data?: any;
     style?: {
       color?: string,
