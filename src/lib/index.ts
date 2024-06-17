@@ -71,6 +71,7 @@ export { default as AvatarDropdown } from './components/composed/forms/AvatarDro
 export { default as ToggleList } from './components/composed/forms/ToggleList.svelte'
 
 export { default as PaginatedTable } from './components/composed/list/PaginatedTable.svelte'
+export { default as Paginator } from './components/simple/lists/Paginator.svelte'
 
 export { default as Filters } from './components/composed/search/Filters.svelte'
 export { default as GlobalSearchTextField } from './components/composed/search/GlobalSearchTextField.svelte'

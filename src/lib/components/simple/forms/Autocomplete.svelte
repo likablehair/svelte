@@ -262,7 +262,7 @@
         </slot>
       {/if}
 
-      <input 
+      <input
         class="autocomplete-input"
         bind:value={searchText}
         on:focus={handleTextFieldFocus}
