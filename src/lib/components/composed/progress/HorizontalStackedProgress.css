@@ -1,3 +1,9 @@
 :root {
-  --horizontal-stacked-progress-default-gap: 4px
+  --horizontal-stacked-progress-default-gap: 4px;
+  --horizontal-stacked-progress-default-dot-height: 10px;
+  --horizontal-stacked-progress-default-dot-width: 10px;
+  --horizontal-stacked-progress-default-dot-min-width: 10px;
+  --horizontal-stacked-progress-label-gap: 12px;
+  --horizontal-stacked-progress-legend-margin-top: 8px;
+  --progress-bar-default-tooltip-padding: 8px;
 }

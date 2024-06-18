@@ -62,6 +62,12 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/ProgressBar'
   }, {
+    title: 'HorizontalStackedProgress',
+    description: 'Stacked progress.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/HorizontalStackedProgress'
+  }, {
     title: 'IntersectionObserver',
     description: 'Get if there are intersection with the current viewport',
     status: 'stable',

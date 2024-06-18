@@ -4,4 +4,6 @@
   --progress-bar-default-height: 5px;
   --progress-bar-default-width: 100%;
   --progress-bar-default-border-radius: 2px;
+  --progress-bar-default-tooltip-background-color: rgb(var(--global-color-background-100));
+  --progress-bar-default-tooltip-border-radius: 8px;
 }

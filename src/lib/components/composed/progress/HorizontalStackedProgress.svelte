@@ -2,7 +2,8 @@
   export type ProgressItem = {
     label?: string,
     color?: string,
-    value: number
+    value: number,
+    valueLabel?: string | number
   };
 
   export function isProgressItem(obj: any): obj is ProgressItem {
@@ -22,7 +23,13 @@
       number | 
       ProgressItem
     )[] = [],
-    labelVisible: boolean = true
+    labelVisible: boolean = true,
+    labelValueVisible: boolean = true,
+    labelTextVisible: boolean = true,
+    legendVisible: boolean = false,
+    legendValueVisible: boolean = true,
+    legendTextVisible: boolean = true,
+    hideLabelUnderPercentage: number | undefined = undefined
 
   let colors = [
     'rgb(var(--global-color-primary-500))',
@@ -59,38 +66,77 @@
   }).filter(p => p.value !== 0)
 </script>
 
-<div
-  class="stacked-container"
->
-  {#each progressesItems as progress}
-    <div
-      style:width={progress.percentage + '%'}
-      class="single-progress-container"
-    >
-      <ProgressBar
-        total={progress.value}
-        value={progress.value}
-        --progress-bar-highlight-color={progress.color}
-      ></ProgressBar>
-      {#if progress.label && labelVisible}
-        <div class="label">
-          <div class="label-text">{progress.label}</div>
-          <div class="label-value">
-            <div 
-              class="dot" 
-              style:background-color={progress.color || 'rgb(var(--global-color-background-300))'}
-            ></div>
-            <div class="value-text">
-              {progress.value}
-            </div>
+<div class="horizontal-stacked-progress">
+  <div
+    class="stacked-container"
+  >
+    {#each progressesItems as progress}
+      <div
+        style:width={progress.percentage + '%'}
+        class="single-progress-container"
+      >
+        <ProgressBar
+          total={progress.value}
+          value={progress.value}
+          --progress-bar-highlight-color={progress.color}
+          valueTooltip
+          valueTooltipLabel={progress.valueLabel || progress.value}
+        ></ProgressBar>
+        {#if progress.label && labelVisible && (hideLabelUnderPercentage === undefined || progress.percentage > hideLabelUnderPercentage)}
+          <div class="label">
+            {#if labelTextVisible}
+              <div class="label-text">
+                {progress.label}
+              </div>
+            {/if}
+            {#if labelValueVisible}
+              <div class="label-value">
+                <div 
+                  class="dot" 
+                  style:background-color={progress.color || 'rgb(var(--global-color-background-300))'}
+                ></div>
+                <div class="value-text">
+                  {progress.valueLabel || progress.value}
+                </div>
+              </div>
+            {/if}
           </div>
+        {/if}
+      </div>
+    {/each}
+  </div>
+  {#if legendVisible}
+    <div class="legend">
+      {#each progressesItems as progress}
+        <div class="legend-item">
+          <div
+            class="dot" 
+            style:background-color={progress.color || 'rgb(var(--global-color-background-300))'}
+          ></div>
+          {#if legendValueVisible}
+            <div class="value-text">
+              {progress.valueLabel || progress.value}
+            </div>
+          {/if}
+          {#if legendTextVisible}
+            <div class="label-text">
+              {progress.label}
+            </div>
+          {/if}
         </div>
-      {/if}
+      {/each}
     </div>
-  {/each}
+  {/if}
 </div>
 
 <style>
+  .horizontal-stacked-progress {
+    width: var(
+      --horizontal-stacked-progress-width,
+      var(--horizontal-stacked-progress-default-width)
+    );
+  }
+
   .stacked-container {
     overflow: hidden;
     display: flex;
@@ -98,10 +144,7 @@
       --horizontal-stacked-progress-gap,
       var(--horizontal-stacked-progress-default-gap)
     );
-    width: var(
-      --horizontal-stacked-progress-width,
-      var(--horizontal-stacked-progress-default-width)
-    );
+    width: 100%;
   }
 
   .single-progress-container {
@@ -116,7 +159,10 @@
   }
 
   .label {
-    margin-top: 12px;
+    margin-top: var(
+      --horizontal-stacked-progress-label-gap,
+      var(--horizontal-stacked-progress-default-label-gap)
+    );
   }
 
   .label-value {
@@ -131,8 +177,34 @@
   }
 
   .dot {
-    height: 10px;
-    width: 10px;
+    height: var(
+      --horizontal-stacked-progress-dot-height,
+      var(--horizontal-stacked-progress-default-dot-height)
+    );
+    width: var(
+      --horizontal-stacked-progress-dot-width,
+      var(--horizontal-stacked-progress-default-dot-width)
+    );
+    min-width: var(
+      --horizontal-stacked-progress-dot-min-width,
+      var(--horizontal-stacked-progress-default-dot-min-width)
+    );
     border-radius: 9999px;
+  }
+
+  .legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: var(
+      --horizontal-stacked-progress-legend-margin-top,
+      var(--horizontal-stacked-progress-default-legend-margin-top)
+    );
+  }
+
+  .legend-item {
+    display: flex;
+    gap: 8px;
+    align-items: center;
   }
 </style>
