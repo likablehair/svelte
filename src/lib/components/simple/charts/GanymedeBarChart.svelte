@@ -25,6 +25,7 @@
     CategoryScale
   );
 
+  type TooltipLabelParameter = Parameters<NonNullable<NonNullable<NonNullable<NonNullable<NonNullable<ComponentProps<Bar>['options']>['plugins']>['tooltip']>['callbacks']>['label']>>[0]
 
   export let data: {
       labels: string[],
@@ -49,7 +50,10 @@
     displayYGrid: boolean = true,
     lineWidth: number = 1,
     enableZoom: boolean = true,
-    resetZoom: boolean = false
+    resetZoom: boolean = false,
+    tooltipLabel: ((tooltip: TooltipLabelParameter) => string) | undefined = undefined,
+    yTickLabel: ((tickValue: string | number, index: number, ticks: any[]) => (string | number)) | undefined = undefined,
+    xTickLabel: ((tickValue: string | number, index: number, ticks: any[]) => (string | number)) | undefined = undefined
 
   let mounted: boolean = false,
     zoomMounted: boolean = false
@@ -103,6 +107,9 @@
           bodyFont: {
             size: 14,
             weight: "bold"
+          },
+          callbacks: {
+            label: tooltipLabel
           }
         },
         legend: {
@@ -138,7 +145,8 @@
             display: false
           },
           ticks: {
-            display: showYTicks
+            display: showYTicks,
+            callback: xTickLabel
           }
         },
         y: {
@@ -154,7 +162,8 @@
             display: false
           },
           ticks: {
-            display: showXTicks
+            display: showXTicks,
+            callback: yTickLabel
           }
         }
       }
