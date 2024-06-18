@@ -88,6 +88,8 @@ export { default as FilterValidator } from './utils/filters/validator'
 export { countriesList, countriesOptions, getCountryInfoByAlpha2 } from './utils/countries'
 
 export { default as GanymedeLineChart } from './components/simple/charts/GanymedeLineChart.svelte'
+export { default as GanymedeBarChart } from './components/simple/charts/GanymedeBarChart.svelte'
+export { default as GanymedePieChart } from './components/simple/charts/GanymedePieChart.svelte'
 
 export { default as mediaQuery } from './stores/mediaQuery'
 export { default as theme, toggleTheme, setTheme } from './stores/theme'
