@@ -534,8 +534,8 @@
                       --button-width="100%"
                       --button-box-shadow="none"
                       --button-padding="10px 0px 10px 0px"
-                      --button-background-color="rgb(var(--global-color-grey-50))"
-                      --button-color="rgb(var(--global-color-primary-500))"
+                      --button-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
+                      --button-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
                       --button-border-radius="0px 0px 0px 0px"
                       on:click={() => {mobileOpen = false; closeFilterMenu(200)}}
                     >{cancelFilterLabel}</Button>
@@ -609,8 +609,8 @@
               <div class="footer">
                 <div class="actions" style:padding-bottom={mAndDown ? '20px' : undefined}>
                   <Button
-                    --button-color="rgb(var(--global-color-primary-400))"
-                    --button-background-color="transparent"
+                    --button-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
+                    --button-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
                     --button-hover-background-color="rgb(var(--global-color-primary-500))"
                     --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
                     --button-box-shadow="none"
@@ -713,7 +713,8 @@
               <svelte:fragment slot="filter-actions" let:applyFilterDisabled let:filter>
                 <div class="sub-filter-button">
                   <Button
-                    --button-background-color="transparent"
+                    --button-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
+                    --button-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
                     --button-hover-background-color="rgb(var(--global-color-primary-500))"
                     --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
                     --button-box-shadow="none"
@@ -775,8 +776,8 @@
           <div class="footer">
             <div class="actions" style:padding-bottom={mAndDown ? '20px' : undefined}>
               <Button
-                --button-color="rgb(var(--global-color-primary-400))"
-                --button-background-color="transparent"
+                --button-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
+                --button-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
                 --button-hover-background-color="rgb(var(--global-color-primary-500))"
                 --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
                 --button-box-shadow="none"
