@@ -16,25 +16,11 @@
   } = {};
 	export { clazz as class };
 
-  /*
-    Styles:
-
-    --unstable-divided-side-bar-layout-content-padding
-    --unstable-divided-side-bar-layout-side-bar-width
-    --unstable-divided-side-bar-layout-side-bar-border-color
-    --unstable-divided-side-bar-layout-side-bar-padding
-    --unstable-divided-side-bar-layout-header-menu-height
-    --unstable-divided-side-bar-layout-header-menu-border-color
-    --unstable-divided-side-bar-layout-header-menu-padding
-    --unstable-divided-side-bar-layout-inner-header-menu-background-color
-    --unstable-divided-side-bar-layout-drawer-background-color
-    --unstable-divided-side-bar-layout-drawer-width
-  */
-
   export let drawerOpened: boolean = false,
     expandOn: 'hover' | 'click' | 'none' = 'hover',
     options: Option[] = [],
-    selectedIndex: number | undefined = undefined
+    selectedIndex: number | undefined = undefined,
+    sidebarExpanded: boolean = false
 
   let dispatch = createEventDispatcher<{
     'drawer-change': {
@@ -63,9 +49,6 @@
       option: option
     })
   }
-
-
-  let sidebarExpanded: boolean = false
 
   $: $sidebarOpened = sidebarExpanded
 </script>
@@ -152,6 +135,8 @@
         on:keypress={handleOverlayClick}
         class:visible={drawerOpened}
         class="overlay {clazz.overlay || ''}"
+        role="presentation"
+        tabindex="-1"
       ></div>
       <div
         class="content"
