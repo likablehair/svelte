@@ -150,6 +150,7 @@
       class:fade-out={transition == 'fade' && !localOpen && hasBeenOpened}
 
       class:hidden={!localOpen && !hasBeenOpened}
+      class:hidden-far-behind={!localOpen}
     >
       <slot name="top-right" />
     </div>
@@ -176,6 +177,7 @@
       class:fade-out={transition == 'fade' && !localOpen && hasBeenOpened}
 
       class:hidden={!localOpen && !hasBeenOpened}
+      class:hidden-far-behind={!localOpen}
     >
       <slot name="center-left" />
     </div>
@@ -202,7 +204,7 @@
       class:fade-out={transition == 'fade' && !localOpen && hasBeenOpened}
 
       class:hidden={!localOpen}
-      class:hidden-behind={!localOpen}
+      class:hidden-far-behind={!localOpen}
     >
       <slot />
     </div>
@@ -229,6 +231,7 @@
       class:fade-out={transition == 'fade' && !localOpen && hasBeenOpened}
 
       class:hidden={!localOpen && !hasBeenOpened}
+      class:hidden-far-behind={!localOpen}
     >
       <slot name="center-right" />
     </div>
@@ -300,6 +303,10 @@
 
   .hidden-behind {
     z-index: -200 !important;
+  }
+
+  .hidden-far-behind {
+    z-index: -250 !important;
   }
 
   /* Fly down animation */
