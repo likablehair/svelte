@@ -113,14 +113,14 @@
     class="overlay-container"
     class:overlay-container-active={localOpen}
     class:overlay-container-deactive={!localOpen}
-    class:hidden-behind={!localOpen && !hasBeenOpened}
+    class:hidden-behind={!localOpen}
     bind:this={dialogElement}
   >
     <div
       style:background-color={_overlayColor}
       class="overlay"
       class:overlay-active={localOpen}
-      class:hidden-behind={!localOpen && !hasBeenOpened}
+      class:hidden-behind={!localOpen}
       on:click={handleOverlayClick}
       on:keypress={handleOverlayClick}
       on:touchmove|preventDefault={() => {}}
