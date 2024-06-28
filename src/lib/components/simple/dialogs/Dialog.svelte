@@ -125,6 +125,8 @@
       on:keypress={handleOverlayClick}
       on:touchmove|preventDefault={() => {}}
       on:wheel|preventDefault={() => {}}
+      role="presentation"
+      tabindex="-1"
     />
     <div
       style:position="absolute"
@@ -155,6 +157,8 @@
       style:z-index={zIndex + 1}
       on:click|stopPropagation
       on:keypress|stopPropagation
+      role="presentation"
+      tabindex="-1"
 
       class:fly-down-in={transition == 'fly-down' && localOpen}
       class:fly-down-out={transition == 'fly-down' && !localOpen && hasBeenOpened}
@@ -179,6 +183,8 @@
       style:z-index={zIndex + 1}
       on:click|stopPropagation
       on:keypress|stopPropagation
+      role="presentation"
+      tabindex="-1"
 
       class:fly-down-in={transition == 'fly-down' && localOpen}
       class:fly-down-out={transition == 'fly-down' && !localOpen && hasBeenOpened}
@@ -195,7 +201,8 @@
       class:fade-in={transition == 'fade' && localOpen}
       class:fade-out={transition == 'fade' && !localOpen && hasBeenOpened}
 
-      class:hidden={!localOpen && !hasBeenOpened}
+      class:hidden={!localOpen}
+      class:hidden-behind={!localOpen}
     >
       <slot />
     </div>
@@ -203,6 +210,8 @@
       style:z-index={zIndex + 1}
       on:click|stopPropagation
       on:keypress|stopPropagation
+      role="presentation"
+      tabindex="-1"
 
       class:fly-down-in={transition == 'fly-down' && localOpen}
       class:fly-down-out={transition == 'fly-down' && !localOpen && hasBeenOpened}
