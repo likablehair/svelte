@@ -1,13 +1,11 @@
 <script lang="ts">
-  import IMask, { InputMask, type FactoryArg } from 'imask';
+  import IMask, { InputMask } from 'imask';
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
-  import DatePicker from "$lib/components/simple/dates/DatePicker.svelte";
   import Menu from "$lib/components/simple/common/Menu.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import { onMount, type ComponentProps } from 'svelte';
   import { DateTime } from 'luxon'
   import { createEventDispatcher } from 'svelte';
-  import type { DateStat } from '../../simple/dates/utils';
   import MediaQuery from '../../simple/common/MediaQuery.svelte';
   import Dialog from '../../simple/dialogs/Dialog.svelte';
     import YearSelector from '$lib/components/simple/dates/YearSelector.svelte';
@@ -81,6 +79,7 @@
   function handleInputChange(event: any) {
     setTimeout(() => {
       const typedValue = mask.value
+      console.log(typedValue)
 
       if(typedValue !== undefined && typedValue !== null) {
         // find year
@@ -88,6 +87,8 @@
         const year = typedValue.substring(yearIndex, yearIndex + 4)
         if(year.length == 4) {
           selectedYear = Number(year)
+        } else if(year.length == 0) {
+          selectedYear = undefined
         }
 
         dispatch('input', {

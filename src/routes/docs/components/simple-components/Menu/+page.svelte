@@ -2,7 +2,6 @@
   import Button from "$lib/components/simple/buttons/Button.svelte";
   import Menu from "$lib/components/simple/common/Menu.svelte";
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
-  import colors from "../../../stores/colors"
   import PropsViewer from "../../PropsViewer.svelte";
   import SlotsViewer from "../../SlotsViewer.svelte";
 
@@ -38,9 +37,6 @@
 <div class="example">
   <div style:width="fit-content" bind:this={activator}>
     <Button
-      backgroundColor={$colors.primary}
-      color={$colors.background}
-      hoverBackgroundColor={$colors.secondary}
       width="200px"
       maxWidth="90vw"
       on:click={(e) => handleButtonClick(e)}

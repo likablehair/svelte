@@ -2,13 +2,18 @@
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
   import YearPickerTextfield from "$lib/components/composed/forms/YearPickerTextField.svelte";
+
+  let selectedYear: number
 </script>
 
 <h1>YearPickerTextField</h1>
 <ComponentSubtitle>If you want a year, you'll have a year.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
-  <YearPickerTextfield></YearPickerTextfield>
+  <div>Anno selezionato: {selectedYear}</div>
+  <YearPickerTextfield
+    bind:selectedYear={selectedYear}
+  ></YearPickerTextfield>
 </div>
 <h2>Props</h2>
 <PropsViewer props={[
@@ -36,7 +41,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 2px;
+    flex-direction: column;
+    gap: 24px;
     margin-bottom: 20px;
   }
 </style>
