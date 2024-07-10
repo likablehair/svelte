@@ -13,6 +13,8 @@
   <div>Anno selezionato: {selectedYear}</div>
   <YearPickerTextfield
     bind:selectedYear={selectedYear}
+    minYearInRange={1990}
+    maxYearInRange={new Date().getFullYear()}
   ></YearPickerTextfield>
 </div>
 <h2>Props</h2>

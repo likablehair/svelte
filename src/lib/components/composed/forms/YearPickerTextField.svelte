@@ -79,7 +79,6 @@
   function handleInputChange(event: any) {
     setTimeout(() => {
       const typedValue = mask.value
-      console.log(typedValue)
 
       if(typedValue !== undefined && typedValue !== null) {
         // find year
@@ -203,6 +202,9 @@
           bind:selectedYear={selectedYear}
           on:click={handleYearSelect}
           {disabled}
+          selectableYears={[...Array((maxYearInRange - minYearInRange) + 1).keys()].map((v) => {
+            return minYearInRange + v
+          })}
         ></YearSelector>
       </div>
     </Menu>
