@@ -131,6 +131,8 @@
       on:applyFilter={handleFiltersChange}
       on:removeFilter={handleFiltersChange}
       on:removeAllFilters={handleFiltersChange}
+      on:removeFilter
+      on:removeAllFilter
       --filters-default-wrapper-width="100%"
       {lang}
       {editFilterMode}
