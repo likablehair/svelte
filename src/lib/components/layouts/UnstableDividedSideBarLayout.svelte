@@ -116,7 +116,14 @@
                     --icon-default-size="1.3rem"
                     deletable={false}
                     on:select={(e) => handleMenuSelection(e.detail.option)}
-                  ></ColorInvertedSelector>
+                  >
+                    <svelte:fragment slot="before-prepend" let:option let:index>
+                      <slot name="before-prepend" {option} {index}></slot>
+                    </svelte:fragment>
+                    <svelte:fragment slot="after-prepend" let:option let:index>
+                      <slot name="after-prepend" {option} {index}></slot>
+                    </svelte:fragment>
+                  </ColorInvertedSelector>
                 </div>
               </slot>
             </div>

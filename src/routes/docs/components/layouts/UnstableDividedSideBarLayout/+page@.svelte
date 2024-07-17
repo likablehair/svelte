@@ -107,7 +107,8 @@
           .where("categories.name", value);
       },
     },
-  ];
+  ],
+  drawerOpened: boolean = false;
 </script>
 
 <UnstableDividedSideBarLayout
@@ -119,7 +120,15 @@
     { label: "Wallet", name: "wallet", icon: "mdi-newspaper" },
     { label: "News", name: "news", icon: "mdi-store" },
   ]}
+  bind:drawerOpened
 >
+  <svelte:fragment slot="after-prepend" let:option let:index>
+    {#if option.name == "market"}
+      <div class="number-container {drawerOpened ? 'far' : 'near'}">
+        <div class="number">1</div>
+      </div>
+    {/if}
+  </svelte:fragment>
   <PaginatedTable
     filters={filters}
     headers={headers}
@@ -150,4 +159,29 @@
 </UnstableDividedSideBarLayout>
 
 <style>
+  .number-container {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+  }
+  .far {
+    top: -8px;
+    right: -40px;
+  }
+  .near {
+    top: -4px;
+    right: -4px;
+  }
+  .number {
+    background-color: limegreen;
+    color: #000;
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 9999px;
+    height: 12px;
+    width: 12px;
+  }
+
 </style>
