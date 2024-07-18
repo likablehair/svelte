@@ -117,11 +117,21 @@
                     deletable={false}
                     on:select={(e) => handleMenuSelection(e.detail.option)}
                   >
-                    <svelte:fragment slot="before-prepend" let:option let:index>
-                      <slot name="before-prepend" {option} {index}></slot>
+                    <svelte:fragment slot="prepend" let:option let:handleClickClose let:index>
+                      <slot name="prepend" {option} {handleClickClose} {index}>
+                        {#if !!option.icon}
+                          <Icon
+                            name={option.icon}
+                          ></Icon>
+                        {/if}
+                      </slot>
                     </svelte:fragment>
-                    <svelte:fragment slot="after-prepend" let:option let:index>
-                      <slot name="after-prepend" {option} {index}></slot>
+                    <svelte:fragment slot="option" let:option>
+                      <slot name="option" {option}>
+                        <div class="label">
+                          {@html option.label}
+                        </div>
+                      </slot>
                     </svelte:fragment>
                   </ColorInvertedSelector>
                 </div>
@@ -178,6 +188,14 @@
     z-index: 10;
     overflow: clip;
     transition: all .2s cubic-bezier(.4,0,.2,1);
+  }
+
+  .label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    position: relative;
   }
 
   @media (min-width: 1024.1px) {

@@ -69,20 +69,18 @@
         <div class="icon-and-title">
           {#if !!$$slots.prepend || !!option.icon}
             <div>
-              <slot name="before-prepend" {option} {index}></slot>
-              <slot name="prepend" {option} {handleClickClose}>
+              <slot name="prepend" {option} {handleClickClose} {index}>
                 {#if !!option.icon}
                   <Icon
                     name={option.icon}
                   ></Icon>
                 {/if}
               </slot>
-              <slot name="after-prepend" {option} {index}></slot>
             </div>
           {/if}
           <slot name="option" {option}>
             <div class="label">
-              {@html option.label}
+              {option.label}
             </div>
           </slot>
         </div>

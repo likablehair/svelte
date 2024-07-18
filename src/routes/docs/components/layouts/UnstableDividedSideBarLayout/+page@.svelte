@@ -4,6 +4,7 @@
   import type { Filter } from "$lib/utils/filters/filters";
   import type { Header } from "$lib/components/simple/lists/SimpleTable.svelte";
   import PaginatedTable from "$lib/components/composed/list/PaginatedTable.svelte";
+  import Icon from "$lib/components/simple/media/Icon.svelte";
 
   let headers: Header[] = [
     {
@@ -122,7 +123,10 @@
   ]}
   bind:drawerOpened
 >
-  <svelte:fragment slot="after-prepend" let:option let:index>
+  <svelte:fragment slot="prepend" let:option let:handleClickClose>
+    {#if !!option.icon}
+      <Icon name={option.icon} />
+    {/if}
     {#if option.name == "market"}
       <div class="number-container {drawerOpened ? 'far' : 'near'}">
         <div class="number">1</div>
