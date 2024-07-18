@@ -123,12 +123,12 @@
   ]}
   bind:drawerOpened
 >
-  <svelte:fragment slot="prepend" let:option let:handleClickClose>
+  <svelte:fragment slot="prepend" let:option let:handleClickClose let:sidebarExpanded>
     {#if !!option.icon}
       <Icon name={option.icon} />
     {/if}
     {#if option.name == "market"}
-      <div class="number-container {drawerOpened ? 'far' : 'near'}">
+      <div class="number-container {sidebarExpanded ? 'far' : 'near'}">
         <div class="number">1</div>
       </div>
     {/if}
