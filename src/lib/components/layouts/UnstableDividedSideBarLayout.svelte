@@ -118,7 +118,7 @@
                     on:select={(e) => handleMenuSelection(e.detail.option)}
                   >
                     <svelte:fragment slot="prepend" let:option let:handleClickClose let:index>
-                      <slot name="prepend" {option} {handleClickClose} {index}>
+                      <slot name="prepend" {option} {handleClickClose} {index} {sidebarExpanded}>
                         {#if !!option.icon}
                           <Icon
                             name={option.icon}
