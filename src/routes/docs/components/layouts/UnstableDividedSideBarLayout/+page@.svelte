@@ -4,6 +4,7 @@
   import type { Filter } from "$lib/utils/filters/filters";
   import type { Header } from "$lib/components/simple/lists/SimpleTable.svelte";
   import PaginatedTable from "$lib/components/composed/list/PaginatedTable.svelte";
+  import Icon from "$lib/components/simple/media/Icon.svelte";
 
   let headers: Header[] = [
     {
@@ -107,7 +108,8 @@
           .where("categories.name", value);
       },
     },
-  ];
+  ],
+  drawerOpened: boolean = false;
 </script>
 
 <UnstableDividedSideBarLayout
@@ -119,7 +121,18 @@
     { label: "Wallet", name: "wallet", icon: "mdi-newspaper" },
     { label: "News", name: "news", icon: "mdi-store" },
   ]}
+  bind:drawerOpened
 >
+  <svelte:fragment slot="prepend" let:option let:handleClickClose let:sidebarExpanded>
+    {#if !!option.icon}
+      <Icon name={option.icon} />
+    {/if}
+    {#if option.name == "market"}
+      <div class="number-container {sidebarExpanded ? 'far' : 'near'}">
+        <div class="number">1</div>
+      </div>
+    {/if}
+  </svelte:fragment>
   <PaginatedTable
     filters={filters}
     headers={headers}
@@ -150,4 +163,29 @@
 </UnstableDividedSideBarLayout>
 
 <style>
+  .number-container {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+  }
+  .far {
+    top: -8px;
+    right: -40px;
+  }
+  .near {
+    top: -4px;
+    right: -4px;
+  }
+  .number {
+    background-color: limegreen;
+    color: #000;
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 9999px;
+    height: 12px;
+    width: 12px;
+  }
+
 </style>

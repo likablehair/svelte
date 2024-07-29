@@ -101,6 +101,7 @@
     }
   }
 ]
+  let value: string | number | undefined = undefined
 
   function handleFiltersChange(e: CustomEvent) {
     let filterBuilder: Builder = e.detail.builder
@@ -167,6 +168,7 @@
     searchBarColumns={['businessName', 'productName']}
     totalElements={40}
     on:filtersChange={handleFiltersChange}
+    on:removeFilter={(e) => {if(e.detail.filter.name == "productCategory") {value = undefined}}}
     editFilterMode="multi-edit"
     showActiveFilters={true}
     {calculateRowStyles}
@@ -175,7 +177,8 @@
   <svelte:fragment slot="custom-filter" let:filter let:updateFunction>
     {#if !!filter}
       {#if filter.name == 'productCategory'}
-        <SimpleTextField on:input={(e) => handleCustomInput(e, filter.name, updateFunction)}></SimpleTextField>
+        <label for="productCategory">Product Category</label>
+        <SimpleTextField name="productCategory" bind:value on:input={(e) => handleCustomInput(e, filter.name, updateFunction)}></SimpleTextField>
       {/if}
     {/if}
   </svelte:fragment>

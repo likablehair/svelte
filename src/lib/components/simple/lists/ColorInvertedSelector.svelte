@@ -59,7 +59,7 @@
   role="listbox"
 >
   {#each options as option, index}
-    <li>
+    <li >
       <button
         class:selected={selectedIndex == index}
         class="element {clazz?.element || ''} {selectedIndex == index ? clazz.selected : ''}"
@@ -69,7 +69,7 @@
         <div class="icon-and-title">
           {#if !!$$slots.prepend || !!option.icon}
             <div>
-              <slot name="prepend" {option} {handleClickClose}>
+              <slot name="prepend" {option} {handleClickClose} {index}>
                 {#if !!option.icon}
                   <Icon
                     name={option.icon}
@@ -143,6 +143,7 @@
       var(--color-inverted-selector-default-font-size)
     );
     max-width: 100%;
+    position: var(--color-inverted-selector-icon-and-title-position, relative);
   }
 
   .element {
@@ -168,6 +169,7 @@
     background-color: transparent;
     font-size: inherit;
     color: inherit;
+    position: var(--color-inverted-selector-element-position, relative);
   }
 
   .label {
@@ -175,6 +177,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     flex: 1;
+    position: relative;
   }
 
   .element:not(.selected):hover {
