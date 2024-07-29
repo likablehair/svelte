@@ -132,7 +132,7 @@
       on:removeFilter={handleFiltersChange}
       on:removeAllFilters={handleFiltersChange}
       on:removeFilter
-      on:removeAllFilter
+      on:removeAllFilters
       --filters-default-wrapper-width="100%"
       {lang}
       {editFilterMode}
