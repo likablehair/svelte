@@ -129,7 +129,7 @@
                     <svelte:fragment slot="option" let:option>
                       <slot name="option" {option}>
                         <div class="label">
-                          {@html option.label}
+                          {option.label}
                         </div>
                       </slot>
                     </svelte:fragment>
