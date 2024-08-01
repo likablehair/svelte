@@ -235,7 +235,7 @@
   role="button"
   tabindex="0"
 >
-  <slot name="selection-container" {values} {searchText} {disabled} {openMenu} {handleKeyDown}>
+  <slot name="selection-container" {values} {searchText} {disabled} {openMenu} {handleKeyDown} {unselect} {select}>
     <div
       class="selection-container"
     >
