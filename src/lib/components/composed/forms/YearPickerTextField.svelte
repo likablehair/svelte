@@ -97,16 +97,22 @@
     }, 30);
   }
 
-  function handleYearSelect(ev: CustomEvent<{
+  function handleYearClick(ev: CustomEvent<{
     year: number
   }>) {
-    if(!!selectedYear) {
-      mask.value = selectedYear.toString()
-    }
-
     dispatch('year-click', {
       year: ev.detail.year
     })
+  }
+
+  function handleYearChange(ev: CustomEvent<{
+    year: number | undefined
+  }>) {
+    if(!!selectedYear) {
+      mask.value = selectedYear.toString()
+    } else {
+      mask.value = ''
+    }
   }
 
   $: if(!!selectedYear) {
@@ -177,7 +183,8 @@
       >
         <YearSelector
           bind:selectedYear={selectedYear}
-          on:click={handleYearSelect}
+          on:click={handleYearClick}
+          on:change={handleYearChange}
           {disabled}
         ></YearSelector>
       </div>
@@ -200,7 +207,8 @@
       >
         <YearSelector
           bind:selectedYear={selectedYear}
-          on:click={handleYearSelect}
+          on:click={handleYearClick}
+          on:change={handleYearChange}
           {disabled}
           selectableYears={[...Array((maxYearInRange - minYearInRange) + 1).keys()].map((v) => {
             return minYearInRange + v

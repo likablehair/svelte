@@ -32,16 +32,25 @@
     click: {
       year: number;
     };
+    change: {
+      year: number | undefined
+    }
   }>();
 
   function handleYearClick(year: number) {
-    selectedYear = year;
-
-    scrollAtCenter(container, targetButtons[selectedYear], "smooth");
+    if(selectedYear === year) {
+      selectedYear = undefined
+    } else {
+      selectedYear = year;
+      scrollAtCenter(container, targetButtons[selectedYear], "smooth");
+    }
 
     dispatch("click", {
       year,
-    });
+    })
+    dispatch("change", {
+      year: selectedYear
+    })
   }
   import Button from "$lib/components/simple/buttons/Button.svelte";
 </script>
