@@ -173,7 +173,7 @@
     while(!!parent) {
       scroll += parent.scrollTop
       let parentPosition = getComputedStyle(parent).position
-      if(parentPosition === 'absolute' || parentPosition === 'fixed') break
+      if(parentPosition === 'absolute' || parentPosition === 'fixed' || parentPosition === 'relative') break
       parent = parent.parentElement
     }
     return scroll
@@ -186,7 +186,7 @@
       while(!!parent) {
         let parentPosition = getComputedStyle(parent).position
         parent.addEventListener('scroll', refreshMenuPosition)
-        if(parentPosition == 'absolute' || parentPosition == 'fixed') break
+        if(parentPosition == 'absolute' || parentPosition == 'fixed' || parentPosition === 'relative') break
         parent = parent.parentElement
       }
     }
@@ -280,7 +280,7 @@
 
   function getPositionedAncestor(elem: HTMLElement | null): HTMLElement | null {
     if (!elem) return null
-    if (['fixed', 'absolute', 'sticky'].includes(getComputedStyle(elem).position)) return elem
+    if (['fixed', 'absolute', 'sticky', 'relative'].includes(getComputedStyle(elem).position)) return elem
     return getPositionedAncestor(elem.parentElement)
   }
 
@@ -308,7 +308,7 @@
       const position = computedStyle.position;
       const display = computedStyle.display;
 
-      if((position === 'fixed' || position === 'absolute') && display === "flex") {
+      if((position === 'fixed' || position === 'absolute' || position === 'relative') && display === "flex") {
         const boundingClientRect = activatorParent.getBoundingClientRect();
         top = top + boundingClientRect.top
         left = left + boundingClientRect.left

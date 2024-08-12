@@ -85,6 +85,18 @@
     ></Dropdown>
   </div>
 </Dialog>
+<div 
+  style:position="relative"
+  style:display="flex"
+  style:justify-content="center"
+  style:align-items="center"
+  style:height="500px"
+>
+  <Dropdown 
+    {items}
+    multiple={true}
+  ></Dropdown>
+</div>
 <h2>Props</h2>
 <PropsViewer
   props={[
