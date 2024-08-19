@@ -39,6 +39,18 @@
       default: "true",
       description: "Gabbo aiutami.",
     },
+    {
+      name: "disabled",
+      type: "boolean",
+      default: "false",
+      description: "If set to false, the input will not accept new files."
+    },
+    {
+      name: "limit",
+      type: "number | undefined",
+      default: "undefined",
+      description: "If set it limits the number of files that can be uploaded. Exceding files will be ignored."
+    }
   ]}
   styleProps={[
     {

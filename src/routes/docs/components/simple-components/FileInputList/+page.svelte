@@ -10,10 +10,10 @@
 <ComponentSubtitle>Drop it like it's hot (the list).</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
-  <FileInputList 
-  --file-input-list-height="100%"
-  --file-input-list-width="100%"
-  --file-input-list-border-radius="10px"
+  <FileInputList
+    --file-input-list-height="100%"
+    --file-input-list-width="100%"
+    --file-input-list-border-radius="10px"
   />
 </div>
 <h2>Props</h2>
@@ -42,6 +42,18 @@
       default: "true",
       description: "Dai Gabbo.",
     },
+    {
+      name: "disabled",
+      type: "boolean",
+      default: "false",
+      description: "If set to false, the input will not accept new files."
+    },
+    {
+      name: "limit",
+      type: "number | undefined",
+      default: "undefined",
+      description: "If set it limits the number of files that can be uploaded. Exceding files will be ignored."
+    }
   ]}
   styleProps={[
     {
