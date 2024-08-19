@@ -13,7 +13,7 @@
     dropAreaActive: boolean = true,
     icon: string = "mdi-file-document",
     disabled: boolean = false,
-    limit: number | undefined = undefined;
+    maxFiles: number | undefined = undefined;
 
   let fileActive: File | null = null;
 
@@ -39,13 +39,13 @@
   <FileInput
     bind:files
     {persistOverUpload}
-    disabled={disabled || (limit !== undefined && files.length >= limit)}
+    disabled={disabled || (maxFiles !== undefined && files.length >= maxFiles)}
     --file-input-border-radius="var(--file-input-list-border-radius,var(--file-input-list-default-border-radius))"
     --file-input-background-color="var(--file-input-list-background-color,var(--file-input-list-default-background-color))"
     --file-input-color="var(--file-input-list-color,var(--file-input-list-default-color))"
     --file-input-height="var(--file-input-list-height,var(--file-input-list-default-height))"
     --file-input-width="var(--file-input-list-width,var(--file-input-list-default-width))"
-     {limit}
+     {maxFiles}
   >
     <span
       slot="body"

@@ -46,7 +46,7 @@
       description: "If set to false, the input will not accept new files."
     },
     {
-      name: "limit",
+      name: "maxFiles",
       type: "number | undefined",
       default: "undefined",
       description: "If set it limits the number of files that can be uploaded. Exceding files will be ignored."

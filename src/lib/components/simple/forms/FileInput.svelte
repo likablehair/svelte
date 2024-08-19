@@ -21,7 +21,7 @@
     placeholder: string | undefined = undefined,
     persistOverUpload : boolean = true,
     disabled : boolean = false,
-    limit: number | undefined = undefined;
+    maxFiles: number | undefined = undefined;
 
   let inputElement: HTMLElement | undefined = undefined;
   let dropAreaActive = false;
@@ -46,8 +46,8 @@
     let limitedFiles: File[]
 
     if (droppedFiles) {
-      if(limit !== undefined) {
-        let freeSlots = Math.max(0, limit - (files?.length || 0))
+      if(maxFiles !== undefined) {
+        let freeSlots = Math.max(0, maxFiles - (files?.length || 0))
         limitedFiles = Array.from(droppedFiles).slice(0, freeSlots)
       } else {
         limitedFiles = Array.from(droppedFiles)
@@ -71,8 +71,8 @@
     let limitedFiles: File[]
 
     if (selectedFiles) {
-      if(limit !== undefined) {
-        let freeSlots = Math.max(0, limit - (files?.length || 0))
+      if(maxFiles !== undefined) {
+        let freeSlots = Math.max(0, maxFiles - (files?.length || 0))
         limitedFiles = Array.from(selectedFiles).slice(0, freeSlots)
       } else {
         limitedFiles = Array.from(selectedFiles)
