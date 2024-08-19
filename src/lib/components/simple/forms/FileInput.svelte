@@ -20,8 +20,9 @@
   export let files: File[] | undefined = undefined,
     placeholder: string | undefined = undefined,
     persistOverUpload : boolean = true,
-    disabled : boolean = false;
-    
+    disabled : boolean = false,
+    maxFiles: number | undefined = undefined;
+
   let inputElement: HTMLElement | undefined = undefined;
   let dropAreaActive = false;
 
@@ -42,33 +43,50 @@
 
   function handleFileDrop(event: DragEvent) {
     let droppedFiles: FileList | undefined = event.dataTransfer?.files;
+    let limitedFiles: File[]
+
     if (droppedFiles) {
-      if (!persistOverUpload) files = Array.from(droppedFiles);
+      if(maxFiles !== undefined) {
+        let freeSlots = Math.max(0, maxFiles - (files?.length || 0))
+        limitedFiles = Array.from(droppedFiles).slice(0, freeSlots)
+      } else {
+        limitedFiles = Array.from(droppedFiles)
+      }
+
+      if (!persistOverUpload) files = limitedFiles;
       else
         files = files
-          ? [...files, ...Array.from(droppedFiles)]
-          : Array.from(droppedFiles);
+          ? [...files, ...limitedFiles]
+          : limitedFiles;
 
       dispatch("fileDrop", {
         nativeEvent: event,
-        files: Array.from(droppedFiles),
+        files: limitedFiles,
       });
     }
   }
 
   function handleFileFromInput(event: Event) {
     let selectedFiles: FileList | null = (<HTMLInputElement>event.target).files;
+    let limitedFiles: File[]
 
     if (selectedFiles) {
-      if (!persistOverUpload) files = Array.from(selectedFiles);
+      if(maxFiles !== undefined) {
+        let freeSlots = Math.max(0, maxFiles - (files?.length || 0))
+        limitedFiles = Array.from(selectedFiles).slice(0, freeSlots)
+      } else {
+        limitedFiles = Array.from(selectedFiles)
+      }
+
+      if (!persistOverUpload) files = limitedFiles;
       else
         files = files
-          ? [...files, ...Array.from(selectedFiles)]
-          : Array.from(selectedFiles);
+          ? [...files, ...limitedFiles]
+          : limitedFiles;
 
       dispatch("fileSelect", {
         nativeEvent: event,
-        files: Array.from(selectedFiles),
+        files: limitedFiles,
       });
     }
   }
@@ -136,7 +154,7 @@
   .drop-area > input {
     display: none;
   }
-  .drop-area:hover:not(.disabled) {    
+  .drop-area:hover:not(.disabled) {
     box-shadow: var(
     --file-input-focus-shadow,
     var(--file-input-default-focus-shadow)
