@@ -45,7 +45,8 @@
     --file-input-color="var(--file-input-list-color,var(--file-input-list-default-color))"
     --file-input-height="var(--file-input-list-height,var(--file-input-list-default-height))"
     --file-input-width="var(--file-input-list-width,var(--file-input-list-default-width))"
-     {maxFiles}
+    on:change
+    {maxFiles}
   >
     <span
       slot="body"

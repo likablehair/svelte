@@ -103,6 +103,7 @@
   }}
   class:disabled
   class="drop-area {clazz}"
+  role="presentation"
 >
   <slot name="body" active={dropAreaActive}>
     <span> { placeholder || 'Drop file here or click to upload'} </span>
@@ -113,6 +114,7 @@
     multiple
     bind:this={inputElement}
     on:input={handleFileFromInput}
+    on:change
     {disabled}
   />
 </div>
