@@ -68,6 +68,12 @@ const list: {
     type: 'composed',
     url: '/docs/components/composed-components/HorizontalStackedProgress'
   }, {
+    title: 'SimpleTimeLine',
+    description: 'Always simple timeline.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/SimpleTimeLine'
+  }, {
     title: 'IntersectionObserver',
     description: 'Get if there are intersection with the current viewport',
     status: 'stable',

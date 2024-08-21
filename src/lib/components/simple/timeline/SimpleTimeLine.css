@@ -1,0 +1,8 @@
+:root {
+  --simple-time-line-default-gap: 16px;
+  --simple-time-line-default-line-background: rgb(var(--global-color-background-200));
+  --simple-time-line-default-circle-width: 12px;
+  --simple-time-line-default-circle-height: 12px;
+  --simple-time-line-default-line-width: 2px;
+  --simple-time-line-default-circle-background-color: rgb(var(--global-color-primary-500));
+}

@@ -6,49 +6,32 @@
     imageUrl?: string;
     from?: Date;
     to?: Date;
-    /* eslint-disable  @typescript-eslint/no-explicit-any */
     data?: any;
   };
 </script>
 
 <script lang="ts">
   import { dateToString } from "$lib/components/simple/dates/utils";
+  import "../../../css/main.css";
+  import "./SimpleTimeLine.css";
 
   export let items: TimeLineItem[] = [],
     singleSided = false,
-    height: string | undefined = undefined,
-    width: string | undefined = undefined,
-    itemMarginTop = "15px",
-    itemMarginBottom = "0px",
-    firstItemMarginTop = "5px",
-    lastItemMarginBottom = "5px",
-    circleColor = "black",
-    circleDiameter = "15px",
-    timesWidth: string | undefined = undefined,
     circleAlignment: "top" | "center" | "bottom" = "top";
-
-  $: cssVariables = Object.entries({
-    "-divider-width": "48px",
-    "-central-line-left": singleSided
-      ? `calc(var(--simple-timeline-divider-width)/2)`
-      : "calc(50% - 1px)",
-    "-body-width": singleSided
-      ? `calc(100% - var(--simple-timeline-divider-width))`
-      : `calc(50% - var(--simple-timeline-divider-width) / 2)`,
-  })
-    .filter(([key]) => key.startsWith("-"))
-    .reduce((css, [key, value]) => {
-      return `${css}--simple-timeline${key}: ${value};`;
-    }, "");
 </script>
 
-<div style:height style:width style={cssVariables} class="container">
+<div
+  style:--simple-time-line-divider-width="48px"
+  style:--simple-time-line-central-line-left={singleSided
+    ? `calc(var(--simple-time-line-divider-width)/2)`
+    : "calc(50% - 0.5px)"}
+  style:--simple-time-line-body-width={singleSided
+    ? `calc(100% - var(--simple-time-line-divider-width))`
+    : `calc(50% - var(--simple-time-line-divider-width) / 2)`}
+  class="container"
+>
   {#each items as item, index}
     <div
-      style:margin-top={index == 0 ? firstItemMarginTop : itemMarginTop}
-      style:margin-bottom={index == items.length - 1
-        ? lastItemMarginBottom
-        : itemMarginBottom}
       style:flex-direction={singleSided || index % 2 == 0
         ? "row-reverse"
         : "row"}
@@ -58,7 +41,6 @@
         style:flex-direction={singleSided || index % 2 == 0
           ? "row"
           : "row-reverse"}
-        style:justify-content={"flex-start"}
         class="time-line-body"
       >
         <slot
@@ -71,7 +53,6 @@
               style:padding={singleSided || index % 2 == 0
                 ? "0px 20px 0px 0px"
                 : "0px 0px 0px 20px"}
-              style:width={timesWidth}
               class="time-line-times"
             >
               <slot name="times" {item} {dateToString}>
@@ -104,29 +85,22 @@
               </slot>
             </div>
           {/if}
-          <div class="time-line-infos">
+          <div
+            class="time-line-infos"
+            style:text-align={singleSided || index % 2 == 0 ? "left" : "right"}
+          >
             <slot
               name="infos"
               {item}
               alignment={!singleSided && index % 2 == 0 ? "right" : "left"}
             >
               {#if !!item.title}
-                <div
-                  style:text-align={singleSided || index % 2 == 0
-                    ? "left"
-                    : "right"}
-                  class="time-line-title"
-                >
+                <div class="time-line-title">
                   {item.title}
                 </div>
               {/if}
               {#if !!item.description}
-                <div
-                  style:text-align={singleSided || index % 2 == 0
-                    ? "left"
-                    : "right"}
-                  class="time-line-description"
-                >
+                <div class="time-line-description">
                   {item.description}
                 </div>
               {/if}
@@ -141,14 +115,7 @@
       </div>
       <div style:align-items={circleAlignment} class="time-line-divider">
         <slot name="circle" {item}>
-          <div
-            style="margin-top: 5px;"
-            style:background-color={circleColor}
-            style:height={circleDiameter}
-            style:width={circleDiameter}
-            style:z-index="5"
-            class="circle"
-          />
+          <div class="circle" />
         </slot>
       </div>
     </div>
@@ -158,18 +125,32 @@
 <style>
   .container {
     position: relative;
+    height: var(
+      --simple-time-line-height,
+      var(--simple-time-line-default-height)
+    );
+    width: var(--simple-time-line-width, var(--simple-time-line-default-width));
+    display: flex;
+    flex-direction: column;
+    gap: var(--simple-time-line-gap, var(--simple-time-line-default-gap));
   }
 
   .container::before {
     position: absolute;
-    left: var(--simple-timeline-central-line-left);
+    left: var(--simple-time-line-central-line-left);
     right: auto;
     top: 0;
     bottom: 0;
     height: 100%;
-    background: #6767678f;
+    background: var(
+      --simple-time-line-line-background,
+      var(--simple-time-line-default-line-background)
+    );
     content: "";
-    width: 2px;
+    width: var(
+      --simple-time-line-line-width,
+      var(--simple-time-line-default-line-width)
+    );
   }
 
   .time-line-times {
@@ -177,7 +158,21 @@
   }
 
   .circle {
-    border-radius: 50%;
+    border-radius: 9999px;
+    height: var(
+      --simple-time-line-circle-height,
+      var(--simple-time-line-default-circle-height)
+    );
+    width: var(
+      --simple-time-line-circle-width,
+      var(--simple-time-line-default-circle-width)
+    );
+    background-color: var(
+      --simple-time-line-circle-background-color,
+      var(--simple-time-line-default-circle-background-color)
+    );
+    z-index: 5;
+    margin-top: 4px;
   }
 
   .time-line-item {
@@ -196,12 +191,13 @@
   }
 
   .time-line-body {
-    width: var(--simple-timeline-body-width);
+    width: var(--simple-time-line-body-width);
+    justify-content: flex-start;
     display: flex;
   }
 
   .time-line-divider {
-    width: var(--simple-timeline-divider-width);
+    width: var(--simple-time-line-divider-width);
     display: flex;
     justify-content: center;
   }
