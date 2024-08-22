@@ -1,11 +1,11 @@
 <script context="module" lang="ts">
-  export type HeaderType = ColumnBoolean | 
-    ColumnString | 
-    ColumnNumber | 
-    ColumnDate | 
-    ColumnIcon | 
-    ColumnCheckBox | 
-    ColumnCustom 
+  export type HeaderType = ColumnBoolean |
+    ColumnString |
+    ColumnNumber |
+    ColumnDate |
+    ColumnIcon |
+    ColumnCheckBox |
+    ColumnCustom
 
   export type Header = {
     value: string
@@ -35,7 +35,7 @@
   import '../../../css/main.css'
   import './SimpleTable.css'
   import Icon from '../media/Icon.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import type { DateTime } from 'luxon';
   import type { ColumnBoolean, ColumnCheckBox, ColumnCustom, ColumnDate, ColumnIcon, ColumnNumber, ColumnString } from './columnTypes';
 
@@ -54,16 +54,43 @@
     },
     'rowClick': {
       item: Item
+    },
+    columnResize: {
+      id: string,
+      newWidthPx: number
     }
   }>()
 
   export let headers: Header[] = [],
     items: Item[] = [],
     sortedBy: string | undefined = undefined,
-    sortDirection: "asc" | "desc" = "asc";
+    sortDirection: "asc" | "desc" = "asc",
+    resizableColumns: boolean = false,
+    resizedColumnSizeWithPadding: { [value: string]: number } = {};
 
   export let calculateRowStyles: CalculateRowStyles | undefined = undefined;
   export let calculateRowClasses: CalculateRowClasses | undefined = undefined;
+
+  onMount(() => {
+    if(resizableColumns) {
+      for(const head of headers) {
+        let th = document.getElementById(head.value) as HTMLElement
+        let { paddingLeft, paddingRight } = getComputedStyle(th)
+        let widthWihtPadding: number
+        if(!!resizedColumnSizeWithPadding[head.value]) {
+          widthWihtPadding = resizedColumnSizeWithPadding[head.value]
+        } else {
+          widthWihtPadding = th.getBoundingClientRect().width
+          resizedColumnSizeWithPadding[head.value] = widthWihtPadding
+        }
+        let width = widthWihtPadding - parseFloat(paddingLeft) - parseFloat(paddingRight)
+        th.style.width = `${width}px`
+      }
+      let table = document.getElementsByClassName('table')[0] as HTMLElement
+      table.classList.add('resizable')
+    }
+  })
+
 
   function handleHeaderClick(header: Header) {
     if(header.sortable) {
@@ -91,20 +118,79 @@
   function formatDate(dateTime: DateTime, dateFormat: ColumnDate['params']): string  {
     return dateTime.setLocale(dateFormat.locale).toFormat(dateFormat.format)
   }
+
+
+  function resize(node: HTMLElement) {
+    let th: HTMLElement | null = node.parentElement
+    let thead: Element | null = document.getElementsByClassName('thead').item(0)
+
+    if(!!th && !!thead && thead instanceof HTMLElement) {
+      let resizing = false
+      let { width } = th.getBoundingClientRect()
+
+      node.addEventListener('mousedown', (e) => {
+        e.stopPropagation()
+        resizing = true
+        let { paddingLeft, paddingRight } = getComputedStyle(th)
+        width = th.getBoundingClientRect().width - parseFloat(paddingLeft) - parseFloat(paddingRight)
+      })
+
+      document.addEventListener('mouseup', (e) => {
+        e.stopPropagation()
+        resizing = false
+        let { paddingLeft, paddingRight } = getComputedStyle(th)
+        width = th.getBoundingClientRect().width - parseFloat(paddingLeft) - parseFloat(paddingRight)
+      })
+
+      document.addEventListener('mousemove', (e) => {
+        if(resizing) {
+          width += e.movementX
+          let { paddingLeft, paddingRight } = getComputedStyle(th)
+
+          let minWidth: string | undefined = headers.find(h => h.value === th.id)?.minWidth
+          let minWidthPx: number | undefined = undefined
+          if(!!minWidth && minWidth.endsWith('px')) {
+            minWidthPx = parseInt(minWidth, 10)
+          }
+
+          let actualMinWidth = (minWidthPx || 50) - parseFloat(paddingLeft) - parseFloat(paddingRight)
+          if(width > actualMinWidth) {
+            th.style.width = width + 'px'
+            resizedColumnSizeWithPadding[th.id] = th.getBoundingClientRect().width
+            dispatch('columnResize', {
+              id: th.id,
+              newWidthPx: width
+            })
+          }
+        }
+      })
+    }
+  }
+
 </script>
 
 {#if !!items && Array.isArray(items)}
-  <div class="simple-table-container {clazz.container || ''}">
+  <div class="simple-table-container {clazz.container || ''}" class:resizable={resizableColumns}>
     <table class="table">
       <thead class="thead {clazz.header || ''}">
         <tr>
           {#each headers as head}
             <th
+              tabindex="0"
               style:width={head.width}
               style:min-width={head.minWidth}
               class:sortable={head.sortable}
-              on:click={() => handleHeaderClick(head)}
+              on:mousedown={() => handleHeaderClick(head)}
+              on:keydown={(e) => {
+                if(e.key == 'Enter' || e.keyCode === 113) {
+                  handleHeaderClick(head)
+                }
+              }}
+              id={head.value}
             >
+              {#if resizableColumns}
+                <div class="resizer" use:resize></div>
+              {/if}
               <slot name="header" {head}>
                 <span class="header-label">
                   <slot name="headerLabel">
@@ -176,7 +262,7 @@
                   {:else}
                     {item[header.value]}
                   {/if}
-                {:else} 
+                {:else}
                   {item[header.value]}
                 {/if}
               </td>
@@ -195,6 +281,29 @@
 {/if}
 
 <style>
+  .simple-table-container.resizable {
+    overflow-x: auto;
+  }
+
+  .resizer {
+    width: 2px;
+    display: none;
+    position: absolute;
+    right: 5%;
+    top: 10%;
+    bottom: 10%;
+    z-index: 1000;
+    background-color: rgb(var(--simple-table-column-resizer-color, var(--global-color-contrast-400)));
+    cursor: col-resize;
+    background-clip: content-box;
+    padding: 0px 5px 0px 5px;
+  }
+
+  th:hover .resizer {
+    display: inline-block;
+  }
+
+
   .simple-table-container {
     width: var(--simple-table-width, var(--simple-table-default-width));
     min-width: var(
@@ -250,6 +359,10 @@
     cursor: pointer;
     transition: all 0.1s ease-in;
     user-select: none;
+  }
+
+  .table.resizable .thead th.sortable {
+    transition: none;
   }
 
   .thead th.sortable:hover {
@@ -326,10 +439,23 @@
     width: 100%;
   }
 
+  .table.resizable {
+    table-layout: fixed;
+    width: fit-content;
+  }
+
+  .table.resizable td, th {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
   th {
     text-align: start;
     padding-left: 10px;
     min-width: 100px;
+    position: relative;
+    user-select: none;
   }
 
   td {
