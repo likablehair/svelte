@@ -44,7 +44,10 @@
     searchBarPlaceholder: string = "Type something to search...",
     lang: 'it' | 'en' = 'en',
     editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit',
-    showActiveFilters: boolean = true
+    showActiveFilters: boolean = true,
+    resizableColumns: boolean = false,
+    resizedColumnSizeWithPadding: { [value: string]: number } = {};
+
 
   export let calculateRowStyles: CalculateRowStyles | undefined = undefined;
   export let calculateRowClasses: CalculateRowClasses | undefined = undefined;
@@ -159,6 +162,8 @@
     on:rowClick
     {calculateRowStyles}
     {calculateRowClasses}
+    {resizableColumns}
+    bind:resizedColumnSizeWithPadding
   >
     <svelte:fragment slot="header" let:head>
       <slot name="header" {head} >

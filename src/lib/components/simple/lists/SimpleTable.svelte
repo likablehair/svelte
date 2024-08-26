@@ -73,18 +73,20 @@
 
   onMount(() => {
     if(resizableColumns) {
-      for(const head of headers) {
+      for(const head of [...headers, { value: 'slot-append' }]) {
         let th = document.getElementById(head.value) as HTMLElement
-        let { paddingLeft, paddingRight } = getComputedStyle(th)
-        let widthWihtPadding: number
-        if(!!resizedColumnSizeWithPadding[head.value]) {
-          widthWihtPadding = resizedColumnSizeWithPadding[head.value]
-        } else {
-          widthWihtPadding = th.getBoundingClientRect().width
-          resizedColumnSizeWithPadding[head.value] = widthWihtPadding
+        if(!!th) {
+          let { paddingLeft, paddingRight } = getComputedStyle(th)
+          let widthWihtPadding: number
+          if(!!resizedColumnSizeWithPadding[head.value]) {
+            widthWihtPadding = resizedColumnSizeWithPadding[head.value]
+          } else {
+            widthWihtPadding = th.getBoundingClientRect().width
+            resizedColumnSizeWithPadding[head.value] = widthWihtPadding
+          }
+          let width = widthWihtPadding - parseFloat(paddingLeft) - parseFloat(paddingRight)
+          th.style.width = `${width}px`
         }
-        let width = widthWihtPadding - parseFloat(paddingLeft) - parseFloat(paddingRight)
-        th.style.width = `${width}px`
       }
       let table = document.getElementsByClassName('table')[0] as HTMLElement
       table.classList.add('resizable')
@@ -128,22 +130,8 @@
       let resizing = false
       let { width } = th.getBoundingClientRect()
 
-      node.addEventListener('mousedown', (e) => {
-        e.stopPropagation()
-        resizing = true
-        let { paddingLeft, paddingRight } = getComputedStyle(th)
-        width = th.getBoundingClientRect().width - parseFloat(paddingLeft) - parseFloat(paddingRight)
-      })
-
-      document.addEventListener('mouseup', (e) => {
-        e.stopPropagation()
-        resizing = false
-        let { paddingLeft, paddingRight } = getComputedStyle(th)
-        width = th.getBoundingClientRect().width - parseFloat(paddingLeft) - parseFloat(paddingRight)
-      })
-
-      document.addEventListener('mousemove', (e) => {
-        if(resizing) {
+      function mouseMoveHandler(e: MouseEvent) {
+        if(resizing && !!th) {
           width += e.movementX
           let { paddingLeft, paddingRight } = getComputedStyle(th)
 
@@ -163,7 +151,38 @@
             })
           }
         }
-      })
+      }
+
+      function mouseUpHandler(e: MouseEvent) {
+        if(!!th) {
+          e.stopPropagation()
+          resizing = false
+          let { paddingLeft, paddingRight } = getComputedStyle(th)
+          width = th.getBoundingClientRect().width - parseFloat(paddingLeft) - parseFloat(paddingRight)
+        }
+      }
+
+      function mouseDownHandler(e: MouseEvent) {
+        if(!!th) {
+          e.stopPropagation()
+          resizing = true
+          let { paddingLeft, paddingRight } = getComputedStyle(th)
+          width = th.getBoundingClientRect().width - parseFloat(paddingLeft) - parseFloat(paddingRight)
+        }
+      }
+
+      node.addEventListener('mousedown', mouseDownHandler)
+      document.addEventListener('mouseup', mouseUpHandler)
+      document.addEventListener('mousemove', mouseMoveHandler)
+
+
+      return {
+        destroy() {
+          node.removeEventListener('mousedown', mouseDownHandler)
+          document.removeEventListener('mouseup', mouseUpHandler)
+          document.removeEventListener('mousemove', mouseMoveHandler)
+        }
+      }
     }
   }
 
@@ -177,12 +196,12 @@
           {#each headers as head}
             <th
               tabindex="0"
-              style:width={head.width}
+              style={`${resizableColumns || !head.width ? '' : `width: ${head.width}`}`}
               style:min-width={head.minWidth}
               class:sortable={head.sortable}
               on:mousedown={() => handleHeaderClick(head)}
               on:keydown={(e) => {
-                if(e.key == 'Enter' || e.keyCode === 113) {
+                if(e.key == 'Enter') {
                   handleHeaderClick(head)
                 }
               }}
@@ -215,7 +234,7 @@
             </th>
           {/each}
           {#if $$slots.rowActions || $$slots.append}
-            <th>
+            <th id="slot-append">
               <slot name="append" index={-1} items={undefined} />
             </th>
           {/if}

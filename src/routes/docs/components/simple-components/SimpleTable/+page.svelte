@@ -41,7 +41,7 @@
         type:   {
           key:"string"
         },
-        minWidth: '200px',
+        minWidth: '160px',
         sortable: true
       }, {
         value: 'progress',
@@ -89,7 +89,7 @@
             format: "HH 'ore e' mm 'minuti",
           }
         }
-      },
+      }
     ]
 
 </script>
