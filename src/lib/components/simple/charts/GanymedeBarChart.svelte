@@ -53,7 +53,9 @@
     resetZoom: boolean = false,
     tooltipLabel: ((tooltip: TooltipLabelParameter) => string) | undefined = undefined,
     yTickLabel: ((tickValue: string | number, index: number, ticks: any[]) => (string | number)) | undefined = undefined,
-    xTickLabel: ((tickValue: string | number, index: number, ticks: any[]) => (string | number)) | undefined = undefined
+    xTickLabel: ((tickValue: string | number, index: number, ticks: any[]) => (string | number)) | undefined = undefined,
+    xTickStepSize: number | undefined = undefined,
+    yTickStepSize: number | undefined = undefined
 
   let mounted: boolean = false,
     zoomMounted: boolean = false
@@ -149,7 +151,8 @@
           },
           ticks: {
             display: showYTicks,
-            callback: xTickLabel
+            callback: xTickLabel,
+            stepSize: xTickStepSize
           }
         },
         y: {
@@ -166,7 +169,8 @@
           },
           ticks: {
             display: showXTicks,
-            callback: yTickLabel
+            callback: yTickLabel,
+            stepSize: yTickStepSize
           }
         }
       }
