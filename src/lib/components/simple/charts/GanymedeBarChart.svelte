@@ -62,13 +62,16 @@
     mounted = true
   })
 
-  let rgbTooltipColor: string | undefined = undefined
-  let rgbTooltipBackgroundColor: string | undefined = undefined
-  let rgbBackgroundColor: string | undefined = undefined
+  export let rgbTooltipColor: string | undefined = undefined
+  export let rgbTooltipBackgroundColor: string | undefined = undefined
+  export let rgbBackgroundColor: string | undefined = undefined
 
-  $: rgbTooltipColor = $theme.colors?.[$theme.active]['dark']['primary']['300']
-  $: rgbTooltipBackgroundColor = $theme.colors?.[$theme.active]['dark']['primary']['900']
-  $: rgbBackgroundColor = $theme.colors?.[$theme.active]['dark']['background']['200']
+  $: if(!rgbTooltipColor && !!$theme.colors?.[$theme.active]['dark']['primary']['300']) 
+    rgbTooltipColor = $theme.colors?.[$theme.active]['dark']['primary']['300']
+  $: if(!rgbTooltipBackgroundColor && !!$theme.colors?.[$theme.active]['dark']['primary']['900']) 
+    rgbTooltipBackgroundColor = $theme.colors?.[$theme.active]['dark']['primary']['900']
+  $: if(!rgbBackgroundColor && !!$theme.colors?.[$theme.active]['dark']['background']['200']) 
+    rgbBackgroundColor = $theme.colors?.[$theme.active]['dark']['background']['200']
 
   $: finalTooltipColor = !!rgbTooltipColor ? `rgb(${rgbTooltipColor}, .8)` : undefined
   $: finalTooltipBackgroundColor = !!rgbTooltipBackgroundColor ? `rgb(${rgbTooltipBackgroundColor})` : undefined
