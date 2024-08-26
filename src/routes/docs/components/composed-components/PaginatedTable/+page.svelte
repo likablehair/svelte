@@ -143,6 +143,7 @@
 <h2>Example</h2>
 <div class="example">
   <PaginatedTable
+    resizableColumns={true}
     filters={filters}
     headers={headers}
     items={[
@@ -198,6 +199,8 @@
   >
     <button>Ciao</button>
   </div>
+  <svelte:fragment slot="append">rowActions</svelte:fragment>
+  <svelte:fragment slot="rowActions">rowActions</svelte:fragment>
 </PaginatedTable>
 </div>
 <h2>Props</h2>

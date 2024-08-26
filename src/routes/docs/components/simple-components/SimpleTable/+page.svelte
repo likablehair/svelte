@@ -1,40 +1,34 @@
 <script lang="ts">
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
-  
-  import SimpleTable from "$lib/components/simple/lists/SimpleTable.svelte";
-
+  import SimpleTable, { type Header } from "$lib/components/simple/lists/SimpleTable.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import { DateTime } from "luxon";
-</script>
 
-<h1>SimpleTable</h1>
-<ComponentSubtitle>Grid beutiful view.</ComponentSubtitle>
-<h2>Example</h2>
-<div class="example">
-  <SimpleTable 
-    headers={[
+  let resizedColumnSizeWithPadding: { [value: string]: number } | undefined = undefined
+
+  let headers: Header[] = [
       // {
       //   value: 'true',
       //   label: 'New customer',
       //   type: 'checkbox',
-      //   additionalParams :{ 
+      //   additionalParams :{
       //     checkboxColor:'white',
       //     checkboxSize:'2.1rem'
       //   }
-      // }, 
+      // },
        {
         value: 'active',
         label: 'Active',
         type: {
           key:'icon',
-          params :{ 
+          params :{
             name:'mdi-check',
             color:'green',
             size:'2.1rem'
           }
         }
-      }, 
+      },
       {
         value: 'businessName',
         label: 'Business name',
@@ -47,13 +41,14 @@
         type:   {
           key:"string"
         },
-        sortable: true,
+        minWidth: '160px',
+        sortable: true
       }, {
         value: 'progress',
         label: 'Progress',
         type:   {
           key:"string"
-        },
+        }
       }, {
         value: 'rating',
         label: 'Rating',
@@ -67,54 +62,71 @@
         label: 'Start date ',
         type: {
           key:'date',
-          params :{ 
+          params :{
             locale: 'it',
             format: 'dd/MM/yyyy',
           }
         }
       },
       {
-        value: 'startDate',
+        value: 'activeDate',
         label: 'Active date [toLocaleString]',
         type: {
           key:'date',
-          params :{ 
+          params :{
             locale: 'en',
             format: 'MM-dd-yy',
           }
         }
-      },   
+      },
       {
-        value: 'startDate',
+        value: 'endDate',
         label: 'End date ',
         type: {
           key:'date',
-          params :{ 
+          params :{
             locale: 'it',
             format: "HH 'ore e' mm 'minuti",
           }
         }
-      },    
-    ]}
+      }
+    ]
+
+</script>
+
+<h1>SimpleTable</h1>
+<ComponentSubtitle>Grid beutiful view.</ComponentSubtitle>
+<h2>Example</h2>
+<div class="example">
+  <SimpleTable
+    resizableColumns={true}
+    bind:resizedColumnSizeWithPadding
+    {headers}
     items={[
       {
         businessName: 'GQ Creators',
         productName: 'Data Protection',
         progress: '339 sold',
         rating: 5,
-        startDate: DateTime.now()
+        startDate: DateTime.now(),
+        activeDate: DateTime.now(),
+        endDate: DateTime.now(),
       }, {
         businessName: 'Dribblers Agency',
         productName: 'Job Search',
         progress: '212 sold',
         rating: 4.5,
-        startDate: DateTime.now()
+        startDate: DateTime.now(),
+        activeDate: DateTime.now(),
+        endDate: DateTime.now(),
       }, {
         businessName: 'Popular My',
         productName: 'Financial Transactions',
         progress: '94 sold',
         rating: 4.2,
-        startDate: DateTime.now()
+        startDate: DateTime.now(),
+        activeDate: DateTime.now(),
+        endDate: DateTime.now()
       },
     ]}
   >
