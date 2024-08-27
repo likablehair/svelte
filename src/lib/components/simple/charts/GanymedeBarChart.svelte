@@ -55,7 +55,9 @@
     yTickLabel: ((tickValue: string | number, index: number, ticks: any[]) => (string | number)) | undefined = undefined,
     xTickLabel: ((tickValue: string | number, index: number, ticks: any[]) => (string | number)) | undefined = undefined,
     xTickStepSize: number | undefined = undefined,
-    yTickStepSize: number | undefined = undefined
+    yTickStepSize: number | undefined = undefined,
+    xMax: number | undefined = undefined,
+    yMax: number | undefined = undefined
 
   let mounted: boolean = false,
     zoomMounted: boolean = false
@@ -139,6 +141,7 @@
       },
       scales: {
         x: {
+          max: xMax,
           display: true,
           title: {
             display: true
@@ -150,12 +153,13 @@
             display: false
           },
           ticks: {
-            display: showYTicks,
+            display: showXTicks,
             callback: xTickLabel,
             stepSize: xTickStepSize
           }
         },
         y: {
+          max: yMax,
           display: displayYGrid,
           title: {
           },
@@ -168,7 +172,7 @@
             display: false
           },
           ticks: {
-            display: showXTicks,
+            display: showYTicks,
             callback: yTickLabel,
             stepSize: yTickStepSize
           }

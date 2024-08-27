@@ -56,7 +56,11 @@
     displayYGrid: boolean = true,
     lineWidth: number = 1,
     enableZoom: boolean = false,
-    resetZoom: boolean = false
+    resetZoom: boolean = false,
+    xTickStepSize: number | undefined = undefined,
+    yTickStepSize: number | undefined = undefined,
+    xMax: number | undefined = undefined,
+    yMax: number | undefined = undefined
 
   $: gridColor = 'rgb(' + (background || '200, 200, 200') + ', .3)'
 
@@ -112,7 +116,8 @@
             display: false
           },
           ticks: {
-            display: showYTicks
+            display: showYTicks,
+            stepSize: yTickStepSize
           }
         },
         y: {
@@ -128,7 +133,8 @@
             display: false
           },
           ticks: {
-            display: showXTicks
+            display: showXTicks,
+            stepSize: xTickStepSize
           }
         }
       }
