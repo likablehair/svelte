@@ -105,6 +105,7 @@
       },
       scales: {
         x: {
+          max: xMax,
           display: true,
           title: {
             display: true
@@ -121,6 +122,7 @@
           }
         },
         y: {
+          max: yMax,
           display: displayYGrid,
           title: {
           },
