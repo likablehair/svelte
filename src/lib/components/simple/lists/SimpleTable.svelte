@@ -155,7 +155,6 @@
 
       function mouseUpHandler(e: MouseEvent) {
         if(!!th) {
-          e.stopPropagation()
           resizing = false
           let { paddingLeft, paddingRight } = getComputedStyle(th)
           width = th.getBoundingClientRect().width - parseFloat(paddingLeft) - parseFloat(paddingRight)
@@ -316,6 +315,7 @@
     cursor: col-resize;
     background-clip: content-box;
     padding: 0px 5px 0px 5px;
+    box-sizing: content-box;
   }
 
   th:hover .resizer {
