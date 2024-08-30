@@ -74,20 +74,38 @@
   onMount(() => {
     if(resizableColumns) {
       for(const head of [...headers, { value: 'slot-append' }]) {
-        let th = document.getElementById(head.value) as HTMLElement
+        let th
+        if(head.value == 'slot-append') {
+          th = document.getElementsByClassName(head.value).item(0) as HTMLElement
+        } else {
+          th = document.getElementById(head.value) as HTMLElement
+        }
         if(!!th) {
-          let { paddingLeft, paddingRight } = getComputedStyle(th)
-          let widthWihtPadding: number
-          if(!!resizedColumnSizeWithPadding[head.value]) {
-            widthWihtPadding = resizedColumnSizeWithPadding[head.value]
+          let widthWihtPadding;
+          if (!!resizedColumnSizeWithPadding[head.value]) {
+            widthWihtPadding = resizedColumnSizeWithPadding[head.value];
           } else {
-            widthWihtPadding = th.getBoundingClientRect().width
-            resizedColumnSizeWithPadding[head.value] = widthWihtPadding
+            widthWihtPadding = th.getBoundingClientRect().width;
+            resizedColumnSizeWithPadding[head.value] = widthWihtPadding;
           }
-          let width = widthWihtPadding - parseFloat(paddingLeft) - parseFloat(paddingRight)
+        }
+      }
+
+      for(const head of [...headers, { value: 'slot-append' }]) {
+        let th
+        if(head.value == 'slot-append') {
+          th = document.getElementsByClassName(head.value).item(0) as HTMLElement
+        } else {
+          th = document.getElementById(head.value) as HTMLElement
+        }
+        if(!!th) {
+          let { paddingLeft, paddingRight } = getComputedStyle(th);
+          let width = resizedColumnSizeWithPadding[head.value] - parseFloat(paddingLeft) - parseFloat(paddingRight);
+          console.log(resizedColumnSizeWithPadding[head.value], paddingLeft, paddingRight, width)
           th.style.width = `${width}px`
         }
       }
+
       let table = document.getElementsByClassName('table')[0] as HTMLElement
       table.classList.add('resizable')
     }
@@ -233,7 +251,7 @@
             </th>
           {/each}
           {#if $$slots.rowActions || $$slots.append}
-            <th id="slot-append">
+            <th class="slot-append">
               <slot name="append" index={-1} items={undefined} />
             </th>
           {/if}
@@ -286,7 +304,7 @@
               </td>
             {/each}
             {#if $$slots.rowActions || $$slots.append}
-              <td class="{clazz.cell || ''}">
+              <td class="{clazz.cell || ''} append" style:width="fit-content">
                 <slot name="rowActions" index={i} {item} />
                 <slot name="append" index={i} {item} />
               </td>
@@ -299,6 +317,20 @@
 {/if}
 
 <style>
+
+  th.slot-append {
+    width: 1px;
+    min-width: unset;
+  }
+
+  .table.resizable .slot-append {
+    box-sizing: content-box;
+  }
+
+  .table.resizable td.append {
+    padding: 0;
+  }
+
   .simple-table-container.resizable {
     overflow-x: auto;
   }
@@ -475,6 +507,7 @@
     min-width: 100px;
     position: relative;
     user-select: none;
+    box-sizing: content-box;
   }
 
   td {

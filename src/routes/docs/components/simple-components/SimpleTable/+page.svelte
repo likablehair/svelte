@@ -136,6 +136,12 @@
           <Icon name="mdi-star" --icon-color="green"></Icon>
         {/if}
       </svelte:fragment>
+      <svelte:fragment slot="append" let:index>
+        {#if index == -1}
+          Append
+        {/if}
+      </svelte:fragment>
+      <svelte:fragment slot="rowActions">RowActions</svelte:fragment>
   </SimpleTable>
 </div>
 <h2>Props</h2>
