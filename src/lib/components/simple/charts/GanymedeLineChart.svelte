@@ -37,11 +37,12 @@
       labels: string[],
       datasets: {
         label: string,
-        data: number[],
+        data: (number | null)[],
         backgroundColor?: string,
         borderColor?: string,
         hoverBackgroundColor?: string[]
         tension?: number,
+        spanGaps?: boolean | number | undefined
       }[]
     } = {
       labels: [],
@@ -141,11 +142,13 @@
         }
       }
     }
+
+  $: realData = data as ComponentProps<Line>['data']
 </script>
 
 {#if zoomMounted || !enableZoom}
-  <Line
-    bind:data={data}
+  <Line 
+    bind:data={realData}
     options={chartOptions}
     bind:chart={chart}
   ></Line>
