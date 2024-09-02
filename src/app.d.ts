@@ -10,3 +10,7 @@ declare namespace svelte.JSX {
 
 declare module 'svelte-grid';
 declare module 'svelte-grid/build/helper/index.mjs';
+
+declare module '*.svelte' {
+  export { SvelteComponentDev as default } from 'svelte/internal';
+}
