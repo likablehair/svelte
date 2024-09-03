@@ -1,9 +1,7 @@
 <script lang="ts">
-  import FinalButton from "../../../FinalButton.svelte";
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
   import SlotsViewer from "../../SlotsViewer.svelte";
-  import colors from "../../../stores/colors";
   import EventsViewer from "../../EventsViewer.svelte";
 
   import LinkButton from "$lib/components/simple/buttons/LinkButton.svelte";

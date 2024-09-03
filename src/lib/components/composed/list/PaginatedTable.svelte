@@ -125,7 +125,6 @@
     if(!!sortedBy){
       builder.orderBy(sortedBy, sortDirection || 'asc')
     }
-
     return builder
   }
 
