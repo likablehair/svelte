@@ -1,0 +1,10 @@
+:root {
+    --radio-button-default-active-color: rgb(var(--global-color-primary-500));
+    --radio-button-default-active-inner-color: rgb(var(--global-color-grey-50));
+    --radio-button-default-focus-shadow: 2px rgb(var(--global-color-primary-500), .3);
+    --radio-button-default-border-color: rgb(var(--global-color-contrast-300), .2);
+    --radio-button-default-border-hover-color: rgb(var(--global-color-primary-500));
+    --radio-button-default-background-color: rgb(var(--global-color-background-200));
+    --radio-button-default-disabled-color: rgb(var(--global-color-background-200), .5);
+    --radio-button-default-disabled-active-color: rgb(var(--global-color-primary-400));
+}
