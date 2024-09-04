@@ -19,6 +19,12 @@
   {disabled}
   {checked}
   on:change
+  on:input
+  on:focus
+  on:blur
+  on:keydown
+  on:keypress
+  on:keyup
 />
 {#if label}
   <label for={id}>
