@@ -11,6 +11,7 @@
   import type { LabelMapper } from "./Filters.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import ToggleList from "$lib/components/composed/forms/ToggleList.svelte";
+  import { createEventDispatcher } from "svelte";
 
   export let filter: Filter | undefined = undefined,
     lang: 'en' | 'it' = 'en',
@@ -20,7 +21,8 @@
     forceApplyValid: boolean = false,
     editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit',
     tmpFilter: Filter | undefined = undefined,
-    mobile: boolean = false
+    mobile: boolean = false,
+    textfieldBorderRadius = "5px";
 
   let advancedModeOptions: Item[],
     advancedModeSelectedOptions: Item[] | undefined
@@ -108,6 +110,14 @@
     }
   }
 
+  const dispatch = createEventDispatcher<{
+		change: Filter | undefined
+	}>()
+  
+  function handleChangeValue() {       
+   dispatch('change', tmpFilter)  
+  }
+
 
 </script>
 
@@ -140,6 +150,8 @@
             type="text"
             placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
             --simple-textfield-width="100%"
+            --simple-textfield-border-radius={textfieldBorderRadius}
+            on:change={handleChangeValue}
           ></SimpleTextField>
         {:else if tmpFilter.type === "date" && tmpFilter.mode !== 'between'}
           <div>
@@ -150,6 +162,8 @@
               on:day-click={() => {calendarOpened = false}}
               --simple-textfield-width="100%"
               flipOnOverflow
+              --simple-textfield-border-radius={textfieldBorderRadius}
+              on:change={handleChangeValue}
             >
               <svelte:fragment slot="append-inner">
                 <Icon
@@ -171,6 +185,8 @@
               type="number"
               placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
               --simple-textfield-width="100%"
+              --simple-textfield-border-radius={textfieldBorderRadius}
+              on:change={handleChangeValue}
             ></SimpleTextField>
           </div>
         {:else if tmpFilter.type === "select" && (tmpFilter.view === undefined || tmpFilter.view === 'autocomplete')}
@@ -185,6 +201,8 @@
               --simple-textfield-width="0px"
               --simple-text-field-margin-left="0px"
               mobileDrawer={mobile}
+              --simple-textfield-border-radius={textfieldBorderRadius}
+              on:change={handleChangeValue}
             ></Autocomplete>
           </div>
         {:else if tmpFilter.type === "select" && (tmpFilter.view === 'toggle')}
@@ -206,6 +224,8 @@
               bind:menuOpened={calendarOpened}
               on:day-click={() => {calendarOpened = false}}
               --simple-textfield-width="100%"
+              --simple-textfield-border-radius={textfieldBorderRadius}
+              on:change={handleChangeValue}
             >
               <svelte:fragment slot="append-inner">
                 <Icon
@@ -229,6 +249,8 @@
               on:day-click={() => {calendarOpened2 = false}}
               --simple-textfield-width="100%"
               flipOnOverflow
+              --simple-textfield-border-radius={textfieldBorderRadius}
+              on:change={handleChangeValue}
             >
               <svelte:fragment slot="append-inner">
                 <Icon
@@ -250,6 +272,8 @@
               type="number"
               placeholder={betweenFromLabel}
               --simple-textfield-width="100%"
+              --simple-textfield-border-radius={textfieldBorderRadius}
+              on:change={handleChangeValue}
             ></SimpleTextField>
           </div>
           <div>
@@ -258,12 +282,15 @@
               type="number"
               placeholder={betweenToLabel}
               --simple-textfield-width="100%"
+              --simple-textfield-border-radius={textfieldBorderRadius}
+              on:change={handleChangeValue}
             ></SimpleTextField>
           </div>
         {:else if tmpFilter.type == 'bool'}
           <div class="bool-filter">
             <Checkbox
               bind:value={tmpFilter.value}
+              on:change={handleChangeValue}
             ></Checkbox>
             <span style:margin-left="10px">
               {tmpFilter.description}
