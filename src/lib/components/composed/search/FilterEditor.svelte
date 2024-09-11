@@ -162,7 +162,6 @@
               on:day-click={() => {calendarOpened = false}}
               --simple-textfield-width="100%"
               flipOnOverflow
-              
               on:change={handleChangeValue}
             >
               <svelte:fragment slot="append-inner">
@@ -185,7 +184,6 @@
               type="number"
               placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
               --simple-textfield-width="100%"
-              
               on:change={handleChangeValue}
             ></SimpleTextField>
           </div>
@@ -201,7 +199,6 @@
               --simple-textfield-width="0px"
               --simple-text-field-margin-left="0px"
               mobileDrawer={mobile}
-              
               on:change={handleChangeValue}
             ></Autocomplete>
           </div>
@@ -224,7 +221,6 @@
               bind:menuOpened={calendarOpened}
               on:day-click={() => {calendarOpened = false}}
               --simple-textfield-width="100%"
-              
               on:change={handleChangeValue}
             >
               <svelte:fragment slot="append-inner">
@@ -249,7 +245,6 @@
               on:day-click={() => {calendarOpened2 = false}}
               --simple-textfield-width="100%"
               flipOnOverflow
-              
               on:change={handleChangeValue}
             >
               <svelte:fragment slot="append-inner">
@@ -272,7 +267,6 @@
               type="number"
               placeholder={betweenFromLabel}
               --simple-textfield-width="100%"
-              
               on:change={handleChangeValue}
             ></SimpleTextField>
           </div>
@@ -282,15 +276,13 @@
               type="number"
               placeholder={betweenToLabel}
               --simple-textfield-width="100%"
-              
               on:change={handleChangeValue}
             ></SimpleTextField>
           </div>
         {:else if tmpFilter.type == 'bool'}
           <div class="bool-filter">
             <Checkbox
-              bind:value={tmpFilter.value}
-              on:change={handleChangeValue}
+              bind:value={tmpFilter.value}on:change={handleChangeValue}
             ></Checkbox>
             <span style:margin-left="10px">
               {tmpFilter.description}
