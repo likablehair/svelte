@@ -282,7 +282,8 @@
         {:else if tmpFilter.type == 'bool'}
           <div class="bool-filter">
             <Checkbox
-              bind:value={tmpFilter.value}on:change={handleChangeValue}
+              bind:value={tmpFilter.value}
+              on:change={handleChangeValue}
             ></Checkbox>
             <span style:margin-left="10px">
               {tmpFilter.description}
