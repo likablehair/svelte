@@ -95,7 +95,6 @@
 
     dropdownOpened = false;
     handleChangeValue()
-    console.log('pippo')
   }
 
   $: applyFilterDisabled = !Validator.isValid(tmpFilter) && !forceApplyValid
