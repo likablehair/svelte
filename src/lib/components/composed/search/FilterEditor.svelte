@@ -150,7 +150,6 @@
             type="text"
             placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
             --simple-textfield-width="100%"
-            
             on:change={handleChangeValue}
           ></SimpleTextField>
         {:else if tmpFilter.type === "date" && tmpFilter.mode !== 'between'}
