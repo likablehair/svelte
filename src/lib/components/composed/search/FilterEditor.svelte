@@ -94,6 +94,7 @@
     }
 
     dropdownOpened = false;
+    handleChangeValue()
   }
 
   $: applyFilterDisabled = !Validator.isValid(tmpFilter) && !forceApplyValid
