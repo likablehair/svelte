@@ -21,8 +21,7 @@
     forceApplyValid: boolean = false,
     editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit',
     tmpFilter: Filter | undefined = undefined,
-    mobile: boolean = false,
-    textfieldBorderRadius = "5px";
+    mobile: boolean = false;
 
   let advancedModeOptions: Item[],
     advancedModeSelectedOptions: Item[] | undefined
@@ -151,7 +150,7 @@
             type="text"
             placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
             --simple-textfield-width="100%"
-            --simple-textfield-border-radius={textfieldBorderRadius}
+            
             on:change={handleChangeValue}
           ></SimpleTextField>
         {:else if tmpFilter.type === "date" && tmpFilter.mode !== 'between'}
@@ -163,7 +162,7 @@
               on:day-click={() => {calendarOpened = false}}
               --simple-textfield-width="100%"
               flipOnOverflow
-              --simple-textfield-border-radius={textfieldBorderRadius}
+              
               on:change={handleChangeValue}
             >
               <svelte:fragment slot="append-inner">
@@ -186,7 +185,7 @@
               type="number"
               placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
               --simple-textfield-width="100%"
-              --simple-textfield-border-radius={textfieldBorderRadius}
+              
               on:change={handleChangeValue}
             ></SimpleTextField>
           </div>
@@ -202,7 +201,7 @@
               --simple-textfield-width="0px"
               --simple-text-field-margin-left="0px"
               mobileDrawer={mobile}
-              --simple-textfield-border-radius={textfieldBorderRadius}
+              
               on:change={handleChangeValue}
             ></Autocomplete>
           </div>
@@ -225,7 +224,7 @@
               bind:menuOpened={calendarOpened}
               on:day-click={() => {calendarOpened = false}}
               --simple-textfield-width="100%"
-              --simple-textfield-border-radius={textfieldBorderRadius}
+              
               on:change={handleChangeValue}
             >
               <svelte:fragment slot="append-inner">
@@ -250,7 +249,7 @@
               on:day-click={() => {calendarOpened2 = false}}
               --simple-textfield-width="100%"
               flipOnOverflow
-              --simple-textfield-border-radius={textfieldBorderRadius}
+              
               on:change={handleChangeValue}
             >
               <svelte:fragment slot="append-inner">
@@ -273,7 +272,7 @@
               type="number"
               placeholder={betweenFromLabel}
               --simple-textfield-width="100%"
-              --simple-textfield-border-radius={textfieldBorderRadius}
+              
               on:change={handleChangeValue}
             ></SimpleTextField>
           </div>
@@ -283,7 +282,7 @@
               type="number"
               placeholder={betweenToLabel}
               --simple-textfield-width="100%"
-              --simple-textfield-border-radius={textfieldBorderRadius}
+              
               on:change={handleChangeValue}
             ></SimpleTextField>
           </div>
