@@ -86,6 +86,7 @@ export { default as FilterBuilder } from './utils/filters/builder'
 export { default as FilterConverter } from './utils/filters/filters'
 export { default as FilterValidator } from './utils/filters/validator'
 export { countriesList, countriesOptions, getCountryInfoByAlpha2 } from './utils/countries'
+export { default as FilterEditor } from './components/composed/search/FilterEditor.svelte'
 
 export { default as GanymedeLineChart } from './components/simple/charts/GanymedeLineChart.svelte'
 export { default as GanymedeBarChart } from './components/simple/charts/GanymedeBarChart.svelte'

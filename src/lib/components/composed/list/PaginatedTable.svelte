@@ -58,7 +58,8 @@
   let dispatch = createEventDispatcher<{
     paginationChange: {
       rowsPerPage: number,
-      page: number
+      page: number,
+      builder: Builder
     },
     filtersChange: {
       builder: Builder
@@ -79,27 +80,15 @@
   }
 
   function handlePaginationChange() {
+    let builder = buildFilters()
+
     dispatch('paginationChange', {
-      rowsPerPage, page
+      rowsPerPage, page, builder
     })
   }
 
   function handleSearchChange(searchText: string | undefined) {
-    let converter = new Converter()
-    let builder: Builder
-    builder = converter.createBuilder({
-      filters: filters || []
-    })
-
-    if(!!searchText && !!searchBarColumns && searchBarColumns.length > 0) {
-
-      builder.where(b => {
-        b.where(searchBarColumns![0], 'ilike', '%' + searchText + '%')
-        for(let i = 1; i < searchBarColumns!.length; i += 1) {
-          b.orWhere(searchBarColumns![i], 'ilike', '%' + searchText + '%')
-        }
-      })
-    }
+    let builder = buildFilters({searchText})
 
     dispatch('filtersChange', {
       builder
@@ -109,9 +98,35 @@
   $: handleSearchChange(searchText)
 
   function handleFiltersChange() {
-    handleSearchChange(searchText)
+    let builder = buildFilters({searchText})
+
+    dispatch('filtersChange', {
+      builder
+    })
   }
 
+  function buildFilters(params?:{searchText?:string | undefined}){
+    let converter = new Converter()
+    let builder: Builder
+    builder = converter.createBuilder({
+      filters: filters || []
+    })
+
+    if(!!params?.searchText && !!searchBarColumns && searchBarColumns.length > 0) {
+
+      builder.where(b => {
+        b.where(searchBarColumns![0], 'ilike', '%' + params?.searchText + '%')
+        for(let i = 1; i < searchBarColumns!.length; i += 1) {
+          b.orWhere(searchBarColumns![i], 'ilike', '%' + params?.searchText + '%')
+        }
+      })
+    }
+
+    if(!!sortedBy){
+      builder.orderBy(sortedBy, sortDirection || 'asc')
+    }
+    return builder
+  }
 
 </script>
 
@@ -158,6 +173,7 @@
     bind:items
     bind:sortedBy
     bind:sortDirection
+    on:sort={handleFiltersChange}
     on:sort
     on:rowClick
     {calculateRowStyles}

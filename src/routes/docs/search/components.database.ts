@@ -319,6 +319,12 @@ const list: {
     status: 'beta',
     type: 'composed',
     url: '/docs/components/composed-components/TreeEditor'
+  }, {
+    title: 'RadioButton',
+    description: 'Tune in and choose you favorite station with our radio buttons.',
+    status: 'beta',
+    type: 'simple',
+    url: '/docs/components/simple-components/RadioButton'
   }
 ]
 
