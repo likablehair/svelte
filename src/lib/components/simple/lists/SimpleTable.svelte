@@ -101,7 +101,6 @@
         if(!!th) {
           let { paddingLeft, paddingRight } = getComputedStyle(th);
           let width = resizedColumnSizeWithPadding[head.value] - parseFloat(paddingLeft) - parseFloat(paddingRight);
-          console.log(resizedColumnSizeWithPadding[head.value], paddingLeft, paddingRight, width)
           th.style.width = `${width}px`
         }
       }
