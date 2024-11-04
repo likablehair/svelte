@@ -156,7 +156,7 @@ export default class Builder {
         kind: 'inBuilder',
         logicalOperator: logicalOperator,
         key: key,
-        children: inBuilder._modifiers.filter((el) => el.method == 'where' || el.method == 'select') as (WhereModifier | SelectModifier)[]
+        children: inBuilder._modifiers.filter((el) => el.method == 'where' || el.method == 'select' || el.method == 'join') as (WhereModifier | SelectModifier | JoinModifier)[]
       })
     } else {
       this._modifiers.push({

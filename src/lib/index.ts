@@ -103,3 +103,5 @@ export { default as StableDividedSideBarLayout } from './components/layouts/Stab
 export { default as UnstableDividedSideBarLayout } from './components/layouts/UnstableDividedSideBarLayout.svelte'
 
 export { default as Converter } from './utils/filters/filters'
+
+export { default as RadioButton } from './components/simple/forms/RadioButton.svelte'
