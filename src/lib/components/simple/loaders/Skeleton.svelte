@@ -1,67 +1,47 @@
-<script lang="ts" context="module">
-  export type SectionType = "image" | "text";
-</script>
-
 <script lang="ts">
-  type Section = {
-    type: SectionType;
-    height?: string;
-  };
-
-  export let sections: Section[] = [],
-    maxWidth: string | undefined = undefined,
-    maxHeight: string | undefined = undefined,
-    minWidth: string | undefined = undefined,
-    minHeight: string | undefined = undefined,
-    width = "100%",
-    height = "100%",
-    padding = "10px",
-    dark = false;
-
-  $: widthLessPadding = `calc(${width} - (${padding} * 2))`;
-  $: heightLessPadding = `calc(${height} - (${padding} * 2))`;
-  $: maxWidthLessPadding = `calc(${maxWidth} - (${padding} * 2))`;
-  $: maxHeightLessPadding = `calc(${maxHeight} - (${padding} * 2))`;
-  $: minWidthLessPadding = `calc(${minWidth} - (${padding} * 2))`;
-  $: minHeightLessPadding = `calc(${minHeight} - (${padding} * 2))`;
-  $: elementBackground = dark ? "#1a1a1a" : "#eee";
-  $: animationBackground = dark ? "#000000e6" : "#ffffffe6";
-  $: cardBackground = dark ? "#000000" : "#fff";
+  import '../../../css/main.css'
+  import './Skeleton.css'
 </script>
 
 <div
-  style:--skeleton-card-background={cardBackground}
-  style:--skeleton-animation-color={animationBackground}
-  style:width={widthLessPadding}
-  style:height={heightLessPadding}
-  style:max-width={maxWidthLessPadding}
-  style:max-height={maxHeightLessPadding}
-  style:min-width={minWidthLessPadding}
-  style:min-height={minHeightLessPadding}
-  style:padding
-  class="card"
->
-  {#each sections as section}
-    {#if section.type == "image"}
-      <div
-        style:height={section.height}
-        style:background={elementBackground}
-        class="skeleton-image"
-      />
-    {/if}
-  {/each}
-</div>
+  class="skeleton"
+></div>
 
 <style>
-  .skeleton-image {
-    margin-bottom: 10px;
-    border-radius: 5px;
-    overflow: hidden;
-    width: 100%;
-  }
 
-  .card {
-    background: var(--skeleton-card-background);
+  .skeleton {
+    background: var(
+      --skeleton-card-background,
+      var(--skeleton-default-card-background)
+    );
+    width: var(
+      --skeleton-card-width,
+      var(--skeleton-default-card-width)
+    );
+    height: var(
+      --skeleton-card-height,
+      var(--skeleton-default-card-height)
+    );
+    max-width: var(
+      --skeleton-card-max-width,
+      var(--skeleton-default-card-max-width)
+    );
+    max-height: var(
+      --skeleton-card-max-height,
+      var(--skeleton-default-card-max-height)
+    );
+    min-width: var(
+      --skeleton-card-min-width,
+      var(--skeleton-default-card-min-width)
+    );
+    min-height: var(
+      --skeleton-card-min-height,
+      var(--skeleton-default-card-min-height)
+    );
+    padding: var(
+      --skeleton-card-padding,
+      var(--skeleton-default-card-padding)
+    );
     position: relative;
     border-radius: 5px;
     box-shadow: 0 10px 100px rgba(0, 0, 0, 0.1);
@@ -77,19 +57,22 @@
     }
   }
 
-  .card::before {
+  .skeleton::before {
     content: "";
     position: absolute;
     background: linear-gradient(
       90deg,
       transparent,
-      var(--skeleton-animation-color),
+      var(
+        --skeleton-animation-color,
+        var(--skeleton-default-animation-color)
+      ),
       transparent
     );
     width: 50%;
     height: 100%;
     top: 0;
     left: 0;
-    animation: loading 1s infinite;
+    animation: loading 1.2s infinite;
   }
 </style>

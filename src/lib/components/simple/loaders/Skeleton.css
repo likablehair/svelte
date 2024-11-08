@@ -1,0 +1,6 @@
+:root {
+  --skeleton-default-card-background: rgb(var(--global-color-background-200));
+  --skeleton-default-animation-color: rgb(var(--global-color-background-400));
+  --skeleton-default-card-width: 100%;
+  --skeleton-default-card-height: 100%;
+}

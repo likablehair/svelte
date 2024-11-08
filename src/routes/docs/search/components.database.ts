@@ -62,6 +62,12 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/ProgressBar'
   }, {
+    title: 'Skeleton',
+    description: 'Bones in my closet.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Skeleton'
+  }, {
     title: 'HorizontalStackedProgress',
     description: 'Stacked progress.',
     status: 'stable',
