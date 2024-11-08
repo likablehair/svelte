@@ -34,7 +34,7 @@
     applyFilterLabel : string = lang == 'en' ? "Apply filter" : "Applica filtro",
     showActiveFilters: boolean = true,
     filterTitleLabel: string = lang == 'en' ? "Filter by" : "Filtra per",
-    dateLocale: Locale = 'en',
+    dateLocale: Locale = lang == 'en' ? 'en' : 'it',
     betweenSeparator: string = lang == 'en' ? "and" : "e",
     trueString: string = lang == 'en' ? "true" : "vero",
     falseString: string = lang == 'en' ? "false" : "falso",
