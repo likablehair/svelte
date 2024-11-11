@@ -1,4 +1,5 @@
 import type { Modifier } from "../builder"
+import type { FromModifier } from "./from"
 import type { JoinModifier } from "./join"
 import type { SelectModifier } from "./select"
 
@@ -49,7 +50,7 @@ type InBuilderWhere = {
   kind: 'inBuilder',
   logicalOperator?: 'and' | 'or' | 'andNot' | 'orNot',
   key: string,
-  children: (ObjectWhere | SimpleWhere | GroupedWhere | InWhere | ColumnWhere | JsonSupersetWhere | InBuilderWhere | NullWhere | SelectModifier | JoinModifier)[]
+  children: (ObjectWhere | SimpleWhere | GroupedWhere | InWhere | ColumnWhere | JsonSupersetWhere | InBuilderWhere | NullWhere | SelectModifier | JoinModifier | FromModifier)[]
 }
 
 type JsonSupersetWhere = {
