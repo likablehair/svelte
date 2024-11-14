@@ -22,6 +22,10 @@ export default class Builder {
     return lodash.cloneDeep(this._modifiers)
   }
 
+  public set modifiers(value: Modifier[]) {
+    this._modifiers = value
+  }
+
   public where(callback: (builder: Builder) => void): Builder
   public where(key: Record<string, WhereFilterValue>): Builder
   public where(key: string, value: WhereFilterValue): Builder
