@@ -333,50 +333,52 @@
       </Menu>
     {/key}
   {:else}
-    <MenuOrDrawer
-      {activator}
-      _width={localMenuWidth || ""}
-      _height={menuHeight}
-      _maxHeight="300px"
-      _boxShadow={menuBoxShadow}
-      _borderRadius={menuBorderRadius}
-      bind:open={menuOpened}
-      on:close
-    >
-      <ul
-        class={clazz.menu || ''}
-        style:background-color="rgb(var(--global-color-background-100))"
+    {#key filteredItems}
+      <MenuOrDrawer
+        {activator}
+        _width={localMenuWidth || ""}
+        _height={menuHeight}
+        _maxHeight="300px"
+        _boxShadow={menuBoxShadow}
+        _borderRadius={menuBorderRadius}
+        bind:open={menuOpened}
+        on:close
       >
-        {#each filteredItems as item, index}
-          <li class="item-{index}">
-            <slot
-              name="item"
-              {item}
-              {index}
-              selected={(values || []).findIndex((i) => {
-                return i.value == item.value;
-              }) != -1}
-            >
-              <div
-                class:selection-item={true}
-                class:focused={index == focusedIndex}
-                class:selected={(values || []).findIndex((i) => {
+        <ul
+          class={clazz.menu || ''}
+          style:background-color="rgb(var(--global-color-background-100))"
+        >
+          {#each filteredItems as item, index}
+            <li class="item-{index}">
+              <slot
+                name="item"
+                {item}
+                {index}
+                selected={(values || []).findIndex((i) => {
                   return i.value == item.value;
                 }) != -1}
-                on:click={() => toggle(item)}
-                on:keypress={() => toggle(item)}
-                role="button"
-                tabindex="0"
               >
-                <slot name="item-label" {item}>
-                  {item.label}
-                </slot>
-              </div>
-            </slot>
-          </li>
-        {/each}
-      </ul>
-    </MenuOrDrawer>
+                <div
+                  class:selection-item={true}
+                  class:focused={index == focusedIndex}
+                  class:selected={(values || []).findIndex((i) => {
+                    return i.value == item.value;
+                  }) != -1}
+                  on:click={() => toggle(item)}
+                  on:keypress={() => toggle(item)}
+                  role="button"
+                  tabindex="0"
+                >
+                  <slot name="item-label" {item}>
+                    {item.label}
+                  </slot>
+                </div>
+              </slot>
+            </li>
+          {/each}
+        </ul>
+      </MenuOrDrawer>
+    {/key}
   {/if}
 </slot>
 
