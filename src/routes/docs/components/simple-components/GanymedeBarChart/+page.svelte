@@ -36,6 +36,8 @@
     enableZoom={true}
     lineWidth={0}
     bind:resetZoom={resetZoom}
+    rgbTooltipBackgroundColor={'255 0 0'}
+    rgbTooltipColor={'0 255 0'}
   ></GanymedeBarChart>
   <Button
     on:click={() => { resetZoom = true }}

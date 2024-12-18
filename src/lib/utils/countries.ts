@@ -243,7 +243,6 @@ export const countriesList = [
   { alpha2: "VU", name: "Vanuatu" },
   { alpha2: "WF", name: "Wallis and Futuna" },
   { alpha2: "WS", name: "Samoa" },
-  { alpha2: "XS", name: "Serbia" },
   { alpha2: "YE", name: "Yemen" },
   { alpha2: "YT", name: "Mayotte" },
   { alpha2: "ZA", name: "South Africa" },

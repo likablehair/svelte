@@ -79,10 +79,9 @@
   $: if(!rgbBackgroundColor && !!$theme.colors?.[$theme.active]['dark']['background']['200']) 
     rgbBackgroundColor = $theme.colors?.[$theme.active]['dark']['background']['200']
 
-  $: finalTooltipColor = !!rgbTooltipColor ? `rgb(${rgbTooltipColor}, .8)` : undefined
+  $: finalTooltipColor = !!rgbTooltipColor ? `rgb(${rgbTooltipColor})` : undefined
   $: finalTooltipBackgroundColor = !!rgbTooltipBackgroundColor ? `rgb(${rgbTooltipBackgroundColor})` : undefined
   $: finalBackgroundColor = !!rgbBackgroundColor ? `rgb(${rgbBackgroundColor}, .3)` : undefined  
-
 
   let chart: ComponentProps<Bar>['chart']
   $: if(!!chart && !!enableZoom && !!resetZoom) {
