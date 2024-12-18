@@ -68,7 +68,6 @@ export const countriesList = [
   { alpha2: "ER", name: "Eritrea" },
   { alpha2: "ES", name: "Spain" },
   { alpha2: "ET", name: "Ethiopia" },
-  { alpha2: "EU", name: "European Union" },
   { alpha2: "FI", name: "Finland" },
   { alpha2: "FJ", name: "Fiji" },
   { alpha2: "FK", name: "Falkland Islands (Malvinas)" },
