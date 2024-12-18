@@ -57,7 +57,12 @@
     xTickStepSize: number | undefined = undefined,
     yTickStepSize: number | undefined = undefined,
     xMax: number | undefined = undefined,
-    yMax: number | undefined = undefined
+    yMax: number | undefined = undefined,
+    rgbTooltipColor: string | undefined = undefined,
+    rgbTooltipBackgroundColor: string | undefined = undefined,
+    rgbBackgroundColor: string | undefined = undefined,
+    width: string | number | undefined = undefined,
+    height: string | number | undefined = undefined
 
   let mounted: boolean = false,
     zoomMounted: boolean = false
@@ -66,9 +71,6 @@
     mounted = true
   })
 
-  export let rgbTooltipColor: string | undefined = undefined
-  export let rgbTooltipBackgroundColor: string | undefined = undefined
-  export let rgbBackgroundColor: string | undefined = undefined
 
   $: if(!rgbTooltipColor && !!$theme.colors?.[$theme.active]['dark']['primary']['300']) 
     rgbTooltipColor = $theme.colors?.[$theme.active]['dark']['primary']['300']
@@ -185,4 +187,6 @@
   bind:data={data}
   options={chartOptions}
   bind:chart={chart}
+  bind:width={width}
+  bind:height={height}
 ></Bar>
