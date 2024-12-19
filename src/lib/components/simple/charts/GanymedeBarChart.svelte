@@ -13,6 +13,7 @@
     BarElement,
   } from 'chart.js';
   import { onMount, type ComponentProps } from 'svelte';
+  import lodash from 'lodash'
 
   ChartJS.register(
     Title,
@@ -89,10 +90,13 @@
     resetZoom = false
   }
 
-  $: if(enableZoom && mounted) {
+  $: if(mounted) {
     import('chartjs-plugin-zoom').then(({ default: zoomPlugin }) => {
       ChartJS.register(zoomPlugin)
       zoomMounted = true
+      setTimeout(() => {
+        chart?.resetZoom()
+      }, 20);
     })
   }
 
@@ -125,13 +129,13 @@
         },
         zoom: {
           pan: {
-            enabled: true,
+            enabled: enableZoom,
             mode: 'x',
             modifierKey: 'ctrl',
           },
           zoom: {
             drag: {
-              enabled: true
+              enabled: enableZoom
             },
             mode: 'x',
           },
