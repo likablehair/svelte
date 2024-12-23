@@ -66,7 +66,8 @@
     sortedBy: string | undefined = undefined,
     sortDirection: "asc" | "desc" = "asc",
     resizableColumns: boolean = false,
-    resizedColumnSizeWithPadding: { [value: string]: number } = {};
+    resizedColumnSizeWithPadding: { [value: string]: number } = {},
+    pointerOnRowHover: boolean = false;
 
   export let calculateRowStyles: CalculateRowStyles | undefined = undefined;
   export let calculateRowClasses: CalculateRowClasses | undefined = undefined;
@@ -263,9 +264,16 @@
           <tr
             class="item-tr {clazz.row || ''} {classes}"
             on:click={() => handleRowClick(item)}
+            on:keydown={(event) => {
+              if (event.key === 'Enter') {
+                handleRowClick(item);
+              }
+            }}
+            tabindex="0"
             style:background-color={styles.backgroundColor}
             style:color={styles.color}
             style:font-weight={styles.fontWeight}
+            class:pointer={pointerOnRowHover}
           >
             {#each headers as header, j}
               <td class="{clazz.cell || ''}">
@@ -511,5 +519,9 @@
 
   td {
     padding-left: 10px;
+  }
+
+  .pointer {
+    cursor: pointer;
   }
 </style>
