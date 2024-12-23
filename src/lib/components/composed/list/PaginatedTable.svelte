@@ -46,7 +46,8 @@
     editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit',
     showActiveFilters: boolean = true,
     resizableColumns: boolean = false,
-    resizedColumnSizeWithPadding: { [value: string]: number } = {};
+    resizedColumnSizeWithPadding: { [value: string]: number } = {},
+    pointerOnRowHover: boolean | undefined = undefined;
 
 
   export let calculateRowStyles: CalculateRowStyles | undefined = undefined;
@@ -173,6 +174,7 @@
     bind:items
     bind:sortedBy
     bind:sortDirection
+    bind:pointerOnRowHover
     on:sort={handleFiltersChange}
     on:sort
     on:rowClick
