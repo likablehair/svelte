@@ -37,6 +37,36 @@
   <Button
     on:click={() => { resetZoom = true }}
   >Reset zoom</Button>
+  <div style:height="24px" style:width="48px">
+    <GanymedeLineChart
+      data={{
+        labels: ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dec'],
+        datasets: [
+          {
+            label: 'Vendite',
+            data: [20, 30, 20, 40, 50, 10, 60, 20, 30, 20, 80, 100],
+            backgroundColor: '#0891b2',
+            borderColor: '#7dd3fc',
+            tension: 0.3
+          }
+        ]
+      }}
+      showLegend={false}
+      enableZoom={false}
+      showXTicks={false}
+      showYTicks={false}
+      displayYGrid={false}
+      displayXGrid={false}
+      maintainAspectRatio={false}
+      pointRadius={0}
+      hitRadius={0}
+      hoverRadius={0}
+      gridLineWidth={0}
+      lineWidth={1}
+      tooltipsDisabled={true}
+      bind:resetZoom={resetZoom}
+    ></GanymedeLineChart>
+  </div>
 </div>
 <h2>Props</h2>
 <PropsViewer
