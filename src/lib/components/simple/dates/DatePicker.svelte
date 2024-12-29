@@ -98,7 +98,7 @@
 </script>
 
 <div
-  class="container {clazz.container || ''}"
+  class="date-picker-container {clazz.container || ''}"
 >
   <div
     class="header {clazz.header || ''}"
@@ -198,7 +198,7 @@
 </div>
 
 <style>
-  .container {
+  .date-picker-container {
     border-radius: 5px;
     height: var(
       --date-picker-height,
