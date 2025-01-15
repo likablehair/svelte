@@ -54,7 +54,8 @@
 
   type Item = {
     [key: string]: any;
-    disableEdit?: boolean;
+    disableEdit?: boolean,
+    rowDisableBackgroundColor?: string
   };
 
   type ItemAutoComplete = {
@@ -1255,12 +1256,14 @@
           {#each rows as row, indexRow}
             <tr
               class="item-row"
-              style:--row-hover-background-color={rowHoverBackgroundColor}
-              style:background-color={row.item.disableEdit
-                ? rowDisableBackgroundColor
-                : expandedRows.findIndex((r) => r.item.id == row.item.id) != -1
-                ? expandedRowBackgroundColor
-                : ""}
+              style:background-color={!!row.item.disableEdit 
+                ? !!row.item.rowDisableBackgroundColor 
+                  ? row.item.rowDisableBackgroundColor
+                  : rowDisableBackgroundColor
+                : expandedRows.findIndex((r) => r.item.id == row.item.id ) != -1 
+                  ? expandedRowBackgroundColor 
+                  : ""
+                }
               on:click={() => handleRowClick(row)}
             >
               {#if !!showSelect && !showExpand}
