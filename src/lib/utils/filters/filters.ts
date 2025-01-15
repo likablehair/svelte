@@ -1,15 +1,27 @@
 import Builder from "./builder"
 
-export const StringModes = ['equal', 'like', 'ilike', 'contains'] as const
-export type StringMode = typeof StringModes[number]
+export const STRING_MODES = ['equal', 'like', 'ilike', 'contains'] as const
+export type StringMode = typeof STRING_MODES[number]
+export function isStringMode(mode: any): mode is StringMode { 
+  return STRING_MODES.includes(mode)
+}
 
-export const GenericModes = ['equal', 'greater', 'lower', 'between'] as const
-export type DateMode = typeof GenericModes[number]
+export const GENERIC_MODES = ['equal', 'greater', 'lower', 'between'] as const
+export type DateMode = typeof GENERIC_MODES[number]
+export function isDateMode(mode: any): mode is DateMode { 
+  return GENERIC_MODES.includes(mode)
+}
 
-export type NumberMode = typeof GenericModes[number]
+export type NumberMode = typeof GENERIC_MODES[number]
+export function isNumberMode(mode: any): mode is NumberMode { 
+  return GENERIC_MODES.includes(mode)
+}
 
-export const SelectModes = ['equal', 'different'] as const
-export type SelectMode = typeof SelectModes[number]
+export const SELECT_MODES = ['equal', 'different'] as const
+export type SelectMode = typeof SELECT_MODES[number]
+export function isSelectMode(mode: any): mode is SelectMode { 
+  return SELECT_MODES.includes(mode)
+}
 
 type MultiStringFilter = {
   type: 'multiString',

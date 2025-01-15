@@ -1,0 +1,11 @@
+:root {
+	--switch-default-padding: 1px;
+	--switch-default-width: 40px;
+	--switch-default-background-color: rgb(var(--global-color-background-300), 0.5);
+	--switch-default-border-radius: 9999px;
+	--switch-default-box-shadow: none;
+	--switch-default-active-toggle-color: rgb(var(--global-color-contrast-900));
+	--switch-default-active-background-color: rgb(var(--global-color-contrast-900));
+	--switch-default-inactive-toggle-color: rgb(var(--global-color-contrast-900));
+	--switch-default-inactive-background-color: rgb(var(--global-color-contrast-900));
+}

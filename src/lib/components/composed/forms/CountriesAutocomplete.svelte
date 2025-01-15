@@ -12,9 +12,8 @@
 	export { clazz as class };
 
   export let autocompleteProps: Omit<ComponentProps<Autocomplete>, 'items'> = {},
-    selected: Item[] = []
-
-  let items: Item[] = countriesOptions;
+    selected: Item[] = [],
+    items: Item[] = countriesOptions;
 </script>
 
 <Autocomplete
