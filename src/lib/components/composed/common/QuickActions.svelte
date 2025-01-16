@@ -50,7 +50,7 @@
     class="select-container"
     transition:fly={{ delay: 150, duration: 150, y: -10, easing: cubicIn }}
   >
-    <div class="flex">
+    <div style="display: flex;">
       <div>
         <button class="select-info" on:click={() => (selectedItems = [])}>
           {!!isSelectedAll ? totalRows : selectedItems.length} items selected
@@ -59,59 +59,57 @@
       </div>
       <div class="select-actions-container">
         <div class="select-actions" bind:this={slotSelectActionsContainer}>
-          <div class="flex gap-2">
-            {#each actions as action}
+          {#each actions as action}
+            <Button
+              --button-height="35px"
+              disabled={action.disabled}
+              on:click={action.onClick}
+            >
+              <div class="action">
+                {action.label}
+                {#if action.icon}
+                  <Icon name={action.icon} />
+                {/if}
+                {#if !!action.info}
+                  <div bind:this={infoActivators[action.label]}>
+                    <Icon						
+                      name="mdi-help-circle-outline"
+                      --icon-size="16px"
+                    />
+                  </div>
+                  <ToolTip
+                    appearTimeout={1000}
+                    activator={infoActivators[action.label]}
+                  >
+                    <div
+                      style:background-color='rgb(var(--global-color-background-300), .95)'
+                      style:border-radius="5px"
+                      style:padding="10px"
+                      style:color='rgb(var(--global-color-contrast-900))'
+                    > 
+                      {action.info}
+                    </div>
+                  </ToolTip>
+                {/if}
+              </div>
+            </Button>
+          {/each}
+
+          {#if extraActions.length > 0}
+            <div id="more-actions" bind:this={moreActionsActivator}>
               <Button
                 --button-height="35px"
-                disabled={action.disabled}
-                on:click={action.onClick}
+                disabled={disabled || loading}
+                class="ml-2"
+                on:click={(e) => {
+                  openMoreActions = !openMoreActions;
+                }}
               >
-                <div class="flex align-center justify-center gap-2">
-                  {action.label}
-                  {#if action.icon}
-                    <Icon name={action.icon} />
-                  {/if}
-                  {#if !!action.info}
-                    <div bind:this={infoActivators[action.label]}>
-                      <Icon						
-                        name="mdi-help-circle-outline"
-                        --icon-size="16px"
-                      />
-                    </div>
-                    <ToolTip
-                      appearTimeout={1000}
-                      activator={infoActivators[action.label]}
-                    >
-                      <div
-                        style:background-color='rgb(var(--global-color-background-300), .95)'
-                        style:border-radius="5px"
-                        style:padding="10px"
-                        style:color='rgb(var(--global-color-contrast-900))'
-                      > 
-                        {action.info}
-                      </div>
-                    </ToolTip>
-                  {/if}
-                </div>
+                <Icon name="mdi-dots-vertical" />
+                More
               </Button>
-            {/each}
-
-            {#if extraActions.length > 0}
-              <div id="more-actions" bind:this={moreActionsActivator}>
-                <Button
-                  --button-height="35px"
-                  disabled={disabled || loading}
-                  class="ml-2"
-                  on:click={(e) => {
-                    openMoreActions = !openMoreActions;
-                  }}
-                >
-                  <Icon name="mdi-dots-vertical" />
-                  More
-                </Button>
-              </div>
-            {/if}
-          </div>
+            </div>
+          {/if}
         </div>
       </div>
     </div>
@@ -134,7 +132,7 @@
         disabled={action.disabled}
         on:click={action.onClick}
       >
-        <div class="flex align-center justify-center gap-2">
+        <div class="action">
           {action.label}
           {#if action.icon}
             <Icon name={action.icon} />
@@ -204,6 +202,13 @@
     margin: 0 8px;
     justify-content: flex-end;
     width: 100%;
+    gap: 8px;
+  }
+
+  .action {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
   }
 
   .more-actions-container {

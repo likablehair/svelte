@@ -44,11 +44,10 @@
 	{#each items as item(item.id)}
 		<div
       animate:flip="{{duration: flipDurationMs}}"
-      class="mb-3"
+      style="margin-bottom: 12px;"
     > 
       <div
-        class="grid gap-3 p-2 cursor-move {clazz}"
-        style="grid-template-columns: 10px auto;"
+        class="item-container {clazz}"
       >
         <Icon
           name="mdi-drag" 
@@ -60,3 +59,13 @@
 		</div>
 	{/each}
 </section>
+
+<style>
+  .item-container {
+    display: grid;
+    gap: 12px;
+    padding: 8px;
+    cursor: move;
+    grid-template-columns: 10px auto;
+  }
+</style>

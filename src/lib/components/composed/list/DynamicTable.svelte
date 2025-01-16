@@ -303,9 +303,10 @@
     cellEditorContainer: HTMLElement | undefined,
     menuElementCellEditor: HTMLElement,
     menuElementQuickFilters: HTMLElement,
-    cellEditorBackgroundColor: string,
-    rowHoverBackgroundColor: string,
-    expandedRowBackgroundColor: string,
+    cellEditorBackgroundColor = "rgb(var(--global-color-background-300))",
+    quickFilterBackgroundColor = "rgb(var(--global-color-background-300))",
+    rowHoverBackgroundColor = "rgb(var(--global-color-background-400))",
+    expandedRowBackgroundColor = "rgb(var(--global-color-background-500))",
     cellEditorInfoActive: CellEditorInfo & {
       value?: any;
       item?: Item;
@@ -315,7 +316,6 @@
     searchBarInput: HTMLElement | undefined = undefined,
     openQuickFilter: boolean = false,
     quickFilterActivator: HTMLElement | undefined,
-    quickFilterBackgroundColor: string,
     quickFilterActive: QuickFilter,
     globalBuilder: FilterBuilder = new FilterBuilder(),
     slotSelectActionsContainer: HTMLElement | undefined,
@@ -564,24 +564,6 @@
   }
 
   $: {
-    if ($theme.dark) {
-      cellEditorBackgroundColor =
-        "rgb(var(--global-color-dark-background-300))";
-      quickFilterBackgroundColor =
-        "rgb(var(--global-color-dark-background-300))";
-      rowHoverBackgroundColor = "rgb(var(--global-color-dark-background-400))";
-      expandedRowBackgroundColor =
-        "rgb(var(--global-color-dark-background-500))";
-    } else {
-      cellEditorBackgroundColor =
-        "rgb(var(--global-color-light-background-300))";
-      quickFilterBackgroundColor =
-        "rgb(var(--global-color-light-background-300))";
-      rowHoverBackgroundColor = "rgb(var(--global-color-light-background-400))";
-      expandedRowBackgroundColor =
-        "rgb(var(--global-color-light-background-500))";
-    }
-
     if (!showExpand) {
       totalBatchLength = rows.length;
     } else {
@@ -1021,7 +1003,7 @@
   />
 
   <slot name="search-bar" {handleSearchChange}>
-    <div class="search-bar-container mb-5">
+    <div class="search-bar-container">
       {#if searchBarVisible}
         <SimpleTextField
           placeholder={searchBarPlaceholder}
@@ -1038,7 +1020,7 @@
       {/if}
 
       {#if filtersVisible}
-        <div class="ml-5">
+        <div style="margin-left: 20px;">
           <Filters
             bind:filters
             on:applyFilter={() => {
@@ -1092,14 +1074,14 @@
       {#if !!quickFilters && quickFilters.length > 0}
         {#each quickFilters as quickFilter}
           <div
-            class={quickFilter.active ? "active-quick-filters" : "flex mr-4"}
+            class={quickFilter.active ? "active-quick-filters" : "non-active-quick-filters"}
           >
             <button
               on:click={(e) => {
                 handleQuickFilterClick(e, quickFilter);
               }}
             >
-              <div class="flex gap-1 ml-2 mr-2">
+              <div class="quick-filter-icon">
                 <Icon name={quickFilter.icon} --icon-size="20px" />
                 {quickFilter.title}
               </div>
@@ -1123,7 +1105,7 @@
   {/if}
 
   <div class="table-container">
-    <table class="table">
+    <table style="display: table;" class="table">
       <thead class="table-header">
         <tr>
           {#if !!showSelect && !showExpand && rows.length > 0}
@@ -1212,7 +1194,7 @@
               style:min-width="30px"
               style:text-align="center"
             >
-              <div class="flex gap-2">
+              <div style="display: flex; gap: 8px;">
                 <Icon
                   name="mdi-plus-circle-outline"
                   click
@@ -1226,7 +1208,8 @@
           <tr>
             <th
               colspan={headersToShowInTable.length + 1}
-              class="text-center loading"
+              class="loading"
+              style="text-align: center;"
               style:border="none"
               style:cursor="default"
               style:font-size="1.2em"
@@ -1243,7 +1226,7 @@
           <tr>
             <td
               colspan={headersToShowInTable.length + 1}
-              class="text-center"
+              style="text-align: center;"
               style:border="none"
               style:cursor="default"
               style:padding="10px"
@@ -1256,6 +1239,7 @@
           {#each rows as row, indexRow}
             <tr
               class="item-row"
+              style:--row-hover-background-color={rowHoverBackgroundColor}
               style:background-color={!!row.item.disableEdit 
                 ? !!row.item.rowDisableBackgroundColor 
                   ? row.item.rowDisableBackgroundColor
@@ -1348,7 +1332,7 @@
                         {header.type.params.nullText}
                       {/if}
                     {:else}
-                      <div class="flex justify-center">-</div>
+                      <div style="display: flex; justify-content: center;">-</div>
                     {/if}
                   {:else}
                     {row.item[header.value]}
@@ -1369,7 +1353,7 @@
                     colspan={headersToShowInTable.length + 1}
                     style:border="none"
                   >
-                    <table class="table">
+                    <table style="display: table;">
                       <thead class="table-header table-subheader">
                         <tr>
                           {#each subHeaders as subHeader}
@@ -1628,7 +1612,7 @@
         <slot name="custom-quick-filter" quickFilter={quickFilterActive} {setQuickFilterMissingValue}>
         </slot>
       {:else if quickFilterActive.type.key === "string"}
-        <div class="font-medium space-between">
+        <div class="space-between" style="font-weight: 500;">
           {quickFilterActive.title}
           {#if !!quickFilterActive.type.missingLabel}
             <button
@@ -1652,7 +1636,7 @@
           }}
         />
       {:else if quickFilterActive.type.key === "number"}
-        <div class="font-medium mb-2 space-between">
+        <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
           {quickFilterActive.title}
           {#if !!quickFilterActive.type.missingLabel}
             <button
@@ -1678,7 +1662,7 @@
           }}
         />
       {:else if quickFilterActive.type.key === "multi-select"}
-        <div class="font-medium mb-2 space-between">
+        <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
           {quickFilterActive.title}
           {#if !!quickFilterActive.type.missingLabel}
             <button
@@ -1758,7 +1742,7 @@
           </div>
         {/if}
       {:else if quickFilterActive.type.key === "country"}
-        <div class="font-medium mb-2 space-between">
+        <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
           {quickFilterActive.title}
           {#if !!quickFilterActive.type.missingLabel}
             <button
@@ -1875,10 +1859,10 @@
     _space={sAndDown ? "60vh" : "20vw"}
     position={sAndDown ? "bottom" : "right"}
   >
-    <div class="p-5">
-      <div class="text-xl font-bold p-5">Personalize your headers</div>
+    <div style="padding: 20px;">
+      <div class="personalize-header">Personalize your headers</div>
 
-      <span class="grid grid-col-1 gap-3 p-2">Headers shown in table</span>
+      <span class="headers-show grid-col-1">Headers shown in table</span>
 
       {#if headersToShow}
         <VerticalDraggableList
@@ -1903,14 +1887,14 @@
         </VerticalDraggableList>
       {/if}
       <Divider color="rgb(var(--global-color-contrast-100)" />
-      <span class="grid grid-col-1 gap-3 p-2">Headers to show</span>
+      <span class="headers-show grid-col-1">Headers to show</span>
       {#if headersToSelect && headersToSelect.length > 0}
         {#each headersToSelect as header (header.id)}
           <div
             animate:flip
             in:receive={{ key: header }}
             out:send={{ key: header }}
-            class="grid grid-col-1 gap-3 p-2"
+            class="headers-show grid-col-1"
           >
             <StandardSwitch
               labelWidth="90%"
@@ -1928,11 +1912,11 @@
           </div>
         {/each}
       {:else}
-        <div class="grid grid-col-1 gap-3 p-2">
-          <span class="text-center">No headers to add</span>
+        <div class="headers-show grid-col-1">
+          <span style="text-align: center;">No headers to add</span>
         </div>
       {/if}
-      <div class="w-full flex justify-center">
+      <div style="width: 100%; display: flex; justify-content: center;">
         <Button
           class="mr-3 mt-5"
           --button-width="70%"
@@ -2172,6 +2156,7 @@
   .search-bar-container {
     display: flex;
     flex-direction: row;
+    margin-bottom: 20px;
   }
 
   .quick-filters {
@@ -2212,5 +2197,29 @@
     background-color: rgb(var(--global-color-primary-500));
     border-radius: 5px;
     width: fit-content;
+  }
+
+  .non-active-quick-filters {
+    display: flex;
+    margin-right: 16px;
+  }
+
+  .quick-filter-icon {
+    display: flex;
+    gap: 4px;
+    margin: 0 8px;
+  }
+
+  .personalize-header {
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 700;
+    padding: 20px;
+  }
+
+  .headers-show {
+    display: grid;
+    gap: 12px;
+    padding: 8px;
   }
 </style>
