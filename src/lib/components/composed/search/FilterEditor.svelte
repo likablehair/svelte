@@ -137,6 +137,7 @@
             bind:menuOpened={dropdownOpened}
             openingId="advanced-filter"
             mobileDrawer={mobile}
+            {lang}
           ></Dropdown>
         </div>
       </div>
