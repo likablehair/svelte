@@ -296,7 +296,8 @@
     quickFilters: QuickFilter[] = [],
     actionsForSelectedItems: Action[] = [],
     hasMoreToLoad: boolean = false,
-    totalRows: number = rows.length;
+    totalRows: number = rows.length,
+    headerBackGroundColor: string | undefined = undefined;
 
   let openCellEditor: boolean = false,
     cellEditorActivator: HTMLElement | undefined,
@@ -1110,6 +1111,7 @@
         <tr>
           {#if !!showSelect && !showExpand && rows.length > 0}
             <th
+              style="background-color: {headerBackGroundColor || 'rgb(var(--global-color-background-700))'};"
               style:width="30px"
               style:min-width="30px"
               style:text-align="center"
@@ -1126,6 +1128,7 @@
           {/if}
           {#if showExpand}
             <th
+              style="background-color: {headerBackGroundColor || 'rgb(var(--global-color-background-700))'};" 
               style:width="60px"
               style:min-width="60px"
               style:text-align="center"
@@ -1133,6 +1136,7 @@
           {/if}
           {#each headersToShowInTable as head, index}
             <th
+              style="background-color: {headerBackGroundColor || 'rgb(var(--global-color-background-700))'};"
               style:width={head.width}
               style:min-width={head.minWidth}
               class:sortable={head.sortable}
@@ -1184,12 +1188,15 @@
             </th>
           {/each}
           {#if $$slots.rowActions || $$slots.append}
-            <th>
+            <th
+              style="background-color: {headerBackGroundColor || 'rgb(var(--global-color-background-700))'};"
+            >
               <slot name="append" index={-1} items={undefined} />
             </th>
           {/if}
           {#if customizeHeaders}
             <th
+              style="background-color: {headerBackGroundColor || 'rgb(var(--global-color-background-700))'};"
               style:width="30px"
               style:min-width="30px"
               style:text-align="center"
@@ -1209,7 +1216,7 @@
             <th
               colspan={headersToShowInTable.length + 1}
               class="loading"
-              style="text-align: center;"
+              style="text-align: center; background-color: {headerBackGroundColor || 'rgb(var(--global-color-background-700))'};"
               style:border="none"
               style:cursor="default"
               style:font-size="1.2em"
@@ -1387,7 +1394,9 @@
                             </th>
                           {/each}
                           {#if $$slots.subRowActions || $$slots.subAppend}
-                            <th>
+                            <th
+                              style="background-color: {headerBackGroundColor || 'rgb(var(--global-color-background-700))'};"
+                            >
                               <slot
                                 name="subAppend"
                                 index={-1}
@@ -1976,7 +1985,6 @@
   }
 
   .table-header th {
-    background-color: rgb(var(--global-color-background-700));
     padding: var(
       --simple-table-header-padding,
       var(--simple-table-default-header-padding)

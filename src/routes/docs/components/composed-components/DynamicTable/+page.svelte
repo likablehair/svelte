@@ -123,6 +123,7 @@
     headersToShowInTable={headers}
     showExpand
     filtersVisible
+    headerBackGroundColor={'rgb(var(--global-color-background-400))'}
     rows={[
       {
         item: {

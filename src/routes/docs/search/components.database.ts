@@ -218,6 +218,18 @@ const list: {
     type: 'composed',
     url: '/docs/components/composed-components/PaginatedTable'
   }, {
+    title: 'QuickActions',
+    description: 'Fast actions available only to you.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/QuickActions'
+  }, {
+    title: 'DynamicFilters',
+    description: 'Make it easy, make it filter. Dynamically.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/DynamicFilters'
+  }, {
     title: 'DynamicTable',
     description: 'Dynamic table and pagination agreement.',
     status: 'stable',
