@@ -11,9 +11,8 @@
     Icon,
     MediaQuery,
     Menu,
-    theme,
     ToolTip,
-    type PaginatedTable,
+    type PaginatedTable
   } from "$lib";
   import { DateTime } from "luxon";
   import { createEventDispatcher, type ComponentProps } from "svelte";
@@ -31,9 +30,11 @@
   import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
   import LabelAndSelect from "../forms/LabelAndSelect.svelte";
   import LabelAndTextField from "../forms/LabelAndTextField.svelte";
-    import DynamicFilters from "../search/DynamicFilters.svelte";
-    import type { DateMode, Filter, NumberMode, SelectMode, StringMode } from "$lib/utils/filters/filters";
-    import QuickActions, { type Action } from "../common/QuickActions.svelte";
+  import DynamicFilters from "../search/DynamicFilters.svelte";
+  import type { DateMode, Filter, NumberMode, SelectMode, StringMode } from "$lib/utils/filters/filters";
+  import QuickActions, { type Action } from "../common/QuickActions.svelte";
+  import './DynamicTable.css'
+    import type { QuickFilter } from "$lib/utils/filters/quickFilters";
 
   const [send, receive] = crossfade({
     duration: 500,
@@ -56,12 +57,6 @@
     [key: string]: any;
     disableEdit?: boolean,
     rowDisableBackgroundColor?: string
-  };
-
-  type ItemAutoComplete = {
-    value: string;
-    label?: string;
-    data?: any;
   };
 
   type Row = {
@@ -114,106 +109,6 @@
     type: CellEditorInfoType;
     column: string;
     info?: string;
-  };
-
-  type StringQuickFilter = {
-    key: "string";
-    value?: string;
-    mode?: "equal" | "like" | "ilike" | "contains";
-    missingValue?: boolean;
-    missingLabel?: string;
-    modify?: (params: {
-      builder: FilterBuilder;
-      value?: { value?: string; missingValue?: boolean };
-    }) => FilterBuilder;
-  };
-
-  type NumberQuickFilter = {
-    key: "number";
-    value?: number;
-    missingValue?: boolean;
-    missingLabel?: string;
-    modify?: (params: {
-      builder: FilterBuilder;
-      value?: { value?: number; missingValue?: boolean };
-    }) => FilterBuilder;
-  };
-
-  type DateQuickFilter = {
-    key: "date";
-    from?: Date;
-    to?: Date;
-    modify?: (params: {
-      builder: FilterBuilder;
-      value?: { from?: Date; to?: Date };
-    }) => FilterBuilder;
-  };
-
-  type BooleanQuickFilter = {
-    key: "boolean";
-    params?: {
-      labelTrue: string;
-      labelFalse: string;
-    };
-    value?: boolean;
-    modify?: (params: {
-      builder: FilterBuilder;
-      value?: boolean;
-    }) => FilterBuilder;
-  };
-
-  type CountryQuickFilter = {
-    key: "country";
-    selected?: ItemAutoComplete[];
-    missingValue?: boolean;
-    missingLabel?: string;
-    countriesOptions?: ItemAutoComplete[];
-    modify?: (params: {
-      builder: FilterBuilder;
-      value?: { values?: string[]; missingValue?: boolean };
-    }) => FilterBuilder;
-  };
-
-  type MultiSelectQuickFilter = {
-    key: "multi-select";
-    items: ItemAutoComplete[];
-    values: ItemAutoComplete[];
-    missingValue?: boolean;
-    missingLabel?: string;
-    countriesAlpha2?: ItemAutoComplete[];
-    modify?: (params: {
-      builder: FilterBuilder;
-      value?: { values?: string[]; missingValue?: boolean };
-    }) => FilterBuilder;
-  };
-
-  type CustomQuickFilter = {
-    key: 'custom'
-    value?: any
-    missingValue?: boolean;
-    modify: (params: {
-      builder: FilterBuilder
-      value?: { value?: any; missingValue?: boolean }
-    }) => FilterBuilder
-  }
-
-  type QuickFilterType =
-    | StringQuickFilter
-    | NumberQuickFilter
-    | DateQuickFilter
-    | BooleanQuickFilter
-    | CountryQuickFilter
-    | MultiSelectQuickFilter
-    | CustomQuickFilter
-
-  type QuickFilter = {
-    title: string;
-    icon: string;
-    description?: string;
-    type: QuickFilterType;
-    column?: string;
-    info?: string;
-    active?: boolean;
   };
 
   type Headers = NonNullable<ComponentProps<PaginatedTable>["headers"]>;
@@ -281,7 +176,6 @@
     selectedItems: Item[] = [],
     showExpand: boolean = false,
     loading: boolean = false,
-    rowDisableBackgroundColor: string = "",
     disabled: boolean = false,
     filters: ComponentProps<Filters>["filters"] = [],
     searchBarColumns: string[] | undefined = undefined,
@@ -296,18 +190,13 @@
     quickFilters: QuickFilter[] = [],
     actionsForSelectedItems: Action[] = [],
     hasMoreToLoad: boolean = false,
-    totalRows: number = rows.length,
-    headerBackGroundColor: string | undefined = undefined;
+    totalRows: number = rows.length
 
   let openCellEditor: boolean = false,
     cellEditorActivator: HTMLElement | undefined,
     cellEditorContainer: HTMLElement | undefined,
     menuElementCellEditor: HTMLElement,
     menuElementQuickFilters: HTMLElement,
-    cellEditorBackgroundColor = "rgb(var(--global-color-background-300))",
-    quickFilterBackgroundColor = "rgb(var(--global-color-background-300))",
-    rowHoverBackgroundColor = "rgb(var(--global-color-background-400))",
-    expandedRowBackgroundColor = "rgb(var(--global-color-background-500))",
     cellEditorInfoActive: CellEditorInfo & {
       value?: any;
       item?: Item;
@@ -323,7 +212,10 @@
     isSelectedAll: boolean = false,
     calendarOpened: boolean = false,
     calendarOpened2: boolean = false,
-    selectedIndexes: number[] = []
+    selectedIndexes: number[] = [],
+    cellEditorIndexRow: number | undefined,
+    cellEditorIndexHeader: number | undefined,
+    cellEditorSubItem: boolean | undefined
 
   let openHeaderDrawer: boolean = false,
     headersToSelect: {
@@ -396,21 +288,20 @@
     },
     item: Item,
     cellEditorInfo?: CellEditorInfo,
-    value?: any
+    value?: any,
+    indexRow?: number,
+    indexHeader?: number,
+    subItem?: boolean
   ) {
     if (disabled || loading) return;
     if (cellEdit && cellEditorInfo && !item.disableEdit) {
       if (!cellEditorActivator) {
         let target = mouseEvent.target as unknown as HTMLElement;
         cellEditorActivator = target;
-        cellEditorActivator.style.border =
-          "1px solid var(--simple-table-default-hover-color)";
-        cellEditorActivator.style.borderRadius = "5px";
 
-        if (cellEditorActivator.parentElement) {
-          cellEditorActivator.parentElement.style.backgroundColor =
-            "var(--row-hover-background-color)";
-        }
+        cellEditorIndexRow = indexRow
+        cellEditorIndexHeader = indexHeader
+        cellEditorSubItem = subItem
 
         cellEditorInfoActive = {
           ...cellEditorInfo,
@@ -450,16 +341,9 @@
   }
 
   function handleSaveClick() {
-    if (!!cellEditorActivator) {
-      cellEditorActivator.style.removeProperty("border");
-      cellEditorActivator.style.removeProperty("border-radius");
-
-      if (cellEditorActivator.parentElement) {
-        cellEditorActivator.parentElement.style.removeProperty(
-          "background-color"
-        );
-      }
-    }
+    cellEditorIndexHeader = undefined
+    cellEditorIndexRow = undefined
+    cellEditorSubItem = undefined
 
     dispatch("saveCellEdit", {
       item: cellEditorInfoActive,
@@ -470,30 +354,12 @@
   }
 
   function handleCancelClick() {
-    if (!!cellEditorActivator) {
-      cellEditorActivator.style.removeProperty("border");
-      cellEditorActivator.style.removeProperty("border-radius");
-
-      if (cellEditorActivator.parentElement) {
-        cellEditorActivator.parentElement.style.removeProperty(
-          "background-color"
-        );
-      }
-    }
+    cellEditorIndexHeader = undefined
+    cellEditorIndexRow = undefined
+    cellEditorSubItem = undefined
 
     cellEditorActivator = undefined;
     openCellEditor = false;
-
-    if (!!quickFilterActivator) {
-      quickFilterActivator.style.removeProperty("border");
-      quickFilterActivator.style.removeProperty("border-radius");
-
-      if (quickFilterActivator.parentElement) {
-        quickFilterActivator.parentElement.style.removeProperty(
-          "background-color"
-        );
-      }
-    }
 
     quickFilterActivator = undefined;
     openQuickFilter = false;
@@ -898,7 +764,7 @@
       quickFilter.type.values = value;
       quickFilter.type.missingValue = missingValue;
 
-      const values = value.map((item: ItemAutoComplete) => item.value);
+      const values = value.map(item => item.value);
 
       if (quickFilter.type.modify) {
         builder = quickFilter.type.modify({
@@ -1013,10 +879,6 @@
           bind:input={searchBarInput}
           on:keydown={handleSearchBoxKeydown}
           --simple-textfield-default-width="450px"
-          class={{
-            field:
-              "!rounded-lg !bg-transparent !ring-1 !ring-inset !ring-[rgb(var(--global-color-background-500))] focus-within:!ring-2 focus-within:!ring-inset focus-within:!ring-[rgb(var(--global-color-primary-500))]",
-          }}
         />
       {/if}
 
@@ -1111,7 +973,6 @@
         <tr>
           {#if !!showSelect && !showExpand && rows.length > 0}
             <th
-              style="background-color: {headerBackGroundColor || 'rgb(var(--global-color-background-700))'};"
               style:width="30px"
               style:min-width="30px"
               style:text-align="center"
@@ -1128,15 +989,12 @@
           {/if}
           {#if showExpand}
             <th
-              style="background-color: {headerBackGroundColor || 'rgb(var(--global-color-background-700))'};" 
-              style:width="60px"
               style:min-width="60px"
               style:text-align="center"
             />
           {/if}
           {#each headersToShowInTable as head, index}
             <th
-              style="background-color: {headerBackGroundColor || 'rgb(var(--global-color-background-700))'};"
               style:width={head.width}
               style:min-width={head.minWidth}
               class:sortable={head.sortable}
@@ -1188,15 +1046,12 @@
             </th>
           {/each}
           {#if $$slots.rowActions || $$slots.append}
-            <th
-              style="background-color: {headerBackGroundColor || 'rgb(var(--global-color-background-700))'};"
-            >
+            <th>
               <slot name="append" index={-1} items={undefined} />
             </th>
           {/if}
           {#if customizeHeaders}
             <th
-              style="background-color: {headerBackGroundColor || 'rgb(var(--global-color-background-700))'};"
               style:width="30px"
               style:min-width="30px"
               style:text-align="center"
@@ -1216,7 +1071,7 @@
             <th
               colspan={headersToShowInTable.length + 1}
               class="loading"
-              style="text-align: center; background-color: {headerBackGroundColor || 'rgb(var(--global-color-background-700))'};"
+              style="text-align: center;"
               style:border="none"
               style:cursor="default"
               style:font-size="1.2em"
@@ -1246,15 +1101,18 @@
           {#each rows as row, indexRow}
             <tr
               class="item-row"
-              style:--row-hover-background-color={rowHoverBackgroundColor}
-              style:background-color={!!row.item.disableEdit 
-                ? !!row.item.rowDisableBackgroundColor 
-                  ? row.item.rowDisableBackgroundColor
-                  : rowDisableBackgroundColor
-                : expandedRows.findIndex((r) => r.item.id == row.item.id ) != -1 
-                  ? expandedRowBackgroundColor 
-                  : ""
+              style:background-color={
+                !!row.item.disableEdit ?
+                  !!row.item.rowDisableBackgroundColor ?
+                    row.item.rowDisableBackgroundColor : 
+                    'var(--dynamic-table-row-disabled-background-color, var(--dynamic-table-row-default-disabled-background-color))' : 
+                expandedRows.findIndex((r) => r.item.id == row.item.id ) != -1 ? 
+                  'var(--dynamic-table-expanded-row-background-color, var(--dynamic-table-expanded-row-default-background-color))' :
+                  !!selectedItems.find(i => i.id == row.item.id) ?
+                    'var(--dynamic-table-selected-row-background-color, var(--dynamic-table-selected-row-default-background-color))' :
+                    ""
                 }
+              class:row-activator={cellEditorIndexRow == indexRow && !cellEditorSubItem}
               on:click={() => handleRowClick(row)}
             >
               {#if !!showSelect && !showExpand}
@@ -1285,31 +1143,17 @@
               {/if}
               {#each headersToShowInTable as header, indexHeader}
                 <td
-                  on:mouseover={(e) => {
-                    if (cellEdit && !loading && !!header.cellEditorInfo) {
-                      e.currentTarget.classList.add("hover-cell");
-                    } else {
-                      e.currentTarget.classList.remove("hover-cell");
-                    }
-                  }}
-                  on:mouseleave={(e) => {
-                    if (cellEdit) {
-                      e.currentTarget.classList.remove("hover-cell");
-                    }
-                  }}
-                  on:focus={(e) => {
-                    if (cellEdit && !!header.cellEditorInfo) {
-                      e.currentTarget.classList.add("hover-cell");
-                    } else {
-                      e.currentTarget.classList.remove("hover-cell");
-                    }
-                  }}
+                  class:hover-cell={cellEdit && !loading && !!header.cellEditorInfo}
+                  class:cell-edit-activator={cellEditorIndexHeader == indexHeader && cellEditorIndexRow == indexRow && !cellEditorSubItem}
                   on:click={(e) => {
                     handleCellClick(
                       e,
                       row.item,
                       header.cellEditorInfo,
-                      row.item[header.value]
+                      row.item[header.value],
+                      indexRow,
+                      indexHeader,
+                      false
                     );
                   }}
                 >
@@ -1355,7 +1199,7 @@
             </tr>
             {#if showExpand}
               {#if expandedRows.findIndex((r) => r.item.id == row.item.id) != -1}
-                <tr class="item-row">
+                <tr>
                   <td
                     colspan={headersToShowInTable.length + 1}
                     style:border="none"
@@ -1394,9 +1238,7 @@
                             </th>
                           {/each}
                           {#if $$slots.subRowActions || $$slots.subAppend}
-                            <th
-                              style="background-color: {headerBackGroundColor || 'rgb(var(--global-color-background-700))'};"
-                            >
+                            <th>
                               <slot
                                 name="subAppend"
                                 index={-1}
@@ -1410,43 +1252,22 @@
                       <tbody>
                         {#each row.subItems as subItem, indexSubItem}
                           <tr
-                            class="item-row"
-                            style:--row-hover-background-color={rowHoverBackgroundColor}
                             on:click={() => handleRowClick(subItem)}
+                            class:row-activator={cellEditorIndexRow == indexSubItem && cellEditorSubItem}
                           >
                             {#each subHeaders as subHeader, indexSubHeader}
                               <td
-                                on:mouseover={(e) => {
-                                  if (cellEdit) {
-                                    e.currentTarget.classList.add("hover-cell");
-                                  } else {
-                                    e.currentTarget.classList.remove(
-                                      "hover-cell"
-                                    );
-                                  }
-                                }}
-                                on:mouseleave={(e) => {
-                                  if (cellEdit) {
-                                    e.currentTarget.classList.remove(
-                                      "hover-cell"
-                                    );
-                                  }
-                                }}
-                                on:focus={(e) => {
-                                  if (cellEdit) {
-                                    e.currentTarget.classList.add("hover-cell");
-                                  } else {
-                                    e.currentTarget.classList.remove(
-                                      "hover-cell"
-                                    );
-                                  }
-                                }}
+                                class:cell-edit-activator={cellEditorIndexHeader == indexSubHeader && cellEditorIndexRow == indexSubItem && cellEditorSubItem}
+                                class:hover-cell={cellEdit}
                                 on:click={(e) => {
                                   handleCellClick(
                                     e,
                                     subItem,
                                     subHeader.cellEditorInfo,
-                                    subItem[subHeader.value]
+                                    subItem[subHeader.value],
+                                    indexSubItem,
+                                    indexSubHeader,
+                                    true
                                   );
                                 }}
                               >
@@ -1529,7 +1350,6 @@
 >
   <div
     class="cell-editor-container"
-    style:--cell-editor-background-color={cellEditorBackgroundColor}
     bind:this={cellEditorContainer}
   >
     <div style:grid-column="1 / 3">
@@ -1541,12 +1361,6 @@
           info={cellEditorInfoActive.info}
           type="text"
           orientation="horizontal"
-          class={{
-            input: {
-              field:
-                "!rounded-lg !bg-transparent !ring-1 !ring-inset !ring-[rgb(var(--global-color-background-500))] focus-within:!ring-2 focus-within:!ring-inset focus-within:!ring-[rgb(var(--global-color-primary-500))]",
-            },
-          }}
           bind:value={cellEditorInfoActive.value}
         />
       {:else if cellEditorInfoActive.type.key === "number"}
@@ -1559,12 +1373,6 @@
           orientation="horizontal"
           error={saveEditDisabled}
           bind:value={cellEditorInfoActive.value}
-          class={{
-            input: {
-              field:
-                "!rounded-lg !bg-transparent !ring-1 !ring-inset !ring-[rgb(var(--global-color-background-500))] focus-within:!ring-2 focus-within:!ring-inset focus-within:!ring-[rgb(var(--global-color-primary-500))]",
-            },
-          }}
         />
       {:else if cellEditorInfoActive.type.key === "select"}
         <LabelAndSelect
@@ -1590,7 +1398,7 @@
     </div>
 
     <div style:margin-top="10px" style:grid-row="2" style:grid-column="1 / 3">
-      <Divider color="rgb(var(--global-color-contrast-100)" />
+      <Divider --divider-color=rgb(var(--global-color-contrast-100) />
     </div>
     <div style:grid-row="3" style:grid-column="2" style:margin-top="-15px">
       <ConfirmOrCancelButtons
@@ -1614,7 +1422,6 @@
 >
   <div
     class="quick-filter-container"
-    style:--quick-filter-background-color={quickFilterBackgroundColor}
   >
     <div style:grid-column="1 / 3">
       {#if quickFilterActive.type.key == 'custom'}
@@ -1637,12 +1444,6 @@
           info={quickFilterActive.info}
           type="text"
           bind:value={quickFilterActive.type.value}
-          class={{
-            input: {
-              field:
-                "!rounded-lg !bg-transparent !ring-1 !ring-inset !ring-[rgb(var(--global-color-background-500))] focus-within:!ring-2 focus-within:!ring-inset focus-within:!ring-[rgb(var(--global-color-primary-500))]",
-            },
-          }}
         />
       {:else if quickFilterActive.type.key === "number"}
         <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
@@ -1663,12 +1464,6 @@
           orientation="horizontal"
           error={saveEditDisabled}
           bind:value={quickFilterActive.type.value}
-          class={{
-            input: {
-              field:
-                "!rounded-lg !bg-transparent !ring-1 !ring-inset !ring-[rgb(var(--global-color-background-500))] focus-within:!ring-2 focus-within:!ring-inset focus-within:!ring-[rgb(var(--global-color-primary-500))]",
-            },
-          }}
         />
       {:else if quickFilterActive.type.key === "multi-select"}
         <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
@@ -1787,12 +1582,6 @@
               flipOnOverflow
               bind:menuOpened={calendarOpened}
               on:day-click={() => (calendarOpened = false)}
-              class={{
-                textfield: {
-                  field:
-                    "!rounded-lg !bg-transparent !ring-1 !ring-inset !ring-[rgb(var(--global-color-background-500))] focus-within:!ring-2 focus-within:!ring-inset focus-within:!ring-[rgb(var(--global-color-primary-500))]",
-                },
-              }}
             >
               <svelte:fragment slot="append-inner">
                 <Icon
@@ -1818,12 +1607,6 @@
               flipOnOverflow
               bind:menuOpened={calendarOpened2}
               on:day-click={() => (calendarOpened2 = false)}
-              class={{
-                textfield: {
-                  field:
-                    "!rounded-lg !bg-transparent !ring-1 !ring-inset !ring-[rgb(var(--global-color-background-500))] focus-within:!ring-2 focus-within:!ring-inset focus-within:!ring-[rgb(var(--global-color-primary-500))]",
-                },
-              }}
             >
               <svelte:fragment slot="append-inner">
                 <Icon
@@ -1847,7 +1630,7 @@
 
     {#if quickFilterActive.type.key != "boolean"}
       <div style:margin-top="10px" style:grid-row="2" style:grid-column="1 / 3">
-        <Divider color="rgb(var(--global-color-contrast-100)" />
+        <Divider --divider-color=rgb(var(--global-color-contrast-100)) />
       </div>
       <div style:grid-row="3" style:grid-column="2" style:margin-top="-15px">
         <ConfirmOrCancelButtons
@@ -1895,7 +1678,7 @@
           </svelte:fragment>
         </VerticalDraggableList>
       {/if}
-      <Divider color="rgb(var(--global-color-contrast-100)" />
+      <Divider --divider-color=rgb(var(--global-color-contrast-100) />
       <span class="headers-show grid-col-1">Headers to show</span>
       {#if headersToSelect && headersToSelect.length > 0}
         {#each headersToSelect as header (header.id)}
@@ -1942,38 +1725,16 @@
   .table-container {
     overflow-x: auto;
     overflow-y: auto;
-    max-height: var(--table-container-max-height, 70dvh);
-  }
-
-  .simple-table-container {
-    width: var(--simple-table-width, var(--simple-table-default-width));
-    min-width: var(
-      --simple-table-min-width,
-      var(--simple-table-default-min-width)
-    );
-    max-width: var(
-      --simple-table-max-width,
-      var(--simple-table-default-max-width)
-    );
-    height: var(--simple-table-height, var(--simple-table-default-height));
-    min-height: var(
-      --simple-table-min-height,
-      var(--simple-table-default-min-height)
-    );
     max-height: var(
-      --simple-table-max-height,
-      var(--simple-table-default-max-height)
-    );
-    overflow-x: var(
-      --simple-table-overflow-x,
-      var(--simple-table-default-overflow-x)
+      --dynamic-table-max-height,
+      var(--dynamic-table-default-max-height)
     );
   }
 
   .table {
     background-color: var(
-      --simple-table-background-color,
-      var(--simple-table-default-background-color)
+      --dynamic-table-background-color,
+      var(--dynamic-table-default-background-color)
     );
     border-collapse: separate;
   }
@@ -1986,21 +1747,28 @@
 
   .table-header th {
     padding: var(
-      --simple-table-header-padding,
-      var(--simple-table-default-header-padding)
+      --dynamic-table-header-padding,
+      var(--dynamic-table-default-header-padding)
     );
     font-size: var(
-      --simple-table-header-font-size,
-      var(--simple-table-default-header-font-size)
+      --dynamic-table-header-font-size,
+      var(--dynamic-table-default-header-font-size)
     );
     font-weight: var(
-      --simple-table-header-font-weight,
-      var(--simple-table-default-header-font-weight)
+      --dynamic-table-header-font-weight,
+      var(--dynamic-table-default-header-font-weight)
+    );
+    background-color: var(
+      --dynamic-table-header-background-color, 
+      var(--dynamic-table-default-header-background-color)
     );
   }
 
   .table-subheader th {
-    background-color: rgb(var(--global-color-background-100));
+    background-color: var(
+      --dynamic-table-subheader-background-color,
+      var(--dynamic-table-default-subheader-background-color)
+    );
   }
 
   .table-header th.sortable {
@@ -2011,8 +1779,8 @@
 
   .table-header th.sortable:hover {
     color: var(
-      --simple-table-header-hover-color,
-      var(--simple-table-default-hover-color)
+      --dynamic-table-header-hover-color,
+      var(--dynamic-table-default-hover-color)
     );
   }
 
@@ -2031,51 +1799,30 @@
 
   .table-header th:first-child {
     border-top-left-radius: var(
-      --simple-table-header-border-radius,
-      var(--simple-table-default-header-border-radius)
+      --dynamic-table-header-border-radius,
+      var(--dynamic-table-default-header-border-radius)
     );
     border-bottom-left-radius: var(
-      --simple-table-header-border-radius,
-      var(--simple-table-default-header-border-radius)
+      --dynamic-table-header-border-radius,
+      var(--dynamic-table-default-header-border-radius)
     );
   }
 
   .table-header th:last-child {
     border-top-right-radius: var(
-      --simple-table-header-border-radius,
-      var(--simple-table-default-header-border-radius)
+      --dynamic-table-header-border-radius,
+      var(--dynamic-table-default-header-border-radius)
     );
     border-bottom-right-radius: var(
-      --simple-table-header-border-radius,
-      var(--simple-table-default-header-border-radius)
+      --dynamic-table-header-border-radius,
+      var(--dynamic-table-default-header-border-radius)
     );
   }
 
   .thead {
     height: var(
-      --simple-table-header-height,
-      var(--simple-table-default-header-height)
-    );
-  }
-
-  .item-tr {
-    border-bottom: solid;
-    border-width: 1px 0;
-    border-color: var(
-      --simple-table-separator-color,
-      var(--simple-table-default-separator-color)
-    );
-    height: var(
-      --simple-table-row-height,
-      var(--simple-table-default-row-height)
-    );
-    transition: background-color 0.1s ease-in-out;
-  }
-
-  .item-tr:hover {
-    background-color: var(
-      --simple-table-row-hover-background-color,
-      var(--simple-table-default-row-hover-background-color)
+      --dynamic-table-header-height,
+      var(--dynamic-table-default-header-height)
     );
   }
 
@@ -2095,14 +1842,17 @@
     border: 1px solid transparent;
   }
 
-  .hover-cell {
+  .hover-cell:hover, .hover-cell:focus, .cell-edit-activator {
     cursor: pointer;
-    border: 1px solid var(--simple-table-default-hover-color);
+    border: 1px solid rgb(var(--global-color-contrast-800));
     border-radius: 5px;
   }
 
-  tr:hover {
-    background-color: var(--row-hover-background-color);
+  .item-row:hover {
+    background-color: var(
+      --dynamic-table-row-background-color-hover,
+      var(--dynamic-table-row-default-background-color-hover)
+    );
   }
 
   .cell-editor-container {
@@ -2114,10 +1864,21 @@
     position: fixed;
     padding: 10px;
     border-radius: 10px;
-    background-color: var(--cell-editor-background-color);
-    height: 180px;
+    background-color: var(
+      --cell-editor-background-color,
+      var(--cell-editor-default-background-color)
+    );
+    height: 200px;
     width: 500px;
   }
+
+  .row-activator {
+    background-color: var(
+      --dynamic-table-row-background-color-hover,
+      var(--dynamic-table-row-default-background-color-hover)
+    );
+  }
+
   .quick-filter-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -2127,7 +1888,10 @@
     position: fixed;
     padding: 10px;
     border-radius: 10px;
-    background-color: var(--quick-filter-background-color);
+    background-color: var(
+      --quick-filter-background-color,
+      var(--quick-filter-default-background-color)
+    );
   }
 
   .container {

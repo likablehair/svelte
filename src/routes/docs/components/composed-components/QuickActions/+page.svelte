@@ -1,17 +1,12 @@
 <script lang="ts">
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
-  import PaginatedTable from "$lib/components/composed/list/PaginatedTable.svelte";
-  import type { Filter } from "$lib/utils/filters/filters";
-  import type { Header } from "$lib/components/simple/lists/SimpleTable.svelte";
-  import Icon from "$lib/components/simple/media/Icon.svelte";
-  import type Builder from "$lib/utils/filters/builder";
-  import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
-    import Button from "$lib/components/simple/buttons/Button.svelte";
-    import QuickActions from "$lib/components/composed/common/QuickActions.svelte";
+  import Button from "$lib/components/simple/buttons/Button.svelte";
+  import QuickActions from "$lib/components/composed/common/QuickActions.svelte";
 
   let slotSelectActionsContainer: HTMLElement,
-    showSelectContainer = false
+    showSelectContainer = false,
+    selectedItems = [{}]
 
 </script>
 
@@ -20,7 +15,12 @@
 <h2>Example</h2>
 <div class="example">
   <Button
-    on:click={() => { showSelectContainer = true }}
+    on:click={() => { selectedItems = [
+        {},
+        {}
+      ]
+      showSelectContainer = true 
+    }}
   >
     Show Actions
   </Button>
@@ -39,7 +39,9 @@
         disabled: true,
         onClick: () => {
           return
-        }
+        },
+        info: 'info',
+        disabledInfo: 'disabled'
       },
       {
         label: 'Aggregate',
@@ -53,7 +55,8 @@
         disabled: false,
         onClick: () => {
           return
-        }
+        },
+        info: 'info'
       },
       {
         label: 'Split',
@@ -61,7 +64,8 @@
         disabled: true,
           onClick: () => {
           return
-        }
+        },
+        info: 'info'
       },
       {
         label: 'Supplier = Trader',
@@ -89,10 +93,7 @@
         }
       }
     ]}
-    selectedItems={[
-      {},
-      {}
-    ]}
+    {selectedItems}
   >
   </QuickActions>
 </div>

@@ -2,12 +2,12 @@
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
   import type { Filter } from "$lib/utils/filters/filters";
-  import type { Header } from "$lib/components/simple/lists/SimpleTable.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
-    import DynamicTable from "$lib/components/composed/list/DynamicTable.svelte";
+  import DynamicTable from "$lib/components/composed/list/DynamicTable.svelte";
+  import type { ComponentProps } from "svelte";
 
-  let headers : Header[] =[
+  let headers : ComponentProps<DynamicTable>['headers'] =[
       {
         value: 'businessName',
         label: 'Business name',
@@ -22,6 +22,15 @@
         key: "string",
       },
       sortable: true,
+      cellEditorInfo: {
+        description: 'Descrizione',
+        title: 'Titolo',
+        type: {
+          key: 'string',
+        },
+        column: 'Colonna',
+        info: 'Informazioni'
+      }
     },
     {
       value: "progress",
@@ -123,7 +132,7 @@
     headersToShowInTable={headers}
     showExpand
     filtersVisible
-    headerBackGroundColor={'rgb(var(--global-color-background-400))'}
+    cellEdit
     rows={[
       {
         item: {

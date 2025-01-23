@@ -6,7 +6,9 @@
     elementScroll: HTMLElement | null = null,
     hasMore: boolean = true
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{
+    'loadMore': undefined
+  }>();
   let isLoadMore = false,
     component: HTMLElement;
 

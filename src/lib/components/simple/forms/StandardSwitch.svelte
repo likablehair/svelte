@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte'
-	import './Switch.css'
+	import './StandardSwitch.css'
 
 	export let label: string = '',
 		value: boolean | undefined = undefined,

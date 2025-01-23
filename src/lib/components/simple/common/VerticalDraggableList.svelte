@@ -2,7 +2,7 @@
   import { flip } from "svelte/animate";
   import { dndzone } from "svelte-dnd-action";
 	import { createEventDispatcher } from "svelte"
-    import { Icon } from "$lib";
+  import { Icon } from "$lib";
 
 	type Item = { [key: string]: any }
   let clazz: string = '';

@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { FilterEditor, Icon } from "$lib";
-    import type { Filter } from "$lib/utils/filters/filters";
+	import { FilterEditor, Icon } from "$lib";
+	import type { Filter } from "$lib/utils/filters/filters";
 	import { createEventDispatcher } from "svelte"
 
 
@@ -176,8 +176,8 @@
     display: inline-flex;
     align-items: center;
     padding: 0.25rem 0.5rem;
-    background-color: rgb(var(--global-color-background-500));
-    color: rgb(var(--global-color-primary-500));
+    background-color: rgb(var(--global-color-background-700));
+    color: rgb(var(--global-color-primary-600));
     border-radius: 1rem;
     font-weight: bold;
     font-size: 0.9rem;
@@ -192,8 +192,8 @@
     height: 1rem;
     margin-left: 0.5rem;
     border-radius: 50%;
-    background-color: rgb(var(--global-color-background-500));
-    color: rgb(var(--global-color-primary-500));
+    background-color: rgb(var(--global-color-background-700));
+    color: rgb(var(--global-color-primary-600));
     font-weight: bold;
     cursor: pointer;
     font-size: 0.8rem;
@@ -201,6 +201,6 @@
   }
 
   .clear-button:hover {
-    background-color: rgb(var(--global-color-background-600));
+    background-color: rgb(var(--global-color-background-500));
   }
 </style>

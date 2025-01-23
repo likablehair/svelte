@@ -1,4 +1,5 @@
 <script lang="ts" context="module">
+	import './Select.css'
 	export type Option = {
 		icon?: string
 		value: string | number | undefined
@@ -14,9 +15,7 @@
 		name: string | undefined = undefined,
 		value: string | number | undefined = undefined,
 		disabled: boolean = false,
-		borderRadius: string | undefined = undefined,
-		placeholder: string | undefined = undefined,
-		border: string = '1.3px solid rgb(var(--global-color-contrast-300), .3)'
+		placeholder: string | undefined = undefined
 </script>
 
 <select
@@ -25,15 +24,6 @@
 	on:change
 	{placeholder}
 	class="select"
-	style:color="rgb(var(--global-color-contrast-900))"
-	style:background-color="transparent"
-	style:border-radius={!!borderRadius ? borderRadius : '5px'}
-	style:font-family="inherit"
-	style:font-size="inherit"
-	style:padding-left="5px"
-	style:padding-right="5px"
-	style:border
-	style:text-overflow="ellipsis"
 	{disabled}
 >
 	{#each options as option}
@@ -48,25 +38,65 @@
 
 <style>
 	.select {
-		height: var(--standard-select-height, 36px);
-		width: var(--standard-select-width, 100%);
-		color: var(--global-contrast-color);
-		background-color: var(--global-background-color);
-		border-color: var(--global-thin-contrast-color);
-		padding-left: var(--standard-select-padding-left, 5px);
-		padding-right: var(--standard-select-padding-right, 5px);
+		height: var(
+			--select-height, 
+			var(--select-default-height)
+		);
+		width: var(
+			--select-width, 
+			var(--select-default-width)
+		);
+		color: var(
+			--select-color, 
+			var(--select-default-color)
+		);
+		background-color: var(
+			--select-background-color,
+			var(--select-default-background-color)
+		);
+		padding-left: var(
+			--select-padding-left,
+			var(--select-default-padding-left)
+		);
+		padding-right: var(
+			--select-padding-right,
+			var(--select-default-padding-right)
+		);
+		font-size: inherit;
+		font-family: inherit;
+		text-overflow: ellipsis;
+		border-radius: var(
+			--select-border-radius,
+			var(--select-default-border-radius)
+		);
+		border: var(
+			--select-border,
+			var(--select-default-border)
+		);
 	}
 
 	.select:focus,
 	.select:active {
-		border-color: rgb(var(--global-color-primary-500)) !important;
+		border-color: var(
+			--selecr-active-border-color,
+			var(--select-default-active-border-color)
+		 ) !important;
 	}
 
 	.option {
 		padding: 10px;
-		color: rgb(var(--global-color-contrast-700));
-		background-color: rgb(var(--global-color-background-200));
-		border-color: rgb(var(--global-color-contrast-200));
+		color: var(
+			--option-color,
+			var(--option-default-color)
+		);
+		background-color: var(
+			--option-background-color,
+			var(--option-default-background-color)
+		);
+		border-color: var(
+			--option-border-color,
+			var(--option-default-border-color)
+		);
 	}
 
 	.select:focus {
