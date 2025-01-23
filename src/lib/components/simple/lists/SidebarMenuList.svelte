@@ -13,16 +13,6 @@
   import './SidebarMenuList.css'
   import { page } from "$app/stores";
 
-  /* 
-    Styles
-
-    --sidebar-menu-list-primary-color
-    --sidebar-menu-list-selected-text-color
-    --sidebar-menu-list-selected-font-weight
-    --sidebar-menu-list-color
-    --sidebar-menu-list-hover-color
-  */
-
   export let menus: Menu[],
     level: number = 0,
     selected: string | number | undefined = undefined,
@@ -35,12 +25,10 @@
   
   let selectedIndex: number | undefined = undefined
 
-  page.subscribe(() => {
-    if(autoDetectUrl) {
-      const results = getMenuNameMatchingUrl({ menus: menus })
-      selected = results.name
-    }
-  })
+  $: if(autoDetectUrl && !!$page) {
+    const results = getMenuNameMatchingUrl({ menus: menus })
+    selected = results.name
+  }
 
   $: if(level == 0) {
     if(selected !== undefined && selected !== null) {

@@ -159,12 +159,11 @@
   }
 
   function getTopDistance(elem: HTMLElement): number {
-    let positionedAncestor = getPositionedAncestor(elem)
+    let positionedAncestor = !!menuElement?.parentElement ? getPositionedAncestor(menuElement?.parentElement) : undefined
     if(!!positionedAncestor) {
       let top: number = parseInt(getComputedStyle(positionedAncestor).top)
       return (isNaN(top) ? 0 : top) + elem.offsetTop - calcScrollY(elem)
-    }
-    return window.scrollY + elem.getBoundingClientRect().top
+    } else return window.scrollY + elem.getBoundingClientRect().top
   }
 
   function calcScrollY(elem: HTMLElement): number {
@@ -278,9 +277,9 @@
     calculateMenuPosition({menuElement, activator})
   }
 
-  function getPositionedAncestor(elem: HTMLElement | null): HTMLElement | null {
+  function getPositionedAncestor(elem: HTMLElement | null, positions: string[] = ['fixed', 'absolute', 'sticky', 'relative']): HTMLElement | null {
     if (!elem) return null
-    if (['fixed', 'absolute', 'sticky', 'relative'].includes(getComputedStyle(elem).position)) return elem
+    if (positions.includes(getComputedStyle(elem).position)) return elem
     return getPositionedAncestor(elem.parentElement)
   }
 
@@ -309,10 +308,10 @@
       const display = computedStyle.display;
 
       if((position === 'fixed' || position === 'absolute' || position === 'relative') && display === "flex") {
-        const boundingClientRect = activatorParent.getBoundingClientRect();
+        const boundingClientRect = currentParent.getBoundingClientRect();
         top = top + boundingClientRect.top
         left = left + boundingClientRect.left
-        fixedParent = activatorParent
+        fixedParent = currentParent
       }
 
       if(position === 'sticky') {

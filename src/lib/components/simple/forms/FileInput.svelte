@@ -6,17 +6,6 @@
   let clazz: string = '';
 	export { clazz as class };
 
-  /*
-    Styles
-
-    --file-input-default-height
-    --file-input-default-width
-    --file-input-default-color
-    --file-input-default-background-color
-    --file-input-default-focus-shadow
-    --file-input-border-radius
-  */
-
   export let files: File[] | undefined = undefined,
     placeholder: string | undefined = undefined,
     persistOverUpload : boolean = true,
@@ -42,6 +31,7 @@
   }>();
 
   function handleFileDrop(event: DragEvent) {
+    highlight(false)
     let droppedFiles: FileList | undefined = event.dataTransfer?.files;
     let limitedFiles: File[]
 
@@ -95,7 +85,9 @@
 <div
   on:click={() => inputElement?.click()}
   on:keypress={() => inputElement?.click()}
-  on:dragover|preventDefault={() => highlight(true)}
+  on:dragover|preventDefault={() => {
+    highlight(true)
+  }}
   on:dragleave={() => highlight(false)}
   on:dragend={() => highlight(false)}
   on:drop|preventDefault={(e) => {
@@ -103,6 +95,7 @@
   }}
   class:disabled
   class="drop-area {clazz}"
+  class:active={dropAreaActive}
   role="presentation"
 >
   <slot name="body" active={dropAreaActive}>
@@ -149,6 +142,13 @@
     transition: 0.2s;
   }
 
+  .drop-area.active {
+    background-color: var(
+      --file-input-active-background-color,
+      var(--file-input-default-active-background-color)
+    );
+  }
+
   .disabled {
     opacity: 0.5;
     cursor: default;
@@ -158,8 +158,8 @@
   }
   .drop-area:hover:not(.disabled) {
     box-shadow: var(
-    --file-input-focus-shadow,
-    var(--file-input-default-focus-shadow)
+      --file-input-focus-shadow,
+      var(--file-input-default-focus-shadow)
     );
   }
 </style>

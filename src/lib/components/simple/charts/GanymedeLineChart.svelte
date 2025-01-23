@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Line } from 'svelte-chartjs';
+  import Line from './Line.svelte';
   import {
     Chart as ChartJS,
     Title,
@@ -23,8 +23,7 @@
   );
 
   let background: string | undefined = undefined,
-    mounted: boolean = false,
-    zoomMounted: boolean = false
+    mounted: boolean = false
 
   onMount(async () => {
     let style = getComputedStyle(document.body);
@@ -73,23 +72,7 @@
 
   $: gridColor = 'rgb(' + (background || '200, 200, 200') + ', .3)'
 
-  let chart: ComponentProps<Line>['chart']
-  $: if(!!chart && !!enableZoom && !!resetZoom) {
-    chart.resetZoom()
-    resetZoom = false
-  }
-
-  $: if(mounted) {
-    import('chartjs-plugin-zoom').then(({ default: zoomPlugin }) => {
-      ChartJS.register(zoomPlugin)
-      zoomMounted = true
-      setTimeout(() => {
-        chart?.resetZoom()
-      }, 20);
-    })
-  }
-
-  let chartOptions: ComponentProps<Line>['options']
+  let chartOptions: ComponentProps<typeof Line>['options']
   $: chartOptions = {
       indexAxis: horizontal ? 'y' : 'x',
       responsive: responsive,
@@ -169,13 +152,11 @@
       }
     }
 
-  $: realData = data as ComponentProps<Line>['data']
+  $: realData = data as ComponentProps<typeof Line>['data']
 </script>
 
-{#if zoomMounted || !enableZoom}
-  <Line 
-    bind:data={realData}
-    options={chartOptions}
-    bind:chart={chart}
-  ></Line>
-{/if}
+<Line 
+  bind:data={realData}
+  options={chartOptions}
+  bind:resetZoom
+></Line>

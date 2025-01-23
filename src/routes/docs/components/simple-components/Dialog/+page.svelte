@@ -1,6 +1,5 @@
 <script lang="ts">
   import Button from "$lib/components/simple/buttons/Button.svelte";
-  import Card from "$lib/components/simple/common/Card.svelte";
   import Dialog from "$lib/components/simple/dialogs/Dialog.svelte";
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import EventsViewer from "../../EventsViewer.svelte";
@@ -50,78 +49,73 @@
   bind:open={dialogOpened}
   transition="scale"
 >
-  <div>
-    <Card
-      padding="30px"
-      width="350px"
+  <div class="card">
+    <div class="card-header">Peace</div>
+    <div class="card-body">
+      <span>"Peace begins with a smile"</span>
+      <DatePickerTextField></DatePickerTextField>
+      <div style:width="fit-content" bind:this={activator}>
+        <Button
+          width="200px"
+          maxWidth="90vw"
+          on:click={(e) => handleButtonClick(e)}
+        >
+          Click me
+        </Button>
+      </div>
+    </div>
+    <div class="card-footer">
+      <span>Mother Teresa</span>
+    </div>
+
+    <Menu
+      _width="160px"
+      activator={activator}
+      bind:open={menuOpened}
+      anchor="bottom-center"
+      _borderRadius="10px"
+      _boxShadow="rgba(149, 157, 165, 0.2) 0px 8px 24px"
+      closeOnClickOutside
     >
-      <div class="card-header" slot="header">Peace</div>
-      <div class="card-body">
-        <span>"Peace begins with a smile"</span>
-        <DatePickerTextField></DatePickerTextField>
-        <div style:width="fit-content" bind:this={activator}>
-          <Button
-            width="200px"
-            maxWidth="90vw"
-            on:click={(e) => handleButtonClick(e)}
-          >
-            Click me
-          </Button>
+      <div class="menu-content">
+        <div class="list-container">
+          <ul>
+            {#each ['this', 'is', 'a', 'menu', '!'] as menuLabel}
+              <li
+                role="presentation"
+                bind:this={secondActivators[menuLabel]} 
+                on:click={() => handleListClick(menuLabel)}
+                on:keypress={() => handleListClick(menuLabel)}
+              >{menuLabel}</li>
+            {/each}
+          </ul>
         </div>
       </div>
-      <div class="card-footer" slot="footer">
-        <span>Mother Teresa</span>
-      </div>
+    </Menu>
 
+    {#each ['this', 'is', 'a', 'menu', '!'] as menuLabel}
       <Menu
         _width="160px"
-        activator={activator}
-        bind:open={menuOpened}
-        anchor="bottom-center"
+        activator={secondActivators[menuLabel]}
+        bind:open={secondMenuOpened[menuLabel]}
+        anchor="right-center"
         _borderRadius="10px"
         _boxShadow="rgba(149, 157, 165, 0.2) 0px 8px 24px"
         closeOnClickOutside
+        openingId="second-menu"
+        flipOnOverflow
       >
-        <div class="menu-content">
-          <div class="list-container">
-            <ul>
-              {#each ['this', 'is', 'a', 'menu', '!'] as menuLabel}
-                <li
-                  role="presentation"
-                  bind:this={secondActivators[menuLabel]} 
-                  on:click={() => handleListClick(menuLabel)}
-                  on:keypress={() => handleListClick(menuLabel)}
-                >{menuLabel}</li>
-              {/each}
-            </ul>
-          </div>
+        <div 
+          role="presentation"
+          style:height="100px"
+          bind:this={thirdActivators[menuLabel]}
+          on:click={() => handleSubMenuClick(menuLabel)}
+          on:keypress={() => handleSubMenuClick(menuLabel)}
+        >
+          {menuLabel}
         </div>
       </Menu>
-
-      {#each ['this', 'is', 'a', 'menu', '!'] as menuLabel}
-        <Menu
-          _width="160px"
-          activator={secondActivators[menuLabel]}
-          bind:open={secondMenuOpened[menuLabel]}
-          anchor="right-center"
-          _borderRadius="10px"
-          _boxShadow="rgba(149, 157, 165, 0.2) 0px 8px 24px"
-          closeOnClickOutside
-          openingId="second-menu"
-          flipOnOverflow
-        >
-          <div 
-            role="presentation"
-            style:height="100px"
-            bind:this={thirdActivators[menuLabel]}
-            on:click={() => handleSubMenuClick(menuLabel)}
-            on:keypress={() => handleSubMenuClick(menuLabel)}
-          >
-            {menuLabel}
-          </div>
-        </Menu>
-      {/each}
-    </Card>
+    {/each}
   </div>
 </Dialog>
 <h2>Props</h2>
@@ -200,6 +194,12 @@
 ></EventsViewer>
 
 <style>
+  .card {
+    background-color: rgb(var(--global-color-background-200));
+    padding: 16px;
+    border-radius: 4px;
+  }
+
   .example {
     display: flex;
     align-items: center;

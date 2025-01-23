@@ -20,23 +20,11 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/LinkButton'
   }, {
-    title: 'TextField',
-    description: 'A simple textfield',
-    status: 'deprecated',
-    type: 'simple',
-    url: '/docs/components/simple-components/TextField'
-  }, {
     title: 'Checkbox',
     description: 'A simple checkbox',
     status: 'stable',
     type: 'simple',
     url: '/docs/components/simple-components/Checkbox'
-  }, {
-    title: 'Card',
-    description: 'A card with header, body and footer. The body is scrollable and the header and footer are fixed',
-    status: 'stable',
-    type: 'simple',
-    url: '/docs/components/simple-components/Card'
   }, {
     title: 'Avatar',
     description: 'Circle image.',
@@ -49,12 +37,6 @@ const list: {
     status: 'stable',
     type: 'composed',
     url: '/docs/components/composed-components/DescriptiveAvatar' 
-  }, {
-    title: 'Gesture',
-    description: 'Handle touch gesture movements',
-    status: 'stable',
-    type: 'simple',
-    url: '/docs/components/simple-components/Gesture'
   }, {
     title: 'ProgressBar',
     description: 'Makes some progress to get there.',
@@ -80,14 +62,8 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/SimpleTimeLine'
   }, {
-    title: 'IntersectionObserver',
-    description: 'Get if there are intersection with the current viewport',
-    status: 'stable',
-    type: 'simple',
-    url: '/docs/components/simple-components/IntersectionObserver'
-  }, {
     title: 'MediaQuery',
-    description: 'Get the viewport size and exposed some variable',
+    description: 'Responsive is the key.',
     status: 'stable',
     type: 'simple',
     url: '/docs/components/simple-components/MediaQuery'
@@ -319,12 +295,6 @@ const list: {
     status: 'stable',
     type: 'composed',
     url: '/docs/components/composed-components/IconsDropdown'
-  }, {
-    title: 'TreeEditor',
-    description: 'Save the trees.',
-    status: 'beta',
-    type: 'composed',
-    url: '/docs/components/composed-components/TreeEditor'
   }, {
     title: 'RadioButton',
     description: 'Tune in and choose you favorite station with our radio buttons.',

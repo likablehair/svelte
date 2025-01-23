@@ -19,15 +19,19 @@
   let secondMenuOpened: Record<string, boolean> = {}
 
   function handleListClick(menuLabel: string) {
-    secondMenuOpened[menuLabel] = true
-    thirdMenuOpened = {}
+    setTimeout(() => {
+      secondMenuOpened[menuLabel] = true
+      thirdMenuOpened = {}
+    }, 10);
   }
 
   let thirdActivators: Record<string, HTMLElement> = {}
   let thirdMenuOpened: Record<string, boolean> = {}
 
   function handleSubMenuClick(menuLabel: string) {
-    thirdMenuOpened[menuLabel] = true
+    setTimeout(() => {
+      thirdMenuOpened[menuLabel] = true
+    }, 10);
   }
 </script>
 
@@ -64,6 +68,7 @@
             bind:this={secondActivators[menuLabel]} 
             on:click={() => handleListClick(menuLabel)}
             on:keypress={() => handleListClick(menuLabel)}
+            role="presentation"
           >{menuLabel}</li>
         {/each}
       </ul>
@@ -88,6 +93,7 @@
       bind:this={thirdActivators[menuLabel]}
       on:click={() => handleSubMenuClick(menuLabel)}
       on:keypress={() => handleSubMenuClick(menuLabel)}
+      role="presentation"
     >
       {menuLabel}
     </div>

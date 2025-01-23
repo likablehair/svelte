@@ -127,7 +127,7 @@
       on:wheel|preventDefault={() => {}}
       role="presentation"
       tabindex="-1"
-    />
+    ></div>
     <div
       style:position="absolute"
       style:top="0px"
@@ -183,6 +183,7 @@
     </div>
     <div
       style:z-index={zIndex + 1}
+      style:position="relative"
       on:click|stopPropagation
       on:keypress|stopPropagation
       role="presentation"

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Bar } from 'svelte-chartjs'
+  import Bar from './Bar.svelte';
   import { theme } from '$lib';
   import {
     Chart as ChartJS,
@@ -13,7 +13,6 @@
     BarElement,
   } from 'chart.js';
   import { onMount, type ComponentProps } from 'svelte';
-  import lodash from 'lodash'
 
   ChartJS.register(
     Title,
@@ -23,10 +22,10 @@
     BarElement,
     LinearScale,
     PointElement,
-    CategoryScale
+    CategoryScale,
   );
 
-  type TooltipLabelParameter = Parameters<NonNullable<NonNullable<NonNullable<NonNullable<NonNullable<ComponentProps<Bar>['options']>['plugins']>['tooltip']>['callbacks']>['label']>>[0]
+  type TooltipLabelParameter = Parameters<NonNullable<NonNullable<NonNullable<NonNullable<NonNullable<ComponentProps<typeof Bar>['options']>['plugins']>['tooltip']>['callbacks']>['label']>>[0]
 
   export let data: {
       labels: string[],
@@ -65,13 +64,6 @@
     width: string | number | undefined = undefined,
     height: string | number | undefined = undefined
 
-  let mounted: boolean = false,
-    zoomMounted: boolean = false
-
-  onMount(() => {
-    mounted = true
-  })
-
 
   $: if(!rgbTooltipColor && !!$theme.colors?.[$theme.active]['dark']['primary']['300']) 
     rgbTooltipColor = $theme.colors?.[$theme.active]['dark']['primary']['300']
@@ -84,23 +76,7 @@
   $: finalTooltipBackgroundColor = !!rgbTooltipBackgroundColor ? `rgb(${rgbTooltipBackgroundColor})` : undefined
   $: finalBackgroundColor = !!rgbBackgroundColor ? `rgb(${rgbBackgroundColor}, .3)` : undefined  
 
-  let chart: ComponentProps<Bar>['chart']
-  $: if(!!chart && !!enableZoom && !!resetZoom) {
-    chart.resetZoom()
-    resetZoom = false
-  }
-
-  $: if(mounted) {
-    import('chartjs-plugin-zoom').then(({ default: zoomPlugin }) => {
-      ChartJS.register(zoomPlugin)
-      zoomMounted = true
-      setTimeout(() => {
-        chart?.resetZoom()
-      }, 20);
-    })
-  }
-
-  let chartOptions: ComponentProps<Bar>['options']
+  let chartOptions: ComponentProps<typeof Bar>['options'] = {}
   $: chartOptions = {
       barPercentage: 0.9,
       borderRadius: 2,
@@ -188,8 +164,8 @@
 
 <Bar
   bind:data={data}
+  bind:resetZoom
   options={chartOptions}
-  bind:chart={chart}
-  bind:width={width}
-  bind:height={height}
+  width={width}
+  height={height}
 ></Bar>

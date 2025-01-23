@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Pie } from "svelte-chartjs";
+  import Pie from './Pie.svelte'
   import {
     Chart as ChartJS,
     Title,
@@ -50,7 +50,7 @@
   },
   showLegend: boolean = true;
 
-  let chartOptions: ComponentProps<Pie>['options']
+  let chartOptions: ComponentProps<typeof Pie>['options']
   $: chartOptions = {
       plugins: {
         legend: {
@@ -60,4 +60,7 @@
     }
 </script>
 
-<Pie bind:data options={chartOptions}/>
+<Pie 
+  bind:data 
+  options={chartOptions}
+></Pie>
