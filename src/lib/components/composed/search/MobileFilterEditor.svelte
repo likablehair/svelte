@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Filter, NumberMode, SelectMode, StringMode } from "$lib/utils/filters/filters";
-  import { GenericModes, SelectModes, StringModes } from '$lib/utils/filters/filters';
+  import { GENERIC_MODES, SELECT_MODES, STRING_MODES } from '$lib/utils/filters/filters';
   import type { DateMode } from "$lib/utils/filters/filters";
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
   import DatePickerTextField from "$lib/components/composed/forms/DatePickerTextField.svelte";
@@ -72,13 +72,13 @@
   $: if(!!tmpFilter) {
     let modes
     if(tmpFilter.type == 'string') {
-      modes = StringModes
+      modes = STRING_MODES
     } else if(tmpFilter.type == 'date') {
-      modes = GenericModes
+      modes = GENERIC_MODES
     } else if(tmpFilter.type == 'number') {
-      modes = GenericModes
+      modes = GENERIC_MODES
     } else if(tmpFilter.type == 'select') {
-      modes = SelectModes
+      modes = SELECT_MODES
     }
 
     if(!!modes) {
