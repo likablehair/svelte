@@ -63,7 +63,7 @@
       class="select-container"
     >
       <div>
-        <button class="select-info" on:click={() => (selectedItems = [])}>
+        <button class="select-info" on:click={() => (selectedItems = [], infoActivators = {}, disabledInfoActivators = {})}>
           {!!isSelectedAll ? totalRows : selectedItems.length} items selected
           <Icon name="mdi-close" />
         </button>
@@ -81,7 +81,7 @@
                 --button-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
                 --button-hover-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
                 --button-focus-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
-                --button-disabled-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
+                --button-disabled-color: var(--quick-actions-buttons-color-disabled);
                 --button-box-shadow: none;
               '
               --button-height="20px"
@@ -146,6 +146,7 @@
                   --button-hover-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
                   --button-focus-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
                   --button-disabled-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
+                  --button-disabled-color: var(--quick-actions-buttons-color-disabled);
                   --button-box-shadow: none;
                   margin-left: 8px;
                 '
@@ -197,6 +198,7 @@
               --button-hover-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
               --button-focus-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
               --button-disabled-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
+              --button-disabled-color: var(--quick-actions-buttons-color-disabled);
               --button-box-shadow: none;
             '
             --button-height="35px"

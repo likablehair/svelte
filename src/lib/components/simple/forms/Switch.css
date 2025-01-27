@@ -8,4 +8,7 @@
 	--switch-default-active-background-color: rgb(var(--global-color-contrast-900));
 	--switch-default-inactive-toggle-color: rgb(var(--global-color-contrast-900));
 	--switch-default-inactive-background-color: rgb(var(--global-color-contrast-900));
+	--switch-default-label-width: 'auto';
+	--switch-default-font-size: 16px;
+	--switch-default-gap: 0.5em;
 }

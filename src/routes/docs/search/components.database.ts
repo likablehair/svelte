@@ -338,6 +338,12 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/FlagIcon'
   }, {
+    title: 'Switch',
+    description: 'Switching sides.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Switch'
+  }, {
     title: 'ActivableButton',
     description: 'Activate the power now.',
     status: 'stable',

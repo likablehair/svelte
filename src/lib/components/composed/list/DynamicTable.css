@@ -1,6 +1,6 @@
 :root {
-  --cell-editor-default-background-color: rgb(var(--global-color-background-300));
-  --quick-filter-default-background-color: rgb(var(--global-color-background-300));
+  --dynamic-table-cell-editor-default-background-color: rgb(var(--global-color-background-300));
+  --dynamic-table-quick-filter-default-background-color: rgb(var(--global-color-background-300));
   --dynamic-table-row-default-background-color-hover: rgb(var(--global-color-background-400));
   --dynamic-table-expanded-row-default-background-color: rgb(var(--global-color-background-500));
   --dynamic-table-selected-row-default-background-color: rgb(var(--global-color-primary-200));
@@ -15,8 +15,4 @@
   --dynamic-table-default-hover-color: rgb(var(--global-color-contrast-800), .7);
   --dynamic-table-default-header-border-radius: 5px;
   --dynamic-table-default-header-height: 30px;
-  --simple-textfield-border-radius: 0.5rem;
-  --simple-textfield-background-color: transparent;
-  --simple-textfield-box-shadow: inset 0 0 0 1px rgb(var(--global-color-background-500));
-  --simple-textfield-focus-box-shadow: inset 0 0 0 2px rgb(var(--global-color-primary-500));
 }

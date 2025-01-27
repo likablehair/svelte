@@ -24,7 +24,6 @@
   import InfiniteScroll from "$lib/components/simple/common/InfiniteScroll.svelte";
   import Divider from "$lib/components/simple/common/Divider.svelte";
   import VerticalDraggableList from "$lib/components/simple/common/VerticalDraggableList.svelte";
-  import StandardSwitch from "$lib/components/simple/forms/StandardSwitch.svelte";
   import Button from "$lib/components/simple/buttons/Button.svelte";
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
   import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
@@ -34,7 +33,8 @@
   import type { DateMode, Filter, NumberMode, SelectMode, StringMode } from "$lib/utils/filters/filters";
   import QuickActions, { type Action } from "../common/QuickActions.svelte";
   import './DynamicTable.css'
-    import type { QuickFilter } from "$lib/utils/filters/quickFilters";
+  import type { QuickFilter } from "$lib/utils/filters/quickFilters";
+  import Switch from "$lib/components/simple/forms/Switch.svelte";
 
   const [send, receive] = crossfade({
     duration: 500,
@@ -879,6 +879,10 @@
           bind:input={searchBarInput}
           on:keydown={handleSearchBoxKeydown}
           --simple-textfield-default-width="450px"
+          --simple-textfield-border-radius= 0.5rem
+          --simple-textfield-background-color= transparent
+          --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+          --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
         />
       {/if}
 
@@ -1362,6 +1366,10 @@
           type="text"
           orientation="horizontal"
           bind:value={cellEditorInfoActive.value}
+          --simple-textfield-border-radius= 0.5rem
+          --simple-textfield-background-color= transparent
+          --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+          --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
         />
       {:else if cellEditorInfoActive.type.key === "number"}
         <LabelAndTextField
@@ -1373,6 +1381,10 @@
           orientation="horizontal"
           error={saveEditDisabled}
           bind:value={cellEditorInfoActive.value}
+          --simple-textfield-border-radius= 0.5rem
+          --simple-textfield-background-color= transparent
+          --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+          --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
         />
       {:else if cellEditorInfoActive.type.key === "select"}
         <LabelAndSelect
@@ -1443,7 +1455,11 @@
           name={quickFilterActive.title}
           info={quickFilterActive.info}
           type="text"
-          bind:value={quickFilterActive.type.value}
+          bind:value={quickFilterActive.type.value}          
+          --simple-textfield-border-radius= 0.5rem
+          --simple-textfield-background-color= transparent
+          --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+          --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
         />
       {:else if quickFilterActive.type.key === "number"}
         <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
@@ -1463,7 +1479,11 @@
           type="number"
           orientation="horizontal"
           error={saveEditDisabled}
-          bind:value={quickFilterActive.type.value}
+          bind:value={quickFilterActive.type.value}          
+          --simple-textfield-border-radius= 0.5rem
+          --simple-textfield-background-color= transparent
+          --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+          --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
         />
       {:else if quickFilterActive.type.key === "multi-select"}
         <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
@@ -1579,6 +1599,10 @@
               bind:selectedDate={quickFilterActive.type.from}
               placeholder={"From"}
               --simple-textfield-width="100%"
+              --simple-textfield-border-radius= 0.5rem
+              --simple-textfield-background-color= transparent
+              --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+              --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
               flipOnOverflow
               bind:menuOpened={calendarOpened}
               on:day-click={() => (calendarOpened = false)}
@@ -1604,6 +1628,10 @@
               bind:selectedDate={quickFilterActive.type.to}
               placeholder={"To"}
               --simple-textfield-width="100%"
+              --simple-textfield-border-radius= 0.5rem
+              --simple-textfield-background-color= transparent
+              --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+              --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
               flipOnOverflow
               bind:menuOpened={calendarOpened2}
               on:day-click={() => (calendarOpened2 = false)}
@@ -1664,8 +1692,8 @@
           }}
         >
           <svelte:fragment slot="item" let:item>
-            <StandardSwitch
-              labelWidth="90%"
+            <Switch
+              --switch-label-width="90%"
               value={headersToShow.find((h) => h.id == item.id) != undefined}
               label={item.name}
               on:change={(e) => {
@@ -1688,8 +1716,8 @@
             out:send={{ key: header }}
             class="headers-show grid-col-1"
           >
-            <StandardSwitch
-              labelWidth="90%"
+            <Switch
+              --switch-label-width="90%"
               value={false}
               label={header.name}
               on:change={(e) => {
@@ -1865,8 +1893,8 @@
     padding: 10px;
     border-radius: 10px;
     background-color: var(
-      --cell-editor-background-color,
-      var(--cell-editor-default-background-color)
+      --dynamic-table-cell-editor-background-color,
+      var(--dynamic-table-cell-editor-default-background-color)
     );
     height: 200px;
     width: 500px;
@@ -1889,8 +1917,8 @@
     padding: 10px;
     border-radius: 10px;
     background-color: var(
-      --quick-filter-background-color,
-      var(--quick-filter-default-background-color)
+      --dynamic-table-quick-filter-background-color,
+      var(--dynamic-table-quick-filter-default-background-color)
     );
   }
 

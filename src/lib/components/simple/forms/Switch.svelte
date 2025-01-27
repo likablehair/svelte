@@ -1,93 +1,110 @@
 <script lang="ts">
-  export let value = false,
-    height = "20px",
-    width = "40px",
-    padding = "6px",
-    borderRadius = "10px",
-    toggleActiveColor = "#5c5c5c",
-    toggleDeactiveColor = "#5c5c5c",
-    backgroundActiveColor = "#e6e6e6",
-    backgroundDeactiveColor = "#e6e6e6",
-    animationDuration = "0.1s";
+	import { createEventDispatcher } from 'svelte'
+	import './Switch.css'
+
+	export let label: string = '',
+		value: boolean | undefined = undefined,
+		disabled: boolean = false
+
+	let checked = value
+	const uniqueID = Math.floor(Math.random() * 100)
+
+	function handleClick(event: MouseEvent) {
+		const target = (event.target as HTMLElement) || null
+
+		const state = target.getAttribute('aria-checked')
+		checked = state === 'true' ? false : true
+		value = checked === true ? true : false
+
+		dispatch('change', {
+			label: label,
+			value: checked
+		})
+	}
+
+	let dispatch = createEventDispatcher<{
+		change: {
+			label: string
+			value: boolean
+		}
+	}>()
 </script>
 
-<div
-  style:--switch-toggle-active-color={toggleActiveColor}
-  style:--switch-toggle-deactive-color={toggleDeactiveColor}
-  style:--switch-animation-duration={animationDuration}
-  style:--switch-height={height}
-  style:--switch-width={width}
-  style:--switch-padding={padding}
-  style:--switch-border-radius={borderRadius}
-  class="container"
->
-  <div
-    class="inner-container"
-    style:background-color={value
-      ? backgroundActiveColor
-      : backgroundDeactiveColor}
-    on:click={() => (value = !value)}
-    on:keypress={() => (value = !value)}
-  >
-    <input bind:checked={value} type="checkbox" on:change />
-    <span class="slider" />
-  </div>
+<div class="s s--slider">
+	<span id={`switch-${uniqueID}`}>{label}</span>
+	<button {disabled} role="switch" aria-checked={checked} on:click={handleClick} />
 </div>
 
 <style>
-  .container {
-    position: relative;
-    width: var(--switch-width);
-    box-sizing: border-box;
-  }
+	:root {
+		--accent-color: rgb(var(--global-color-primary-500));
+		--size: 40px;
+		--gray: #ccc;
+	}
 
-  input {
-    position: absolute;
-    display: none;
-  }
+	.s--slider {
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+		font-size: var(
+			--switch-font-size,
+			var(--switch-default-font-size)
+		);
+		gap: var(
+			--switch-gap,
+			var(--switch-default-gap)
+		);
+	}
 
-  .inner-container {
-    position: absolute;
-    width: 100%;
-    height: var(--switch-height);
-    border-radius: var(--switch-border-radius);
-    cursor: pointer;
-    transition: background-color var(--switch-animation-duration) ease;
-  }
+	.s--slider button {
+		width: var(--size);
+		height: calc(var(--size) * 0.55);
+		position: relative;
+		margin: 0;
+		background: var(--gray);
+		border: none;
+	}
 
-  .slider {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: var(--switch-border-radius);
-    transition: var(--switch-animation-duration);
-  }
+	.s--slider button::before {
+		content: '';
+		position: absolute;
+		width: calc(var(--size) / 3);
+		height: calc(var(--size) / 3);
+		background: #fff;
+		top: calc(var(--size) / 10);
+		right: calc(var(--size) / 1.7);
+		transition: transform 0.3s;
+	}
 
-  .slider::before {
-    --switch-toggle-top-padding: calc(var(--switch-padding) / 2);
-    --switch-toggle-left-padding: calc(var(--switch-padding) / 2);
-    --switch-toggle-right-padding: calc(var(--switch-padding) / 2);
-    --switch-toggle-bottom-padding: calc(var(--switch-padding) / 2);
-    content: "";
-    position: absolute;
-    top: var(--switch-toggle-top-padding);
-    left: var(--switch-toggle-left-padding);
-    width: calc(
-      var(--switch-width) / 2 - var(--switch-toggle-right-padding) -
-        var(--switch-toggle-left-padding)
-    );
-    height: calc(
-      var(--switch-height) - var(--switch-toggle-top-padding) -
-        var(--switch-toggle-bottom-padding)
-    );
-    border-radius: var(--switch-border-radius);
-    background-color: var(--switch-toggle-deactive-color);
-    transition: var(--switch-animation-duration);
-  }
+	.s--slider button[aria-checked='true'] {
+		background-color: var(--accent-color);
+	}
 
-  input:checked ~ .slider::before {
-    transform: translateX(calc(var(--switch-width) / 2));
-    background-color: var(--switch-toggle-active-color);
-    box-shadow: none;
-  }
+	.s--slider button[aria-checked='true']::before {
+		transform: translateX(1.3em);
+		transition: transform 0.3s;
+	}
+
+	.s--slider button:focus {
+		box-shadow: 0 0px 0px 1px var(--accent-color);
+	}
+
+	.s--slider button {
+		border-radius: 1.5em;
+	}
+
+	.s--slider button::before {
+		border-radius: 100%;
+	}
+
+	.s--slider button:focus {
+		box-shadow: 0 0px 8px var(--accent-color);
+		border-radius: 1.5em;
+	}
+	span {
+		width: var(
+			--switch-label-width,
+			var(--switch-default-label-width)
+		);
+	}
 </style>

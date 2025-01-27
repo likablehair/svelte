@@ -5,7 +5,7 @@
   --quick-actions-default-z-index: 48;
 
   --quick-actions-default-buttons-background-color: var(--quick-actions-background-color, var(--quick-actions-default-background-color));
-  --quick-actions-default-buttons-background-color-disabled: var(--quick-actions-buttons-background-color , var(--quick-actions-default-buttons-background-color));
+  --quick-actions-default-buttons-background-color-disabled: rgb(var(--global-color-background-300), .5);
   --quick-actions-default-buttons-background-color-hover: rgb(var(--global-color-background-300));
   --quick-actions-default-buttons-color: rgb(var(--global-color-contrast-900));
 }

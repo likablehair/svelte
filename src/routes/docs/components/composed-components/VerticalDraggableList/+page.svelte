@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { Button, Divider, Drawer, Icon, VerticalDraggableList } from "$lib";
-    import MediaQuery from "$lib/components/simple/common/MediaQuery.svelte";
-    import StandardSwitch from "$lib/components/simple/forms/StandardSwitch.svelte";
-    import { flip } from "svelte/animate";
+  import { Button, Divider, Drawer, Icon, VerticalDraggableList } from "$lib";
+  import MediaQuery from "$lib/components/simple/common/MediaQuery.svelte";
+  import { flip } from "svelte/animate";
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
-    import { type Header } from "$lib/components/simple/lists/SimpleTable.svelte";
-    import { crossfade } from "svelte/transition";
-    import { quintOut } from "svelte/easing";
+  import { type Header } from "$lib/components/simple/lists/SimpleTable.svelte";
+  import { crossfade } from "svelte/transition";
+  import { quintOut } from "svelte/easing";
+  import Switch from "$lib/components/simple/forms/Switch.svelte";
 
   const [send, receive] = crossfade({
     duration: 500,
@@ -115,8 +115,8 @@
           }}
         >
           <svelte:fragment slot="item" let:item>
-            <StandardSwitch
-              labelWidth="90%"
+            <Switch
+              --switch-label-width="90%"
               value={headersToShow.find((h) => h.id == item.id) != undefined}
               label={item.name}
               on:change={(e) => {
@@ -129,7 +129,7 @@
           </svelte:fragment>
         </VerticalDraggableList>
       {/if}
-      <Divider color="rgb(var(--global-color-contrast-100)" />
+      <Divider --divider-color="rgb(var(--global-color-contrast-100)" />
       <span class="headers-show grid-col-1">Headers to show</span>
       {#if headersToSelect && headersToSelect.length > 0}
         {#each headersToSelect as header (header.id)}
@@ -139,8 +139,8 @@
             out:send={{ key: header }}
             class="headers-show grid-col-1"
           >
-            <StandardSwitch
-              labelWidth="90%"
+            <Switch
+              --switch-label-width="90%"
               value={false}
               label={header.name}
               on:change={(e) => {
