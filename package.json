@@ -1,7 +1,7 @@
 {
   "name": "@likable-hair/svelte",
   "description": "A Svelte component for likablehair and others",
-  "version": "3.3.1",
+  "version": "3.3.2",
   "scripts": {
     "host": "vite --host",
     "dev": "vite dev",
@@ -52,8 +52,7 @@
     "tslib": "^2.4.1",
     "typescript": "^4.9.3",
     "vite": "^5.0.0",
-    "vitest": "^0.25.3",
-    "svelte-dnd-action": "0.9.50"
+    "vitest": "^0.25.3"
   },
   "svelte": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -71,6 +70,7 @@
     "sortablejs": "^1.15.2",
     "svelte-chartjs": "^3.1.5",
     "svelte-dts": "^0.3.7",
-    "svelte-grid": "^5.1.2"
+    "svelte-grid": "^5.1.2",
+    "svelte-dnd-action": "0.9.50"
   }
 }
