@@ -8,12 +8,14 @@
   import type { ComponentProps } from "svelte";
 
   let headers : ComponentProps<DynamicTable>['headers'] =[
-      {
-        value: 'businessName',
-        label: 'Business name',
-        type: {
+    {
+      value: 'businessName',
+      label: 'Business name',
+      type: {
         key: "string",
       },
+      info: 'informazioni',
+      sortable: true
     },
     {
       value: "productName",

@@ -1005,33 +1005,27 @@
               on:click={() => handleHeaderClick(head)}
             >
               <slot name="header" {head}>
-                <span class="header-label">
-                  <slot name="headerLabel">
-                    <div bind:this={infoActivators[index]}>
-                      {head.label}
-                      {#if !!head.info}
-                        <Icon						
-                          name="mdi-help-circle-outline"
-                          --icon-size="16px"
-                        />
-                      {/if}
-                    </div>
-                    {#if !!head.info}
-                      <ToolTip
-                        appearTimeout={1000}
-                        activator={infoActivators[index]}
-                      >
-                        <div
-                          style:background-color='rgb(var(--global-color-background-300), .95)'
-                          style:border-radius="5px"
-                          style:padding="10px"
-                        >
-                          {head.info}
-                        </div>
-                      </ToolTip>
-                    {/if}
-                  </slot>
+                <span class="header-label" bind:this={infoActivators[index]}>
+                  <slot name="headerLabel">{head.label}</slot>
+                  {#if !!head.info}
+                    <Icon						
+                      name="mdi-help-circle-outline"
+                      --icon-size="16px"
+                    />
+                  {/if}
                 </span>
+                <ToolTip
+                  appearTimeout={1000}
+                  activator={infoActivators[index]}
+                >
+                  <div
+                    style:background-color='rgb(var(--global-color-background-300), .95)'
+                    style:border-radius="5px"
+                    style:padding="10px"
+                  >
+                    {head.info}
+                  </div>
+                </ToolTip>
                 {#if head.sortable}
                   <span
                     class="header-sort-icon"
