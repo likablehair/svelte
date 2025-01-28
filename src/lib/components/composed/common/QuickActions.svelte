@@ -38,7 +38,7 @@
   $: {
     if (!!slotSelectActionsContainer) {
       let numberOfSplit = $mediaQuery.xl ? 5 :
-        $mediaQuery.l ? 5 :
+        $mediaQuery.l ? 4 :
         $mediaQuery.m ? 2 :
         $mediaQuery.s ? 0 :
         $mediaQuery.xs ? 0 : 3
@@ -259,11 +259,12 @@
       --quick-actions-z-index,
       var(--quick-actions-default-z-index)
     );
-    width: 100%;
+    width: 90%;
   }
 
   .container-top {
     top: 16px;
+    left: 250px;
   }
 
   .container-bottom {
@@ -279,6 +280,7 @@
 
     .container-top {
       top: 16px;
+      left: auto;
     }
 
     .container-bottom {
