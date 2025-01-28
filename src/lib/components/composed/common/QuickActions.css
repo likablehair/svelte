@@ -8,4 +8,5 @@
   --quick-actions-default-buttons-background-color-disabled: rgb(var(--global-color-background-300), .5);
   --quick-actions-default-buttons-background-color-hover: rgb(var(--global-color-background-300));
   --quick-actions-default-buttons-color: rgb(var(--global-color-contrast-900));
+  --quick-actions-default-buttons-color-disabled: rgb(var(--global-color-contrast-900), .5)
 }

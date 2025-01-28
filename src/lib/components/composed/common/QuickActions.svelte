@@ -81,7 +81,7 @@
                 --button-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
                 --button-hover-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
                 --button-focus-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
-                --button-disabled-color: var(--quick-actions-buttons-color-disabled);
+                --button-disabled-color: var(--quick-actions-buttons-color-disabled, var(--quick-actions-default-buttons-color-disabled));
                 --button-box-shadow: none;
               '
               --button-height="20px"
@@ -145,8 +145,7 @@
                   --button-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
                   --button-hover-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
                   --button-focus-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
-                  --button-disabled-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
-                  --button-disabled-color: var(--quick-actions-buttons-color-disabled);
+                  --button-disabled-color: var(--quick-actions-buttons-color-disabled, var(--quick-actions-default-buttons-color-disabled));
                   --button-box-shadow: none;
                   margin-left: 8px;
                 '
@@ -197,8 +196,7 @@
               --button-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
               --button-hover-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
               --button-focus-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
-              --button-disabled-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
-              --button-disabled-color: var(--quick-actions-buttons-color-disabled);
+              --button-disabled-color: var(--quick-actions-buttons-color-disabled, var(--quick-actions-default-buttons-color-disabled));
               --button-box-shadow: none;
             '
             --button-height="35px"
