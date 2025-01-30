@@ -190,7 +190,8 @@
     quickFilters: QuickFilter[] = [],
     actionsForSelectedItems: Action[] = [],
     hasMoreToLoad: boolean = false,
-    totalRows: number = rows.length
+    totalRows: number = rows.length,
+    searchText: string | undefined = undefined
 
   let openCellEditor: boolean = false,
     cellEditorActivator: HTMLElement | undefined,
@@ -202,7 +203,6 @@
       item?: Item;
     },
     saveEditDisabled: boolean = false,
-    searchText: string | undefined = undefined,
     searchBarInput: HTMLElement | undefined = undefined,
     openQuickFilter: boolean = false,
     quickFilterActivator: HTMLElement | undefined,
