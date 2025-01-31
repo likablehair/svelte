@@ -1014,18 +1014,20 @@
                     />
                   {/if}
                 </span>
-                <ToolTip
-                  appearTimeout={1000}
-                  activator={infoActivators[index]}
-                >
-                  <div
-                    style:background-color='rgb(var(--global-color-background-300), .95)'
-                    style:border-radius="5px"
-                    style:padding="10px"
+                {#if !!head.info}
+                  <ToolTip
+                    appearTimeout={1000}
+                    activator={infoActivators[index]}
                   >
-                    {head.info}
-                  </div>
-                </ToolTip>
+                    <div
+                      style:background-color='rgb(var(--global-color-background-300), .95)'
+                      style:border-radius="5px"
+                      style:padding="10px"
+                    >
+                      {head.info}
+                    </div>
+                  </ToolTip>
+                {/if}
                 {#if head.sortable}
                   <span
                     class="header-sort-icon"
