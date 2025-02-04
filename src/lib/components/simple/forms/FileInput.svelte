@@ -34,11 +34,11 @@
     fileDrop: {
       nativeEvent: DragEvent;
       files: File[];
-    };
+    }
     fileSelect: {
       nativeEvent: Event;
       files: File[];
-    };
+    }
   }>();
 
   function handleFileDrop(event: DragEvent) {

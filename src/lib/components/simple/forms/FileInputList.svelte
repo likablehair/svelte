@@ -4,9 +4,16 @@
   import Button from "$lib/components/simple/buttons/Button.svelte";
   import FileInput from "$lib/components/simple/forms/FileInput.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
+    import { createEventDispatcher } from "svelte";
 
   let clazz: string = "";
   export { clazz as class };
+
+  let dispatch = createEventDispatcher<{
+    fileChange: {
+      files: File[]
+    }
+  }>()
 
   export let files: File[] = [],
     persistOverUpload: boolean = true,
@@ -32,6 +39,15 @@
     files = files.filter((elem) => {
       return elem != file;
     });
+    dispatch("fileChange", { files })
+  }
+
+  function handleFileDrop() {
+    dispatch("fileChange", { files })
+  }
+
+  function handleFileSelect() {
+    dispatch("fileChange", { files })
   }
 </script>
 
@@ -46,6 +62,10 @@
     --file-input-height="var(--file-input-list-height,var(--file-input-list-default-height))"
     --file-input-width="var(--file-input-list-width,var(--file-input-list-default-width))"
     on:change
+    on:fileDrop={handleFileDrop}
+    on:fileDrop
+    on:fileSelect={handleFileSelect}
+    on:fileSelect
     {maxFiles}
   >
     <span
