@@ -19,6 +19,7 @@
     persistOverUpload: boolean = true,
     dropAreaActive: boolean = true,
     icon: string = "mdi-file-document",
+    message: string = "Drop file here or click to upload",
     disabled: boolean = false,
     maxFiles: number | undefined = undefined;
 
@@ -77,44 +78,48 @@
     >
       <div class="body-container" class:active={dropAreaActive}>
         {#if files.length == 0}
-          <span>Drop file here or click to upload</span>
+          <slot name="message">
+            <span>{message}</span>
+          </slot>
         {:else}
-          <table class="file-list">
-            {#each files as file}
-              <tr
-                on:click|stopPropagation={() => {
-                  handleFileClick(file);
-                }}
-                on:mouseenter|stopPropagation={() => {
-                  handleFileMouseEnter(file);
-                }}
-                on:mouseleave|stopPropagation={() => {
-                  handleFileMouseLeave();
-                }}
-                class:file-active={fileActive == file}
-              >
-                <td>
-                  <Icon name={icon} />
-                </td>
-                <td class="file-name">
-                  {file.name}
-                </td>
-                <td>
-                  {file.size}
-                </td>
-                <td style:width="10%" style:margin-right="10px">
-                  <Button
-                    buttonType="text"
-                    icon="mdi-close"
-                    on:click={(e) => {
-                      e.detail.nativeEvent.stopPropagation();
-                      handleRemove(file);
-                    }}
-                  />
-                </td>
-              </tr>
-            {/each}
-          </table>
+          <slot name="file-list" {files}>
+            <table class="file-list">
+              {#each files as file}
+                <tr
+                  on:click|stopPropagation={() => {
+                    handleFileClick(file);
+                  }}
+                  on:mouseenter|stopPropagation={() => {
+                    handleFileMouseEnter(file);
+                  }}
+                  on:mouseleave|stopPropagation={() => {
+                    handleFileMouseLeave();
+                  }}
+                  class:file-active={fileActive == file}
+                >
+                  <td>
+                    <Icon name={icon} />
+                  </td>
+                  <td class="file-name">
+                    {file.name}
+                  </td>
+                  <td>
+                    {file.size}
+                  </td>
+                  <td style:width="10%" style:margin-right="10px">
+                    <Button
+                      buttonType="text"
+                      icon="mdi-close"
+                      on:click={(e) => {
+                        e.detail.nativeEvent.stopPropagation();
+                        handleRemove(file);
+                      }}
+                    />
+                  </td>
+                </tr>
+              {/each}
+            </table>
+          </slot>
         {/if}
       </div>
     </span>
