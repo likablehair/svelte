@@ -1,7 +1,7 @@
 <script lang="ts">
   import './Checkbox.css'
   import '../../../css/main.css'
-    import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
 
   export let value = false,
     id: string | undefined = undefined,
@@ -30,12 +30,15 @@
   }
 
   let dispatch = createEventDispatcher<{
-    'change': { shiftKeyPressed: boolean }
+    'change': { 
+      shiftKeyPressed: boolean,
+      nativeEvent: Event
+    }
   }>(),
     shiftKeyPressed: boolean = false
 
-  function handleChange() {
-    dispatch('change', { shiftKeyPressed })
+  function handleChange(e: Event) {
+    dispatch('change', { shiftKeyPressed, nativeEvent: e })
   }
 </script>
 
