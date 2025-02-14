@@ -15,7 +15,7 @@
     type PaginatedTable
   } from "$lib";
   import { DateTime } from "luxon";
-  import { createEventDispatcher, type ComponentProps } from "svelte";
+  import { createEventDispatcher, onMount, type ComponentProps } from "svelte";
   import { quintOut } from "svelte/easing";
   import { crossfade } from "svelte/transition";
   import Filters from "../search/Filters.svelte";
@@ -36,6 +36,21 @@
   import type { QuickFilter } from "$lib/utils/filters/quickFilters";
   import Switch from "$lib/components/simple/forms/Switch.svelte";
 
+  onMount(() => {
+    updateHeaderHeight();
+    window.addEventListener('resize', updateHeaderHeight);
+    return () => window.removeEventListener('resize', updateHeaderHeight);
+  });
+
+  let mainHeader: Element
+
+  function updateHeaderHeight() {
+    if (mainHeader) {
+      const headerHeight = mainHeader.getBoundingClientRect().height;
+      document.documentElement.style.setProperty('--main-header-height', headerHeight + 'px');
+    }
+  }
+  
   const [send, receive] = crossfade({
     duration: 500,
     fallback(node, params) {
@@ -973,7 +988,7 @@
 
   <div class="table-container">
     <table style="display: table;" class="table">
-      <thead class="table-header">
+      <thead class="table-header" bind:this={mainHeader}>
         <tr>
           {#if !!showSelect && !showExpand && rows.length > 0}
             <th
@@ -1769,6 +1784,10 @@
     z-index: 1;
   }
 
+  .table-subheader {
+  top: var(--main-header-height);
+  z-index: 0;
+}
   .table-header th {
     padding: var(
       --dynamic-table-header-padding,
