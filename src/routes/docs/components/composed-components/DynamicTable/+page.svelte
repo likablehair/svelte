@@ -48,6 +48,14 @@
         key: "custom",
       },
       sortable: true,
+    },
+    {
+      value: "id",
+      label: "ID",
+      type: {
+        key: "string",
+      },
+      sortable: true,
     }
   ],
   filters: Filter[] | undefined  = [
@@ -112,95 +120,16 @@
     }
   ],
   value: string | number | undefined = undefined,
-  rows = [
-    {
-      item: {
-        id: 1,
-        businessName: "GQ Creators",
-        productName: "Data Protection",
-        progress: "339 sold",
-        rating: 5,
-      },
-      subItems: [
-        {
-          businessName: "GQ Creators",
-          productName: "Data Protection",
-          progress: "339 sold",
-          rating: 5,
-        },
-        { 
-          businessName: "Dribblers Agency",
-          productName: "Job Search",
-          progress: "212 sold",
-          rating: 4.5,
-        },
-        {
-          businessName: "Popular My",
-          productName: "Financial Transactions",
-          progress: "94 sold",
-          rating: 4.2,
-        },
-      ]
+  rows = Array.from({ length: 500 }, (_, index) => ({
+    item: {
+      id: index + 1,
+      businessName: "Popular My",
+      productName: "Financial Transactions",
+      progress: `${94 + (index % 10)} sold`, 
+      rating: (4 + (index % 5) * 0.1).toFixed(1), 
     },
-    {
-      item: {
-        id: 2,
-        businessName: "Dribblers Agency",
-        productName: "Job Search",
-        progress: "212 sold",
-        rating: 4.5,
-      },
-      subItems: [
-        {
-          businessName: "GQ Creators",
-          productName: "Data Protection",
-          progress: "339 sold",
-          rating: 5,
-        },
-        { 
-          businessName: "Dribblers Agency",
-          productName: "Job Search",
-          progress: "212 sold",
-          rating: 4.5,
-        },
-        {
-          businessName: "Popular My",
-          productName: "Financial Transactions",
-          progress: "94 sold",
-          rating: 4.2,
-        },
-      ]
-    },
-    {
-      item: {
-        id: 3,
-        businessName: "Popular My",
-        productName: "Financial Transactions",
-        progress: "94 sold",
-        rating: 4.2,
-      },
-      subItems: [
-        {
-          businessName: "GQ Creators",
-          productName: "Data Protection",
-          progress: "339 sold",
-          rating: 5,
-        },
-        { 
-          businessName: "Dribblers Agency",
-          productName: "Job Search",
-          progress: "212 sold",
-          rating: 4.5,
-        },
-        {
-          businessName: "Popular My",
-          productName: "Financial Transactions",
-          progress: "94 sold",
-          rating: 4.2,
-        },
-      ]
-    },
-  ]
+    subItems: []
+  }));
 
   function handleCustomInput(e: Event, filterName: string, updateFunction: (filterName: string, newValue: any, newValid: boolean) => void) {
     //@ts-ignore
@@ -225,6 +154,23 @@
     filtersVisible
     cellEdit
     {rows}
+    hasMoreToLoad
+    on:fetchData={() => {
+      let lastId = rows[rows.length - 1].item.id
+      rows = [
+        ...rows,
+        ...(Array.from({ length: 100 }, (_, index) => ({
+          item: {
+            id: ++lastId,
+            businessName: "Popular My",
+            productName: "Financial Transactions",
+            progress: `${94 + (index % 10)} sold`, 
+            rating: (4 + (index % 5) * 0.1).toFixed(1), 
+          },
+          subItems: []
+        })))
+      ]
+    }}
     customizeHeaders
     searchBarPlaceholder={'Type to search'}
     searchBarVisible
