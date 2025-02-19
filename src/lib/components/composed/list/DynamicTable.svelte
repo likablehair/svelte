@@ -208,8 +208,8 @@
     totalRows: number = rows.length,
     searchText: string | undefined = undefined,
     renderedRowsNumber = 100,
-    sectionRowsNumber = 100,
-    sectionTreshold = sectionRowsNumber,
+    sectionRowsNumber = 20,
+    sectionTreshold = 2,
     backwardTresholdPixel = 100,
     forwardTresholdPixel = 100
 
