@@ -7,7 +7,7 @@
   import DynamicTable from "$lib/components/composed/list/DynamicTable.svelte";
   import type { ComponentProps } from "svelte";
 
-  let headers : ComponentProps<DynamicTable>['headers'] =[
+  let headers : ComponentProps<DynamicTable>['headers'] = [
     {
       value: 'businessName',
       label: 'Business name',
@@ -48,70 +48,88 @@
         key: "custom",
       },
       sortable: true,
-      }
-    ]
-
-  let filters: Filter[] | undefined  = [{
-    label: "Business name",
-    active: false,
-    type: 'string',
-    name: "businessName",
-    column: "businessName",
-    mode: 'contains',
-    modify: function({ builder, value }) {
-      return builder.whereJsonSuperset('products.categories', {data: [{name: "Tipologie Gomme", tags: {data: [{value: value, selected: true}]}}]})
-    }
-  },
-  {
-    label: "Product name",
-    active: false,
-    type: 'string',
-    name: "productName",
-    column: "productName",
-    advanced: true,
-    mode: 'like'
-  },
-  {
-    label: 'Rating',
-    view: 'toggle',
-    active: false,
-    type: 'select',
-    column: 'rating',
-    mode: 'equal',
-    advanced: true,
-    name: 'rating',
-    items: [
-      {
-        label: "5",
-        value: 5
+    },
+    {
+      value: "id",
+      label: "ID",
+      type: {
+        key: "string",
       },
-      {
-        label: "4.5",
-        value: 4.5
-      }
-    ]
-  },
-  {
-    label: "Test date",
-    active: false,
-    type: 'date',
-    name: "testDate",
-    column: "testDate",
-    advanced: false,
-    mode: 'equal'
-  },
-  {
-    type: "custom",
-    label: "Product category",
-    name: "productCategory",
-    modify: ({builder, value}) => {
-      return builder.join('categories', q => {
-        q.on('product.categoryId', 'category.id')
-      }).where('categories.name', value)
+      sortable: true,
     }
-  }
-]
-  let value: string | number | undefined = undefined
+  ],
+  filters: Filter[] | undefined  = [
+    {
+      label: "Business name",
+      active: false,
+      type: 'string',
+      name: "businessName",
+      column: "businessName",
+      mode: 'contains',
+      modify: function({ builder, value }) {
+        return builder.whereJsonSuperset('products.categories', {data: [{name: "Tipologie Gomme", tags: {data: [{value: value, selected: true}]}}]})
+      }
+    },
+    {
+      label: "Product name",
+      active: false,
+      type: 'string',
+      name: "productName",
+      column: "productName",
+      advanced: true,
+      mode: 'like'
+    },
+    {
+      label: 'Rating',
+      view: 'toggle',
+      active: false,
+      type: 'select',
+      column: 'rating',
+      mode: 'equal',
+      advanced: true,
+      name: 'rating',
+      items: [
+        {
+          label: "5",
+          value: 5
+        },
+        {
+          label: "4.5",
+          value: 4.5
+        }
+      ]
+    },
+    {
+      label: "Test date",
+      active: false,
+      type: 'date',
+      name: "testDate",
+      column: "testDate",
+      advanced: false,
+      mode: 'equal'
+    },
+    {
+      type: "custom",
+      label: "Product category",
+      name: "productCategory",
+      modify: ({builder, value}) => {
+        return builder.join('categories', q => {
+          q.on('product.categoryId', 'category.id')
+        }).where('categories.name', value)
+      }
+    }
+  ],
+  value: string | number | undefined = undefined,
+  rows = Array.from({ length: 500 }, (_, index) => ({
+    item: {
+      id: index + 1,
+      businessName: "Popular My",
+      productName: "Financial Transactions",
+      progress: `${94 + (index % 10)} sold`, 
+      rating: (4 + (index % 5) * 0.1).toFixed(1), 
+    },
+    subItems: []
+  }));
 
   function handleCustomInput(e: Event, filterName: string, updateFunction: (filterName: string, newValue: any, newValid: boolean) => void) {
     //@ts-ignore
@@ -135,95 +153,24 @@
     showExpand
     filtersVisible
     cellEdit
-    rows={[
-      {
-        item: {
-          id: 1,
-          businessName: "GQ Creators",
-          productName: "Data Protection",
-          progress: "339 sold",
-          rating: 5,
-        },
-        subItems: [
-          {
-            businessName: "GQ Creators",
-            productName: "Data Protection",
-            progress: "339 sold",
-            rating: 5,
-          },
-          { 
-            businessName: "Dribblers Agency",
-            productName: "Job Search",
-            progress: "212 sold",
-            rating: 4.5,
-          },
-          {
+    {rows}
+    hasMoreToLoad
+    on:fetchData={() => {
+      let lastId = rows[rows.length - 1].item.id
+      rows = [
+        ...rows,
+        ...(Array.from({ length: 100 }, (_, index) => ({
+          item: {
+            id: ++lastId,
             businessName: "Popular My",
             productName: "Financial Transactions",
-            progress: "94 sold",
-            rating: 4.2,
+            progress: `${94 + (index % 10)} sold`, 
+            rating: (4 + (index % 5) * 0.1).toFixed(1), 
           },
-        ]
-      },
-      {
-        item: {
-          id: 2,
-          businessName: "Dribblers Agency",
-          productName: "Job Search",
-          progress: "212 sold",
-          rating: 4.5,
-        },
-        subItems: [
-          {
-            businessName: "GQ Creators",
-            productName: "Data Protection",
-            progress: "339 sold",
-            rating: 5,
-          },
-          { 
-            businessName: "Dribblers Agency",
-            productName: "Job Search",
-            progress: "212 sold",
-            rating: 4.5,
-          },
-          {
-            businessName: "Popular My",
-            productName: "Financial Transactions",
-            progress: "94 sold",
-            rating: 4.2,
-          },
-        ]
-      },
-      {
-        item: {
-          id: 3,
-          businessName: "Popular My",
-          productName: "Financial Transactions",
-          progress: "94 sold",
-          rating: 4.2,
-        },
-        subItems: [
-          {
-            businessName: "GQ Creators",
-            productName: "Data Protection",
-            progress: "339 sold",
-            rating: 5,
-          },
-          { 
-            businessName: "Dribblers Agency",
-            productName: "Job Search",
-            progress: "212 sold",
-            rating: 4.5,
-          },
-          {
-            businessName: "Popular My",
-            productName: "Financial Transactions",
-            progress: "94 sold",
-            rating: 4.2,
-          },
-        ]
-      },
-    ]}
+          subItems: []
+        })))
+      ]
+    }}
     customizeHeaders
     searchBarPlaceholder={'Type to search'}
     searchBarVisible

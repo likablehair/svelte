@@ -4,7 +4,8 @@
   export let treshold: number = 0,
     horizontal: boolean = false,
     elementScroll: HTMLElement | null = null,
-    hasMore: boolean = true
+    hasMore: boolean = true,
+    direction: 'forward' | 'backward' = 'forward'
 
   const dispatch = createEventDispatcher<{
     'loadMore': undefined
@@ -16,9 +17,13 @@
     const element = e.target as HTMLElement
 
     const offset = horizontal 
-      ? element.scrollWidth - element.clientWidth - element.scrollLeft
-      : element.scrollHeight - element.clientHeight - element.scrollTop
-
+      ? direction == 'forward' 
+        ? element.scrollWidth - element.clientWidth - element.scrollLeft
+        : element.scrollLeft
+      : direction == 'forward' 
+        ? element.scrollHeight - element.clientHeight - element.scrollTop
+        : element.scrollTop
+    
     if (offset <= treshold) {
       if (!isLoadMore && hasMore) {
         dispatch("loadMore")

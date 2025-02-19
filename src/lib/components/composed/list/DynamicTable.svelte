@@ -15,7 +15,7 @@
     type PaginatedTable
   } from "$lib";
   import { DateTime } from "luxon";
-  import { createEventDispatcher, type ComponentProps } from "svelte";
+  import { createEventDispatcher, onMount, type ComponentProps } from "svelte";
   import { quintOut } from "svelte/easing";
   import { crossfade } from "svelte/transition";
   import Filters from "../search/Filters.svelte";
@@ -36,6 +36,21 @@
   import type { QuickFilter } from "$lib/utils/filters/quickFilters";
   import Switch from "$lib/components/simple/forms/Switch.svelte";
 
+  onMount(() => {
+    updateHeaderHeight();
+    window.addEventListener('resize', updateHeaderHeight);
+    return () => window.removeEventListener('resize', updateHeaderHeight);
+  });
+
+  let mainHeader: Element
+
+  function updateHeaderHeight() {
+    if (mainHeader) {
+      const headerHeight = mainHeader.getBoundingClientRect().height;
+      document.documentElement.style.setProperty('--main-header-height', headerHeight + 'px');
+    }
+  }
+  
   const [send, receive] = crossfade({
     duration: 500,
     fallback(node, params) {
@@ -191,7 +206,12 @@
     actionsForSelectedItems: Action[] = [],
     hasMoreToLoad: boolean = false,
     totalRows: number = rows.length,
-    searchText: string | undefined = undefined
+    searchText: string | undefined = undefined,
+    renderedRowsNumber = 100,
+    sectionRowsNumber = 100,
+    sectionTreshold = sectionRowsNumber,
+    backwardTresholdPixel = 100,
+    forwardTresholdPixel = 100
 
   let openCellEditor: boolean = false,
     cellEditorActivator: HTMLElement | undefined,
@@ -215,7 +235,14 @@
     selectedIndexes: number[] = [],
     cellEditorIndexRow: number | undefined,
     cellEditorIndexHeader: number | undefined,
-    cellEditorSubItem: boolean | undefined
+    cellEditorSubItem: boolean | undefined,
+    currentSectionNumber = 0,
+    tableBody: HTMLElement,
+    tableContainer: HTMLElement,
+    renderedRows = rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber),
+    userScrolling = true
+
+    $: totalSections = rows.length / sectionRowsNumber
 
   let openHeaderDrawer: boolean = false,
     headersToSelect: {
@@ -852,8 +879,40 @@
     handleSearchChange(searchText);
   }
 
-  function handleLoadMore() {
-    dispatch("fetchData", {});
+  function handleLoadForward() {
+    currentSectionNumber = currentSectionNumber + 1
+    userScrolling = false
+
+    let topElementsHeight = 0
+    for (let i = 0; i < sectionRowsNumber; i++) {
+      topElementsHeight += tableBody?.children.item(i)?.getBoundingClientRect().height || 0
+    }
+
+    renderedRows = rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber)
+
+    tableContainer.scrollTop -= topElementsHeight
+
+    setTimeout(() => userScrolling = true, 20)
+
+    if(totalSections - sectionTreshold < currentSectionNumber) {
+      dispatch("fetchData", {});
+    }
+  }
+
+  function handleLoadBackward() {
+    currentSectionNumber = currentSectionNumber - 1
+    userScrolling = false
+
+    let topElementsHeight = 0
+    for (let i = renderedRows.length - 1; i > renderedRows.length - sectionRowsNumber + 1; i--) {
+      topElementsHeight += tableBody?.children.item(i)?.getBoundingClientRect().height || 0
+    }
+
+    renderedRows = rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber)
+
+    tableContainer.scrollTop += topElementsHeight
+
+    setTimeout(() => userScrolling = true, 20)
   }
 </script>
 
@@ -971,9 +1030,15 @@
     </div>
   {/if}
 
-  <div class="table-container">
+  <div class="table-container" bind:this={tableContainer}>
+    <InfiniteScroll
+      on:loadMore={handleLoadBackward}
+      treshold={backwardTresholdPixel}
+      hasMore={currentSectionNumber > 0 && userScrolling}
+      direction='backward'
+    />
     <table style="display: table;" class="table">
-      <thead class="table-header">
+      <thead class="table-header" bind:this={mainHeader}>
         <tr>
           {#if !!showSelect && !showExpand && rows.length > 0}
             <th
@@ -1083,7 +1148,7 @@
         {/if}
       </thead>
 
-      <tbody>
+      <tbody bind:this={tableBody}>
         {#if rows.length == 0}
           <tr>
             <td
@@ -1098,7 +1163,7 @@
             </td>
           </tr>
         {:else}
-          {#each rows as row, indexRow}
+          {#each renderedRows as row, indexRow}
             <tr
               class="item-row"
               style:background-color={
@@ -1334,9 +1399,9 @@
       </tbody>
     </table>
     <InfiniteScroll
-      on:loadMore={handleLoadMore}
-      treshold={100}
-      hasMore={hasMoreToLoad}
+      on:loadMore={handleLoadForward}
+      treshold={forwardTresholdPixel}
+      hasMore={hasMoreToLoad && userScrolling}
     />
   </div>
 {/if}
@@ -1753,6 +1818,8 @@
       --dynamic-table-max-height,
       var(--dynamic-table-default-max-height)
     );
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 
   .table {
@@ -1769,6 +1836,10 @@
     z-index: 1;
   }
 
+  .table-subheader {
+  top: var(--main-header-height);
+  z-index: 0;
+}
   .table-header th {
     padding: var(
       --dynamic-table-header-padding,
