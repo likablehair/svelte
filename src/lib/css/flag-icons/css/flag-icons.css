@@ -486,6 +486,12 @@
 .fi-gb.fis {
   background-image: url(../flags/1x1/gb.svg);
 }
+.fi-uk {
+  background-image: url(../flags/4x3/gb.svg);
+}
+.fi-uk.fis {
+  background-image: url(../flags/1x1/gb.svg);
+}
 .fi-gd {
   background-image: url(../flags/4x3/gd.svg);
 }
@@ -556,6 +562,12 @@
   background-image: url(../flags/4x3/gr.svg);
 }
 .fi-gr.fis {
+  background-image: url(../flags/1x1/gr.svg);
+}
+.fi-el {
+  background-image: url(../flags/4x3/gr.svg);
+}
+.fi-el.fis {
   background-image: url(../flags/1x1/gr.svg);
 }
 .fi-gs {
@@ -1487,6 +1499,12 @@
 }
 .fi-ws.fis {
   background-image: url(../flags/1x1/ws.svg);
+}
+.fi-xs {
+  background-image: url(../flags/4x3/rs.svg);
+}
+.fi-xs.fis {
+  background-image: url(../flags/1x1/rs.svg);
 }
 .fi-ye {
   background-image: url(../flags/4x3/ye.svg);
