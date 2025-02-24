@@ -208,8 +208,8 @@
     totalRows: number = rows.length,
     searchText: string | undefined = undefined,
     renderedRowsNumber = 100,
-    sectionRowsNumber = 100,
-    sectionTreshold = sectionRowsNumber,
+    sectionRowsNumber = 20,
+    sectionTreshold = 2,
     backwardTresholdPixel = 100,
     forwardTresholdPixel = 100
 
@@ -239,10 +239,10 @@
     currentSectionNumber = 0,
     tableBody: HTMLElement,
     tableContainer: HTMLElement,
-    renderedRows = rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber),
     userScrolling = true
 
     $: totalSections = rows.length / sectionRowsNumber
+    $: renderedRows = rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber)
 
   let openHeaderDrawer: boolean = false,
     headersToSelect: {
@@ -531,6 +531,11 @@
   $: if (searchText != undefined) handleSearchChange(searchText);
 
   function handleFiltersChange() {
+    userScrolling = false
+    currentSectionNumber = 0
+    tableContainer.scrollTop = 0
+    setTimeout(() => userScrolling = true, 20)
+    
     dispatch("filtersChange", {
       builder: globalBuilder,
     });
@@ -880,15 +885,14 @@
   }
 
   function handleLoadForward() {
-    currentSectionNumber = currentSectionNumber + 1
     userScrolling = false
-
+    
     let topElementsHeight = 0
     for (let i = 0; i < sectionRowsNumber; i++) {
       topElementsHeight += tableBody?.children.item(i)?.getBoundingClientRect().height || 0
     }
-
-    renderedRows = rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber)
+    
+    currentSectionNumber = currentSectionNumber + 1
 
     tableContainer.scrollTop -= topElementsHeight
 
@@ -900,15 +904,14 @@
   }
 
   function handleLoadBackward() {
-    currentSectionNumber = currentSectionNumber - 1
     userScrolling = false
-
+    
     let topElementsHeight = 0
     for (let i = renderedRows.length - 1; i > renderedRows.length - sectionRowsNumber + 1; i--) {
       topElementsHeight += tableBody?.children.item(i)?.getBoundingClientRect().height || 0
     }
-
-    renderedRows = rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber)
+    
+    currentSectionNumber = currentSectionNumber - 1
 
     tableContainer.scrollTop += topElementsHeight
 
