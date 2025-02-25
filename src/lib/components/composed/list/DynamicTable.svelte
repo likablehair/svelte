@@ -1541,7 +1541,6 @@
           name={quickFilterActive.title}
           info={quickFilterActive.info}
           type="number"
-          orientation="horizontal"
           error={saveEditDisabled}
           bind:value={quickFilterActive.type.value}          
           --simple-textfield-border-radius= 0.5rem
