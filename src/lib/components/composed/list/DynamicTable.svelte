@@ -1032,8 +1032,9 @@
       {/if}
     </div>
   {/if}
-
-  <div class="table-container" bind:this={tableContainer}>
+  <div class="outer-container">
+    <div class="inner-container" bind:this={tableContainer}>
+  <!-- <div class="table-container" bind:this={tableContainer}> -->
     <InfiniteScroll
       on:loadMore={handleLoadBackward}
       treshold={backwardTresholdPixel}
@@ -1406,6 +1407,7 @@
       treshold={forwardTresholdPixel}
       hasMore={hasMoreToLoad && userScrolling}
     />
+  </div>
   </div>
 {/if}
 
@@ -1813,15 +1815,15 @@
 </MediaQuery>
 
 <style>
-  .table-container {
-    overflow-x: auto;
+  .outer-container {
+    overflow-x: hidden;
+  }
+
+  .inner-container {
     overflow-y: auto;
-    max-height: var(
-      --dynamic-table-max-height,
-      var(--dynamic-table-default-max-height)
-    );
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    margin-right: -15px;
+    padding-right: 15px;
+    max-height: var(--dynamic-table-max-height, var(--dynamic-table-default-max-height));
   }
 
   .table {
