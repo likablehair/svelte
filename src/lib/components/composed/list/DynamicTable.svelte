@@ -1837,12 +1837,12 @@
   .table-header {
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 2;
   }
 
   .table-subheader {
   top: var(--main-header-height);
-  z-index: 0;
+  z-index: 1;
 }
   .table-header th {
     padding: var(
