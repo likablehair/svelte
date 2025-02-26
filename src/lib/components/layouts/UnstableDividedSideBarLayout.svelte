@@ -62,7 +62,7 @@
       class:opened={sidebarExpanded}
       class="header-toolbar"
     >
-      <slot name="menu">
+      <slot name="header">
         <div class="inner-menu">
           {#if mAndDown}
             <div style:margin-right="2rem">
