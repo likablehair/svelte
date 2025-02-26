@@ -88,6 +88,7 @@
           <div
             on:click|stopPropagation={() => { }}
             on:keydown={() => { }}
+            role="presentation"
           >
             <slot name="append" {option} {handleClickClose}>
               {#if deletable}

@@ -35,6 +35,7 @@ export { default as SelectableMenuList } from './components/simple/lists/Selecta
 export { default as SelectableVerticalList } from './components/simple/lists/SelectableVerticalList.svelte'
 export { default as SidebarMenuList } from './components/simple/lists/SidebarMenuList.svelte'
 export { default as SimpleTable } from './components/simple/lists/SimpleTable.svelte'
+export { default as HierarchyMenu } from './components/simple/lists/HierarchyMenu.svelte'
 
 export { default as CircularLoader } from './components/simple/loaders/CircularLoader.svelte'
 export { default as Skeleton } from './components/simple/loaders/Skeleton.svelte'

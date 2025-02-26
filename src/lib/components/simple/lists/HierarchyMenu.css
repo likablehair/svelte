@@ -1,0 +1,18 @@
+:root {
+  --hierarchy-menu-default-gap: 4px;
+  --hierarchy-menu-default-width: 100%;
+  --hierarchy-menu-default-element-border-radius: 8px;
+  --hierarchy-menu-default-element-background-color: transparent;
+  --hierarchy-menu-default-element-color: inherit;
+  --hierarchy-menu-default-element-hover-background-color: rgb(var(--global-color-background-300), .5);
+  --hierarchy-menu-default-element-hover-color: inherit;
+  --hierarchy-menu-default-element-active-background-color: rgb(var(--global-color-background-300), .5);
+  --hierarchy-menu-default-element-active-color: inherit;
+  --hierarchy-menu-default-element-selected-background-color: rgb(var(--global-color-primary-500), .6);
+  --hierarchy-menu-default-element-selected-color: rgb(var(--global-color-grey-50));
+  --hierarchy-menu-default-element-selected-font-weight: 700;
+  --hierarchy-menu-default-element-padding: 8px;
+  --hierarchy-menu-default-element-cursor: pointer;
+  --hierarchy-menu-default-icon-button-padding: 0px 12px 0px 2px;
+  --hierarchy-menu-default-sub-options-padding: 8px 0px 8px 40px;
+}

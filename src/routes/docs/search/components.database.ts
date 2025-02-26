@@ -188,6 +188,12 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/ColorInvertedSelector'
   }, {
+    title: 'HierarchyMenu',
+    description: 'Hierarchy is hard to write.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/HierarchyMenu'
+  }, {
     title: 'SimpleTable',
     description: 'Grid beautiful view.',
     status: 'stable',
