@@ -241,7 +241,7 @@
     tableContainer: HTMLElement,
     userScrolling = true
 
-    $: totalSections = rows.length / sectionRowsNumber
+    $: totalSections = (rows.length - renderedRowsNumber) / sectionRowsNumber
     $: renderedRows = rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber)
 
   let openHeaderDrawer: boolean = false,
@@ -898,7 +898,7 @@
 
     setTimeout(() => userScrolling = true, 20)
 
-    if(totalSections - sectionTreshold < currentSectionNumber) {
+    if(totalSections - sectionTreshold <= currentSectionNumber) {
       dispatch("fetchData", {});
     }
   }
