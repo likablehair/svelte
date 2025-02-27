@@ -204,7 +204,6 @@
     showActiveFilters: boolean = true,
     quickFilters: QuickFilter[] = [],
     actionsForSelectedItems: Action[] = [],
-    hasMoreToLoad: boolean = false,
     totalRows: number = rows.length,
     searchText: string | undefined = undefined,
     renderedRowsNumber = 100,
@@ -239,10 +238,12 @@
     currentSectionNumber = 0,
     tableBody: HTMLElement,
     tableContainer: HTMLElement,
-    userScrolling = true
+    userScrolling = true,
+    totalSections = (totalRows - renderedRowsNumber) / sectionRowsNumber
 
-    $: totalSections = (rows.length - renderedRowsNumber) / sectionRowsNumber
-    $: renderedRows = rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber)
+  $: hasMoreToRender = totalSections > currentSectionNumber
+  $: totalCachedSections = (rows.length - renderedRowsNumber) / sectionRowsNumber
+  $: renderedRows = rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber)
 
   let openHeaderDrawer: boolean = false,
     headersToSelect: {
@@ -898,7 +899,10 @@
 
     setTimeout(() => userScrolling = true, 20)
 
-    if(totalSections - sectionTreshold <= currentSectionNumber) {
+    if(totalCachedSections - sectionTreshold <= currentSectionNumber 
+      && !loading 
+      && totalRows > rows.length
+    ) {
       dispatch("fetchData", {});
     }
   }
@@ -1405,7 +1409,7 @@
     <InfiniteScroll
       on:loadMore={handleLoadForward}
       treshold={forwardTresholdPixel}
-      hasMore={hasMoreToLoad && userScrolling}
+      hasMore={hasMoreToRender && userScrolling}
     />
   </div>
   </div>
