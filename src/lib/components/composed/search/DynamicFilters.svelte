@@ -34,7 +34,7 @@
 		[label: string]: { extended?: string; short: string };
 	};
 	
-	let labelsMapper: LabelMapper = {
+	let labelsMapper: LabelMapper = lang == 'en' ? {
 		equal: { extended: "equal to", short: "equal" },
 		like: { short: "includes" },
 		ilike: { short: "includes" },
@@ -43,6 +43,15 @@
 		lower: { short: "lower", extended: "lower than" },
 		between: { short: "between", extended: "is between" },
 		different: { short: "different", extended: "different from" },
+	} : {
+		equal: { extended: "uguale a", short: "uguale" },
+		like: { short: "include" },
+		ilike: { short: "include" },
+		contains: { short: "contiene" },
+		greater: { short: "maggiore", extended: "maggiore di" },
+		lower: { short: "minore", extended: "minore di" },
+		between: { short: "compreso", extended: "è compreso tra" },
+		different: { short: "diverso", extended: "diverso da" },
 	};
 
 	function selectFilter(filter: Filter) {
@@ -72,7 +81,7 @@
 	
 		{#if activeFilter > 0}
 			<div class="filter-info">
-				{activeFilter} applied
+				{activeFilter} {lang == 'en' ? 'applied' : activeFilter == 1 ? 'applicato' : 'applicati'}
 				<button class="clear-button" on:click={clearFilters}>✕</button>
 			</div>
 		{/if}
@@ -119,7 +128,7 @@
 			</div>
 		{:else}
 			<div class="filters-content-box">
-				<p>Please select a filter to display content.</p>
+				<p>{lang == 'en' ? 'Please select a filter to display content.' : 'Seleziona un filtro per mostrarne il contenuto.'}</p>
 			</div>
 		{/if}
 	</div>

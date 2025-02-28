@@ -48,10 +48,14 @@
       },
     },
   },
-  showLegend: boolean = true;
+  showLegend: boolean = true,
+  responsive: boolean = true,
+  maintainAspectRatio: boolean = false;
 
   let chartOptions: ComponentProps<Pie>['options']
   $: chartOptions = {
+    responsive: responsive,
+    maintainAspectRatio: maintainAspectRatio,
       plugins: {
         legend: {
           display: showLegend

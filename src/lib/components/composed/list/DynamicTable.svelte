@@ -204,7 +204,6 @@
     showActiveFilters: boolean = true,
     quickFilters: QuickFilter[] = [],
     actionsForSelectedItems: Action[] = [],
-    hasMoreToLoad: boolean = false,
     totalRows: number = rows.length,
     searchText: string | undefined = undefined,
     renderedRowsNumber = 100,
@@ -239,10 +238,12 @@
     currentSectionNumber = 0,
     tableBody: HTMLElement,
     tableContainer: HTMLElement,
-    userScrolling = true
+    userScrolling = true,
+    totalSections = (totalRows - renderedRowsNumber) / sectionRowsNumber
 
-    $: totalSections = rows.length / sectionRowsNumber
-    $: renderedRows = rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber)
+  $: hasMoreToRender = totalSections > currentSectionNumber
+  $: totalCachedSections = (rows.length - renderedRowsNumber) / sectionRowsNumber
+  $: renderedRows = rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber)
 
   let openHeaderDrawer: boolean = false,
     headersToSelect: {
@@ -898,7 +899,10 @@
 
     setTimeout(() => userScrolling = true, 20)
 
-    if(totalSections - sectionTreshold < currentSectionNumber) {
+    if(totalCachedSections - sectionTreshold <= currentSectionNumber 
+      && !loading 
+      && totalRows > rows.length
+    ) {
       dispatch("fetchData", {});
     }
   }
@@ -929,6 +933,7 @@
     {disabled}
     {loading}
     {actionsForSelectedItems}
+    {lang}
   />
 
   <slot name="search-bar" {handleSearchChange}>
@@ -1032,8 +1037,9 @@
       {/if}
     </div>
   {/if}
-
-  <div class="table-container" bind:this={tableContainer}>
+  <div class="outer-container">
+    <div class="inner-container" bind:this={tableContainer}>
+  <!-- <div class="table-container" bind:this={tableContainer}> -->
     <InfiniteScroll
       on:loadMore={handleLoadBackward}
       treshold={backwardTresholdPixel}
@@ -1404,8 +1410,9 @@
     <InfiniteScroll
       on:loadMore={handleLoadForward}
       treshold={forwardTresholdPixel}
-      hasMore={hasMoreToLoad && userScrolling}
+      hasMore={hasMoreToRender && userScrolling}
     />
+  </div>
   </div>
 {/if}
 
@@ -1541,7 +1548,6 @@
           name={quickFilterActive.title}
           info={quickFilterActive.info}
           type="number"
-          orientation="horizontal"
           error={saveEditDisabled}
           bind:value={quickFilterActive.type.value}          
           --simple-textfield-border-radius= 0.5rem
@@ -1625,7 +1631,7 @@
             <button
               on:click={() => setQuickFilterValue(quickFilterActive, undefined)}
             >
-              All
+              {lang == 'en' ? 'All' : 'Tutti'}
             </button>
           </div>
         {/if}
@@ -1661,7 +1667,7 @@
           <div>
             <DatePickerTextField
               bind:selectedDate={quickFilterActive.type.from}
-              placeholder={"From"}
+              placeholder={lang == 'en' ? "From" : 'Da'}
               --simple-textfield-width="100%"
               --simple-textfield-border-radius= 0.5rem
               --simple-textfield-background-color= transparent
@@ -1690,7 +1696,7 @@
           <div>
             <DatePickerTextField
               bind:selectedDate={quickFilterActive.type.to}
-              placeholder={"To"}
+              placeholder={lang == 'en' ? "To" : 'A'}
               --simple-textfield-width="100%"
               --simple-textfield-border-radius= 0.5rem
               --simple-textfield-background-color= transparent
@@ -1727,8 +1733,8 @@
       <div style:grid-row="3" style:grid-column="2" style:margin-top="-15px">
         <ConfirmOrCancelButtons
           confirmDisable={saveEditDisabled}
-          confirmText="Apply"
-          cancelText="Cancel"
+          confirmText={lang == 'en' ? "Apply" : 'Applica'}
+          cancelText={lang == 'en' ? "Cancel" : 'Annulla'}
           on:cancel-click={handleCancelClick}
           on:confirm-click={() => handleApplyClick(quickFilterActive, quickFilterActive.type.key == 'custom')}
         />
@@ -1744,9 +1750,9 @@
     position={sAndDown ? "bottom" : "right"}
   >
     <div style="padding: 20px;">
-      <div class="personalize-header">Personalize your headers</div>
+      <div class="personalize-header">{lang == 'en' ? 'Personalize your headers' : 'Personalizza le tue intestazioni'}</div>
 
-      <span class="headers-show grid-col-1">Headers shown in table</span>
+      <span class="headers-show grid-col-1">{lang == 'en' ? 'Headers shown in table' : 'Intestazioni visualizzate in tabella'}</span>
 
       {#if headersToShow}
         <VerticalDraggableList
@@ -1771,7 +1777,7 @@
         </VerticalDraggableList>
       {/if}
       <Divider --divider-color=rgb(var(--global-color-contrast-100) />
-      <span class="headers-show grid-col-1">Headers to show</span>
+      <span class="headers-show grid-col-1">{lang == 'en' ? 'Headers to show' : 'Intestazioni da mostrare'}</span>
       {#if headersToSelect && headersToSelect.length > 0}
         {#each headersToSelect as header (header.id)}
           <div
@@ -1797,7 +1803,7 @@
         {/each}
       {:else}
         <div class="headers-show grid-col-1">
-          <span style="text-align: center;">No headers to add</span>
+          <span style="text-align: center;">{lang == 'en' ? 'No headers to add' : 'Nessuna intestazione da aggiungere'}</span>
         </div>
       {/if}
       <div style="width: 100%; display: flex; justify-content: center;">
@@ -1806,7 +1812,7 @@
           --button-width="70%"
           on:click={saveHeadersToShow}
         >
-          Save preferences
+          {lang == 'en' ? 'Save preferences' : 'Salva preferenze'}
         </Button>
       </div>
     </div>
@@ -1814,15 +1820,15 @@
 </MediaQuery>
 
 <style>
-  .table-container {
-    overflow-x: auto;
+  .outer-container {
+    overflow-x: hidden;
+  }
+
+  .inner-container {
     overflow-y: auto;
-    max-height: var(
-      --dynamic-table-max-height,
-      var(--dynamic-table-default-max-height)
-    );
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    margin-right: -15px;
+    padding-right: 15px;
+    max-height: var(--dynamic-table-max-height, var(--dynamic-table-default-max-height));
   }
 
   .table {
@@ -1836,12 +1842,12 @@
   .table-header {
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 2;
   }
 
   .table-subheader {
   top: var(--main-header-height);
-  z-index: 0;
+  z-index: 1;
 }
   .table-header th {
     padding: var(

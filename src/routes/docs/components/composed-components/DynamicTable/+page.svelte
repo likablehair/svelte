@@ -6,6 +6,7 @@
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
   import DynamicTable from "$lib/components/composed/list/DynamicTable.svelte";
   import type { ComponentProps } from "svelte";
+    import FlagIcon from "$lib/components/simple/media/FlagIcon.svelte";
 
   let headers : ComponentProps<DynamicTable>['headers'] = [
     {
@@ -128,7 +129,36 @@
       progress: `${94 + (index % 10)} sold`, 
       rating: (4 + (index % 5) * 0.1).toFixed(1), 
     },
-    subItems: []
+    subItems: [
+      {
+        id: index + 1,
+        businessName: "Popular My",
+        productName: "Financial Transactions",
+        progress: `${94 + (index % 10)} sold`, 
+        rating: (4 + (index % 5) * 0.1).toFixed(1), 
+      },
+      {
+        id: index + 1,
+        businessName: "Popular My",
+        productName: "Financial Transactions",
+        progress: `${94 + (index % 10)} sold`, 
+        rating: (4 + (index % 5) * 0.1).toFixed(1), 
+      },
+      {
+        id: index + 1,
+        businessName: "Popular My",
+        productName: "Financial Transactions",
+        progress: `${94 + (index % 10)} sold`, 
+        rating: (4 + (index % 5) * 0.1).toFixed(1), 
+      },
+      {
+        id: index + 1,
+        businessName: "Popular My",
+        productName: "Financial Transactions",
+        progress: `${94 + (index % 10)} sold`, 
+        rating: (4 + (index % 5) * 0.1).toFixed(1), 
+      },
+    ]
   }));
 
   function handleCustomInput(e: Event, filterName: string, updateFunction: (filterName: string, newValue: any, newValid: boolean) => void) {
@@ -189,11 +219,16 @@
       {/if}
     </svelte:fragment>
     <svelte:fragment slot="custom" let:header let:row>
-    {#if header.value == 'rating'}
-      {row.item.rating}
-      <Icon name="mdi-star" --icon-color="green"></Icon>
-    {/if}
-  </svelte:fragment>
+      {#if header.value == 'rating'}
+        {row.item.rating}
+        <Icon name="mdi-star" --icon-color="green"></Icon>
+      {/if}
+    </svelte:fragment>
+    <div slot='custom-subheader' let:subHeader let:subItem>
+      {#if subHeader.value == 'rating'}
+        <FlagIcon alpha2='it'></FlagIcon>
+      {/if}
+    </div>
   </DynamicTable>
 </div>
 <h2>Props</h2>
