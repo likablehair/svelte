@@ -11,6 +11,7 @@
   export let open = false,
     position: "left" | "top" | "right" | "bottom" = "left",
     overlay = false,
+    closeOnClickOutside = true,
     items: Item[] = [],
     teleportedUid: string | undefined = undefined,
     _space: string | undefined = undefined,
@@ -65,9 +66,11 @@
   }
 
   function handleClickOverlay() {
-    open = false;
-    overlay = false;
-    dispatch('close', {})
+    if(closeOnClickOutside) {
+      open = false;
+      overlay = false;
+      dispatch('close', {})
+    }
   }
 
   let zIndex: number = 50
