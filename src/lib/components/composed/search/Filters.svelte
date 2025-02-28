@@ -94,7 +94,7 @@
       },
       'between': {
         short: 'compreso',
-        extended: 'è compreso'
+        extended: 'è compreso tra'
       },
       'different': {
         short: 'diverso',

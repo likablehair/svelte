@@ -26,7 +26,8 @@
     disabled: boolean,
     loading: boolean,
     actionsForSelectedItems: Action[],
-    position: 'top' | 'bottom' = 'top';
+    position: 'top' | 'bottom' = 'top',
+    lang: 'it' | 'en' = 'en'
 
   let actions: Action[] = [],
     extraActions: Action[] = [],
@@ -64,7 +65,7 @@
     >
       <div>
         <button class="select-info" on:click={() => (selectedItems = [], infoActivators = {}, disabledInfoActivators = {})}>
-          {!!isSelectedAll ? totalRows : selectedItems.length} items selected
+          {!!isSelectedAll ? totalRows : selectedItems.length} {lang == 'en' ? 'items selected' : 'righe selezionate'}
           <Icon name="mdi-close" />
         </button>
       </div>
@@ -157,7 +158,7 @@
               >
                 <div class="action">
                   <Icon name="mdi-dots-vertical" />
-                  More
+                  {lang == 'en' ? 'More' : 'Altri'}
                 </div>
               </Button>
             </div>
