@@ -15,4 +15,5 @@
   --dynamic-table-default-hover-color: rgb(var(--global-color-contrast-800), .7);
   --dynamic-table-default-header-border-radius: 5px;
   --dynamic-table-default-header-height: 30px;
+  --dynamic-table-row-default-min-height: auto;
 }

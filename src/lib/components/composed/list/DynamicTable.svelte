@@ -886,18 +886,18 @@
   }
 
   function handleLoadForward() {
-    userScrolling = false
-    
-    let topElementsHeight = 0
-    for (let i = 0; i < sectionRowsNumber; i++) {
-      topElementsHeight += tableBody?.children.item(i)?.getBoundingClientRect().height || 0
+    if(renderedRows.length >= renderedRowsNumber) {
+      userScrolling = false
+      
+      let topElementsHeight = 0
+      for (let i = 0; i < sectionRowsNumber; i++) {
+        topElementsHeight += tableBody?.children.item(i)?.getBoundingClientRect().height || 0
+      }
+
+      currentSectionNumber = currentSectionNumber + 1
+      tableContainer.scrollTop -= topElementsHeight
+      setTimeout(() => userScrolling = true, 20)
     }
-    
-    currentSectionNumber = currentSectionNumber + 1
-
-    tableContainer.scrollTop -= topElementsHeight
-
-    setTimeout(() => userScrolling = true, 20)
 
     if(totalCachedSections - sectionTreshold <= currentSectionNumber 
       && !loading 
@@ -1950,6 +1950,13 @@
     cursor: pointer;
     border: 1px solid rgb(var(--global-color-contrast-800));
     border-radius: 5px;
+  }
+
+  .item-row > td {
+    height: var(
+      --dynamic-table-row-min-height,
+      var(--dynamic-table-row-default-min-height)
+    );
   }
 
   .item-row:hover {
