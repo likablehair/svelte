@@ -777,14 +777,14 @@
           builder.where(
             quickFilter.column,
             ">=",
-            DateTime.fromJSDate(from).toString()
+            DateTime.fromJSDate(from).setZone('UTC', { keepLocalTime: true }).startOf('day').toString()
           );
         }
         if (!!to) {
           builder.where(
             quickFilter.column,
             "<=",
-            DateTime.fromJSDate(to).toString()
+            DateTime.fromJSDate(to).setZone('UTC', { keepLocalTime: true }).endOf('day').toString()
           );
         }
       }
