@@ -1332,7 +1332,7 @@
                             {#each subHeaders as subHeader, indexSubHeader}
                               <td
                                 class:cell-edit-activator={cellEditorIndexHeader == indexSubHeader && cellEditorIndexRow == indexSubItem && cellEditorSubItem}
-                                class:hover-cell={cellEdit}
+                                class:hover-cell={cellEdit && !loading && !!subHeader.cellEditorInfo}
                                 on:click={(e) => {
                                   handleCellClick(
                                     e,
@@ -1931,7 +1931,7 @@
   }
 
   table {
-    border-collapse: collapse;
+    border-collapse: separate;
     width: 100%;
   }
 
