@@ -1374,7 +1374,7 @@
                                       {subHeader.type.params.nullText}
                                     {/if}
                                   {:else}
-                                    {subItem[subHeader.value]}
+                                    <div style="display: flex; justify-content: center;">-</div>
                                   {/if}
                                 {:else}
                                   {subItem[subHeader.value]}
