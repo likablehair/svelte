@@ -17,7 +17,7 @@
   import { DateTime } from "luxon";
   import { createEventDispatcher, onMount, type ComponentProps } from "svelte";
   import { quintOut } from "svelte/easing";
-  import { crossfade } from "svelte/transition";
+  import { crossfade, fade } from "svelte/transition";
   import Filters from "../search/Filters.svelte";
   import ConfirmOrCancelButtons from "../forms/ConfirmOrCancelButtons.svelte";
   import { flip } from "svelte/animate";
@@ -39,7 +39,11 @@
   onMount(() => {
     updateHeaderHeight();
     window.addEventListener('resize', updateHeaderHeight);
-    return () => window.removeEventListener('resize', updateHeaderHeight);
+    tableContainer.addEventListener("scroll", setReachedBottom);
+    return () => {
+      window.removeEventListener('resize', updateHeaderHeight);
+      tableContainer.removeEventListener("scroll", setReachedBottom);
+    }
   });
 
   let mainHeader: Element
@@ -49,6 +53,10 @@
       const headerHeight = mainHeader.getBoundingClientRect().height;
       document.documentElement.style.setProperty('--main-header-height', headerHeight + 'px');
     }
+  }
+
+  function setReachedBottom(){
+    reachedBottom = tableContainer.scrollHeight - tableContainer.scrollTop === tableContainer.clientHeight
   }
   
   const [send, receive] = crossfade({
@@ -240,8 +248,9 @@
     tableBody: HTMLElement,
     tableContainer: HTMLElement,
     userScrolling = true,
-    totalSections = (totalRows - renderedRowsNumber) / sectionRowsNumber
-
+    reachedBottom = false
+  
+  $: totalSections = (totalRows - renderedRowsNumber) / sectionRowsNumber
   $: hasMoreToRender = totalSections > currentSectionNumber
   $: totalCachedSections = (rows.length - renderedRowsNumber) / sectionRowsNumber
   $: renderedRows = rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber)
@@ -1414,6 +1423,13 @@
       hasMore={hasMoreToRender && userScrolling}
     />
   </div>
+  {#if totalSections - 1 < currentSectionNumber && reachedBottom}
+    <div class="line-container" transition:fade>
+      <span class="line"></span>
+      <span class="text">{lang == 'en' ? 'End' : 'Fine'}</span>
+      <span class="line"></span>
+    </div>
+  {/if}
   </div>
 {/if}
 
@@ -2105,5 +2121,25 @@
     display: grid;
     gap: 12px;
     padding: 8px;
+  }
+
+  .line-container {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    z-index: 3;
+  }
+
+  .line {
+    flex-grow: 1;
+    height: 1px;
+    background: rgb(var(--global-color-contrast-800));
+    margin: 0 10px;
   }
 </style>
