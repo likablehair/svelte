@@ -210,7 +210,8 @@
     sectionRowsNumber = 20,
     sectionTreshold = 2,
     backwardTresholdPixel = 100,
-    forwardTresholdPixel = 100
+    forwardTresholdPixel = 100,
+    uniqueKey: keyof Item = 'id'
 
   let openCellEditor: boolean = false,
     cellEditorActivator: HTMLElement | undefined,
@@ -394,16 +395,16 @@
   }
 
   function handleSelect(item: Item, shiftKeyPressed: boolean) {
-    let index = selectedItems.findIndex((i) => i.id == item.id);
+    let index = selectedItems.findIndex((i) => i[uniqueKey] == item[uniqueKey]);
     // if item is not in the selected items array, add it
     if (index == -1) {
       if (selectMode == "single") {
         selectedItems = [item];
-        selectedIndexes = [rows.findIndex(r => r.item.id == item.id)]
+        selectedIndexes = [rows.findIndex(r => r.item[uniqueKey] == item[uniqueKey])]
       } else if (selectMode == "multiple") {
         if(shiftKeyPressed && selectedIndexes.length > 0 && !isSelectedAll) {
           let lastSelectedIndex = selectedIndexes[selectedIndexes.length - 1],
-            selectedIndex = rows.findIndex(r => r.item.id == item.id)
+            selectedIndex = rows.findIndex(r => r.item[uniqueKey] == item[uniqueKey])
           if(selectedIndex != -1) {
             if(selectedIndex < lastSelectedIndex) {
               let x = lastSelectedIndex
@@ -411,7 +412,7 @@
               selectedIndex = x
             }
             for (let i = lastSelectedIndex + 1; i <= selectedIndex; i++) {
-              if(!selectedItems.find((selectedItem) => selectedItem.id == rows[i].item.id)) {
+              if(!selectedItems.find((selectedItem) => selectedItem[uniqueKey] == rows[i].item[uniqueKey])) {
                 selectedItems = [...selectedItems, rows[i].item]
               }
             }
@@ -419,12 +420,12 @@
         }
         else {
           selectedItems = [...selectedItems, item];
-          selectedIndexes.push(rows.findIndex(r => r.item.id == item.id))
+          selectedIndexes.push(rows.findIndex(r => r.item[uniqueKey] == item[uniqueKey]))
         }
       }
     } else {
-      selectedItems = selectedItems.filter((i) => i.id != item.id);
-      selectedIndexes = selectedIndexes.filter(r => r != rows.findIndex(r => r.item.id == item.id))
+      selectedItems = selectedItems.filter((i) => i[uniqueKey] != item[uniqueKey]);
+      selectedIndexes = selectedIndexes.filter(r => r != rows.findIndex(r => r.item[uniqueKey] == item[uniqueKey]))
       isSelectedAll = false;
     }
   }
@@ -443,11 +444,11 @@
   }
 
   function expandRow(row: Row) {
-    let index = expandedRows.findIndex((r) => r.item.id == row.item.id);
+    let index = expandedRows.findIndex((r) => r.item[uniqueKey] == row.item[uniqueKey]);
     if (index == -1) {
       expandedRows = [...expandedRows, row];
     } else {
-      expandedRows = expandedRows.filter((r) => r.item.id != row.item.id);
+      expandedRows = expandedRows.filter((r) => r.item[uniqueKey] != row.item[uniqueKey]);
     }
   }
 
@@ -1180,9 +1181,9 @@
                   !!row.item.rowDisableBackgroundColor ?
                     row.item.rowDisableBackgroundColor : 
                     'var(--dynamic-table-row-disabled-background-color, var(--dynamic-table-row-default-disabled-background-color))' : 
-                expandedRows.findIndex((r) => r.item.id == row.item.id ) != -1 ? 
+                expandedRows.findIndex((r) => r.item[uniqueKey] == row.item[uniqueKey] ) != -1 ? 
                   'var(--dynamic-table-expanded-row-background-color, var(--dynamic-table-expanded-row-default-background-color))' :
-                  !!selectedItems.find(i => i.id == row.item.id) ?
+                  !!selectedItems.find(i => i[uniqueKey] == row.item[uniqueKey]) ?
                     'var(--dynamic-table-selected-row-background-color, var(--dynamic-table-selected-row-default-background-color))' :
                     ""
                 }
@@ -1192,9 +1193,9 @@
               {#if !!showSelect && !showExpand}
                 <td style:padding-left="0px" style:text-align="center">
                   <Checkbox
-                    id={row.item.id}
+                    id={row.item[uniqueKey]}
                     value={selectedItems.findIndex(
-                      (i) => i.id == row.item.id
+                      (i) => i[uniqueKey] == row.item[uniqueKey]
                     ) != -1}
                     disabled={disabled || loading}
                     on:change={(e) => handleSelect(row.item, e.detail.shiftKeyPressed)}
@@ -1205,7 +1206,7 @@
                 <td style:padding-left="0px" style:text-align="center">
                   <Icon
                     name={expandedRows.findIndex(
-                      (r) => r.item.id == row.item.id
+                      (r) => r.item[uniqueKey] == row.item[uniqueKey]
                     ) == -1
                       ? "mdi-chevron-down"
                       : "mdi-chevron-up"}
@@ -1272,7 +1273,7 @@
               {/if}
             </tr>
             {#if showExpand}
-              {#if expandedRows.findIndex((r) => r.item.id == row.item.id) != -1}
+              {#if expandedRows.findIndex((r) => r.item[uniqueKey] == row.item[uniqueKey]) != -1}
                 <tr>
                   <td
                     colspan={headersToShowInTable.length + 1}
