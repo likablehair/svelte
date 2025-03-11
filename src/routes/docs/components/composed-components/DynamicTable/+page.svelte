@@ -184,7 +184,7 @@
     filtersVisible
     cellEdit
     {rows}
-    hasMoreToLoad
+    totalRows={100000000}
     on:fetchData={() => {
       let lastId = rows[rows.length - 1].item.id
       rows = [
