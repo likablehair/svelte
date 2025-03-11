@@ -231,6 +231,8 @@
     </div>
   </DynamicTable>
 </div>
+<h2>READ ME</h2>
+<p>If the initial amount of rows is not big enough to generate the scroll, the table will NOT dispatch the fetchData custom event. It is advised to keep the initial number of rows around the number of renderedRowsNumber (default is 100) and always not less that 25</p>
 <h2>Props</h2>
 <PropsViewer
   props={[
