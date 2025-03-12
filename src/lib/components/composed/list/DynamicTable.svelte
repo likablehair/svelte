@@ -35,6 +35,7 @@
   import './DynamicTable.css'
   import type { QuickFilter } from "$lib/utils/filters/quickFilters";
   import Switch from "$lib/components/simple/forms/Switch.svelte";
+  import CircularLoader from "$lib/components/simple/loaders/CircularLoader.svelte";
 
   onMount(() => {
     updateHeaderHeight();
@@ -219,7 +220,8 @@
     sectionTreshold = 2,
     backwardTresholdPixel = 100,
     forwardTresholdPixel = 100,
-    uniqueKey: keyof Item = 'id'
+    uniqueKey: keyof Item = 'id',
+    numberOfResultsVisible: boolean = false
 
   let openCellEditor: boolean = false,
     cellEditorActivator: HTMLElement | undefined,
@@ -1044,6 +1046,20 @@
             {/if}
           </div>
         {/each}
+      {/if}
+    </div>
+  {/if}
+
+  {#if numberOfResultsVisible}
+    <div class='results-number'>
+      { lang == 'en' ? 'Results: ' : 'Risultati: '}
+      {#if !loading}
+        {totalRows || rows.length}
+      {:else}
+        <CircularLoader 
+          {loading}
+          --circular-loader-height='10px'
+        ></CircularLoader>
       {/if}
     </div>
   {/if}
@@ -2141,5 +2157,12 @@
     height: 1px;
     background: rgb(var(--global-color-contrast-800));
     margin: 0 10px;
+  }
+
+  .results-number {
+    margin: 0px 0px 4px 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 </style>
