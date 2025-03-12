@@ -1599,55 +1599,57 @@
             >
           {/if}
         </div>
-        <Autocomplete
-          multiple
-          items={quickFilterActive.type.items}
-          bind:values={quickFilterActive.type.values}
-          --autocomplete-border="1px solid rgb(var(--global-color-background-500))"
-          --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
-        >
-          <svelte:fragment slot="selection" let:selection let:unselect>
-            <slot name="selection" {selection} {unselect}>
-              <div tabindex="-1">
-                <Chip
-                  close={true}
-                  on:close={() => unselect(selection)}
-                  --chip-default-border-radius="var(--autocomplete-border-radius, var(--autocomplete-default-border-radius))"
-                  buttonTabIndex={-1}
-                  truncateText
-                >
-                  <slot name="chip-label" {selection}>
-                    {#if !!quickFilterActive.type.countriesAlpha2 && quickFilterActive.type.countriesAlpha2.find((c) => c.value == selection.value)}
-                      <div>
-                        <FlagIcon
-                          alpha2={quickFilterActive.type.countriesAlpha2
-                            .find((c) => c.value == selection.value)
-                            ?.label?.toString()
-                            .toLowerCase() ?? ""}
-                          --flag-icon-size="16px"
-                        />
-                      </div>
-                    {/if}
-                    {selection.label}
-                  </slot>
-                </Chip>
-              </div>
-            </slot>
-          </svelte:fragment>
-          <svelte:fragment slot="item-label" let:item>
-            <slot name="item-label" {item}>
-              {#if !!quickFilterActive.type.countriesAlpha2 && quickFilterActive.type.countriesAlpha2.find((c) => c.value == item.value)}
-                <FlagIcon
-                  alpha2={quickFilterActive.type.countriesAlpha2
-                    .find((c) => c.value == item.value)
-                    ?.label?.toString()
-                    .toLowerCase() ?? ""}
-                />
-              {/if}
-              {item.label}
-            </slot>
-          </svelte:fragment>
-        </Autocomplete>
+        <div on:click|stopPropagation role="presentation" tabindex="-1">
+          <Autocomplete
+            multiple
+            items={quickFilterActive.type.items}
+            bind:values={quickFilterActive.type.values}
+            --autocomplete-border="1px solid rgb(var(--global-color-background-500))"
+            --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
+          >
+            <svelte:fragment slot="selection" let:selection let:unselect>
+              <slot name="selection" {selection} {unselect}>
+                <div tabindex="-1">
+                  <Chip
+                    close={true}
+                    on:close={() => unselect(selection)}
+                    --chip-default-border-radius="var(--autocomplete-border-radius, var(--autocomplete-default-border-radius))"
+                    buttonTabIndex={-1}
+                    truncateText
+                  >
+                    <slot name="chip-label" {selection}>
+                      {#if !!quickFilterActive.type.countriesAlpha2 && quickFilterActive.type.countriesAlpha2.find((c) => c.value == selection.value)}
+                        <div>
+                          <FlagIcon
+                            alpha2={quickFilterActive.type.countriesAlpha2
+                              .find((c) => c.value == selection.value)
+                              ?.label?.toString()
+                              .toLowerCase() ?? ""}
+                            --flag-icon-size="16px"
+                          />
+                        </div>
+                      {/if}
+                      {selection.label}
+                    </slot>
+                  </Chip>
+                </div>
+              </slot>
+            </svelte:fragment>
+            <svelte:fragment slot="item-label" let:item>
+              <slot name="item-label" {item}>
+                {#if !!quickFilterActive.type.countriesAlpha2 && quickFilterActive.type.countriesAlpha2.find((c) => c.value == item.value)}
+                  <FlagIcon
+                    alpha2={quickFilterActive.type.countriesAlpha2
+                      .find((c) => c.value == item.value)
+                      ?.label?.toString()
+                      .toLowerCase() ?? ""}
+                  />
+                {/if}
+                {item.label}
+              </slot>
+            </svelte:fragment>
+          </Autocomplete>
+        </div>
       {:else if quickFilterActive.type.key === "boolean"}
         {#if quickFilterActive.type.params}
           <div class="vertical-quick-filters">
@@ -1679,22 +1681,24 @@
             >
           {/if}
         </div>
-        <CountriesAutocomplete
-          bind:selected={quickFilterActive.type.selected}
-          {...((!!quickFilterActive.type.countriesOptions && quickFilterActive.type.countriesOptions.length > 0) && {
-            items: quickFilterActive.type.countriesOptions,
-          })}
-          autocompleteProps={{
-            placeholder: !!quickFilterActive.type.selected
-              ? quickFilterActive.type.selected.length > 0
-                ? ""
-                : quickFilterActive.description
-              : quickFilterActive.description,
-            multiple: true,
-          }}
-          --autocomplete-border="1px solid rgb(var(--global-color-background-500))"
-          --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
-        />
+        <div on:click|stopPropagation role="presentation" tabindex="-1">
+          <CountriesAutocomplete
+            bind:selected={quickFilterActive.type.selected}
+            {...((!!quickFilterActive.type.countriesOptions && quickFilterActive.type.countriesOptions.length > 0) && {
+              items: quickFilterActive.type.countriesOptions,
+            })}
+            autocompleteProps={{
+              placeholder: !!quickFilterActive.type.selected
+                ? quickFilterActive.type.selected.length > 0
+                  ? ""
+                  : quickFilterActive.description
+                : quickFilterActive.description,
+              multiple: true,
+            }}
+            --autocomplete-border="1px solid rgb(var(--global-color-background-500))"
+            --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
+          />
+        </div>
       {:else if quickFilterActive.type.key === "date"}
         <div on:click|stopPropagation role="presentation" tabindex="-1">
           <div>
