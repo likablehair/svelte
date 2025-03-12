@@ -1878,10 +1878,18 @@
     z-index: 2;
   }
 
+  @media not all and (min-resolution:.001dpcm) { 
+    .table-header {
+      position: sticky;
+      top: -2px;
+      z-index: 2;
+    }
+  }
+
   .table-subheader {
-  top: var(--main-header-height);
-  z-index: 1;
-}
+    top: var(--main-header-height);
+    z-index: 1;
+  }
   .table-header th {
     padding: var(
       --dynamic-table-header-padding,
