@@ -544,10 +544,12 @@
   $: if (searchText != undefined) handleSearchChange(searchText);
 
   function handleFiltersChange() {
-    userScrolling = false
-    currentSectionNumber = 0
-    tableContainer.scrollTop = 0
-    setTimeout(() => userScrolling = true, 20)
+    if(!!tableContainer) {
+      userScrolling = false
+      currentSectionNumber = 0
+      tableContainer.scrollTop = 0
+      setTimeout(() => userScrolling = true, 20)
+    }
     
     dispatch("filtersChange", {
       builder: globalBuilder,
