@@ -221,7 +221,8 @@
     backwardTresholdPixel = 100,
     forwardTresholdPixel = 100,
     uniqueKey: keyof Item = 'id',
-    numberOfResultsVisible: boolean = false
+    numberOfResultsVisible: boolean = false,
+    endLineVisible: boolean = false
 
   let openCellEditor: boolean = false,
     cellEditorActivator: HTMLElement | undefined,
@@ -1492,7 +1493,7 @@
       hasMore={hasMoreToRender && userScrolling}
     />
   </div>
-  {#if totalSections - 1 < currentSectionNumber && reachedBottom}
+  {#if totalSections - 1 < currentSectionNumber && reachedBottom && endLineVisible}
     <div class="line-container" transition:fade>
       <span class="line"></span>
       <span class="text">{lang == 'en' ? 'End' : 'Fine'}</span>
@@ -2213,7 +2214,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 10px;
     z-index: 3;
   }
 
