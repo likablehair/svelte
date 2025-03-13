@@ -901,14 +901,35 @@
     if(renderedRows.length >= renderedRowsNumber) {
       userScrolling = false
       
-      let topElementsHeight = 0
-      for (let i = 0; i < sectionRowsNumber; i++) {
-        topElementsHeight += tableBody?.children.item(i)?.getBoundingClientRect().height || 0
+      const anchorIndex = renderedRowsNumber - 1
+      const anchorUniqueKey = renderedRows[anchorIndex].item[uniqueKey]
+      const anchorElement = findAnchorElement(anchorUniqueKey)
+      const anchorOffsetBefore = anchorElement?.getBoundingClientRect().top || 0
+      
+      let removedRowCount = 0
+
+      for (let i = 0; removedRowCount < sectionRowsNumber; i++) {
+        let row = tableBody.children.item(i)
+        removedRowCount++
+
+        const rowKey = row?.getAttribute("data-key")
+        const isExpanded = expandedRows.some(r => r.item[uniqueKey] == rowKey)
+        
+        if (isExpanded) {
+          i++
+        }
       }
 
       currentSectionNumber = currentSectionNumber + 1
-      tableContainer.scrollTop -= topElementsHeight
-      setTimeout(() => userScrolling = true, 20)
+
+      requestAnimationFrame(() => {
+        const anchorElementAfter = findAnchorElement(anchorUniqueKey)
+        const anchorOffsetAfter = anchorElementAfter?.getBoundingClientRect().top || 0
+        const offsetDiff = anchorOffsetAfter - anchorOffsetBefore
+        tableContainer.scrollTop += offsetDiff
+
+        userScrolling = true
+      })
     }
 
     if(totalCachedSections - sectionTreshold <= currentSectionNumber 
@@ -921,17 +942,46 @@
 
   function handleLoadBackward() {
     userScrolling = false
-    
-    let topElementsHeight = 0
-    for (let i = renderedRows.length - 1; i > renderedRows.length - sectionRowsNumber + 1; i--) {
-      topElementsHeight += tableBody?.children.item(i)?.getBoundingClientRect().height || 0
+
+    const anchorIndex = 0
+    const anchorUniqueKey = renderedRows[anchorIndex].item[uniqueKey]
+    const anchorElement = findAnchorElement(anchorUniqueKey)
+    const anchorOffsetBefore = anchorElement?.getBoundingClientRect().top || 0
+
+    let removedRowCount = 0
+
+    for (let i = renderedRows.length - 1; removedRowCount < sectionRowsNumber; i--) {
+      let row = tableBody.children.item(i)
+      removedRowCount++
+
+      const rowKey = row?.getAttribute("data-key")
+      const isExpanded = expandedRows.some(r => r.item[uniqueKey] == rowKey)
+      
+      if (isExpanded) {
+        i--
+      }
     }
     
     currentSectionNumber = currentSectionNumber - 1
 
-    tableContainer.scrollTop += topElementsHeight
+    requestAnimationFrame(() => {
+      const anchorElementAfter = findAnchorElement(anchorUniqueKey)
+      const anchorOffsetAfter = anchorElementAfter?.getBoundingClientRect().top || 0
+      const offsetDiff = anchorOffsetAfter - anchorOffsetBefore
+      tableContainer.scrollTop += offsetDiff
 
-    setTimeout(() => userScrolling = true, 20)
+      userScrolling = true
+    })
+  }
+
+  function findAnchorElement(key: keyof Item) {
+    for (let i = 0; i < tableBody.children.length; i++) {
+      const child = tableBody.children.item(i)
+      if (child?.getAttribute("data-key") == key) {
+        return child
+      }
+    }
+    return undefined
   }
 </script>
 
@@ -1201,6 +1251,7 @@
           {#each renderedRows as row, indexRow}
             <tr
               class="item-row"
+              data-key={row.item[uniqueKey]}
               style:background-color={
                 !!row.item.disableEdit ?
                   !!row.item.rowDisableBackgroundColor ?
