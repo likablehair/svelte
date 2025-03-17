@@ -792,15 +792,14 @@
           builder.where(
             quickFilter.column,
             ">=",
-            DateTime.fromJSDate(from).setZone('UTC', { keepLocalTime: true }).startOf('day').toString()
+            DateTime.fromJSDate(from).setLocale('it-IT').startOf('day').toString()
           );
         }
         if (!!to) {
           builder.where(
             quickFilter.column,
             "<=",
-            DateTime.fromJSDate(to).setZone('UTC', { keepLocalTime: true }).endOf('day').toString()
-          );
+            DateTime.fromJSDate(to).setLocale('it-IT').endOf('day').toString()          );
         }
       }
     } else if (quickFilter.type.key == "multi-select") {
@@ -2054,7 +2053,7 @@
   .item-row > td {
     height: var(
       --dynamic-table-row-min-height,
-      var(--dynamic-table-row-default-min-heigth)
+      var(--dynamic-table-default-row-min-height)
     );
   }
 
