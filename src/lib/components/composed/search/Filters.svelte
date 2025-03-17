@@ -24,7 +24,8 @@
   import { fly } from 'svelte/transition';
   import Dialog from '$lib/components/simple/dialogs/Dialog.svelte';
   import Validator from '$lib/utils/filters/validator';
-    import ToolTip from '../common/ToolTip.svelte';
+  import ToolTip from '../common/ToolTip.svelte';
+  import { DateTime } from 'luxon';
 
   export let
     filters: Filter[] = [],
@@ -341,8 +342,14 @@
     if(tmpFilter.type == 'select') {
       tmpFilter.values = newValue
     } else if('mode' in tmpFilter && tmpFilter.mode == 'between') {
-      tmpFilter.to = newValue.to
-      tmpFilter.from = newValue.from
+      if(tmpFilter.type == 'date'){
+        tmpFilter.from = DateTime.fromJSDate(newValue.to).setLocale('it-IT').startOf('day').toJSDate()
+        tmpFilter.to = DateTime.fromJSDate(newValue.to).setLocale('it-IT').endOf('day').toJSDate()
+      }
+      else {
+        tmpFilter.from = newValue.from
+        tmpFilter.to = newValue.to
+      }
     } else {
       tmpFilter.value = newValue
     }

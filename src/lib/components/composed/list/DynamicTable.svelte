@@ -17,7 +17,7 @@
   import { DateTime } from "luxon";
   import { createEventDispatcher, onMount, type ComponentProps } from "svelte";
   import { quintOut } from "svelte/easing";
-  import { crossfade } from "svelte/transition";
+  import { crossfade, fade } from "svelte/transition";
   import Filters from "../search/Filters.svelte";
   import ConfirmOrCancelButtons from "../forms/ConfirmOrCancelButtons.svelte";
   import { flip } from "svelte/animate";
@@ -35,11 +35,16 @@
   import './DynamicTable.css'
   import type { QuickFilter } from "$lib/utils/filters/quickFilters";
   import Switch from "$lib/components/simple/forms/Switch.svelte";
+  import CircularLoader from "$lib/components/simple/loaders/CircularLoader.svelte";
 
   onMount(() => {
     updateHeaderHeight();
     window.addEventListener('resize', updateHeaderHeight);
-    return () => window.removeEventListener('resize', updateHeaderHeight);
+    tableContainer.addEventListener("scroll", setReachedBottom);
+    return () => {
+      window.removeEventListener('resize', updateHeaderHeight);
+      tableContainer.removeEventListener("scroll", setReachedBottom);
+    }
   });
 
   let mainHeader: Element
@@ -49,6 +54,10 @@
       const headerHeight = mainHeader.getBoundingClientRect().height;
       document.documentElement.style.setProperty('--main-header-height', headerHeight + 'px');
     }
+  }
+
+  function setReachedBottom(){
+    reachedBottom = tableContainer.scrollHeight - tableContainer.scrollTop === tableContainer.clientHeight
   }
   
   const [send, receive] = crossfade({
@@ -208,9 +217,12 @@
     searchText: string | undefined = undefined,
     renderedRowsNumber = 100,
     sectionRowsNumber = 20,
-    sectionTreshold = 2,
-    backwardTresholdPixel = 100,
-    forwardTresholdPixel = 100
+    sectionThreshold = 2,
+    backwardThresholdPixel = 100,
+    forwardThresholdPixel = 100,
+    uniqueKey: keyof Item = 'id',
+    numberOfResultsVisible: boolean = false,
+    endLineVisible: boolean = false
 
   let openCellEditor: boolean = false,
     cellEditorActivator: HTMLElement | undefined,
@@ -239,8 +251,9 @@
     tableBody: HTMLElement,
     tableContainer: HTMLElement,
     userScrolling = true,
-    totalSections = (totalRows - renderedRowsNumber) / sectionRowsNumber
-
+    reachedBottom = false
+  
+  $: totalSections = (totalRows - renderedRowsNumber) / sectionRowsNumber
   $: hasMoreToRender = totalSections > currentSectionNumber
   $: totalCachedSections = (rows.length - renderedRowsNumber) / sectionRowsNumber
   $: renderedRows = rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber)
@@ -394,16 +407,16 @@
   }
 
   function handleSelect(item: Item, shiftKeyPressed: boolean) {
-    let index = selectedItems.findIndex((i) => i.id == item.id);
+    let index = selectedItems.findIndex((i) => i[uniqueKey] == item[uniqueKey]);
     // if item is not in the selected items array, add it
     if (index == -1) {
       if (selectMode == "single") {
         selectedItems = [item];
-        selectedIndexes = [rows.findIndex(r => r.item.id == item.id)]
+        selectedIndexes = [rows.findIndex(r => r.item[uniqueKey] == item[uniqueKey])]
       } else if (selectMode == "multiple") {
         if(shiftKeyPressed && selectedIndexes.length > 0 && !isSelectedAll) {
           let lastSelectedIndex = selectedIndexes[selectedIndexes.length - 1],
-            selectedIndex = rows.findIndex(r => r.item.id == item.id)
+            selectedIndex = rows.findIndex(r => r.item[uniqueKey] == item[uniqueKey])
           if(selectedIndex != -1) {
             if(selectedIndex < lastSelectedIndex) {
               let x = lastSelectedIndex
@@ -411,7 +424,7 @@
               selectedIndex = x
             }
             for (let i = lastSelectedIndex + 1; i <= selectedIndex; i++) {
-              if(!selectedItems.find((selectedItem) => selectedItem.id == rows[i].item.id)) {
+              if(!selectedItems.find((selectedItem) => selectedItem[uniqueKey] == rows[i].item[uniqueKey])) {
                 selectedItems = [...selectedItems, rows[i].item]
               }
             }
@@ -419,12 +432,12 @@
         }
         else {
           selectedItems = [...selectedItems, item];
-          selectedIndexes.push(rows.findIndex(r => r.item.id == item.id))
+          selectedIndexes.push(rows.findIndex(r => r.item[uniqueKey] == item[uniqueKey]))
         }
       }
     } else {
-      selectedItems = selectedItems.filter((i) => i.id != item.id);
-      selectedIndexes = selectedIndexes.filter(r => r != rows.findIndex(r => r.item.id == item.id))
+      selectedItems = selectedItems.filter((i) => i[uniqueKey] != item[uniqueKey]);
+      selectedIndexes = selectedIndexes.filter(r => r != rows.findIndex(r => r.item[uniqueKey] == item[uniqueKey]))
       isSelectedAll = false;
     }
   }
@@ -443,11 +456,11 @@
   }
 
   function expandRow(row: Row) {
-    let index = expandedRows.findIndex((r) => r.item.id == row.item.id);
+    let index = expandedRows.findIndex((r) => r.item[uniqueKey] == row.item[uniqueKey]);
     if (index == -1) {
       expandedRows = [...expandedRows, row];
     } else {
-      expandedRows = expandedRows.filter((r) => r.item.id != row.item.id);
+      expandedRows = expandedRows.filter((r) => r.item[uniqueKey] != row.item[uniqueKey]);
     }
   }
 
@@ -532,10 +545,12 @@
   $: if (searchText != undefined) handleSearchChange(searchText);
 
   function handleFiltersChange() {
-    userScrolling = false
-    currentSectionNumber = 0
-    tableContainer.scrollTop = 0
-    setTimeout(() => userScrolling = true, 20)
+    if(!!tableContainer) {
+      userScrolling = false
+      currentSectionNumber = 0
+      tableContainer.scrollTop = 0
+      setTimeout(() => userScrolling = true, 20)
+    }
     
     dispatch("filtersChange", {
       builder: globalBuilder,
@@ -777,15 +792,14 @@
           builder.where(
             quickFilter.column,
             ">=",
-            DateTime.fromJSDate(from).toString()
+            DateTime.fromJSDate(from).setLocale('it-IT').startOf('day').toString()
           );
         }
         if (!!to) {
           builder.where(
             quickFilter.column,
             "<=",
-            DateTime.fromJSDate(to).toString()
-          );
+            DateTime.fromJSDate(to).setLocale('it-IT').endOf('day').toString()          );
         }
       }
     } else if (quickFilter.type.key == "multi-select") {
@@ -886,20 +900,41 @@
   }
 
   function handleLoadForward() {
-    userScrolling = false
-    
-    let topElementsHeight = 0
-    for (let i = 0; i < sectionRowsNumber; i++) {
-      topElementsHeight += tableBody?.children.item(i)?.getBoundingClientRect().height || 0
+    if(renderedRows.length >= renderedRowsNumber) {
+      userScrolling = false
+      
+      const anchorIndex = renderedRowsNumber - 1
+      const anchorUniqueKey = renderedRows[anchorIndex].item[uniqueKey]
+      const anchorElement = findAnchorElement(anchorUniqueKey)
+      const anchorOffsetBefore = anchorElement?.getBoundingClientRect().top || 0
+      
+      let removedRowCount = 0
+
+      for (let i = 0; removedRowCount < sectionRowsNumber; i++) {
+        let row = tableBody.children.item(i)
+        removedRowCount++
+
+        const rowKey = row?.getAttribute("data-key")
+        const isExpanded = expandedRows.some(r => r.item[uniqueKey] == rowKey)
+        
+        if (isExpanded) {
+          i++
+        }
+      }
+
+      currentSectionNumber = currentSectionNumber + 1
+
+      setTimeout(() => {
+        const anchorElementAfter = findAnchorElement(anchorUniqueKey)
+        const anchorOffsetAfter = anchorElementAfter?.getBoundingClientRect().top || 0
+        const offsetDiff = anchorOffsetAfter - anchorOffsetBefore
+        tableContainer.scrollTop += offsetDiff
+
+        userScrolling = true
+      }, 10)
     }
-    
-    currentSectionNumber = currentSectionNumber + 1
 
-    tableContainer.scrollTop -= topElementsHeight
-
-    setTimeout(() => userScrolling = true, 20)
-
-    if(totalCachedSections - sectionTreshold <= currentSectionNumber 
+    if(totalCachedSections - sectionThreshold <= currentSectionNumber 
       && !loading 
       && totalRows > rows.length
     ) {
@@ -909,17 +944,46 @@
 
   function handleLoadBackward() {
     userScrolling = false
-    
-    let topElementsHeight = 0
-    for (let i = renderedRows.length - 1; i > renderedRows.length - sectionRowsNumber + 1; i--) {
-      topElementsHeight += tableBody?.children.item(i)?.getBoundingClientRect().height || 0
+
+    const anchorIndex = 0
+    const anchorUniqueKey = renderedRows[anchorIndex].item[uniqueKey]
+    const anchorElement = findAnchorElement(anchorUniqueKey)
+    const anchorOffsetBefore = anchorElement?.getBoundingClientRect().top || 0
+
+    let removedRowCount = 0
+
+    for (let i = renderedRows.length - 1; removedRowCount < sectionRowsNumber; i--) {
+      let row = tableBody.children.item(i)
+      removedRowCount++
+
+      const rowKey = row?.getAttribute("data-key")
+      const isExpanded = expandedRows.some(r => r.item[uniqueKey] == rowKey)
+      
+      if (isExpanded) {
+        i--
+      }
     }
     
     currentSectionNumber = currentSectionNumber - 1
 
-    tableContainer.scrollTop += topElementsHeight
+    setTimeout(() => {
+      const anchorElementAfter = findAnchorElement(anchorUniqueKey)
+      const anchorOffsetAfter = anchorElementAfter?.getBoundingClientRect().top || 0
+      const offsetDiff = anchorOffsetAfter - anchorOffsetBefore
+      tableContainer.scrollTop += offsetDiff
 
-    setTimeout(() => userScrolling = true, 20)
+      userScrolling = true
+    }, 10)
+  }
+
+  function findAnchorElement(key: keyof Item) {
+    for (let i = 0; i < tableBody.children.length; i++) {
+      const child = tableBody.children.item(i)
+      if (child?.getAttribute("data-key") == key) {
+        return child
+      }
+    }
+    return undefined
   }
 </script>
 
@@ -1037,12 +1101,26 @@
       {/if}
     </div>
   {/if}
+
+  {#if numberOfResultsVisible}
+    <div class='results-number'>
+      { lang == 'en' ? 'Results: ' : 'Risultati: '}
+      {#if !loading}
+        {totalRows || rows.length}
+      {:else}
+        <CircularLoader 
+          {loading}
+          --circular-loader-height='10px'
+        ></CircularLoader>
+      {/if}
+    </div>
+  {/if}
   <div class="outer-container">
     <div class="inner-container" bind:this={tableContainer}>
   <!-- <div class="table-container" bind:this={tableContainer}> -->
     <InfiniteScroll
       on:loadMore={handleLoadBackward}
-      treshold={backwardTresholdPixel}
+      threshold={backwardThresholdPixel}
       hasMore={currentSectionNumber > 0 && userScrolling}
       direction='backward'
     />
@@ -1175,14 +1253,15 @@
           {#each renderedRows as row, indexRow}
             <tr
               class="item-row"
+              data-key={row.item[uniqueKey]}
               style:background-color={
                 !!row.item.disableEdit ?
                   !!row.item.rowDisableBackgroundColor ?
                     row.item.rowDisableBackgroundColor : 
                     'var(--dynamic-table-row-disabled-background-color, var(--dynamic-table-row-default-disabled-background-color))' : 
-                expandedRows.findIndex((r) => r.item.id == row.item.id ) != -1 ? 
+                expandedRows.findIndex((r) => r.item[uniqueKey] == row.item[uniqueKey] ) != -1 ? 
                   'var(--dynamic-table-expanded-row-background-color, var(--dynamic-table-expanded-row-default-background-color))' :
-                  !!selectedItems.find(i => i.id == row.item.id) ?
+                  !!selectedItems.find(i => i[uniqueKey] == row.item[uniqueKey]) ?
                     'var(--dynamic-table-selected-row-background-color, var(--dynamic-table-selected-row-default-background-color))' :
                     ""
                 }
@@ -1192,9 +1271,9 @@
               {#if !!showSelect && !showExpand}
                 <td style:padding-left="0px" style:text-align="center">
                   <Checkbox
-                    id={row.item.id}
+                    id={row.item[uniqueKey]}
                     value={selectedItems.findIndex(
-                      (i) => i.id == row.item.id
+                      (i) => i[uniqueKey] == row.item[uniqueKey]
                     ) != -1}
                     disabled={disabled || loading}
                     on:change={(e) => handleSelect(row.item, e.detail.shiftKeyPressed)}
@@ -1205,7 +1284,7 @@
                 <td style:padding-left="0px" style:text-align="center">
                   <Icon
                     name={expandedRows.findIndex(
-                      (r) => r.item.id == row.item.id
+                      (r) => r.item[uniqueKey] == row.item[uniqueKey]
                     ) == -1
                       ? "mdi-chevron-down"
                       : "mdi-chevron-up"}
@@ -1272,7 +1351,7 @@
               {/if}
             </tr>
             {#if showExpand}
-              {#if expandedRows.findIndex((r) => r.item.id == row.item.id) != -1}
+              {#if expandedRows.findIndex((r) => r.item[uniqueKey] == row.item[uniqueKey]) != -1}
                 <tr>
                   <td
                     colspan={headersToShowInTable.length + 1}
@@ -1332,7 +1411,7 @@
                             {#each subHeaders as subHeader, indexSubHeader}
                               <td
                                 class:cell-edit-activator={cellEditorIndexHeader == indexSubHeader && cellEditorIndexRow == indexSubItem && cellEditorSubItem}
-                                class:hover-cell={cellEdit}
+                                class:hover-cell={cellEdit && !loading && !!subHeader.cellEditorInfo}
                                 on:click={(e) => {
                                   handleCellClick(
                                     e,
@@ -1374,7 +1453,7 @@
                                       {subHeader.type.params.nullText}
                                     {/if}
                                   {:else}
-                                    {subItem[subHeader.value]}
+                                    <div style="display: flex; justify-content: center;">-</div>
                                   {/if}
                                 {:else}
                                   {subItem[subHeader.value]}
@@ -1409,10 +1488,17 @@
     </table>
     <InfiniteScroll
       on:loadMore={handleLoadForward}
-      treshold={forwardTresholdPixel}
+      threshold={forwardThresholdPixel}
       hasMore={hasMoreToRender && userScrolling}
     />
   </div>
+  {#if totalSections - 1 < currentSectionNumber && reachedBottom && endLineVisible}
+    <div class="line-container" transition:fade>
+      <span class="line"></span>
+      <span class="text">{lang == 'en' ? 'End' : 'Fine'}</span>
+      <span class="line"></span>
+    </div>
+  {/if}
   </div>
 {/if}
 
@@ -1566,55 +1652,57 @@
             >
           {/if}
         </div>
-        <Autocomplete
-          multiple
-          items={quickFilterActive.type.items}
-          bind:values={quickFilterActive.type.values}
-          --autocomplete-border="1px solid rgb(var(--global-color-background-500))"
-          --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
-        >
-          <svelte:fragment slot="selection" let:selection let:unselect>
-            <slot name="selection" {selection} {unselect}>
-              <div tabindex="-1">
-                <Chip
-                  close={true}
-                  on:close={() => unselect(selection)}
-                  --chip-default-border-radius="var(--autocomplete-border-radius, var(--autocomplete-default-border-radius))"
-                  buttonTabIndex={-1}
-                  truncateText
-                >
-                  <slot name="chip-label" {selection}>
-                    {#if !!quickFilterActive.type.countriesAlpha2 && quickFilterActive.type.countriesAlpha2.find((c) => c.value == selection.value)}
-                      <div>
-                        <FlagIcon
-                          alpha2={quickFilterActive.type.countriesAlpha2
-                            .find((c) => c.value == selection.value)
-                            ?.label?.toString()
-                            .toLowerCase() ?? ""}
-                          --flag-icon-size="16px"
-                        />
-                      </div>
-                    {/if}
-                    {selection.label}
-                  </slot>
-                </Chip>
-              </div>
-            </slot>
-          </svelte:fragment>
-          <svelte:fragment slot="item-label" let:item>
-            <slot name="item-label" {item}>
-              {#if !!quickFilterActive.type.countriesAlpha2 && quickFilterActive.type.countriesAlpha2.find((c) => c.value == item.value)}
-                <FlagIcon
-                  alpha2={quickFilterActive.type.countriesAlpha2
-                    .find((c) => c.value == item.value)
-                    ?.label?.toString()
-                    .toLowerCase() ?? ""}
-                />
-              {/if}
-              {item.label}
-            </slot>
-          </svelte:fragment>
-        </Autocomplete>
+        <div on:click|stopPropagation role="presentation" tabindex="-1">
+          <Autocomplete
+            multiple
+            items={quickFilterActive.type.items}
+            bind:values={quickFilterActive.type.values}
+            --autocomplete-border="1px solid rgb(var(--global-color-background-500))"
+            --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
+          >
+            <svelte:fragment slot="selection" let:selection let:unselect>
+              <slot name="selection" {selection} {unselect}>
+                <div tabindex="-1">
+                  <Chip
+                    close={true}
+                    on:close={() => unselect(selection)}
+                    --chip-default-border-radius="var(--autocomplete-border-radius, var(--autocomplete-default-border-radius))"
+                    buttonTabIndex={-1}
+                    truncateText
+                  >
+                    <slot name="chip-label" {selection}>
+                      {#if !!quickFilterActive.type.countriesAlpha2 && quickFilterActive.type.countriesAlpha2.find((c) => c.value == selection.value)}
+                        <div>
+                          <FlagIcon
+                            alpha2={quickFilterActive.type.countriesAlpha2
+                              .find((c) => c.value == selection.value)
+                              ?.label?.toString()
+                              .toLowerCase() ?? ""}
+                            --flag-icon-size="16px"
+                          />
+                        </div>
+                      {/if}
+                      {selection.label}
+                    </slot>
+                  </Chip>
+                </div>
+              </slot>
+            </svelte:fragment>
+            <svelte:fragment slot="item-label" let:item>
+              <slot name="item-label" {item}>
+                {#if !!quickFilterActive.type.countriesAlpha2 && quickFilterActive.type.countriesAlpha2.find((c) => c.value == item.value)}
+                  <FlagIcon
+                    alpha2={quickFilterActive.type.countriesAlpha2
+                      .find((c) => c.value == item.value)
+                      ?.label?.toString()
+                      .toLowerCase() ?? ""}
+                  />
+                {/if}
+                {item.label}
+              </slot>
+            </svelte:fragment>
+          </Autocomplete>
+        </div>
       {:else if quickFilterActive.type.key === "boolean"}
         {#if quickFilterActive.type.params}
           <div class="vertical-quick-filters">
@@ -1646,22 +1734,24 @@
             >
           {/if}
         </div>
-        <CountriesAutocomplete
-          bind:selected={quickFilterActive.type.selected}
-          {...((!!quickFilterActive.type.countriesOptions && quickFilterActive.type.countriesOptions.length > 0) && {
-            items: quickFilterActive.type.countriesOptions,
-          })}
-          autocompleteProps={{
-            placeholder: !!quickFilterActive.type.selected
-              ? quickFilterActive.type.selected.length > 0
-                ? ""
-                : quickFilterActive.description
-              : quickFilterActive.description,
-            multiple: true,
-          }}
-          --autocomplete-border="1px solid rgb(var(--global-color-background-500))"
-          --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
-        />
+        <div on:click|stopPropagation role="presentation" tabindex="-1">
+          <CountriesAutocomplete
+            bind:selected={quickFilterActive.type.selected}
+            {...((!!quickFilterActive.type.countriesOptions && quickFilterActive.type.countriesOptions.length > 0) && {
+              items: quickFilterActive.type.countriesOptions,
+            })}
+            autocompleteProps={{
+              placeholder: !!quickFilterActive.type.selected
+                ? quickFilterActive.type.selected.length > 0
+                  ? ""
+                  : quickFilterActive.description
+                : quickFilterActive.description,
+              multiple: true,
+            }}
+            --autocomplete-border="1px solid rgb(var(--global-color-background-500))"
+            --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
+          />
+        </div>
       {:else if quickFilterActive.type.key === "date"}
         <div on:click|stopPropagation role="presentation" tabindex="-1">
           <div>
@@ -1845,10 +1935,18 @@
     z-index: 2;
   }
 
+  @media not all and (min-resolution:.001dpcm) { 
+    .table-header {
+      position: sticky;
+      top: -2px;
+      z-index: 2;
+    }
+  }
+
   .table-subheader {
-  top: var(--main-header-height);
-  z-index: 1;
-}
+    top: var(--main-header-height);
+    z-index: 1;
+  }
   .table-header th {
     padding: var(
       --dynamic-table-header-padding,
@@ -1931,7 +2029,7 @@
   }
 
   table {
-    border-collapse: collapse;
+    border-collapse: separate;
     width: 100%;
   }
 
@@ -1950,6 +2048,13 @@
     cursor: pointer;
     border: 1px solid rgb(var(--global-color-contrast-800));
     border-radius: 5px;
+  }
+
+  .item-row > td {
+    height: var(
+      --dynamic-table-row-min-height,
+      var(--dynamic-table-default-row-min-height)
+    );
   }
 
   .item-row:hover {
@@ -2097,5 +2202,31 @@
     display: grid;
     gap: 12px;
     padding: 8px;
+  }
+
+  .line-container {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3;
+  }
+
+  .line {
+    flex-grow: 1;
+    height: 1px;
+    background: rgb(var(--global-color-contrast-800));
+    margin: 0 10px;
+  }
+
+  .results-number {
+    margin: 0px 0px 4px 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 </style>

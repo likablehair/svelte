@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy, createEventDispatcher } from "svelte";
 
-  export let treshold: number = 0,
+  export let threshold: number = 0,
     horizontal: boolean = false,
     elementScroll: HTMLElement | null = null,
     hasMore: boolean = true,
@@ -24,7 +24,7 @@
         ? element.scrollHeight - element.clientHeight - element.scrollTop
         : element.scrollTop
     
-    if (offset <= treshold) {
+    if (offset <= threshold) {
       if (!isLoadMore && hasMore) {
         dispatch("loadMore")
       }
