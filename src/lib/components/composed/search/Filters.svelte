@@ -343,12 +343,12 @@
       tmpFilter.values = newValue
     } else if('mode' in tmpFilter && tmpFilter.mode == 'between') {
       if(tmpFilter.type == 'date'){
-        tmpFilter.to = DateTime.fromJSDate(newValue.to).setZone('UTC', { keepLocalTime: true }).endOf('day').toJSDate()
-        tmpFilter.from = DateTime.fromJSDate(newValue.from).setZone('UTC', { keepLocalTime: true }).startOf('day').toJSDate()
+        tmpFilter.from = DateTime.fromJSDate(newValue.to).setLocale('it-IT').startOf('day').toJSDate()
+        tmpFilter.to = DateTime.fromJSDate(newValue.to).setLocale('it-IT').endOf('day').toJSDate()
       }
       else {
-        tmpFilter.to = newValue.to
         tmpFilter.from = newValue.from
+        tmpFilter.to = newValue.to
       }
     } else {
       tmpFilter.value = newValue

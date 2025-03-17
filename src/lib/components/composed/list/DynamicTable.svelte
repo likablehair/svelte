@@ -217,9 +217,9 @@
     searchText: string | undefined = undefined,
     renderedRowsNumber = 100,
     sectionRowsNumber = 20,
-    sectionTreshold = 2,
-    backwardTresholdPixel = 100,
-    forwardTresholdPixel = 100,
+    sectionThreshold = 2,
+    backwardThresholdPixel = 100,
+    forwardThresholdPixel = 100,
     uniqueKey: keyof Item = 'id',
     numberOfResultsVisible: boolean = false,
     endLineVisible: boolean = false
@@ -935,7 +935,7 @@
       })
     }
 
-    if(totalCachedSections - sectionTreshold <= currentSectionNumber 
+    if(totalCachedSections - sectionThreshold <= currentSectionNumber 
       && !loading 
       && totalRows > rows.length
     ) {
@@ -1121,7 +1121,7 @@
   <!-- <div class="table-container" bind:this={tableContainer}> -->
     <InfiniteScroll
       on:loadMore={handleLoadBackward}
-      treshold={backwardTresholdPixel}
+      threshold={backwardThresholdPixel}
       hasMore={currentSectionNumber > 0 && userScrolling}
       direction='backward'
     />
@@ -1489,7 +1489,7 @@
     </table>
     <InfiniteScroll
       on:loadMore={handleLoadForward}
-      treshold={forwardTresholdPixel}
+      threshold={forwardThresholdPixel}
       hasMore={hasMoreToRender && userScrolling}
     />
   </div>
@@ -2054,7 +2054,7 @@
   .item-row > td {
     height: var(
       --dynamic-table-row-min-height,
-      var(--dynamic-table-row-default-min-height)
+      var(--dynamic-table-row-default-min-heigth)
     );
   }
 

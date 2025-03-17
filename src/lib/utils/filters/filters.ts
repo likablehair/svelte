@@ -233,17 +233,17 @@ export default class Converter {
     builder: Builder,
     filter: NumberFilter
   }): Builder {
-    if(params.filter.mode == 'equal' && params.filter.value != undefined) {
+    if(params.filter.mode == 'equal' && params.filter.value !== undefined) {
       params.builder.where(params.filter.column, '=', params.filter.value)
-    } else if(params.filter.mode == 'greater' && params.filter.value != undefined) {
+    } else if(params.filter.mode == 'greater' && params.filter.value !== undefined) {
       params.builder.where(params.filter.column, '>', params.filter.value)
-    } else if(params.filter.mode == 'lower' && params.filter.value != undefined) {
+    } else if(params.filter.mode == 'lower' && params.filter.value !== undefined) {
       params.builder.where(params.filter.column, '<', params.filter.value)
     } else if(params.filter.mode == 'between') {
-      if(params.filter.from != undefined) {
+      if(params.filter.from !== undefined) {
         params.builder.where(params.filter.column, '>=', params.filter.from)
       }
-      if(params.filter.to != undefined) {
+      if(params.filter.to !== undefined) {
         params.builder.where(params.filter.column, '<=', params.filter.to)
       }
     }
