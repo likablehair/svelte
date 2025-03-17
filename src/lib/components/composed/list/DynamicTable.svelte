@@ -925,14 +925,14 @@
 
       currentSectionNumber = currentSectionNumber + 1
 
-      requestAnimationFrame(() => {
+      setTimeout(() => {
         const anchorElementAfter = findAnchorElement(anchorUniqueKey)
         const anchorOffsetAfter = anchorElementAfter?.getBoundingClientRect().top || 0
         const offsetDiff = anchorOffsetAfter - anchorOffsetBefore
         tableContainer.scrollTop += offsetDiff
 
         userScrolling = true
-      })
+      }, 10)
     }
 
     if(totalCachedSections - sectionThreshold <= currentSectionNumber 
@@ -967,14 +967,14 @@
     
     currentSectionNumber = currentSectionNumber - 1
 
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       const anchorElementAfter = findAnchorElement(anchorUniqueKey)
       const anchorOffsetAfter = anchorElementAfter?.getBoundingClientRect().top || 0
       const offsetDiff = anchorOffsetAfter - anchorOffsetBefore
       tableContainer.scrollTop += offsetDiff
 
       userScrolling = true
-    })
+    }, 10)
   }
 
   function findAnchorElement(key: keyof Item) {
