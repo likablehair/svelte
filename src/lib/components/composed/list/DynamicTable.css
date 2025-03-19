@@ -1,10 +1,10 @@
 :root {
-  --dynamic-table-cell-editor-default-background-color: rgb(var(--global-color-background-300));
-  --dynamic-table-quick-filter-default-background-color: rgb(var(--global-color-background-300));
-  --dynamic-table-row-default-background-color-hover: rgb(var(--global-color-background-400));
-  --dynamic-table-expanded-row-default-background-color: rgb(var(--global-color-background-500));
-  --dynamic-table-selected-row-default-background-color: rgb(var(--global-color-primary-200));
-  --dynamic-table-row-default-disabled-background-color: rgb(var(--global-color-primary-400));
+  --dynamic-table-default-cell-editor-background-color: rgb(var(--global-color-background-300));
+  --dynamic-table-default-quick-filter-background-color: rgb(var(--global-color-background-300));
+  --dynamic-table-default-row-background-color-hover: rgb(var(--global-color-background-400));
+  --dynamic-table-default-expanded-row-background-color: rgb(var(--global-color-background-500));
+  --dynamic-table-default-selected-row-background-color: rgb(var(--global-color-primary-200));
+  --dynamic-table-default-row-disabled-background-color: rgb(var(--global-color-primary-400));
   --dynamic-table-default-header-background-color: rgb(var(--global-color-background-500));
   --dynamic-table-default-background-color: transparent;
   --dynamic-table-default-max-height: 70vh;
@@ -16,4 +16,7 @@
   --dynamic-table-default-header-border-radius: 5px;
   --dynamic-table-default-header-height: 30px;
   --dynamic-table-default-row-min-height: auto;
+  --dynamic-table-default-end-line-background-color: transparent;
+  --dynamic-table-default-end-line-color: rgb(var(--global-color-contrast-500));
+  --dynamic-table-default-end-line-text-color: rgb(var(--global-color-contrast-500));
 }

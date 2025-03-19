@@ -1258,11 +1258,11 @@
                 !!row.item.disableEdit ?
                   !!row.item.rowDisableBackgroundColor ?
                     row.item.rowDisableBackgroundColor : 
-                    'var(--dynamic-table-row-disabled-background-color, var(--dynamic-table-row-default-disabled-background-color))' : 
+                    'var(--dynamic-table-row-disabled-background-color, var(--dynamic-table-default-row-disabled-background-color))' : 
                 expandedRows.findIndex((r) => r.item[uniqueKey] == row.item[uniqueKey] ) != -1 ? 
-                  'var(--dynamic-table-expanded-row-background-color, var(--dynamic-table-expanded-row-default-background-color))' :
+                  'var(--dynamic-table-expanded-row-background-color, var(--dynamic-table-default-expanded-row-background-color))' :
                   !!selectedItems.find(i => i[uniqueKey] == row.item[uniqueKey]) ?
-                    'var(--dynamic-table-selected-row-background-color, var(--dynamic-table-selected-row-default-background-color))' :
+                    'var(--dynamic-table-selected-row-background-color, var(--dynamic-table-default-selected-row-background-color))' :
                     ""
                 }
               class:row-activator={cellEditorIndexRow == indexRow && !cellEditorSubItem}
@@ -2060,7 +2060,7 @@
   .item-row:hover {
     background-color: var(
       --dynamic-table-row-background-color-hover,
-      var(--dynamic-table-row-default-background-color-hover)
+      var(--dynamic-table-default-row-background-color-hover)
     );
   }
 
@@ -2075,7 +2075,7 @@
     border-radius: 10px;
     background-color: var(
       --dynamic-table-cell-editor-background-color,
-      var(--dynamic-table-cell-editor-default-background-color)
+      var(--dynamic-table-default-cell-editor-background-color)
     );
     height: 200px;
     width: 500px;
@@ -2084,7 +2084,7 @@
   .row-activator {
     background-color: var(
       --dynamic-table-row-background-color-hover,
-      var(--dynamic-table-row-default-background-color-hover)
+      var(--dynamic-table-default-row-background-color-hover)
     );
   }
 
@@ -2099,7 +2099,7 @@
     border-radius: 10px;
     background-color: var(
       --dynamic-table-quick-filter-background-color,
-      var(--dynamic-table-quick-filter-default-background-color)
+      var(--dynamic-table-default-quick-filter-background-color)
     );
   }
 
@@ -2209,7 +2209,10 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    background: white;
+    background: var(
+      --dynamic-table-end-line-background-color,
+      var(--dynamic-table-default-end-line-background-color)
+    );
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2219,8 +2222,18 @@
   .line {
     flex-grow: 1;
     height: 1px;
-    background: rgb(var(--global-color-contrast-800));
+    background: var(
+      --dynamic-table-end-line-color,
+      var(--dynamic-table-default-end-line-color)
+    );
     margin: 0 10px;
+  }
+
+  .text {
+    color: var(
+      --dynamic-table-end-line-text-color,
+      var(--dynamic-table-default-end-line-text-color)
+    );
   }
 
   .results-number {
