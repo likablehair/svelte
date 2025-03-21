@@ -110,14 +110,21 @@
                   src={avatar.src}
                   --avatar-default-border="2px solid rgb(var(--global-color-background-100))"
                 ></Avatar>
-                <button 
+                <div 
                   on:click|stopPropagation={() => {
                     handleCloseClick({ index: i })
                   }}
+                  on:keypress={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      handleCloseClick({ index: i })
+                    }
+                  }}
                   class="unstyled-button remove-button"
+                  role="button"
+                  tabindex="0"
                 >
                   <Icon --icon-default-size="10px" name="mdi-close"></Icon>
-                </button>
+                </div>
               </div>
             {/each}
           </div>

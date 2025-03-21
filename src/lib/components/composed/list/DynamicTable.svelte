@@ -1001,70 +1001,72 @@
   />
 
   <slot name="search-bar" {handleSearchChange}>
-    <div class="search-bar-container">
-      {#if searchBarVisible}
-        <SimpleTextField
-          placeholder={searchBarPlaceholder}
-          appendInnerIcon="mdi-magnify"
-          bind:value={searchText}
-          bind:input={searchBarInput}
-          on:keydown={handleSearchBoxKeydown}
-          --simple-textfield-default-width="450px"
-          --simple-textfield-border-radius= 0.5rem
-          --simple-textfield-background-color= transparent
-          --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-          --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-        />
-      {/if}
+    {#if searchBarVisible || filtersVisible}
+      <div class="search-bar-container">
+        {#if searchBarVisible}
+          <SimpleTextField
+            placeholder={searchBarPlaceholder}
+            appendInnerIcon="mdi-magnify"
+            bind:value={searchText}
+            bind:input={searchBarInput}
+            on:keydown={handleSearchBoxKeydown}
+            --simple-textfield-default-width="450px"
+            --simple-textfield-border-radius= 0.5rem
+            --simple-textfield-background-color= transparent
+            --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+            --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+          />
+        {/if}
 
-      {#if filtersVisible}
-        <div style="margin-left: 20px;">
-          <Filters
-            bind:filters
-            on:applyFilter={() => {
-              handleSearchChange(searchText);
-            }}
-            on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
-            on:removeAllFilters={() => handleRemoveAllFilters()}
-            --filters-default-wrapper-width="100%"
-            {lang}
-            {editFilterMode}
-            {showActiveFilters}
-          >
-            <svelte:fragment slot="append">
-              <slot name="filter-append" />
-            </svelte:fragment>
-            <svelte:fragment slot="custom-chip" let:filter>
-              <slot name="custom-filter-chip" {filter} />
-            </svelte:fragment>
-            <svelte:fragment
-              slot="custom"
-              let:filter
-              let:updateFunction
-              let:mAndDown
+        {#if filtersVisible}
+          <div style="margin-left: 20px;">
+            <Filters
+              bind:filters
+              on:applyFilter={() => {
+                handleSearchChange(searchText);
+              }}
+              on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
+              on:removeAllFilters={() => handleRemoveAllFilters()}
+              --filters-default-wrapper-width="100%"
+              {lang}
+              {editFilterMode}
+              {showActiveFilters}
             >
-              <slot name="custom-filter" {filter} {updateFunction} {mAndDown} />
-            </svelte:fragment>
+              <svelte:fragment slot="append">
+                <slot name="filter-append" />
+              </svelte:fragment>
+              <svelte:fragment slot="custom-chip" let:filter>
+                <slot name="custom-filter-chip" {filter} />
+              </svelte:fragment>
+              <svelte:fragment
+                slot="custom"
+                let:filter
+                let:updateFunction
+                let:mAndDown
+              >
+                <slot name="custom-filter" {filter} {updateFunction} {mAndDown} />
+              </svelte:fragment>
 
-            <svelte:fragment slot="content" let:mAndDown let:filters let:updateMultiFilterValues let:handleRemoveAllFilters={removeAllFilters}>
-              {#key filters}
-                <DynamicFilters
-                  {lang}
-                  {filters}                      
-                  {mAndDown}
-                  on:change={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
-                  on:removeAllFilters={() => handleRemoveAllFilters(removeAllFilters)}
-                >
-                  <svelte:fragment slot="custom" let:filter let:mAndDown>
-                    <slot name="custom-filter" {filter} {updateMultiFilterValues} {mAndDown}></slot>
-                  </svelte:fragment>
-                </DynamicFilters>
-              {/key}
-            </svelte:fragment>
-          </Filters>
-        </div>
-      {/if}
-    </div>
+              <svelte:fragment slot="content" let:mAndDown let:filters let:updateMultiFilterValues let:handleRemoveAllFilters={removeAllFilters}>
+                {#key filters}
+                  <DynamicFilters
+                    {lang}
+                    {filters}                      
+                    {mAndDown}
+                    on:change={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
+                    on:removeAllFilters={() => handleRemoveAllFilters(removeAllFilters)}
+                  >
+                    <svelte:fragment slot="custom" let:filter let:mAndDown>
+                      <slot name="custom-filter" {filter} {updateMultiFilterValues} {mAndDown}></slot>
+                    </svelte:fragment>
+                  </DynamicFilters>
+                {/key}
+              </svelte:fragment>
+            </Filters>
+          </div>
+        {/if}
+      </div>
+    {/if}
   </slot>
 
   {#if quickFiltersVisible}
@@ -1116,7 +1118,7 @@
     </div>
   {/if}
   <div class="outer-container">
-    <div class="inner-container" bind:this={tableContainer}>
+    <div class="inner-container" bind:this={tableContainer} on:scroll>
   <!-- <div class="table-container" bind:this={tableContainer}> -->
     <InfiniteScroll
       on:loadMore={handleLoadBackward}
@@ -1258,11 +1260,11 @@
                 !!row.item.disableEdit ?
                   !!row.item.rowDisableBackgroundColor ?
                     row.item.rowDisableBackgroundColor : 
-                    'var(--dynamic-table-row-disabled-background-color, var(--dynamic-table-row-default-disabled-background-color))' : 
+                    'var(--dynamic-table-row-disabled-background-color, var(--dynamic-table-default-row-disabled-background-color))' : 
                 expandedRows.findIndex((r) => r.item[uniqueKey] == row.item[uniqueKey] ) != -1 ? 
-                  'var(--dynamic-table-expanded-row-background-color, var(--dynamic-table-expanded-row-default-background-color))' :
+                  'var(--dynamic-table-expanded-row-background-color, var(--dynamic-table-default-expanded-row-background-color))' :
                   !!selectedItems.find(i => i[uniqueKey] == row.item[uniqueKey]) ?
-                    'var(--dynamic-table-selected-row-background-color, var(--dynamic-table-selected-row-default-background-color))' :
+                    'var(--dynamic-table-selected-row-background-color, var(--dynamic-table-default-selected-row-background-color))' :
                     ""
                 }
               class:row-activator={cellEditorIndexRow == indexRow && !cellEditorSubItem}
@@ -1657,6 +1659,7 @@
             multiple
             items={quickFilterActive.type.items}
             bind:values={quickFilterActive.type.values}
+            --autocomplete-border-radius= 0.5rem
             --autocomplete-border="1px solid rgb(var(--global-color-background-500))"
             --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
           >
@@ -2060,7 +2063,7 @@
   .item-row:hover {
     background-color: var(
       --dynamic-table-row-background-color-hover,
-      var(--dynamic-table-row-default-background-color-hover)
+      var(--dynamic-table-default-row-background-color-hover)
     );
   }
 
@@ -2075,7 +2078,7 @@
     border-radius: 10px;
     background-color: var(
       --dynamic-table-cell-editor-background-color,
-      var(--dynamic-table-cell-editor-default-background-color)
+      var(--dynamic-table-default-cell-editor-background-color)
     );
     height: 200px;
     width: 500px;
@@ -2084,7 +2087,7 @@
   .row-activator {
     background-color: var(
       --dynamic-table-row-background-color-hover,
-      var(--dynamic-table-row-default-background-color-hover)
+      var(--dynamic-table-default-row-background-color-hover)
     );
   }
 
@@ -2099,7 +2102,7 @@
     border-radius: 10px;
     background-color: var(
       --dynamic-table-quick-filter-background-color,
-      var(--dynamic-table-quick-filter-default-background-color)
+      var(--dynamic-table-default-quick-filter-background-color)
     );
   }
 
@@ -2209,7 +2212,10 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    background: white;
+    background: var(
+      --dynamic-table-end-line-background-color,
+      var(--dynamic-table-default-end-line-background-color)
+    );
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2219,8 +2225,18 @@
   .line {
     flex-grow: 1;
     height: 1px;
-    background: rgb(var(--global-color-contrast-800));
+    background: var(
+      --dynamic-table-end-line-color,
+      var(--dynamic-table-default-end-line-color)
+    );
     margin: 0 10px;
+  }
+
+  .text {
+    color: var(
+      --dynamic-table-end-line-text-color,
+      var(--dynamic-table-default-end-line-text-color)
+    );
   }
 
   .results-number {

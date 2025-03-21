@@ -84,6 +84,18 @@
   --global-color-warning-800: var(--global-color-light-warning-800, 114, 75, 14);
   --global-color-warning-900: var(--global-color-light-warning-900, 55, 36, 7);
   --global-color-warning-950: var(--global-color-light-warning-950, 27, 18, 3);
+
+  --global-color-success-50: var(--global-color-light-success-50, 231, 253, 237);
+  --global-color-success-100: var(--global-color-light-success-100, 212, 252, 225);
+  --global-color-success-200: var(--global-color-light-success-200, 170, 249, 200);
+  --global-color-success-300: var(--global-color-light-success-300, 122, 245, 170);
+  --global-color-success-400: var(--global-color-light-success-400, 80, 242, 140);
+  --global-color-success-500: var(--global-color-light-success-500, 37, 238, 110);
+  --global-color-success-600: var(--global-color-light-success-600, 16, 211, 89);
+  --global-color-success-700: var(--global-color-light-success-700, 12, 156, 66);
+  --global-color-success-800: var(--global-color-light-success-800, 8, 104, 44);
+  --global-color-success-900: var(--global-color-light-success-900, 4, 52, 22);
+  --global-color-success-950: var(--global-color-light-success-950, 2, 28, 12);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -171,6 +183,18 @@
     --global-color-warning-800: var(--global-color-dark-warning-800, 114, 75, 14);
     --global-color-warning-900: var(--global-color-dark-warning-900, 55, 36, 7);
     --global-color-warning-950: var(--global-color-dark-warning-950, 27, 18, 3);
+
+    --global-color-success-50: var(--global-color-dark-success-50, 231, 253, 237);
+    --global-color-success-100: var(--global-color-dark-success-100, 212, 252, 225);
+    --global-color-success-200: var(--global-color-dark-success-200, 170, 249, 200);
+    --global-color-success-300: var(--global-color-dark-success-300, 122, 245, 170);
+    --global-color-success-400: var(--global-color-dark-success-400, 80, 242, 140);
+    --global-color-success-500: var(--global-color-dark-success-500, 37, 238, 110);
+    --global-color-success-600: var(--global-color-dark-success-600, 16, 211, 89);
+    --global-color-success-700: var(--global-color-dark-success-700, 12, 156, 66);
+    --global-color-success-800: var(--global-color-dark-success-800, 8, 104, 44);
+    --global-color-success-900: var(--global-color-dark-success-900, 4, 52, 22);
+    --global-color-success-950: var(--global-color-dark-success-950, 2, 28, 12);
   }
 }
 
@@ -258,4 +282,16 @@
   --global-color-warning-800: var(--global-color-dark-warning-800, 114, 75, 14);
   --global-color-warning-900: var(--global-color-dark-warning-900, 55, 36, 7);
   --global-color-warning-950: var(--global-color-dark-warning-950, 27, 18, 3);
+
+  --global-color-success-50: var(--global-color-dark-success-50, 231, 253, 237);
+  --global-color-success-100: var(--global-color-dark-success-100, 212, 252, 225);
+  --global-color-success-200: var(--global-color-dark-success-200, 170, 249, 200);
+  --global-color-success-300: var(--global-color-dark-success-300, 122, 245, 170);
+  --global-color-success-400: var(--global-color-dark-success-400, 80, 242, 140);
+  --global-color-success-500: var(--global-color-dark-success-500, 37, 238, 110);
+  --global-color-success-600: var(--global-color-dark-success-600, 16, 211, 89);
+  --global-color-success-700: var(--global-color-dark-success-700, 12, 156, 66);
+  --global-color-success-800: var(--global-color-dark-success-800, 8, 104, 44);
+  --global-color-success-900: var(--global-color-dark-success-900, 4, 52, 22);
+  --global-color-success-950: var(--global-color-dark-success-950, 2, 28, 12);
 }
