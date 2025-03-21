@@ -1118,7 +1118,7 @@
     </div>
   {/if}
   <div class="outer-container">
-    <div class="inner-container" bind:this={tableContainer}>
+    <div class="inner-container" bind:this={tableContainer} on:scroll>
   <!-- <div class="table-container" bind:this={tableContainer}> -->
     <InfiniteScroll
       on:loadMore={handleLoadBackward}
