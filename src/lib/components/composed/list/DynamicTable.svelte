@@ -1001,70 +1001,72 @@
   />
 
   <slot name="search-bar" {handleSearchChange}>
-    <div class="search-bar-container">
-      {#if searchBarVisible}
-        <SimpleTextField
-          placeholder={searchBarPlaceholder}
-          appendInnerIcon="mdi-magnify"
-          bind:value={searchText}
-          bind:input={searchBarInput}
-          on:keydown={handleSearchBoxKeydown}
-          --simple-textfield-default-width="450px"
-          --simple-textfield-border-radius= 0.5rem
-          --simple-textfield-background-color= transparent
-          --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-          --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-        />
-      {/if}
+    {#if searchBarVisible || filtersVisible}
+      <div class="search-bar-container">
+        {#if searchBarVisible}
+          <SimpleTextField
+            placeholder={searchBarPlaceholder}
+            appendInnerIcon="mdi-magnify"
+            bind:value={searchText}
+            bind:input={searchBarInput}
+            on:keydown={handleSearchBoxKeydown}
+            --simple-textfield-default-width="450px"
+            --simple-textfield-border-radius= 0.5rem
+            --simple-textfield-background-color= transparent
+            --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+            --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+          />
+        {/if}
 
-      {#if filtersVisible}
-        <div style="margin-left: 20px;">
-          <Filters
-            bind:filters
-            on:applyFilter={() => {
-              handleSearchChange(searchText);
-            }}
-            on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
-            on:removeAllFilters={() => handleRemoveAllFilters()}
-            --filters-default-wrapper-width="100%"
-            {lang}
-            {editFilterMode}
-            {showActiveFilters}
-          >
-            <svelte:fragment slot="append">
-              <slot name="filter-append" />
-            </svelte:fragment>
-            <svelte:fragment slot="custom-chip" let:filter>
-              <slot name="custom-filter-chip" {filter} />
-            </svelte:fragment>
-            <svelte:fragment
-              slot="custom"
-              let:filter
-              let:updateFunction
-              let:mAndDown
+        {#if filtersVisible}
+          <div style="margin-left: 20px;">
+            <Filters
+              bind:filters
+              on:applyFilter={() => {
+                handleSearchChange(searchText);
+              }}
+              on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
+              on:removeAllFilters={() => handleRemoveAllFilters()}
+              --filters-default-wrapper-width="100%"
+              {lang}
+              {editFilterMode}
+              {showActiveFilters}
             >
-              <slot name="custom-filter" {filter} {updateFunction} {mAndDown} />
-            </svelte:fragment>
+              <svelte:fragment slot="append">
+                <slot name="filter-append" />
+              </svelte:fragment>
+              <svelte:fragment slot="custom-chip" let:filter>
+                <slot name="custom-filter-chip" {filter} />
+              </svelte:fragment>
+              <svelte:fragment
+                slot="custom"
+                let:filter
+                let:updateFunction
+                let:mAndDown
+              >
+                <slot name="custom-filter" {filter} {updateFunction} {mAndDown} />
+              </svelte:fragment>
 
-            <svelte:fragment slot="content" let:mAndDown let:filters let:updateMultiFilterValues let:handleRemoveAllFilters={removeAllFilters}>
-              {#key filters}
-                <DynamicFilters
-                  {lang}
-                  {filters}                      
-                  {mAndDown}
-                  on:change={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
-                  on:removeAllFilters={() => handleRemoveAllFilters(removeAllFilters)}
-                >
-                  <svelte:fragment slot="custom" let:filter let:mAndDown>
-                    <slot name="custom-filter" {filter} {updateMultiFilterValues} {mAndDown}></slot>
-                  </svelte:fragment>
-                </DynamicFilters>
-              {/key}
-            </svelte:fragment>
-          </Filters>
-        </div>
-      {/if}
-    </div>
+              <svelte:fragment slot="content" let:mAndDown let:filters let:updateMultiFilterValues let:handleRemoveAllFilters={removeAllFilters}>
+                {#key filters}
+                  <DynamicFilters
+                    {lang}
+                    {filters}                      
+                    {mAndDown}
+                    on:change={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
+                    on:removeAllFilters={() => handleRemoveAllFilters(removeAllFilters)}
+                  >
+                    <svelte:fragment slot="custom" let:filter let:mAndDown>
+                      <slot name="custom-filter" {filter} {updateMultiFilterValues} {mAndDown}></slot>
+                    </svelte:fragment>
+                  </DynamicFilters>
+                {/key}
+              </svelte:fragment>
+            </Filters>
+          </div>
+        {/if}
+      </div>
+    {/if}
   </slot>
 
   {#if quickFiltersVisible}
