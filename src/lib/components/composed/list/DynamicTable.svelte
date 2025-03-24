@@ -1069,9 +1069,10 @@
     {/if}
   </slot>
 
-  {#if quickFiltersVisible}
+  {#if quickFiltersVisible || numberOfResultsVisible}
+  <div class="quick-filters-results-container">
     <div class="quick-filters">
-      {#if !!quickFilters && quickFilters.length > 0}
+      {#if !!quickFilters && quickFilters.length > 0 && quickFiltersVisible}
         {#each quickFilters as quickFilter}
           <div
             class={quickFilter.active ? "active-quick-filters" : "non-active-quick-filters"}
@@ -1102,21 +1103,22 @@
         {/each}
       {/if}
     </div>
+    {#if numberOfResultsVisible}
+      <div class='results-number'>
+        { lang == 'en' ? 'Results: ' : 'Risultati: '}
+        {#if !loading}
+          {totalRows || rows.length}
+        {:else}
+          <CircularLoader 
+            {loading}
+            --circular-loader-height='10px'
+          ></CircularLoader>
+        {/if}
+      </div>
+    {/if}
+  </div>
   {/if}
 
-  {#if numberOfResultsVisible}
-    <div class='results-number'>
-      { lang == 'en' ? 'Results: ' : 'Risultati: '}
-      {#if !loading}
-        {totalRows || rows.length}
-      {:else}
-        <CircularLoader 
-          {loading}
-          --circular-loader-height='10px'
-        ></CircularLoader>
-      {/if}
-    </div>
-  {/if}
   <div class="outer-container">
     <div class="inner-container" bind:this={tableContainer} on:scroll>
   <!-- <div class="table-container" bind:this={tableContainer}> -->
@@ -1920,7 +1922,6 @@
   .inner-container {
     overflow-y: auto;
     margin-right: -15px;
-    padding-right: 15px;
     max-height: var(--dynamic-table-max-height, var(--dynamic-table-default-max-height));
   }
 
@@ -2147,6 +2148,11 @@
     display: flex;
     flex-direction: row;
     margin-bottom: 10px;
+  }
+
+  .quick-filters-results-container {
+    display: flex;
+    justify-content: space-between;
   }
 
   .vertical-quick-filters {
