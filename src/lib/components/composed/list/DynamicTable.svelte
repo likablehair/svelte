@@ -40,10 +40,10 @@
   onMount(() => {
     updateHeaderHeight();
     window.addEventListener('resize', updateHeaderHeight);
-    tableContainer.addEventListener("scroll", setReachedBottom);
+    tableContainer.addEventListener("scroll", setReachedBottomOrTop);
     return () => {
       window.removeEventListener('resize', updateHeaderHeight);
-      tableContainer.removeEventListener("scroll", setReachedBottom);
+      tableContainer.removeEventListener("scroll", setReachedBottomOrTop);
     }
   });
 
@@ -56,8 +56,25 @@
     }
   }
 
-  function setReachedBottom(){
+  function setReachedBottomOrTop(){
     reachedBottom = tableContainer.scrollHeight - tableContainer.scrollTop === tableContainer.clientHeight
+    reachedTop = tableContainer.scrollTop === 0
+  }
+
+  $: if(reachedBottom && rows.length < totalRows) {
+    setTimeout(() => {
+      if(reachedBottom) {
+        handleLoadForward()
+      }
+    }, 30)
+  }
+
+  $: if(reachedTop && currentSectionNumber > 0) {
+    setTimeout(() => {
+      if(reachedTop) {
+        handleLoadBackward()
+      }
+    }, 30)
   }
   
   const [send, receive] = crossfade({
@@ -251,7 +268,8 @@
     tableBody: HTMLElement,
     tableContainer: HTMLElement,
     userScrolling = true,
-    reachedBottom = false
+    reachedBottom = false,
+    reachedTop = false
   
   $: totalSections = (totalRows - renderedRowsNumber) / sectionRowsNumber
   $: hasMoreToRender = totalSections > currentSectionNumber
