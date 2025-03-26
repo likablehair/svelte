@@ -10,16 +10,13 @@
 </script>
 
 {#if click}
-  <button
+  <span
+    role="button"
     on:click
     on:keypress
-    class="{clazz}"
+    class="icon mdi {name} {clazz} click"
     {tabindex}
-  >
-    <span
-      class="icon mdi {name} {clazz}"
-    />
-  </button>
+  />
 {:else}
   <span
     class="icon mdi {name} {clazz}"
@@ -27,31 +24,6 @@
 {/if}
 
 <style>
-  button {
-    background: none; 
-    border: none; 
-    padding: 0;
-    font: inherit;
-    color: inherit;
-    cursor: pointer;
-    outline: inherit;
-    height: var(
-      --icon-container-height,
-      var(--icon-default-container-height)
-    );
-    width: var(
-      --icon-container-width,
-      var(--icon-default-container-width)
-    )
-  }
-
-  button:active, button:focus {
-    color: var(
-      --icon-active-color,
-      rgb(var(--global-color-primary-500))
-    );
-  }
-
   .icon {
     font-size: var(
       --icon-size,
@@ -65,9 +37,25 @@
   .icon.click {
     cursor: var(--icon-cursor, pointer);
     pointer-events: var(--icon-pointer-events, auto);
+    height: var(
+      --icon-container-height,
+      var(--icon-default-container-height)
+    );
+    width: var(
+      --icon-container-width,
+      var(--icon-default-container-width)
+    );
   }
   .icon.click:not(.click) {
     cursor: var(--icon-cursor, default);
     pointer-events: var(--icon-pointer-events, none);
+  }
+
+  .click:focus, .click:active {
+    color: var(
+      --icon-active-color,
+      rgb(var(--global-color-primary-500))
+    );
+    outline: none;
   }
 </style>
