@@ -24,8 +24,17 @@
     }
   }>();
 
-  function handleChipClick(e: MouseEvent) {
-    dispatch("click", { native: e });
+  function handleChipClick(e: MouseEvent | KeyboardEvent) {
+    let native: MouseEvent;
+    
+    if (e instanceof KeyboardEvent) {
+      if (e.key !== "Enter" && e.key !== " ") return
+      native = new PointerEvent("click", { bubbles: true, cancelable: true })
+      e.currentTarget?.dispatchEvent(native)
+    } 
+    else {
+      dispatch("click", { native: e })
+    }
   }
 
   function handleCloseClick(e: CustomEvent) {
@@ -36,14 +45,15 @@
   }
 </script>
 
-<button
+<div
   class="chip"
   class:label
   class:outlined
   class:disabled
-  disabled={disabled}
-  tabindex={buttonTabIndex}
+  role="button"
+  tabindex={disabled ? -1 : buttonTabIndex}
   on:click={handleChipClick}
+  on:keydown={handleChipClick}
 >
   {#if filter}
     <div class="icon-before">
@@ -72,7 +82,7 @@
       />
     </div>
   {/if}
-</button>
+</div>
 
 <style>
   .chip {
