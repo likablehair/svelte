@@ -1,0 +1,14 @@
+:root {
+  --select-default-border: 1.3px solid rgb(var(--global-color-contrast-300), .3);
+  --select-default-active-border-color: rgb(var(--global-color-primary-500));
+  --option-default-border-color: rgb(var(--global-color-contrast-200));
+  --option-default-background-color: rgb(var(--global-color-background-200));
+  --option-default-color: rgb(var(--global-color-contrast-700));
+  --select-default-border-radius: 5px;
+  --select-default-padding-right: 5px;
+  --select-default-padding-left: 5px;
+  --select-default-background-color: transparent;
+  --select-default-color: rgb(var(--global-color-contrast-900));
+  --select-default-width: 100%;
+  --select-default-height: 36px;
+}

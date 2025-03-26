@@ -15,7 +15,7 @@
   import Button from '$lib/components/simple/buttons/Button.svelte';
   import Icon from '$lib/components/simple/media/Icon.svelte';
   import { createEventDispatcher, type ComponentProps } from 'svelte';
-  import type { Filter } from '$lib/utils/filters/filters';
+  import { isDateMode, isSelectMode, isStringMode, type DateMode, type Filter, type NumberMode, type SelectMode, type StringMode } from '$lib/utils/filters/filters';
   import SelectableVerticalList from '$lib/components/simple/lists/SelectableVerticalList.svelte';
   import Chip from '$lib/components/simple/navigation/Chip.svelte';
   import type { Locale } from '$lib/components/simple/dates/utils';
@@ -24,7 +24,8 @@
   import { fly } from 'svelte/transition';
   import Dialog from '$lib/components/simple/dialogs/Dialog.svelte';
   import Validator from '$lib/utils/filters/validator';
-    import ToolTip from '../common/ToolTip.svelte';
+  import ToolTip from '../common/ToolTip.svelte';
+  import { DateTime } from 'luxon';
 
   export let
     filters: Filter[] = [],
@@ -94,7 +95,7 @@
       },
       'between': {
         short: 'compreso',
-        extended: 'è compreso'
+        extended: 'è compreso tra'
       },
       'different': {
         short: 'diverso',
@@ -287,6 +288,8 @@
       singleFilterMenuOpened = false
     }
     filters = filters
+    tmpFilters = {}
+    customToBeInitialized = false
     dispatch('removeAllFilters')
   }
 
@@ -317,19 +320,40 @@
     handleMultiEditApplyClick()
   }
 
-  function updateMultiFilterValues(filterName: string, newValue: any) {
+  function updateMultiFilterValues(filterName: string, newValue: any, newValid: boolean, mode?: NumberMode | StringMode | SelectMode | DateMode) {
     let filter = filters.find(f => f.name === filterName)
     if(!filter) throw new Error('cannot find filter with name ' + filterName)
     if(!tmpFilters[filterName]) tmpFilters[filterName] = {...filter}
     let tmpFilter = tmpFilters[filterName]
+    if('mode' in tmpFilter && !!mode) {
+      if(tmpFilter.type == 'date' && isDateMode(mode)){
+        tmpFilter.mode = mode
+      }
+      else if(tmpFilter.type == 'number' && isDateMode(mode)){
+        tmpFilter.mode = mode
+      }
+      else if(tmpFilter.type == 'string' && isStringMode(mode)){
+        tmpFilter.mode = mode
+      }
+      else if(tmpFilter.type == 'select' && isSelectMode(mode)){
+        tmpFilter.mode = mode
+      }
+    }
     if(tmpFilter.type == 'select') {
       tmpFilter.values = newValue
     } else if('mode' in tmpFilter && tmpFilter.mode == 'between') {
-      tmpFilter.to = newValue.to
-      tmpFilter.from = newValue.from
+      if(tmpFilter.type == 'date'){
+        tmpFilter.from = DateTime.fromJSDate(newValue.to).setLocale('it-IT').startOf('day').toJSDate()
+        tmpFilter.to = DateTime.fromJSDate(newValue.to).setLocale('it-IT').endOf('day').toJSDate()
+      }
+      else {
+        tmpFilter.from = newValue.from
+        tmpFilter.to = newValue.to
+      }
     } else {
       tmpFilter.value = newValue
     }
+    tmpFilter.active = newValid
   }
 
   let customToBeInitialized = true
@@ -578,7 +602,7 @@
                 <h1>{addFilterLabel}</h1>
               </div>
               <div class="body">
-                <slot name="content" {mAndDown} {updateMultiFilterValues} {filters}>
+                <slot name="content" {mAndDown} {updateMultiFilterValues} {handleRemoveAllFilters} {filters}>
                   <div class="multi-filters-container" style:grid-template-columns={mAndDown ? '1fr' : '1fr 1fr'}>
                     {#each filters as filter, i}
                       <div class="filter">
@@ -746,7 +770,7 @@
             <h1>{addFilterLabel}</h1>
           </div>
           <div class="body">
-            <slot name="content" {mAndDown} {updateMultiFilterValues} {filters}>
+            <slot name="content" {mAndDown} {updateMultiFilterValues} {handleRemoveAllFilters} {filters}>
               <div class="multi-filters-container" style:grid-template-columns={mAndDown ? '1fr' : '1fr 1fr'}>
                 {#each filters as filter, i}
                   <div class="filter" class:wide={filter.type === 'select' || filter.type === 'custom'}>

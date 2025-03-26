@@ -1,0 +1,12 @@
+:root {
+  --quick-actions-default-background-color: rgb(var(--global-color-background-200));
+  --quick-actions-default-selected-items-button-background-color: rgb(var(--global-color-background-500));
+  --quick-actions-default-selected-items-button-background-color-hover: rgb(var(--global-color-background-300));
+  --quick-actions-default-z-index: 48;
+
+  --quick-actions-default-buttons-background-color: var(--quick-actions-background-color, var(--quick-actions-default-background-color));
+  --quick-actions-default-buttons-background-color-disabled: rgb(var(--global-color-background-300), .5);
+  --quick-actions-default-buttons-background-color-hover: rgb(var(--global-color-background-300));
+  --quick-actions-default-buttons-color: rgb(var(--global-color-contrast-900));
+  --quick-actions-default-buttons-color-disabled: rgb(var(--global-color-contrast-900), .5)
+}

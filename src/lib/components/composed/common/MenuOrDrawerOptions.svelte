@@ -63,5 +63,7 @@
 <style>
   .selectable-list-wrapper {
     background-color: rgb(var(--global-color-background-100));
+    overflow: auto;
+    height: 100%
   }
 </style>

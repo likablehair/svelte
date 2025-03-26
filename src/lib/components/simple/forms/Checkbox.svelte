@@ -1,17 +1,52 @@
 <script lang="ts">
   import './Checkbox.css'
   import '../../../css/main.css'
+  import { createEventDispatcher, onMount } from 'svelte';
 
   export let value = false,
     id: string | undefined = undefined,
     disabled = false;
+
+  onMount(() => {
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  })
+
+  function handleKeyDown(event: KeyboardEvent) {
+    if(event.key == 'Shift') {
+      shiftKeyPressed = true
+    }
+  }
+
+  function handleKeyUp(event: KeyboardEvent) {
+    if(event.key == 'Shift') {
+      shiftKeyPressed = false
+    }
+  }
+
+  let dispatch = createEventDispatcher<{
+    'change': { 
+      shiftKeyPressed: boolean,
+      nativeEvent: Event
+    }
+  }>(),
+    shiftKeyPressed: boolean = false
+
+  function handleChange(e: Event) {
+    dispatch('change', { shiftKeyPressed, nativeEvent: e })
+  }
 </script>
 
 <input
   {id}
   type="checkbox"
   bind:checked={value}
-  on:change
+  on:change={handleChange}
   {disabled}
 />
 

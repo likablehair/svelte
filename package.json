@@ -1,7 +1,7 @@
 {
   "name": "@likable-hair/svelte",
   "description": "A Svelte component for likablehair and others",
-  "version": "3.2.12",
+  "version": "3.3.13",
   "scripts": {
     "host": "vite --host",
     "dev": "vite dev",
@@ -73,6 +73,7 @@
     "sortablejs": "^1.15.2",
     "svelte-dts": "^0.3.7",
     "svelte-grid": "^5.1.2",
-    "svelte-preprocess": "^6.0.3"
+    "svelte-preprocess": "^6.0.3",
+    "svelte-dnd-action": "0.9.50"
   }
 }

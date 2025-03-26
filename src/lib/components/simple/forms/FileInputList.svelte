@@ -4,14 +4,22 @@
   import Button from "$lib/components/simple/buttons/Button.svelte";
   import FileInput from "$lib/components/simple/forms/FileInput.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
+    import { createEventDispatcher } from "svelte";
 
   let clazz: string = "";
   export { clazz as class };
+
+  let dispatch = createEventDispatcher<{
+    fileChange: {
+      files: File[]
+    }
+  }>()
 
   export let files: File[] = [],
     persistOverUpload: boolean = true,
     dropAreaActive: boolean = true,
     icon: string = "mdi-file-document",
+    message: string = "Drop file here or click to upload",
     disabled: boolean = false,
     maxFiles: number | undefined = undefined;
 
@@ -32,6 +40,15 @@
     files = files.filter((elem) => {
       return elem != file;
     });
+    dispatch("fileChange", { files })
+  }
+
+  function handleFileDrop() {
+    dispatch("fileChange", { files })
+  }
+
+  function handleFileSelect() {
+    dispatch("fileChange", { files })
   }
 </script>
 
@@ -46,6 +63,10 @@
     --file-input-height="var(--file-input-list-height,var(--file-input-list-default-height))"
     --file-input-width="var(--file-input-list-width,var(--file-input-list-default-width))"
     on:change
+    on:fileDrop={handleFileDrop}
+    on:fileDrop
+    on:fileSelect={handleFileSelect}
+    on:fileSelect
     {maxFiles}
   >
     <span
@@ -57,44 +78,48 @@
     >
       <div class="body-container" class:active={dropAreaActive}>
         {#if files.length == 0}
-          <span>Drop file here or click to upload</span>
+          <slot name="message">
+            <span>{message}</span>
+          </slot>
         {:else}
-          <table class="file-list">
-            {#each files as file}
-              <tr
-                on:click|stopPropagation={() => {
-                  handleFileClick(file);
-                }}
-                on:mouseenter|stopPropagation={() => {
-                  handleFileMouseEnter(file);
-                }}
-                on:mouseleave|stopPropagation={() => {
-                  handleFileMouseLeave();
-                }}
-                class:file-active={fileActive == file}
-              >
-                <td>
-                  <Icon name={icon} />
-                </td>
-                <td class="file-name">
-                  {file.name}
-                </td>
-                <td>
-                  {file.size}
-                </td>
-                <td style:width="10%" style:margin-right="10px">
-                  <Button
-                    buttonType="text"
-                    icon="mdi-close"
-                    on:click={(e) => {
-                      e.detail.nativeEvent.stopPropagation();
-                      handleRemove(file);
-                    }}
-                  />
-                </td>
-              </tr>
-            {/each}
-          </table>
+          <slot name="file-list" {files}>
+            <table class="file-list">
+              {#each files as file}
+                <tr
+                  on:click|stopPropagation={() => {
+                    handleFileClick(file);
+                  }}
+                  on:mouseenter|stopPropagation={() => {
+                    handleFileMouseEnter(file);
+                  }}
+                  on:mouseleave|stopPropagation={() => {
+                    handleFileMouseLeave();
+                  }}
+                  class:file-active={fileActive == file}
+                >
+                  <td>
+                    <Icon name={icon} />
+                  </td>
+                  <td class="file-name">
+                    {file.name}
+                  </td>
+                  <td>
+                    {file.size}
+                  </td>
+                  <td style:width="10%" style:margin-right="10px">
+                    <Button
+                      buttonType="text"
+                      icon="mdi-close"
+                      on:click={(e) => {
+                        e.detail.nativeEvent.stopPropagation();
+                        handleRemove(file);
+                      }}
+                    />
+                  </td>
+                </tr>
+              {/each}
+            </table>
+          </slot>
         {/if}
       </div>
     </span>

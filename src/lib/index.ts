@@ -29,6 +29,7 @@ export { default as SelectableMenuList } from './components/simple/lists/Selecta
 export { default as SelectableVerticalList } from './components/simple/lists/SelectableVerticalList.svelte'
 export { default as SidebarMenuList } from './components/simple/lists/SidebarMenuList.svelte'
 export { default as SimpleTable } from './components/simple/lists/SimpleTable.svelte'
+export { default as HierarchyMenu } from './components/simple/lists/HierarchyMenu.svelte'
 
 export { default as CircularLoader } from './components/simple/loaders/CircularLoader.svelte'
 export { default as Skeleton } from './components/simple/loaders/Skeleton.svelte'
@@ -92,3 +93,12 @@ export { default as UnstableDividedSideBarLayout } from './components/layouts/Un
 export { default as Converter } from './utils/filters/filters'
 
 export { default as RadioButton } from './components/simple/forms/RadioButton.svelte'
+
+export { default as DynamicTable } from './components/composed/list/DynamicTable.svelte'
+export { default as DynamicFilters } from './components/composed/search/DynamicFilters.svelte'
+export { default as QuickActions } from './components/composed/common/QuickActions.svelte'
+
+export { default as VerticalDraggableList } from './components/simple/common/VerticalDraggableList.svelte'
+export { default as Select } from './components/simple/forms/Select.svelte'
+export { default as InfiniteScroll } from './components/simple/common/InfiniteScroll.svelte'
+export { default as Divider } from './components/simple/common/Divider.svelte'

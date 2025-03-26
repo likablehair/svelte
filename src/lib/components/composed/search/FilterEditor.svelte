@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Filter, NumberMode, SelectMode, StringMode } from "$lib/utils/filters/filters";
   import Dropdown, { type Item } from "../forms/Dropdown.svelte";
-  import { GenericModes, SelectModes, StringModes } from '$lib/utils/filters/filters';
+  import { GENERIC_MODES, SELECT_MODES, STRING_MODES } from '$lib/utils/filters/filters';
   import type { DateMode } from "$lib/utils/filters/filters";
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
   import DatePickerTextField from "$lib/components/composed/forms/DatePickerTextField.svelte";
@@ -52,13 +52,13 @@
   $: if(!!tmpFilter) {
     let modes
     if(tmpFilter.type == 'string') {
-      modes = StringModes
+      modes = STRING_MODES
     } else if(tmpFilter.type == 'date') {
-      modes = GenericModes
+      modes = GENERIC_MODES
     } else if(tmpFilter.type == 'number') {
-      modes = GenericModes
+      modes = GENERIC_MODES
     } else if(tmpFilter.type == 'select') {
-      modes = SelectModes
+      modes = SELECT_MODES
     } else if(tmpFilter.type == 'bool') {
       modes = undefined
     }
@@ -137,6 +137,7 @@
             bind:menuOpened={dropdownOpened}
             openingId="advanced-filter"
             mobileDrawer={mobile}
+            {lang}
           ></Dropdown>
         </div>
       </div>
@@ -161,7 +162,8 @@
               on:day-click={() => {calendarOpened = false}}
               --simple-textfield-width="100%"
               flipOnOverflow
-              on:change={handleChangeValue}
+              on:input={handleChangeValue}
+              on:day-click={handleChangeValue}
             >
               <svelte:fragment slot="append-inner">
                 <Icon
@@ -220,7 +222,8 @@
               bind:menuOpened={calendarOpened}
               on:day-click={() => {calendarOpened = false}}
               --simple-textfield-width="100%"
-              on:change={handleChangeValue}
+              on:input={handleChangeValue}
+              on:day-click={handleChangeValue}
             >
               <svelte:fragment slot="append-inner">
                 <Icon
@@ -244,7 +247,8 @@
               on:day-click={() => {calendarOpened2 = false}}
               --simple-textfield-width="100%"
               flipOnOverflow
-              on:change={handleChangeValue}
+              on:input={handleChangeValue}
+              on:day-click={handleChangeValue}
             >
               <svelte:fragment slot="append-inner">
                 <Icon

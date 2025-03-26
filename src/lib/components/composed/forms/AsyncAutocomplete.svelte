@@ -62,4 +62,11 @@
   bind:disabled
   searchFunction={() => true}
   on:change
-></Autocomplete>
+>
+  <div slot="chip-label" let:selection>
+    <slot name="chip-label" {selection}>{selection.label}</slot>
+  </div>
+  <div slot="item-label" let:item>
+    <slot name="item-label" {item}>{item.label}</slot>
+  </div>
+</Autocomplete>

@@ -116,6 +116,18 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/TimePicker'
   }, {
+    title: 'VerticalDraggableList',
+    description: 'Drag all over me',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/simple-components/VerticalDraggableList'
+  }, {
+    title: 'Select',
+    description: 'Choose me',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Select'
+  }, {
     title: 'Autocomplete',
     description: 'Autocompletion out of the limits.',
     status: 'stable',
@@ -152,6 +164,12 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/ColorInvertedSelector'
   }, {
+    title: 'HierarchyMenu',
+    description: 'Hierarchy is hard to write.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/HierarchyMenu'
+  }, {
     title: 'SimpleTable',
     description: 'Grid beautiful view.',
     status: 'stable',
@@ -181,6 +199,24 @@ const list: {
     status: 'stable',
     type: 'composed',
     url: '/docs/components/composed-components/PaginatedTable'
+  }, {
+    title: 'QuickActions',
+    description: 'Fast actions available only to you.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/QuickActions'
+  }, {
+    title: 'DynamicFilters',
+    description: 'Make it easy, make it filter. Dynamically.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/DynamicFilters'
+  }, {
+    title: 'DynamicTable',
+    description: 'Dynamic table and pagination agreement.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/DynamicTable'
   }, {
     title: 'Filters',
     description: 'Make it easy, make it filter.',
@@ -283,6 +319,12 @@ const list: {
     status: 'stable',
     type: 'simple',
     url: '/docs/components/simple-components/FlagIcon'
+  }, {
+    title: 'Switch',
+    description: 'Switching sides.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Switch'
   }, {
     title: 'ActivableButton',
     description: 'Activate the power now.',

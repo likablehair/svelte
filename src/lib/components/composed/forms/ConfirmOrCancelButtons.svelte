@@ -87,6 +87,11 @@
     padding: 0;
     background-color: transparent;
     background-image: none;
+    border: none;
+  }
+
+  .text-button:hover {
+    cursor: pointer;
   }
 
   .button-container {

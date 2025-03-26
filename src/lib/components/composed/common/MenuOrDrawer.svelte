@@ -17,7 +17,8 @@
     _maxHeight: string | undefined = undefined,
     _minWidth: string = "100px",
     _borderRadius: string = "5px",
-    openingId: ComponentProps<Menu>['openingId'] = undefined;
+    openingId: ComponentProps<Menu>['openingId'] = undefined,
+    _drawerOverflow: string | undefined = undefined;
 </script>
 
 <MediaQuery let:mAndDown>
@@ -27,6 +28,7 @@
       bind:position={drawerPosition}
       on:close
       on:item-click
+      _overflow={_drawerOverflow}
     >
       <slot isDrawer={true} isMenu={false}></slot>
     </Drawer>
