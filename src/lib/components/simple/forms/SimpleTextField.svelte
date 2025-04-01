@@ -2,15 +2,8 @@
   import '../../../css/main.css'
   import './SimpleTextField.css'
   import Icon from "../media/Icon.svelte";
-
-  let clazz: {
-    container?: string,
-    row?: string,
-    field?: string,
-    hint?: string,
-    input?: string
-  } | undefined = {};
-	export { clazz as class };
+  import type { HTMLInputAttributes } from 'svelte/elements';
+  import type { Snippet } from 'svelte';
 
   /* 
     Styles:
@@ -37,37 +30,100 @@
     --simple-textfield-margin-left
   */
 
-  export let value: string | number | undefined = undefined,
-    type: "text" | "password" | "number" | "time" | "date" = "text",
-    placeholder: string | undefined = undefined,
-    disabled: boolean = false,
-    readonly: boolean = false,
-    id: string | undefined = undefined,
-    appendIcon: string | undefined = undefined,
-    appendInnerIcon: string | undefined = undefined,
-    prependIcon: string | undefined = undefined,
-    prependInnerIcon: string | undefined = undefined,
-    iconSize: string = "12pt",
-    name: string | undefined = undefined,
-    hint: string | undefined = undefined,
-    input: HTMLElement | undefined = undefined
+  interface Props extends HTMLInputAttributes{
+    value?: string | number;
+    type?: "text" | "password" | "number" | "time" | "date";
+    placeholder?: string;
+    disabled?: boolean;
+    readonly?: boolean;
+    id?: string;
+    appendIcon?: string;
+    appendInnerIcon?: string;
+    prependIcon?: string;
+    prependInnerIcon?: string;
+    iconSize?: string;
+    name?: string;
+    hint?: string;
+    input?: HTMLElement;
+    class?: {
+      container?: string,
+      row?: string,
+      field?: string,
+      hint?: string,
+      input?: string
+    }
+    prependSnippet?: Snippet<[{
+      prependIcon: string | undefined
+      iconSize: string
+    }]>
+    prependInnerSnippet?: Snippet<[{
+      prependInnerIcon: string | undefined
+      iconSize: string
+    }]>
+    appendSnippet?: Snippet<[{
+      appendIcon: string | undefined
+      iconSize: string
+    }]>
+    appendInnerSnippet?: Snippet<[{
+      appendInnerIcon: string | undefined
+      iconSize: string
+    }]>
+    hintSnippet?: Snippet<[{
+      hint: string | undefined
+    }]>
+  }
+
+  let {
+    value = $bindable(undefined),
+    type = "text",
+    placeholder = undefined,
+    disabled = false,
+    readonly = false,
+    id = undefined,
+    appendIcon = undefined,
+    appendInnerIcon = undefined,
+    prependIcon = undefined,
+    prependInnerIcon = undefined,
+    iconSize = "12pt",
+    name = undefined,
+    hint = undefined,
+    input = $bindable(undefined),
+    class: clazz = {},
+    prependSnippet,
+    prependInnerSnippet,
+    appendInnerSnippet,
+    appendSnippet,
+    hintSnippet,
+    onchange,
+    oninput,
+    onfocus,
+    onblur,
+    onkeydown,
+    onkeyup,
+    onkeypress,
+    ...rest
+  }: Props = $props();
 </script>
 
 <div
   class="textfield-container {clazz?.container || ''}"
 >
   <div class="row {clazz?.row || ''}">
-    <slot name="prepend" {prependIcon} {iconSize}>
+    {#if prependSnippet}
+      {@render prependSnippet({ prependIcon, iconSize })}
+    {:else}
       {#if !!prependIcon}
         <Icon name={prependIcon} --icon-size={iconSize}></Icon>
       {/if}
-    </slot>
+    {/if}
     <div class="textfield {clazz?.field || ''}">
-      <slot name="prepend-inner" {prependInnerIcon} {iconSize}>
+      {#if prependInnerSnippet}
+        {@render prependInnerSnippet({ prependInnerIcon, iconSize })}
+      {:else}
         {#if !!prependInnerIcon}
           <Icon name={prependInnerIcon} --icon-size={iconSize}></Icon>
         {/if}
-      </slot>
+      {/if}
       {#if type == "text"}
         <input
           bind:value={value}
@@ -76,18 +132,17 @@
           id={id}
           disabled={disabled}
           readonly={readonly}
-          on:change
-          on:input
-          on:focus
-          on:blur
-          on:keydown
-          on:keypress
-          on:keyup
-          on:change
+          {onchange}
+          {oninput}
+          {onfocus}
+          {onblur}
+          {onkeydown}
+          {onkeyup}
+          {onkeypress}
           name={name}
           class={clazz?.input || ''}
           bind:this={input}
-          {...$$restProps}
+          {...rest}
         />
       {:else if type == "password"}
         <input
@@ -97,18 +152,17 @@
           id={id}
           disabled={disabled}
           readonly={readonly}
-          on:change
-          on:input
-          on:focus
-          on:blur
-          on:keydown
-          on:keypress
-          on:keyup
-          on:change
+          {onchange}          
+          {oninput}
+          {onfocus}
+          {onblur}
+          {onkeydown}
+          {onkeyup}
+          {onkeypress}
           name={name}
           class={clazz?.input || ''}
           bind:this={input}
-          {...$$restProps}
+          {...rest}
         />
       {:else if type == "number"}
         <input
@@ -118,18 +172,17 @@
           id={id}
           disabled={disabled}
           readonly={readonly}
-          on:change
-          on:input
-          on:focus
-          on:blur
-          on:keydown
-          on:keypress
-          on:keyup
-          on:change
+          {onchange}
+          {oninput}
+          {onfocus}
+          {onblur}
+          {onkeydown}
+          {onkeyup}
+          {onkeypress}
           name={name}
           class={clazz?.input || ''}
           bind:this={input}
-          {...$$restProps}
+          {...rest}
         />
       {:else if type == "time"}
         <input
@@ -139,18 +192,17 @@
           id={id}
           disabled={disabled}
           readonly={readonly}
-          on:change
-          on:input
-          on:focus
-          on:blur
-          on:keydown
-          on:keypress
-          on:keyup
-          on:change
+          {onchange}          
+          {oninput}
+          {onfocus}
+          {onblur}
+          {onkeydown}
+          {onkeyup}
+          {onkeypress}
           name={name}
           class={clazz?.input || ''}
           bind:this={input}
-          {...$$restProps}
+          {...rest}
         />
       {:else if type == "date"}
         <input
@@ -160,38 +212,43 @@
           id={id}
           disabled={disabled}
           readonly={readonly}
-          on:change
-          on:input
-          on:focus
-          on:blur
-          on:keydown
-          on:keypress
-          on:keyup
-          on:change
+          {onchange}
+          {oninput}
+          {onfocus}
+          {onblur}
+          {onkeydown}
+          {onkeyup}
+          {onkeypress}
           name={name}
           class={clazz?.input || ''}
           bind:this={input}
-          {...$$restProps}
+          {...rest}
         />
       {/if}
-      <slot name="append-inner" {appendInnerIcon} {iconSize}>
+      {#if appendInnerSnippet}
+        {@render appendInnerSnippet({ appendInnerIcon, iconSize })}
+      {:else}
         {#if !!appendInnerIcon}
           <Icon name={appendInnerIcon} --icon-size={iconSize}></Icon>
         {/if}
-      </slot>
+      {/if}
     </div>
-    <slot name="append" {appendIcon} {iconSize}>
+    {#if appendSnippet}
+      {@render appendSnippet({ appendIcon, iconSize })}
+    {:else}
       {#if !!appendIcon}
         <Icon name={appendIcon} --icon-size={iconSize}></Icon>
       {/if}
-    </slot>
+    {/if}
   </div>
   <div class="row {clazz?.hint || ''}">
-    <slot name="hint">
+    {#if hintSnippet}
+      {@render hintSnippet({ hint })}
+    {:else}
       {#if !!hint}
         <span class="hint">{hint}</span>
       {/if}
-    </slot>
+    {/if}
   </div>
 </div>
 

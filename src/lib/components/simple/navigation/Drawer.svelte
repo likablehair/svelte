@@ -3,34 +3,57 @@
   import './Drawer.css'
   import Navigator from "$lib/components/simple/navigation/Navigator.svelte";
   import type { Item } from "$lib/components/simple/navigation/Navigator.svelte";
-  import { createEventDispatcher, onMount, beforeUpdate } from 'svelte';
+  import { onMount, type ComponentProps, type Snippet } from 'svelte';
   import Teleporter from '$lib/utils/teleporter';
   import Keyboarder, { type CallbackFunction } from '$lib/utils/keyboarder';
   import { BROWSER } from 'esm-env';
 
-  export let open = false,
-    position: "left" | "top" | "right" | "bottom" = "left",
-    overlay = false,
+  interface Props {
+    open?: boolean;
+    position?: "left" | "top" | "right" | "bottom";
+    overlay?: boolean;
+    closeOnClickOutside?: boolean;
+    items?: Item[];
+    teleportedUid?: string;
+    _space?: string;
+    _openingSpeed?: string;
+    _backgroundColor?: string;
+    _color?: string;
+    _overflow?: string;
+    _borderRadius?: string;
+    _margin?: string;
+    _overlaySpeed?: string;
+    _overlayBackgroundColor?: string;
+    _overlayOpacity?: string;
+    onclose?: () => void
+    onitemClick?: ComponentProps<typeof Navigator>['onitemClick']
+    children?: Snippet<[]>
+  }
+
+  let {
+    open = $bindable(false),
+    position = $bindable("left"),
+    overlay = $bindable(false),
     closeOnClickOutside = true,
-    items: Item[] = [],
-    teleportedUid: string | undefined = undefined,
-    _space: string | undefined = undefined,
-    _openingSpeed: string | undefined = undefined,
-    _backgroundColor: string | undefined = undefined,
-    _color: string | undefined = undefined,
-    _overflow: string | undefined = undefined,
-    _borderRadius: string | undefined = undefined,
-    _margin: string | undefined = undefined,
-    _overlaySpeed: string | undefined = undefined,
-    _overlayBackgroundColor: string | undefined = undefined,
-    _overlayOpacity: string | undefined = undefined
+    items = [],
+    teleportedUid = undefined,
+    _space = undefined,
+    _openingSpeed = undefined,
+    _backgroundColor = undefined,
+    _color = undefined,
+    _overflow = undefined,
+    _borderRadius = undefined,
+    _margin = undefined,
+    _overlaySpeed = undefined,
+    _overlayBackgroundColor = undefined,
+    _overlayOpacity = undefined,
+    onclose,
+    children,
+    onitemClick,
+  }: Props = $props();
 
   let drawerElement: HTMLElement,
-    localOpen: boolean = false
-
-  const dispatch = createEventDispatcher<{
-    'close': {}
-  }>()
+    localOpen: boolean = $state(false)
 
   onMount(() => {
     if(!teleportedUid) {
@@ -62,19 +85,23 @@
   function closeDrawer() {
     open = false;
     overlay = false;
-    dispatch('close', {})
+    if(onclose) {
+      onclose()
+    }
   }
 
   function handleClickOverlay() {
     if(closeOnClickOutside) {
       open = false;
       overlay = false;
-      dispatch('close', {})
+      if(onclose) {
+        onclose()
+      }
     }
   }
 
-  let zIndex: number = 50
-  beforeUpdate(() => {
+  let zIndex: number = $state(50)
+  $effect.pre(() => {
     if(BROWSER && open && localOpen !== open) {
       let otherDialogs: NodeListOf<HTMLElement> =
       document.querySelectorAll("[data-dialog=true]");
@@ -142,7 +169,9 @@
     class:animate-top={position == "top"}
     style:z-index={zIndex + 1}
   >
-    <slot open={localOpen}>
+    {#if children}
+      {@render children()}
+    {:else}
       <div
         style:display="flex"
         style:justify-content="center"
@@ -157,20 +186,22 @@
         <Navigator
           {items}
           vertical={position == "right" || position == "left"}
-          on:item-click
+          {onitemClick}
         />
       </div>
-    </slot>
+    {/if}
   </div>
   {#if overlay}
     <div
-      on:click={handleClickOverlay}
-      on:keypress={handleClickOverlay}
+      onclick={handleClickOverlay}
+      onkeypress={handleClickOverlay}
       class="overlay"
       class:overlay-active={localOpen}
       class:overlay-hidden={!localOpen}
       style:z-index={zIndex}
-    />
+      role="button"
+      tabindex="0"
+    ></div>
   {/if}
 </div>
 

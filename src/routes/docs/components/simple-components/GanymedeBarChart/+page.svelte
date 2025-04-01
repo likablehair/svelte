@@ -4,7 +4,7 @@
   import GanymedeBarChart from "$lib/components/simple/charts/GanymedeBarChart.svelte";
   import Button from "$lib/components/simple/buttons/Button.svelte";
 
-  let resetZoom: boolean = false
+  let resetZoom: boolean = true
 </script>
 
 <h1>GanymedeBarChart</h1>
@@ -40,7 +40,7 @@
     rgbTooltipColor={'0 255 0'}
   ></GanymedeBarChart>
   <Button
-    on:click={() => { resetZoom = true }}
+    onclick={() => { resetZoom = true }}
   >Reset zoom</Button>
 </div>
 <h2>Props</h2>

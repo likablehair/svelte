@@ -1,11 +1,26 @@
 <script lang="ts">
   import './Checkbox.css'
   import '../../../css/main.css'
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
-  export let value = false,
-    id: string | undefined = undefined,
-    disabled = false;
+  interface Props {
+    value?: boolean;
+    id?: string;
+    disabled?: boolean;
+    onchange?: (event: {
+      detail: {
+        shiftKeyPressed: boolean,
+        nativeEvent: Event
+      }
+    }) => void
+  }
+
+  let { 
+    value = $bindable(false), 
+    id = undefined, 
+    disabled = false,
+    onchange,
+  }: Props = $props();
 
   onMount(() => {
     window.addEventListener('keydown', handleKeyDown)
@@ -29,16 +44,17 @@
     }
   }
 
-  let dispatch = createEventDispatcher<{
-    'change': { 
-      shiftKeyPressed: boolean,
-      nativeEvent: Event
-    }
-  }>(),
-    shiftKeyPressed: boolean = false
+  let shiftKeyPressed: boolean = false
 
   function handleChange(e: Event) {
-    dispatch('change', { shiftKeyPressed, nativeEvent: e })
+    if(onchange) {
+      onchange({
+        detail: {
+          shiftKeyPressed, 
+          nativeEvent: e
+        }
+      })
+    }
   }
 </script>
 
@@ -46,7 +62,7 @@
   {id}
   type="checkbox"
   bind:checked={value}
-  on:change={handleChange}
+  onchange={handleChange}
   {disabled}
 />
 
@@ -55,6 +71,7 @@
     input[type="checkbox"] {
       -webkit-appearance: none;
       -moz-appearance: none;
+      appearance: none;
       height: 21px;
       outline: none;
       display: inline-block;
@@ -139,10 +156,6 @@
       --d-t-e: cubic-bezier(0.2, 0.85, 0.32, 1.2);
       --o: .7;
       --r: 43deg;
-    }
-
-    input[type="checkbox"]:disabled + label {
-      cursor: not-allowed;
     }
 
     input[type="checkbox"]:hover:not(:checked):not(:disabled) {

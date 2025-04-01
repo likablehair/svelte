@@ -2,12 +2,37 @@
   import './RadioButton.css'
   import "../../../css/main.css";
 
-  export let name: string,
-    value: string,
-    id: string | undefined = undefined,
-    checked = false,
-    label: string | undefined = undefined,
-    disabled = false;
+  interface Props {
+    name: string;
+    value: string;
+    id?: string;
+    checked?: boolean;
+    label?: string;
+    disabled?: boolean;
+    onchange?: () => void
+    oninput?: () => void
+    onfocus?: () => void
+    onblur?: () => void
+    onkeydown?: () => void
+    onkeypress?: () => void
+    onkeyup?: () => void
+  }
+
+  let {
+    name,
+    value,
+    id = undefined,
+    checked = $bindable(false),
+    label = undefined,
+    disabled = false,
+    onblur,
+    onchange,
+    onfocus,
+    oninput,
+    onkeydown,
+    onkeypress,
+    onkeyup,
+  }: Props = $props();
 
 </script>
 
@@ -18,13 +43,13 @@
   {id}
   {disabled}
   {checked}
-  on:change
-  on:input
-  on:focus
-  on:blur
-  on:keydown
-  on:keypress
-  on:keyup
+  {onchange}
+  {oninput}
+  {onfocus}
+  {onblur}
+  {onkeydown}
+  {onkeypress}
+  {onkeyup}
 />
 {#if label}
   <label for={id}>
@@ -37,6 +62,7 @@
   input[type="radio"] {
     -webkit-appearance: none;
     -moz-appearance: none;
+    appearance: none;
     height: 21px;
     width: 21px;
     outline: none;

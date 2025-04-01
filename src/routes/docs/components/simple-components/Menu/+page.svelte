@@ -7,26 +7,29 @@
 
   let menuOpened = false
   let activator
+  let menuLabels = ['this', 'is', 'a', 'menu', '!']
 
-  let stickyActivator: HTMLElement
-
-  function handleButtonClick(e: CustomEvent) {
-    e.detail.nativeEvent.stopPropagation()
+  function handleButtonClick(e: MouseEvent) {
+    e.stopPropagation()
     menuOpened = !menuOpened
   }
 
   let secondActivators: Record<string, HTMLElement> = {}
   let secondMenuOpened: Record<string, boolean> = {}
+  let thirdActivators: Record<string, HTMLElement> = {}
+  let thirdMenuOpened: Record<string, boolean> = {}
+
+  menuLabels.forEach(label => {
+    secondMenuOpened[label] = false
+    thirdMenuOpened[label] = false
+  })
 
   function handleListClick(menuLabel: string) {
     setTimeout(() => {
       secondMenuOpened[menuLabel] = true
-      thirdMenuOpened = {}
+      thirdMenuOpened[menuLabel] = false
     }, 10);
   }
-
-  let thirdActivators: Record<string, HTMLElement> = {}
-  let thirdMenuOpened: Record<string, boolean> = {}
 
   function handleSubMenuClick(menuLabel: string) {
     setTimeout(() => {
@@ -34,16 +37,13 @@
     }, 10);
   }
 </script>
-
 <h1>Menu</h1>
 <ComponentSubtitle>Custom elements that appear on the screen wherever you want them to be positioned.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
   <div style:width="fit-content" bind:this={activator}>
     <Button
-      width="200px"
-      maxWidth="90vw"
-      on:click={(e) => handleButtonClick(e)}
+      onclick={(e) => handleButtonClick(e.detail.nativeEvent)}
     >
       Click me
     </Button>
@@ -63,11 +63,11 @@
   <div class="menu-content">
     <div class="list-container">
       <ul>
-        {#each ['this', 'is', 'a', 'menu', '!'] as menuLabel}
+        {#each menuLabels as menuLabel}
           <li
             bind:this={secondActivators[menuLabel]} 
-            on:click={() => handleListClick(menuLabel)}
-            on:keypress={() => handleListClick(menuLabel)}
+            onclick={() => handleListClick(menuLabel)}
+            onkeypress={() => handleListClick(menuLabel)}
             role="presentation"
           >{menuLabel}</li>
         {/each}
@@ -76,7 +76,7 @@
   </div>
 </Menu>
 
-{#each ['this', 'is', 'a', 'menu', '!'] as menuLabel}
+{#each menuLabels as menuLabel}
   <Menu
     _width="160px"
     activator={secondActivators[menuLabel]}
@@ -91,8 +91,8 @@
     <div 
       style:height="100px"
       bind:this={thirdActivators[menuLabel]}
-      on:click={() => handleSubMenuClick(menuLabel)}
-      on:keypress={() => handleSubMenuClick(menuLabel)}
+      onclick={() => handleSubMenuClick(menuLabel)}
+      onkeypress={() => handleSubMenuClick(menuLabel)}
       role="presentation"
     >
       {menuLabel}
@@ -100,7 +100,7 @@
   </Menu>
 {/each}
 
-{#each ['this', 'is', 'a', 'menu', '!'] as menuLabel}
+{#each menuLabels as menuLabel}
   <Menu
     _width="140px"
     activator={thirdActivators[menuLabel]}

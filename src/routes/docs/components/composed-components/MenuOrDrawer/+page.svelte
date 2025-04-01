@@ -18,9 +18,7 @@
 <div class="example">
   <Button
     bind:buttonElement={activator}
-    width="200px"
-    maxWidth="90vw"
-    on:click={handleButtonClick}
+    onclick={handleButtonClick}
   >
     Open menu or drawer
   </Button>
@@ -28,13 +26,14 @@
     <MenuOrDrawer
       bind:open={open}
       activator={activator}
-      let:isDrawer
     >
-      {#if isDrawer}
-        io sono un drawer
-      {:else}
-        io sono un menu
-      {/if}
+      {#snippet children({ isDrawer, isMenu })}
+        {#if isDrawer}
+          io sono un drawer
+        {:else}
+          io sono un menu
+        {/if}
+      {/snippet} 
     </MenuOrDrawer>
   {/if}
 </div>

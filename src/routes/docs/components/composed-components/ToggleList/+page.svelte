@@ -19,7 +19,7 @@
     },
   ]
 
-  let values: Item[] | undefined
+  let values: Item[] | undefined = []
 
 </script>
 

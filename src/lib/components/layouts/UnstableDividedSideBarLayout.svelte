@@ -3,166 +3,276 @@
   import './UnstableDividedSideBarLayout.css'
   import MediaQuery from "$lib/components/simple/common/MediaQuery.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte"
-  import { createEventDispatcher } from "svelte";
   import { clickOutside } from '$lib/utils/clickOutside';
   import ColorInvertedSelector, { type Option } from '../simple/lists/ColorInvertedSelector.svelte';
   import { sidebarOpened } from '$lib/stores/layouts/unstableSidebarOpened';
+  import { onMount, type ComponentProps, type Snippet } from 'svelte';
 
-  let clazz: {
-    container?: string,
-    header?: string,
-    mainSection?: string,
-    overlay?: string
-  } = {};
-	export { clazz as class };
-
-  export let drawerOpened: boolean = false,
-    expandOn: 'hover' | 'click' | 'none' = 'hover',
-    options: Option[] = [],
-    selectedIndex: number | undefined = undefined,
-    sidebarExpanded: boolean = false
-
-  let dispatch = createEventDispatcher<{
-    'drawer-change': {
-      opened: boolean
-    },
-    'menu-select': {
-      option: Option
+  let headerElement: HTMLElement
+  onMount(() => {
+    if (headerElement) {
+      headerElement.addEventListener('clickoutside', handleOutsideClick);
     }
-  }>()
+
+    return () => {
+      if (headerElement) {
+        headerElement.removeEventListener('clickoutside', handleOutsideClick);
+      }
+    };
+  });
+
+  function handleOutsideClick() {
+    if (expandOn === 'click') {
+      sidebarExpanded = false;
+    }
+  };
+
+  interface Props {
+    drawerOpened?: boolean;
+    expandOn?: 'hover' | 'click' | 'none';
+    options?: Option[];
+    selectedIndex?: number;
+    sidebarExpanded?: boolean;
+    class?: {
+      container?: string,
+      header?: string,
+      mainSection?: string,
+      overlay?: string
+    }
+    ondrawerChange?: (event: {
+      detail: {
+        opened: boolean
+      }
+    }) => void
+    onmenuSelect?: (event: {
+      detail: {
+        option: Option
+      }
+    }) => void
+    menuSnippet?: Snippet<[{
+      hamburgerVisible?: boolean
+      sidebarExpanded?: boolean
+    }]>
+    innerMenuSnippet?: Snippet<[{
+      hamburgerVisible: boolean
+    }]>
+    sidebarSnippet?: Snippet<[{
+      hamburgerVisible: boolean
+      sidebarExpanded: boolean
+    }]>
+    logoSnippet?: Snippet<[{
+      hamburgerVisible: boolean
+      sidebarExpanded: boolean
+    }]>
+    prependSnippet?: Snippet<[{
+      option: Option
+      sidebarExpanded: boolean
+      index: number
+      handleClickClose: Parameters<NonNullable<ComponentProps<typeof ColorInvertedSelector>['prependSnippet']>>[0]['handleClickClose']
+    }]>
+    optionSnippet?: Snippet<[{
+      option: Option
+    }]>
+    userSnippet?: Snippet<[{
+      hamburgerVisible: boolean
+      sidebarExpanded: boolean
+    }]>
+    children?: Snippet<[]>
+  }
+
+  let { 
+    drawerOpened = $bindable(false),
+    expandOn = 'hover',
+    options = [],
+    selectedIndex = undefined,
+    sidebarExpanded = $bindable(false),
+    ondrawerChange,
+    onmenuSelect,
+    children,
+    innerMenuSnippet,
+    logoSnippet,
+    menuSnippet,
+    optionSnippet: optionInternalSnippet,
+    prependSnippet: prependInternalSnippet,
+    sidebarSnippet,
+    userSnippet,
+    class: clazz = {},
+  }: Props = $props();
 
   function toggleMenu() {
     drawerOpened = !drawerOpened
-    dispatch('drawer-change', { opened: drawerOpened })
+    if(ondrawerChange) {
+      ondrawerChange({
+        detail: {
+          opened: drawerOpened
+        }
+      })
+    }
   }
 
   function handleOverlayClick() {
     drawerOpened = false
-    dispatch('drawer-change', { opened: drawerOpened })
+    if(ondrawerChange) {
+      ondrawerChange({
+        detail: {
+          opened: drawerOpened
+        }
+      })
+    }
   }
 
   function handleMenuSelection(option: Option) {
     sidebarExpanded = false
     drawerOpened = false
-    dispatch('drawer-change', { opened: drawerOpened })
-    dispatch('menu-select', {
-      option: option
-    })
+    if(ondrawerChange) {
+      ondrawerChange({
+        detail: {
+          opened: drawerOpened
+        }
+      })
+    }
+    if(onmenuSelect) {
+      onmenuSelect({
+        detail: {
+          option
+        }
+      })
+    }
   }
 
-  $: $sidebarOpened = sidebarExpanded
+  $effect(() => {
+    $sidebarOpened = sidebarExpanded
+  })
 </script>
 
-<MediaQuery let:mAndDown>
-  <div
-    class={clazz.container || ''}
-  >
-    <nav 
-      class:opened-drawer={drawerOpened}
-      class:opened={sidebarExpanded}
-      class="header-toolbar"
+<MediaQuery>
+  {#snippet defaultSnippet({ mAndDown})}
+    <div
+      class={clazz.container || ''}
     >
-      <slot name="header">
-        <div class="inner-menu">
-          {#if mAndDown}
-            <div style:margin-right="2rem">
-              <Icon 
-                name="mdi-menu" 
-                click
-                on:click={toggleMenu}
-              ></Icon>
-            </div>
-          {/if}
-          <slot name="inner-menu" hamburgerVisible={mAndDown}>
-            Menu
-          </slot>
-        </div>
-      </slot>
-    </nav>
-    <header
-      class:opened={(mAndDown && drawerOpened) || sidebarExpanded}
-      on:mouseleave={() => {if(expandOn == 'hover') sidebarExpanded = false}}
-      on:mouseenter={() => {if(expandOn == 'hover') sidebarExpanded = true}}
-      on:click={() => {if(expandOn == 'click' && !mAndDown) sidebarExpanded = true}}
-      on:keypress={() => {if(expandOn == 'click' && !mAndDown) sidebarExpanded = true}}
-      use:clickOutside 
-      on:clickoutside={() => {if(expandOn == 'click') sidebarExpanded = false}}
-      class="side-bar {clazz.header || ''}"
-      role="presentation"
-      tabindex="-1"
-    >
-      <div class="side-bar-content">
-        <slot name="sidebar" hamburgerVisible={mAndDown} {sidebarExpanded}>
-          <div class="sidebar-container">
-            <div class="logo-and-menu">
-              <slot name="logo" hamburgerVisible={mAndDown} {sidebarExpanded}>
-                <div class="logo">logo</div>
-              </slot>
-              <slot name="menu" hamburgerVisible={mAndDown} {sidebarExpanded}>
-                <div 
-                  class="menu-container"
-                  class:expanded={sidebarExpanded}
-                >
-                  <ColorInvertedSelector
-                    options={options}
-                    selectedIndex={selectedIndex}
-                    --color-inverted-selector-default-background-color="transparent"
-                    --color-inverted-selector-default-font-size="1.2rem"
-                    --color-inverted-selector-default-icon-gap="1.2rem"
-                    --color-inverted-selector-default-element-height="3rem"
-                    --color-inverted-selector-default-element-padding="8px 8px 8px 11px"
-                    --color-inverted-selector-default-element-border-radius="16px"
-                    --color-inverted-selector-default-selected-font-weight="400"
-                    --icon-default-size="1.3rem"
-                    deletable={false}
-                    on:select={(e) => handleMenuSelection(e.detail.option)}
-                  >
-                    <svelte:fragment slot="prepend" let:option let:handleClickClose let:index>
-                      <slot name="prepend" {option} {handleClickClose} {index} {sidebarExpanded}>
-                        {#if !!option.icon}
-                          <Icon
-                            name={option.icon}
-                          ></Icon>
-                        {/if}
-                      </slot>
-                    </svelte:fragment>
-                    <svelte:fragment slot="option" let:option>
-                      <slot name="option" {option}>
-                        <div class="label">
-                          {option.label}
-                        </div>
-                      </slot>
-                    </svelte:fragment>
-                  </ColorInvertedSelector>
-                </div>
-              </slot>
-            </div>
-            <slot name="user" hamburgerVisible={mAndDown} {sidebarExpanded}>
-            </slot>
+      <nav 
+        class:opened-drawer={drawerOpened}
+        class:opened={sidebarExpanded}
+        class="header-toolbar"
+      >
+        {#if menuSnippet}
+          {@render menuSnippet({})}
+        {:else}
+          <div class="inner-menu">
+            {#if mAndDown}
+              <div style:margin-right="2rem">
+                <Icon 
+                  name="mdi-menu" 
+                  onclick={toggleMenu}
+                ></Icon>
+              </div>
+            {/if}
+            {#if innerMenuSnippet}
+              {@render innerMenuSnippet({ hamburgerVisible: mAndDown })}
+            {:else}
+              Menu
+            {/if}
           </div>
-        </slot>
-      </div>
-    </header>
-    <div 
-      class="main-section {clazz.mainSection || ''}"
-      class:opened={sidebarExpanded}
-    >
-      <div 
-        on:click={handleOverlayClick}
-        on:keypress={handleOverlayClick}
-        class:visible={drawerOpened}
-        class="overlay {clazz.overlay || ''}"
+        {/if}
+      </nav>
+      <header
+        bind:this={headerElement}
+        class:opened={(mAndDown && drawerOpened) || sidebarExpanded}
+        onmouseleave={() => {if(expandOn == 'hover') sidebarExpanded = false}}
+        onmouseenter={() => {if(expandOn == 'hover') sidebarExpanded = true}}
+        onclick={() => {if(expandOn == 'click' && !mAndDown) sidebarExpanded = true}}
+        onkeypress={() => {if(expandOn == 'click' && !mAndDown) sidebarExpanded = true}}
+        use:clickOutside 
+        class="side-bar {clazz.header || ''}"
         role="presentation"
         tabindex="-1"
-      ></div>
-      <div
-        class="content"
-        class:blurred={drawerOpened}
       >
-        <slot>Content</slot>
+        <div class="side-bar-content">
+          {#if sidebarSnippet}
+            {@render sidebarSnippet({ hamburgerVisible: mAndDown, sidebarExpanded })}
+          {:else}
+            <div class="sidebar-container">
+              <div class="logo-and-menu">
+                {#if logoSnippet}
+                  {@render logoSnippet({ hamburgerVisible: mAndDown, sidebarExpanded })}
+                {:else}
+                  <div class="logo">logo</div>
+                {/if}
+                {#if menuSnippet}
+                  {@render menuSnippet({ hamburgerVisible: mAndDown, sidebarExpanded })}
+                {:else}
+                  <div 
+                    class="menu-container"
+                    class:expanded={sidebarExpanded}
+                  >
+                    <ColorInvertedSelector
+                      options={options}
+                      selectedIndex={selectedIndex}
+                      --color-inverted-selector-default-background-color="transparent"
+                      --color-inverted-selector-default-font-size="1.2rem"
+                      --color-inverted-selector-default-icon-gap="1.2rem"
+                      --color-inverted-selector-default-element-height="3rem"
+                      --color-inverted-selector-default-element-padding="8px 8px 8px 11px"
+                      --color-inverted-selector-default-element-border-radius="16px"
+                      --color-inverted-selector-default-selected-font-weight="400"
+                      --icon-default-size="1.3rem"
+                      deletable={false}
+                      onselect={(e) => handleMenuSelection(e.detail.option)}
+                    >
+                      {#snippet prependSnippet({ handleClickClose, index, option })} 
+                        {#if prependInternalSnippet}
+                          {@render prependInternalSnippet({ option, handleClickClose, index, sidebarExpanded })} 
+                        {:else}
+                          {#if !!option.icon}
+                            <Icon
+                              name={option.icon}
+                            ></Icon>
+                          {/if}
+                        {/if}
+                      {/snippet}
+                      {#snippet optionSnippet({ option })}
+                        {#if optionInternalSnippet}
+                          {@render optionInternalSnippet({ option })}
+                        {:else}
+                          <div class="label">
+                            {option.label}
+                          </div>
+                        {/if}
+                      {/snippet}
+                    </ColorInvertedSelector>
+                  </div>
+                {/if}
+              </div>
+              {@render userSnippet?.({ hamburgerVisible: mAndDown, sidebarExpanded })}
+            </div>
+          {/if}
+        </div>
+      </header>
+      <div 
+        class="main-section {clazz.mainSection || ''}"
+        class:opened={sidebarExpanded}
+      >
+        <div 
+          onclick={handleOverlayClick}
+          onkeypress={handleOverlayClick}
+          class:visible={drawerOpened}
+          class="overlay {clazz.overlay || ''}"
+          role="presentation"
+          tabindex="-1"
+        ></div>
+        <div
+          class="content"
+          class:blurred={drawerOpened}
+        >
+          {#if children}
+            {@render children()}
+          {:else}
+            Content
+          {/if}
+        </div>
       </div>
     </div>
-  </div>
+  {/snippet}
 </MediaQuery>
 
 

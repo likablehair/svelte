@@ -2,14 +2,32 @@
   import './DescriptiveAvatar.css'
   import '../../../css/main.css'
   import Avatar from "$lib/components/simple/media/Avatar.svelte";
+  import type { MouseEventHandler } from 'svelte/elements';
+  import type { Snippet } from 'svelte';
 
-  export let src: string | undefined = undefined,
-    title: string | undefined = undefined,
-    subtitle: string | undefined = undefined,
-    avatarText: string | undefined = !title ? undefined : title.substring(0, 2).toUpperCase(),
-    direction: "row" | "column" = "row",
+  interface Props {
+    src?: string;
+    title?: string;
+    subtitle?: string;
+    avatarText?: string;
+    direction?: "row" | "column";
+    reverse?: boolean;
+    referrerpolicy?: ReferrerPolicy | undefined;
+    onclick?: MouseEventHandler<HTMLDivElement>
+    children?: Snippet<[]>
+  }
+
+  let {
+    src = undefined,
+    title = undefined,
+    subtitle = undefined,
+    avatarText = title ? title.substring(0, 2).toUpperCase() : undefined,
+    direction = "row",
     reverse = false,
-    referrerpolicy: ReferrerPolicy | null | undefined = "no-referrer";
+    referrerpolicy = "no-referrer",
+    onclick,
+    children,
+  }: Props = $props();
 </script>
 
 <div 
@@ -18,15 +36,17 @@
   class:flex-reverse={direction == 'row' && reverse}
   class:flex-col-reverse={direction == 'column' && reverse}
   role="presentation"
-  on:click
+  {onclick}
 >
   <Avatar
     {src}
     {referrerpolicy}
-    bind:text={avatarText}
+    text={avatarText}
   ></Avatar>
   {#if !!title || !!subtitle}
-    <slot {title} {subtitle} {avatarText} {src}>
+    {#if children}
+      {@render children()}
+    {:else}
       <div class="flex flex-col text-gapped">
         {#if !!title}
           <div 
@@ -45,7 +65,7 @@
           >{subtitle}</div>
         {/if}
       </div>
-    </slot>
+    {/if}
   {/if}
 </div>
 

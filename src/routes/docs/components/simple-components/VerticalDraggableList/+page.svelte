@@ -92,85 +92,86 @@
 <div class="example">
   <Icon
     name="mdi-plus-circle-outline"
-    click
-    on:click={() => (openHeaderDrawer = true)}
+    onclick={() => (openHeaderDrawer = true)}
   />
 
-  <MediaQuery let:sAndDown>
-  <Drawer
-    bind:open={openHeaderDrawer}
-    _space={sAndDown ? "60vh" : "20vw"}
-    position={sAndDown ? "bottom" : "right"}
-  >
-    <div style="padding: 20px;">
-      <div class="personalize-header">Personalize your headers</div>
-
-      <span class="headers-show grid-col-1">Headers shown in table</span>
-
-      {#if headersToShow}
-        <VerticalDraggableList
-          items={headersToShow}
-          on:changeOrder={(e) => {
-            headersToShow = e.detail.items;
-          }}
-        >
-          <svelte:fragment slot="item" let:item>
-            <Switch
-              --switch-label-width="90%"
-              value={headersToShow.find((h) => h.id == item.id) != undefined}
-              label={item.name}
-              on:change={(e) => {
-                if (e.detail.value == false) {
-                  headersToShow = headersToShow.filter((h) => h.id != item.id);
-                  headersToSelect = [...headersToSelect, item];
-                }
+  <MediaQuery>
+    {#snippet defaultSnippet({ sAndDown })} 
+      <Drawer
+        bind:open={openHeaderDrawer}
+        _space={sAndDown ? "60vh" : "20vw"}
+        position={sAndDown ? "bottom" : "right"}
+      >
+        <div style="padding: 20px;">
+          <div class="personalize-header">Personalize your headers</div>
+    
+          <span class="headers-show grid-col-1">Headers shown in table</span>
+    
+          {#if headersToShow}
+            <VerticalDraggableList
+              items={headersToShow}
+              onchangeOrder={(e) => {
+                headersToShow = e.detail.items;
               }}
-            />
-          </svelte:fragment>
-        </VerticalDraggableList>
-      {/if}
-      <Divider --divider-color="rgb(var(--global-color-contrast-100)" />
-      <span class="headers-show grid-col-1">Headers to show</span>
-      {#if headersToSelect && headersToSelect.length > 0}
-        {#each headersToSelect as header (header.id)}
-          <div
-            animate:flip
-            in:receive={{ key: header }}
-            out:send={{ key: header }}
-            class="headers-show grid-col-1"
-          >
-            <Switch
-              --switch-label-width="90%"
-              value={false}
-              label={header.name}
-              on:change={(e) => {
-                if (e.detail.value == true) {
-                  headersToSelect = headersToSelect.filter(
-                    (h) => h.id != header.id
-                  );
-                  headersToShow = [...headersToShow, header];
-                }
-              }}
-            />
+            >
+              {#snippet itemSnippet({ item })}
+                <Switch
+                  --switch-label-width="90%"
+                  value={headersToShow.find((h) => h.id == item.id) != undefined}
+                  label={item.name}
+                  onchange={(e) => {
+                    if (e.detail.value == false) {
+                      headersToShow = headersToShow.filter((h) => h.id != item.id);
+                      headersToSelect = [...headersToSelect, item];
+                    }
+                  }}
+                />
+              {/snippet}
+            </VerticalDraggableList>
+          {/if}
+          <Divider --divider-color="rgb(var(--global-color-contrast-100)" />
+          <span class="headers-show grid-col-1">Headers to show</span>
+          {#if headersToSelect && headersToSelect.length > 0}
+            {#each headersToSelect as header (header.id)}
+              <div
+                animate:flip
+                in:receive={{ key: header }}
+                out:send={{ key: header }}
+                class="headers-show grid-col-1"
+              >
+                <Switch
+                  --switch-label-width="90%"
+                  value={false}
+                  label={header.name}
+                  onchange={(e) => {
+                    if (e.detail.value == true) {
+                      headersToSelect = headersToSelect.filter(
+                        (h) => h.id != header.id
+                      );
+                      headersToShow = [...headersToShow, header];
+                    }
+                  }}
+                />
+              </div>
+            {/each}
+          {:else}
+            <div class="headers-show grid-col-1">
+              <span style="text-align: center;">No headers to add</span>
+            </div>
+          {/if}
+          <div style="width: 100%; display: flex; justify-content: center;">
+            <Button
+              class="mr-3 mt-5"
+              --button-width="70%"
+              onclick={() => openHeaderDrawer = false}
+            >
+              Save preferences
+            </Button>
           </div>
-        {/each}
-      {:else}
-        <div class="headers-show grid-col-1">
-          <span style="text-align: center;">No headers to add</span>
         </div>
-      {/if}
-      <div style="width: 100%; display: flex; justify-content: center;">
-        <Button
-          class="mr-3 mt-5"
-          --button-width="70%"
-          on:click={() => openHeaderDrawer = false}
-        >
-          Save preferences
-        </Button>
-      </div>
-    </div>
-  </Drawer>
-</MediaQuery>
+      </Drawer>
+    {/snippet}
+  </MediaQuery>
 </div>
 <h2>Props</h2>
 <PropsViewer

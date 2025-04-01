@@ -7,7 +7,12 @@
   import { beforeNavigate, goto } from "$app/navigation";
   import componentDatabase from './search/components.database'
   import theme, { toggleTheme } from "$lib/stores/theme";
+  import type { ComponentProps } from "svelte";
+  import type { Result } from "$lib/components/composed/search/SearchResults.svelte";
 
+  type Data = {
+    url: string
+  }
   theme.update((currentTheme) => {
     currentTheme.disabled = false
     return currentTheme
@@ -20,7 +25,7 @@
     drawerOpened = false
   })
 
-  async function search(params: { searchText: string }): Promise<{ title: string, name: string, subtitle: string, data?: any }[]> {
+  async function search(params: { searchText: string }): Promise<Result<Data>[]> {
     let response = await fetch('/docs/search?text=' + params.searchText)
     let results = await response.json()
     return results.map((el: {
@@ -39,13 +44,13 @@
     })
   }
 
-  async function handleSearchSelect(event: CustomEvent<{element: { data?: { url: string }}}>) {
+  async function handleSearchSelect(event: Parameters<NonNullable<ComponentProps<typeof GlobalSearchTextField<Data>>['onselect']>>[0]) {
     if(!!event.detail.element.data) goto(event.detail.element.data.url)
     searchDialogOpened = false
   }
 
-  function handleItemClick(item: CustomEvent) {
-    if(item.detail.item.name == 'theme') toggleTheme()
+  function handleItemClick(event: Parameters<NonNullable<ComponentProps<typeof Navigator>['onitemClick']>>[0]) {
+    if(event.detail.item.name == 'theme') toggleTheme()
   }
 </script>
 
@@ -56,7 +61,7 @@
 <StableDividedSideBarLayout
   bind:drawerOpened={drawerOpened}
 >
-  <div slot="sidebar">
+  {#snippet sidebarSnippet()}  
     <div
       class="application-logo-container"
     >
@@ -141,8 +146,9 @@
       ]}
       autoDetectUrl
     ></SidebarMenuList>
-  </div>
-  <svelte:fragment slot="inner-menu" let:hamburgerVisible>
+  {/snippet}
+  {#snippet innerMenuSnippet({ hamburgerVisible })}
+    
     {#if !hamburgerVisible}
       <div
         style:flex="1 1 auto"
@@ -151,7 +157,7 @@
         <GlobalSearchTextField
           searcher={search}
           bind:searchDialogOpened={searchDialogOpened}
-          on:select={handleSearchSelect}
+          onselect={handleSearchSelect}
         ></GlobalSearchTextField>
       </div>
     {:else}
@@ -169,32 +175,32 @@
       <GlobalSearchTextField
         searcher={search}
         bind:searchDialogOpened={searchDialogOpened}
-        on:select={handleSearchSelect}
+        onselect={handleSearchSelect}
       >
-        <div 
-          style:display="flex"
-          style:align-items="center"
-          style:margin-right="1rem"
-          style:color="grey"
-          slot="search-button" 
-          let:toggleSearchDialog
-        >
-          <svg
-            on:click={toggleSearchDialog}
-            style:height="1.5rem"
-            style:width="1.5rem"
-            style:stroke="currentColor"
-            viewBox="0 0 20 20"
-            fill="none"
-            aria-hidden="true"
-            class="search-icon"
-            ><path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12.01 12a4.25 4.25 0 1 0-6.02-6 4.25 4.25 0 0 0 6.02 6Zm0 0 3.24 3.25"
-            /></svg
+        {#snippet searchButtonSnippet({ toggleSearchDialog })}
+          <div 
+            style:display="flex"
+            style:align-items="center"
+            style:margin-right="1rem"
+            style:color="grey"
           >
-        </div>
+            <svg
+              onclick={toggleSearchDialog}
+              style:height="1.5rem"
+              style:width="1.5rem"
+              style:stroke="currentColor"
+              viewBox="0 0 20 20"
+              fill="none"
+              aria-hidden="true"
+              class="search-icon"
+              ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12.01 12a4.25 4.25 0 1 0-6.02-6 4.25 4.25 0 0 0 6.02 6Zm0 0 3.24 3.25"
+              /></svg
+            >
+          </div>
+        {/snippet}
       </GlobalSearchTextField>
     {/if}
     <Navigator
@@ -219,9 +225,9 @@
       ]}
       textColor="grey"
       hoverTextColor="inherit"
-      on:item-click={handleItemClick}
+      onitemClick={handleItemClick}
     ></Navigator>
-  </svelte:fragment>
+  {/snippet}
 
   <div class="content-container">
     <div class="content">

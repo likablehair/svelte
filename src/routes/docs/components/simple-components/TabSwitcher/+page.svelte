@@ -16,7 +16,7 @@
       { name: 'paperino', label: 'Paperino', icon: 'mdi-cog'},
     ]}
     selected="pippo"
-  >Some chip</TabSwitcher>
+  ></TabSwitcher>
 </div>
 <h2>Props</h2>
 <PropsViewer

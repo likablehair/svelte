@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type Option = {
     label: string;
     name: string;
@@ -11,25 +11,46 @@
 <script lang="ts">
   import "../../../css/main.css";
   import "./HierarchyMenu.css";
-  import { createEventDispatcher } from "svelte";
   import { Icon } from "$lib";
   import { slide } from "svelte/transition";
   import { sineIn } from "svelte/easing";
+  import type { Snippet } from "svelte";
 
-  export let options: Option[],
-    selected: string | undefined = undefined,
-    expanded: string[] = [],
-    iconsOnly: boolean = false;
+  interface Props {
+    options: Option[];
+    selected?: string;
+    expanded?: string[];
+    iconsOnly?: boolean;
+    onoptionClick?: (event: {
+      detail: {
+        option: Option
+      }
+    }) => void
+    prependSnippet?: Snippet<[{ option: Option }]>
+    optionSnippet?: Snippet<[{ option: Option }]>
+    appendSnippet?: Snippet<[{ option: Option }]>
+  }
 
-  let dispatch = createEventDispatcher<{
-    optionClick: {
-      option: Option;
-    };
-  }>();
+  let {
+    options,
+    selected = $bindable(undefined),
+    expanded = [],
+    iconsOnly = false,
+    onoptionClick,
+    appendSnippet,
+    optionSnippet,
+    prependSnippet,
+  }: Props = $props();
 
   function handleOptionClick(option: Option) {
     selected = option.name;
-    dispatch("optionClick", { option });
+    if(onoptionClick) {
+      onoptionClick({
+        detail: {
+          option
+        }
+      })
+    }
   }
 
   function handleExpandOptionClick(option: Option) {
@@ -47,15 +68,18 @@
         class="main-option"
         role="presentation"
         class:selected={option.name === selected}
-        on:click={() => handleOptionClick(option)}
+        onclick={() => handleOptionClick(option)}
       >
         <div>
-          <slot name="prepend" {option}>
+          {#if prependSnippet}
+            {@render prependSnippet({ option })}
+          {:else}
             {#if !!option.options}
               <button
                 class="style-less-button icon-button"
                 class:no-transform={iconsOnly}
-                on:click|stopPropagation={(event) => {
+                onclick={(e) => {
+                  e.stopPropagation()
                   if(!iconsOnly) {
                     handleExpandOptionClick(option)
                   } else {
@@ -75,7 +99,10 @@
               {#if !iconsOnly}
                 <button
                   class="style-less-button expand-button"
-                  on:click|stopPropagation={() => handleExpandOptionClick(option)}
+                  onclick={(e) => {
+                    e.stopPropagation()
+                    handleExpandOptionClick(option)}
+                  }
                 >
                   {#if isExpanded}
                     <Icon name="mdi-chevron-down" />
@@ -89,21 +116,23 @@
                 <Icon name={option.icon} />
               </div>
             {/if}
-          </slot>
+          {/if}
         </div>
         {#if !iconsOnly}
-          <slot name="option" {option}>
+          {#if optionSnippet}
+            {@render optionSnippet({ option })}
+          {:else}
             <div class="label">
               {option.label}
             </div>
-          </slot>
-          {#if !!$$slots.append}
+          {/if}
+          {#if appendSnippet}  
             <div
-              on:click|stopPropagation={() => {}}
-              on:keydown={() => {}}
+              onclick={(e) => { e.stopPropagation() }}
+              onkeydown={() => {}}
               role="presentation"
             >
-              <slot name="append" {option} />
+             {@render appendSnippet({ option })}
             </div>
           {/if}
         {/if}
@@ -121,30 +150,34 @@
               <div
                 role="presentation"
                 class:selected={subOption.name === selected}
-                on:click={() => handleOptionClick(subOption)}
+                onclick={() => handleOptionClick(subOption)}
                 class="main-option sub-element-main-option"
               >
                 <div>
-                  <slot name="prepend" option={subOption}>
+                  {#if prependSnippet}
+                    {@render prependSnippet({ option: subOption })}
+                  {:else}
                     <div class="style-less-button sub-icon-button">
                       {#if !!subOption.icon}
                         <Icon name={subOption.icon} />
                       {/if}
                     </div>
-                  </slot>
+                  {/if}
                 </div>
-                <slot name="option" option={subOption}>
+                {#if optionSnippet}
+                  {@render optionSnippet({ option: subOption })}
+                {:else}
                   <div class="label">
                     {subOption.label}
                   </div>
-                </slot>
-                {#if !!$$slots.append}
+                {/if}
+                {#if appendSnippet}  
                   <div
-                    on:click|stopPropagation={() => {}}
-                    on:keydown={() => {}}
+                    onclick={(e) => { e.stopPropagation() }}
+                    onkeydown={() => {}}
                     role="presentation"
                   >
-                    <slot name="append" option={subOption} />
+                    {@render appendSnippet({ option: subOption })}
                   </div>
                 {/if}
               </div>

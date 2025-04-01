@@ -1,32 +1,58 @@
 <script lang="ts">
-    import { Icon, ToolTip, SimpleTextField } from "$lib";
+	import { Icon, ToolTip, SimpleTextField } from "$lib";
+    import type { ComponentProps } from "svelte";
 
-	let clazz: {
-		label?: string
-		input?: {
-			container?: string,
-			row?: string,
-			field?: string,
-			hint?: string,
-			input?: string
+	interface Props {
+    value?: string | number;
+    label?: string;
+    description?: string;
+    info?: string;
+    placeholder?: string;
+    name: string;
+    type?: 'password' | 'text' | 'number';
+    readonly?: boolean;
+    error?: boolean;
+    errorText?: string;
+    disabled?: boolean;
+    orientation?: 'horizontal' | 'vertical';
+		class?: {
+			label?: string
+			input?: {
+				container?: string,
+				row?: string,
+				field?: string,
+				hint?: string,
+				input?: string
+			}
 		}
-	} = {}
-	export { clazz as class }
+		onkeydown?: ComponentProps<typeof SimpleTextField>['onkeydown']
+		onfocus?: ComponentProps<typeof SimpleTextField>['onfocus']
+		oninput?: ComponentProps<typeof SimpleTextField>['oninput']
+		prependInnerSnippet?: ComponentProps<typeof SimpleTextField>['prependInnerSnippet']
+		appendInnerSnippet?: ComponentProps<typeof SimpleTextField>['appendInnerSnippet']
+  }
 
-	export let value: string | number | undefined = undefined,
-		label: string | undefined = undefined,
-		description: string | undefined = undefined,
-		info: string | undefined = undefined,
-		placeholder: string = '',
-		name: string,
-		type: 'password' | 'text' | 'number' = 'text',
-		readonly: boolean = false,
-		error: boolean = false,
-		errorText: string = '',
-		disabled: boolean = false,
-		orientation: 'horizontal' | 'vertical' = 'vertical'
+  let {
+    value = $bindable(undefined),
+    label = undefined,
+    description = undefined,
+    info = undefined,
+    placeholder = '',
+    name,
+    type = 'text',
+    readonly = false,
+    error = false,
+    disabled = false,
+    orientation = 'vertical',
+		class: clazz = {},
+		onfocus,
+		oninput,
+		onkeydown,
+		appendInnerSnippet,
+		prependInnerSnippet,
+  }: Props = $props();
 
-	let infoActivator: HTMLElement
+	let infoActivator: HTMLElement | undefined = $state()
 		
 </script>
 
@@ -89,22 +115,16 @@
 			bind:value
 			{type}
 			{readonly}
-			{errorText}
-			bind:error
 			{disabled}
 			{placeholder}
-			on:input
-			on:focus
-			on:keydown
+			{oninput}
+			{onfocus}
+			{onkeydown}
 			class={clazz.input}
 			--simple-textfield-border={error ? "1px solid red" : "0"}
+			{prependInnerSnippet}
+			{appendInnerSnippet}
 		>
-			<svelte:fragment slot="prepend-inner">
-				<slot name="prepend-inner" />
-			</svelte:fragment>
-			<svelte:fragment slot="append-inner">
-				<slot name="append-inner" />
-			</svelte:fragment>
 		</SimpleTextField>
 	</div>
 </div>

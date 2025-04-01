@@ -1,34 +1,52 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import '../../../css/main.css'
   import './FileInput.css'
-  import { createEventDispatcher } from "svelte";
 
-  let clazz: string = '';
-	export { clazz as class };
+  interface Props {
+    files?: File[] | undefined;
+    placeholder?: string | undefined;
+    persistOverUpload?: boolean;
+    disabled?: boolean;
+    maxFiles?: number | undefined;
+    class?: string
+    onfileDrop?: (event: {
+      detail: {
+        nativeEvent: DragEvent;
+        files: File[];
+      }
+    }) => void
+    onfileSelect?: (event: {
+      detail: {
+        nativeEvent: Event;
+        files: File[];
+      }
+    }) => void
+    onchange?: () => void
+    bodySnippet?: Snippet<[{
+      active: boolean
+    }]>
+  }
 
-  export let files: File[] | undefined = undefined,
-    placeholder: string | undefined = undefined,
-    persistOverUpload : boolean = true,
-    disabled : boolean = false,
-    maxFiles: number | undefined = undefined;
+  let {
+    files = $bindable(undefined),
+    placeholder = undefined,
+    persistOverUpload = true,
+    disabled = false,
+    maxFiles = undefined,
+    class: clazz = '',
+    onfileDrop,
+    onfileSelect,
+    onchange,
+    bodySnippet,
+  }: Props = $props();
 
   let inputElement: HTMLElement | undefined = undefined;
-  let dropAreaActive = false;
+  let dropAreaActive = $state(false);
 
   const highlight: (highlighted: boolean) => void = (highlighted) => {
     dropAreaActive = highlighted && !disabled;
   };
-
-  const dispatch = createEventDispatcher<{
-    fileDrop: {
-      nativeEvent: DragEvent;
-      files: File[];
-    }
-    fileSelect: {
-      nativeEvent: Event;
-      files: File[];
-    }
-  }>();
 
   function handleFileDrop(event: DragEvent) {
     highlight(false)
@@ -49,10 +67,14 @@
           ? [...files, ...limitedFiles]
           : limitedFiles;
 
-      dispatch("fileDrop", {
-        nativeEvent: event,
-        files: limitedFiles,
-      });
+      if(onfileDrop){
+        onfileDrop({
+          detail: {
+            nativeEvent: event,
+            files: limitedFiles,
+          }
+        })
+      }
     }
   }
 
@@ -74,23 +96,29 @@
           ? [...files, ...limitedFiles]
           : limitedFiles;
 
-      dispatch("fileSelect", {
-        nativeEvent: event,
-        files: limitedFiles,
-      });
+      if(onfileSelect){
+        onfileSelect({
+          detail: {
+            nativeEvent: event,
+            files: limitedFiles,
+          }
+        })
+      }
     }
   }
 </script>
 
 <div
-  on:click={() => inputElement?.click()}
-  on:keypress={() => inputElement?.click()}
-  on:dragover|preventDefault={() => {
+  onclick={() => inputElement?.click()}
+  onkeypress={() => inputElement?.click()}
+  ondragover={(e) => {
+    e.preventDefault()
     highlight(true)
   }}
-  on:dragleave={() => highlight(false)}
-  on:dragend={() => highlight(false)}
-  on:drop|preventDefault={(e) => {
+  ondragleave={() => highlight(false)}
+  ondragend={() => highlight(false)}
+  ondrop={(e) => {
+    e.preventDefault()
     if (!disabled) handleFileDrop(e);
   }}
   class:disabled
@@ -98,16 +126,18 @@
   class:active={dropAreaActive}
   role="presentation"
 >
-  <slot name="body" active={dropAreaActive}>
+  {#if bodySnippet}
+    {@render bodySnippet({ active: dropAreaActive})}
+  {:else}
     <span> { placeholder || 'Drop file here or click to upload'} </span>
-  </slot>
+  {/if}
 
   <input
     type="file"
     multiple
     bind:this={inputElement}
-    on:input={handleFileFromInput}
-    on:change
+    oninput={handleFileFromInput}
+    {onchange}
     {disabled}
   />
 </div>

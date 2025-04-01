@@ -69,7 +69,7 @@
     <div style:height="500px">lorem</div>
   </div>
 </div>
-<Button on:click={() => dialogOpened = true}>Apri dialog</Button>
+<Button onclick={() => dialogOpened = true}>Apri dialog</Button>
 <Dialog
   bind:open={dialogOpened}
 >

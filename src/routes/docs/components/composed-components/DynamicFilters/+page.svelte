@@ -7,7 +7,7 @@
     import type { ComponentProps } from "svelte";
 
   let searchText = '',
-    filters: ComponentProps<Filters>["filters"] = [
+    filters: ComponentProps<typeof Filters>["filters"] = [
     {
       type: 'string',
       column: 'cbam_declaration_goods.mrn',
@@ -153,51 +153,33 @@
 <div class="example">
 <Filters
   bind:filters
-  on:applyFilter={() => {
+  onapplyFilter={() => {
     handleSearchChange(searchText);
   }}
-  on:removeFilter={() => {
+  onremoveFilter={() => {
     handleSearchChange(searchText);
   }}
-  on:removeAllFilters={() => {
+  onremoveAllFilters={() => {
     handleSearchChange(searchText);
   }}
   --filters-default-wrapper-width="100%"
   lang={'en'}
   editFilterMode='multi-edit'
 >
-  <svelte:fragment slot="append">
-    <slot name="filter-append" />
-  </svelte:fragment>
-  <svelte:fragment slot="custom-chip" let:filter>
-    <slot name="custom-filter-chip" {filter} />
-  </svelte:fragment>
-  <svelte:fragment
-    slot="custom"
-    let:filter
-    let:updateFunction
-    let:mAndDown
-  >
-    <slot name="custom-filter" {filter} {updateFunction} {mAndDown} />
-  </svelte:fragment>
-
-  <svelte:fragment slot="content" let:mAndDown let:filters let:updateMultiFilterValues let:handleRemoveAllFilters={removeAllFilters}>
+  {#snippet contentSnippet({ filters, handleRemoveAllFilters, mAndDown, updateMultiFilterValues, })}
     {#key filters}
       <DynamicFilters
         lang='en'
         {filters}                      
         {mAndDown}
-        on:change={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
-        on:removeAllFilters={() => {
+        onchange={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
+        onremoveAllFilters={() => {
           handleSearchChange(searchText);
         }}
       >
-        <svelte:fragment slot="custom" let:filter let:mAndDown>
-          <slot name="custom-filter" {filter} {updateMultiFilterValues} {mAndDown}></slot>
-        </svelte:fragment>
       </DynamicFilters>
     {/key}
-  </svelte:fragment>
+  {/snippet}
 </Filters>
 </div>
 <h2>Props</h2>

@@ -37,7 +37,6 @@ export { default as Skeleton } from './components/simple/loaders/Skeleton.svelte
 export { default as AlertBanner } from './components/simple/notifiers/AlertBanner.svelte'
 
 export { default as Avatar } from './components/simple/media/Avatar.svelte'
-export { default as Carousel } from './components/simple/media/Carousel.svelte'
 export { default as DescriptiveAvatar } from './components/simple/media/DescriptiveAvatar.svelte'
 export { default as Icon } from './components/simple/media/Icon.svelte'
 export { default as FlagIcon } from './components/simple/media/FlagIcon.svelte'

@@ -1,10 +1,10 @@
-<script lang="ts" context="module">
-  export type Element = {
+<script lang="ts" module>
+  export type Element<Data = any> = {
     title: string | number,
     name: string | number,
     description?: string,
     icon?: string,
-    data?: any;
+    data?: Data;
     style?: {
       color?: string,
       backgroundColor?: string
@@ -14,36 +14,77 @@
   };
 </script>
 
-<script lang="ts">
+<script lang="ts" generics="Data">
   import '../../../css/main.css'
   import './SelectableVerticalList.css'
   import keyboarder from "$lib/utils/keyboarder";
-  import { createEventDispatcher, onMount } from "svelte";
+  import { onMount, type Snippet } from "svelte";
   import Icon from '../media/Icon.svelte';
+  import type { KeyboardEventHandler } from 'svelte/elements';
 
-  export let activeKeyboard: boolean = false,
-    loopSelection: boolean = true,
-    focused: string | number | undefined = undefined,
-    selected: string | number | undefined = undefined,
-    elements: Element[] = [],
-    centered: boolean = false,
-    bicolor: boolean = false,
-    appendIconSize: string = "20pt"
+  type ElementData = Element<Data>
 
-  let dispatch = createEventDispatcher<{
-    'select': {
-      element: Element
-    },
-    'focus': {
-      element: Element
-    },
-    'iconClick': {
-      index: number,
-      element: Element
-    }
-  }>()
+  interface Props {
+    activeKeyboard?: boolean;
+    loopSelection?: boolean;
+    focused?: string | number;
+    selected?: string | number;
+    elements?: ElementData[];
+    centered?: boolean;
+    bicolor?: boolean
+    appendIconSize?: string;
+    onselect?: (event: {
+      detail: {
+        element: ElementData
+      }
+    }) => void
+    onfocus?: (event: {
+      detail: {
+        element: ElementData
+      }
+    }) => void
+    oniconClick?: (event: {
+      detail: {
+        index: number,
+        element: ElementData
+      }
+    }) => void
+    onkeypress?: KeyboardEventHandler<HTMLDivElement>
+    elementSnippet?: Snippet<[{
+      selected: boolean
+      focused: boolean
+    }]>
+    titleSnippet?: Snippet<[{
+      selected: boolean
+      focused: boolean
+      element: ElementData
+    }]>
+    descriptionSnippet?: Snippet<[{
+      selected: boolean
+      focused: boolean
+      element: ElementData
+    }]>
+  }
 
-  $: focusedIndex = elements.findIndex((el) => el.name == focused)
+  let {
+    activeKeyboard = false,
+    loopSelection = true,
+    focused = $bindable(undefined),
+    selected = $bindable(undefined),
+    elements = $bindable([]),
+    centered = false,
+    bicolor = false,
+    appendIconSize = "20pt",
+    onfocus,
+    oniconClick,
+    onselect,
+    onkeypress,
+    elementSnippet,
+    descriptionSnippet,
+    titleSnippet,
+  }: Props = $props();
+
+  let focusedIndex = $derived(elements.findIndex((el) => el.name == focused))
 
   function handleKeypress(params: {key: string}) {
     if(activeKeyboard && elements.length > 0) {
@@ -57,7 +98,13 @@
           newIndex = focusedIndex + 1
         }
 
-        if(newIndex !== undefined) dispatch('focus', { element: elements[newIndex] })
+        if(newIndex !== undefined && onfocus) {
+          onfocus({
+            detail: {
+              element: elements[newIndex]
+            }
+          })
+        }
       } else if(params.key == 'ArrowUp') {
         let newIndex
         if((focusedIndex === undefined || focusedIndex === -1) || (loopSelection && focusedIndex <= 0)) {
@@ -68,22 +115,46 @@
           newIndex = focusedIndex - 1
         }
 
-        if(newIndex !== undefined) dispatch('focus', { element: elements[newIndex] })
+        if(newIndex !== undefined && onfocus) {
+          onfocus({
+            detail: {
+              element: elements[newIndex]
+            }
+          })
+        }
       } else if(params.key == 'Enter' && focusedIndex !== -1) {
         selected = elements[focusedIndex].name
-        dispatch('select', { element: elements[focusedIndex] })
+        if(onselect) {
+          onselect({
+            detail: {
+              element: elements[focusedIndex]
+            }
+          })
+        }
       }
     }
   }
 
   function handleElementClick(element: Element) {
     selected = element.name
-    dispatch('select', { element })
+    if(onselect) {
+      onselect({
+        detail: {
+          element
+        }
+      })
+    }
   }
 
   function handleElementMouseover(element: Element) {
     focused = element.name
-    dispatch('focus', { element })
+    if(onfocus) {
+      onfocus({
+        detail: {
+          element
+        }
+      })
+    }
   }
 
   onMount(() => {
@@ -95,10 +166,14 @@
   })
 
   function handleIconClick(index: number, element: Element) {
-    dispatch('iconClick', {
-      index,
-      element
-    })
+    if(oniconClick) {
+      oniconClick({
+        detail: {
+          element,
+          index
+        }
+      })
+    }
   }
 
 </script>
@@ -108,24 +183,29 @@
   role="listbox"
 >
   {#each elements as element, index (element.name)}
+  <div
+    role="button"
+    tabindex="0"
+    onkeypress={() => handleElementClick(element)}
+    onmouseover={() => handleElementMouseover(element)}
+    onfocus={() => handleElementMouseover(element)}
+    onclick={() => handleElementClick(element)}
+  >
     <li
       class="element"
       class:bicolor
       class:focused={focused == element.name}
       class:disabled={element.disabled}
-      aria-selected={selected == element.name}
-      on:mouseover={() => handleElementMouseover(element)}
-      on:focus={() => handleElementMouseover(element)}
-      on:click={() => handleElementClick(element)}
-      on:keypress={() => handleElementClick(element)}
+      class:selected={selected == element.name}
       style:color={element.style?.color}
       style:background-color={element.style?.backgroundColor}
     >
-      <slot
-        name="element"
-        focused={focused == element.name}
-        selected={selected == element.name}
-      >
+      {#if elementSnippet}
+        {@render elementSnippet({ 
+          focused: focused == element.name,
+          selected: selected == element.name
+        })}
+      {:else}
         {#if !!element.icon}
           <Icon
             name={element.icon}
@@ -133,33 +213,40 @@
         {/if}
         <div class="title-description-container" class:centered>
           <div class="title">
-            <slot
-              name="title"
-              focused={focused == element.name}
-              selected={selected == element.name}
-              element={element}
-            >
+            {#if titleSnippet}
+              {@render titleSnippet({ 
+                focused: focused == element.name,
+                selected: selected == element.name,
+                element
+              })}
+            {:else}
               {element.title}
-            </slot>
+            {/if}
           </div>
           {#if !!element.description}
             <div class="description">
-              <slot
-                name="description"
-                focused={focused == element.name}
-                selected={selected == element.name}
-                element={element}
-              >
+              {#if descriptionSnippet}
+                {@render descriptionSnippet({ 
+                  focused: focused == element.name,
+                  selected: selected == element.name,
+                  element
+                })}
+              {:else}
                 {element.description || ''}
-              </slot>
+              {/if}
             </div>
           {/if}
         </div>
         {#if !!element.appendIcon}
           <div
+            role="button"
+            tabindex="0"
             class="append"
-            on:click|stopPropagation={() => {handleIconClick(index, element)}}
-            on:keypress
+            onclick={(e) => {
+              e.stopPropagation()
+              handleIconClick(index, element)
+            }}
+            {onkeypress}
           >
             <Icon
               name={element.appendIcon}
@@ -167,8 +254,9 @@
             ></Icon>
           </div>
         {/if}
-      </slot>
+      {/if}
     </li>
+  </div>
   {/each}
 </ul>
 
@@ -278,7 +366,7 @@
     )
   }
 
-  .element[aria-selected=true] {
+  .element.selected {
     background-color: var(
       --selectable-vertical-list-selection-background-color,
       var(--selectable-vertical-list-default-selection-background-color)
@@ -286,7 +374,7 @@
     color: var(
       --selectable-vertical-list-selection-color,
       var(--selectable-vertical-list-default-selection-color)
-    )
+    );
   }
 
   .element.disabled {

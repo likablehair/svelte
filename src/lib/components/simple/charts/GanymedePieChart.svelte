@@ -22,46 +22,54 @@
     CategoryScale
   );
 
-  export let data: {
-    labels: string[];
-    datasets: {
-      label: string;
-      data: number[];
-      backgroundColor?: string[];
-      borderColor?: string;
-      hoverBackgroundColor?: string[];
-      hoverOffset?: number;
-    }[];
-    options?: {
-      title: {
-        display: boolean;
-        text: string;
+  interface Props {
+    data: {
+      labels: string[];
+      datasets: {
+        label: string;
+        data: number[];
+        backgroundColor?: string[];
+        borderColor?: string;
+        hoverBackgroundColor?: string[];
+        hoverOffset?: number;
+      }[];
+      options?: {
+        title: {
+          display: boolean;
+          text: string;
+        };
       };
     };
-  } = {
-    labels: [],
-    datasets: [],
-    options: {
-      title: {
-        display: false,
-        text: "",
+    showLegend?: boolean;
+    responsive?: boolean;
+    maintainAspectRatio?: boolean
+  }
+
+  let {
+    data = {
+      labels: [],
+      datasets: [],
+      options: {
+        title: {
+          display: false,
+          text: "",
+        },
       },
     },
-  },
-  showLegend: boolean = true,
-  responsive: boolean = true,
-  maintainAspectRatio: boolean = false;
+    responsive = true,
+    maintainAspectRatio = false,
+    showLegend = true
+  }: Props = $props();
 
-  let chartOptions: ComponentProps<typeof Pie>['options']
-  $: chartOptions = {
-    responsive: responsive,
-    maintainAspectRatio: maintainAspectRatio,
-      plugins: {
-        legend: {
-          display: showLegend
-        }
+  let chartOptions: ComponentProps<typeof Pie>['options'] = $derived({
+    responsive,
+    maintainAspectRatio,
+    plugins: {
+      legend: {
+        display: showLegend
       }
     }
+  })
 </script>
 
 <Pie 

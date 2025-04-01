@@ -7,19 +7,26 @@
   import SlotsViewer from "../../SlotsViewer.svelte";
   import Menu from "$lib/components/simple/common/Menu.svelte";
   import DatePickerTextField from "$lib/components/composed/forms/DatePickerTextField.svelte";
+  import type { ComponentProps } from "svelte";
 
   let dialogOpened = false
 
   let menuOpened = false
   let activator: HTMLElement
 
-  function handleButtonClick(e: CustomEvent) {
+  function handleButtonClick(e: Parameters<NonNullable<ComponentProps<typeof Button>['onclick']>>[0]) {
     e.detail.nativeEvent.stopPropagation()
     menuOpened = !menuOpened
   }
 
   let secondActivators: Record<string, HTMLElement> = {}
-  let secondMenuOpened: Record<string, boolean> = {}
+  let secondMenuOpened: Record<string, boolean> = {
+    'this': false,
+    'is': false,
+    'a': false,
+    'menu': false,
+    '!': false,
+  }
 
   function handleListClick(menuLabel: string) {
     secondMenuOpened[menuLabel] = true
@@ -39,7 +46,7 @@
 <h2>Example</h2>
 <div class="example">
   <Button
-    on:click={() => { dialogOpened = !dialogOpened }}
+    onclick={() => { dialogOpened = !dialogOpened }}
   >
     Click me
   </Button>
@@ -56,9 +63,7 @@
       <DatePickerTextField></DatePickerTextField>
       <div style:width="fit-content" bind:this={activator}>
         <Button
-          width="200px"
-          maxWidth="90vw"
-          on:click={(e) => handleButtonClick(e)}
+          onclick={(e) => handleButtonClick(e)}
         >
           Click me
         </Button>

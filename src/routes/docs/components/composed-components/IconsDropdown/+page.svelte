@@ -4,8 +4,6 @@
   import IconsDropdown, { type IconItem } from "$lib/components/composed/forms/IconsDropdown.svelte";
 
   let values: IconItem[] = []
-
-  $: console.log(values)
 </script>
 
 <h1>IconsDropdown</h1>

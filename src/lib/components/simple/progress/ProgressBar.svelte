@@ -3,28 +3,37 @@
   import './ProgressBar.css'
   import ToolTip from '$lib/components/composed/common/ToolTip.svelte';
 
-  export let value = 0,
+  interface Props {
+    value?: number;
+    total?: number;
+    valueTooltip?: boolean;
+    valueTooltipLabel?: string | number;
+  }
+
+  let {
+    value = 0,
     total = 100,
-    valueTooltip: boolean = false,
-    valueTooltipLabel: string | number | undefined = undefined
+    valueTooltip = false,
+    valueTooltipLabel = undefined,
+  }: Props = $props();
 
-  let activator: HTMLElement
+  let activator: HTMLElement | undefined = $state()
 
-  $: hundredBasedProgress = total === 0 ? 100 : (value * 100) / total;
-  $: cssVariables = Object.entries({
+  let hundredBasedProgress = $derived(total === 0 ? 100 : (value * 100) / total);
+  let cssVariables = $derived(Object.entries({
     "--progress-width": hundredBasedProgress + "%",
   })
     .filter(([key]) => key.startsWith("--"))
     .reduce((css, [key, value]) => {
       return `${css}${key}: ${value};`;
-    }, "");
+    }, ""))
 </script>
 
 <div
   style={cssVariables}
   class="progress-bar-container"
 >
-  {#if valueTooltip}
+  {#if valueTooltip && activator}
     <ToolTip
       bind:activator
     >
@@ -37,7 +46,7 @@
     bind:this={activator}
     style:width={hundredBasedProgress + "%"}
     class="progress"
-  />
+  ></div>
 </div>
 
 <style>

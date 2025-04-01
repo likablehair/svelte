@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import type { Item } from "../../../components/simple/forms/Autocomplete.svelte";
   export type { Item }
 </script>
@@ -8,76 +8,116 @@
   import Autocomplete from "../../../components/simple/forms/Autocomplete.svelte";
   import Button from '../../simple/buttons/Button.svelte'
   import Icon from '../../simple/media/Icon.svelte'
-  import { createEventDispatcher } from "svelte";
+  import type { ComponentProps, Snippet } from "svelte";
 
-  let dispatch = createEventDispatcher<{
-    change: {
-      unselect: Item | undefined;
-      select: Item | undefined;
-      selection: Item[];
+  interface Props {
+    items?: Item[];
+    values?: Item[];
+    multiple?: boolean;
+    lang?: 'it' | 'en';
+    searchText?: string;
+    maxVisibleChips?: number;
+    placeholder?: string;
+    clearable?: boolean;
+    mandatory?: boolean;
+    icon?: string;
+    menuOpened?: boolean;
+    openingId?: string;
+    width?: string;
+    minWidth?: string;
+    menuWidth?: string;
+    mobileDrawer?: boolean;
+    disabled?: boolean;
+    onchange?: (event: {
+      detail: {
+        unselect: Item | undefined;
+        select: Item | undefined;
+        selection: Item[];
+      }
+    }) => void
+    itemLabelSnippet?: ComponentProps<typeof Autocomplete>['itemLabelSnippet']
+    labelSnippet?: Snippet<[{
+      values: typeof values,
+      items: typeof items,
+      searchText: typeof searchText,
+      generatedLabel: typeof generatedLabel,
+      placeholder: typeof placeholder,
+      clearable: typeof clearable,
+      handleCloseClick: typeof handleCloseClick,
+    }]>
+  }
+
+  let {
+    items = [],
+    values = $bindable([]),
+    multiple = false,
+    lang = 'en',
+    searchText = $bindable(),
+    maxVisibleChips,
+    placeholder = lang === 'en' ? "Select" : "Seleziona",
+    clearable = true,
+    mandatory = true,
+    icon,
+    menuOpened = $bindable(false),
+    openingId = $bindable("autocomplete-menu"),
+    width,
+    minWidth,
+    menuWidth = width,
+    mobileDrawer = false,
+    disabled = false,
+    onchange,
+    itemLabelSnippet: itemLabelInternalSnippet,
+    labelSnippet,
+  }: Props = $props();
+
+  let generatedLabel = $derived(values.length == 1 ? values[0].label : `${values.length} Selezionati`)
+
+  function handleCloseClick(event: Parameters<NonNullable<ComponentProps<typeof Icon>['onclick']>>[0]) {
+    if(event){
+      event.preventDefault()
+      event.stopPropagation()
     }
-  }>()
-
-  export let items: Item[] = [],
-    values: Item[] = [],
-    multiple: boolean = false,
-    lang: 'it' | 'en' = 'en',
-    searchText: string | undefined = undefined,
-    maxVisibleChips: number | undefined = undefined,
-    placeholder: string = lang == 'en' ? "Select" : "Seleziona",
-    clearable: boolean = true,
-    mandatory: boolean = true,
-    icon: string | undefined = undefined,
-    menuOpened: boolean = false,
-    openingId: string | undefined = undefined,
-    width: string | undefined = undefined,
-    minWidth: string | undefined = undefined,
-    menuWidth: string | undefined = width,
-    mobileDrawer: boolean = false,
-    disabled: boolean = false
-
-  $: generatedLabel = values.length == 1 ? values[0].label : `${values.length} Selezionati`
-
-  function handleCloseClick(event: MouseEvent) {
-    event.preventDefault()
-    event.stopPropagation()
     let valuesBefore = lodash.cloneDeep(values)
     values = []
 
-    dispatch('change', {
-      unselect: valuesBefore[0],
-      select: undefined,
-      selection: []
-    })
+    if(onchange){
+      onchange({
+        detail: {
+          unselect: valuesBefore[0],
+          select: undefined,
+          selection: []
+        }
+      })
+    }
   }
 </script>
 
 <Autocomplete
-  bind:items
+  {items}
   bind:values
   bind:searchText
-  bind:multiple
-  bind:maxVisibleChips
-  bind:mandatory
-  bind:disabled
+  {multiple}
+  {maxVisibleChips}
+  {mandatory}
+  {disabled}
   searchFunction={() => true}
-  on:change
+  {onchange}
   bind:menuOpened
   bind:openingId
-  bind:width
+  {width}
   {mobileDrawer}
-  bind:minWidth
-  bind:menuWidth
+  {minWidth}
+  {menuWidth}
 >
-  <svelte:fragment slot="selection-container" let:openMenu let:handleKeyDown>
+  {#snippet selectionContainerSnippet({ openMenu, handleKeyDown })}
     <Button
       --button-default-background-color="transparent"
       --button-default-focus-background-color="rgb(var(--global-color-primary-400), .3)"
       --button-default-focus-color="rgb(var(--global-color-contrast-900))"
       --button-default-border="2px solid rgb(var(--global-color-primary-400))"
       --button-default-color="rgb(var(--global-color-contrast-800))"
-      on:click={openMenu}
-      on:keydown={(event) => {
+      onclick={openMenu}
+      onkeydown={(event) => {
         handleKeyDown(event.detail.nativeEvent)
         if(event.detail.nativeEvent.key == 'ArrowDown' || event.detail.nativeEvent.key == 'ArrowUp') {
           event.detail.nativeEvent.stopPropagation()
@@ -85,16 +125,17 @@
         }
       }}
     >
-      <slot
-        name="label"
-        {values}
-        {items}
-        {searchText}
-        {generatedLabel}
-        {placeholder}
-        {clearable}
-        {handleCloseClick}
-      >
+      {#if labelSnippet}
+        {@render labelSnippet({ 
+          values,
+          items,
+          searchText,
+          generatedLabel,
+          placeholder,
+          clearable,
+          handleCloseClick,
+        })}
+      {:else}
         <div class="label">
           {#if !!icon}
             <Icon name={icon}></Icon>
@@ -110,21 +151,22 @@
               {#if clearable}
                 <Icon
                   name="mdi-close"
-                  click
-                  on:click={handleCloseClick}
+                  onclick={handleCloseClick}
                 ></Icon>
               {/if}
             </div>
           {/if}
         </div>
-      </slot>
+      {/if}
     </Button>
-  </svelte:fragment>
-  <svelte:fragment slot="item-label" let:item >
-    <slot name="item-label" {item}>
+  {/snippet}
+  {#snippet itemLabelSnippet({ item })}
+    {#if itemLabelInternalSnippet}
+      {@render itemLabelInternalSnippet({ item })}
+    {:else}
       {item.label}
-    </slot>
-  </svelte:fragment>
+    {/if}
+  {/snippet}
 </Autocomplete>
 
 <style>

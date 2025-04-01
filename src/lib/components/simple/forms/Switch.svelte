@@ -1,12 +1,27 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte'
 	import './Switch.css'
 
-	export let label: string = '',
-		value: boolean | undefined = undefined,
-		disabled: boolean = false
+	interface Props {
+		label: string;
+		value?: boolean;
+		disabled?: boolean;
+		onchange?: (event: {
+			detail: {
+				label: string,
+				value: boolean
+			}
+		}) => void
+	}
 
-	let checked = value
+	let {
+		label = '',
+		value = $bindable(undefined),
+		disabled = false,
+		onchange,
+	}: Props = $props();
+
+
+	let checked = $state(value)
 	const uniqueID = Math.floor(Math.random() * 100)
 
 	function handleClick(event: MouseEvent) {
@@ -16,23 +31,26 @@
 		checked = state === 'true' ? false : true
 		value = checked === true ? true : false
 
-		dispatch('change', {
-			label: label,
-			value: checked
-		})
-	}
-
-	let dispatch = createEventDispatcher<{
-		change: {
-			label: string
-			value: boolean
+		if(onchange){
+			onchange({
+				detail: {
+					label,
+					value: checked
+				}
+			})
 		}
-	}>()
+	}
 </script>
 
 <div class="s s--slider">
 	<span id={`switch-${uniqueID}`}>{label}</span>
-	<button {disabled} role="switch" aria-checked={checked} on:click={handleClick} />
+	<button
+		{disabled}
+		role="switch"
+		aria-checked={checked}
+		onclick={handleClick}
+		aria-label={`Switch for ${label}`}
+	></button>
 </div>
 
 <style>

@@ -1,11 +1,16 @@
 <script lang="ts">
   import '../../../css/flag-icons/css/flag-icons.min.css'
   import './FlagIcon.css'
-  
-  let clazz: string | undefined = undefined;
-	export { clazz as class };
 
-  export let alpha2: string
+  interface Props { 
+    alpha2: string
+    class?: string
+  }
+
+  let { 
+    alpha2,
+    class: clazz,
+  }: Props = $props() 
 </script>
 
 <span 

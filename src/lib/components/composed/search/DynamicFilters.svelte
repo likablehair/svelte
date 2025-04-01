@@ -1,34 +1,46 @@
 <script lang="ts">
 	import { FilterEditor, Icon } from "$lib";
 	import type { Filter } from "$lib/utils/filters/filters";
-	import { createEventDispatcher } from "svelte"
+	import { type ComponentProps } from "svelte"
 
+	interface Props {
+    filters?: Filter[];
+    lang?: "it" | "en";
+    mAndDown?: boolean;
+		onremoveAllFilters?: () => void
+		onchange?: (event: {
+			detail: {
+				filter: Filter
+			}
+		}) => void
+		customSnippet?: ComponentProps<typeof FilterEditor>['customSnippet']
+  }
 
-	export let filters: Filter[] = [],
-		lang: "it" | "en" = "en",
-		mAndDown: boolean = false;		
+  let {
+    filters = [],
+    lang = "en",
+    mAndDown = false,
+		onchange,
+		onremoveAllFilters,
+		customSnippet,
+  }: Props = $props();	
 
-	let selectedFilter: Filter | undefined;
-	let tmpFilters: { [filterName: string]: Filter } = filters.reduce((acc, f) => {
+	let selectedFilter: Filter | undefined = $state();
+	let tmpFilters: { [filterName: string]: Filter } = $state(filters.reduce((acc, f) => {
     if (f.active) {
         acc[f.name] = f; 
     }
     return acc;
-	}, {} as { [filterName: string]: Filter });
+	}, {} as { [filterName: string]: Filter }))
 
-  const dispatch = createEventDispatcher<{
-    'removeAllFilters': {},
-		'change': { filter: Filter }
-  }>()
-
-	let activeFilter = Object.values(tmpFilters).reduce((count, filter) => {
+	let activeFilter = $derived(Object.values(tmpFilters).reduce((count, filter) => {
 		if ((filter as any).value !== undefined ||
 			(filter as any).from !== undefined ||
 			(filter as any).to !== undefined ||
 			((filter as any).values !== undefined && (filter as any).values.length > 0)
 		) count++;
 		return count;
-	}, 0);
+	}, 0))
 
 	type LabelMapper = {
 		[label: string]: { extended?: string; short: string };
@@ -66,12 +78,18 @@
 	
 	function clearFilters() {
 		tmpFilters = {};
-		dispatch('removeAllFilters', {})
+		if(onremoveAllFilters) {
+			onremoveAllFilters()
+		}
 	}
 
 	function handleFilterChange() {
-		if(!!selectedFilter){
-			dispatch('change', { filter: tmpFilters[selectedFilter.name] })
+		if(!!selectedFilter && onchange){
+			onchange({
+				detail: {
+					filter: tmpFilters[selectedFilter.name]
+				}
+			})
 		}
 	}
 </script>
@@ -82,7 +100,7 @@
 		{#if activeFilter > 0}
 			<div class="filter-info">
 				{activeFilter} {lang == 'en' ? 'applied' : activeFilter == 1 ? 'applicato' : 'applicati'}
-				<button class="clear-button" on:click={clearFilters}>✕</button>
+				<button class="clear-button" onclick={clearFilters}>✕</button>
 			</div>
 		{/if}
 
@@ -93,8 +111,8 @@
 				role="button"
 				class="filters-selection-item"
 				class:selected={filter === selectedFilter}
-				on:click={() => selectFilter(filter)}
-				on:keydown={(event) => handleKeyPress(event, filter)}
+				onclick={() => selectFilter(filter)}
+				onkeydown={(event) => handleKeyPress(event, filter)}
 				aria-pressed={filter === selectedFilter}
 			>
 				<div class="filters-selection-title">
@@ -117,13 +135,11 @@
 					editFilterMode="one-edit"
 					bind:tmpFilter={tmpFilters[selectedFilter.name]}
 					mobile={mAndDown}
-					on:change={handleFilterChange}
+					onchange={handleFilterChange}
 					--simple-textfield-border-radius="5px"
 					--chip-default-color="rgb(var(--global-color-primary-foreground))"
+					{customSnippet}
 				>
-				<svelte:fragment slot="custom" let:filter>
-					<slot name="custom" {filter} {mAndDown}></slot>
-				</svelte:fragment>
 				</FilterEditor>
 			</div>
 		{:else}

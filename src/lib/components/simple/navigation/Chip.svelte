@@ -3,26 +3,45 @@
   import './Chip.css'
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import Button from "$lib/components/simple/buttons/Button.svelte";
-  import { createEventDispatcher } from "svelte";
+  import { type ComponentProps, type Snippet } from "svelte";
 
-  export let close = false,
+  interface Props {
+    close?: boolean;
+    closeIcon?: string;
+    disabled?: boolean;
+    filter?: boolean;
+    filterIcon?: string;
+    label?: boolean;
+    outlined?: boolean;
+    buttonTabIndex?: number | null;
+    truncateText?: boolean;
+    onclick?: (event: {
+      detail: {
+        native: MouseEvent
+      }
+    }) => void
+    onclose?: (event: {
+      detail: {
+        native: MouseEvent
+      }
+    }) => void
+    children?: Snippet<[]>
+  }
+
+  let {
+    close = $bindable(false),
     closeIcon = "mdi-close-circle",
     disabled = false,
     filter = false,
     filterIcon = "mdi-check",
     label = false,
     outlined = false,
-    buttonTabIndex: number | null = null,
-    truncateText: boolean = false
-
-  const dispatch = createEventDispatcher<{
-    click: {
-      native: MouseEvent
-    },
-    close: {
-      native: MouseEvent
-    }
-  }>();
+    buttonTabIndex = null,
+    truncateText = false,
+    onclick,
+    onclose,
+    children,
+  }: Props = $props();
 
   function handleChipClick(e: MouseEvent | KeyboardEvent) {
     let native: MouseEvent;
@@ -32,16 +51,24 @@
       native = new PointerEvent("click", { bubbles: true, cancelable: true })
       e.currentTarget?.dispatchEvent(native)
     } 
-    else {
-      dispatch("click", { native: e })
+    else if (onclick){
+      onclick({
+        detail: {
+          native: e
+        }
+      })
     }
   }
 
-  function handleCloseClick(e: CustomEvent) {
+  function handleCloseClick(e: Parameters<NonNullable<ComponentProps<typeof Button>['onclick']>>[0]) {
     e.detail.nativeEvent.stopPropagation()
-    dispatch("close", {
-      native: e.detail.nativeEvent
-    });
+    if(onclose) {
+      onclose({
+        detail: {
+          native: e.detail.nativeEvent
+        }
+      })
+    }
   }
 </script>
 
@@ -52,8 +79,8 @@
   class:disabled
   role="button"
   tabindex={disabled ? -1 : buttonTabIndex}
-  on:click={handleChipClick}
-  on:keydown={handleChipClick}
+  onclick={handleChipClick}
+  onkeydown={handleChipClick}
 >
   {#if filter}
     <div class="icon-before">
@@ -64,7 +91,7 @@
     class="text"
     class:truncate={truncateText}
   >
-    <slot />
+    {@render children?.()}
   </div>
   {#if close}
     <div class="icon-after">
@@ -77,8 +104,7 @@
         --button-color="var(--chip-color, var(--chip-default-color))"
         --button-default-icon-active-color="var(--chip-color, var(--chip-default-color))"
         --button-default-focus-active-color="var(--chip-color, var(--chip-default-color))"
-        on:click
-        ={handleCloseClick}
+        onclick={handleCloseClick}
       />
     </div>
   {/if}

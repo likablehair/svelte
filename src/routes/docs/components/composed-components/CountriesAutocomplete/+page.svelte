@@ -30,7 +30,7 @@
     ></CountriesAutocomplete>
   </div>
   <div>
-    <Button on:click={() => dialog = !dialog}>Apri dialog</Button>
+    <Button onclick={() => dialog = !dialog}>Apri dialog</Button>
     <Dialog
       bind:open={dialog}
     >

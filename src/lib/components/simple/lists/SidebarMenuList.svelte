@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type Menu = {
     title: string,
     name: string | number,
@@ -11,40 +11,60 @@
 <script lang="ts">
   import '../../../css/main.css'
   import './SidebarMenuList.css'
-  import { page } from "$app/stores";
+  import Self from './SidebarMenuList.svelte'
+  import { page } from "$app/state";
 
-  export let menus: Menu[],
-    level: number = 0,
-    selected: string | number | undefined = undefined,
-    bookmarkColor: string = "rgb(var(--global-color-primary-500))",
-    color: string = "inherit",
-    hoverColor: string = 'inherit',
-    selectedTextColor: string = "inherit",
-    selectedFontWeight: string = "600",
-    autoDetectUrl: boolean = false
+  interface Props {
+    menus: Menu[];
+    level?: number;
+    selected?: string | number;
+    bookmarkColor?: string;
+    color?: string;
+    hoverColor?: string;
+    selectedTextColor?: string;
+    selectedFontWeight?: string;
+    autoDetectUrl?: boolean;
+  }
+
+  let {
+    menus,
+    level = 0,
+    selected = $bindable(undefined),
+    bookmarkColor = "rgb(var(--global-color-primary-500))",
+    color = "inherit",
+    hoverColor = 'inherit',
+    selectedTextColor = "inherit",
+    selectedFontWeight = "600",
+    autoDetectUrl = false,
+  }: Props = $props();
   
-  let selectedIndex: number | undefined = undefined
+  let selectedIndex: number | undefined = $state(undefined)
 
-  $: if(autoDetectUrl && !!$page) {
-    const results = getMenuNameMatchingUrl({ menus: menus })
-    selected = results.name
-  }
-
-  $: if(level == 0) {
-    if(selected !== undefined && selected !== null) {
-      let results = getSelectionIndex({
-        menus: menus,
-        offset: 0,
-        search: selected
-      })
-
-      if(results.found) selectedIndex = results.offset
-      else selectedIndex = undefined
-    } else {
-      selectedIndex = undefined
+  $effect(() => {
+    if(autoDetectUrl && !!page) {
+      const results = getMenuNameMatchingUrl({ menus: menus })
+      selected = results.name
     }
-  }
-  $: isSelected = selectedIndex !== undefined
+  }) 
+
+  $effect(() => {
+    if(level == 0) {
+      if(selected !== undefined && selected !== null) {
+        let results = getSelectionIndex({
+          menus: menus,
+          offset: 0,
+          search: selected
+        })
+  
+        if(results.found) selectedIndex = results.offset
+        else selectedIndex = undefined
+      } else {
+        selectedIndex = undefined
+      }
+    }
+  })
+
+  let isSelected = $derived(selectedIndex !== undefined)
 
   function getSelectionIndex(params: {
     menus: Menu[],
@@ -95,10 +115,10 @@
         }
       }
       
-      if(!!currentMenu.url && $page.url.pathname === currentMenu.url) {
+      if(!!currentMenu.url && page.url.pathname === currentMenu.url) {
         foundName = currentMenu.name
         foundMatchType = 'equal'
-      } else if(foundMatchType !== 'equal' && !!currentMenu.url && $page.url.pathname.startsWith(currentMenu.url)) {
+      } else if(foundMatchType !== 'equal' && !!currentMenu.url && page.url.pathname.startsWith(currentMenu.url)) {
         foundName = currentMenu.name
         foundMatchType = 'startsWith'
       }
@@ -134,7 +154,7 @@
     <li>
       <a 
         href={menu.url} 
-        on:click={(event) => handleUrlClick(event, menu)} 
+        onclick={(event) => handleUrlClick(event, menu)} 
         title={menu.title}
         aria-disabled={menu.disabled}
         data-sveltekit-preload-data={menu.disabled ? 'off' : 'hover'}
@@ -142,11 +162,12 @@
         class:active={selected == menu.name}
       >{menu.title}</a>
       {#if !!menu.children}
-        <svelte:self
+        <Self
           menus={menu.children}
           level={level + 1}
           bind:selected={selected}
-        ></svelte:self>
+        >
+        </Self>
       {/if}
     </li>
   {/each}

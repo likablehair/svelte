@@ -1,14 +1,37 @@
 <script lang="ts">
-  export let value = false,
+    import type { Snippet } from "svelte";
+
+  interface Props {
+    value: boolean;
+    height: string;
+    width: string;
+    rounded: boolean;
+    backgroundColor: string;
+    selectedOptionColor: string;
+    sliderColor: string;
+    optionColor: string;
+    fontSize: string;
+    animationDuration: string;
+    onchange?: () => void
+    falseOptionSnippet?: Snippet<[]>
+    trueOptionSnippet?: Snippet<[]>
+  }
+
+  let {
+    value = $bindable(false),
     height = "60px",
     width = "30px",
     rounded = false,
     backgroundColor = "#90CAF9",
-    selectedOptionColor: string = backgroundColor,
+    selectedOptionColor = backgroundColor,
     sliderColor = "white",
-    optionColor: string = sliderColor,
+    optionColor = sliderColor,
     fontSize = "11px",
-    animationDuration = "0.1s";
+    animationDuration = "0.1s",
+    onchange,
+    falseOptionSnippet,
+    trueOptionSnippet,
+  }: Props = $props();
 </script>
 
 <div
@@ -26,17 +49,29 @@
 >
   <div
     class="inner-container"
-    on:click={() => (value = !value)}
-    on:keypress={() => (value = !value)}
+    role="switch"
+    aria-checked={value}
+    aria-label="Toggle option"
+    tabindex="0"
+    onclick={() => (value = !value)}
+    onkeypress={() => (value = !value)}
   >
     <div class={value ? "first-option selected" : "first-option"}>
-      <slot name="trueOption">1</slot>
+      {#if trueOptionSnippet}
+        {@render trueOptionSnippet()}
+      {:else}
+        1
+      {/if}
     </div>
     <div class={value ? "second-option" : "second-option selected"}>
-      <slot name="falseOption">0</slot>
+      {#if falseOptionSnippet}
+        {@render falseOptionSnippet()}
+      {:else}
+        0
+      {/if}
     </div>
-    <input bind:checked={value} type="checkbox" on:change />
-    <span class={value ? "slider top" : "slider bottom"} />
+    <input bind:checked={value} type="checkbox" {onchange} />
+    <span class={value ? "slider top" : "slider bottom"}></span>
   </div>
 </div>
 

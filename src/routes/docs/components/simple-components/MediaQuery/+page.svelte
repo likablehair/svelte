@@ -3,38 +3,29 @@
   import PropsViewer from "../../PropsViewer.svelte";
   import MediaQuery from "$lib/components/simple/common/MediaQuery.svelte";
 
-  let open: boolean = false
-
-  function handleButtonClick() {
-    open = true
-  }
 </script>
 
 <h1>MediaQuery</h1>
 <ComponentSubtitle>Responsive is the key.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
-  <MediaQuery
-    let:xl
-    let:l
-    let:m
-    let:s
-    let:xs
-  >
-    <div>
-      the screen size is 
-      {#if xs}
-        xs
-      {:else if s}
-        s
-      {:else if m}
-        m
-      {:else if l}
-        l
-      {:else if xl}
-        xl
-      {/if}
-    </div>
+  <MediaQuery>
+    {#snippet defaultSnippet({ l, m, s, xl, xs})}
+      <div>
+        the screen size is 
+        {#if xs}
+          xs
+        {:else if s}
+          s
+        {:else if m}
+          m
+        {:else if l}
+          l
+        {:else if xl}
+          xl
+        {/if}
+      </div>
+    {/snippet}
   </MediaQuery>
 </div>
 <h2>Props</h2>

@@ -7,6 +7,7 @@
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import type Builder from "$lib/utils/filters/builder";
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
+  import type { ComponentProps } from "svelte";
 
   let headers : Header[] =[
       {
@@ -103,19 +104,17 @@
 ]
   let value: string | number | undefined = undefined
 
-  function handleFiltersChange(e: CustomEvent) {
+  function handleFiltersChange(e: Parameters<NonNullable<ComponentProps<typeof PaginatedTable>['onfiltersChange']>>[0]) {
     let filterBuilder: Builder = e.detail.builder
-    console.log(filterBuilder)
   }
 
-  function handleCustomInput(e: Event, filterName: string, updateFunction: (filterName: string, newValue: any, newValid: boolean) => void) {
-    //@ts-ignore
-    let newValue: string = e.target.value
+  function handleCustomInput(e: Parameters<NonNullable<ComponentProps<typeof SimpleTextField>['oninput']>>[0], filterName: string, updateFunction: (filterName: string, newValue: any, newValid: boolean) => void) {
+    let newValue: string = e.currentTarget.value
     let isValid = !!newValue && newValue.length > 2
     updateFunction(filterName, newValue, isValid)
   }
 
-  function calculateRowStyles(item: { [key: string]: any }): {
+  function calculateRowStyles(item: Parameters<NonNullable<ComponentProps<typeof PaginatedTable>['calculateRowStyles']>>[0]): {
     backgroundColor?: string;
     color?: string;
     fontWeight?: string;
@@ -130,7 +129,7 @@
     return {}
   }
 
-  function calculateRowClasses(item: { [key: string]: any }): string | undefined {
+  function calculateRowClasses(item: Parameters<NonNullable<ComponentProps<typeof PaginatedTable>['calculateRowClasses']>>[0]): string | undefined {
     if (!!item.businessName && item.businessName == "Popular My") {
       return 'calculated-class'
     }
@@ -168,39 +167,45 @@
     ]}
     searchBarColumns={['businessName', 'productName']}
     totalElements={40}
-    on:filtersChange={handleFiltersChange}
-    on:removeFilter={(e) => {if(e.detail.filter.name == "productCategory") {value = undefined}}}
+    onfiltersChange={handleFiltersChange}
+    onremoveFilter={(e) => {if(e.detail.filter.name == "productCategory") {value = undefined}}}
     editFilterMode="multi-edit"
     showActiveFilters={true}
     {calculateRowStyles}
     {calculateRowClasses}
   >
-  <svelte:fragment slot="custom-filter" let:filter let:updateFunction>
+  {#snippet customFilterSnippet({ filter, mAndDown, updateFunction, })}
     {#if !!filter}
       {#if filter.name == 'productCategory'}
         <label for="productCategory">Product Category</label>
-        <SimpleTextField name="productCategory" bind:value on:input={(e) => handleCustomInput(e, filter.name, updateFunction)}></SimpleTextField>
+        <SimpleTextField name="productCategory" bind:value oninput={(e) => handleCustomInput(e, filter.name, updateFunction)}></SimpleTextField>
       {/if}
     {/if}
-  </svelte:fragment>
-  <svelte:fragment slot="custom-filter-chip" let:filter>
+  {/snippet}
+  {#snippet customFilterChipSnippet({ filter })}
     {#if filter.name === 'productCategory'}
       <span>Product category equal to {filter.type === 'custom' ? filter.value : undefined}</span>
     {/if}
-  </svelte:fragment>
-  <svelte:fragment slot="custom" let:header let:item>
+  {/snippet}
+  {#snippet customSnippet({ columnIndex, header, index, item, })}
     {#if header.value == 'rating'}
       {item.rating}
       <Icon name="mdi-star" --icon-color="green"></Icon>
     {/if}
-  </svelte:fragment>
-  <div slot="filter-append"
-    style:margin-left="auto"
-  >
-    <button>Ciao</button>
-  </div>
-  <svelte:fragment slot="append">rowActions</svelte:fragment>
-  <svelte:fragment slot="rowActions">rowActions</svelte:fragment>
+  {/snippet}
+  {#snippet rowActionsSnippet({ index, item, })}
+    RowActions
+  {/snippet}
+  {#snippet appendSnippet({ index, item, })}
+    RowActions
+  {/snippet}
+  {#snippet filterAppendSnippet()}
+    <div
+      style:margin-left="auto"
+    >
+      <button>Ciao</button>
+    </div>
+  {/snippet}
 </PaginatedTable>
 </div>
 <h2>Props</h2>

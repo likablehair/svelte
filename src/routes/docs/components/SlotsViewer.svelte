@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type Slot = {
     name: string,
     description: string,
@@ -13,7 +13,11 @@
 
 <script lang="ts">
   import Code from "$lib/components/simple/typography/Code.svelte";
-  export let slots: Slot[] = []
+  interface Props {
+    slots?: Slot[];
+  }
+
+  let { slots = [] }: Props = $props();
 </script>
 
 <ul class="container">

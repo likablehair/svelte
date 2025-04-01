@@ -1,11 +1,11 @@
-<script context="module" lang="ts">
+<script module lang="ts">
   export type Action = {
     label: string;
     icon?: string;
     disabled?: boolean;
     info?: string;
     disabledInfo?: string
-    onClick: (e: CustomEvent<{ nativeEvent: MouseEvent }>) => void;
+    onClick: NonNullable<ComponentProps<typeof Button>['onclick']>
   };
 </script>
 
@@ -18,25 +18,40 @@
   import MenuOrDrawer from "./MenuOrDrawer.svelte";
   import './QuickActions.css'
 
-  export let selectedItems: ComponentProps<DynamicTable["selectedItems"]>[],
-    showSelectContainer: boolean,
-    isSelectedAll: boolean,
-    totalRows: number,
-    slotSelectActionsContainer: HTMLElement | undefined,
-    disabled: boolean,
-    loading: boolean,
-    actionsForSelectedItems: Action[],
-    position: 'top' | 'bottom' = 'top',
-    lang: 'it' | 'en' = 'en'
+  interface Props {
+    selectedItems: ComponentProps<typeof DynamicTable>["selectedItems"];
+    showSelectContainer: boolean;
+    isSelectedAll: boolean;
+    totalRows: number;
+    slotSelectActionsContainer?: HTMLElement;
+    disabled: boolean;
+    loading: boolean;
+    actionsForSelectedItems: Action[];
+    position?: 'top' | 'bottom';
+    lang?: 'it' | 'en';
+  }
 
-  let actions: Action[] = [],
-    extraActions: Action[] = [],
-    moreActionsActivator: HTMLElement | undefined,
-    openMoreActions: boolean = false,
-    infoActivators: { [actionLabel: string]: HTMLElement } = {},
-    disabledInfoActivators: { [actionLabel: string]: HTMLElement } = {};
+  let {
+    selectedItems,
+    showSelectContainer,
+    isSelectedAll,
+    totalRows,
+    slotSelectActionsContainer = $bindable(),
+    disabled,
+    loading,
+    actionsForSelectedItems,
+    position = 'top',
+    lang = 'en'
+  }: Props = $props();
 
-  $: {
+  let actions: Action[] = $state([]),
+    extraActions: Action[] = $state([]),
+    moreActionsActivator: HTMLElement | undefined = $state(),
+    openMoreActions: boolean = $state(false),
+    infoActivators: { [actionLabel: string]: HTMLElement } = $state({}),
+    disabledInfoActivators: { [actionLabel: string]: HTMLElement } = $state({});
+
+  $effect(() => {
     if (!!slotSelectActionsContainer) {
       let numberOfSplit = $mediaQuery.xl ? 5 :
         $mediaQuery.l ? 4 :
@@ -52,7 +67,7 @@
         extraActions = [];
       }
     }
-  }
+  })
 </script>
 
 {#if selectedItems && selectedItems.length > 0 && showSelectContainer}
@@ -64,7 +79,7 @@
       class="select-container"
     >
       <div>
-        <button class="select-info" on:click={() => (selectedItems = [], infoActivators = {}, disabledInfoActivators = {})}>
+        <button class="select-info" onclick={() => (selectedItems = [], infoActivators = {}, disabledInfoActivators = {})}>
           {!!isSelectedAll ? totalRows : selectedItems.length} {lang == 'en' ? 'items selected' : 'righe selezionate'}
           <Icon name="mdi-close" />
         </button>
@@ -87,7 +102,7 @@
               '
               --button-height="20px"
               disabled={action.disabled}
-              on:click={action.onClick}
+              onclick={action.onClick}
             >
               <div class="action" bind:this={disabledInfoActivators[action.label]}>
                 {#if action.icon}
@@ -147,12 +162,12 @@
                   --button-hover-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
                   --button-focus-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
                   --button-disabled-color: var(--quick-actions-buttons-color-disabled, var(--quick-actions-default-buttons-color-disabled));
-                  --button-box-shadow: none;
+                  --button-box-shadow: none;"
                   margin-left: 8px;
                 '
                 --button-height="20px"
                 disabled={disabled || loading}
-                on:click={(e) => {
+                onclick={(e) => {
                   openMoreActions = !openMoreActions;
                 }}
               >
@@ -178,77 +193,77 @@
       menuAnchor='bottom-center'
       openingId='more-actions'
       _drawerOverflow='hidden'
-      let:isMenu
-      let:isDrawer
     >
-      <div 
-        class:more-actions-container-menu={isMenu}
-        class:more-actions-container-drawer={isDrawer}
-        class:more-actions-container-bottom={isMenu && position == 'bottom'}
-      >
-        {#each extraActions as action}
-          <Button
-            style='
-              --button-background-color: var(--quick-actions-buttons-background-color, var(--quick-actions-default-buttons-background-color));
-              --button-active-background-color: var(--quick-actions-buttons-background-color, var(--quick-actions-default-buttons-background-color));
-              --button-focus-background-color: var(--quick-actions-buttons-background-color, var(--quick-actions-default-buttons-background-color));
-              --button-hover-background-color: var(--quick-actions-buttons-background-color-hover, var(--quick-actions-default-buttons-background-color-hover));
-              --button-disabled-background-color: var(--quick-actions-buttons-background-color-disabled, var(--quick-actions-default-buttons-background-color-disabled));
-              --button-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
-              --button-hover-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
-              --button-focus-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
-              --button-disabled-color: var(--quick-actions-buttons-color-disabled, var(--quick-actions-default-buttons-color-disabled));
-              --button-box-shadow: none;
-            '
-            --button-height="35px"
-            disabled={action.disabled}
-            on:click={action.onClick}
-          >
-            <div class="action" bind:this={disabledInfoActivators[action.label]}>
-              {#if action.icon}
-                <Icon name={action.icon} --icon-size='16px'/>
-              {/if}
-              {#if !!action.info && !action.disabled}
-                <div bind:this={infoActivators[action.label]}>
-                  <Icon						
-                    name="mdi-help-circle-outline"
-                    --icon-size="16px"
-                  />
-                </div>
-                <ToolTip
-                  appearTimeout={1000}
-                  activator={infoActivators[action.label]}
-                >
-                  <div
-                    style:background-color='rgb(var(--global-color-background-300), .95)'
-                    style:border-radius="5px"
-                    style:padding="10px"
-                    style:color='rgb(var(--global-color-contrast-900))'
-                  > 
-                    {action.info}
+      {#snippet children({ isDrawer, isMenu })}
+        <div 
+          class:more-actions-container-menu={isMenu}
+          class:more-actions-container-drawer={isDrawer}
+          class:more-actions-container-bottom={isMenu && position == 'bottom'}
+        >
+          {#each extraActions as action}
+            <Button
+              style='
+                --button-background-color: var(--quick-actions-buttons-background-color, var(--quick-actions-default-buttons-background-color));
+                --button-active-background-color: var(--quick-actions-buttons-background-color, var(--quick-actions-default-buttons-background-color));
+                --button-focus-background-color: var(--quick-actions-buttons-background-color, var(--quick-actions-default-buttons-background-color));
+                --button-hover-background-color: var(--quick-actions-buttons-background-color-hover, var(--quick-actions-default-buttons-background-color-hover));
+                --button-disabled-background-color: var(--quick-actions-buttons-background-color-disabled, var(--quick-actions-default-buttons-background-color-disabled));
+                --button-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
+                --button-hover-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
+                --button-focus-color: var(--quick-actions-buttons-color, var(--quick-actions-default-buttons-color));
+                --button-disabled-color: var(--quick-actions-buttons-color-disabled, var(--quick-actions-default-buttons-color-disabled));
+                --button-box-shadow: none;
+              '
+              --button-height="35px"
+              disabled={action.disabled}
+              onclick={action.onClick}
+            >
+              <div class="action" bind:this={disabledInfoActivators[action.label]}>
+                {#if action.icon}
+                  <Icon name={action.icon} --icon-size='16px'/>
+                {/if}
+                {#if !!action.info && !action.disabled}
+                  <div bind:this={infoActivators[action.label]}>
+                    <Icon						
+                      name="mdi-help-circle-outline"
+                      --icon-size="16px"
+                    />
                   </div>
-                </ToolTip>
-              {/if}
-              {action.label}
-              {#if !!action.disabledInfo && action.disabled}
-                <ToolTip
-                  appearTimeout={1000}
-                  activator={disabledInfoActivators[action.label]}
-                >
-                  <div
-                    style:background-color='rgb(var(--global-color-background-300), .95)'
-                    style:border-radius="5px"
-                    style:padding="10px"
-                    style:color='rgb(var(--global-color-contrast-900))'
-                  > 
-                    {action.disabledInfo}
-                  </div>
-                </ToolTip>
-              {/if}
-            </div>
-          </Button>
-        {/each}
-      </div>
+                  <ToolTip
+                    appearTimeout={1000}
+                    activator={infoActivators[action.label]}
+                  >
+                    <div
+                      style:background-color='rgb(var(--global-color-background-300), .95)'
+                      style:border-radius="5px"
+                      style:padding="10px"
+                      style:color='rgb(var(--global-color-contrast-900))'
+                    > 
+                      {action.info}
+                    </div>
+                  </ToolTip>
+                {/if}
+                {action.label}
+                {#if !!action.disabledInfo && action.disabled}
+                  <ToolTip
+                    appearTimeout={1000}
+                    activator={disabledInfoActivators[action.label]}
+                  >
+                    <div
+                      style:background-color='rgb(var(--global-color-background-300), .95)'
+                      style:border-radius="5px"
+                      style:padding="10px"
+                      style:color='rgb(var(--global-color-contrast-900))'
+                    > 
+                      {action.disabledInfo}
+                    </div>
+                  </ToolTip>
+                {/if}
+              </div>
+            </Button>
+          {/each}
+        </div>
+      {/snippet}
     </MenuOrDrawer>
   </div>
 {/if}

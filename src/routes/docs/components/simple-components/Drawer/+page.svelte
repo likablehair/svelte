@@ -20,23 +20,17 @@
 <h2>Example</h2>
 <div class="example">
   <Button
-    width="200px"
-    maxWidth="90vw"
-    on:click={handleButtonClick}
+    onclick={handleButtonClick}
   >
     Open drawer
   </Button>
   <Button
-    width="200px"
-    maxWidth="90vw"
-    on:click={() => largerDrawer = true}
+    onclick={() => largerDrawer = true}
   >
     Open larger drawer
   </Button>
   <Button
-    width="200px"
-    maxWidth="90vw"
-    on:click={() => dialogOpened = true}
+    onclick={() => dialogOpened = true}
   >
     Open dialog
   </Button>
@@ -44,9 +38,7 @@
     bind:open={open}
   >
     <Button
-      width="200px"
-      maxWidth="90vw"
-      on:click={() => dialogOpened = true}
+      onclick={() => dialogOpened = true}
     >
       Open dialog
     </Button>
@@ -57,9 +49,7 @@
     _openingSpeed=".5s"
   >
     <Button
-      width="200px"
-      maxWidth="90vw"
-      on:click={() => dialogOpened = true}
+      onclick={() => dialogOpened = true}
     >
       Open dialog
     </Button>
@@ -69,9 +59,7 @@
   >
     <div>
       <Button
-        width="200px"
-        maxWidth="90vw"
-        on:click={() => secondDrawerOpened = true}
+        onclick={() => secondDrawerOpened = true}
       >
         Open drawer
       </Button>

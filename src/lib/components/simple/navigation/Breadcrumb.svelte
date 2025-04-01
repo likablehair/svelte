@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type BreadcrumbItem = {
     name: string;
     title: string;
@@ -7,23 +7,38 @@
 </script>
 
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
-  const dispatch = createEventDispatcher<{
-    "item-click": {
-      item: BreadcrumbItem;
-    };
-  }>();
+  interface Props {
+    items: BreadcrumbItem[];
+    underliner?: boolean;
+    separatorIcon?: string;
+    separatorIconSize?: string;
+    spacing?: string;
+    onitemClick?: (event: {
+      detail: {
+        item: BreadcrumbItem,
+        nativeEvent?: KeyboardEvent & { currentTarget: EventTarget & HTMLSpanElement }
+      }
+    }) => void
+  }
 
-  export let items: BreadcrumbItem[] = [],
+  let {
+    items = [],
     underliner = true,
     separatorIcon = "mdi-chevron-right",
-    separatorIconSize = 10,
-    spacing = "20px";
+    separatorIconSize = '10px',
+    spacing = "20px",
+    onitemClick,
+  }: Props = $props();
 
-  function handleLinkClick(item: BreadcrumbItem) {
-    dispatch("item-click", {
-      item: item,
-    });
+  function handleLinkClick(params: { 
+    event?: KeyboardEvent & { currentTarget: EventTarget & HTMLSpanElement },
+    item: BreadcrumbItem
+  }) {
+    if(onitemClick){
+      onitemClick({
+        detail: params
+      })
+    }
   }
 
   import Icon from "$lib/components/simple/media/Icon.svelte";
@@ -35,14 +50,21 @@
       class="history"
       class:link={underliner && index != items.length - 1}
       class:bar-link={underliner && index != items.length - 1}
-      on:click={() => handleLinkClick(item)}
-      on:keypress={() => handleLinkClick(item)}>{item.title}</span
+      role="button"
+      tabindex="0"
+      onclick={() => handleLinkClick({item})}
+      onkeypress={e => handleLinkClick({ event: e, item})}
     >
-    {#if index != items.length - 1}<span
+      {item.title}
+    </span>
+    {#if index != items.length - 1}
+      <span
         style:margin-left={`calc(${spacing} / 2)`}
         style:margin-right={`calc(${spacing} / 2)`}
-        ><Icon name={separatorIcon} size={separatorIconSize} /></span
-      >{/if}
+      >
+        <Icon name={separatorIcon} --icon-size={separatorIconSize} />
+      </span>
+    {/if}
   {/each}
 </div>
 

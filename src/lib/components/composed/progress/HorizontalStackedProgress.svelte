@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type ProgressItem = {
     label?: string,
     color?: string,
@@ -19,17 +19,27 @@
   import './HorizontalStackedProgress.css'
   import ProgressBar from "$lib/components/simple/progress/ProgressBar.svelte";
 
-  export let progresses: (
-      number | 
-      ProgressItem
-    )[] = [],
-    labelVisible: boolean = true,
-    labelValueVisible: boolean = true,
-    labelTextVisible: boolean = true,
-    legendVisible: boolean = false,
-    legendValueVisible: boolean = true,
-    legendTextVisible: boolean = true,
-    hideLabelUnderPercentage: number | undefined = undefined
+  interface Props {
+    progresses?: (number | ProgressItem)[];
+    labelVisible?: boolean;
+    labelValueVisible?: boolean;
+    labelTextVisible?: boolean;
+    legendVisible?: boolean;
+    legendValueVisible?: boolean;
+    legendTextVisible?: boolean;
+    hideLabelUnderPercentage?: number;
+  }
+
+  let {
+    progresses = [],
+    labelVisible = true,
+    labelValueVisible = true,
+    labelTextVisible = true,
+    legendVisible = false,
+    legendValueVisible = true,
+    legendTextVisible = true,
+    hideLabelUnderPercentage
+  }: Props = $props();
 
   let colors = [
     'rgb(var(--global-color-primary-500))',
@@ -40,15 +50,15 @@
     'rgb(var(--global-color-primary-700), .5)'
   ]
 
-  $: total = progresses.reduce<number>((p, c, i, a) => {
+  let total = $derived(progresses.reduce<number>((p, c, i, a) => {
     if(isProgressItem(c)) {
       return p + c.value
     } else {
       return p + c
     }
-  }, 0)
+  }, 0))
 
-  $: progressesItems = progresses.map((p, i) => {
+  let progressesItems = $derived(progresses.map((p, i) => {
     let item: ProgressItem & { percentage: number }
     let value = isProgressItem(p) ? p.value : p
     // x : 100 = value : total
@@ -63,7 +73,7 @@
     }
 
     return item
-  }).filter(p => p.value !== 0)
+  }).filter(p => p.value !== 0))
 </script>
 
 <div class="horizontal-stacked-progress">

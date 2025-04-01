@@ -1,24 +1,43 @@
 <script lang="ts">
   import Teleporter from '$lib/utils/teleporter';
   import { BROWSER } from 'esm-env';
-  import { beforeUpdate, onMount } from "svelte";
+  import { onMount, type Snippet } from "svelte";
   import Keyboarder, { type CallbackFunction } from '$lib/utils/keyboarder';
 
-  export let open = false,
-    transition: 'fly-down' | 'fly-up' | 'fly-horizontal' | 'scale' | 'fade' = 'fly-up'
+  interface Props {
+    open: boolean;
+    transition?: 'fly-down' | 'fly-up' | 'fly-horizontal' | 'scale' | 'fade';
+    _overlayOpacity?: string;
+    _overlayColor?: string;
+    _overlayBackdropFilter?: string;
+    _transitionTimingFunction?: string;
+    _transitionDuration?: string;
+    topRightSnippet?: Snippet<[]>;
+    centerLeftSnippet?: Snippet<[]>;
+    centerRightSnippet?: Snippet<[]>;
+    children?: Snippet<[]>;
+  }
 
-  export let _overlayOpacity: string = "30%",
-    _overlayColor: string = "#282828",
-    _overlayBackdropFilter: string | undefined = undefined,
-    _transitionTimingFunction: string = 'cubic-bezier(0.075, 0.82, 0.165, 1)',
-    _transitionDuration: string = '0.5s'
+  let {
+    open = $bindable(false),
+    transition = 'fly-up',
+    _overlayOpacity = "30%",
+    _overlayColor = "#282828",
+    _overlayBackdropFilter,
+    _transitionTimingFunction = 'cubic-bezier(0.075, 0.82, 0.165, 1)',
+    _transitionDuration = '0.5s',
+    topRightSnippet,
+    centerLeftSnippet,
+    centerRightSnippet,
+    children,
+  }: Props = $props()
 
 
-  let zIndex = 50,
-    localOpen: boolean = open,
+  let zIndex = $state(50),
+    localOpen: boolean = $state(open),
     dialogElement: HTMLElement,
     teleportedUid: string | undefined = undefined,
-    hasBeenOpened: boolean = false;
+    hasBeenOpened: boolean = $state(false);
 
   onMount(() => {
     if(!teleportedUid) {
@@ -41,7 +60,7 @@
     }
   })
 
-  beforeUpdate(() => {
+  $effect.pre(() => {
     if (BROWSER) {
       if (open && localOpen != open) {
         hasBeenOpened = true
@@ -121,10 +140,14 @@
       class="overlay"
       class:overlay-active={localOpen}
       class:hidden-behind={!localOpen}
-      on:click={handleOverlayClick}
-      on:keypress={handleOverlayClick}
-      on:touchmove|preventDefault={() => {}}
-      on:wheel|preventDefault={() => {}}
+      onclick={handleOverlayClick}
+      onkeypress={handleOverlayClick}
+      ontouchmove={(e) => {
+        e.preventDefault()
+      }}
+      onwheel={e => {
+        e.preventDefault()
+      }}
       role="presentation"
       tabindex="-1"
     ></div>
@@ -152,12 +175,16 @@
       class:hidden={!localOpen && !hasBeenOpened}
       class:hidden-far-behind={!localOpen}
     >
-      <slot name="top-right" />
+      {@render topRightSnippet?.()}
     </div>
     <div
       style:z-index={zIndex + 1}
-      on:click|stopPropagation
-      on:keypress|stopPropagation
+      onclick={e => {
+        e.stopPropagation()
+      }}
+      onkeypress={e => {
+        e.stopPropagation()
+      }}
       role="presentation"
       tabindex="-1"
 
@@ -179,13 +206,17 @@
       class:hidden={!localOpen && !hasBeenOpened}
       class:hidden-far-behind={!localOpen}
     >
-      <slot name="center-left" />
+      {@render centerLeftSnippet?.()}
     </div>
     <div
       style:z-index={zIndex + 1}
       style:position="relative"
-      on:click|stopPropagation
-      on:keypress|stopPropagation
+      onclick={e => {
+        e.stopPropagation()
+      }}
+      onkeypress={e => {
+        e.stopPropagation()
+      }}
       role="presentation"
       tabindex="-1"
 
@@ -207,12 +238,16 @@
       class:hidden={!localOpen}
       class:hidden-far-behind={!localOpen}
     >
-      <slot />
+      {@render children?.()}
     </div>
     <div
       style:z-index={zIndex + 1}
-      on:click|stopPropagation
-      on:keypress|stopPropagation
+      onclick={e => {
+        e.stopPropagation()
+      }}
+      onkeypress={e => {
+        e.stopPropagation()
+      }}
       role="presentation"
       tabindex="-1"
 
@@ -234,7 +269,7 @@
       class:hidden={!localOpen && !hasBeenOpened}
       class:hidden-far-behind={!localOpen}
     >
-      <slot name="center-right" />
+      {@render centerRightSnippet?.()}
     </div>
   </div>
 </div>

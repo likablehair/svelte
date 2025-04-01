@@ -10,45 +10,78 @@
   } from "svelte/transition";
 
   import { sidebarOpened } from '$lib/stores/layouts/unstableSidebarOpened';
+  import type { Snippet } from 'svelte';
 
-  export let _top: number | undefined = undefined,
-    _left: number | undefined = undefined,
-    _width: string = 'auto',
-    _height: string = 'auto',
-    _maxHeight: string | undefined = undefined,
-    _minWidth: string | undefined = undefined,
-    _overflow = "auto",
-    _boxShadow: string | undefined = undefined,
-    _borderRadius: string | undefined = undefined,
-    _activatorGap: number = 5
+  interface Props {
+    _top?: number;
+    _left?: number;
+    _width?: string;
+    _height?: string;
+    _maxHeight?: string;
+    _minWidth?: string;
+    _overflow?: string;
+    _boxShadow?: string;
+    _borderRadius?: string;
+    _activatorGap?: number;
 
-  export let open = false,
-    refreshPosition = false,
-    activator: HTMLElement | undefined = undefined,
-    anchor: "bottom" | "bottom-center" | "right-center" = "bottom",
+    open?: boolean;
+    refreshPosition?: boolean;
+    activator?: HTMLElement;
+    anchor?: "bottom" | "bottom-center" | "right-center";
+    closeOnClickOutside?: boolean;
+    inAnimation?: (
+      node: Element,
+      params?: SlideParams | FlyParams | FadeParams
+    ) => TransitionConfig;
+    inAnimationConfig?: SlideParams | FlyParams | FadeParams;
+    outAnimation?: (
+      node: Element,
+      params?: SlideParams | FlyParams | FadeParams
+    ) => TransitionConfig;
+    outAnimationConfig?: SlideParams | FlyParams | FadeParams;
+    menuElement?: HTMLElement;
+    flipOnOverflow?: boolean;
+    stayInViewport?: boolean;
+    openingId?: string;
+    onkeydown?: () => void;
+    children?: Snippet<[]>;
+  }
+
+  let {
+    _activatorGap = 5,
+    _height = 'auto',
+    _overflow = 'auto',
+    _width = 'auto',
+    anchor = 'bottom',
     closeOnClickOutside = false,
-    inAnimation: (
-      node: Element,
-      params?: SlideParams | FlyParams | FadeParams
-    ) => TransitionConfig = fly,
-    inAnimationConfig: SlideParams | FlyParams | FadeParams = {
+    flipOnOverflow = $bindable(false),
+    inAnimation = fly,
+    inAnimationConfig = {
       duration: 100,
       y: 10,
     },
-    outAnimation: (
-      node: Element,
-      params?: SlideParams | FlyParams | FadeParams
-    ) => TransitionConfig = fly,
-    outAnimationConfig: SlideParams | FlyParams | FadeParams = {
+    open = $bindable(false),
+    outAnimation = fly,
+    outAnimationConfig = {
       duration: 100,
       y: 10,
     },
-    menuElement: HTMLElement | undefined = undefined,
-    flipOnOverflow: boolean = false,
-    stayInViewport: boolean = false,
-    openingId: string | undefined = undefined;
+    refreshPosition = $bindable(false),
+    stayInViewport = $bindable(false),
+    _borderRadius = undefined,
+    _boxShadow = undefined,
+    _left = undefined,
+    _maxHeight = undefined,
+    _minWidth = undefined,
+    _top = undefined,
+    activator = $bindable(undefined),
+    menuElement = $bindable(undefined),
+    openingId = $bindable(undefined),
+    onkeydown,
+    children,
+  }: Props = $props()
 
-  let zIndex = 50,
+  let zIndex = $state(50),
     currentUid: string = createId(),
     closeController: HTMLElement;
 
@@ -179,103 +212,115 @@
   }
 
 
-  $: if (open) {
-    if(!!activator) {
-      let parent = activator.parentElement
-      while(!!parent) {
-        let parentPosition = getComputedStyle(parent).position
-        parent.addEventListener('scroll', refreshMenuPosition)
-        if(parentPosition == 'absolute' || parentPosition == 'fixed' || parentPosition === 'relative') break
-        parent = parent.parentElement
-      }
-    }
+  $effect(() => {
+    if (open) {
+      if (!menuElement || !activator) return;
+      if (_top !== undefined && _left !== undefined) return;
 
-    if(!!openingId) {
-      const controllers = document.querySelectorAll(`[data-operation="close"][data-opening-id="${openingId}"]`)
-      for(let k = 0; k < controllers.length; k += 1) {
-        if(controllers[k] !== closeController) {
-          const clickEvent = new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            view: window
-          })
-
-          controllers[k].dispatchEvent(clickEvent)
+      if(!!activator) {
+        let parent = activator.parentElement
+        while(!!parent) {
+          let parentPosition = getComputedStyle(parent).position
+          parent.addEventListener('scroll', refreshMenuPosition)
+          if(parentPosition == 'absolute' || parentPosition == 'fixed' || parentPosition === 'relative') break
+          parent = parent.parentElement
         }
       }
-    }
-
-    let otherMenus: NodeListOf<HTMLElement> =
-      document.querySelectorAll("[data-menu]");
-    let otherDialogs: NodeListOf<HTMLElement> =
-      document.querySelectorAll("[data-dialog]");
-
-    let maxZIndex: number | undefined = undefined;
-    if (otherDialogs.length > 0) {
-      otherDialogs.forEach((dialog) => {
-        if (!maxZIndex || maxZIndex < Number(dialog.style.zIndex))
-          maxZIndex = Number(dialog.style.zIndex);
-      });
-    }
-
-    if (otherMenus.length > 0) {
-      otherMenus.forEach((menu) => {
-        if (!maxZIndex || maxZIndex < Number(menu.style.zIndex))
-          maxZIndex = Number(menu.style.zIndex);
-      });
-    }
-
-    if (!!activator && !!menuElement)
-      calculateMenuPosition({ activator, menuElement });
-
-    if (maxZIndex) zIndex = maxZIndex + 2;
-  }
-  $: if (!!_width && !!activator && !!menuElement) {
-    setTimeout(() => {
-      if(!!activator && !!menuElement)
+  
+      if(!!openingId) {
+        const controllers = document.querySelectorAll(`[data-operation="close"][data-opening-id="${openingId}"]`)
+        for(let k = 0; k < controllers.length; k += 1) {
+          if(controllers[k] !== closeController) {
+            const clickEvent = new MouseEvent('click', {
+              bubbles: true,
+              cancelable: true,
+              view: window
+            })
+  
+            controllers[k].dispatchEvent(clickEvent)
+          }
+        }
+      }
+  
+      let otherMenus: NodeListOf<HTMLElement> =
+        document.querySelectorAll("[data-menu]");
+      let otherDialogs: NodeListOf<HTMLElement> =
+        document.querySelectorAll("[data-dialog]");
+  
+      let maxZIndex: number | undefined = undefined;
+      if (otherDialogs.length > 0) {
+        otherDialogs.forEach((dialog) => {
+          if (!maxZIndex || maxZIndex < Number(dialog.style.zIndex))
+            maxZIndex = Number(dialog.style.zIndex);
+        });
+      }
+  
+      if (otherMenus.length > 0) {
+        otherMenus.forEach((menu) => {
+          if (!maxZIndex || maxZIndex < Number(menu.style.zIndex))
+            maxZIndex = Number(menu.style.zIndex);
+        });
+      }
+  
+      if (!!activator && !!menuElement)
         calculateMenuPosition({ activator, menuElement });
-    }, 1)
-  }
-  $: if (refreshPosition && !!activator && !!menuElement) {
-    calculateMenuPosition({ activator, menuElement });
-    refreshPosition = false;
-  }
-  $: if (closeOnClickOutside && !!menuElement) {
-    window.addEventListener("mousedown", () => {
-      open = false;
-    });
-
-    window.addEventListener("touchstart", () => {
-      open = false;
-    });
-
-    if (activator) {
-      activator.addEventListener("mousedown", (event) => {
+  
+      if (maxZIndex) zIndex = maxZIndex + 2;
+    }
+  }) 
+  $effect(() => {
+    if (!!_width && !!activator && !!menuElement) {
+      setTimeout(() => {
+        if(!!activator && !!menuElement)
+          calculateMenuPosition({ activator, menuElement });
+      }, 1)
+    }
+  })
+  $effect(() => {
+    if (refreshPosition && !!activator && !!menuElement) {
+      calculateMenuPosition({ activator, menuElement });
+      refreshPosition = false;
+    }
+  })
+  $effect(() => {
+    if (closeOnClickOutside && !!menuElement) {
+      window.addEventListener("mousedown", () => {
+        open = false;
+      });
+  
+      window.addEventListener("touchstart", () => {
+        open = false;
+      });
+  
+      if (activator) {
+        activator.addEventListener("mousedown", (event) => {
+          event.stopPropagation();
+        });
+  
+        activator.addEventListener("touchstart", (event) => {
+          event.stopPropagation();
+        });
+      }
+  
+      menuElement.addEventListener("mousedown", (event) => {
         event.stopPropagation();
       });
-
-      activator.addEventListener("touchstart", (event) => {
+  
+      menuElement.addEventListener("touchstart", (event) => {
         event.stopPropagation();
       });
     }
-
-    menuElement.addEventListener("mousedown", (event) => {
-      event.stopPropagation();
-    });
-
-    menuElement.addEventListener("touchstart", (event) => {
-      event.stopPropagation();
-    });
-  }
+  })
 
 
   let positionedAncestor: HTMLElement | undefined = undefined
-
-  $: if(!!menuElement && !!activator) {
-    let elem = getPositionedAncestor(menuElement.parentElement)
-    positionedAncestor = elem == null ? undefined : elem
-    calculateMenuPosition({menuElement, activator})
-  }
+  $effect(() => {
+    if(!!menuElement && !!activator) {
+      let elem = getPositionedAncestor(menuElement.parentElement)
+      positionedAncestor = elem == null ? undefined : elem
+      calculateMenuPosition({menuElement, activator})
+    }
+  })
 
   function getPositionedAncestor(elem: HTMLElement | null, positions: string[] = ['fixed', 'absolute', 'sticky', 'relative']): HTMLElement | null {
     if (!elem) return null
@@ -351,7 +396,9 @@
   }
 
   // TODO find a better way to update menu positions with animations
-  $: if($sidebarOpened !== undefined) setTimeout(refreshMenuPosition, 300)
+  $effect(() => {
+    if($sidebarOpened !== undefined) setTimeout(refreshMenuPosition, 300)
+  })
 </script>
 
 <svelte:window on:scroll={refreshMenuPosition} on:resize={refreshMenuPosition} ></svelte:window>
@@ -361,8 +408,8 @@
   data-operation="close"
   data-opening-id={openingId}
   data-uid={currentUid}
-  on:click={handleCloseControllerClick}
-  on:keypress={handleCloseControllerClick}
+  onclick={handleCloseControllerClick}
+  onkeypress={handleCloseControllerClick}
   bind:this={closeController}
   role="presentation"
   tabindex="-1"
@@ -386,10 +433,10 @@
     style:overflow={_overflow}
     in:inAnimation|local={inAnimationConfig}
     out:outAnimation|local={outAnimationConfig}
-    on:click={(e) => handleMenuClick(e, zIndex)}
-    on:keydown
+    onclick={(e) => handleMenuClick(e, zIndex)}
+    {onkeydown}
   >
-    <slot />
+    {@render children?.()}
   </div>
 {/if}
 

@@ -6,44 +6,55 @@
   import { countriesOptions } from '$lib/utils/countries';
   import FlagIcon from "$lib/components/simple/media/FlagIcon.svelte";
 
-  let clazz: {
-    flagIcon?: string,
-  } = {};
-	export { clazz as class };
+  interface Props {
+    autocompleteProps?: Omit<ComponentProps<typeof Autocomplete>, 'items'>;
+    selected?: Item[];
+    items?: Item[];
+    class?: {
+      flagIcon?: string,
+    }
+    onblur?: ComponentProps<typeof Autocomplete>['onblur']
+    onclose?: ComponentProps<typeof Autocomplete>['onclose']
+    onfocus?: ComponentProps<typeof Autocomplete>['onfocus']
+    onkeydown?: ComponentProps<typeof Autocomplete>['onblur']
+    onchange?: ComponentProps<typeof Autocomplete>['onchange']
+  }
 
-  export let autocompleteProps: Omit<ComponentProps<Autocomplete>, 'items'> = {},
-    selected: Item[] = [],
-    items: Item[] = countriesOptions;
+  let {
+    autocompleteProps = {},
+    selected = $bindable([]),
+    items = countriesOptions,
+    onblur,
+    onchange,
+    onclose,
+    onfocus,
+    onkeydown,
+    class: clazz = {}
+  }: Props = $props();
 </script>
 
 <Autocomplete
   items={items}
   bind:values={selected}
   {...autocompleteProps}
-  on:blur
-  on:close
-  on:focus
-  on:keydown
-  on:change
+  {onblur}
+  {onclose}
+  {onfocus}
+  {onkeydown}
+  {onchange}
 >
-  <svelte:fragment 
-    slot="chip-label"
-    let:selection
-  >
+  {#snippet chipLabelSnippet({ selection })}
     <FlagIcon
       alpha2={selection.value.toString().toLowerCase()}
       class={clazz.flagIcon}
     ></FlagIcon>
     {selection.label}
-  </svelte:fragment>
-  <svelte:fragment
-    slot="item-label" 
-    let:item
-  >
+  {/snippet}
+  {#snippet itemLabelSnippet({ item })}
     <FlagIcon
       alpha2={item.value.toString().toLowerCase()}
       class={clazz.flagIcon}
     ></FlagIcon>
     {item.label}
-  </svelte:fragment>
+  {/snippet}
 </Autocomplete>

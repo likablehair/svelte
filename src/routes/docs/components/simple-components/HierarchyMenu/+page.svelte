@@ -4,7 +4,7 @@
   
   import HierarchyMenu from "$lib/components/simple/lists/HierarchyMenu.svelte";
 
-  $: options = [
+  let options = [
     { label: 'Articoli', name: 'articles', icon: 'mdi-cube' },
     { label: 'Movimenti', name: 'movements', icon: 'mdi-warehouse', options: [
       { label: 'Acquisto', name: 'purchase', icon: 'mdi-cart-arrow-down' },
@@ -23,13 +23,13 @@
 <div class="example">
   <div style:width="200px">
     <HierarchyMenu
-      bind:options
+      {options}
       --icon-size="20px"
     ></HierarchyMenu>
   </div>
   <div style:width="40px">
     <HierarchyMenu
-      bind:options
+      {options}
       --icon-size="20px"
       iconsOnly={true}
     ></HierarchyMenu>

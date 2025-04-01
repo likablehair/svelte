@@ -18,9 +18,7 @@
 <div class="example">
   <Button
     bind:buttonElement={activator}
-    width="200px"
-    maxWidth="90vw"
-    on:click={handleButtonClick}
+    onclick={handleButtonClick}
   >
     Open menu or drawer
   </Button>

@@ -2,7 +2,7 @@
   import Grid from "svelte-grid";
   import gridHelp from "svelte-grid/build/helper/index.mjs";
 
-  const id = () => "_" + Math.random().toString(36).substr(2, 9);
+  const id = () => "_" + Math.random().toString(36).slice(2, 11);
 
   let items = [
     {

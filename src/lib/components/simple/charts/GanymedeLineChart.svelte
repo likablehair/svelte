@@ -31,49 +31,72 @@
     mounted = true
   })
 
-
-  export let data: {
-      labels: string[],
+  interface Props {
+    data: {
+      labels: string[];
       datasets: {
-        label: string,
-        data: (number | null)[],
-        backgroundColor?: string,
-        borderColor?: string,
-        hoverBackgroundColor?: string[]
-        tension?: number,
-        spanGaps?: boolean | number | undefined
-      }[]
-    } = {
-      labels: [],
-      datasets: []
-    },
-    horizontal: boolean = false,
-    responsive: boolean = true,
-    maintainAspectRatio: boolean = true,
-    showLegend: boolean = true,
-    showYTicks: boolean = false,
-    showXTicks: boolean = false,
-    displayYGrid: boolean = true,
-    displayXGrid: boolean = true,
-    gridLineWidth: number = 1,
-    lineWidth: number = 3,
-    enableZoom: boolean = false,
-    resetZoom: boolean = false,
-    xTickStepSize: number | undefined = undefined,
-    yTickStepSize: number | undefined = undefined,
-    xMax: number | undefined = undefined,
-    yMax: number | undefined = undefined,
-    xMin: number | undefined = undefined,
-    yMin: number | undefined = undefined,
-    pointRadius: number | undefined = undefined,
-    hitRadius: number | undefined = undefined,
-    hoverRadius: number | undefined = undefined,
-    tooltipsDisabled: boolean = false
+        label: string;
+        data: (number | null)[];
+        backgroundColor?: string;
+        borderColor?: string;
+        hoverBackgroundColor?: string[];
+        tension?: number;
+        spanGaps?: boolean | number | undefined;
+      }[];
+    };
+    horizontal?: boolean;
+    responsive?: boolean;
+    maintainAspectRatio?: boolean;
+    showLegend?: boolean;
+    showYTicks?: boolean;
+    showXTicks?: boolean;
+    displayYGrid?: boolean;
+    displayXGrid?: boolean;
+    gridLineWidth?: number;
+    lineWidth?: number;
+    enableZoom?: boolean;
+    resetZoom?: boolean;
+    xTickStepSize?: number;
+    yTickStepSize?: number;
+    xMax?: number;
+    yMax?: number;
+    xMin?: number;
+    yMin?: number;
+    pointRadius?: number;
+    hitRadius?: number;
+    hoverRadius?: number;
+    tooltipsDisabled?: boolean;
+  }
 
-  $: gridColor = 'rgb(' + (background || '200, 200, 200') + ', .3)'
+  let {
+    data = { labels: [], datasets: [] },
+    horizontal = false,
+    responsive = true,
+    maintainAspectRatio = true,
+    showLegend = true,
+    showYTicks = false,
+    showXTicks = false,
+    displayYGrid = true,
+    displayXGrid = true,
+    gridLineWidth = 1,
+    lineWidth = 3,
+    enableZoom = false,
+    resetZoom = $bindable(false),
+    xTickStepSize = undefined,
+    yTickStepSize = undefined,
+    xMax = undefined,
+    yMax = undefined,
+    xMin = undefined,
+    yMin = undefined,
+    pointRadius = undefined,
+    hitRadius = undefined,
+    hoverRadius = undefined,
+    tooltipsDisabled = false,
+  }: Props = $props();
 
-  let chartOptions: ComponentProps<typeof Line>['options']
-  $: chartOptions = {
+  let gridColor = $derived('rgb(' + (background || '200, 200, 200') + ', .3)')
+
+  let chartOptions: ComponentProps<typeof Line>['options'] = $derived({
       indexAxis: horizontal ? 'y' : 'x',
       responsive: responsive,
       maintainAspectRatio: maintainAspectRatio,
@@ -150,13 +173,11 @@
           }
         }
       }
-    }
-
-  $: realData = data as ComponentProps<typeof Line>['data']
+    })
 </script>
 
 <Line 
-  bind:data={realData}
+  bind:data={(data as ComponentProps<typeof Line>['data'])}
   options={chartOptions}
   bind:resetZoom
 ></Line>

@@ -4,51 +4,110 @@
   import Button from "$lib/components/simple/buttons/Button.svelte";
   import FileInput from "$lib/components/simple/forms/FileInput.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
-    import { createEventDispatcher } from "svelte";
+  import type { ComponentProps, Snippet } from "svelte";
 
-  let clazz: string = "";
-  export { clazz as class };
-
-  let dispatch = createEventDispatcher<{
-    fileChange: {
+  interface Props {
+    files?: File[];
+    persistOverUpload?: boolean;
+    dropAreaActive?: boolean;
+    icon?: string;
+    message?: string;
+    disabled?: boolean;
+    maxFiles?: number | undefined;
+    class?: string
+    onchange?: ComponentProps<typeof FileInput>['onchange']
+    onfileChange?: (event: {
+      detail: {
+        files: File[]
+      }
+    }) => void
+    onfileDrop?: () => void
+    onfileSelect?: () => void
+    bodySnippet?: Snippet<[{
+      active: boolean
+    }]>
+    messageSnippet?: Snippet<[{
+      message: string | undefined
+    }]>
+    fileListSnippet?: Snippet<[{
       files: File[]
-    }
-  }>()
+    }]>
+  }
 
-  export let files: File[] = [],
-    persistOverUpload: boolean = true,
-    dropAreaActive: boolean = true,
-    icon: string = "mdi-file-document",
-    message: string = "Drop file here or click to upload",
-    disabled: boolean = false,
-    maxFiles: number | undefined = undefined;
+  let {
+    files = $bindable([]),
+    persistOverUpload = true,
+    dropAreaActive = true,
+    icon = "mdi-file-document",
+    message = "Drop file here or click to upload",
+    disabled = false,
+    maxFiles = undefined,
+    class: clazz = '',
+    onchange,
+    onfileChange,
+    onfileDrop,
+    onfileSelect,
+    bodySnippet: bodyOuterSnippet,
+    messageSnippet,
+    fileListSnippet,
+  }: Props = $props();
 
-  let fileActive: File | null = null;
+  let fileActive: File | null = $state(null);
 
   function handleFileMouseEnter(file: File) {
     dropAreaActive = false;
     fileActive = file;
   }
+
   function handleFileMouseLeave() {
     dropAreaActive = true;
     fileActive = null;
   }
+
   function handleFileClick(file: File) {
     alert(file.name);
   }
+
   function handleRemove(file: File) {
     files = files.filter((elem) => {
       return elem != file;
     });
-    dispatch("fileChange", { files })
+
+    if(onfileChange){
+      onfileChange({
+        detail: {
+          files
+        }
+      })
+    }
   }
 
   function handleFileDrop() {
-    dispatch("fileChange", { files })
+    if(onfileChange){
+      onfileChange({
+        detail: {
+          files
+        }
+      })
+    }
+
+    if(onfileDrop){
+      onfileDrop()
+    }
   }
 
   function handleFileSelect() {
-    dispatch("fileChange", { files })
+    if(onfileChange){
+      onfileChange({
+        detail: {
+          files
+        }
+      })
+    }
+
+    if(onfileSelect){
+      onfileSelect()
+    }
   }
 </script>
 
@@ -62,67 +121,78 @@
     --file-input-color="var(--file-input-list-color,var(--file-input-list-default-color))"
     --file-input-height="var(--file-input-list-height,var(--file-input-list-default-height))"
     --file-input-width="var(--file-input-list-width,var(--file-input-list-default-width))"
-    on:change
-    on:fileDrop={handleFileDrop}
-    on:fileDrop
-    on:fileSelect={handleFileSelect}
-    on:fileSelect
+    {onchange}
+    onfileDrop={handleFileDrop}
+    onfileSelect={handleFileSelect}
     {maxFiles}
   >
-    <span
-      slot="body"
-      style:height="100%"
-      style:width="100%"
-      style:display="flex"
-      let:active={dropAreaActive}
-    >
-      <div class="body-container" class:active={dropAreaActive}>
-        {#if files.length == 0}
-          <slot name="message">
-            <span>{message}</span>
-          </slot>
-        {:else}
-          <slot name="file-list" {files}>
-            <table class="file-list">
-              {#each files as file}
-                <tr
-                  on:click|stopPropagation={() => {
-                    handleFileClick(file);
-                  }}
-                  on:mouseenter|stopPropagation={() => {
-                    handleFileMouseEnter(file);
-                  }}
-                  on:mouseleave|stopPropagation={() => {
-                    handleFileMouseLeave();
-                  }}
-                  class:file-active={fileActive == file}
-                >
-                  <td>
-                    <Icon name={icon} />
-                  </td>
-                  <td class="file-name">
-                    {file.name}
-                  </td>
-                  <td>
-                    {file.size}
-                  </td>
-                  <td style:width="10%" style:margin-right="10px">
-                    <Button
-                      buttonType="text"
-                      icon="mdi-close"
-                      on:click={(e) => {
-                        e.detail.nativeEvent.stopPropagation();
-                        handleRemove(file);
-                      }}
-                    />
-                  </td>
-                </tr>
-              {/each}
-            </table>
-          </slot>
-        {/if}
-      </div>
-    </span>
+    {#snippet bodySnippet({ active })}
+      {#if bodyOuterSnippet}
+        {@render bodyOuterSnippet({ active })}
+      {:else}
+        <span
+          style:height="100%"
+          style:width="100%"
+          style:display="flex"
+        >
+          <div class="body-container" class:{active}>
+            {#if files.length == 0}
+              {#if messageSnippet}
+                {@render messageSnippet({ message })}
+              {:else}
+                <span>{message}</span>
+              {/if}
+            {:else}
+              {#if fileListSnippet}
+                {@render fileListSnippet({ files })}
+              {:else}
+                <table class="file-list">
+                  <tbody>
+                    {#each files as file}
+                      <tr
+                        onclick={(e) => {
+                          e.stopPropagation()
+                          handleFileClick(file);
+                        }}
+                        onmouseenter={(e) => {
+                          e.stopPropagation()
+                          handleFileMouseEnter(file);
+                        }}
+                        onmouseleave={(e) => {
+                          e.stopPropagation()
+                          handleFileMouseLeave();
+                        }}
+                        class:file-active={fileActive == file}
+                      >
+                        <td>
+                          <Icon name={icon} />
+                        </td>
+                        <td class="file-name">
+                          {file.name}
+                        </td>
+                        <td>
+                          {file.size}
+                        </td>
+                        <td style:width="10%" style:margin-right="10px">
+                          <Button
+                            buttonType="text"
+                            icon="mdi-close"
+                            onclick={(e) => {
+                              e.detail.nativeEvent.stopPropagation();
+                              handleRemove(file);
+                            }}
+                          />
+                        </td>
+                      </tr>
+                    {/each}
+                  </tbody>
+                </table>
+              {/if}
+            {/if}
+          </div>
+        </span>
+      {/if}
+    {/snippet}
   </FileInput>
 </div>
 

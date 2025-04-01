@@ -2,24 +2,26 @@
   import '../../../css/main.css'
   import './TimePicker.css'
   import { DateTime } from 'luxon';
-  import { createEventDispatcher } from 'svelte';
   import Icon from '../media/Icon.svelte';
 
-  let clazz: {
-    container?: string,
-    header?: string,
-    selectorRow?: string
-  } = {};
-	export { clazz as class };
+  interface Props {
+    selectedTime?: Date | null | undefined;
+    locale?: "it-IT" | "en-EN";
+    class?: {
+      container?: string,
+      header?: string,
+      selectorRow?: string
+    }
+  }
 
-  export let selectedTime: Date | null | undefined = undefined,
-    locale: "it-IT" | "en-EN" = 'it-IT'
+  let {
+    selectedTime = $bindable(undefined),
+    locale = 'it-IT',
+    class: clazz = {}
+  }: Props = $props();
 
-  let hours: string = '00'
-
-  let dispatch = createEventDispatcher<{}>()
-
-  let buildUpHours: string = hours
+  let hours = $state('00')
+  let buildUpHours: string = '00'
   function handleHoursInput(e: KeyboardEvent) {
     setTimeout(() => {
       let inserted = e.key
@@ -43,8 +45,6 @@
       hours = buildUpHours
     }, 10);
   }
-
-  $: hours = buildUpHours
 </script>
 
 <div
@@ -73,7 +73,7 @@
         type="text"
         class="transparent-input"
         bind:value={hours}
-        on:keydown={handleHoursInput}
+        onkeydown={handleHoursInput}
       />
       <button 
         class="icon-button"

@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
   export type LabelMapper = {
@@ -14,7 +14,7 @@
   import MediaQuery from '$lib/components/simple/common/MediaQuery.svelte';
   import Button from '$lib/components/simple/buttons/Button.svelte';
   import Icon from '$lib/components/simple/media/Icon.svelte';
-  import { createEventDispatcher, type ComponentProps } from 'svelte';
+  import { type ComponentProps, type Snippet } from 'svelte';
   import { isDateMode, isSelectMode, isStringMode, type DateMode, type Filter, type NumberMode, type SelectMode, type StringMode } from '$lib/utils/filters/filters';
   import SelectableVerticalList from '$lib/components/simple/lists/SelectableVerticalList.svelte';
   import Chip from '$lib/components/simple/navigation/Chip.svelte';
@@ -26,136 +26,144 @@
   import Validator from '$lib/utils/filters/validator';
   import ToolTip from '../common/ToolTip.svelte';
   import { DateTime } from 'luxon';
+  import type { KeyboardEventHandler, MouseEventHandler } from 'svelte/elements';
 
-  export let
-    filters: Filter[] = [],
-    lang: 'it' | 'en' = 'en',
-    addFilterLabel: string = lang == 'en' ? "Filters" : "Filtri",
-    cancelFilterLabel : string = lang == 'en' ? "Cancel" : "Annulla",
-    applyFilterLabel : string = lang == 'en' ? "Apply filter" : "Applica filtro",
-    showActiveFilters: boolean = true,
-    filterTitleLabel: string = lang == 'en' ? "Filter by" : "Filtra per",
-    dateLocale: Locale = lang == 'en' ? 'en' : 'it',
-    betweenSeparator: string = lang == 'en' ? "and" : "e",
-    trueString: string = lang == 'en' ? "true" : "vero",
-    falseString: string = lang == 'en' ? "false" : "falso",
-    editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit',
-    // TODO create global translation mechanism
-    labelsMapper: LabelMapper = lang == 'en' ? {
-      'equal': {
-        extended: 'equal to',
-        short: 'equal'
-      },
-      'like': {
-        short: 'includes'
-      },
-      'ilike': {
-        short: 'includes'
-      },
-      'contains': {
-        short: 'contains'
-      },
-      'greater': {
-        short: 'greater',
-        extended: 'greater than'
-      },
-      'lower': {
-        short: 'lower',
-        extended: 'lower than'
-      },
-      'between': {
-        short: 'between',
-        extended: 'is between'
-      },
-      'different': {
-        short: 'different',
-        extended: 'different from'
+  interface Props {
+    filters?: Filter[];
+    lang?: 'it' | 'en';
+    addFilterLabel?: string;
+    cancelFilterLabel?: string;
+    applyFilterLabel?: string;
+    showActiveFilters?: boolean;
+    filterTitleLabel?: string;
+    dateLocale?: Locale;
+    betweenSeparator?: string;
+    trueString?: string;
+    falseString?: string;
+    editFilterMode?: 'one-edit' | 'multi-edit';
+    labelsMapper?: LabelMapper;
+    onaddFilterClick?: () => void
+    onapplyFilter?: () => void
+    onremoveAllFilters?: () => void
+    onremoveFilter?: (event: {
+      detail: {
+        filter: Filter
       }
-    } : {
-      'equal': {
-        extended: 'uguale a',
-        short: 'uguale'
-      },
-      'like': {
-        short: 'include'
-      },
-      'ilike': {
-        short: 'include'
-      },
-      'contains': {
-        short: 'contiene'
-      },
-      'greater': {
-        short: 'maggiore',
-        extended: 'maggiore di'
-      },
-      'lower': {
-        short: 'minore',
-        extended: 'minore di'
-      },
-      'between': {
-        short: 'compreso',
-        extended: 'è compreso tra'
-      },
-      'different': {
-        short: 'diverso',
-        extended: 'diverso da'
-      }
-    }
-
-
-  let dispatch = createEventDispatcher<{
-    'addFilterClick': undefined,
-    'applyFilter': undefined,
-    'removeFilter': {
+    }) => void
+    customSnippet?: Snippet<[{
+      filter: Filter | undefined,
+      updateFunction: typeof updateFunction,
+      mAndDown: boolean
+    }]>
+    customChipSnippet?: Snippet<[{
       filter: Filter
-    },
-    'removeAllFilters': undefined
-  }>()
+    }]>
+    appendSnippet?: Snippet<[]>
+    contentSnippet?: Snippet<[{ 
+      mAndDown: boolean,
+      updateMultiFilterValues: typeof updateMultiFilterValues,
+      handleRemoveAllFilters: typeof handleRemoveAllFilters,
+      filters: Filter[]
+    }]>
+    onclick?: MouseEventHandler<HTMLDivElement>
+    onkeydown?: KeyboardEventHandler<HTMLDivElement>
+  }
 
-  let open: boolean = false,
-    mobileOpen: boolean = false,
-    activator: HTMLElement
+  let {
+    filters = $bindable([]),
+    lang = 'en',
+    addFilterLabel = lang === 'en' ? "Filters" : "Filtri",
+    cancelFilterLabel = lang === 'en' ? "Cancel" : "Annulla",
+    applyFilterLabel = lang === 'en' ? "Apply filter" : "Applica filtro",
+    showActiveFilters = true,
+    filterTitleLabel = lang === 'en' ? "Filter by" : "Filtra per",
+    dateLocale = lang === 'en' ? 'en' : 'it',
+    betweenSeparator = lang === 'en' ? "and" : "e",
+    trueString = lang === 'en' ? "true" : "vero",
+    falseString = lang === 'en' ? "false" : "falso",
+    editFilterMode = 'one-edit',
+    labelsMapper = lang === 'en'
+      ? {
+          equal: { extended: 'equal to', short: 'equal' },
+          like: { short: 'includes' },
+          ilike: { short: 'includes' },
+          contains: { short: 'contains' },
+          greater: { short: 'greater', extended: 'greater than' },
+          lower: { short: 'lower', extended: 'lower than' },
+          between: { short: 'between', extended: 'is between' },
+          different: { short: 'different', extended: 'different from' }
+        }
+      : {
+          equal: { extended: 'uguale a', short: 'uguale' },
+          like: { short: 'include' },
+          ilike: { short: 'include' },
+          contains: { short: 'contiene' },
+          greater: { short: 'maggiore', extended: 'maggiore di' },
+          lower: { short: 'minore', extended: 'minore di' },
+          between: { short: 'compreso', extended: 'è compreso tra' },
+          different: { short: 'diverso', extended: 'diverso da' }
+        },
+    onaddFilterClick,
+    onapplyFilter,
+    onremoveAllFilters,
+    onremoveFilter,
+    customSnippet: customInternalSnippet,
+    customChipSnippet,
+    appendSnippet,
+    contentSnippet,
+    onclick: onclickInternal,
+    onkeydown,
+  }: Props = $props();
+
+  let open: boolean = $state(false),
+    mobileOpen: boolean = $state(false),
+    activator: HTMLElement | undefined = $state()
 
   function handleAddFilterClick() {
-    dispatch('addFilterClick')
+    if(onaddFilterClick) {
+      onaddFilterClick()
+    }
     open = true
     mobileOpen = true
   }
 
-  $: filterOptions = filters.map((f) => {
+  let filterOptions = $derived(filters.map((f) => {
     return {
       title: f.label,
       name: f.name
     }
-  })
+  }))
 
-  $: deletableFilterOptions = filters.map((f) => {
+  let deletableFilterOptions = $derived(filters.map((f) => {
     return {
       title: f.label,
       name: f.name,
       appendIcon: f.active ? 'mdi-delete' : undefined
     }
+  }))
+
+  let selected: ArrayElement<NonNullable<ComponentProps<typeof SelectableVerticalList>['elements']>>['name'] | undefined = $state()
+  let focused: ArrayElement<NonNullable<ComponentProps<typeof SelectableVerticalList>['elements']>>['name'] | undefined = $state()
+  $effect(() => {
+    if(!!focused && !open) focused = undefined
   })
 
-  let selected: ArrayElement<NonNullable<ComponentProps<SelectableVerticalList>['elements']>>['name'] | undefined
-  let focused: ArrayElement<NonNullable<ComponentProps<SelectableVerticalList>['elements']>>['name'] | undefined
-  $: if(!!focused && !open) focused = undefined
-
-  let filterOpened: 'edit' | 'new' = 'new'
+  let filterOpened: 'edit' | 'new' = $state('new')
 
 
-  let filterOptionsListActivator: HTMLElement | undefined
-  let singleFilterActivator:  HTMLElement | undefined
-  let singleFilterMenuAnchor: 'right-center' | 'bottom-center' = 'right-center'
-  let singleFilterMenuOpened: boolean = false
+  let filterOptionsListActivator: HTMLElement | undefined = $state()
+  let singleFilterActivator:  HTMLElement | undefined = $state()
+  let singleFilterMenuAnchor: 'right-center' | 'bottom-center' = $state('right-center')
+  let singleFilterMenuOpened: boolean = $state(false)
 
-  let selectedFilter : Filter | undefined = undefined
-  $: selectedFilterIndex = filters.findIndex((f) => { return f.name === selected })
-  $: selectedFilter = selected === undefined ? undefined : filters[selectedFilterIndex]
+  let selectedFilter : Filter | undefined = $state()
+  let selectedFilterIndex = $derived(filters.findIndex((f) => { return f.name === selected }))
+  $effect(() => {
+    selectedFilter = selected === undefined ? undefined : filters[selectedFilterIndex]
+  })
 
 
-  function handleFilterSelection(e: CustomEvent, mobile: boolean = false) {
+  function handleFilterSelection(e: Parameters<NonNullable<ComponentProps<typeof SelectableVerticalList>['onselect']>>[0], mobile: boolean = false) {
     if(mobile) {
       selected = e.detail.element.name
       singleFilterMenuOpened = true;
@@ -189,11 +197,13 @@
       open = false
       mobileOpen = false
       singleFilterMenuOpened = false;
-      dispatch('applyFilter')
+      if(onapplyFilter) {
+        onapplyFilter()
+      }
     }
   }
 
-  $: activeFilters = filters.filter((f) => f.active)
+  let activeFilters = $derived(filters.filter((f) => f.active))
 
   function handleRemoveFilter(filter: { name: string }) {
     let filterIndex = filters.findIndex((f) => f.name === filter.name)
@@ -232,7 +242,13 @@
       }
     }
     singleFilterMenuOpened = false
-    dispatch('removeFilter', { filter: filters[filterIndex] })
+    if(onremoveFilter) {
+      onremoveFilter({
+        detail: {
+          filter: filters[filterIndex]
+        }
+      })
+    }
   }
 
   let activeFiltersActivators: Record<string, HTMLElement> = {}
@@ -259,14 +275,14 @@
     }, delay)
   }
 
-  function handleDeleteIconClick(e: CustomEvent) {
-    let filterIndex = e.detail.index
+  function handleDeleteIconClick(event: Parameters<NonNullable<ComponentProps<typeof SelectableVerticalList>['oniconClick']>>[0]) {
+    let filterIndex = event.detail.index
     let name = filters[filterIndex].name
     handleRemoveFilter({name})
   }
 
-  function handleRemoveAllFilters(e?: MouseEvent) {
-    if(!!e) e.stopPropagation()
+  function handleRemoveAllFilters(event?: Parameters<NonNullable<ComponentProps<typeof Icon>['onclick']>>[0]) {
+    if(!!event) event.stopPropagation()
     for(let i = 0; i < filters.length; i += 1) {
       filters[i].active = false
       if(Object.keys(filters[i]).includes('value')) {
@@ -290,13 +306,17 @@
     filters = filters
     tmpFilters = {}
     customToBeInitialized = false
-    dispatch('removeAllFilters')
+    if(onremoveAllFilters) {
+      onremoveAllFilters()
+    }
   }
 
   function handleMultiEditApplyClick() {
     open = false
     mobileOpen = false
-    dispatch('applyFilter')
+    if(onapplyFilter) {
+      onapplyFilter()
+    }
   }
 
   function handleMultiEditRemoveClick() {
@@ -305,9 +325,9 @@
     mobileOpen = false
   }
 
-  let selectedTmpFilter: Filter | undefined = undefined
+  let selectedTmpFilter: Filter | undefined = $state()
 
-  let tmpFilters: {[filterName: string]: Filter} = {}
+  let tmpFilters: {[filterName: string]: Filter} = $state({})
 
   function handleApplyMultiFilterClick() {
     for(let i = 0; i < filters.length; i += 1) {
@@ -357,7 +377,9 @@
   }
 
   let customToBeInitialized = true
-  $: if(customToBeInitialized && !!tmpFilters) initCustomTmpFilters()
+  $effect(() => {
+    if(customToBeInitialized && !!tmpFilters) initCustomTmpFilters()
+  })
 
   function initCustomTmpFilters() {
     let customFilters = filters.filter(f => f.type === 'custom')
@@ -369,7 +391,7 @@
     customToBeInitialized = false
   }
 
-  let customFilterApplyDisabled: boolean = true
+  let customFilterApplyDisabled: boolean = $state(true)
   function updateFunction(filterName: string, newValue: any, newValid: boolean) {
     let tmpFilter = tmpFilters[filterName]
     if(!!tmpFilter && tmpFilter.type == 'custom') {
@@ -380,458 +402,477 @@
     }
   }
 
-  let moreItemsActivator: HTMLElement
+  let moreItemsActivator: HTMLElement | undefined = $state()
 
+  function onclick(event: MouseEvent & {
+    currentTarget: EventTarget & HTMLDivElement;
+  }, stopPropagation: boolean = false) {
+    if(stopPropagation){
+      event.stopPropagation()
+    }
+    if(onclickInternal) {
+      onclickInternal(event)
+    }
+  }
 </script>
 
-<MediaQuery let:mAndDown>
-  <div class="filters-wrapper" class:mobile={mAndDown} style:--filter-dot-size={activeFilters.length > 0 ? '22px' : '0px'} style:--filter-dot-content={activeFilters.length > 0 ? `"${activeFilters.length}"` : '""'}>
-    <div class="filters-container" class:mobile={mAndDown} class:hidden={mAndDown && (!showActiveFilters || activeFilters.length == 0)}>
-      {#if showActiveFilters}
-        {#each activeFilters as filter}
-          <div
-            class="filter-slot"
-            bind:this={activeFiltersActivators[filter.name]}
-          >
-            <Chip
-              label
-              close
-              on:close={() => handleRemoveFilter(filter)}
-              on:click={() => handleActiveFilterClick(filter)}
+<MediaQuery>
+  {#snippet defaultSnippet({ mAndDown})}
+    <div class="filters-wrapper" class:mobile={mAndDown} style:--filter-dot-size={activeFilters.length > 0 ? '22px' : '0px'} style:--filter-dot-content={activeFilters.length > 0 ? `"${activeFilters.length}"` : '""'}>
+      <div class="filters-container" class:mobile={mAndDown} class:hidden={mAndDown && (!showActiveFilters || activeFilters.length == 0)}>
+        {#if showActiveFilters}
+          {#each activeFilters as filter}
+            <div
+              class="filter-slot"
+              bind:this={activeFiltersActivators[filter.name]}
             >
-              {#if filter.type === 'custom'}
-                <slot name="custom-chip" {filter}></slot>
-              {:else}
-                <span class="truncate-text inline-truncated" style:max-width="160px">
-                  <b>{filter.label}</b>
-                </span>
-                {#if filter.type === "string" && filter.value != undefined}
-                  {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                  <span class="truncate-text inline-truncated">
-                    <b>{filter.value}</b>
+              <Chip
+                label
+                close
+                onclose={() => handleRemoveFilter(filter)}
+                onclick={() => handleActiveFilterClick(filter)}
+              >
+                {#if filter.type === 'custom'}
+                  {@render customChipSnippet?.({ filter })}
+                {:else}
+                  <span class="truncate-text inline-truncated" style:max-width="160px">
+                    <b>{filter.label}</b>
                   </span>
-                {:else if filter.type === "date"}
-                  {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
+                  {#if filter.type === "string" && filter.value != undefined}
                     {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                    <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
-                    {betweenSeparator}
-                    <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
-                  {:else if filter.mode == 'between' && filter.from != undefined}
-                    {labelsMapper['greater'].extended || labelsMapper['greater'].short}
-                    <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
-                  {:else if filter.mode == 'between' && filter.to != undefined}
-                    {labelsMapper['lower'].extended || labelsMapper['lower'].short}
-                    <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
-                  {:else if filter.mode != 'between' && filter.value != undefined}
+                    <span class="truncate-text inline-truncated">
+                      <b>{filter.value}</b>
+                    </span>
+                  {:else if filter.type === "date"}
+                    {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
+                      {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
+                      <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
+                      {betweenSeparator}
+                      <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
+                    {:else if filter.mode == 'between' && filter.from != undefined}
+                      {labelsMapper['greater'].extended || labelsMapper['greater'].short}
+                      <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
+                    {:else if filter.mode == 'between' && filter.to != undefined}
+                      {labelsMapper['lower'].extended || labelsMapper['lower'].short}
+                      <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
+                    {:else if filter.mode != 'between' && filter.value != undefined}
+                      {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
+                      <span class="truncate-text inline-truncated"><b>{filter.value?.toLocaleDateString(dateLocale)}</b></span>
+                    {/if}
+                  {:else if filter.type == "number"}
+                    {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
+                      {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
+                      <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
+                      {betweenSeparator}
+                      <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
+                    {:else if filter.mode == 'between' && filter.from != undefined}
+                      {labelsMapper['greater'].extended || labelsMapper['greater'].short}
+                      <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
+                    {:else if filter.mode == 'between' && filter.to != undefined}
+                      {labelsMapper['lower'].extended || labelsMapper['lower'].short}
+                      <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
+                    {:else if filter.mode != 'between' && filter.value != undefined}
+                      {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
+                      <span class="truncate-text inline-truncated"><b>{filter.value}</b></span>
+                    {/if}
+                  {:else if filter.type == 'select' && !!filter.values && filter.values.length > 0}
                     {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                    <span class="truncate-text inline-truncated"><b>{filter.value?.toLocaleDateString(dateLocale)}</b></span>
+                    <span class="truncate-text inline-truncated"><b>{filter.values[0].label}</b></span>
+                    {#if filter.values.length >= 2}
+                      <span class="more-items" bind:this={moreItemsActivator}>+{filter.values.length - 1}</span>
+                      <ToolTip activator={moreItemsActivator}>
+                        <div class="more-tooltip-content">
+                          <ul>
+                            {#each filter.values as value}
+                              <li><div class="truncate-text">{value.label}</div></li>
+                            {/each}
+                          </ul>
+                        </div>
+                      </ToolTip>
+                    {/if}
+                  {:else if filter.type == 'bool' && filter.value !== undefined}
+                      <b>{filter.value ? trueString : falseString}</b>
                   {/if}
-                {:else if filter.type == "number"}
-                  {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
-                    {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                    <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
-                    {betweenSeparator}
-                    <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
-                  {:else if filter.mode == 'between' && filter.from != undefined}
-                    {labelsMapper['greater'].extended || labelsMapper['greater'].short}
-                    <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
-                  {:else if filter.mode == 'between' && filter.to != undefined}
-                    {labelsMapper['lower'].extended || labelsMapper['lower'].short}
-                    <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
-                  {:else if filter.mode != 'between' && filter.value != undefined}
-                    {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                    <span class="truncate-text inline-truncated"><b>{filter.value}</b></span>
-                  {/if}
-                {:else if filter.type == 'select' && !!filter.values && filter.values.length > 0}
-                  {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                  <span class="truncate-text inline-truncated"><b>{filter.values[0].label}</b></span>
-                  {#if filter.values.length >= 2}
-                    <span class="more-items" bind:this={moreItemsActivator}>+{filter.values.length - 1}</span>
-                    <ToolTip activator={moreItemsActivator}>
-                      <div class="more-tooltip-content">
-                        <ul>
-                          {#each filter.values as value}
-                            <li><div class="truncate-text">{value.label}</div></li>
-                          {/each}
-                        </ul>
-                      </div>
-                    </ToolTip>
-                  {/if}
-                {:else if filter.type == 'bool' && filter.value !== undefined}
-                    <b>{filter.value ? trueString : falseString}</b>
                 {/if}
-              {/if}
-            </Chip>
+              </Chip>
+            </div>
+          {/each}
+        {/if}
+        {#if !mAndDown}
+          <div
+            class="filter-button"
+            bind:this={activator}
+          >
+            <Button
+              --button-color="var(--chip-color, var(--chip-default-color))"
+              onclick={handleAddFilterClick}
+            >
+              <div class="filter-button-content">
+                <Icon name="mdi-filter"></Icon>
+                {addFilterLabel}
+                <div class="remove-filters" class:hidden={activeFilters.length <= 0}>
+                  <Icon name="mdi-close-circle" onclick={handleRemoveAllFilters}></Icon>
+                </div>
+              </div>
+            </Button>
+
           </div>
-        {/each}
-      {/if}
-      {#if !mAndDown}
+        {/if}
+      </div>
+      {#if mAndDown}
         <div
           class="filter-button"
           bind:this={activator}
         >
           <Button
             --button-color="var(--chip-color, var(--chip-default-color))"
-            on:click={handleAddFilterClick}
+            onclick={handleAddFilterClick}
           >
             <div class="filter-button-content">
               <Icon name="mdi-filter"></Icon>
               {addFilterLabel}
               <div class="remove-filters" class:hidden={activeFilters.length <= 0}>
-                <Icon name="mdi-close-circle" click on:click={handleRemoveAllFilters}></Icon>
+                <Icon name="mdi-close-circle" onclick={handleRemoveAllFilters}></Icon>
               </div>
             </div>
           </Button>
 
         </div>
       {/if}
+      {@render appendSnippet?.()}
     </div>
     {#if mAndDown}
-      <div
-        class="filter-button"
-        bind:this={activator}
+      <Drawer
+        bind:open={mobileOpen}
+        position="bottom"
+        onclose={() => {closeFilterMenu(200)}}
+        _borderRadius="20px 20px 0px 0px"
+        _margin="5px 5px 0px 5px"
       >
-        <Button
-          --button-color="var(--chip-color, var(--chip-default-color))"
-          on:click={handleAddFilterClick}
-        >
-          <div class="filter-button-content">
-            <Icon name="mdi-filter"></Icon>
-            {addFilterLabel}
-            <div class="remove-filters" class:hidden={activeFilters.length <= 0}>
-              <Icon name="mdi-close-circle" click on:click={handleRemoveAllFilters}></Icon>
-            </div>
-          </div>
-        </Button>
+        <div class="drawer-content">
+          {#if editFilterMode === 'one-edit'}
+            {#if !!selectedFilter && singleFilterMenuOpened}
+              <div
+                class="drawer-filter-detail"
+                style:height="100%"
+                in:fly|local={{delay: 100, duration: 100, x: 200}}
+                out:fly|local={{duration: 100, x: -200}}
+              >
+                <MobileFilterEditor
+                  bind:filter={selectedFilter}
+                  onbackClick={handleMobileBackTap}
+                  {lang}
+                  {labelsMapper}
+                  bind:tmpFilter={selectedTmpFilter}
+                >
+                  <!-- <div slot="title">
+                    <div class="mobile-title">
+                      {selectedFilter?.label}
+                    </div>
+                  </div> -->
+                  {#snippet customSnippet({ filter })}
+                    {@render customInternalSnippet?.({ filter, updateFunction, mAndDown})}
+                  {/snippet}
 
-      </div>
-    {/if}
-    <slot name="append"></slot>
-  </div>
-  {#if mAndDown}
-    <Drawer
-      bind:open={mobileOpen}
-      position="bottom"
-      on:close={() => {closeFilterMenu(200)}}
-      _borderRadius="20px 20px 0px 0px"
-      _margin="5px 5px 0px 5px"
-    >
-      <div class="drawer-content">
-        {#if editFilterMode === 'one-edit'}
-          {#if !!selectedFilter && singleFilterMenuOpened}
+                  {#snippet filterActionsSnippet({ applyFilterDisabled, filter })}
+                    <div class="btn">
+                      <Button
+                        --button-width="100%"
+                        --button-box-shadow="none"
+                        --button-height="30px"
+                        --button-padding="10px 0px 10px 0px"
+                        --button-border-radius="10px 10px 0px 0px"
+                        disabled={!filter || (filter.type === 'custom' ? customFilterApplyDisabled : applyFilterDisabled)}
+                        onclick={handleApplyFilterClick}
+                      >{applyFilterLabel}</Button>
+                    </div>
+                    <div class="btn">
+                      <Button
+                        --button-width="100%"
+                        --button-box-shadow="none"
+                        --button-padding="10px 0px 10px 0px"
+                        --button-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
+                        --button-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
+                        --button-border-radius="0px 0px 0px 0px"
+                        onclick={() => {mobileOpen = false; closeFilterMenu(200)}}
+                      >{cancelFilterLabel}</Button>
+                    </div>
+                  {/snippet}
+                </MobileFilterEditor>
+              </div>
+            {:else}
+              <div
+                class="drawer-filter-list"
+                style:margin-top="20px"
+                style:height="100%"
+                out:fly|local={{duration: 100, x: -200}}
+                in:fly|local={{duration: 100, x: 200, delay: 100}}
+              >
+                <SelectableVerticalList
+                  bind:selected
+                  bind:focused
+                  elements={deletableFilterOptions}
+                  --selectable-vertical-list-default-width="100%"
+                  --selectable-vertical-list-default-element-height="56px"
+                  --selectable-vertical-list-default-title-font-size="null"
+                  onselect={(e) => {handleFilterSelection(e, true)}}
+                  centered
+                  bicolor
+                  appendIconSize="18pt"
+                  oniconClick={handleDeleteIconClick}
+                  --icon-color="rgb(var(--global-color-error-400))"
+                ></SelectableVerticalList>
+              </div>
+            {/if}
+          {:else if editFilterMode === 'multi-edit'}
             <div
-              class="drawer-filter-detail"
+              class="drawer-multi-filter"
               style:height="100%"
-              in:fly|local={{delay: 100, duration: 100, x: 200}}
-              out:fly|local={{duration: 100, x: -200}}
             >
-              <MobileFilterEditor
+              <div class="form-container" style:background-color={mAndDown ? 'transparent' : 'rgb(var(--global-color-background-100))'} style:width={mAndDown ? '100%' : '50vw'} style:box-sizing="border-box">
+                <div class="header">
+                  <h1>{addFilterLabel}</h1>
+                </div>
+                <div class="body">
+                  {#if contentSnippet}
+                    {@render contentSnippet({ mAndDown, updateMultiFilterValues, filters, handleRemoveAllFilters })}
+                  {:else}
+                    <div class="multi-filters-container" style:grid-template-columns={mAndDown ? '1fr' : '1fr 1fr'}>
+                      {#each filters as filter, i}
+                        <div class="filter">
+                          <div class="input">
+                            {#if !filter.advanced && filter.type !== 'custom'}
+                              <div class="label">
+                                {filter.label}
+                              </div>
+                            {/if}
+                            <div class="field">
+                              <FilterEditor
+                                bind:filter={filters[i]}
+                                {lang}
+                                {labelsMapper}
+                                editFilterMode="multi-edit"
+                                bind:tmpFilter={tmpFilters[filter.name]}
+                                mobile={mAndDown}
+                              >
+                                {#snippet customSnippet({ filter })}
+                                  {@render customInternalSnippet?.({ filter, updateFunction, mAndDown })}
+                                {/snippet}
+                              </FilterEditor>
+                            </div>
+                          </div>
+                        </div>
+                      {/each}
+                    </div>
+                  {/if}
+                </div>
+                <div class="footer">
+                  <div class="actions" style:padding-bottom={mAndDown ? '20px' : undefined}>
+                    <Button
+                      --button-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
+                      --button-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
+                      --button-hover-background-color="rgb(var(--global-color-primary-500))"
+                      --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
+                      --button-box-shadow="none"
+                      onclick={handleCancelFilterClick}
+                    >
+                      {cancelFilterLabel}
+                    </Button>
+                    <Button
+                      --button-color="rgb(var(--global-color-primary-400))"
+                      --button-background-color="transparent"
+                      --button-hover-background-color="rgb(var(--global-color-primary-500))"
+                      --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
+                      --button-box-shadow="none"
+                      onclick={handleMultiEditRemoveClick}
+                    >
+                      {lang == 'en' ? "Remove filters" : "Rimuovi filtri"}
+                    </Button>
+                    <Button
+                      --button-min-width="100px"
+                      onclick={handleApplyMultiFilterClick}
+                    >
+                      {applyFilterLabel}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {/if}
+        </div>
+      </Drawer>
+    {:else}
+      {#if editFilterMode === 'one-edit'}
+        <Menu
+          bind:activator={activator}
+          bind:open={open}
+          closeOnClickOutside
+          _boxShadow="rgb(var(--global-color-grey-900), .5) 0px 2px 4px"
+          _height="fit-content"
+          _minWidth="10vw"
+          _borderRadius="5px"
+          anchor="bottom"
+          openingId="select-filter"
+          flipOnOverflow
+        >
+          <div
+            style:background-color="rgb(var(--global-color-background-200))"
+            bind:this={filterOptionsListActivator}
+            onclick={e => onclick(e, true)}
+            {onkeydown}
+            role="presentation"
+            tabindex="-1"
+          >
+            <SelectableVerticalList
+              bind:selected
+              bind:focused
+              elements={filterOptions}
+              --selectable-vertical-list-default-width="100%"
+              --selectable-vertical-list-default-element-height="56px"
+              --selectable-vertical-list-default-title-font-size="null"
+              onselect={handleFilterSelection}
+            ></SelectableVerticalList>
+          </div>
+        </Menu>
+
+        <Menu
+          _width="350px"
+          _borderRadius="10px"
+          _boxShadow="rgb(var(--global-color-grey-900), .5) 0px 2px 4px"
+          _overflow="unset"
+          activator={singleFilterActivator}
+          bind:open={singleFilterMenuOpened}
+          anchor={singleFilterMenuAnchor}
+          closeOnClickOutside
+          flipOnOverflow
+          openingId={ filterOpened == 'edit' ? "select-filter" : ""}
+        >
+          <div
+            style:min-height="160px"
+            {onclick}
+            {onkeydown}
+            style:border-radius="10px"
+            style:overflow="auto"
+            style:height="100%"
+            style:background-color="rgb(var(--global-color-background-200))"
+            role="presentation"
+          >
+            <div class="filter-title">
+              {filterTitleLabel} {selectedFilter?.label}
+            </div>
+
+            {#if !!selectedFilter}
+              <FilterEditor
                 bind:filter={selectedFilter}
-                on:backClick={handleMobileBackTap}
                 {lang}
                 {labelsMapper}
                 bind:tmpFilter={selectedTmpFilter}
               >
-                <div slot="title">
-                  <div class="mobile-title">
-                    {selectedFilter?.label}
-                  </div>
-                </div>
-                <svelte:fragment slot="custom" let:filter>
-                  <slot name="custom" {filter} {updateFunction} {mAndDown}></slot>
-                </svelte:fragment>
-
-                <svelte:fragment slot="filter-actions" let:applyFilterDisabled let:filter>
-                  <div class="btn">
+                {#snippet customSnippet({ filter })}
+                  {@render customInternalSnippet?.({ filter, updateFunction, mAndDown })}
+                {/snippet}
+                {#snippet filterActionsSnippet({ applyFilterDisabled, filter })}
+                  <div class="sub-filter-button">
                     <Button
-                      --button-width="100%"
-                      --button-box-shadow="none"
-                      --button-height="30px"
-                      --button-padding="10px 0px 10px 0px"
-                      --button-border-radius="10px 10px 0px 0px"
-                      disabled={!filter || (filter.type === 'custom' ? customFilterApplyDisabled : applyFilterDisabled)}
-                      on:click={handleApplyFilterClick}
-                    >{applyFilterLabel}</Button>
-                  </div>
-                  <div class="btn">
-                    <Button
-                      --button-width="100%"
-                      --button-box-shadow="none"
-                      --button-padding="10px 0px 10px 0px"
                       --button-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
                       --button-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
-                      --button-border-radius="0px 0px 0px 0px"
-                      on:click={() => {mobileOpen = false; closeFilterMenu(200)}}
-                    >{cancelFilterLabel}</Button>
-                  </div>
-                </svelte:fragment>
+                      --button-hover-background-color="rgb(var(--global-color-primary-500))"
+                      --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
+                      --button-box-shadow="none"
+                      onclick={handleCancelFilterClick}
+                    >
+                      {cancelFilterLabel}
+                    </Button>
+                    <Button
+                      --button-min-width="100px"
+                      onclick={handleApplyFilterClick}
+                      disabled={!filter || (filter.type === 'custom' ? customFilterApplyDisabled : applyFilterDisabled)}
+                    >
+                      {applyFilterLabel}
 
-              </MobileFilterEditor>
+                    </Button>
+                  </div>
+                {/snippet}
+              </FilterEditor>
+            {/if}
+          </div>
+        </Menu>
+      {:else if editFilterMode === 'multi-edit'}
+        <Dialog
+          bind:open={open}
+        >
+          <div class="form-container" style:background-color={mAndDown ? 'transparent' : 'rgb(var(--global-color-background-100))'} style:width={mAndDown ? '100%' : '50vw'} style:box-sizing="border-box">
+            <div class="header">
+              <h1>{addFilterLabel}</h1>
             </div>
-          {:else}
-            <div
-              class="drawer-filter-list"
-              style:margin-top="20px"
-              style:height="100%"
-              out:fly|local={{duration: 100, x: -200}}
-              in:fly|local={{duration: 100, x: 200, delay: 100}}
-            >
-              <SelectableVerticalList
-                bind:selected
-                bind:focused
-                bind:elements={deletableFilterOptions}
-                --selectable-vertical-list-default-width="100%"
-                --selectable-vertical-list-default-element-height="56px"
-                --selectable-vertical-list-default-title-font-size="null"
-                on:select={(e) => {handleFilterSelection(e, true)}}
-                centered
-                bicolor
-                appendIconSize="18pt"
-                on:iconClick={handleDeleteIconClick}
-                --icon-color="rgb(var(--global-color-error-400))"
-              ></SelectableVerticalList>
-            </div>
-          {/if}
-        {:else if editFilterMode === 'multi-edit'}
-          <div
-            class="drawer-multi-filter"
-            style:height="100%"
-          >
-            <div class="form-container" style:background-color={mAndDown ? 'transparent' : 'rgb(var(--global-color-background-100))'} style:width={mAndDown ? '100%' : '50vw'} style:box-sizing="border-box">
-              <div class="header">
-                <h1>{addFilterLabel}</h1>
-              </div>
-              <div class="body">
-                <slot name="content" {mAndDown} {updateMultiFilterValues} {handleRemoveAllFilters} {filters}>
-                  <div class="multi-filters-container" style:grid-template-columns={mAndDown ? '1fr' : '1fr 1fr'}>
-                    {#each filters as filter, i}
-                      <div class="filter">
-                        <div class="input">
-                          {#if !filter.advanced && filter.type !== 'custom'}
-                            <div class="label">
-                              {filter.label}
-                            </div>
-                          {/if}
-                          <div class="field">
-                            <FilterEditor
-                              bind:filter={filter}
-                              {lang}
-                              {labelsMapper}
-                              editFilterMode="multi-edit"
-                              bind:tmpFilter={tmpFilters[filter.name]}
-                              mobile={mAndDown}
-                            >
-                              <slot name="custom" slot="custom" {updateFunction} {mAndDown} {filter}></slot>
-                            </FilterEditor>
+            <div class="body">
+              {#if contentSnippet}
+                {@render contentSnippet({ mAndDown, updateMultiFilterValues, filters, handleRemoveAllFilters })}
+              {:else}
+                <div class="multi-filters-container" style:grid-template-columns={mAndDown ? '1fr' : '1fr 1fr'}>
+                  {#each filters as filter, i}
+                    <div class="filter" class:wide={filter.type === 'select' || filter.type === 'custom'}>
+                      <div class="input">
+                        {#if !filter.advanced && filter.type !== 'custom'}
+                          <div class="label">
+                            {filter.label}
                           </div>
+                        {/if}
+                        <div class="field">
+                          <FilterEditor
+                            bind:filter={filters[i]}
+                            {lang}
+                            {labelsMapper}
+                            editFilterMode="multi-edit"
+                            bind:tmpFilter={tmpFilters[filter.name]}
+                            mobile={mAndDown}
+                          >
+                            {#snippet customSnippet({ filter })}
+                              {@render customInternalSnippet?.({ filter, updateFunction, mAndDown })}
+                            {/snippet}
+                          </FilterEditor>
                         </div>
-                      </div>
-                    {/each}
-                  </div>
-                </slot>
-              </div>
-              <div class="footer">
-                <div class="actions" style:padding-bottom={mAndDown ? '20px' : undefined}>
-                  <Button
-                    --button-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
-                    --button-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
-                    --button-hover-background-color="rgb(var(--global-color-primary-500))"
-                    --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
-                    --button-box-shadow="none"
-                    on:click={handleCancelFilterClick}
-                  >
-                    {cancelFilterLabel}
-                  </Button>
-                  <Button
-                    --button-color="rgb(var(--global-color-primary-400))"
-                    --button-background-color="transparent"
-                    --button-hover-background-color="rgb(var(--global-color-primary-500))"
-                    --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
-                    --button-box-shadow="none"
-                    on:click={handleMultiEditRemoveClick}
-                  >
-                    {lang == 'en' ? "Remove filters" : "Rimuovi filtri"}
-                  </Button>
-                  <Button
-                    --button-min-width="100px"
-                    on:click={handleApplyMultiFilterClick}
-                  >
-                    {applyFilterLabel}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        {/if}
-      </div>
-    </Drawer>
-  {:else}
-    {#if editFilterMode === 'one-edit'}
-      <Menu
-        bind:activator={activator}
-        bind:open={open}
-        closeOnClickOutside
-        _boxShadow="rgb(var(--global-color-grey-900), .5) 0px 2px 4px"
-        _height="fit-content"
-        _minWidth="10vw"
-        _borderRadius="5px"
-        anchor="bottom"
-        openingId="select-filter"
-        flipOnOverflow
-      >
-        <div
-          style:background-color="rgb(var(--global-color-background-200))"
-          bind:this={filterOptionsListActivator}
-          on:click|stopPropagation
-          on:keydown
-          role="presentation"
-          tabindex="-1"
-        >
-          <SelectableVerticalList
-            bind:selected
-            bind:focused
-            bind:elements={filterOptions}
-            --selectable-vertical-list-default-width="100%"
-            --selectable-vertical-list-default-element-height="56px"
-            --selectable-vertical-list-default-title-font-size="null"
-            on:select={handleFilterSelection}
-          ></SelectableVerticalList>
-        </div>
-      </Menu>
-
-      <Menu
-        _width="350px"
-        _borderRadius="10px"
-        _boxShadow="rgb(var(--global-color-grey-900), .5) 0px 2px 4px"
-        _overflow="unset"
-        activator={singleFilterActivator}
-        bind:open={singleFilterMenuOpened}
-        anchor={singleFilterMenuAnchor}
-        closeOnClickOutside
-        flipOnOverflow
-        openingId={ filterOpened == 'edit' ? "select-filter" : ""}
-      >
-        <div
-          style:min-height="160px"
-          on:click
-          on:keydown
-          style:border-radius="10px"
-          style:overflow="auto"
-          style:height="100%"
-          style:background-color="rgb(var(--global-color-background-200))"
-          role="presentation"
-        >
-          <div class="filter-title">
-            {filterTitleLabel} {selectedFilter?.label}
-          </div>
-
-          {#if !!selectedFilter}
-            <FilterEditor
-              bind:filter={selectedFilter}
-              {lang}
-              {labelsMapper}
-              bind:tmpFilter={selectedTmpFilter}
-            >
-              <svelte:fragment slot="custom" let:filter>
-                <slot name="custom" {filter} {updateFunction} {mAndDown}></slot>
-              </svelte:fragment>
-              <svelte:fragment slot="filter-actions" let:applyFilterDisabled let:filter>
-                <div class="sub-filter-button">
-                  <Button
-                    --button-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
-                    --button-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
-                    --button-hover-background-color="rgb(var(--global-color-primary-500))"
-                    --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
-                    --button-box-shadow="none"
-                    on:click={handleCancelFilterClick}
-                  >
-                    {cancelFilterLabel}
-                  </Button>
-                  <Button
-                    --button-min-width="100px"
-                    on:click={handleApplyFilterClick}
-                    disabled={!filter || (filter.type === 'custom' ? customFilterApplyDisabled : applyFilterDisabled)}
-                  >
-                    {applyFilterLabel}
-
-                  </Button>
-                </div>
-              </svelte:fragment>
-            </FilterEditor>
-          {/if}
-        </div>
-      </Menu>
-    {:else if editFilterMode === 'multi-edit'}
-      <Dialog
-        bind:open={open}
-      >
-        <div class="form-container" style:background-color={mAndDown ? 'transparent' : 'rgb(var(--global-color-background-100))'} style:width={mAndDown ? '100%' : '50vw'} style:box-sizing="border-box">
-          <div class="header">
-            <h1>{addFilterLabel}</h1>
-          </div>
-          <div class="body">
-            <slot name="content" {mAndDown} {updateMultiFilterValues} {handleRemoveAllFilters} {filters}>
-              <div class="multi-filters-container" style:grid-template-columns={mAndDown ? '1fr' : '1fr 1fr'}>
-                {#each filters as filter, i}
-                  <div class="filter" class:wide={filter.type === 'select' || filter.type === 'custom'}>
-                    <div class="input">
-                      {#if !filter.advanced && filter.type !== 'custom'}
-                        <div class="label">
-                          {filter.label}
-                        </div>
-                      {/if}
-                      <div class="field">
-                        <FilterEditor
-                          bind:filter={filter}
-                          {lang}
-                          {labelsMapper}
-                          editFilterMode="multi-edit"
-                          bind:tmpFilter={tmpFilters[filter.name]}
-                          mobile={mAndDown}
-                        >
-                          <slot name="custom" slot="custom" {updateFunction} {mAndDown} {filter}></slot>
-                        </FilterEditor>
                       </div>
                     </div>
-                  </div>
-                {/each}
+                  {/each}
+                </div>
+              {/if}
+            </div>
+            <div class="footer">
+              <div class="actions" style:padding-bottom={mAndDown ? '20px' : undefined}>
+                <Button
+                  --button-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
+                  --button-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
+                  --button-hover-background-color="rgb(var(--global-color-primary-500))"
+                  --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
+                  --button-box-shadow="none"
+                  onclick={handleCancelFilterClick}
+                >
+                  {cancelFilterLabel}
+                </Button>
+                <Button
+                  --button-color="rgb(var(--global-color-primary-400))"
+                  --button-background-color="transparent"
+                  --button-hover-background-color="rgb(var(--global-color-primary-500))"
+                  --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
+                  --button-box-shadow="none"
+                  onclick={handleMultiEditRemoveClick}
+                >
+                  {lang == 'en' ? "Remove filters" : "Rimuovi filtri"}
+                </Button>
+                <Button
+                  --button-min-width="100px"
+                  onclick={handleApplyMultiFilterClick}
+                >
+                  {applyFilterLabel}
+                </Button>
               </div>
-            </slot>
-          </div>
-          <div class="footer">
-            <div class="actions" style:padding-bottom={mAndDown ? '20px' : undefined}>
-              <Button
-                --button-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
-                --button-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
-                --button-hover-background-color="rgb(var(--global-color-primary-500))"
-                --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
-                --button-box-shadow="none"
-                on:click={handleCancelFilterClick}
-              >
-                {cancelFilterLabel}
-              </Button>
-              <Button
-                --button-color="rgb(var(--global-color-primary-400))"
-                --button-background-color="transparent"
-                --button-hover-background-color="rgb(var(--global-color-primary-500))"
-                --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
-                --button-box-shadow="none"
-                on:click={handleMultiEditRemoveClick}
-              >
-                {lang == 'en' ? "Remove filters" : "Rimuovi filtri"}
-              </Button>
-              <Button
-                --button-min-width="100px"
-                on:click={handleApplyMultiFilterClick}
-              >
-                {applyFilterLabel}
-              </Button>
             </div>
           </div>
-        </div>
-      </Dialog>
+        </Dialog>
+      {/if}
     {/if}
-  {/if}
+  {/snippet}
 </MediaQuery>
 
 

@@ -8,7 +8,7 @@
   import type { ComponentProps } from "svelte";
     import FlagIcon from "$lib/components/simple/media/FlagIcon.svelte";
 
-  let headers : ComponentProps<DynamicTable>['headers'] = [
+  let headers : ComponentProps<typeof DynamicTable>['headers'] = [
     {
       value: 'businessName',
       label: 'Business name',
@@ -185,7 +185,7 @@
     cellEdit
     {rows}
     totalRows={100000000}
-    on:fetchData={() => {
+    onfetchData={() => {
       let lastId = rows[rows.length - 1].item.id
       rows = [
         ...rows,
@@ -205,30 +205,33 @@
     searchBarPlaceholder={'Type to search'}
     searchBarVisible
   >
-    <svelte:fragment slot="custom-filter" let:filter let:updateMultiFilterValues>
+    {#snippet appendSnippet()}
+      ciao
+    {/snippet}
+    {#snippet customFilterSnippet({ filter, updateMultiFilterValues })}
       {#if !!filter}
         {#if filter.name == 'productCategory'}
           <label for="productCategory">Product Category</label>
-          <SimpleTextField name="productCategory" bind:value on:input={(e) => handleCustomInput(e, filter.name, updateMultiFilterValues)}></SimpleTextField>
+          <SimpleTextField name="productCategory" bind:value oninput={(e) => handleCustomInput(e, filter.name, updateMultiFilterValues)}></SimpleTextField>
         {/if}
       {/if}
-    </svelte:fragment>
-    <svelte:fragment slot="custom-filter-chip" let:filter>
+    {/snippet}
+    {#snippet customFilterChipSnippet({ filter })}
       {#if filter.name === 'productCategory'}
         <span>Product category equal to {filter.type === 'custom' ? filter.value : undefined}</span>
       {/if}
-    </svelte:fragment>
-    <svelte:fragment slot="custom" let:header let:row>
+    {/snippet}
+    {#snippet customRowSnippet({ columnIndex, header, index, row, })}
       {#if header.value == 'rating'}
         {row.item.rating}
         <Icon name="mdi-star" --icon-color="green"></Icon>
       {/if}
-    </svelte:fragment>
-    <div slot='custom-subheader' let:subHeader let:subItem>
+    {/snippet}
+    {#snippet subHeaderSnippet({ subHeader })}
       {#if subHeader.value == 'rating'}
         <FlagIcon alpha2='it'></FlagIcon>
       {/if}
-    </div>
+    {/snippet}
   </DynamicTable>
 </div>
 <h2>READ ME</h2>

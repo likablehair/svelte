@@ -1,11 +1,8 @@
 <script lang="ts">
   import '../../../css/main.css'
   import './LinkButton.css'
-  import { createEventDispatcher } from "svelte";
+  import { type Snippet } from "svelte";
   import Icon from "../media/Icon.svelte";
-
-  let clazz: string = '';
-	export { clazz as class };
 
   /*
     Styles
@@ -23,56 +20,92 @@
     --link-button-hover-background-color
   */
 
-  // props
-  export let disabled: boolean = false,
-    href: string,
-    prependIcon: string | undefined = undefined,
-    appendIcon: string | undefined = undefined,
-    target: string | undefined = undefined
-  
-  const dispatch = createEventDispatcher<{
-    click: {
-      nativeEvent: MouseEvent;
-    };
-    keypress: {
-      nativeEvent: KeyboardEvent;
-    };
-  }>();
+  interface Props {
+    disabled?: boolean;
+    href: string;
+    prependIcon?: string;
+    appendIcon?: string;
+    target?: string;
+    class?: string;
+    onclick?: (event: {
+      detail: {
+        nativeEvent: MouseEvent
+      }
+    }) => void
+    onkeypress?: (event: {
+      detail: {
+        nativeEvent: KeyboardEvent
+      }
+    }) => void
+    prependSnippet?: Snippet<[{
+      prependIcon: string | undefined
+    }]>
+    appendSnippet?: Snippet<[{
+      appendIcon: string | undefined
+    }]>
+    children?: Snippet<[]>
+  }
+
+  let {
+    disabled = false,
+    href,
+    prependIcon = undefined,
+    appendIcon = undefined,
+    target = undefined,
+    class: clazz = '',
+    onclick,
+    onkeypress,
+    prependSnippet,
+    appendSnippet,
+    children,
+  }: Props = $props();
 
   function handleClick(event: MouseEvent) {
     if (disabled) return;
-    dispatch("click", {
-      nativeEvent: event,
-    });
+    if(onclick){
+      onclick({
+        detail: {
+          nativeEvent: event
+        }
+      })
+    }
   }
 
   function handleKeyPress(event: KeyboardEvent) {
     if (disabled) return;
-    dispatch("keypress", {
-      nativeEvent: event,
-    });
+    if(onkeypress){
+      onkeypress({
+        detail: {
+          nativeEvent: event
+        }
+      })
+    }
   }
 </script>
 
 <a
-  on:click={handleClick}
-  on:keypress={handleKeyPress}
+  onclick={handleClick}
+  onkeypress={handleKeyPress}
   href={href}
   target={target}
   rel={target == '_blank' ? 'noreferrer' : undefined}
   class="link {clazz}"
 >
-  <slot name="prepend" {prependIcon}>
+  {#if prependSnippet}
+    {@render prependSnippet({prependIcon})}
+  {:else}
     {#if !!prependIcon}
       <Icon name={prependIcon}></Icon>
     {/if}
-  </slot>
-  <slot></slot>
-  <slot name="append" {appendIcon}>
+  {/if}
+  {@render children?.()}
+  {#if appendSnippet}
+    {@render appendSnippet({appendIcon})}
+  {:else}
     {#if !!appendIcon}
       <Icon name={appendIcon}></Icon>
     {/if}
-  </slot>
+  {/if}
 </a>
 
 <style>

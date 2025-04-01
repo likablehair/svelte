@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type Option = {
     label: string,
     name: string,
@@ -10,47 +10,80 @@
   import '../../../css/main.css'
   import './ColorInvertedSelector.css'
   import Icon from '../media/Icon.svelte'
-  import { createEventDispatcher } from "svelte";
+  import type { Snippet } from 'svelte';
 
-  let clazz: {
-    container?: string,
-    element?: string,
-    selected?: string,
-  } = {};
-	export { clazz as class };
-
-  let dispatch = createEventDispatcher<{
-    'select': {
-      option: Option,
-      selectedIndex: number | undefined,
-      native: Event
-    },
-    'delete': {
-      option: Option,
-      index: number
+  interface Props {
+    options: Option[];
+    selectedIndex?: number;
+    deletable?: boolean;
+    class?: {
+      container?: string,
+      element?: string,
+      selected?: string,
     }
-  }>()
+    onselect?: (event: {
+      detail: {
+        option: Option,
+        selectedIndex: number | undefined,
+        native: Event
+      }
+    }) => void
+    ondelete?: (event: {
+      detail: {
+        option: Option,
+      index: number
+      }
+    }) => void
+    prependSnippet?: Snippet<[{
+      option: Option,
+      index: number,
+      handleClickClose: (option: Option, index: number) => void
+    }]>
+    optionSnippet?: Snippet<[{
+      option: Option,
+    }]>
+    appendSnippet?: Snippet<[{
+      option: Option,
+      handleClickClose: (option: Option, index: number) => void
+    }]>
+  }
 
-  export let options: Option[],
-    selectedIndex: number | undefined,
-    deletable: boolean = true
+  let { 
+      options, 
+      selectedIndex = $bindable(undefined), 
+      deletable = true,
+      class: clazz = {},
+      ondelete,
+      onselect,
+      appendSnippet,
+      optionSnippet,
+      prependSnippet,
+  }: Props = $props();
 
 
   function handleOptionClick(option: Option, index: number, e: Event) {
-    dispatch('select', {
-      option: option,
-      selectedIndex,
-      native: e
-    })
+    if(onselect){
+      onselect({
+        detail: {
+          option,
+          selectedIndex,
+          native: e
+        }
+      })
+    }
     
     selectedIndex = index
   }
 
   function handleClickClose(option: Option, index: number) {
-    dispatch('delete', {
-      option: option,
-      index: index
-    })
+    if(ondelete){
+      ondelete({
+        detail: {
+          option,
+          index
+        }
+      })
+    }
   }
 </script>
 
@@ -63,45 +96,45 @@
       <button
         class:selected={selectedIndex == index}
         class="element {clazz?.element || ''} {selectedIndex == index ? clazz.selected : ''}"
-        on:click={(e) => handleOptionClick(option, index, e)}
-        on:keydown={() => { }}
+        onclick={(e) => handleOptionClick(option, index, e)}
+        onkeydown={() => { }}
       >
         <div class="icon-and-title">
-          {#if !!$$slots.prepend || !!option.icon}
-            <div>
-              <slot name="prepend" {option} {handleClickClose} {index}>
-                {#if !!option.icon}
-                  <Icon
-                    name={option.icon}
-                  ></Icon>
-                {/if}
-              </slot>
-            </div>
-          {/if}
-          <slot name="option" {option}>
+          <div>
+            {#if prependSnippet}
+                {@render prependSnippet({ option, handleClickClose, index })}
+            {:else}
+              {#if !!option.icon}
+                <Icon
+                  name={option.icon}
+                ></Icon>
+              {/if}
+            {/if}
+          </div>
+          {#if optionSnippet}
+            {@render optionSnippet({ option })}
+          {:else}
             <div class="label">
               {option.label}
             </div>
-          </slot>
+          {/if}
         </div>
-        {#if !!$$slots.append || deletable}
-          <div
-            on:click|stopPropagation={() => { }}
-            on:keydown={() => { }}
-            role="presentation"
-          >
-            <slot name="append" {option} {handleClickClose}>
-              {#if deletable}
-                <Icon
-                  name="mdi-close"
-                  click
-                  on:click={() => handleClickClose(option, index)}
-                  on:keydown={() => { }}
-                ></Icon>
-              {/if}
-            </slot>
-          </div>
-        {/if}
+        <div
+          onclick={(e) => { e.stopPropagation() }}
+          onkeydown={() => { }}
+          role="presentation"
+        >
+          {#if appendSnippet}
+            {@render appendSnippet({ option, handleClickClose })}
+          {:else}
+            {#if deletable}
+              <Icon
+                name="mdi-close"
+                onclick={() => handleClickClose(option, index)}
+              ></Icon>
+            {/if}
+          {/if}
+        </div>
       </button>
     </li>
   {/each}

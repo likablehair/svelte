@@ -49,7 +49,7 @@
 
     <div class="select-actions-container">
       <div class="select-actions">
-        <div style="display: flex; gap: 8px" />
+        <div style="display: flex; gap: 8px" ></div>
           <div bind:this={thirdActivator}>hover</div>
           <ToolTip
             activator={thirdActivator}

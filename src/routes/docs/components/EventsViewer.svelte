@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type Event = {
     name: string,
     description: string,
@@ -11,7 +11,11 @@
 </script>
 
 <script lang="ts">
-  export let events: Event[] = []
+  let { 
+    events = []
+  } : {
+    events?: Event[]
+  } = $props();
 </script>
 
 <ul class="container">

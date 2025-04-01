@@ -31,7 +31,10 @@
   $effect(() => {
     import('chartjs-plugin-zoom').then(({ default: zoomPlugin }) => {
       Chart.register(zoomPlugin)
-      chart.resetZoom()
+      setTimeout(() => {
+        if(!!chart.resetZoom)
+          chart.resetZoom()
+      }, 40);
     })
 
     chart = new Chart(canvasElem, {

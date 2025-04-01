@@ -35,7 +35,7 @@
     bind:resetZoom={resetZoom}
   ></GanymedeLineChart>
   <Button
-    on:click={() => { resetZoom = true }}
+    onclick={() => { resetZoom = true }}
   >Reset zoom</Button>
   <div style:height="24px" style:width="48px">
     <GanymedeLineChart

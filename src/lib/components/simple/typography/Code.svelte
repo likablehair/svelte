@@ -6,19 +6,33 @@
   import './dracula.css'
   import lodash from 'lodash'
 
+  interface Props {
+    codeBackgroundColor?: string;
+    headerBackgroundColor?: string;
+    dividerColor?: string;
+    borderRadius?: string;
+    headerPadding?: string;
+    codePadding?: string;
+    color?: string;
+    boxShadow?: string;
+    code: string;
+    title?: string;
+    language?: 'javascript' | 'bash' | 'html' | 'svelte' | 'typescript' | 'css';
+  }
 
-  export let 
-    codeBackgroundColor: string = "rgb(24 24 27/1)",
-    headerBackgroundColor: string = "rgb(39 39 42/1)",
-    dividerColor: string = "rgb(63 63 70)",
-    borderRadius: string = ".5rem",
-    headerPadding: string = "1rem 1rem",
-    codePadding: string = "0rem 1rem",
-    color: string = "white",
-    boxShadow: string = "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-    code: string,
-    title: string | undefined = undefined,
-    language: 'javascript' | 'bash' | 'html' | 'svelte' | 'typescript' | 'css' = 'javascript'
+  let {
+    codeBackgroundColor = "rgb(24 24 27/1)",
+    headerBackgroundColor = "rgb(39 39 42/1)",
+    dividerColor = "rgb(63 63 70)",
+    borderRadius = ".5rem",
+    headerPadding = "1rem 1rem",
+    codePadding = "0rem 1rem",
+    color = "white",
+    boxShadow = "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+    code,
+    title = undefined,
+    language = 'javascript',
+  }: Props = $props();
 
   let codeElement: HTMLElement
   onMount(() => {

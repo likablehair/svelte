@@ -32,7 +32,7 @@
     import("chartjs-plugin-zoom").then(({ default: zoomPlugin}) => {
       Chart.register(zoomPlugin)
       setTimeout(() => {
-        if(!!chart)
+        if(!!chart.resetZoom)
           chart.resetZoom()
       }, 40);
     })

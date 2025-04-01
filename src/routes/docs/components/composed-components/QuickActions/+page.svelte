@@ -15,7 +15,7 @@
 <h2>Example</h2>
 <div class="example">
   <Button
-    on:click={() => { selectedItems = [
+    onclick={() => { selectedItems = [
         {},
         {}
       ]

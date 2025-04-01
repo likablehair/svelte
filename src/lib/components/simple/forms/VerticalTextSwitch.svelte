@@ -1,18 +1,38 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
   import { fly } from "svelte/transition";
 
-  export let value = false,
+  interface Props {
+    value: boolean;
+    height: string;
+    width: string;
+    backgroundColor?: string;
+    firstColor?: string;
+    secondColor?: string;
+    fontSize: string;
+    hoverBackgroundColor?: string;
+    hoverBoxShadow?: string;
+    animationDuration: number;
+    trueOptionSnippet?: Snippet<[]>
+    falseOptionSnippet?: Snippet<[]>
+  }
+
+  let {
+    value = $bindable(false),
     height = "100%",
     width = "100%",
-    backgroundColor: string | undefined = undefined,
-    firstColor: string | undefined = undefined,
-    secondColor: string | undefined = firstColor,
+    backgroundColor,
+    firstColor,
+    secondColor = firstColor,
     fontSize = "12px",
-    hoverBackgroundColor: string | undefined = undefined,
-    hoverBoxShadow: string | undefined = undefined,
-    animationDuration = 200;
+    hoverBackgroundColor,
+    hoverBoxShadow,
+    animationDuration = 200,
+    falseOptionSnippet,
+    trueOptionSnippet,
+  }: Props = $props();
 
-  let optionHeight: number | undefined = undefined;
+  let optionHeight: number | undefined = $state(undefined);
 </script>
 
 <div
@@ -23,10 +43,13 @@
   style:--vertical-text-switch-hover-background-color={hoverBackgroundColor}
   style:--vertical-text-switch-hover-box-shadow={hoverBoxShadow}
   bind:clientHeight={optionHeight}
-  on:click={() => (value = !value)}
-  on:keypress={() => (value = !value)}
+  onclick={() => (value = !value)}
+  onkeypress={() => (value = !value)}
   style:background-color={backgroundColor}
   style:padding="5px"
+  role="switch"
+  aria-checked={value}
+  tabindex="0"
 >
   {#if value}
     <div
@@ -40,7 +63,9 @@
       style:color={firstColor}
       style:font-size={fontSize}
     >
-      <slot name="trueOption" />
+      {#if trueOptionSnippet}
+        {@render trueOptionSnippet()}
+      {/if}
     </div>
   {:else}
     <div
@@ -54,7 +79,9 @@
       style:color={secondColor}
       style:font-size={fontSize}
     >
-      <slot name="falseOption" />
+      {#if falseOptionSnippet}
+        {@render falseOptionSnippet()}
+      {/if}
     </div>
   {/if}
   <input type="checkbox" bind:value />

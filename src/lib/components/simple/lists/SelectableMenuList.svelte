@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   type Divider = {
     divider: true,
     marginTop?: string,
@@ -22,25 +22,36 @@
   import '../../../css/main.css'
   import './SelectableMenuList.css'
   import Icon from "$lib/components/simple/media/Icon.svelte";
-  import { createEventDispatcher } from 'svelte';
 
-  let dispatch = createEventDispatcher<{
-    'select': {
-      item: Item
-    }
-  }>()
+  interface Props {
+    collapsed?: boolean;
+    items?: MenuItem[];
+    selected?: string | number;
+    onselect?: (event: {
+      detail: {
+        item: Item
+      }
+    }) => void
+  }
 
-  export let collapsed: boolean = false,
-    items: MenuItem[] = [],
-    selected: string | number | undefined = undefined
+  let {
+    collapsed = $bindable(false),
+    items = [],
+    selected = $bindable(undefined),
+    onselect,
+  }: Props = $props();
 
   function handleItemClick(item: Item) {
     if(item.disabled) return
 
     selected = item.name
-    dispatch('select', {
-      item
-    })
+    if(onselect) {
+      onselect({
+        detail: {
+          item
+        }
+      })
+    }
   }
 </script>
 
@@ -51,24 +62,29 @@
   <ul>
     {#each items as item}
       {#if !item.divider }
-        <li
-          class="menu-row"
-          aria-label={item.label}
-          class:selected={!!selected && item.name === selected}
-          class:disabled={item.disabled}
-          on:click={() => { if(!item.divider) handleItemClick(item) }}
-          on:keypress={() => { if(!item.divider) handleItemClick(item) }}
+        <div
+          role="button"
+          tabindex="0"
+          onclick={() => { if(!item.divider) handleItemClick(item) }}
+          onkeypress={() => { if(!item.divider) handleItemClick(item) }}
         >
-          <div class="menu-icon">
-            <Icon 
-              name={item.icon}
-              --icon-default-size="1.5rem"
-            ></Icon>
-          </div>
-          {#if !collapsed}
-            <div class="menu-name">{item.label}</div>
-          {/if}
-        </li>
+          <li
+            class="menu-row"
+            aria-label={item.label}
+            class:selected={!!selected && item.name === selected}
+            class:disabled={item.disabled}
+          >
+            <div class="menu-icon">
+              <Icon 
+                name={item.icon}
+                --icon-size="1.5rem"
+              ></Icon>
+            </div>
+            {#if !collapsed}
+              <div class="menu-name">{item.label}</div>
+            {/if}
+          </li>
+        </div>
       {:else}
         <div
           style:margin-top={item.marginTop}

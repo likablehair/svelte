@@ -1,18 +1,11 @@
-<script lang="ts">
+<script lang="ts" generics="Data">
   import '../../../css/main.css'
   import './GlobalSearchTextField.css'
   import Dialog from '$lib/components/simple/dialogs/Dialog.svelte'
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { onMount, type ComponentProps, type Snippet } from 'svelte';
   import SearchBar from './SearchBar.svelte';
   import Keyboarder, { type CallbackFunction } from '$lib/utils/keyboarder';
-  import SearchResults, { type Result } from './SearchResults.svelte';
-
-  let clazz: {
-    container?: string,
-    button?: string,
-    shortcut?: string
-  } = {};
-	export { clazz as class };
+  import SearchResults, { type Result } from './SearchResults.svelte'
 
   /* 
     Styles:
@@ -28,68 +21,115 @@
     --global-search-text-field-font-size
   */
 
-  export let searchButtonText: string = "Search",
-    searchDialogOpened: boolean = false,
-    transitionDuration: string = ".8s",
-    searcher: (params: { searchText: string }) => Promise<Result[] | undefined> = () => Promise.resolve([])
-
-    let searchBarInput: HTMLElement,
-      searchText: string | undefined = undefined,
-      searchResults: Result[] | undefined = undefined,
-      searchLoading: boolean = false,
-      searchBarFocused: boolean = false
-
-    let dispatch = createEventDispatcher<{
-      'toggle-search-dialog': {
+  interface Props {
+    searchButtonText?: string;
+    searchDialogOpened?: boolean;
+    transitionDuration?: string;
+    class?: {
+      container?: string,
+      button?: string,
+      shortcut?: string
+    }
+    searcher?: (params: { searchText: string }) => Promise<Result<Data>[] | undefined>;
+    ontoggleSearchDialog?: (event: {
+      detail: {
         opened: boolean
       }
-    }>()
+    }) => void
+    searchButtonSnippet?: Snippet<[{
+      toggleSearchDialog: typeof toggleSearchDialog
+    }]>
+    searchButtonIconSnippet?: Snippet<[{
+      toggleSearchDialog: typeof toggleSearchDialog
+    }]>
+    searchButtonTextSnippet?: Snippet<[]>
+    searchButtonShortcutSnippet?: Snippet<[]>
+    searchBarSnippet?: Snippet<[{
+      searchBarInput: typeof searchBarInput,
+      searchText: typeof searchText,
+      search: typeof search,
+    }]>
+    searchResultsSnippet?: Snippet<[{
+      searchLoading: typeof searchLoading,
+      searchResults: typeof searchResults,
+    }]>
+    onselect?: ComponentProps<typeof SearchResults<Data>>['onselect']
+  }
 
-    onMount(() => {
-      let handler: CallbackFunction = (params) => {
-        if((params.meta || params.ctrl) && params.key == 'k') {
-          toggleSearchDialog()
+  let {
+    searchButtonText = "Search",
+    searchDialogOpened = $bindable(false),
+    transitionDuration = ".8s",
+    searcher = () => Promise.resolve([]),
+    class: clazz = {},
+    ontoggleSearchDialog,
+    searchBarSnippet,
+    searchButtonIconSnippet,
+    searchButtonShortcutSnippet,
+    searchButtonSnippet,
+    searchButtonTextSnippet,
+    searchResultsSnippet,
+    onselect,
+  }: Props = $props();
+
+  let searchBarInput: HTMLElement | undefined = $state(),
+    searchText: string | undefined = $state(),
+    searchResults: Result<Data>[] | undefined = $state(),
+    searchLoading: boolean = $state(false),
+    searchBarFocused: boolean = $state(false)
+
+  onMount(() => {
+    let handler: CallbackFunction = (params) => {
+      if((params.meta || params.ctrl) && params.key == 'k') {
+        toggleSearchDialog()
+      }
+    }
+
+    Keyboarder.on(handler)
+
+    return () => {
+      Keyboarder.off(handler)
+    }
+  })
+
+  function handleKeydown(event: KeyboardEvent) {
+    if(event.key == 'ArrowDown' || event.key == 'ArrowUp') event.preventDefault()
+  }
+
+  function toggleSearchDialog()  {
+    searchDialogOpened = !searchDialogOpened
+    if(searchDialogOpened) searchBarInput?.focus()
+    if(ontoggleSearchDialog) {
+      ontoggleSearchDialog({
+        detail: {
+          opened: searchDialogOpened
         }
-      }
-
-      Keyboarder.on(handler)
-
-      return () => {
-        Keyboarder.off(handler)
-      }
-    })
-
-    function handleKeydown(event: KeyboardEvent) {
-      if(event.key == 'ArrowDown' || event.key == 'ArrowUp') event.preventDefault()
+      })
     }
+  }
 
-    function toggleSearchDialog()  {
-      searchDialogOpened = !searchDialogOpened
-      if(searchDialogOpened) searchBarInput.focus()
-      dispatch('toggle-search-dialog', { opened: searchDialogOpened })
+  async function search() {
+    if(!!searchText) {
+      searchLoading = true
+      searchResults = await searcher({
+        searchText
+      })
+      searchLoading = false
     }
-
-    async function search() {
-      if(!!searchText) {
-        searchLoading = true
-        searchResults = await searcher({
-          searchText
-        })
-        searchLoading = false
-      }
-    }
+  }
 </script>
 
 <div class={clazz.container || ''}>
-  <slot 
-    name="search-button"
-    {toggleSearchDialog}
-  >
+  {#if searchButtonSnippet}
+    {@render searchButtonSnippet({ toggleSearchDialog })}
+  {:else}
     <button 
-      on:click={toggleSearchDialog}
+      onclick={toggleSearchDialog}
       class="search-like-button {clazz.button || ''}"
     >
-      <slot name="search-button-icon">
+      {#if searchButtonIconSnippet}
+        {@render searchButtonIconSnippet({ toggleSearchDialog })}
+      {:else}
         <svg
           viewBox="0 0 20 20"
           fill="none"
@@ -99,17 +139,21 @@
             stroke-linecap="round"
             stroke-linejoin="round"
             d="M12.01 12a4.25 4.25 0 1 0-6.02-6 4.25 4.25 0 0 0 6.02 6Zm0 0 3.24 3.25"
-          /></svg
-        >
-      </slot>
-      <slot name="search-button-text">
+          />
+        </svg>
+      {/if}
+      {#if searchButtonTextSnippet}
+        {@render searchButtonTextSnippet()}
+      {:else}
         {searchButtonText}
-      </slot>
-      <slot name="search-button-shortcut">
+      {/if}
+      {#if searchButtonShortcutSnippet}
+        {@render searchButtonShortcutSnippet()}
+      {:else}
         <kbd class="shortcut {clazz.shortcut || ''}"><kbd class="shortcut">⌘</kbd><kbd class="shortcut">K</kbd></kbd>
-      </slot>
+      {/if}
     </button>
-  </slot>
+  {/if}
   <Dialog
     bind:open={searchDialogOpened}
     transition="scale"
@@ -122,45 +166,44 @@
       style:height="500px"
       style:display="flex"
       style:justify-content="center"
-      on:click={() => searchDialogOpened = false}
-      on:keypress={() => searchDialogOpened = false}
+      onclick={() => searchDialogOpened = false}
+      onkeypress={() => searchDialogOpened = false}
+      role='button'
+      tabindex={0}
     >
       <div
-        on:click|stopPropagation={() => { }}
-        on:keypress|stopPropagation={() => { }}
+        onclick={(e) => { e.stopPropagation() }}
+        onkeypress={(e) => { e.stopPropagation() }}
         style:width="100%"
         style:height="fit-content"
+        role='button'
+        tabindex={-1}
       >
-        <slot 
-          name="search-bar"
-          searchBarInput
-          searchText
-          search
-        >
+        {#if searchBarSnippet}
+          {@render searchBarSnippet({ searchBarInput, searchText, search })}
+        {:else}
           <SearchBar
             bind:input={searchBarInput}
             bind:value={searchText}
-            on:input={search}
-            on:keydown={handleKeydown}
-            on:focus={() => searchBarFocused = true}
-            on:blur={() => searchBarFocused = false}
+            oninput={search}
+            onkeydown={handleKeydown}
+            onfocus={() => searchBarFocused = true}
+            onblur={() => searchBarFocused = false}
           ></SearchBar>
-        </slot>
+        {/if}
         {#if !!searchText}
-          <slot 
-            name="search-results"
-            searchLoading
-            searchResults
-          >
+          {#if searchResultsSnippet}
+            {@render searchResultsSnippet({ searchLoading, searchResults })}
+          {:else}
             <SearchResults
               --search-results-margin="-.5rem 0 0 0"
               --search-results-border-radius="0 0 .5rem .5rem"
               loading={searchLoading}
               results={searchResults}
               activeKeyboard={searchBarFocused}
-              on:select
+              {onselect}
             ></SearchResults>
-          </slot>
+          {/if}
         {/if}
       </div>
     </div>

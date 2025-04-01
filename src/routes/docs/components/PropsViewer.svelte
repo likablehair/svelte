@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type Prop = {
     name: string,
     type: string,
@@ -8,8 +8,15 @@
 </script>
 
 <script lang="ts">
-  export let props: Prop[] = [],
-    styleProps: Prop[] = []
+  interface Props {
+    props?: Prop[];
+    styleProps?: Prop[];
+  }
+
+  const { 
+    props = [],
+    styleProps = []
+  }: Props = $props();
 </script>
 
 <ul class="container">
