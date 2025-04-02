@@ -8,7 +8,7 @@
 </script>
 <script lang="ts">
 	import { Icon } from "$lib";
-    import type { HTMLOptionAttributes, HTMLSelectAttributes } from 'svelte/elements';
+	import type { HTMLOptionAttributes, HTMLSelectAttributes } from 'svelte/elements';
 
 	interface Props extends HTMLSelectAttributes{
 		options: Option[],

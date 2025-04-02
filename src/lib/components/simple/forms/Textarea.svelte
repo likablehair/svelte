@@ -2,20 +2,20 @@
   import { createId } from '@paralleldrive/cuid2';
 
   interface Props {
-    label: string | null;
-    placeholder: string;
-    textAreaId: string;
-    fontFamily: string;
-    value: string;
-    resizable: boolean;
-    disabled: boolean;
-    readOnly: boolean;
+    label?: string;
+    placeholder?: string;
+    textAreaId?: string;
+    fontFamily?: string;
+    value?: string;
+    resizable?: boolean;
+    disabled?: boolean;
+    readOnly?: boolean;
     maxLength?: number;
-    textColor: string;
-    border: string;
-    borderRadius: string;
+    textColor?: string;
+    border?: string;
+    borderRadius?: string;
     focusedBoxShadow?: string;
-    backgroundColor: string | null;
+    backgroundColor?: string;
     padding?: string;
     paddingLeft?: string;
     paddingRight?: string;
@@ -24,12 +24,12 @@
     fontSize?: string;
     labelFontSize?: string;
     labelColor?: string;
-    width: string;
-    height: string;
+    width?: string;
+    height?: string;
   }
 
   let {
-    label = null,
+    label = undefined,
     placeholder = "placeholder",
     textAreaId = createId(),
     fontFamily = "inherit",
@@ -42,7 +42,7 @@
     border = "none",
     borderRadius = "5px",
     focusedBoxShadow = undefined,
-    backgroundColor = null,
+    backgroundColor = undefined,
     padding = undefined,
     paddingLeft = undefined,
     paddingRight = undefined,

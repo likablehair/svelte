@@ -1,30 +1,13 @@
 <script lang="ts">
-	import './Divider.css'
-	interface Props {
-    weight?: string;
-    radius?: string;
-    marginTop?: string;
-    marginBottom?: string;
-    marginLeft?: string;
-    marginRight?: string;
-  }
-
-  let {
-    weight = '1px',
-    radius = '0.5px',
-    marginTop = '10px',
-    marginBottom = '10px',
-    marginLeft = '5px',
-    marginRight = '5px',
-  }: Props = $props();
+	import './Divider.css';
 </script>
 
 <div
-	style:background-color={'var(--divider-color, var(--divider-default-color))'}
-	style:border-radius={radius}
-	style:height={weight}
-	style:margin-top={marginTop}
-	style:margin-bottom={marginBottom}
-	style:margin-right={marginRight}
-	style:margin-left={marginLeft}
+  style:background-color="var(--divider-color, var(--divider-default-color))"
+  style:border-radius="var(--divider-radius, var(--divider-default-radius))"
+  style:height="var(--divider-weight, var(--divider-default-weight))"
+  style:margin-top="var(--divider-margin-top, var(--divider-default-margin-top))"
+  style:margin-bottom="var(--divider-margin-bottom, var(--divider-default-margin-bottom))"
+  style:margin-right="var(--divider-margin-right, var(--divider-default-margin-right))"
+  style:margin-left="var(--divider-margin-left, var(--divider-default-margin-left))"
 ></div>

@@ -13,7 +13,7 @@
     icon?: string;
     message?: string;
     disabled?: boolean;
-    maxFiles?: number | undefined;
+    maxFiles?: number;
     class?: string
     onchange?: ComponentProps<typeof FileInput>['onchange']
     onfileChange?: (event: {

@@ -2,6 +2,8 @@
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
   import GanymedePieChart from "$lib/components/simple/charts/GanymedePieChart.svelte";
+  import EventsViewer from "../../EventsViewer.svelte";
+  import SlotsViewer from "../../SlotsViewer.svelte";
 </script>
 
 <h1>GanymedePieChart</h1>
@@ -51,11 +53,18 @@
 </div>
 <h2>Props</h2>
 <PropsViewer
-  props={[]}
+  props={[
+    { name: "data", type: "object", description: "Chart data including labels, datasets, and options", default: "{ labels: [], datasets: [], options: object } }" },
+    { name: "showLegend", type: "boolean", description: "Show legend in chart", default: "true" },
+    { name: "responsive", type: "boolean", description: "Make chart responsive", default: "true" },
+    { name: "maintainAspectRatio", type: "boolean", description: "Maintain aspect ratio", default: "false" }
+  ]}
   styleProps={[]}
 />
 <h2>Slots</h2>
+<SlotsViewer></SlotsViewer>
 <h2>Events</h2>
+<EventsViewer></EventsViewer>
 
 <style>
   .example {

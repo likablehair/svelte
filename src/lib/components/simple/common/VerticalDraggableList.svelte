@@ -71,7 +71,7 @@
         {#if itemSnippet}
           {@render itemSnippet({ item })}
         {:else}
-          {item.name}	
+          {item.name}
         {/if}
       </div>
 		</div>

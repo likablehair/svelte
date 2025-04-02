@@ -401,7 +401,7 @@
   })
 </script>
 
-<svelte:window on:scroll={refreshMenuPosition} on:resize={refreshMenuPosition} ></svelte:window>
+<svelte:window onscroll={refreshMenuPosition} onresize={refreshMenuPosition} ></svelte:window>
 
 <div
   class="controller"

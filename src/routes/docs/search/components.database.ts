@@ -38,6 +38,30 @@ const list: {
     type: 'composed',
     url: '/docs/components/composed-components/DescriptiveAvatar' 
   }, {
+    title: 'CollapsibleDivider',
+    description: 'Make everything collapsable',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/CollapsibleDivider' 
+  }, {
+    title: 'Divider',
+    description: "Wasn't meant to be together",
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Divider'
+  }, {
+    title: 'Calendar',
+    description: "Just a calendar",
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Calendar'
+  }, {
+    title: 'MonthSelector',
+    description: "Just a month selector",
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/MonthSelector'
+  }, {
     title: 'ProgressBar',
     description: 'Makes some progress to get there.',
     status: 'stable',
@@ -74,6 +98,24 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/Menu'
   }, {
+    title: 'Textarea',
+    description: 'Big area of text',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Textarea'
+  }, {
+    title: 'VerticalSwitch',
+    description: 'Switching sides vertically',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/VerticalSwitch'
+  }, {
+    title: 'VerticalTextSwitch',
+    description: 'Switching sides vertically and with text',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/VerticalTextSwitch'
+  }, {
     title: 'SimpleTextField',
     description: 'A simple text input',
     status: 'beta',
@@ -109,12 +151,6 @@ const list: {
     status: 'stable',
     type: 'composed',
     url: '/docs/components/composed-components/YearPickerTextField'
-  }, {
-    title: 'TimePicker',
-    description: 'Time to change, always time to change',
-    status: 'stable',
-    type: 'simple',
-    url: '/docs/components/simple-components/TimePicker'
   }, {
     title: 'VerticalDraggableList',
     description: 'Drag all over me',

@@ -4,17 +4,11 @@
   import { scrollAtCenter } from "$lib/components/simple/common/scroller";
   import { onMount, type Snippet } from "svelte";
 
-  /*
-    Styles
-
-    --year-selector-height
-    --year-selector-width
-  */
-
   interface Props {
-    selectedYear?: number | undefined;
+    selectedYear?: number;
     selectableYears?: number[];
     disabled?: boolean;
+    
     class?: string
     onclick?: (event: {
       detail: {

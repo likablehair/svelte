@@ -5,31 +5,6 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
   import type { Snippet } from 'svelte';
 
-  /* 
-    Styles:
-    
-    --simple-textfield-padding
-    --simple-textfield-height
-    --simple-textfield-width
-    --simple-textfield-max-width
-    --simple-textfield-color
-    --simple-textfield-background-color
-    --simple-textfield-border-radius
-    --simple-textfield-box-shadow
-    --simple-textfield-focus-background-color
-    --simple-textfield-focus-box-shadow
-    --simple-textfield-transition
-    --simple-textfield-font-size
-    --simple-textfield-font-weight
-    --simple-textfield-outer-gap
-    --simple-textfield-inner-gap
-    --simple-textfield-hint-font-size
-    --simple-textfield-hint-color
-    --simple-textfield-hint-margin-left
-    --simple-textfield-margin-bottom
-    --simple-textfield-margin-left
-  */
-
   interface Props extends HTMLInputAttributes{
     value?: string | number;
     type?: "text" | "password" | "number" | "time" | "date";

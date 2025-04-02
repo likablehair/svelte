@@ -3,18 +3,18 @@
   import { fly } from "svelte/transition";
 
   interface Props {
-    value: boolean;
-    height: string;
-    width: string;
+    value?: boolean;
+    height?: string;
+    width?: string;
     backgroundColor?: string;
     firstColor?: string;
     secondColor?: string;
-    fontSize: string;
+    fontSize?: string;
     hoverBackgroundColor?: string;
     hoverBoxShadow?: string;
-    animationDuration: number;
-    trueOptionSnippet?: Snippet<[]>
-    falseOptionSnippet?: Snippet<[]>
+    animationDuration?: number;
+    trueOptionSnippet: Snippet<[]>
+    falseOptionSnippet: Snippet<[]>
   }
 
   let {
@@ -63,9 +63,7 @@
       style:color={firstColor}
       style:font-size={fontSize}
     >
-      {#if trueOptionSnippet}
-        {@render trueOptionSnippet()}
-      {/if}
+      {@render trueOptionSnippet()}
     </div>
   {:else}
     <div
@@ -79,12 +77,10 @@
       style:color={secondColor}
       style:font-size={fontSize}
     >
-      {#if falseOptionSnippet}
-        {@render falseOptionSnippet()}
-      {/if}
+      {@render falseOptionSnippet()}
     </div>
   {/if}
-  <input type="checkbox" bind:value />
+  <input type="checkbox" bind:checked={value} />
 </div>
 
 <style>

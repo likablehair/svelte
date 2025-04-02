@@ -3,13 +3,8 @@
   import './MonthSelector.css'
   import type { Locale } from "./utils";
   import { getMonthName } from "./utils";
-
-  /*
-    Styles
-
-    --month-selector-height
-    --month-selector-width
-  */
+  import Button from "$lib/components/simple/buttons/Button.svelte";
+  import type { Snippet } from 'svelte';
 
   interface Props {
     selectedMonth?: number | undefined;
@@ -54,8 +49,6 @@
       })
     }
   }
-  import Button from "$lib/components/simple/buttons/Button.svelte";
-    import type { Snippet } from 'svelte';
 </script>
 
 <div class="selector-container {clazz.container || ''}">
@@ -78,9 +71,6 @@
           {getMonthName(monthIndex, locale)}
         {/if}
       </Button>
-    {/if}
-    {#if selectorSnippet}
-      {@render selectorSnippet({ month: monthIndex, monthName: getMonthName(monthIndex, locale) })}
     {/if}
   {/each}
 </div>

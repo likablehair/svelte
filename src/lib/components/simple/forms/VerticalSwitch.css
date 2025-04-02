@@ -1,0 +1,14 @@
+:root {
+  --vertical-switch-default-width: 30px;
+  --vertical-switch-default-height: 60px;
+  --vertical-switch-default-background-color: #90CAF9;
+  --vertical-switch-default-selected-option-color: var(--vertical-switch-default-background-color);
+  --vertical-switch-default-slider-color: white;
+  --vertical-switch-default-option-color: var(--vertical-switch-default-slider-color);
+  --vertical-switch-default-font-size: 11px;
+  --vertical-switch-animation-duration: 0.1s;
+  --vertical-switch-default-container-border-radius: 4px;
+  --vertical-switch-default-container-border-radius-rounded: 500px;
+  --vertical-switch-default-slider-border-radius: 4px;
+  --vertical-switch-default-slider-border-radius-rounded: 100%;
+}

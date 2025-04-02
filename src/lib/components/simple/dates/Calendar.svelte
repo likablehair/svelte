@@ -7,7 +7,7 @@
   import type { Snippet } from 'svelte';
 
   interface Props {
-    selectedDate?: Date | null;
+    selectedDate?: Date;
     visibleMonth?: number;
     visibleYear?: number;
     locale?: Locale;
@@ -23,8 +23,8 @@
     ondayClick?: (event: {
       detail: {
         dateStat: DateStat;
-      selected: boolean;
-      extraMonth: boolean;
+        selected: boolean;
+        extraMonth: boolean;
       }
     }) => void
     weekHeaderSnippet?: Snippet<[{
@@ -119,8 +119,6 @@
             >
               {day.dayOfMonth}
             </div>
-            <!-- {:else}
-            <div /> -->
           {/if}        
         {/if}
       {/each}

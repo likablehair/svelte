@@ -73,7 +73,7 @@
   }
 </script>
 
-<svelte:window bind:scrollY on:scroll={handleScroll} />
+<svelte:window bind:scrollY onscroll={handleScroll} />
 
 <Drawer
   bind:open={openDrawer}

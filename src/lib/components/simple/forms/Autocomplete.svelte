@@ -1,21 +1,21 @@
 <script module lang="ts">
-  export type Item = {
+  export type Item<Data = any> = {
     value: string | number;
     label?: string | number;
-    /* eslint-disable  @typescript-eslint/no-explicit-any */
-    data?: any;
+    data?: Data;
   };
 </script>
 
-<script lang="ts">
+<script lang="ts" generics="Data">
   import '../../../css/main.css'
   import './Autocomplete.css'
   import { scrollInMenu } from '../common/scroller';
 
+  type ItemData = Item<Data>
   interface Props {
-    values?: Item[];
-    items?: Item[];
-    searchFunction?: (item: Item, searchText: string | undefined) => boolean;
+    values?: ItemData[];
+    items?: ItemData[];
+    searchFunction?: (item: ItemData, searchText: string | undefined) => boolean;
     multiple?: boolean;
     disabled?: boolean;
     mandatory?: boolean;
@@ -40,42 +40,42 @@
       simpleTextfield?: ComponentProps<typeof SimpleTextField>['class']
     }
     selectionContainerSnippet?: Snippet<[{
-      values: Item[];
+      values: ItemData[];
       searchText: string | undefined;
       disabled: boolean;
       openMenu: () => void;
       handleKeyDown: (event: { key: string }) => void
-      unselect: (item: Item) => void;
-      select: (item: Item) => void;
+      unselect: (item: ItemData) => void;
+      select: (item: ItemData) => void;
     }]>;
     selectionSnippet?: Snippet<[{
-      selection: Item;
-      unselect: (item: Item) => void;
+      selection: ItemData;
+      unselect: (item: ItemData) => void;
     }]>;
     chipLabelSnippet?: Snippet<[{
-      selection: Item;
+      selection: ItemData;
     }]>;
     exceedCounterSnippet?: Snippet<[{
       notVisibleChipNumber: number;
       maxVisibleChips: number;
-      values: Item[];
+      values: ItemData[];
       searchText: string | undefined;
       disabled: boolean;
     }]>;
     menuSnippet?: Snippet<[]>;
     itemLabelSnippet?: Snippet<[{
-      item: Item
+      item: ItemData
     }]>;
     itemSnippet?: Snippet<[{
-      item: Item,
+      item: ItemData,
       index: number
       selected: boolean
     }]>;
     onchange?: (event: {
       detail: {
-        unselect: Item | undefined,
-        select: Item | undefined,
-        selection: Item[]
+        unselect: ItemData | undefined,
+        select: ItemData | undefined,
+        selection: ItemData[]
       }
     }) => void
     onfocus?: () => void,
@@ -123,7 +123,7 @@
 
   let notVisibleChipNumber = $derived(Math.max((values?.length || 0) - (maxVisibleChips || 0), 0))
 
-  function select(item: Item) {
+  function select(item: ItemData) {
     if(disabled) return
 
     const alreadyPresent =
@@ -148,7 +148,7 @@
     if (!multiple && closeOnSelect) menuOpened = false
   }
 
-  function unselect(item: Item) {
+  function unselect(item: ItemData) {
     if(disabled) return
 
     if(values.length == 1 && mandatory) return
@@ -183,7 +183,7 @@
     }
   }
 
-  function toggle(item: Item) {
+  function toggle(item: ItemData) {
     const alreadyPresent =
       values.findIndex((i) => i.value === item.value) != -1;
 
@@ -281,7 +281,7 @@
     }
   }
 
-  let filteredItems: Item[] = $state(items);
+  let filteredItems: ItemData[] = $state(items);
   $effect(() => {
     if (searchText) {
      focusedIndex = undefined;
@@ -388,104 +388,104 @@
     {@render menuSnippet()}
   {:else}
     {#if !mobileDrawer}
-    <Menu
-      {activator}
-      _width={localMenuWidth || ""}
-      _height={menuHeight}
-      _maxHeight="300px"
-      _boxShadow={menuBoxShadow}
-      _borderRadius={menuBorderRadius}
-      bind:open={menuOpened}
-      anchor="bottom-center"
-      closeOnClickOutside
-      bind:refreshPosition
-      bind:menuElement
-      bind:openingId={openingId}
-      flipOnOverflow
-    >
-      <ul
-        class={clazz.menu || ''}
-        style:background-color="rgb(var(--global-color-background-100))"
+      <Menu
+        {activator}
+        _width={localMenuWidth || ""}
+        _height={menuHeight}
+        _maxHeight="300px"
+        _boxShadow={menuBoxShadow}
+        _borderRadius={menuBorderRadius}
+        bind:open={menuOpened}
+        anchor="bottom-center"
+        closeOnClickOutside
+        bind:refreshPosition
+        bind:menuElement
+        bind:openingId={openingId}
+        flipOnOverflow
       >
-        {#each filteredItems as item, index}
-          <li class="item-{index}">
-            {#if itemSnippet}
-              {@render itemSnippet({
-                item,
-                index,
-                selected: (values || [])
-                  .findIndex((i) => { return i.value == item.value }) != -1
-              })}
-            {:else}
-              <div
-                class:selection-item={true}
-                class:focused={index == focusedIndex}
-                class:selected={(values || []).findIndex((i) => {
-                  return i.value == item.value;
-                }) != -1}
-                onclick={() => toggle(item)}
-                onkeypress={() => toggle(item)}
-                role="button"
-                tabindex="0"
-              >
-                {#if itemLabelSnippet}
-                  {@render itemLabelSnippet({ item })}
-                {:else}
-                  {item.label}
-                {/if}
-              </div>
-            {/if}
-          </li>
-        {/each}
-      </ul>
-    </Menu>
+        <ul
+          class={clazz.menu || ''}
+          style:background-color="rgb(var(--global-color-background-100))"
+        >
+          {#each filteredItems as item, index}
+            <li class="item-{index}">
+              {#if itemSnippet}
+                {@render itemSnippet({
+                  item,
+                  index,
+                  selected: (values || [])
+                    .findIndex((i) => { return i.value == item.value }) != -1
+                })}
+              {:else}
+                <div
+                  class:selection-item={true}
+                  class:focused={index == focusedIndex}
+                  class:selected={(values || []).findIndex((i) => {
+                    return i.value == item.value;
+                  }) != -1}
+                  onclick={() => toggle(item)}
+                  onkeypress={() => toggle(item)}
+                  role="button"
+                  tabindex="0"
+                >
+                  {#if itemLabelSnippet}
+                    {@render itemLabelSnippet({ item })}
+                  {:else}
+                    {item.label}
+                  {/if}
+                </div>
+              {/if}
+            </li>
+          {/each}
+        </ul>
+      </Menu>
     {:else}
-    <MenuOrDrawer
-      {activator}
-      _width={localMenuWidth || ""}
-      _height={menuHeight}
-      _maxHeight="300px"
-      _boxShadow={menuBoxShadow}
-      _borderRadius={menuBorderRadius}
-      bind:open={menuOpened}
-      {onclose}
-    >
-      <ul
-        class={clazz.menu || ''}
-        style:background-color="rgb(var(--global-color-background-100))"
+      <MenuOrDrawer
+        {activator}
+        _width={localMenuWidth || ""}
+        _height={menuHeight}
+        _maxHeight="300px"
+        _boxShadow={menuBoxShadow}
+        _borderRadius={menuBorderRadius}
+        bind:open={menuOpened}
+        {onclose}
       >
-        {#each filteredItems as item, index}
-          <li class="item-{index}">
-            {#if itemSnippet}
-              {@render itemSnippet({
-                item,
-                index,
-                selected: (values || [])
-                  .findIndex((i) => { return i.value == item.value }) != -1
-              })}
-            {:else}
-              <div
-                class:selection-item={true}
-                class:focused={index == focusedIndex}
-                class:selected={(values || []).findIndex((i) => {
-                  return i.value == item.value;
-                }) != -1}
-                onclick={() => toggle(item)}
-                onkeypress={() => toggle(item)}
-                role="button"
-                tabindex="0"
-              >
-                {#if itemLabelSnippet}
-                  {@render itemLabelSnippet({ item })}
-                {:else}
-                  {item.label}
-                {/if}
-              </div>
-            {/if}
-          </li>
-        {/each}
-      </ul>
-    </MenuOrDrawer>
+        <ul
+          class={clazz.menu || ''}
+          style:background-color="rgb(var(--global-color-background-100))"
+        >
+          {#each filteredItems as item, index}
+            <li class="item-{index}">
+              {#if itemSnippet}
+                {@render itemSnippet({
+                  item,
+                  index,
+                  selected: (values || [])
+                    .findIndex((i) => { return i.value == item.value }) != -1
+                })}
+              {:else}
+                <div
+                  class:selection-item={true}
+                  class:focused={index == focusedIndex}
+                  class:selected={(values || []).findIndex((i) => {
+                    return i.value == item.value;
+                  }) != -1}
+                  onclick={() => toggle(item)}
+                  onkeypress={() => toggle(item)}
+                  role="button"
+                  tabindex="0"
+                >
+                  {#if itemLabelSnippet}
+                    {@render itemLabelSnippet({ item })}
+                  {:else}
+                    {item.label}
+                  {/if}
+                </div>
+              {/if}
+            </li>
+          {/each}
+        </ul>
+      </MenuOrDrawer>
     {/if}
   {/if}
 {/key}

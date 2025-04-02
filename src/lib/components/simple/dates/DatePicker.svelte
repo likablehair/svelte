@@ -12,7 +12,7 @@
   interface Props {
     selectedYear?: number;
     selectedMonth?: number;
-    selectedDate?: Date | null;
+    selectedDate?: Date;
     visibleMonth?: number;
     visibleYear?: number;
     view?: "year" | "month" | "day";

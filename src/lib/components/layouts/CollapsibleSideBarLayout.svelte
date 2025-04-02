@@ -6,7 +6,7 @@
   import type { MenuItem } from "../simple/lists/SelectableMenuList.svelte";
   import SelectableMenuList from "../simple/lists/SelectableMenuList.svelte";
   import HeaderMenu from '../simple/navigation/HeaderMenu.svelte';
-    import type { ComponentProps, Snippet } from 'svelte';
+  import type { ComponentProps, Snippet } from 'svelte';
 
   interface Props {
     drawerOpened?: boolean;
@@ -34,6 +34,7 @@
       collapsed: boolean,
       mAndDown: boolean
     }]>
+    ondrawerChange?: ComponentProps<typeof HeaderMenu>['ondrawerChange']
   }
 
   let {
@@ -48,6 +49,7 @@
     sidebarFooterSnippet,
     children,
     logoSnippet,
+    ondrawerChange,
   }: Props = $props();
 
   function handleMenuSelect(event: Parameters<NonNullable<ComponentProps<typeof SelectableMenuList>['onselect']>>[0]) {
@@ -105,7 +107,7 @@
       <div class="header-menu">
         <HeaderMenu
           bind:openDrawer={drawerOpened}
-          on:drawer-change
+          {ondrawerChange}
         >
           {#snippet titleSnippet()}
             <div class="header-logo-container">

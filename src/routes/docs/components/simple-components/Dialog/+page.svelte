@@ -89,8 +89,8 @@
               <li
                 role="presentation"
                 bind:this={secondActivators[menuLabel]} 
-                on:click={() => handleListClick(menuLabel)}
-                on:keypress={() => handleListClick(menuLabel)}
+                onclick={() => handleListClick(menuLabel)}
+                onkeypress={() => handleListClick(menuLabel)}
               >{menuLabel}</li>
             {/each}
           </ul>
@@ -114,8 +114,8 @@
           role="presentation"
           style:height="100px"
           bind:this={thirdActivators[menuLabel]}
-          on:click={() => handleSubMenuClick(menuLabel)}
-          on:keypress={() => handleSubMenuClick(menuLabel)}
+          onclick={() => handleSubMenuClick(menuLabel)}
+          onkeypress={() => handleSubMenuClick(menuLabel)}
         >
           {menuLabel}
         </div>
@@ -126,75 +126,33 @@
 <h2>Props</h2>
 <PropsViewer
   props={[
-    {
-      name: "open",
-      type: "boolean",
-      description: "Define whether the dialog is opened or not",
-      default: "false"
-    }, {
-      name: "transition",
-      type: "'fly-down' | 'fly-up' | 'fly-horizontal' | 'scale' | 'fade'",
-      default: "'fly-up'",
-      description: "Type of transition used by the dialog to show up"
-    }
+    { name: 'open', type: 'boolean', description: 'Controls the visibility of the dialog.', default: 'false' }, 
+    { name: 'transition', type: "fly-down | fly-up | fly-horizontal | scale | fade", description: 'Defines the transition effect when opening/closing the dialog.', default: "'fly-up'" }, 
+    { name: '_overlayOpacity', type: 'string', description: 'The opacity of the overlay.', default: '"30%"' }, 
+    { name: '_overlayColor', type: 'string', description: 'The background color of the overlay.', default: '"#282828"' }, 
+    { name: '_overlayBackdropFilter', type: 'string', description: 'CSS filter applied to the backdrop of the overlay.', default: 'undefined' }, 
+    { name: '_transitionTimingFunction', type: 'string', description: 'The timing function for the transition.', default: '"cubic-bezier(0.075, 0.82, 0.165, 1)"' }, 
+    { name: '_transitionDuration', type: 'string', description: 'The duration of the transition.', default: '"0.5s"' }
   ]}
   styleProps={[
-    {
-      name: "_overlayOpacity",
-      type: "string",
-      default: "30%",
-      description: "Opacity of the background"
-    }, {
-      name: "_overlayColor",
-      type: "string",
-      default: "#282828",
-      description: "Color of the background"
-    }, {
-      name: "_overlayBackdropFilter",
-      type: "string",
-      default: "undefined",
-      description: "backdrop-filter css property"
-    }, {
-      name: "_transitionTimingFunction",
-      type: "string",
-      default: "cubic-bezier(0.075, 0.82, 0.165, 1)",
-      description: "transition-timing-function css property"
-    }, {
-      name: "_transitionDuration",
-      type: "string",
-      default: "0.5s",
-      description: "transition-duration css property"
-    }
+    { name: '--dialog-overlay-opacity', type: 'opacity', description: 'Opacity of the overlay.', default: '30%' },
+    { name: '--dialog-transition-timing-function', type: 'timing-function', description: 'Timing function for the dialog transition.', default: '"cubic-bezier(0.075, 0.82, 0.165, 1)"' },
+    { name: '--dialog-transition-duration', type: 'duration', description: 'Duration of the dialog transition.', default: '"0.5s"' },
+    { name: '--dialog-z-index', type: 'z-index', description: 'Z-index of the dialog.', default: '50' }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>
 <SlotsViewer
   slots={[
-    {
-      name: 'top-right',
-      description: 'Space in the top-right conrner'
-    }, {
-      name: 'center-left',
-      description: 'Space vertically centered on the left'
-    }, {
-      name: 'center-left',
-      description: 'Space vertically centered on the right'
-    }, {
-      name: 'default',
-      description: 'Space vertically and horizontally centered'
-    }
+    { name: 'topRightSnippet', description: 'Custom content rendered in the top-right area of the dialog.' },
+    { name: 'centerLeftSnippet', description: 'Custom content rendered in the center-left area of the dialog.' },
+    { name: 'centerRightSnippet', description: 'Custom content rendered in the center-right area of the dialog.' },
+    { name: 'children', description: 'Custom content rendered within the dialog.' }
   ]}
 ></SlotsViewer>
 <h2>Events</h2>
 <EventsViewer
   events={[
-    {
-      name: 'click',
-      description: 'Native event triggered by the content of the Dialog'
-    }, {
-      name: 'keypress',
-      description: 'Native event triggered by the content of the Dialog'
-    }
   ]}
 ></EventsViewer>
 

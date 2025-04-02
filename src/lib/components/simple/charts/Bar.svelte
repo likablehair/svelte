@@ -56,9 +56,12 @@
   });
 
   $effect(() => {
-    if(!!chart && !!resetZoom) {
-      chart.resetZoom()
-      resetZoom = false
+    if(!!chart && !!resetZoom && !!chart.resetZoom) {
+      setTimeout(() => {
+        if(!!chart.resetZoom)
+          chart.resetZoom()
+          resetZoom = false
+      }, 40);
     }
   });
 </script>

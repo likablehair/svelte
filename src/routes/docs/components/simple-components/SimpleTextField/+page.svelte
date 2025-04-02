@@ -26,258 +26,79 @@
 <h2>Props</h2>
 <PropsViewer
   props={[
-    {
-      name: 'value',
-      type: 'string | number | undefined',
-      default: "undefined",
-      description: "The value in the TextField"
-    }, {
-      name: 'type',
-      type: '"text" | "password" | "number"',
-      description: "The type of the input value",
-      default: '"text"'
-    }, {
-      name: 'placeholder',
-      type: 'string',
-      description: "Placeholder",
-      default: 'undefined'
-    }, {
-      name: 'disabled',
-      type: 'boolean',
-      description: "Whether the input field is disabled",
-      default: 'false'
-    }, {
-      name: 'readonly',
-      type: 'boolean',
-      description: "Whether the input field is readonly",
-      default: 'false'
-    }, {
-      name: 'prependIcon',
-      type: 'string',
-      description: "Name of the icon located before the container",
-      default: 'undefined'
-    }, {
-      name: 'prependInnerIcon',
-      type: 'string',
-      description: "Name of the icon located inside the container bedore the field",
-      default: 'undefined'
-    }, {
-      name: 'appendInnerIcon',
-      type: 'string',
-      description: "Name of the icon located inside the container after the field",
-      default: 'undefined'
-    }, {
-      name: 'appendIcon',
-      type: 'string',
-      description: "Name of the icon located after the container",
-      default: 'undefined'
-    }, {
-      name: 'iconSize',
-      description: 'size of the icons',
-      type: 'number',
-      default: '12'
-    }, {
-      name: 'hint',
-      description: 'a description under the input field',
-      type: 'string',
-      default: 'undefined'
-    }
+    { name: "value", type: "string | number", description: "Bound value of the text field.", default: "undefined" },
+    { name: "type", type: "'text' | 'password' | 'number' | 'time' | 'date'", description: "Type of input field.", default: "'text'" },
+    { name: "placeholder", type: "string", description: "Placeholder text.", default: "undefined" },
+    { name: "disabled", type: "boolean", description: "Whether the input is disabled.", default: "false" },
+    { name: "readonly", type: "boolean", description: "Whether the input is read-only.", default: "false" },
+    { name: "id", type: "string", description: "ID of the input field.", default: "undefined" },
+    { name: "appendIcon", type: "string", description: "Icon to display at the end.", default: "undefined" },
+    { name: "appendInnerIcon", type: "string", description: "Icon inside the field at the end.", default: "undefined" },
+    { name: "prependIcon", type: "string", description: "Icon to display at the start.", default: "undefined" },
+    { name: "prependInnerIcon", type: "string", description: "Icon inside the field at the start.", default: "undefined" },
+    { name: "iconSize", type: "string", description: "Size of the icons.", default: "'12pt'" },
+    { name: "name", type: "string", description: "Name attribute of the input field.", default: "undefined" },
+    { name: "hint", type: "string", description: "Hint text below the input field.", default: "undefined" },
+    { name: "input", type: "HTMLElement", description: "Reference to the input element.", default: "undefined" },
+    { name: "class", type: "{ container?: string, row?: string, field?: string, hint?: string, input?: string }", description: "Additional CSS class for the button.", default: "undefined" }
   ]}
   styleProps={[
-    {
-      name: '--simple-textfield-padding',
-      description: 'Padding css property',
-      type: 'string',
-      default: '0.65rem 1rem 0.65rem 1rem'
-    }, {
-      name: '--simple-textfield-width',
-      description: 'Width css property',
-      type: 'string',
-      default: '280px'
-    }, {
-      name: '--simple-textfield-height',
-      description: 'Height css property',
-      type: 'string',
-      default: 'null'
-    }, {
-      name: '--simple-textfield-background-color',
-      description: 'background-color css property',
-      type: 'string',
-      default: 'rgb(244 244 245/1)'
-    }, {
-      name: '--simple-textfield-border-radius',
-      description: 'border-radius css property',
-      type: 'string',
-      default: '9999px'
-    }, {
-      name: '--simple-textfield-box-shadow',
-      description: 'box-shadow css property',
-      type: 'string',
-      default: 'none'
-    }, {
-      name: '--simple-textfield-transition',
-      description: 'css transition time',
-      type: 'string',
-      default: '0.2s'
-    }, {
-      name: '--simple-textfield-font-size',
-      description: 'font-size css property',
-      type: 'string',
-      default: '0.9rem'
-    }, {
-      name: '--simple-textfield-font-weight',
-      description: 'font-weight css property',
-      type: 'string',
-      default: 'normal'
-    }, {
-      name: '--simple-textfield-focus-background-color',
-      description: 'background color of the input field when focused',
-      type: 'string',
-      default: '_backgroundColor'
-    }, {
-      name: '--simple-textfield-focus-box-shadow',
-      description: 'box-shadow of the input field when focused',
-      type: 'string',
-      default: 'rgba(100, 100, 111, 0.4) 0px 4px 25px 0px'
-    }, {
-      name: '--simple-textfield-outer-gap',
-      description: 'Gap between the container and outer icons (or slots)',
-      type: 'string',
-      default: '8px'
-    }, {
-      name: '--simple-textfield-inner-gap',
-      description: 'Gap between the field and inner icons (or slots)',
-      type: 'string',
-      default: '8px'
-    }, {
-      name: '--simple-textfield-hint-font-size',
-      description: 'Font size of the hint',
-      type: 'string',
-      default: '0.75rem'
-    }, {
-      name: '--simple-textfield-hint-color',
-      description: 'Text color of the hint',
-      type: 'string',
-      default: 'grey'
-    }, {
-      name: '--simple-textfield-hint-margin-left',
-      description: 'margin-left css proprty of the hint',
-      type: 'string',
-      default: '20px'
-    }, {
-      name: '--simple-textfield-margin-bottom',
-      description: 'The space between the input field and the hint',
-      type: 'string',
-      default: '5px'
-    }
+    { name: "--simple-textfield-padding", type: "spacing", description: "Padding inside the text field", default: "0.65rem 1rem 0.65rem 1rem" },
+    { name: "--simple-textfield-width", type: "size", description: "Width of the text field", default: "280px" },
+    { name: "--simple-textfield-background-color", type: "color", description: "Background color of the text field", default: "rgb(var(--global-color-background-300), .5)" },
+    { name: "--simple-textfield-border-radius", type: "size", description: "Border radius of the text field", default: "9999px" },
+    { name: "--simple-textfield-box-shadow", type: "shadow", description: "Box shadow of the text field", default: "none" },
+    { name: "--simple-textfield-transition", type: "animation", description: "Transition effect duration", default: ".2s" },
+    { name: "--simple-textfield-font-size", type: "typography", description: "Font size of the text field", default: ".9rem" },
+    { name: "--simple-textfield-font-weight", type: "typography", description: "Font weight of the text field", default: "normal" },
+    { name: "--simple-textfield-outer-gap", type: "spacing", description: "Gap between elements around the text field", default: "8px" },
+    { name: "--simple-textfield-inner-gap", type: "spacing", description: "Gap between elements inside the text field", default: "8px" },
+    { name: "--simple-textfield-hint-font-size", type: "typography", description: "Font size of the hint text", default: ".75rem" },
+    { name: "--simple-textfield-hint-color", type: "color", description: "Color of the hint text", default: "rgb(var(--global-color-contrast-500), .5)" },
+    { name: "--simple-textfield-hint-margin-left", type: "spacing", description: "Margin left for the hint text", default: "20px" },
+    { name: "--simple-textfield-margin-bottom", type: "spacing", description: "Bottom margin of the text field", default: "5px" },
+    { name: "--simple-textfield-color", type: "color", description: "Text color of the input field", default: "rgb(var(--global-color-contrast-900))" }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>
 <SlotsViewer
-    slots={[
-      {
-        name: 'prepend',
-        description: 'space before the input container',
-        default: `{#if !!prependIcon}
-  <Icon name={prependIcon} size={iconSize}></Icon>
-{/if}`,
-        properties: [
-          {
-            name: 'prependIcon',
-            type: 'string',
-            description: 'the prependIcon prop'
-          }, {
-            name: 'iconSize',
-            type: 'string',
-            description: 'the iconSize prop'
-          }
-        ]
-      }, {
-        name: 'prepend-inner',
-        description: 'space inside the input container before the input field',
-        default: `{#if !!prependInnerIcon}
-  <Icon name={prependInnerIcon} size={iconSize}></Icon>
-{/if}`,
-        properties: [
-          {
-            name: 'prependInnerIcon',
-            type: 'string',
-            description: 'the prependInnerIcon prop'
-          }, {
-            name: 'iconSize',
-            type: 'string',
-            description: 'the iconSize prop'
-          }
-        ]
-      }, {
-        name: 'append-inner',
-        description: 'space inside the input container after the input field',
-        default: `{#if !!appendInnerIcon}
-  <Icon name={appendInnerIcon} size={iconSize}></Icon>
-{/if}`,
-        properties: [
-          {
-            name: 'appendInnerIcon',
-            type: 'string',
-            description: 'the appendInnerIcon prop'
-          }, {
-            name: 'iconSize',
-            type: 'string',
-            description: 'the iconSize prop'
-          }
-        ]
-      }, {
-        name: 'append',
-        description: 'space after the input container',
-        default: `{#if !!appendIcon}
-  <Icon name={appendIcon} size={iconSize}></Icon>
-{/if}`,
-        properties: [
-          {
-            name: 'appendIcon',
-            type: 'string',
-            description: 'the appendIcon prop'
-          }, {
-            name: 'iconSize',
-            type: 'string',
-            description: 'the iconSize prop'
-          }
-        ]
-      }, {
-        name: 'hint',
-        description: 'space under the input container',
-        default: `{{#if !!hint}
+  slots={[
+    { name: "prependSnippet", description: "Slot for prepending an icon outside the field.", default: `
+{#if !!prependIcon}
+  <Icon name={prependIcon} --icon-size={iconSize}></Icon>
+{/if}
+    `, properties: [{ name: "prependIcon", type: "string | undefined", description: "Icon to display." }, { name: "iconSize", type: "string", description: "Size of the icon." }] },
+    { name: "prependInnerSnippet", description: "Slot for prepending an icon inside the field.", default: `
+{#if !!prependInnerIcon}
+  <Icon name={prependInnerIcon} --icon-size={iconSize}></Icon>
+{/if}
+    `, properties: [{ name: "prependInnerIcon", type: "string | undefined", description: "Icon to display." }, { name: "iconSize", type: "string", description: "Size of the icon." }] },
+    { name: "appendSnippet", description: "Slot for appending an icon outside the field.", default: `
+{#if !!appendIcon}
+  <Icon name={appendIcon} --icon-size={iconSize}></Icon>
+{/if}
+    `, properties: [{ name: "appendIcon", type: "string | undefined", description: "Icon to display." }, { name: "iconSize", type: "string", description: "Size of the icon." }] },
+    { name: "appendInnerSnippet", description: "Slot for appending an icon inside the field.", default: `
+{#if !!appendInnerIcon}
+  <Icon name={appendInnerIcon} --icon-size={iconSize}></Icon>
+{/if}
+    `, properties: [{ name: "appendInnerIcon", type: "string | undefined", description: "Icon to display." }, { name: "iconSize", type: "string", description: "Size of the icon." }] },
+    { name: "hintSnippet", description: "Slot for custom hint text.", default: `
+{#if !!hint}
   <span class="hint">{hint}</span>
-{/if}`
-      }
-    ]}
+{/if}
+    `, properties: [{ name: "hint", type: "string | undefined", description: "Hint text to display." }] }
+  ]}
 ></SlotsViewer>
 <h2>Events</h2>
 <EventsViewer
-      events={
-        [
-          {
-            name: 'change',
-            description: 'Native event',
-          }, {
-            name: 'input',
-            description: 'Native event'
-          }, {
-            name: 'focus',
-            description: 'Native event'
-          }, {
-            name: 'blur',
-            description: 'Native event'
-          }, {
-            name: 'keydown',
-            description: 'Native event'
-          }, {
-            name: 'keypress',
-            description: 'Native event'
-          }, {
-            name: 'keyup',
-            description: 'Native event'
-          }
-        ]
-      }
+  events={[
+    { name: "onchange", description: "Triggered when input value changes." },
+    { name: "oninput", description: "Triggered while typing inside the input field." },
+    { name: "onfocus", description: "Triggered when input field is focused." },
+    { name: "onblur", description: "Triggered when input field loses focus." },
+    { name: "onkeydown", description: "Triggered when a key is pressed down." },
+    { name: "onkeyup", description: "Triggered when a key is released." },
+    { name: "onkeypress", description: "Triggered when a key that produces a character is pressed." }
+  ]}
 ></EventsViewer>

@@ -3,8 +3,10 @@
   import PropsViewer from "../../PropsViewer.svelte";
   import GanymedeBarChart from "$lib/components/simple/charts/GanymedeBarChart.svelte";
   import Button from "$lib/components/simple/buttons/Button.svelte";
+    import EventsViewer from "../../EventsViewer.svelte";
+    import SlotsViewer from "../../SlotsViewer.svelte";
 
-  let resetZoom: boolean = true
+  let resetZoom: boolean = false
 </script>
 
 <h1>GanymedeBarChart</h1>
@@ -45,11 +47,36 @@
 </div>
 <h2>Props</h2>
 <PropsViewer
-  props={[]}
-  styleProps={[]}
+  props={[
+    { name: "data", type: "object", description: "Chart data including labels and datasets", default: "{ labels: [], datasets: [] }" },
+    { name: "horizontal", type: "boolean", description: "Display chart in horizontal mode", default: "false" },
+    { name: "responsive", type: "boolean", description: "Make chart responsive", default: "true" },
+    { name: "maintainAspectRatio", type: "boolean", description: "Maintain aspect ratio", default: "true" },
+    { name: "showLegend", type: "boolean", description: "Show legend in chart", default: "true" },
+    { name: "showYTicks", type: "boolean", description: "Display Y-axis ticks", default: "false" },
+    { name: "showXTicks", type: "boolean", description: "Display X-axis ticks", default: "false" },
+    { name: "displayYGrid", type: "boolean", description: "Show grid lines along Y-axis", default: "true" },
+    { name: "lineWidth", type: "number", description: "Width of line in the chart", default: "1" },
+    { name: "enableZoom", type: "boolean", description: "Allow zooming in the chart", default: "true" },
+    { name: "resetZoom", type: "boolean", description: "Control for resetting zoom", default: "false" },
+    { name: "tooltipLabel", type: "function", description: "Custom tooltip label formatter", default: "undefined" },
+    { name: "yTickLabel", type: "function", description: "Custom Y-axis tick label formatter", default: "undefined" },
+    { name: "xTickLabel", type: "function", description: "Custom X-axis tick label formatter", default: "undefined" },
+    { name: "xTickStepSize", type: "number", description: "Step size for X-axis ticks", default: "undefined" },
+    { name: "yTickStepSize", type: "number", description: "Step size for Y-axis ticks", default: "undefined" },
+    { name: "xMax", type: "number", description: "Maximum value for X-axis", default: "undefined" },
+    { name: "yMax", type: "number", description: "Maximum value for Y-axis", default: "undefined" },
+    { name: "rgbTooltipColor", type: "string", description: "RGB color for tooltip text", default: "undefined" },
+    { name: "rgbTooltipBackgroundColor", type: "string", description: "RGB background color for tooltip", default: "undefined" },
+    { name: "rgbBackgroundColor", type: "string", description: "RGB background color for chart", default: "undefined" },
+    { name: "width", type: "string | number", description: "Width of the chart", default: "undefined" },
+    { name: "height", type: "string | number", description: "Height of the chart", default: "undefined" }
+  ]}
 ></PropsViewer>
 <h2>Slots</h2>
+<EventsViewer></EventsViewer>
 <h2>Events</h2>
+<SlotsViewer></SlotsViewer>
 
 <style>
   .example {

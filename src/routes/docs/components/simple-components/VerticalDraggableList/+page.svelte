@@ -8,6 +8,8 @@
   import { crossfade } from "svelte/transition";
   import { quintOut } from "svelte/easing";
   import Switch from "$lib/components/simple/forms/Switch.svelte";
+    import SlotsViewer from "../../SlotsViewer.svelte";
+    import EventsViewer from "../../EventsViewer.svelte";
 
   const [send, receive] = crossfade({
     duration: 500,
@@ -175,25 +177,38 @@
 </div>
 <h2>Props</h2>
 <PropsViewer
-  props={[
-    // {
-    //   name: 'type',
-    //   type: '"button" | "submit"',
-    //   description: "HTML type attribute",
-    //   default: "button"
-    // }
+  props={[  
+    { name: "items", type: "{ id: string; name: string; }[]", description: "An array of draggable items.", default: "[]" },  
+    { name: "class", type: "string", description: "Additional CSS classes for item containers.", default: "''" }  
   ]}
   styleProps={[
-    // {
-    //   name: '--button-max-width',
-    //   type: 'string',
-    //   default: 'undefined',
-    //   description: 'The max width of the outer element'
-    // }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>
+<SlotsViewer
+  slots={[
+    { 
+      name: "itemSnippet", 
+      description: "Custom rendering snippet for each draggable item.", 
+      properties: [
+        { name: "item", type: "{ id: string; name: string; }", description: "The item being rendered." }
+      ],
+      default: '{item.name}'
+    }
+  ]}
+></SlotsViewer>
 <h2>Events</h2>
+<EventsViewer
+  events={[
+    { 
+      name: "onchangeOrder", 
+      description: "Triggered when the order of items changes.", 
+      properties: [
+        { name: "items", type: "{ id: string; name: string; }[]", description: "The updated list of items in the new order." }
+      ] 
+    }
+  ]}
+></EventsViewer>
 
 <style>
   .example {

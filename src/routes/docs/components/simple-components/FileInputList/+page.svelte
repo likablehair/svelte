@@ -19,122 +19,146 @@
 <h2>Props</h2>
 <PropsViewer
   props={[
-    {
-      name: "files",
-      type: "File[] | undefined",
-      default: "undefined",
-      description: "The list of files to upload.",
-    },
-    {
-      name: "dropAreaActive",
-      type: "boolean",
-      default: "true",
-      description: "Whether the drop area is active.",
-    },{
-      name: "icon",
-      type: "string",
-      default: "mdi-file-document",
-      description: "File icon to use. See { https://pictogrammers.com/library/mdi }",
-    },
-    {
-      name: "persistOverUpload",
-      type: "boolean",
-      default: "true",
-      description: "Dai Gabbo.",
-    },
-    {
-      name: "disabled",
-      type: "boolean",
-      default: "false",
-      description: "If set to false, the input will not accept new files."
-    },
-    {
-      name: "maxFiles",
-      type: "number | undefined",
-      default: "undefined",
-      description: "If set it limits the number of files that can be uploaded. Exceding files will be ignored."
-    }
+    { name: "files", type: "File[]", description: "List of selected files", default: "[]" },
+    { name: "persistOverUpload", type: "boolean", description: "Whether to keep previous files when adding new ones", default: "true" },
+    { name: "dropAreaActive", type: "boolean", description: "Whether the drop area is active", default: "true" },
+    { name: "icon", type: "string", description: "Icon for file representation", default: "'mdi-file-document'" },
+    { name: "message", type: "string", description: "Message displayed when no files are selected", default: "'Drop file here or click to upload'" },
+    { name: "disabled", type: "boolean", description: "Whether the file input is disabled", default: "false" },
+    { name: "maxFiles", type: "number", description: "Maximum number of files allowed", default: "undefined" },
+    { name: "class", type: "string", description: "Additional CSS classes", default: "''" }
   ]}
   styleProps={[
-    {
-      name: "--file-input-list-color",
-      type: "string",
-      default: "inherit",
-      description: "color css property.",
-    },
-    {
-      name: "--file-input-list-background-color",
-      type: "string",
-      default: "rgb(244 244 245/1)",
-      description: "background-color css property.",
-    },
-    {
-      name: "--file-input-list-width",
-      type: "string",
-      default: "fit-content",
-      description: "width css property.",
-    },
-    {
-      name: "--file-input-list-height",
-      type: "string",
-      default: "auto",
-      description: "height css property.",
-    },
+    { name: "--file-input-list-height", type: "size", description: "Height of the file input list", default: "64px" },
+    { name: "--file-input-list-background-color", type: "color", description: "Background color of the file input list", default: "rgb(var(--global-color-background-300))" },
+    { name: "--file-input-list-color", type: "color", description: "Text color of the file input list", default: "rgb(var(--global-color-contrast-900))" },
+    { name: "--file-input-list-selected-row-color", type: "color", description: "Text color of the selected file row", default: "rgb(var(--global-color-contrast-1000))" },
+    { name: "--file-input-list-selected-row-background", type: "color", description: "Background color of the selected file row", default: "rgb(var(--global-color-background-500))" },
+    { name: "--file-input-list-hover-color", type: "color", description: "Text color when hovering over the file input list", default: "rgb(var(--global-color-contrast-900))" },
+    { name: "--file-input-list-border-color", type: "color", description: "Border color of the file input list", default: "rgb(var(--global-color-primary-100))" },
+    { name: "--file-input-list-border-radius", type: "size", description: "Border radius of the file input list", default: "5px" }
   ]}
 />
 
 <h2>Slots</h2>
 <SlotsViewer
   slots={[
-    {
-      name: "body",
-      description: "Drop area",
-      properties: [
-        {
-          name: "dropAreaActive",
-          type: "boolean",
-          description: "State of activity of the drop area.",
-        },
-      ],
-    },
+    { name: "bodySnippet", default: `
+<span
+  style:height="100%"
+  style:width="100%"
+  style:display="flex"
+>
+  <div class="body-container" class:{active}>
+    {#if files.length == 0}
+      {#if messageSnippet}
+        {@render messageSnippet({ message })}
+      {:else}
+        <span>{message}</span>
+      {/if}
+    {:else}
+      {#if fileListSnippet}
+        {@render fileListSnippet({ files })}
+      {:else}
+        <table class="file-list">
+          <tbody>
+            {#each files as file}
+              <tr
+                onclick={(e) => {
+                  e.stopPropagation()
+                  handleFileClick(file);
+                }}
+                onmouseenter={(e) => {
+                  e.stopPropagation()
+                  handleFileMouseEnter(file);
+                }}
+                onmouseleave={(e) => {
+                  e.stopPropagation()
+                  handleFileMouseLeave();
+                }}
+                class:file-active={fileActive == file}
+              >
+                <td>
+                  <Icon name={icon} />
+                </td>
+                <td class="file-name">
+                  {file.name}
+                </td>
+                <td>
+                  {file.size}
+                </td>
+                <td style:width="10%" style:margin-right="10px">
+                  <Button
+                    buttonType="text"
+                    icon="mdi-close"
+                    onclick={(e) => {
+                      e.detail.nativeEvent.stopPropagation();
+                      handleRemove(file);
+                    }}
+                  />
+                </td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      {/if}
+    {/if}
+  </div>
+</span>
+    `, description: "Custom content inside the file input area", properties: [{ name: "active", type: "boolean", description: "Whether the drop area is active" }] },
+    { name: "messageSnippet", default: "<span>{message}</span>", description: "Custom message when no files are selected", properties: [{ name: "message", type: "string | undefined", description: "The message to display" }] },
+    { name: "fileListSnippet", default: `
+<table class="file-list">
+  <tbody>
+    {#each files as file}
+      <tr
+        onclick={(e) => {
+          e.stopPropagation()
+          handleFileClick(file);
+        }}
+        onmouseenter={(e) => {
+          e.stopPropagation()
+          handleFileMouseEnter(file);
+        }}
+        onmouseleave={(e) => {
+          e.stopPropagation()
+          handleFileMouseLeave();
+        }}
+        class:file-active={fileActive == file}
+      >
+        <td>
+          <Icon name={icon} />
+        </td>
+        <td class="file-name">
+          {file.name}
+        </td>
+        <td>
+          {file.size}
+        </td>
+        <td style:width="10%" style:margin-right="10px">
+          <Button
+            buttonType="text"
+            icon="mdi-close"
+            onclick={(e) => {
+              e.detail.nativeEvent.stopPropagation();
+              handleRemove(file);
+            }}
+          />
+        </td>
+      </tr>
+    {/each}
+  </tbody>
+</table>
+    `, description: "Custom file list display", properties: [{ name: "files", type: "File[]", description: "List of selected files" }] }
   ]}
 />
 <h2>Events</h2>
 <EventsViewer
   events={[
-    {
-      name: "click",
-      description: "Occurs when an item is being click over the target area",
-      properties: [
-        {
-          name: "NativeEvent",
-          type: "ClickEvent",
-          description: "The native event caught by the handler.",
-        },
-      ],
-    },
-    {
-      name: "mouseenter",
-      description: "Occurs when the mouse pointer enters the target area",
-      properties: [
-        {
-          name: "NativeEvent",
-          type: "MouseEvent",
-          description: "The native event caught by the handler.",
-        },
-      ],
-    },
-    {
-      name: "mouseleave",
-      description: "Occurs when the mouse pointer leaves the target area",
-      properties: [
-        {
-          name: "NativeEvent",
-          type: "MouseEvent",
-          description: "The native event caught by the handler.",
-        },
-      ],
-    },
+    { name: "onchange", description: "Triggered when the file selection changes" },
+    { name: "onfileChange", description: "Triggered when files are added or removed", properties: [{ name: "files", type: "File[]", description: "Updated list of files" }] },
+    { name: "onfileDrop", description: "Triggered when files are dropped" },
+    { name: "onfileSelect", description: "Triggered when files are selected via input" }
   ]}
 />
 

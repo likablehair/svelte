@@ -4,11 +4,11 @@
   import './FileInput.css'
 
   interface Props {
-    files?: File[] | undefined;
-    placeholder?: string | undefined;
+    files?: File[];
+    placeholder?: string;
     persistOverUpload?: boolean;
     disabled?: boolean;
-    maxFiles?: number | undefined;
+    maxFiles?: number;
     class?: string
     onfileDrop?: (event: {
       detail: {
@@ -129,7 +129,7 @@
   {#if bodySnippet}
     {@render bodySnippet({ active: dropAreaActive})}
   {:else}
-    <span> { placeholder || 'Drop file here or click to upload'} </span>
+    <span> { placeholder || 'Drop file here or click to upload'}</span>
   {/if}
 
   <input
