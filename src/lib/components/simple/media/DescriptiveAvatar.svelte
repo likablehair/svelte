@@ -21,7 +21,7 @@
     src = undefined,
     title = undefined,
     subtitle = undefined,
-    avatarText = title ? title.substring(0, 2).toUpperCase() : undefined,
+    avatarText = title?.substring(0, 2).toUpperCase(),
     direction = "row",
     reverse = false,
     referrerpolicy = "no-referrer",

@@ -4,16 +4,16 @@
   import './AlertBanner.css'
 
   interface Props {
-    title?: string | undefined
-    description?: string | undefined
+    title?: string
+    description?: string
     disabled?: boolean
     class?: {
       container?: string,
       border?: string,
       body?: string
     },
-    click?: (e: MouseEvent) => void,
-    keypress?: (e: KeyboardEvent) => void,
+    onclick?: (e: MouseEvent) => void,
+    onkeypress?: (e: KeyboardEvent) => void,
     contentSnippet?: Snippet<[{
       title?: string,
       description?: string
@@ -34,8 +34,8 @@
     description,
     disabled = false,
     class: clazz = { },
-    click,
-    keypress,
+    onclick: onclickInternal,
+    onkeypress: onkeypressInternal,
     contentSnippet,
     titleSnippet,
     descriptionSnippet,
@@ -43,11 +43,11 @@
   }: Props = $props()
 
   function onclick(e: MouseEvent) {
-    if(!disabled && !!click) click(e)
+    if(!disabled && !!onclickInternal) onclickInternal(e)
   }
 
   function onkeypress(e: KeyboardEvent) {
-    if(!disabled && !!keypress) keypress(e)
+    if(!disabled && !!onkeypressInternal) onkeypressInternal(e)
   }
 </script>
 

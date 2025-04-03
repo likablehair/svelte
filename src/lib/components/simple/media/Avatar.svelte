@@ -18,7 +18,7 @@
     alt = "",
     text = undefined,
     referrerpolicy = "no-referrer",
-    imageLoadingStatus = "success",
+    imageLoadingStatus = $bindable("success"),
     children,
   }: Props = $props();
 

@@ -2,14 +2,6 @@
   import '../../../css/main.css'
   import './CircularLoader.css'
 
-  /*
-    Styles
-
-    --circular-loader-width
-    --circular-loader-height
-    --circular-loader-color
-  */
-
   let { 
     loading = true,
     class: clazz = '',

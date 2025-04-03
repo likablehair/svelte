@@ -7,6 +7,8 @@
 </script>
 
 <script lang="ts">
+  import Icon from "$lib/components/simple/media/Icon.svelte";
+  
   interface Props {
     items: BreadcrumbItem[];
     underliner?: boolean;
@@ -40,8 +42,6 @@
       })
     }
   }
-
-  import Icon from "$lib/components/simple/media/Icon.svelte";
 </script>
 
 <div>

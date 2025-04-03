@@ -59,7 +59,7 @@
   }
   .click:hover, .click:focus {
     color: var(
-      --icon-active-color,
+      --icon-hover-color,
       rgb(var(--global-color-primary-500))
     );
     outline: none;

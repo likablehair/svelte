@@ -116,6 +116,48 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/VerticalTextSwitch'
   }, {
+    title: 'SelectableMenuList',
+    description: 'Choose wisely.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/SelectableMenuList'
+  }, {
+    title: 'SideBarMenuList',
+    description: 'Choose wisely, but to the side.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/SideBarMenuList'
+  }, {
+    title: 'CircularLoader',
+    description: 'Like a dog chasing his own tail.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/CircularLoader'
+  }, {
+    title: 'Icon',
+    description: 'Be iconic.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Icon'
+  }, {
+    title: 'Breadcrumb',
+    description: 'Never leave any crumbs left.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Breadcrumb'
+  }, {
+    title: 'HeaderMenu',
+    description: 'Menu that scores an header.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/HeaderMenu'
+  }, {
+    title: 'Navigator',
+    description: 'Better than a TomTom.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Navigator'
+  }, {
     title: 'SimpleTextField',
     description: 'A simple text input',
     status: 'beta',
