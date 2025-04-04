@@ -1,18 +1,14 @@
-<script lang="ts" module>
-  import type { Item } from "../../../components/simple/forms/Autocomplete.svelte";
-  export type { Item }
-</script>
-
-<script lang="ts">
+<script lang="ts" generics="Data">
   import lodash from "lodash";
-  import Autocomplete from "../../../components/simple/forms/Autocomplete.svelte";
+  import Autocomplete, { type Item } from "../../../components/simple/forms/Autocomplete.svelte";
   import Button from '../../simple/buttons/Button.svelte'
   import Icon from '../../simple/media/Icon.svelte'
   import type { ComponentProps, Snippet } from "svelte";
 
+  type ItemData = Item<Data>
   interface Props {
-    items?: Item[];
-    values?: Item[];
+    items?: ItemData[];
+    values?: ItemData[];
     multiple?: boolean;
     lang?: 'it' | 'en';
     searchText?: string;
@@ -30,12 +26,12 @@
     disabled?: boolean;
     onchange?: (event: {
       detail: {
-        unselect: Item | undefined;
-        select: Item | undefined;
-        selection: Item[];
+        unselect: ItemData | undefined;
+        select: ItemData | undefined;
+        selection: ItemData[];
       }
     }) => void
-    itemLabelSnippet?: ComponentProps<typeof Autocomplete>['itemLabelSnippet']
+    itemLabelSnippet?: ComponentProps<typeof Autocomplete<Data>>['itemLabelSnippet']
     labelSnippet?: Snippet<[{
       values: typeof values,
       items: typeof items,
@@ -66,7 +62,7 @@
     mobileDrawer = false,
     disabled = false,
     onchange,
-    itemLabelSnippet: itemLabelInternalSnippet,
+    itemLabelSnippet,
     labelSnippet,
   }: Props = $props();
 
@@ -108,6 +104,7 @@
   {mobileDrawer}
   {minWidth}
   {menuWidth}
+  {itemLabelSnippet}
 >
   {#snippet selectionContainerSnippet({ openMenu, handleKeyDown })}
     <Button
@@ -159,13 +156,6 @@
         </div>
       {/if}
     </Button>
-  {/snippet}
-  {#snippet itemLabelSnippet({ item })}
-    {#if itemLabelInternalSnippet}
-      {@render itemLabelInternalSnippet({ item })}
-    {:else}
-      {item.label}
-    {/if}
   {/snippet}
 </Autocomplete>
 

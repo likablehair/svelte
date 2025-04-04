@@ -7,20 +7,6 @@
   import Keyboarder, { type CallbackFunction } from '$lib/utils/keyboarder';
   import SearchResults, { type Result } from './SearchResults.svelte'
 
-  /* 
-    Styles:
-    
-    --global-search-text-field-ring-color
-    --global-search-text-field-hover-ring-color
-    --global-search-text-field-color
-    --global-search-text-field-width
-    --global-search-text-field-max-width
-    --global-search-text-field-height
-    --global-search-text-field-background-color
-    --global-search-text-field-padding
-    --global-search-text-field-font-size
-  */
-
   interface Props {
     searchButtonText?: string;
     searchDialogOpened?: boolean;

@@ -238,30 +238,30 @@
       {#if activatorSnippet}
         {@render activatorSnippet({ mask, handleTextFieldFocus, handleInputChange, inputElement, placeholder, disabled })}
       {:else}
-          <SimpleTextField
-            bind:value={mask.value}
-            onfocus={() => handleTextFieldFocus(mAndDown)}
-            onkeydown={handleInputChange}
-            bind:input={inputElement}
-            {placeholder}
-            class={clazz.textfield}
-            {disabled}
-            {appendInnerSnippet}
-            {prependSnippet}
-            {appendSnippet}
-          >
-            {#snippet prependInnerSnippet({ iconSize, prependInnerIcon })}
-              {#if prependInnerInternalSnippet}
-                {@render prependInnerInternalSnippet({ prependInnerIcon, iconSize })}
-              {:else}
-                <Icon
-                  name="mdi-calendar"
-                  onclick={() => menuOpened = !menuOpened}
-                  tabindex={-1}
-                ></Icon>
-              {/if}
-            {/snippet}
-          </SimpleTextField>
+        <SimpleTextField
+          bind:value={mask.value}
+          onfocus={() => handleTextFieldFocus(mAndDown)}
+          onkeydown={handleInputChange}
+          bind:input={inputElement}
+          {placeholder}
+          class={clazz.textfield}
+          {disabled}
+          {appendInnerSnippet}
+          {prependSnippet}
+          {appendSnippet}
+        >
+          {#snippet prependInnerSnippet({ iconSize, prependInnerIcon })}
+            {#if prependInnerInternalSnippet}
+              {@render prependInnerInternalSnippet({ prependInnerIcon, iconSize })}
+            {:else}
+              <Icon
+                name="mdi-calendar"
+                onclick={() => menuOpened = !menuOpened}
+                tabindex={-1}
+              ></Icon>
+            {/if}
+          {/snippet}
+        </SimpleTextField>
       {/if}
     </div>
 

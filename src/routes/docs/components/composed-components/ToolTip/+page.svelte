@@ -6,6 +6,8 @@
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import { fly } from "svelte/transition";
   import { cubicIn } from "svelte/easing";
+    import SlotsViewer from "../../SlotsViewer.svelte";
+    import EventsViewer from "../../EventsViewer.svelte";
 
   let activator: HTMLElement,
     secondActivator: HTMLElement,
@@ -74,24 +76,21 @@
 <h2>Props</h2>
 <PropsViewer
   props={[
-    // {
-    //   name: 'type',
-    //   type: '"button" | "submit"',
-    //   description: "HTML type attribute",
-    //   default: "button"
-    // }
+    { name: "activator", type: "HTMLElement", description: "Element that triggers the menu.", default: "undefined" },
+    { name: "menuOpen", type: "boolean", description: "Controls whether the menu is open.", default: "false" },
+    { name: "menuProps", type: "ComponentProps<typeof Menu>", description: "Props forwarded to the Menu component.", default: "{}" },
+    { name: "appearTimeout", type: "number", description: "Delay before the menu appears when hovered.", default: "undefined" }
   ]}
-  styleProps={[
-    // {
-    //   name: '--button-max-width',
-    //   type: 'string',
-    //   default: 'undefined',
-    //   description: 'The max width of the outer element'
-    // }
-  ]}
+  styleProps={[]}
 />
 <h2>Slots</h2>
+<SlotsViewer
+  slots={[
+    { name: "children", description: "Content to be rendered inside the menu.", }
+  ]}
+></SlotsViewer>
 <h2>Events</h2>
+<EventsViewer></EventsViewer>
 
 <style>
   .example {

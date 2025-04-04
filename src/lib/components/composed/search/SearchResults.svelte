@@ -14,19 +14,6 @@
   import SelectableVerticalList from "$lib/components/simple/lists/SelectableVerticalList.svelte";
   import type { ComponentProps, Snippet } from 'svelte';
 
-  /*
-    Styles
-
-    --search-results-width
-    --search-results-max-width
-    --search-results-height
-    --search-results-max-height
-    --search-results-margin
-    --search-results-background-color
-    --search-results-border-color
-    --search-results-border-radius
-  */
-
   interface Props {
     noDataText?: string;
     loadingText?: string;
@@ -44,7 +31,7 @@
     noDataSnippet?: Snippet<[]>
     footerSnippet?: Snippet<[]>
     onfocus?: ComponentProps<typeof SelectableVerticalList<Data>>['onfocus']
-    onselect?: NonNullable<ComponentProps<typeof SelectableVerticalList<Data>>['onselect']>
+    onselect?: ComponentProps<typeof SelectableVerticalList<Data>>['onselect']
   }
 
   let {

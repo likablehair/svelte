@@ -7,12 +7,15 @@
 </script>
 
 <script lang="ts" generics="Data">
-  import Dropdown, { type Item } from "./Dropdown.svelte";
+  import Dropdown from "./Dropdown.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import type { ComponentProps } from "svelte";
-  import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
+  import Autocomplete, { type Item } from "$lib/components/simple/forms/Autocomplete.svelte";
 
   type IconItemData = IconItem<Data>
+
+  type AutocompleteData = { icon: string, data?: Data }
+  type AutocompleteItem = Item<AutocompleteData>
   interface Props {
     items?: IconItemData[];
     values?: IconItemData[];
@@ -43,7 +46,7 @@
     onchange,
   }: Props = $props();
 
-  let dropdownValues: Item[] = $state([])
+  let dropdownValues: AutocompleteItem[] = $state([])
 
   $effect(() => {
     dropdownValues = values.map((e) => ({
@@ -55,7 +58,7 @@
     }))
   })
 
-  let dropDownItems = $derived(items.map((e) => ({
+  let dropDownItems: AutocompleteItem[] = $derived(items.map((e) => ({
     value: e.value,
     data: {
       icon: e.icon,
@@ -63,29 +66,34 @@
     }
   })))
 
-  function handleChange(event: Parameters<NonNullable<ComponentProps<typeof Autocomplete>['onchange']>>[0]) {
-    values = event.detail.selection.map((e) => ({
-      value: e.value,
-      icon: e.data.icon,
-      data: e.data
-    }))
-
-    if(onchange) {
-      onchange({
-        detail: {
-          unselect: !!event.detail.unselect ? {
-            value: event.detail.unselect.value,
-            icon: event.detail.unselect.data.icon,
-            data: event.detail.unselect.data
-          } : undefined,
-          select: !!event.detail.select ? {
-            value: event.detail.select.value,
-            icon: event.detail.select.data.icon,
-            data: event.detail.select.data
-          } : undefined,
-          selection: values
-        }
-      })
+  function handleChange(event: Parameters<NonNullable<ComponentProps<typeof Autocomplete<AutocompleteData>>['onchange']>>[0]) {
+    if(event.detail.selection.every(selection => !!selection.data) 
+      && !!event.detail.unselect?.data
+      && !!event.detail.select?.data
+    ) {
+      values = event.detail.selection.map((e) => ({
+        value: e.value,
+        icon: e.data!.icon,
+        data: e.data!.data
+      }))
+  
+      if(onchange) {
+        onchange({
+          detail: {
+            unselect: !!event.detail.unselect ? {
+              value: event.detail.unselect.value,
+              icon: event.detail.unselect.data.icon,
+              data: event.detail.unselect.data.data
+            } : undefined,
+            select: !!event.detail.select ? {
+              value: event.detail.select.value,
+              icon: event.detail.select.data.icon,
+              data: event.detail.select.data.data
+            } : undefined,
+            selection: values
+          }
+        })
+      }
     }
   }
 </script>
@@ -105,7 +113,9 @@
     {#if values.length == 0}
       {placeholder}
     {:else if values.length == 1}
-      <Icon name={values[0].data.icon}></Icon> 
+      {#if values[0].data}
+        <Icon name={values[0].data.icon}></Icon> 
+      {/if}
     {:else}
       {generatedLabel}
     {/if}
@@ -119,12 +129,14 @@
     {/if}
   {/snippet}
   {#snippet itemLabelSnippet({ item })}
-    <div class="label-container">
-      <Icon
-        name={item.data.icon}
-        --icon-size="20px"
-      ></Icon>
-    </div>
+    {#if item.data}
+      <div class="label-container">
+        <Icon
+          name={item.data.icon}
+          --icon-size="20px"
+        ></Icon>
+      </div>
+    {/if}
   {/snippet}
 </Dropdown>
 

@@ -122,6 +122,36 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/SelectableMenuList'
   }, {
+    title: 'ConfirmOrCancelButtons',
+    description: 'Last chance to make the right decision.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/ConfirmOrCancelButtons'
+  }, {
+    title: 'SearchResults',
+    description: 'The answers to all your questions.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/SearchResults'
+  }, {
+    title: 'SearchBar',
+    description: 'The question to all your answers.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/SearchBar'
+  }, {
+    title: 'GlobalSearchTextField',
+    description: 'TextField global friendly.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/GlobalSearchTextField'
+  }, {
+    title: 'FilterEditor',
+    description: 'The key for making it easy',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/FilterEditor'
+  }, {
     title: 'SideBarMenuList',
     description: 'Choose wisely, but to the side.',
     status: 'stable',

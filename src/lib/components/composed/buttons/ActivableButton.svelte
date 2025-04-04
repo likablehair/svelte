@@ -14,7 +14,7 @@
     buttonProps = {},
     onclick,
     children,
-    appendSnippet,
+    appendSnippet: appendInternalSnippet,
   }: Props = $props();
 
   function handleOnClick(e: Parameters<NonNullable<typeof onclick>>[0]) {
@@ -67,6 +67,6 @@
 >
   {@render children?.()}
   {#snippet appendSnippet()}
-    {@render appendSnippet?.()}
+    {@render appendInternalSnippet?.()}
   {/snippet}
 </Button>

@@ -42,24 +42,47 @@
   <h2>Props</h2>
   <PropsViewer
     props={[
-      {
-        name: 'title',
-        type: 'string',
-        default: "undefined",
-        description: "The title of the banner."
-      }
+      { name: "autocompleteProps", type: "ComponentProps<typeof Autocomplete>", description: "Props to pass down to the Autocomplete component, excluding the 'items' prop.", default: "{}" },
+      { name: "selected", type: "Item[]", description: "The selected items in the autocomplete.", default: "[]" },
+      { name: "items", type: "Item[]", description: "The list of items displayed in the autocomplete.", default: "countriesOptions" },
+      { name: "class", type: "{ flagIcon?: string, }", description: "Custom class names for styling.", default: "{}" },
     ]}
-    styleProps={[
-      {
-        name: '--alert-banner-color',
-        type: 'string',
-        default: "grey",
-        description: "Banner color."
-      }
-    ]}
+    styleProps={[]}
   ></PropsViewer>
   <h2>Slots</h2>
+  <SlotsViewer
+    slots={[]}
+  ></SlotsViewer>
   <h2>Events</h2>
+  <EventsViewer
+    events={[
+      {
+        name: 'onchange',
+        description: 'Fired when the selection changes.',
+        properties: [
+          { name: 'unselect', type: 'Item | undefined', description: 'The item that was unselected.' },
+          { name: 'select', type: 'Item | undefined', description: 'The item that was selected.' },
+          { name: 'selection', type: 'Item[]', description: 'The current selection of items.' }
+        ]
+      },
+      {
+        name: 'onfocus',
+        description: 'Fired when the input field is focused.',
+      },
+      {
+        name: 'onblur',
+        description: 'Fired when the input field loses focus.',
+      },
+      {
+        name: 'onkeydown',
+        description: 'Fired when a key is pressed in the input field.',
+      },
+      {
+        name: 'onclose',
+        description: 'Fired when the menu is closed.',
+      }
+    ]}
+  ></EventsViewer>
 
   <style>
     .example {

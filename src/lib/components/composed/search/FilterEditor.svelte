@@ -1,12 +1,12 @@
 <script lang="ts">
   import type { Filter, NumberMode, SelectMode, StringMode } from "$lib/utils/filters/filters";
-  import Dropdown, { type Item } from "../forms/Dropdown.svelte";
+  import Dropdown from "../forms/Dropdown.svelte";
   import { GENERIC_MODES, SELECT_MODES, STRING_MODES } from '$lib/utils/filters/filters';
   import type { DateMode } from "$lib/utils/filters/filters";
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
   import DatePickerTextField from "$lib/components/composed/forms/DatePickerTextField.svelte";
   import Validator from "$lib/utils/filters/validator";
-  import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
+  import Autocomplete, { type Item } from "$lib/components/simple/forms/Autocomplete.svelte";
   import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
   import type { LabelMapper } from "./Filters.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";

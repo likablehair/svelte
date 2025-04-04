@@ -5,6 +5,8 @@
   import Converter, { type DateMode, type Filter, type NumberMode, type SelectMode, type StringMode } from "$lib/utils/filters/filters";
     import { DynamicFilters, FilterBuilder } from "$lib";
     import type { ComponentProps } from "svelte";
+    import EventsViewer from "../../EventsViewer.svelte";
+    import SlotsViewer from "../../SlotsViewer.svelte";
 
   let searchText = '',
     filters: ComponentProps<typeof Filters>["filters"] = [
@@ -185,24 +187,45 @@
 <h2>Props</h2>
 <PropsViewer
   props={[
-    // {
-    //   name: 'type',
-    //   type: '"button" | "submit"',
-    //   description: "HTML type attribute",
-    //   default: "button"
-    // }
+    { name: "filters", type: "Filter[]", description: "List of filters to show and edit.", default: "[]" },
+    { name: "lang", type: "'it' | 'en'", description: "Language of the component text and labels.", default: '"en"' },
+    { name: "mAndDown", type: "boolean", description: "Enables mobile layout mode if true.", default: "false" },
   ]}
-  styleProps={[
-    // {
-    //   name: '--button-max-width',
-    //   type: 'string',
-    //   default: 'undefined',
-    //   description: 'The max width of the outer element'
-    // }
-  ]}
+  styleProps={[]}
 />
 <h2>Slots</h2>
+<SlotsViewer
+  slots={[
+    {
+      name: "customSnippet",
+      description: "Allows a custom input field or UI element for the filter.",
+      properties: [
+        { name: "filter", type: "Filter", description: "The current filter object." },
+        { name: "onChange", type: "(newFilter: Filter) => void", description: "Callback to update the filter value." }
+      ]
+    }
+  ]}
+></SlotsViewer>
 <h2>Events</h2>
+<EventsViewer
+  events={[
+    {
+      name: "onremoveAllFilters",
+      description: "Emitted when the user clicks to remove all filters.",
+    },
+    {
+      name: "onchange",
+      description: "Emitted when a filter is updated.",
+      properties: [
+        {
+          name: "filter",
+          type: "Filter",
+          description: "The updated filter."
+        }
+      ]
+    }
+  ]}
+></EventsViewer>
 
 <style>
   .example {
