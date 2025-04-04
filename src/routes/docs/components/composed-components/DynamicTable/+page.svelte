@@ -207,9 +207,6 @@
     searchBarPlaceholder={'Type to search'}
     searchBarVisible
   >
-    {#snippet appendSnippet()}
-      ciao
-    {/snippet}
     {#snippet customFilterSnippet({ filter, updateMultiFilterValues })}
       {#if !!filter}
         {#if filter.name == 'productCategory'}
