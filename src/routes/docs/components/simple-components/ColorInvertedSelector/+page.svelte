@@ -1,14 +1,13 @@
 <script lang="ts">
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
-  
   import ColorInvertedSelector from "$lib/components/simple/lists/ColorInvertedSelector.svelte";
-    import EventsViewer from "../../EventsViewer.svelte";
-    import SlotsViewer from "../../SlotsViewer.svelte";
+  import EventsViewer from "../../EventsViewer.svelte";
+  import SlotsViewer from "../../SlotsViewer.svelte";
 </script>
 
-<h1>TabSwitcher</h1>
-<ComponentSubtitle>Switch to a new tab, switch to a new life.</ComponentSubtitle>
+<h1>ColorInvertedSelector</h1>
+<ComponentSubtitle>A selector with inversion.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
   <ColorInvertedSelector 

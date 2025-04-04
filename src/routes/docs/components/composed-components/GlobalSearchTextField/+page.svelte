@@ -22,16 +22,16 @@
     { name: "searcher", type: "(params: { searchText: string }) => Promise<Result<Data>[] | undefined>", description: "Function to perform the search request", default: "() => Promise.resolve([])" },
   ]}
   styleProps={[
-    { name: "global-search-text-field-ring-color", type: "color", description: "Ring color for the search text field", default: "rgb(var(--global-color-contrast-200), .5)" },
-    { name: "global-search-text-field-hover-ring-color", type: "color", description: "Ring color on hover for the search text field", default: "rgb(var(--global-color-contrast-300))" },
-    { name: "global-search-text-field-color", type: "color", description: "Text color inside the search text field", default: "rgb(var(--global-color-contrast-600))" },
-    { name: "global-search-text-field-width", type: "size", description: "Width of the search text field", default: "100%" },
-    { name: "global-search-text-field-max-width", type: "size", description: "Max width of the search text field", default: "28rem" },
-    { name: "global-search-text-field-height", type: "size", description: "Height of the search text field", default: "2rem" },
-    { name: "global-search-text-field-background-color", type: "color", description: "Background color of the search text field", default: "rgb(var(--global-color-background-100))" },
-    { name: "global-search-text-field-padding", type: "size", description: "Padding inside the search text field", default: "0rem 0.75rem 0rem 0.5rem" },
-    { name: "global-search-text-field-font-size", type: "size", description: "Font size for the search text field", default: ".875rem" },
-    { name: "global-search-text-field-border-radius", type: "size", description: "Border radius for the search text field", default: "9999px" }
+    { name: "--global-search-text-field-ring-color", type: "color", description: "Ring color for the search text field", default: "rgb(var(--global-color-contrast-200), .5)" },
+    { name: "--global-search-text-field-hover-ring-color", type: "color", description: "Ring color on hover for the search text field", default: "rgb(var(--global-color-contrast-300))" },
+    { name: "--global-search-text-field-color", type: "color", description: "Text color inside the search text field", default: "rgb(var(--global-color-contrast-600))" },
+    { name: "--global-search-text-field-width", type: "size", description: "Width of the search text field", default: "100%" },
+    { name: "--global-search-text-field-max-width", type: "size", description: "Max width of the search text field", default: "28rem" },
+    { name: "--global-search-text-field-height", type: "size", description: "Height of the search text field", default: "2rem" },
+    { name: "--global-search-text-field-background-color", type: "color", description: "Background color of the search text field", default: "rgb(var(--global-color-background-100))" },
+    { name: "--global-search-text-field-padding", type: "size", description: "Padding inside the search text field", default: "0rem 0.75rem 0rem 0.5rem" },
+    { name: "--global-search-text-field-font-size", type: "size", description: "Font size for the search text field", default: ".875rem" },
+    { name: "--global-search-text-field-border-radius", type: "size", description: "Border radius for the search text field", default: "9999px" }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>

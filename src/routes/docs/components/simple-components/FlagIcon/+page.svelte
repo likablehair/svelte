@@ -20,8 +20,8 @@
     { name: 'class', type: 'string', description: 'Optional additional classes to apply to the flag icon.', default: 'undefined' }
   ]}
   styleProps={[
-    { name: 'border-radius', type: 'size', description: 'The border radius of the flag icon.', default: '4px' },
-    { name: 'font-size', type: 'size', description: 'The size of the flag icon.', default: '1.2rem' }
+    { name: '--flag-icon-border-radius', type: 'size', description: 'The border radius of the flag icon.', default: '4px' },
+    { name: '--flag-icon-font-size', type: 'size', description: 'The size of the flag icon.', default: '1.2rem' }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>

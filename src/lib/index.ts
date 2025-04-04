@@ -1,4 +1,5 @@
 export { default as Button } from './components/simple/buttons/Button.svelte'
+export { default as LinkButton } from './components/simple/buttons/LinkButton.svelte'
 
 export { default as MediaQuery } from './components/simple/common/MediaQuery.svelte'
 export { default as Menu } from './components/simple/common/Menu.svelte'
@@ -18,7 +19,7 @@ export { default as Autocomplete } from './components/simple/forms/Autocomplete.
 export { default as Checkbox } from './components/simple/forms/Checkbox.svelte'
 export { default as FileInput } from './components/simple/forms/FileInput.svelte'
 export { default as FileInputList } from './components/simple/forms/FileInputList.svelte'
-export { default as Switch } from './components/simple/forms/Switch.svelte'
+// export { default as Switch } from './components/simple/forms/Switch.svelte'
 export { default as Textarea } from './components/simple/forms/Textarea.svelte'
 export { default as SimpleTextField } from './components/simple/forms/SimpleTextField.svelte'
 export { default as VerticalSwitch } from './components/simple/forms/VerticalSwitch.svelte'
@@ -75,9 +76,9 @@ export { default as FilterValidator } from './utils/filters/validator'
 export { countriesList, countriesOptions, getCountryInfoByAlpha2 } from './utils/countries'
 export { default as FilterEditor } from './components/composed/search/FilterEditor.svelte'
 
-export { default as GanymedeLineChart } from './components/simple/charts/GanymedeLineChart.svelte'
-export { default as GanymedeBarChart } from './components/simple/charts/GanymedeBarChart.svelte'
-export { default as GanymedePieChart } from './components/simple/charts/GanymedePieChart.svelte'
+export { default as LineChart } from './components/simple/charts/LineChart.svelte'
+export { default as BarChart } from './components/simple/charts/BarChart.svelte'
+export { default as PieChart } from './components/simple/charts/PieChart.svelte'
 
 export { default as mediaQuery } from './stores/mediaQuery'
 export { default as theme, toggleTheme, setTheme } from './stores/theme'
@@ -85,9 +86,9 @@ export { default as debounce } from './stores/debounce'
 
 export { default as SimpleTimeLine } from './components/simple/timeline/SimpleTimeLine.svelte'
 
-export { default as CollapsibleSideBarLayout } from './components/layouts/CollapsibleSideBarLayout.svelte'
-export { default as StableDividedSideBarLayout } from './components/layouts/StableDividedSideBarLayout.svelte'
-export { default as UnstableDividedSideBarLayout } from './components/layouts/UnstableDividedSideBarLayout.svelte'
+// export { default as CollapsibleSideBarLayout } from './components/layouts/CollapsibleSideBarLayout.svelte'
+// export { default as StableDividedSideBarLayout } from './components/layouts/StableDividedSideBarLayout.svelte'
+// export { default as UnstableDividedSideBarLayout } from './components/layouts/UnstableDividedSideBarLayout.svelte'
 
 export { default as Converter } from './utils/filters/filters'
 
@@ -101,3 +102,7 @@ export { default as VerticalDraggableList } from './components/simple/common/Ver
 export { default as Select } from './components/simple/forms/Select.svelte'
 export { default as InfiniteScroll } from './components/simple/common/InfiniteScroll.svelte'
 export { default as Divider } from './components/simple/common/Divider.svelte'
+export { default as CollapsibleDivider } from './components/simple/common/CollapsibleDivider.svelte'
+export { default as ConfirmOrCancelButtons } from './components/composed/forms/ConfirmOrCancelButtons.svelte'
+export { default as SearchBar } from './components/composed/search/SearchBar.svelte'
+export { default as SearchResults } from './components/composed/search/SearchBar.svelte'

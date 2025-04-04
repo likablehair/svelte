@@ -26,6 +26,6 @@
 <FinalButton
   previousText="Quickstart"
   previousUrl="/docs/quickstart"
-  nextText="Button"
-  nextUrl="/docs/components/simple-components/Button"
+  nextText="AlertBanner"
+  nextUrl="/docs/components/simple-components/AlertBanner"
 ></FinalButton>

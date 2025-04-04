@@ -58,6 +58,7 @@
     {:else}
       <Button
         --button-background-color={monthIndex == selectedMonth ? "rgb(var(--global-color-primary-500))" : "trasparent"}
+        --button-focus-background-color={monthIndex == selectedMonth ? "rgb(var(--global-color-primary-500))" : "trasparent"}
         --button-hover-background-color={monthIndex == selectedMonth ? "var(--button-background-color)" : "rgb(var(--global-color-primary-500), .2)"}
         --button-color={monthIndex == selectedMonth ?  "rgb(var(--global-color-grey-50))" : undefined}
         --button-font-weight="500"

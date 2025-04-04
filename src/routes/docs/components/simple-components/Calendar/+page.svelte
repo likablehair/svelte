@@ -1,15 +1,13 @@
 <script lang="ts">
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
-  
-  import Avatar from "$lib/components/simple/media/Avatar.svelte";
-    import Calendar from "$lib/components/simple/dates/Calendar.svelte";
-    import EventsViewer from "../../EventsViewer.svelte";
-    import SlotsViewer from "../../SlotsViewer.svelte";
+  import Calendar from "$lib/components/simple/dates/Calendar.svelte";
+  import EventsViewer from "../../EventsViewer.svelte";
+  import SlotsViewer from "../../SlotsViewer.svelte";
 </script>
 
-<h1>Avatar</h1>
-<ComponentSubtitle>Circle Image.</ComponentSubtitle>
+<h1>Calendar</h1>
+<ComponentSubtitle>Just a calendar.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
   <Calendar></Calendar>

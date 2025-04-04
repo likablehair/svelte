@@ -57,14 +57,14 @@
     { name: "class", type: "{ container?: string, loading?: string, noData?: string, results?: string }", description: "Custom CSS classes for styling.", default: "{}" },
   ]}
   styleProps={[
-    { name: "search-results-width", type: "size", description: "Width of the search results container", default: "100%" },
-    { name: "search-results-max-width", type: "size", description: "Maximum width of the search results container" },
-    { name: "search-results-height", type: "size", description: "Height of the search results container" },
-    { name: "search-results-max-height", type: "size", description: "Maximum height of the search results container" },
-    { name: "search-results-background-color", type: "color", description: "Background color of the search results container", default: "rgb(var(--global-color-background-100))" },
-    { name: "search-results-margin", type: "size", description: "Margin around the search results container" },
-    { name: "search-results-border-color", type: "color", description: "Border color of the search results container", default: "rgb(var(--global-color-background-300))" },
-    { name: "search-results-border-radius", type: "size", description: "Border radius of the search results container" }
+    { name: "--search-results-width", type: "size", description: "Width of the search results container", default: "100%" },
+    { name: "--search-results-max-width", type: "size", description: "Maximum width of the search results container" },
+    { name: "--search-results-height", type: "size", description: "Height of the search results container" },
+    { name: "--search-results-max-height", type: "size", description: "Maximum height of the search results container" },
+    { name: "--search-results-background-color", type: "color", description: "Background color of the search results container", default: "rgb(var(--global-color-background-100))" },
+    { name: "--search-results-margin", type: "size", description: "Margin around the search results container" },
+    { name: "--search-results-border-color", type: "color", description: "Border color of the search results container", default: "rgb(var(--global-color-background-300))" },
+    { name: "--search-results-border-radius", type: "size", description: "Border radius of the search results container" }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>

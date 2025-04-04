@@ -12,8 +12,16 @@
       border?: string,
       body?: string
     },
-    onclick?: (e: MouseEvent) => void,
-    onkeypress?: (e: KeyboardEvent) => void,
+    onclick?: (event:{
+      detail: {
+        nativeEvent: MouseEvent
+      }
+    }) => void,
+    onkeypress?: (event:{
+      detail: {
+        nativeEvent: KeyboardEvent
+      }
+    }) => void,
     contentSnippet?: Snippet<[{
       title?: string,
       description?: string
@@ -43,11 +51,11 @@
   }: Props = $props()
 
   function onclick(e: MouseEvent) {
-    if(!disabled && !!onclickInternal) onclickInternal(e)
+    if(!disabled && !!onclickInternal) onclickInternal({ detail: { nativeEvent: e }})
   }
 
   function onkeypress(e: KeyboardEvent) {
-    if(!disabled && !!onkeypressInternal) onkeypressInternal(e)
+    if(!disabled && !!onkeypressInternal) onkeypressInternal({ detail: { nativeEvent: e }})
   }
 </script>
 

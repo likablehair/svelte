@@ -64,8 +64,6 @@
     { name: '--activable-button-focus-active-background-color', type: 'color', description: 'Background color when focusing on an active button', default: 'rgb(var(--global-color-primary-500))' },
     { name: '--activable-button-focus-deactive-background-color', type: 'color', description: 'Background color when focusing on an inactive button', default: 'rgb(var(--global-color-background-200))' },
     { name: '--activable-button-focus-active-color', type: 'color', description: 'Text color when focusing on an active button', default: 'rgb(var(--global-color-grey-50))' },
-    { name: '--button-default-disabled-background-color', type: 'color', description: 'Background color when the button is disabled', default: 'none' },
-    { name: '--button-default-disabled-color', type: 'color', description: 'Text color when the button is disabled', default: 'rgb(var(--global-color-contrast-900), .5)' }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>

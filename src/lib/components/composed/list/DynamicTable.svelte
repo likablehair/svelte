@@ -2055,11 +2055,11 @@
   {#snippet defaultSnippet({ sAndDown })}
     <Drawer
       bind:open={openHeaderDrawer}
-      _space={sAndDown ? "60vh" : "20vw"}
+      _space={sAndDown ? "60vh" : "400px"}
       position={sAndDown ? "bottom" : "right"}
     >
+      <div class="personalize-header">{lang == 'en' ? 'Personalize your headers' : 'Personalizza le tue intestazioni'}</div>
       <div style="padding: 20px;">
-        <div class="personalize-header">{lang == 'en' ? 'Personalize your headers' : 'Personalizza le tue intestazioni'}</div>
 
         <span class="headers-show grid-col-1">{lang == 'en' ? 'Headers shown in table' : 'Intestazioni visualizzate in tabella'}</span>
 
@@ -2115,10 +2115,10 @@
             <span style="text-align: center;">{lang == 'en' ? 'No headers to add' : 'Nessuna intestazione da aggiungere'}</span>
           </div>
         {/if}
-        <div style="width: 100%; display: flex; justify-content: center;">
+        <div style="width: 100%; display: flex; justify-content: center; padding-top: 15px;">
           <Button
             class="mr-3 mt-5"
-            --button-width="70%"
+            --button-width="100%"
             onclick={saveHeadersToShow}
           >
             {lang == 'en' ? 'Save preferences' : 'Salva preferenze'}
@@ -2425,7 +2425,7 @@
     font-size: 20px;
     line-height: 28px;
     font-weight: 700;
-    padding: 20px;
+    padding: 20px 20px 0px 20px;
   }
 
   .headers-show {

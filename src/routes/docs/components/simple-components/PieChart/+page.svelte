@@ -1,16 +1,16 @@
 <script lang="ts">
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
-  import GanymedePieChart from "$lib/components/simple/charts/GanymedePieChart.svelte";
+  import PieChart from "$lib/components/simple/charts/PieChart.svelte";
   import EventsViewer from "../../EventsViewer.svelte";
   import SlotsViewer from "../../SlotsViewer.svelte";
 </script>
 
-<h1>GanymedePieChart</h1>
-<ComponentSubtitle>Ganymede pie chart.</ComponentSubtitle>
+<h1>PieChart</h1>
+<ComponentSubtitle>Pie chart.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
-  <GanymedePieChart
+  <PieChart
     data={{
       labels: [
         "Gen",

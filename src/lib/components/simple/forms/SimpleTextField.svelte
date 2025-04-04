@@ -216,15 +216,15 @@
       {/if}
     {/if}
   </div>
-  <div class="row {clazz?.hint || ''}">
-    {#if hintSnippet}
-      {@render hintSnippet({ hint })}
-    {:else}
+  {#if hintSnippet}
+    {@render hintSnippet({ hint })}
+  {:else}
+    <div class="row {clazz?.hint || ''}">
       {#if !!hint}
         <span class="hint">{hint}</span>
       {/if}
-    {/if}
-  </div>
+    </div>
+  {/if}
 </div>
 
 <style>

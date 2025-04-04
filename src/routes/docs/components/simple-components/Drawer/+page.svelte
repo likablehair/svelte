@@ -97,9 +97,9 @@
     { name: "--drawer-overlay-speed", type: "time", description: "Speed of the overlay animation.", default: ".2s" },
     { name: "--drawer-overlay-opacity", type: "opacity", description: "Opacity of the overlay.", default: "50%" },
     { name: "--drawer-overlay-background-color", type: "color", description: "Background color of the overlay.", default: "rgb(var(--global-color-grey-900))" },
-    { name: "--drawer-default-z-index", type: "z-index", description: "Default z-index of the drawer.", default: "30" },
+    { name: "--drawer-z-index", type: "z-index", description: "Z-index of the drawer.", default: "30" },
     { name: "--drawer-background-color", type: "color", description: "Background color of the drawer.", default: "rgb(var(--global-color-background-200))" },
-    { name: "--drawer-default-overflow", type: "overflow", description: "Overflow behavior of the drawer.", default: "auto" }
+    { name: "--drawer-overflow", type: "overflow", description: "Overflow behavior of the drawer.", default: "auto" }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>

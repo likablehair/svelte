@@ -12,13 +12,24 @@
 
 <script lang="ts" generics="Data">
   import lodash from "lodash";
-  import Autocomplete from "../../../components/simple/forms/Autocomplete.svelte";
+  import Autocomplete, { type Item } from "../../../components/simple/forms/Autocomplete.svelte";
   import Icon from '../../simple/media/Icon.svelte'
   import Avatar from "$lib/components/simple/media/Avatar.svelte";
   import ToolTip from "../common/ToolTip.svelte";
-  import type { Snippet } from "svelte";
+  import type { ComponentProps, Snippet } from "svelte";
 
   type AvatarItemData = AvatarItem<Data>
+
+  type AutocompleteData = {
+    tooltip?: string | number,
+    label?: string | number,
+    text?: string
+    src?: string
+    alt?: string
+    data?: Data
+  }
+  type AutocompleteItem = Item<AutocompleteData>
+
   interface Props {
     items?: AvatarItemData[];
     values?: AvatarItemData[];
@@ -46,9 +57,7 @@
       items: AvatarItemData[]
       handleCloseClick: typeof handleCloseClick
     }]>
-    itemLabelSnippet?: Snippet<[{
-      item: AvatarItemData
-    }]>
+    itemLabelSnippet?: ComponentProps<typeof Autocomplete<AutocompleteData>>['itemLabelSnippet']
   }
 
   let {
@@ -61,7 +70,7 @@
     minWidth = 'auto',
     disabled = false,
     menuWidth = "144px",
-    onchange,
+    onchange: onchangeInternal,
     labelSnippet,
     noValuesSnippet,
     itemLabelSnippet: itemLabelInternalSnippet,
@@ -72,8 +81,8 @@
     values.splice(params.index, 1)
     values = [...values]
 
-    if(onchange){ 
-      onchange({
+    if(onchangeInternal){ 
+      onchangeInternal({
         detail: {
           unselect: unselected,
           select: undefined,
@@ -83,12 +92,57 @@
     }
   }
 
-  let autocompleteItems = $derived(items.map((e) => {
-    return {
-      ...e,
+  function onchange(event: Parameters<NonNullable<ComponentProps<typeof Autocomplete<AutocompleteData>>['onchange']>>[0]) {
+    values = event.detail.selection.map((e) => ({
+      value: e.value,
+      tooltip: e.data?.tooltip,
+      label: e.data?.label,
+      text: e.data?.text,
+      src: e.data?.src,
+      alt: e.data?.alt,
+      data: e.data?.data,
+    }))
+
+    if(onchangeInternal) {
+      onchangeInternal({
+        detail: {
+          unselect: !!event.detail.unselect ? {
+            ...event.detail.unselect.data,
+            value: event.detail.unselect.value,
+          } : undefined,
+          select: !!event.detail.select ? {
+            value: event.detail.select.value,
+            ...event.detail.select.data
+          } : undefined,
+          selection: values
+        }
+      })
+    }
+  }
+
+  let autocompleteValues: AutocompleteItem[] = $state([])
+
+  $effect(() => {
+    autocompleteValues = values.map((e) => ({
+      value: e.value,
       label: e.label || e.text,
       data: {
-        ...(e.data || {}),
+        data: e.data,
+        text: e.text,
+        src: e.src,
+        alt: e.alt,
+        label: e.label,
+        tooltip: e.tooltip
+      }
+    }))
+  })
+
+  let autocompleteItems: AutocompleteItem[] = $derived(items.map((e) => {
+    return {
+      value: e.value,
+      label: e.label || e.text,
+      data: {
+        data: e.data,
         text: e.text,
         src: e.src,
         alt: e.alt,
@@ -101,7 +155,7 @@
 
 <Autocomplete
   items={autocompleteItems}
-  bind:values
+  bind:values={autocompleteValues}
   {multiple}
   searchFunction={() => true}
   {onchange}
@@ -177,9 +231,9 @@
     {:else}
       <div class="item-label-container">
         <Avatar 
-          text={item.data.text}
-          alt={item.data.alt}
-          src={item.data.src}
+          text={item.data!.text}
+          alt={item.data!.alt}
+          src={item.data!.src}
           --avatar-default-border="2px solid rgb(var(--global-color-background-100))"
         ></Avatar>
         {item.label}

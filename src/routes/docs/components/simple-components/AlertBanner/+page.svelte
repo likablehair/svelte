@@ -3,7 +3,6 @@
   import PropsViewer from "../../PropsViewer.svelte";
   import SlotsViewer from "../../SlotsViewer.svelte";
   import EventsViewer from "../../EventsViewer.svelte";
-
   import AlertBanner from "$lib/components/simple/notifiers/AlertBanner.svelte";
 </script>
 
@@ -47,7 +46,22 @@
     { 
       name: 'contentSnippet', 
       description: 'A snippet to customize the content of the alert banner', 
-      default: 'undefined', 
+      default: `
+{#if !!title}
+  {#if !!titleSnippet}
+    {@render titleSnippet({ title })}
+  {:else}
+    <div class="title">{title}</div>
+  {/if}
+{/if}
+{#if !!description}
+  {#if !!descriptionSnippet}
+    {@render descriptionSnippet({ description })}
+  {:else}
+    <div class="description">{description}</div>
+  {/if}
+{/if}
+        `, 
       properties: [
         { name: 'title', type: 'string', description: 'The title of the alert banner' },
         { name: 'description', type: 'string', description: 'The description of the alert banner' }
@@ -56,7 +70,7 @@
     { 
       name: 'titleSnippet', 
       description: 'A snippet to customize the title of the alert banner', 
-      default: 'undefined', 
+      default: '<div class="title">{title}</div>', 
       properties: [
         { name: 'title', type: 'string', description: 'The title of the alert banner' }
       ]
@@ -64,7 +78,7 @@
     { 
       name: 'descriptionSnippet', 
       description: 'A snippet to customize the description of the alert banner', 
-      default: 'undefined', 
+      default: '<div class="description">{description}</div>', 
       properties: [
         { name: 'description', type: 'string', description: 'The description of the alert banner' }
       ]
@@ -72,7 +86,6 @@
     { 
       name: 'appendSnippet', 
       description: 'A snippet to append additional content to the alert banner', 
-      default: 'undefined', 
       properties: [
         { name: 'disabled', type: 'boolean', description: 'Whether the additional content should be disabled' }
       ]
@@ -86,14 +99,14 @@
       name: 'onclick', 
       description: 'Triggered when the alert banner is clicked', 
       properties: [
-        { name: 'e', type: 'MouseEvent', description: 'The native mouse click event' }
+        { name: 'nativeEvent', type: 'MouseEvent', description: 'The native mouse click event' }
       ]
     },
     { 
       name: 'onkeypress', 
       description: 'Triggered when a key is pressed while focusing on the alert banner', 
       properties: [
-        { name: 'e', type: 'KeyboardEvent', description: 'The native keyboard event' }
+        { name: 'nativeEvent', type: 'KeyboardEvent', description: 'The native keyboard event' }
       ]
     }
   ]}

@@ -67,33 +67,28 @@
   })))
 
   function handleChange(event: Parameters<NonNullable<ComponentProps<typeof Autocomplete<AutocompleteData>>['onchange']>>[0]) {
-    if(event.detail.selection.every(selection => !!selection.data) 
-      && !!event.detail.unselect?.data
-      && !!event.detail.select?.data
-    ) {
-      values = event.detail.selection.map((e) => ({
-        value: e.value,
-        icon: e.data!.icon,
-        data: e.data!.data
-      }))
-  
-      if(onchange) {
-        onchange({
-          detail: {
-            unselect: !!event.detail.unselect ? {
-              value: event.detail.unselect.value,
-              icon: event.detail.unselect.data.icon,
-              data: event.detail.unselect.data.data
-            } : undefined,
-            select: !!event.detail.select ? {
-              value: event.detail.select.value,
-              icon: event.detail.select.data.icon,
-              data: event.detail.select.data.data
-            } : undefined,
-            selection: values
-          }
-        })
-      }
+    values = event.detail.selection.map((e) => ({
+      value: e.value,
+      icon: e.data!.icon,
+      data: e.data!.data
+    }))
+
+    if(onchange) {
+      onchange({
+        detail: {
+          unselect: !!event.detail.unselect ? {
+            value: event.detail.unselect.value,
+            icon: event.detail.unselect.data!.icon,
+            data: event.detail.unselect.data!.data
+          } : undefined,
+          select: !!event.detail.select ? {
+            value: event.detail.select.value,
+            icon: event.detail.select.data!.icon,
+            data: event.detail.select.data!.data
+          } : undefined,
+          selection: values
+        }
+      })
     }
   }
 </script>

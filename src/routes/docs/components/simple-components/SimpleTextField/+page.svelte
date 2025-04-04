@@ -84,9 +84,11 @@
 {/if}
     `, properties: [{ name: "appendInnerIcon", type: "string | undefined", description: "Icon to display." }, { name: "iconSize", type: "string", description: "Size of the icon." }] },
     { name: "hintSnippet", description: "Slot for custom hint text.", default: `
-{#if !!hint}
-  <span class="hint">{hint}</span>
-{/if}
+<div class="row {clazz?.hint || ''}">
+  {#if !!hint}
+    <span class="hint">{hint}</span>
+  {/if}
+</div>
     `, properties: [{ name: "hint", type: "string | undefined", description: "Hint text to display." }] }
   ]}
 ></SlotsViewer>

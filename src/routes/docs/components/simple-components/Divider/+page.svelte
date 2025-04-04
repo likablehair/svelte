@@ -19,13 +19,13 @@
 <h2>Props</h2>
 <PropsViewer
   styleProps={[
-    { name: 'divider-color', type: 'color', description: 'The background color of the divider.', default: 'rgb(var(--global-color-background-500))' },
-    { name: 'divider-weight', type: 'size', description: 'The weight (height) of the divider.', default: '1px' },
-    { name: 'divider-radius', type: 'size', description: 'The border radius of the divider.', default: '0.5px' },
-    { name: 'divider-margin-top', type: 'size', description: 'The top margin of the divider.', default: '10px' },
-    { name: 'divider-margin-bottom', type: 'size', description: 'The bottom margin of the divider.', default: '10px' },
-    { name: 'divider-margin-left', type: 'size', description: 'The left margin of the divider.', default: '5px' },
-    { name: 'divider-margin-right', type: 'size', description: 'The right margin of the divider.', default: '5px' }
+    { name: '--divider-color', type: 'color', description: 'The background color of the divider.', default: 'rgb(var(--global-color-background-500))' },
+    { name: '--divider-weight', type: 'size', description: 'The weight (height) of the divider.', default: '1px' },
+    { name: '--divider-radius', type: 'size', description: 'The border radius of the divider.', default: '0.5px' },
+    { name: '--divider-margin-top', type: 'size', description: 'The top margin of the divider.', default: '10px' },
+    { name: '--divider-margin-bottom', type: 'size', description: 'The bottom margin of the divider.', default: '10px' },
+    { name: '--divider-margin-left', type: 'size', description: 'The left margin of the divider.', default: '5px' },
+    { name: '--divider-margin-right', type: 'size', description: 'The right margin of the divider.', default: '5px' }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>

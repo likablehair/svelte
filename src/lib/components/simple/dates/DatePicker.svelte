@@ -62,6 +62,7 @@
       : visibleYear.toString()
     )
   let elementDisabled = $derived(view == "year" ? "year" : "date");
+  let lastSelectedYear: number = selectedYear
 
   function next() {
     if (view == "day") {
@@ -96,6 +97,15 @@
   }
 
   function handleYearChange() {
+    if(visibleYear == undefined) {
+      visibleYear = lastSelectedYear
+    }
+    else {
+      lastSelectedYear = visibleYear
+    }
+
+    visibleYear = selectedYear
+
     if(onyearClick){
       onyearClick({
         detail: {
@@ -103,10 +113,13 @@
         }
       })
     }
+
     view = "month";
   }
 
   function handleMonthChange() {
+    visibleMonth = selectedMonth
+
     if(onmonthClick){
       onmonthClick({
         detail: {
@@ -114,6 +127,7 @@
         }
       })
     }
+
     view = "day";
   }
 </script>
@@ -192,14 +206,14 @@
       <MonthSelector
         --month-selector-height="calc((var(--date-picker-height, var(--date-picker-default-height)) / 8 * 5) - 10px)"
         --month-selector-width="var(--date-picker-width, var(--date-picker-default-width))"
-        bind:selectedMonth={visibleMonth}
+        bind:selectedMonth={selectedMonth}
         onclick={handleMonthChange}
         {locale}
       />
     {:else if view == "year"}
       <YearSelector
         --year-selector-height="calc(var(--date-picker-height, var(--date-picker-default-height)) - calc(var(--date-picker-height, var(--date-picker-default-height)) / 4))"
-        bind:selectedYear={visibleYear}
+        bind:selectedYear={selectedYear}
         {selectableYears}
         onclick={handleYearChange}
       />

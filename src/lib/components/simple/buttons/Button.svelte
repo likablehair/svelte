@@ -2,31 +2,6 @@
   import '../../../css/main.css'
   import './Button.css'
 
-  /*
-    Styles
-
-    --button-width
-    --button-max-width
-    --button-min-width
-    --button-height
-    --button-max-height
-    --button-min-height
-    --button-text-align
-    --button-cursor
-    --button-padding
-    --button-font-size
-    --button-font-weight
-    --button-color
-    --button-display
-    --button-justify-content
-    --button-align-items
-    --button-border
-    --button-border-radius
-    --button-background-color
-    --button-hover-background-color
-    --button-box-shadow
-  */
-
   interface Props extends Omit<HTMLButtonAttributes, 
     'onclick' | 'onkeypress' | 'onkeydown' | 'children'> {    
     buttonType?: "default" | "text" | "icon";

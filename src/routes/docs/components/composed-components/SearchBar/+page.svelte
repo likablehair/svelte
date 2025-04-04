@@ -21,15 +21,15 @@
     { name: "class", type: "{ container?: string, icon?: string, input?: string }", description: "Optional custom class names for the container, icon, and input elements" },
   ]}
   styleProps={[
-    { name: "search-bar-ring-color", type: "color", description: "The ring color of the search bar", default: "rgb(var(--global-color-contrast-100))" },
-    { name: "search-bar-background-color", type: "color", description: "The background color of the search bar", default: "rgb(var(--global-color-background-100))" },
-    { name: "search-bar-border-radius", type: "size", description: "The border radius of the search bar", default: "0.5rem" },
-    { name: "search-bar-height", type: "size", description: "The height of the search bar", default: "3rem" },
-    { name: "search-bar-padding", type: "size", description: "The padding inside the search bar", default: "0rem 1rem 0rem 1rem" },
-    { name: "search-bar-line-height", type: "size", description: "The line height of the text inside the search bar", default: "1.5rem" },
-    { name: "search-bar-font-size", type: "size", description: "The font size of the text inside the search bar", default: ".875rem" },
-    { name: "search-bar-max-width", type: "size", description: "The maximum width of the search bar" },
-    { name: "search-bar-width", type: "size", description: "The width of the search bar", default: "100%" }
+    { name: "--search-bar-ring-color", type: "color", description: "The ring color of the search bar", default: "rgb(var(--global-color-contrast-100))" },
+    { name: "--search-bar-background-color", type: "color", description: "The background color of the search bar", default: "rgb(var(--global-color-background-100))" },
+    { name: "--search-bar-border-radius", type: "size", description: "The border radius of the search bar", default: "0.5rem" },
+    { name: "--search-bar-height", type: "size", description: "The height of the search bar", default: "3rem" },
+    { name: "--search-bar-padding", type: "size", description: "The padding inside the search bar", default: "0rem 1rem 0rem 1rem" },
+    { name: "--search-bar-line-height", type: "size", description: "The line height of the text inside the search bar", default: "1.5rem" },
+    { name: "--search-bar-font-size", type: "size", description: "The font size of the text inside the search bar", default: ".875rem" },
+    { name: "--search-bar-max-width", type: "size", description: "The maximum width of the search bar" },
+    { name: "--search-bar-width", type: "size", description: "The width of the search bar", default: "100%" }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>

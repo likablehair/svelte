@@ -392,23 +392,23 @@ const list: {
     type: 'layout',
     url: '/docs/components/layouts/UnstableDividedSideBarLayout'
   }, {
-    title: 'GanymedeBarChart',
-    description: 'Ganymede Bar Chart.',
+    title: 'BarChart',
+    description: ' Bar Chart.',
     status: 'beta',
     type: 'simple',
-    url: '/docs/components/simple-components/GanymedeBarChart'
+    url: '/docs/components/simple-components/BarChart'
   }, {
-    title: 'GanymedeLineChart',
-    description: 'Ganymede Line Chart.',
+    title: 'LineChart',
+    description: ' Line Chart.',
     status: 'beta',
     type: 'simple',
-    url: '/docs/components/simple-components/GanymedeLineChart'
+    url: '/docs/components/simple-components/LineChart'
   }, {
-    title: 'GanymedePieChart',
-    description: 'Ganymede Pie Chart.',
+    title: 'PieChart',
+    description: ' Pie Chart.',
     status: 'beta',
     type: 'simple',
-    url: '/docs/components/simple-components/GanymedePieChart'
+    url: '/docs/components/simple-components/PieChart'
   }, {
     title: 'DashboardGridShaper',
     description: 'Shape new generation dashboards.',
