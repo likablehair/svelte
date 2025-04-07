@@ -38,6 +38,7 @@
   import Switch from "$lib/components/simple/forms/Switch.svelte";
   import CircularLoader from "$lib/components/simple/loaders/CircularLoader.svelte";
   import type { UIEventHandler } from "svelte/elements";
+  import NoData from "$lib/components/simple/common/NoData.svelte";
 
   onMount(() => {
     updateHeaderHeight();
@@ -1478,7 +1479,7 @@
               style:padding="10px"
               style:font-size="1.2em"
             >
-              {noItemsText}
+              <NoData {noItemsText} ></NoData>
             </td>
           </tr>
         {:else}

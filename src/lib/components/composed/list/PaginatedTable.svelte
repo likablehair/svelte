@@ -67,6 +67,7 @@
     appendSnippet?: ComponentProps<typeof SimpleTable>['appendSnippet']
     headerSnippet?: ComponentProps<typeof SimpleTable>['headerSnippet']
     headerLabelSnippet?: ComponentProps<typeof SimpleTable>['headerLabelSnippet']
+    noDataSnippet?: ComponentProps<typeof SimpleTable>['noDataSnippet']
     searchBarSnippet?: Snippet<[{
       handleSearchChange: typeof handleSearchChange
     }]>
@@ -133,6 +134,7 @@
     footerSnippet,
     rangeDescriptorSnippet,
     searchBarSnippet,
+    noDataSnippet,
   }: Props = $props();
 
   let searchBarInput: HTMLElement | undefined = $state(),
@@ -293,6 +295,7 @@
     {appendSnippet}
     {headerSnippet}
     {headerLabelSnippet}
+    {noDataSnippet}
   >
   </SimpleTable>
 

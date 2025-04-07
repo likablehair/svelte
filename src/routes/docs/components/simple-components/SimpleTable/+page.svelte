@@ -202,6 +202,12 @@
       default: "false",
     },
     {
+      name: "lang",
+      type: "'en' | 'it'",
+      description: "Language of the table.",
+      default: "'en'",
+    },
+    {
       name: "calculateRowStyles",
       type: "CalculateRowStyles<Item> | undefined",
       description: "Function to calculate row styles.",
@@ -361,6 +367,13 @@
         { name: "header", type: "TableHeader", description: "Header object." },
         { name: "item", type: "Item", description: "Row item." },
       ],
+    },
+    {
+      name: "noDataSnippet",
+      description: "Custom slot when there are no items.",
+      default: `
+<NoData {lang} />
+      `,
     },
   ]}
 ></SlotsViewer>

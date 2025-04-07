@@ -50,6 +50,12 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/Divider'
   }, {
+    title: 'NoData',
+    description: "Nothing to see here.",
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/NoData'
+  }, {
     title: 'Calendar',
     description: "Just a calendar",
     status: 'stable',

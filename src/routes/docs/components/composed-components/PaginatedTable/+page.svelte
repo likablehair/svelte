@@ -8,14 +8,14 @@
   import type Builder from "$lib/utils/filters/builder";
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
   import type { ComponentProps } from "svelte";
-    import SlotsViewer from "../../SlotsViewer.svelte";
-    import EventsViewer from "../../EventsViewer.svelte";
+  import SlotsViewer from "../../SlotsViewer.svelte";
+  import EventsViewer from "../../EventsViewer.svelte";
 
   let headers : Header[] =[
-      {
-        value: 'businessName',
-        label: 'Business name',
-        type: {
+    {
+      value: 'businessName',
+      label: 'Business name',
+      type: {
         key: "string",
       },
     },
@@ -385,6 +385,13 @@
         { name: "header", type: "TableHeader", description: "Header object." },
         { name: "item", type: "Item", description: "Row item." },
       ],
+    },
+    {
+      name: "noDataSnippet",
+      description: "Custom slot when there are no items.",
+      default: `
+<NoData {lang} />
+      `,
     },
   ]}
 ></SlotsViewer>

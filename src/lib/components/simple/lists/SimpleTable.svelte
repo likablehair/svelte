@@ -33,6 +33,7 @@
   import { onMount, type Snippet } from 'svelte';
   import type { DateTime } from 'luxon';
   import type { ColumnBoolean, ColumnCheckBox, ColumnCustom, ColumnDate, ColumnIcon, ColumnNumber, ColumnString } from './columnTypes';
+  import NoData from '../common/NoData.svelte';
 
   type TableHeader = Header<Data>
 
@@ -44,6 +45,7 @@
     resizableColumns?: boolean;
     resizedColumnSizeWithPadding?: { [value: string]: number };
     pointerOnRowHover?: boolean;
+    lang?: 'it' | 'en'
     calculateRowStyles?: CalculateRowStyles<Item> | undefined
     calculateRowClasses?: CalculateRowClasses<Item> | undefined
     onsort?: (event: {
@@ -83,6 +85,7 @@
       header: TableHeader
       item: Item
     }]>
+    noDataSnippet?: Snippet<[]>
     class?:{
       container?: string;
       header?: string;
@@ -99,6 +102,7 @@
     resizableColumns = false,
     resizedColumnSizeWithPadding = $bindable(),
     pointerOnRowHover = false,
+    lang = 'en',
     calculateRowStyles = undefined,
     calculateRowClasses = undefined,
     oncolumnResize,
@@ -109,6 +113,7 @@
     appendSnippet,
     rowActionsSnippet,
     customSnippet,
+    noDataSnippet,
     class: clazz = {},
   }: Props = $props();
 
@@ -320,66 +325,83 @@
         </tr>
       </thead>
       <tbody>
-        {#each items as item, i}
-          {@const styles = !!calculateRowStyles ? calculateRowStyles(item) : {}}
-          {@const classes = !!calculateRowClasses ? calculateRowClasses(item) : ""}
-          <tr
-            class="item-tr {clazz.row || ''} {classes}"
-            onclick={() => handleRowClick(item)}
-            onkeydown={(event) => {
-              if (event.key === 'Enter') {
-                handleRowClick(item);
-              }
-            }}
-            tabindex="0"
-            style:background-color={styles.backgroundColor}
-            style:color={styles.color}
-            style:font-weight={styles.fontWeight}
-            class:pointer={pointerOnRowHover}
-          >
-            {#each headers as header, j}
-              <td class="{clazz.cell || ''}">
-                {#if header.type.key == "custom"}
-                  {#if customSnippet}
-                    {@render customSnippet({ index: i, columnIndex: j, header, item})}
-                  {/if}
-                {:else if  header.type.key == "date"}
-                  {formatDate(item[header.value], header.type.params)}
-                {:else if header.type.key == "icon"}
-                  <Icon
-                    --icon-color={header.type.params?.color}
-                    --icon-size={header.type.params?.size}
-                    name={header.type.params?.name || ""}
-                  />
-                {:else if header.type.key == 'string'}
-                  {#if item[header.value] !== undefined && item[header.value] !== null}
-                    {item[header.value]}
-                  {:else if !!header.type.params?.nullText}
-                    {#if typeof header.type.params.nullText == 'function'}
-                      {header.type.params.nullText(item)}
+        {#if items.length > 0}
+          {#each items as item, i}
+            {@const styles = !!calculateRowStyles ? calculateRowStyles(item) : {}}
+            {@const classes = !!calculateRowClasses ? calculateRowClasses(item) : ""}
+            <tr
+              class="item-tr {clazz.row || ''} {classes}"
+              onclick={() => handleRowClick(item)}
+              onkeydown={(event) => {
+                if (event.key === 'Enter') {
+                  handleRowClick(item);
+                }
+              }}
+              tabindex="0"
+              style:background-color={styles.backgroundColor}
+              style:color={styles.color}
+              style:font-weight={styles.fontWeight}
+              class:pointer={pointerOnRowHover}
+            >
+              {#each headers as header, j}
+                <td class="{clazz.cell || ''}">
+                  {#if header.type.key == "custom"}
+                    {#if customSnippet}
+                      {@render customSnippet({ index: i, columnIndex: j, header, item})}
+                    {/if}
+                  {:else if  header.type.key == "date"}
+                    {formatDate(item[header.value], header.type.params)}
+                  {:else if header.type.key == "icon"}
+                    <Icon
+                      --icon-color={header.type.params?.color}
+                      --icon-size={header.type.params?.size}
+                      name={header.type.params?.name || ""}
+                    />
+                  {:else if header.type.key == 'string'}
+                    {#if item[header.value] !== undefined && item[header.value] !== null}
+                      {item[header.value]}
+                    {:else if !!header.type.params?.nullText}
+                      {#if typeof header.type.params.nullText == 'function'}
+                        {header.type.params.nullText(item)}
+                      {:else}
+                        {header.type.params.nullText}
+                      {/if}
                     {:else}
-                      {header.type.params.nullText}
+                      {item[header.value]}
                     {/if}
                   {:else}
                     {item[header.value]}
                   {/if}
-                {:else}
-                  {item[header.value]}
-                {/if}
-              </td>
-            {/each}
-            {#if rowActionsSnippet || appendSnippet}
-              <td class="{clazz.cell || ''} append" style:width="fit-content">
-                {#if rowActionsSnippet}
-                  {@render rowActionsSnippet({ index: i, item })}
-                {/if}
-                {#if appendSnippet}
-                  {@render appendSnippet({ index: i, item })}
-                {/if}
-              </td>
-            {/if}
+                </td>
+              {/each}
+              {#if rowActionsSnippet || appendSnippet}
+                <td class="{clazz.cell || ''} append" style:width="fit-content">
+                  {#if rowActionsSnippet}
+                    {@render rowActionsSnippet({ index: i, item })}
+                  {/if}
+                  {#if appendSnippet}
+                    {@render appendSnippet({ index: i, item })}
+                  {/if}
+                </td>
+              {/if}
+            </tr>
+          {/each}
+        {:else}
+          <tr>
+            <td
+              colspan={headers.length + 1}
+              style="text-align: center;"
+              style:border="none"
+              style:cursor="default"
+              style:padding="10px"
+              style:font-size="1.2em"
+            >
+              {#if noDataSnippet}{@render noDataSnippet()}{:else}
+                <NoData {lang} />
+              {/if}
+            </td>
           </tr>
-        {/each}
+        {/if}
       </tbody>
     </table>
   </div>
