@@ -24,6 +24,7 @@ export { default as Textarea } from './components/simple/forms/Textarea.svelte'
 export { default as SimpleTextField } from './components/simple/forms/SimpleTextField.svelte'
 export { default as VerticalSwitch } from './components/simple/forms/VerticalSwitch.svelte'
 export { default as VerticalTextSwitch } from './components/simple/forms/VerticalTextSwitch.svelte'
+export { default as BoxList } from './components/simple/lists/BoxList.svelte'
 
 export { default as ColorInvertedSelector } from './components/simple/lists/ColorInvertedSelector.svelte'
 export { default as SelectableMenuList } from './components/simple/lists/SelectableMenuList.svelte'

@@ -84,7 +84,7 @@
     drawerOpened = $bindable(false),
     expandOn = 'hover',
     options = [],
-    selectedIndex = undefined,
+    selectedIndex = $bindable(undefined),
     sidebarExpanded = $bindable(false),
     ondrawerChange,
     onmenuSelect,
@@ -207,7 +207,7 @@
                   >
                     <ColorInvertedSelector
                       options={options}
-                      selectedIndex={selectedIndex}
+                      bind:selectedIndex={selectedIndex}
                       --color-inverted-selector-default-background-color="transparent"
                       --color-inverted-selector-default-font-size="1.2rem"
                       --color-inverted-selector-default-icon-gap="1.2rem"

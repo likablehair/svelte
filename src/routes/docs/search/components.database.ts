@@ -68,6 +68,12 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/MonthSelector'
   }, {
+    title: 'BoxList',
+    description: "A lot of boxes.",
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/BoxList'
+  }, {
     title: 'ProgressBar',
     description: 'Makes some progress to get there.',
     status: 'stable',

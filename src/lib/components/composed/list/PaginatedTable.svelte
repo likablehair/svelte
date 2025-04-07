@@ -102,7 +102,7 @@
     ],
     hideRowsPerPage = false,
     totalElements = undefined,
-    rowsPerPage = 20,
+    rowsPerPage = $bindable(20),
     filters = $bindable([]),
     searchBarColumns = undefined,
     searchBarVisible = true,
