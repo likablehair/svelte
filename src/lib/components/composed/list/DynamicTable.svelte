@@ -456,7 +456,7 @@
         name: h.label,
       };
     })),
-    infoActivators = Array(headersToShowInTable.length)
+    infoActivators = $state(Array(headersToShowInTable.length))
 
   let totalBatchLength: number = $state(0),
     expandedRows: Row[] = $state([]);    
@@ -2071,17 +2071,25 @@
             }}
           >
             {#snippet itemSnippet({ item })}
-              <Switch
-                --switch-label-width="90%"
-                value={headersToShow.find((h) => h.id == item.id) != undefined}
-                label={item.name}
-                onchange={(e) => {
-                  if (e.detail.value == false) {
-                    headersToShow = headersToShow.filter((h) => h.id != item.id);
-                    headersToSelect = [...headersToSelect, item];
-                  }
-                }}
-              />
+              <div
+                style:display=flex
+              >
+                <div
+                  style:flex-grow=1
+                >
+                  {item.name}
+                </div>
+                <Switch
+                  --switch-label-width="90%"
+                  value={headersToShow.find((h) => h.id == item.id) != undefined}
+                  onchange={(e) => {
+                    if (e.detail.value == false) {
+                      headersToShow = headersToShow.filter((h) => h.id != item.id);
+                      headersToSelect = [...headersToSelect, item];
+                    }
+                  }}
+                />
+              </div>
             {/snippet}
           </VerticalDraggableList>
         {/if}
@@ -2095,19 +2103,27 @@
               out:send={{ key: header }}
               class="headers-show grid-col-1"
             >
-              <Switch
-                --switch-label-width="90%"
-                value={false}
-                label={header.name}
-                onchange={(e) => {
-                  if (e.detail.value == true) {
-                    headersToSelect = headersToSelect.filter(
-                      (h) => h.id != header.id
-                    );
-                    headersToShow = [...headersToShow, header];
-                  }
-                }}
-              />
+              <div
+                style:display=flex
+              >
+                <div
+                  style:flex-grow=1
+                >
+                  {header.name}
+                </div>
+                <Switch
+                  --switch-label-width="90%"
+                  value={false}
+                  onchange={(e) => {
+                    if (e.detail.value == true) {
+                      headersToSelect = headersToSelect.filter(
+                        (h) => h.id != header.id
+                      );
+                      headersToShow = [...headersToShow, header];
+                    }
+                  }}
+                />
+              </div>
             </div>
           {/each}
         {:else}

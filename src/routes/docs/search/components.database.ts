@@ -56,6 +56,12 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/Calendar'
   }, {
+    title: 'CollpasibleSideBarLayout',
+    description: "Just a calendar",
+    status: 'stable',
+    type: 'layout',
+    url: '/docs/components/layouts/CollapsibleSideBarLayout'
+  }, {
     title: 'MonthSelector',
     description: "Just a month selector",
     status: 'stable',

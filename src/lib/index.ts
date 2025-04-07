@@ -19,7 +19,7 @@ export { default as Autocomplete } from './components/simple/forms/Autocomplete.
 export { default as Checkbox } from './components/simple/forms/Checkbox.svelte'
 export { default as FileInput } from './components/simple/forms/FileInput.svelte'
 export { default as FileInputList } from './components/simple/forms/FileInputList.svelte'
-// export { default as Switch } from './components/simple/forms/Switch.svelte'
+export { default as Switch } from './components/simple/forms/Switch.svelte'
 export { default as Textarea } from './components/simple/forms/Textarea.svelte'
 export { default as SimpleTextField } from './components/simple/forms/SimpleTextField.svelte'
 export { default as VerticalSwitch } from './components/simple/forms/VerticalSwitch.svelte'
@@ -86,9 +86,9 @@ export { default as debounce } from './stores/debounce'
 
 export { default as SimpleTimeLine } from './components/simple/timeline/SimpleTimeLine.svelte'
 
-// export { default as CollapsibleSideBarLayout } from './components/layouts/CollapsibleSideBarLayout.svelte'
-// export { default as StableDividedSideBarLayout } from './components/layouts/StableDividedSideBarLayout.svelte'
-// export { default as UnstableDividedSideBarLayout } from './components/layouts/UnstableDividedSideBarLayout.svelte'
+export { default as CollapsibleSideBarLayout } from './components/layouts/CollapsibleSideBarLayout.svelte'
+export { default as StableDividedSideBarLayout } from './components/layouts/StableDividedSideBarLayout.svelte'
+export { default as UnstableDividedSideBarLayout } from './components/layouts/UnstableDividedSideBarLayout.svelte'
 
 export { default as Converter } from './utils/filters/filters'
 

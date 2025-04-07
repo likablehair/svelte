@@ -1,14 +1,17 @@
 :root {
-	--switch-default-padding: 1px;
-	--switch-default-width: 40px;
-	--switch-default-background-color: rgb(var(--global-color-background-300), 0.5);
-	--switch-default-border-radius: 9999px;
-	--switch-default-box-shadow: none;
-	--switch-default-active-toggle-color: rgb(var(--global-color-contrast-900));
-	--switch-default-active-background-color: rgb(var(--global-color-contrast-900));
-	--switch-default-inactive-toggle-color: rgb(var(--global-color-contrast-900));
-	--switch-default-inactive-background-color: rgb(var(--global-color-contrast-900));
-	--switch-default-label-width: 'auto';
-	--switch-default-font-size: 16px;
-	--switch-default-gap: 0.5em;
+	--switch-default-width: 42px;
+	--switch-default-height: 22px;
+	--switch-default-handle-width: 16px;
+	--switch-default-handle-color: #ffffff;
+	--switch-default-translate-x: 20px;
+	--switch-default-active-box-shadow: inset 0 0 0 2px rgb(var(--global-color-primary-500));
+	--switch-default-active-background-color: rgb(var(--global-color-primary-500));
+	--switch-default-inactive-box-shadow: inset 0 0 0 2px rgb(var(--global-color-contrast-200));
+	--switch-default-inactive-background-color: rgb(var(--global-color-contrast-50));
+  --switch-default-disabled-inactive-box-shadow: inset 0 0 0 2px rgb(var(--global-color-contrast-400));
+	--switch-default-disabled-inactive-background-color: rgb(var(--global-color-contrast-100));
+  --switch-default-disabled-inactive-handle-color: rgb(var(--global-color-contrast-400));
+	--switch-default-disabled-active-box-shadow: inset 0 0 0 2px rgb(var(--global-color-primary-400));
+	--switch-default-disabled-active-background-color: rgb(var(--global-color-primary-300));
+  --switch-default-disabled-active-handle-color: #eeeeee
 }

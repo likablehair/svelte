@@ -65,14 +65,22 @@
       <div
         class="item-container {clazz}"
       >
-        <Icon
-          name="mdi-drag" 
-        />
-        {#if itemSnippet}
-          {@render itemSnippet({ item })}
-        {:else}
-          {item.name}
-        {/if}
+        <div
+          style:grid-cols=1
+        >
+          <Icon
+            name="mdi-drag" 
+          />
+        </div>
+        <div
+          style:grid-cols=2
+        >
+          {#if itemSnippet}
+            {@render itemSnippet({ item })}
+          {:else}
+            {item.name}
+          {/if}
+        </div>
       </div>
 		</div>
 	{/each}
