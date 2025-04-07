@@ -90,14 +90,16 @@
     gap: var(
       --descriptive-avatar-image-gap,
       var(--descriptive-avatar-default-image-gap)
-    )
+    );
+    max-width: 100%;
   }
 
   .text-gapped {
     gap: var(
       --descriptive-avatar-text-gap,
       var(--descriptive-avatar-default-text-gap)
-    )
+    );
+    min-width: 0;
   }
 
   .font-bold {
@@ -139,5 +141,12 @@
       --descriptive-avatar-cursor,
       var(--descriptive-avatar-default-cursor)
     );
+  }
+
+  .title,
+  .subtitle {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 </style>
