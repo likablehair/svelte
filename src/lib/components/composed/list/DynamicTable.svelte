@@ -15,7 +15,7 @@
     type PaginatedTable
   } from "$lib";
   import { DateTime } from "luxon";
-  import { createEventDispatcher, onMount, type ComponentProps } from "svelte";
+  import { createEventDispatcher, onMount, tick, type ComponentProps } from "svelte";
   import { quintOut } from "svelte/easing";
   import { crossfade, fade } from "svelte/transition";
   import Filters from "../search/Filters.svelte";
@@ -917,7 +917,7 @@
     handleSearchChange(searchText);
   }
 
-  function handleLoadForward() {
+  async function handleLoadForward() {
     if(renderedRows.length >= renderedRowsNumber) {
       userScrolling = false
       
@@ -942,14 +942,13 @@
 
       currentSectionNumber = currentSectionNumber + 1
 
-      setTimeout(() => {
-        const anchorElementAfter = findAnchorElement(anchorUniqueKey)
-        const anchorOffsetAfter = anchorElementAfter?.getBoundingClientRect().top || 0
-        const offsetDiff = anchorOffsetAfter - anchorOffsetBefore
-        tableContainer.scrollTop += offsetDiff
+      await tick()
+      const anchorElementAfter = findAnchorElement(anchorUniqueKey)
+      const anchorOffsetAfter = anchorElementAfter?.getBoundingClientRect().top || 0
+      const offsetDiff = anchorOffsetAfter - anchorOffsetBefore
+      tableContainer.scrollTop += offsetDiff
 
-        userScrolling = true
-      }, 10)
+      userScrolling = true
     }
 
     if(totalCachedSections - sectionThreshold <= currentSectionNumber 
@@ -960,7 +959,7 @@
     }
   }
 
-  function handleLoadBackward() {
+  async function handleLoadBackward() {
     userScrolling = false
 
     const anchorIndex = 0
@@ -984,14 +983,13 @@
     
     currentSectionNumber = currentSectionNumber - 1
 
-    setTimeout(() => {
-      const anchorElementAfter = findAnchorElement(anchorUniqueKey)
-      const anchorOffsetAfter = anchorElementAfter?.getBoundingClientRect().top || 0
-      const offsetDiff = anchorOffsetAfter - anchorOffsetBefore
-      tableContainer.scrollTop += offsetDiff
+    await tick()
+    const anchorElementAfter = findAnchorElement(anchorUniqueKey)
+    const anchorOffsetAfter = anchorElementAfter?.getBoundingClientRect().top || 0
+    const offsetDiff = anchorOffsetAfter - anchorOffsetBefore
+    tableContainer.scrollTop += offsetDiff
 
-      userScrolling = true
-    }, 10)
+    userScrolling = true
   }
 
   function findAnchorElement(key: keyof Item) {
