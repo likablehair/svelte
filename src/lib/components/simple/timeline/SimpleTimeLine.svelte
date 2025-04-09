@@ -1,23 +1,57 @@
-<script context="module" lang="ts">
-  export type TimeLineItem = {
+<script module lang="ts">
+  export type TimeLineItem<Data = any> = {
     name: string;
     title?: string;
     description?: string;
     imageUrl?: string;
     from?: Date;
     to?: Date;
-    data?: any;
+    data?: Data;
   };
 </script>
 
-<script lang="ts">
+<script lang="ts" generics="Data">
   import { dateToString } from "$lib/components/simple/dates/utils";
+  import type { Snippet } from "svelte";
   import "../../../css/main.css";
   import "./SimpleTimeLine.css";
 
-  export let items: TimeLineItem[] = [],
+  type TimeLineItemData = TimeLineItem<Data>
+  interface Props {
+    items: TimeLineItemData[];
+    singleSided?: boolean;
+    circleAlignment?: "top" | "center" | "bottom";
+    itemSnippet?: Snippet<[{
+      item: TimeLineItemData
+      alignment: 'left' | 'right'
+    }]>
+    timesSnippet?: Snippet<[{
+      item: TimeLineItemData
+      dateToString: typeof dateToString
+    }]>
+    infosSnippet?: Snippet<[{
+      item: TimeLineItemData
+      alignment: 'left' | 'right'
+    }]>
+    infosAppendSnippet?: Snippet<[{
+      item: TimeLineItemData
+      alignment: 'left' | 'right'
+    }]>
+    circleSnippet?: Snippet<[{
+      item: TimeLineItemData
+    }]>
+  }
+
+  let {
+    items = [],
     singleSided = false,
-    circleAlignment: "top" | "center" | "bottom" = "top";
+    circleAlignment = "top",
+    circleSnippet,
+    infosAppendSnippet,
+    infosSnippet,
+    itemSnippet,
+    timesSnippet,
+  }: Props = $props();
 </script>
 
 <div
@@ -43,19 +77,19 @@
           : "row-reverse"}
         class="time-line-body"
       >
-        <slot
-          name="item"
-          {item}
-          alignment={!singleSided && index % 2 == 0 ? "right" : "left"}
-        >
-          {#if !!item.from || !!item.to || $$slots.times}
+        {#if itemSnippet}
+          {@render itemSnippet({ item, alignment: !singleSided && index % 2 == 0 ? "right" : "left" })}
+        {:else}
+          {#if !!item.from || !!item.to || timesSnippet}
             <div
               style:padding={singleSided || index % 2 == 0
                 ? "0px 20px 0px 0px"
                 : "0px 0px 0px 20px"}
               class="time-line-times"
             >
-              <slot name="times" {item} {dateToString}>
+              {#if timesSnippet}
+                {@render timesSnippet({ item, dateToString })}
+              {:else}
                 <div
                   class:vertical-centered-container={circleAlignment ==
                     "center"}
@@ -82,18 +116,16 @@
                     </div>
                   {/if}
                 </div>
-              </slot>
+              {/if}
             </div>
           {/if}
           <div
             class="time-line-infos"
             style:text-align={singleSided || index % 2 == 0 ? "left" : "right"}
           >
-            <slot
-              name="infos"
-              {item}
-              alignment={!singleSided && index % 2 == 0 ? "right" : "left"}
-            >
+            {#if infosSnippet}
+              {@render infosSnippet({ item, alignment: !singleSided && index % 2 == 0 ? "right" : "left"})}
+            {:else}
               {#if !!item.title}
                 <div class="time-line-title">
                   {item.title}
@@ -104,19 +136,17 @@
                   {item.description}
                 </div>
               {/if}
-              <slot
-                name="infos-append"
-                {item}
-                alignment={!singleSided && index % 2 == 0 ? "right" : "left"}
-              />
-            </slot>
+              {@render infosAppendSnippet?.({ item, alignment: !singleSided && index % 2 == 0 ? "right" : "left"})}
+            {/if}
           </div>
-        </slot>
+        {/if}
       </div>
       <div style:align-items={circleAlignment} class="time-line-divider">
-        <slot name="circle" {item}>
-          <div class="circle" />
-        </slot>
+        {#if circleSnippet}
+          {@render circleSnippet({ item })}
+        {:else}
+          <div class="circle"></div>
+        {/if}
       </div>
     </div>
   {/each}

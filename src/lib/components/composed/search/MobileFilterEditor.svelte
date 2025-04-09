@@ -4,8 +4,6 @@
   import type { DateMode } from "$lib/utils/filters/filters";
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
   import DatePickerTextField from "$lib/components/composed/forms/DatePickerTextField.svelte";
-  import Button from "$lib/components/simple/buttons/Button.svelte";
-  import { createEventDispatcher } from "svelte";
   import Validator from "$lib/utils/filters/validator";
   import SelectableVerticalList, { type Element } from "$lib/components/simple/lists/SelectableVerticalList.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
@@ -13,22 +11,50 @@
   import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
   import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
   import type { LabelMapper } from "./Filters.svelte";
-    import ToggleList from "$lib/components/composed/forms/ToggleList.svelte";
+  import ToggleList from "$lib/components/composed/forms/ToggleList.svelte";
+  import type { KeyboardEventHandler, MouseEventHandler } from "svelte/elements";
+  import type { ComponentProps, Snippet } from "svelte";
 
-  export let filter: Filter | undefined = undefined,
-    lang: 'it' | 'en' = 'en',
-    backIcon: string = "mdi-arrow-left",
-    betweenFromLabel: string = lang == 'en' ? "From" : "Da",
-    betweenToLabel: string = lang == 'en' ? "To" : "A",
-    labelsMapper: LabelMapper,
-    forceApplyValid: boolean = false,
-    tmpFilter: Filter | undefined = undefined
+    interface Props {
+    filter?: Filter;
+    lang?: 'it' | 'en';
+    backIcon?: string;
+    betweenFromLabel?: string;
+    betweenToLabel?: string;
+    labelsMapper: LabelMapper;
+    forceApplyValid?: boolean;
+    tmpFilter?: Filter;
+    onbackClick?: () => void
+    onkeypress?: KeyboardEventHandler<HTMLDivElement>
+    onclick?: MouseEventHandler<HTMLDivElement>
+    onclose?: ComponentProps<typeof Autocomplete>['onclose']
+    titleSnippet?: Snippet<[]>
+    customSnippet?: Snippet<[{
+      filter: Filter
+    }]>
+    filterActionsSnippet?: Snippet<[{
+      filter: Filter,
+      applyFilterDisabled: typeof applyFilterDisabled
+    }]>
+  }
 
-  let dispatch = createEventDispatcher<{
-    'backClick': undefined,
-    'cancelClick': undefined
-  }>()
-
+  let {
+    filter = $bindable(undefined),
+    lang = 'en',
+    backIcon = "mdi-arrow-left",
+    betweenFromLabel = lang === 'en' ? "From" : "Da",
+    betweenToLabel = lang === 'en' ? "To" : "A",
+    labelsMapper,
+    forceApplyValid = false,
+    tmpFilter = $bindable(undefined),
+    onbackClick,
+    onkeypress,
+    onclick: onclickInternal,
+    onclose,
+    customSnippet,
+    filterActionsSnippet,
+    titleSnippet,
+  }: Props = $props();
 
   // function handleApplyFilterClick() {
   //   if(!!filter && !!tmpFilter) {
@@ -38,7 +64,7 @@
   //   }
   // }
 
-  let step: 'advanced' | 'editor'
+  let step: 'advanced' | 'editor' | undefined = $state()
 
   function initTmpFilter() {
     tmpFilter = filter === undefined ? undefined : {...filter}
@@ -61,43 +87,48 @@
   }
 
 
-  $: if(!!filter) {
-    initTmpFilter()
-  }
-
-
-  let advancedModeOptions: Element[],
-    advancedModeSelectedOption: string | undefined
-
-  $: if(!!tmpFilter) {
-    let modes
-    if(tmpFilter.type == 'string') {
-      modes = STRING_MODES
-    } else if(tmpFilter.type == 'date') {
-      modes = GENERIC_MODES
-    } else if(tmpFilter.type == 'number') {
-      modes = GENERIC_MODES
-    } else if(tmpFilter.type == 'select') {
-      modes = SELECT_MODES
+  $effect(() => {
+    if(!!filter) {
+      initTmpFilter()
     }
+  })
 
-    if(!!modes) {
-      advancedModeOptions = modes.map(mode => {
-        return {
-          title: labelsMapper[mode].short || mode,
-          name: mode
-        }
-      })
+
+  let advancedModeOptions: Element[] | undefined = $state(),
+    advancedModeSelectedOption: string | undefined = $state()
+
+  $effect(() => {
+    if(!!tmpFilter) {
+      let modes
+      if(tmpFilter.type == 'string') {
+        modes = STRING_MODES
+      } else if(tmpFilter.type == 'date') {
+        modes = GENERIC_MODES
+      } else if(tmpFilter.type == 'number') {
+        modes = GENERIC_MODES
+      } else if(tmpFilter.type == 'select') {
+        modes = SELECT_MODES
+      }
+  
+      if(!!modes) {
+        advancedModeOptions = modes.map(mode => {
+          return {
+            title: labelsMapper[mode].short || mode,
+            name: mode
+          }
+        })
+      }
     }
+  })
 
-  }
+  $effect(() => {
+    if(!tmpFilter?.advanced) {
+      advancedModeSelectedOption = undefined
+    }
+  })
 
-  $: if(!tmpFilter?.advanced) {
-    advancedModeSelectedOption = undefined
-  }
-
-  let calendarOpened: boolean = false,
-    calendarOpened2: boolean = false
+  let calendarOpened: boolean = $state(false),
+    calendarOpened2: boolean = $state(false)
 
   // TODO I don't like that there is a singlo dropdow to handle all filter advance mode.
   // In some case would be necessary to handle more than one selection and this code
@@ -114,30 +145,38 @@
     }
   }
 
-  let canRenderOptions: boolean = true
+  let canRenderOptions: boolean = $state(true)
 
 
-  $: applyFilterDisabled = !Validator.isValid(tmpFilter) && !forceApplyValid
+  let applyFilterDisabled = $derived(!Validator.isValid(tmpFilter) && !forceApplyValid)
 
-  $: if(!!tmpFilter && tmpFilter.type == 'bool') {
-    if(tmpFilter.value === undefined) {
-      tmpFilter.value = false
+  $effect(() => {
+    if(!!tmpFilter && tmpFilter.type == 'bool') {
+      if(tmpFilter.value === undefined) {
+        tmpFilter.value = false
+      }
     }
-  }
+  })
 
-  $: if(!!tmpFilter && tmpFilter.type == 'select') {
-    if(tmpFilter.values === undefined) {
-      tmpFilter.values = []
+  $effect(() => {
+    if(!!tmpFilter && tmpFilter.type == 'select') {
+      if(tmpFilter.values === undefined) {
+        tmpFilter.values = []
+      }
     }
-  }
+  })
 
   function handleModeBackClick() {
-    dispatch('backClick')
+    if(onbackClick) {
+      onbackClick()
+    }
   }
 
   function handleEditorBackCLick() {
     if(!!tmpFilter && !tmpFilter.advanced) {
-      dispatch('backClick')
+      if(onbackClick) {
+        onbackClick()
+      }
     } else {
       step = 'advanced'
       advancedModeSelectedOption = undefined
@@ -147,37 +186,46 @@
     }
   }
 
-  $: if(!!tmpFilter && tmpFilter.type == 'date' && tmpFilter.mode == 'between') {
-    if(!tmpFilter.from) tmpFilter.from = new Date()
-    if(!tmpFilter.to) tmpFilter.to = new Date()
+  $effect(() => {
+    if(!!tmpFilter && tmpFilter.type == 'date' && tmpFilter.mode == 'between') {
+      if(!tmpFilter.from) tmpFilter.from = new Date()
+      if(!tmpFilter.to) tmpFilter.to = new Date()
+    }
+  }) 
+
+  function onclick(event: MouseEvent & {
+      currentTarget: EventTarget & HTMLDivElement;
+  }) {
+    event.stopPropagation()
+    if(onclickInternal) {
+      onclickInternal(event)
+    }
   }
-
-
 </script>
 
 <div class="container">
   {#if !!filter && !!tmpFilter}
-    <div class="header" on:click={step=="advanced" ? handleModeBackClick : handleEditorBackCLick} on:keypress role="presentation">
+    <div class="header" onclick={step=="advanced" ? handleModeBackClick : handleEditorBackCLick} {onkeypress} role="presentation">
       <div class="back-link">
         <Icon
         name={backIcon}
         ></Icon>
       </div>
       <div class="title">
-        <slot name="title"></slot>
+        {@render titleSnippet?.()}
       </div>
     </div>
     <div class="filter-editor">
       {#if tmpFilter.advanced && step == 'advanced' && canRenderOptions}
         <div class="advanced-mode" in:fly|local={{delay: 100, x: 200, duration: 100}} out:fly|local={{x: -200, duration: 100}}>
-          <div class="advanced-mode-selector" on:click|stopPropagation on:keypress role="presentation">
+          <div class="advanced-mode-selector" {onclick} {onkeypress} role="presentation">
             <SelectableVerticalList
               bind:selected={advancedModeSelectedOption}
               bind:elements={advancedModeOptions}
               --selectable-vertical-list-default-width="100%"
               --selectable-vertical-list-default-element-height="56px"
               --selectable-vertical-list-default-title-font-size="null"
-              on:select={handleAdvancedModeSelection}
+              onselect={handleAdvancedModeSelection}
               centered
               bicolor
             ></SelectableVerticalList>
@@ -187,8 +235,8 @@
         <div class="editor" in:fly|local={{delay: 100, x: 200, duration: 100}} out:fly|local={{x: -200, duration: 100}}>
           <div class="fields-container">
             <div class="fields"
-              on:click|stopPropagation
-              on:keypress
+              {onclick}
+              {onkeypress}
               role="presentation"
             >
               {#if tmpFilter.type === "string" }
@@ -206,7 +254,7 @@
                       openingId="advanced-filter"
                       bind:menuOpened={calendarOpened}
                       placeholder={tmpFilter.label}
-                      on:day-click={() => {calendarOpened = false}}
+                      ondayClick={() => {calendarOpened = false}}
                       --simple-textfield-width="100%"
                     ></DatePickerTextField>
                   </div>
@@ -226,7 +274,7 @@
                       openingId="advanced-filter"
                       placeholder={betweenToLabel}
                       bind:menuOpened={calendarOpened}
-                      on:day-click={() => {calendarOpened = false}}
+                      ondayClick={() => {calendarOpened = false}}
                       --simple-textfield-width="100%"
                     ></DatePickerTextField>
                   </div>
@@ -236,7 +284,7 @@
                       openingId="advanced-filter"
                       placeholder="Alla data"
                       bind:menuOpened={calendarOpened2}
-                      on:day-click={() => {calendarOpened2 = false}}
+                      ondayClick={() => {calendarOpened2 = false}}
                       --simple-textfield-width="100%"
                     ></DatePickerTextField>
                   </div>
@@ -263,7 +311,7 @@
               {:else if tmpFilter.type === "select" && (tmpFilter.view === undefined || tmpFilter.view === 'autocomplete')}
                 <div style:width="100%">
                   <Autocomplete
-                    on:close
+                    {onclose}
                     --drawer-margin="5px 5px -10px 5px"
                     mobileDrawer
                     bind:values={tmpFilter.values}
@@ -293,12 +341,12 @@
                   </span>
                 </div>
               {:else if tmpFilter.type == 'custom'}
-                <slot name="custom" filter={tmpFilter}></slot>
+                {@render customSnippet?.({ filter: tmpFilter })}
               {/if}
             </div>
           </div>
           <div class="bottom-btn">
-            <slot name="filter-actions" {applyFilterDisabled} filter={tmpFilter}></slot>
+            {@render filterActionsSnippet?.({ applyFilterDisabled, filter: tmpFilter })}
           </div>
         </div>
       {/if}

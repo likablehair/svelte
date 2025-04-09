@@ -4,31 +4,54 @@
   import { fly } from "svelte/transition";
   import { getDateRowsStats, getDaysNames } from "./utils";
   import type { DateStat, Locale } from "./utils";
+  import type { Snippet } from 'svelte';
 
-  let clazz: {
-    container?: string,
-    weekHeader?: string,
-    day?: string
-  } = {};
-	export { clazz as class };
+  interface Props {
+    selectedDate?: Date;
+    visibleMonth?: number;
+    visibleYear?: number;
+    locale?: Locale;
+    showExtraMonthDays?: boolean;
+    showHeader?: boolean;
+    animationDuration?: number;
+    disabled?: boolean;
+    class?: {
+      container?: string,
+      weekHeader?: string,
+      day?: string
+    }
+    ondayClick?: (event: {
+      detail: {
+        dateStat: DateStat;
+        selected: boolean;
+        extraMonth: boolean;
+      }
+    }) => void
+    weekHeaderSnippet?: Snippet<[{
+      header: string,
+      index: number
+    }]>
+    daySnippet?: Snippet<[{
+      dayStat: DateStat,
+      extraMonth: boolean
+      selected: boolean
+    }]>
+  }
 
-  export let selectedDate: Date | undefined | null = undefined,
-    visibleMonth: number = new Date().getMonth(),
-    visibleYear: number = new Date().getFullYear(),
-    locale: Locale = "it",
-    showExtraMonthDays: boolean = true,
-    showHeader: boolean = true,
-    animationDuration: number = 200,
-    disabled: boolean = false;
-
-  import { createEventDispatcher } from "svelte";
-  const dispatch = createEventDispatcher<{
-    "day-click": {
-      dateStat: DateStat;
-      selected: boolean;
-      extraMonth: boolean;
-    };
-  }>();
+  let {
+    selectedDate = $bindable(undefined),
+    visibleMonth = $bindable(new Date().getMonth()),
+    visibleYear = $bindable(new Date().getFullYear()),
+    locale = "it",
+    showExtraMonthDays = true,
+    showHeader = true,
+    animationDuration = 200,
+    disabled = false,
+    class: clazz = {},
+    ondayClick,
+    weekHeaderSnippet,
+    daySnippet,
+  }: Props = $props();
 
   function handleDayClick(dateStat: DateStat, extraMonth: boolean) {
     if(disabled) return
@@ -45,11 +68,15 @@
       );
     }
 
-    dispatch("day-click", {
-      dateStat: dateStat,
-      selected: !extraMonth,
-      extraMonth: extraMonth,
-    });
+    if(ondayClick){
+      ondayClick({
+        detail: {
+          dateStat,
+          selected: !extraMonth,
+          extraMonth,
+        }
+      })
+    }
   }
 </script>
 
@@ -62,9 +89,11 @@
     >
       {#if showHeader}
         {#each getDaysNames(locale).map((name) => name[0]) as weekHeader, index}
-          <slot name="weekHeader" header={weekHeader} {index}>
+          {#if weekHeaderSnippet}
+            {@render weekHeaderSnippet({ header: weekHeader, index})}
+          {:else}
             <div class="week-header-slot {clazz.weekHeader || ''}">{weekHeader}</div>
-          </slot>
+          {/if}
         {/each}
       {/if}
       {#each getDateRowsStats(visibleMonth, visibleYear, locale) as day}
@@ -74,7 +103,9 @@
           selectedDate.getMonth() == day.month &&
           selectedDate.getFullYear() == day.year}
         {@const extraMonth = day.month != visibleMonth}
-        <slot name="day" dayStat={day} {extraMonth} {selected}>
+        {#if daySnippet}
+            {@render daySnippet({ dayStat: day, extraMonth, selected })}
+        {:else}
           {#if (!showExtraMonthDays && day.month == visibleMonth) || showExtraMonthDays}
             <div
               style:border-radius="50%"
@@ -82,16 +113,14 @@
               class:extra-month={extraMonth}
               class:selected
               class:not-selected={!selected}
-              on:click={() => handleDayClick(day, extraMonth)}
-              on:keydown={() => handleDayClick(day, extraMonth)}
+              onclick={() => handleDayClick(day, extraMonth)}
+              onkeydown={() => handleDayClick(day, extraMonth)}
               role="presentation"
             >
               {day.dayOfMonth}
             </div>
-          {:else}
-            <div />
-          {/if}
-        </slot>
+          {/if}        
+        {/if}
       {/each}
     </div>
   {/key}

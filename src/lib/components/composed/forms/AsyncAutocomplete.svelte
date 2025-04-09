@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import type { Item } from "../../../components/simple/forms/Autocomplete.svelte";
   export type { Item }
 </script>
@@ -7,66 +7,95 @@
   import Autocomplete from "../../../components/simple/forms/Autocomplete.svelte";
   import debounceStore from "$lib/stores/debounce";
   import { writable } from 'svelte/store';
+  import type { ComponentProps } from "svelte";
 
-  export let items: Item[] = [],
-    values: Item[] = [],
-    multiple: boolean = false,
+  interface Props {
+    items: Item[];
+    values?: Item[];
+    multiple?: boolean;
     searcher: (params: {
       searchText: string
-    }) => Promise<Item[]>,
-    placeholder: string | undefined = undefined,
-    searchThreshold: number = 2,
-    debounceTimeout: number = 500,
-    searching: boolean = false,
-    search: boolean = false,
-    searchText: string | undefined = undefined,
-    maxVisibleChips: number | undefined = undefined,
-    menuOpened: boolean = false,
-    mobileDrawer: boolean = false,
-    closeOnSelect: boolean = false,
-    disabled: boolean = false
+    }) => Promise<Item[]>;
+    placeholder?: string;
+    searchThreshold?: number;
+    debounceTimeout?: number;
+    searching?: boolean;
+    search?: boolean;
+    searchText?: string;
+    maxVisibleChips?: number;
+    menuOpened?: boolean;
+    mobileDrawer?: boolean;
+    closeOnSelect?: boolean;
+    disabled?: boolean;
+    chipLabelSnippet?: ComponentProps<typeof Autocomplete>['chipLabelSnippet']
+    itemLabelSnippet?: ComponentProps<typeof Autocomplete>['itemLabelSnippet']
+    onchange?: ComponentProps<typeof Autocomplete>['onchange']
+  }
+
+  let {
+    items = [],
+    values = [],
+    multiple = false,
+    searcher,
+    placeholder,
+    searchThreshold = 2,
+    debounceTimeout = 500,
+    searching = false,
+    search = false,
+    searchText,
+    maxVisibleChips,
+    menuOpened = false,
+    mobileDrawer = false,
+    closeOnSelect = false,
+    disabled = false,
+    chipLabelSnippet,
+    itemLabelSnippet,
+    onchange,
+  }: Props = $props();
 
   const searchTextValue = writable<string | undefined>(searchText)
-  $: searchTextDebounce = debounceStore(searchTextValue, debounceTimeout)
+  let searchTextDebounce = $derived(debounceStore(searchTextValue, debounceTimeout))
   
-  $: if(!!$searchTextDebounce && searchThreshold <= $searchTextDebounce.length) {
-    searching = true
-    searcher({ searchText: $searchTextDebounce }).then((it) => {
-      items = it
-    }).finally(() => {
-      searching = false
-    })
-  }
-  $: if(search) {
-    search = false
-    searching = true
-    searcher({ searchText: $searchTextDebounce }).then((it) => {
-      items = it
-    }).finally(() => {
-      searching = false
-    })
-  }
-  $: $searchTextValue = searchText
+  $effect(() => {
+    if(!!$searchTextDebounce && searchThreshold <= $searchTextDebounce.length) {
+      searching = true
+      searcher({ searchText: $searchTextDebounce }).then((it) => {
+        items = it
+      }).finally(() => {
+        searching = false
+      })
+    }
+  }) 
+  $effect(() => {
+    if(search) {
+      search = false
+      searching = true
+      searcher({ searchText: $searchTextDebounce }).then((it) => {
+        items = it
+      }).finally(() => {
+        searching = false
+      })
+    }
+  }) 
+  $effect(() => {
+    $searchTextValue = searchText
+  })
 </script>
 
 <Autocomplete
-  bind:items
+  {items}
   bind:values
   bind:searchText
-  bind:multiple
-  bind:maxVisibleChips
+  {multiple}
+  {maxVisibleChips}
   bind:menuOpened
-  bind:mobileDrawer
-  bind:placeholder
-  bind:closeOnSelect
-  bind:disabled
+  {mobileDrawer}
+  {placeholder}
+  {closeOnSelect}
+  {disabled}
   searchFunction={() => true}
-  on:change
+  {onchange}
+  {chipLabelSnippet}
+  {itemLabelSnippet}
 >
-  <div slot="chip-label" let:selection>
-    <slot name="chip-label" {selection}>{selection.label}</slot>
-  </div>
-  <div slot="item-label" let:item>
-    <slot name="item-label" {item}>{item.label}</slot>
-  </div>
 </Autocomplete>

@@ -3,15 +3,7 @@
   import './StableDividedSideBarLayout.css'
   import MediaQuery from "$lib/components/simple/common/MediaQuery.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte"
-  import { createEventDispatcher } from "svelte";
-
-  let clazz: {
-    container?: string,
-    header?: string,
-    mainSection?: string,
-    overlay?: string
-  } = {};
-	export { clazz as class };
+  import { type Snippet } from "svelte";
 
   /*
     Styles:
@@ -28,75 +20,125 @@
     --stable-divided-side-bar-layout-drawer-width
   */
 
-  export let drawerOpened: boolean = false
+  interface Props {
+    drawerOpened?: boolean;
+    class?: {
+      container?: string,
+      header?: string,
+      mainSection?: string,
+      overlay?: string
+    }
+    ondrawerChange?: (event: {
+      detail: {
+        opened: boolean
+      }
+    }) => void
+    children?: Snippet<[]>
+    menuSnippet?: Snippet<[]>
+    innerMenuSnippet?: Snippet<[{
+      hamburgerVisible: boolean
+    }]>
+    sidebarSnippet?: Snippet<[{
+      hamburgerVisible: boolean
+    }]>
+  }
 
-  let dispatch = createEventDispatcher<{
-    'drawer-change': {
-      opened: boolean
-    },
-  }>()
+  let { 
+    drawerOpened = $bindable(false),
+    ondrawerChange,
+    children,
+    innerMenuSnippet,
+    menuSnippet,
+    sidebarSnippet,
+    class: clazz = {}
+  }: Props = $props();
 
   function toggleMenu() {
     drawerOpened = !drawerOpened
-    dispatch('drawer-change', { opened: drawerOpened })
+    if(ondrawerChange) {
+      ondrawerChange({
+        detail: {
+          opened: drawerOpened
+        }
+      })
+    }
   }
 
   function handleOverlayClick() {
     drawerOpened = false
-    dispatch('drawer-change', { opened: drawerOpened })
+    if(ondrawerChange) {
+      ondrawerChange({
+        detail: {
+          opened: drawerOpened
+        }
+      })
+    }
   }
 </script>
 
-<MediaQuery let:mAndDown>
-  <div
-    class={clazz.container || ''}
-  >
-    <header 
-      class:opened={drawerOpened}
-      class="side-bar {clazz.header}"
+<MediaQuery>
+  {#snippet defaultSnippet({ mAndDown})}
+    <div
+      class={clazz.container || ''}
     >
-      <div 
-        class:opened-drawer={drawerOpened}
-        class="header-toolbar"
+      <header 
+        class:opened={drawerOpened}
+        class="side-bar {clazz.header}"
       >
-        <slot name="menu">
-          <div class="inner-menu">
-            {#if mAndDown}
-              <div style:margin-right="2rem">
-                <Icon 
-                  name="mdi-menu" 
-                  click
-                  on:click={toggleMenu}
-                ></Icon>
-              </div>
-            {/if}
-            <slot name="inner-menu" hamburgerVisible={mAndDown}>
-              Menu
-            </slot>
-          </div>
-        </slot>
-      </div>
-      <div class="side-bar-content">
-        <slot name="sidebar" hamburgerVisible={mAndDown}>
-          Sidebar
-        </slot>
-      </div>
-    </header>
-    <div class="main-section {clazz.mainSection || ''}">
-      <div 
-        on:click={handleOverlayClick}
-        on:keypress={handleOverlayClick}
-        class:visible={drawerOpened}
-        class="overlay {clazz.overlay || ''}"
-      ></div>
-      <div
-        class="content"
-        class:blurred={drawerOpened}
-      >
-        <slot>Content</slot>
+        <div 
+          class:opened-drawer={drawerOpened}
+          class="header-toolbar"
+        >
+          {#if menuSnippet}
+            {@render menuSnippet()}
+          {:else}
+            <div class="inner-menu">
+              {#if mAndDown}
+                <div style:margin-right="2rem">
+                  <Icon 
+                    name="mdi-menu" 
+                    onclick={toggleMenu}
+                  ></Icon>
+                </div>
+              {/if}
+              {#if innerMenuSnippet}
+                {@render innerMenuSnippet({ hamburgerVisible: mAndDown })}
+              {:else}
+                Menu
+              {/if}
+            </div>
+          {/if}
+        </div>
+        <div class="side-bar-content">
+          {#if sidebarSnippet}
+            {@render sidebarSnippet({ hamburgerVisible: mAndDown })}
+          {:else}
+            Sidebar
+          {/if}
+        </div>
+      </header>
+      <div class="main-section {clazz.mainSection || ''}">
+        <div 
+          onclick={handleOverlayClick}
+          onkeypress={handleOverlayClick}
+          class:visible={drawerOpened}
+          class="overlay {clazz.overlay || ''}"
+          role="button"
+          tabindex="0"
+        ></div>
+        <div
+          class="content"
+          class:blurred={drawerOpened}
+        >
+          {#if children}
+            {@render children()}
+          {:else}
+            Content
+          {/if}
+        </div>
       </div>
     </div>
-  </div>
+  {/snippet}
 </MediaQuery>
 
 

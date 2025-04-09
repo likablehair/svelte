@@ -123,7 +123,7 @@
   ]}
   bind:drawerOpened
 >
-  <svelte:fragment slot="prepend" let:option let:handleClickClose let:sidebarExpanded>
+  {#snippet prependSnippet({ handleClickClose, index, option, sidebarExpanded,})}  
     {#if !!option.icon}
       <Icon name={option.icon} />
     {/if}
@@ -132,7 +132,7 @@
         <div class="number">1</div>
       </div>
     {/if}
-  </svelte:fragment>
+  {/snippet}
   <PaginatedTable
     filters={filters}
     headers={headers}

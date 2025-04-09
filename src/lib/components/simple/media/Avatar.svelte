@@ -2,25 +2,39 @@
   import './Avatar.css'
   import '../../../css/main.css'
   import { BROWSER } from 'esm-env';
+  import type { Snippet } from 'svelte';
 
-  export let src: string | undefined = undefined,
-    alt: string = "",
-    text: string | undefined = undefined,
-    referrerpolicy: ReferrerPolicy | null | undefined = "no-referrer",
-    imageLoadingStatus: 'error' | 'success' = 'success'
-
-  $: if(!!src && BROWSER) {
-    let image = new Image()
-    image.src = src
-    image.onload = () => {
-      imageLoadingStatus = 'success'
-    }
-    image.onerror = () => {
-      imageLoadingStatus = 'error'
-    }
+  interface Props {
+    src?: string;
+    alt?: string;
+    text?: string;
+    referrerpolicy?: ReferrerPolicy | undefined;
+    imageLoadingStatus?: 'error' | 'success';
+    children?: Snippet<[]>
   }
-</script>
 
+  let {
+    src = undefined,
+    alt = "",
+    text = undefined,
+    referrerpolicy = "no-referrer",
+    imageLoadingStatus = $bindable("success"),
+    children,
+  }: Props = $props();
+
+  $effect(() => {
+    if(!!src && BROWSER) {
+      let image = new Image()
+      image.src = src
+      image.onload = () => {
+        imageLoadingStatus = 'success'
+      }
+      image.onerror = () => {
+        imageLoadingStatus = 'error'
+      }
+    }
+  })
+</script>
 
 {#if !!src && imageLoadingStatus == 'success'}
   <img
@@ -30,9 +44,11 @@
     {referrerpolicy}
   />
 {:else}
-  <slot>
+  {#if children}
+    {@render children()}
+  {:else}
     <div class="avatar">{text || ''}</div>
-  </slot>
+  {/if}
 {/if}
 
 <style>

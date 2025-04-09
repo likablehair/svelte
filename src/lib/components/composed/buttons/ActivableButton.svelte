@@ -1,14 +1,33 @@
 <script lang="ts">
   import Button from "$lib/components/simple/buttons/Button.svelte";
-  import type { ComponentProps } from "svelte";
+  import type { ComponentProps, Snippet } from "svelte";
+  interface Props {
+    active?: boolean;
+    buttonProps?: ComponentProps<typeof Button>;
+    onclick?: ComponentProps<typeof Button>['onclick']
+    children?: Snippet<[]>
+    appendSnippet?: Snippet<[]>
+  }
 
-  export let active: boolean = false,
-    buttonProps: ComponentProps<Button> = {}
+  let { 
+    active = $bindable(false), 
+    buttonProps = {},
+    onclick,
+    children,
+    appendSnippet: appendInternalSnippet,
+  }: Props = $props();
+
+  function handleOnClick(e: Parameters<NonNullable<typeof onclick>>[0]) {
+    active = !active
+
+    if(onclick) {
+      onclick(e)
+    }
+  }
 </script>
 
 <Button
-  on:click={() => active = !active}
-  on:click
+  onclick={handleOnClick}
   {...buttonProps}
   buttonType="text"
   --button-default-text-background-color={active ? 
@@ -46,8 +65,8 @@
   --button-default-disabled-background-color="none"
   --button-default-disabled-color="rgb(var(--global-color-contrast-900), .5)"
 >
-  <slot />
-  <svelte:fragment slot="append">
-    <slot name="append" />
-  </svelte:fragment>
+  {@render children?.()}
+  {#snippet appendSnippet()}
+    {@render appendInternalSnippet?.()}
+  {/snippet}
 </Button>

@@ -1,57 +1,129 @@
-<script context="module" lang="ts">
-  export type Item = {
+<script module lang="ts">
+  export type Item<Data = any> = {
     value: string | number;
     label?: string | number;
-    /* eslint-disable  @typescript-eslint/no-explicit-any */
-    data?: any;
+    data?: Data;
   };
 </script>
 
-<script lang="ts">
+<script lang="ts" generics="Data">
   import '../../../css/main.css'
   import './Autocomplete.css'
   import { scrollInMenu } from '../common/scroller';
 
-  let clazz: {
-    activator?: string,
-    menu?: string,
-    simpleTextfield?: ComponentProps<SimpleTextField>['class']
-  } = {};
-	export { clazz as class };
+  type ItemData = Item<Data>
+  interface Props {
+    values?: ItemData[];
+    items?: ItemData[];
+    searchFunction?: (item: ItemData, searchText: string | undefined) => boolean;
+    multiple?: boolean;
+    disabled?: boolean;
+    mandatory?: boolean;
+    placeholder?: string;
+    width?: string;
+    height?: string;
+    maxWidth?: string;
+    minWidth?: string;
+    openingId?: string;
+    searchText?: string;
+    maxVisibleChips?: number;
+    menuOpened?: boolean;
+    closeOnSelect?: boolean;
+    emptySearchTextOnMenuClose?: boolean;
+    menuBoxShadow?: string;
+    menuBorderRadius?: string;
+    mobileDrawer?: boolean;
+    menuWidth?: string | null;
+    class?: {
+      activator?: string,
+      menu?: string,
+      simpleTextfield?: ComponentProps<typeof SimpleTextField>['class']
+    }
+    selectionContainerSnippet?: Snippet<[{
+      values: ItemData[];
+      searchText: string | undefined;
+      disabled: boolean;
+      openMenu: () => void;
+      handleKeyDown: (event: { key: string }) => void
+      unselect: (item: ItemData) => void;
+      select: (item: ItemData) => void;
+    }]>;
+    selectionSnippet?: Snippet<[{
+      selection: ItemData;
+      unselect: (item: ItemData) => void;
+    }]>;
+    chipLabelSnippet?: Snippet<[{
+      selection: ItemData;
+    }]>;
+    exceedCounterSnippet?: Snippet<[{
+      notVisibleChipNumber: number;
+      maxVisibleChips: number;
+      values: ItemData[];
+      searchText: string | undefined;
+      disabled: boolean;
+    }]>;
+    menuSnippet?: Snippet<[]>;
+    itemLabelSnippet?: Snippet<[{
+      item: ItemData
+    }]>;
+    itemSnippet?: Snippet<[{
+      item: ItemData,
+      index: number
+      selected: boolean
+    }]>;
+    onchange?: (event: {
+      detail: {
+        unselect: ItemData | undefined,
+        select: ItemData | undefined,
+        selection: ItemData[]
+      }
+    }) => void
+    onfocus?: () => void,
+    onblur?: () => void,
+    onkeydown?: () => void,
+    onclose?: ComponentProps<typeof MenuOrDrawer>['onclose']
+  }
 
-  export let values: Item[] = [],
-    items: Item[],
-    searchFunction: ((item: Item, searchText: string | undefined) => boolean) | undefined =
-      undefined,
+  let {
+    values = $bindable([]),
+    items = [],
+    searchFunction = undefined,
     multiple = false,
     disabled = false,
     mandatory = false,
     placeholder = "",
     width = "auto",
     height = "auto",
-    maxWidth: string | undefined = undefined,
-    minWidth: string | undefined = "200px",
-    openingId: string = "autocomplete-menu",
-    searchText: string | undefined = undefined,
-    maxVisibleChips: number | undefined = undefined,
-    menuOpened: boolean = false,
-    closeOnSelect: boolean = !multiple,
-    emptySearchTextOnMenuClose: boolean = true,
-    // menu
+    maxWidth = undefined,
+    minWidth = "200px",
+    openingId = $bindable("autocomplete-menu"),
+    searchText = $bindable(undefined),
+    maxVisibleChips = undefined,
+    menuOpened = $bindable(false),
+    closeOnSelect = !multiple,
+    emptySearchTextOnMenuClose = true,
     menuBoxShadow = "rgb(var(--global-color-background-300), .5) 0px 2px 4px",
     menuBorderRadius = "5px",
-    mobileDrawer: boolean = false,
-    menuWidth: string | undefined | null = undefined
+    mobileDrawer = false,
+    menuWidth = undefined,
+    class: clazz = {},
+    selectionContainerSnippet,
+    selectionSnippet,
+    chipLabelSnippet,
+    exceedCounterSnippet,
+    menuSnippet,
+    itemLabelSnippet,
+    itemSnippet,
+    onchange,
+    onfocus,
+    onblur,
+    onkeydown,
+    onclose,
+  }: Props = $props();
 
-  let dispatch = createEventDispatcher<{
-    change: {
-      unselect: Item | undefined;
-      select: Item | undefined;
-      selection: Item[];
-    }
-  }>();
+  let notVisibleChipNumber = $derived(Math.max((values?.length || 0) - (maxVisibleChips || 0), 0))
 
-  function select(item: Item) {
+  function select(item: ItemData) {
     if(disabled) return
 
     const alreadyPresent =
@@ -62,28 +134,36 @@
       else values = [item];
       refreshMenuWidth();
 
-      dispatch("change", {
-        unselect: undefined,
-        select: item,
-        selection: values,
-      });
+      if(onchange) {
+        onchange({
+          detail: {
+            unselect: undefined,
+            select: item,
+            selection: values,
+          }
+        })
+      }
     }
 
     if (!multiple && closeOnSelect) menuOpened = false
   }
 
-  function unselect(item: Item) {
+  function unselect(item: ItemData) {
     if(disabled) return
 
     if(values.length == 1 && mandatory) return
     values = values.filter((i) => i.value != item.value);
     refreshMenuWidth();
 
-    dispatch("change", {
-      unselect: item,
-      select: undefined,
-      selection: values,
-    });
+    if(onchange) {
+      onchange({
+        detail: {
+        unselect: item,
+        select: undefined,
+        selection: values,
+        }
+      })
+    }
   }
 
   function pop() {
@@ -92,14 +172,18 @@
     values = [...values]
     refreshMenuWidth()
 
-    dispatch("change", {
-      unselect: poppedElement,
-      select: undefined,
-      selection: values,
-    });
+    if(onchange) {
+      onchange({
+        detail: {
+          unselect: poppedElement,
+          select: undefined,
+          selection: values,
+        }
+      })
+    }
   }
 
-  function toggle(item: Item) {
+  function toggle(item: ItemData) {
     const alreadyPresent =
       values.findIndex((i) => i.value === item.value) != -1;
 
@@ -107,9 +191,9 @@
     else select(item);
   }
 
-  let localMenuWidth: string | undefined | null = undefined,
+  let localMenuWidth: string | undefined | null = $state(undefined),
     menuHeight = "auto",
-    refreshPosition = false;
+    refreshPosition = $state(false);
 
   function openMenu() {
     refreshMenuWidth();
@@ -119,7 +203,7 @@
   function refreshMenuWidth() {
     setTimeout(() => {
       if(menuWidth !== undefined) localMenuWidth = menuWidth
-      else localMenuWidth = activator.offsetWidth + "px"
+      else if (!!activator) localMenuWidth = activator.offsetWidth + "px"
 
       setTimeout(() => {
         refreshPosition = true;
@@ -127,20 +211,31 @@
     }, 1);
   }
 
-  let activator: HTMLElement,
-    focusedIndex: number | undefined = undefined;
+  let activator: HTMLElement | undefined = $state(),
+    focusedIndex: number | undefined = $state(undefined);
   function handleTextFieldFocus() {
+    if(onfocus){
+      onfocus()
+    }
+
     if(disabled) return
     focusedIndex = undefined;
     openMenu();
   }
 
   function handleTextFieldBlur() {
+    if(onblur) {
+      onblur()
+    }
     // closeMenu()
   }
 
-  let menuElement: HTMLElement;
+  let menuElement: HTMLElement | undefined = $state();
   function handleKeyDown(event: { key: string }) {
+    if(onkeydown) {
+      onkeydown()
+    }
+
     if(disabled) return
 
     if (
@@ -172,7 +267,7 @@
     }
   }
 
-  let input: HTMLElement;
+  let input: HTMLElement | undefined = $state();
   function handleContainerClick() {
     if(disabled) return
     
@@ -186,36 +281,40 @@
     }
   }
 
-  let filteredItems: Item[] = items;
-  $: if (searchText) {
-    focusedIndex = undefined;
-    filteredItems = items.filter((it) => {
-      if (searchFunction) return searchFunction(it, searchText);
-      else return !!searchText && it.label?.toString().toLowerCase().includes((searchText).toLowerCase());
-    });
-  } else {
-    filteredItems = items;
-  }
-
-  $: notVisibleChipNumber = Math.max((values?.length || 0) - (maxVisibleChips || 0), 0)
-
-  $: if(!menuOpened && emptySearchTextOnMenuClose) {
-    setTimeout(() => {
-      if(!menuOpened && emptySearchTextOnMenuClose) searchText = undefined
-    }, 10);
-  }
-
-  $: if(!!input) {
-    if(!disabled && values.length != 0) {
-      input.style.width = Math.max(searchText?.length || placeholder?.length, 1) + 'ch'
+  let filteredItems: ItemData[] = $state(items);
+  $effect(() => {
+    if (searchText) {
+     focusedIndex = undefined;
+     filteredItems = items.filter((it) => {
+       if (searchFunction) return searchFunction(it, searchText);
+       else return !!searchText && it.label?.toString().toLowerCase().includes((searchText).toLowerCase());
+     });
     } else {
-      input.style.width = 'auto'
+      filteredItems = items;
     }
-  }
+  })
+
+  $effect(() => {
+    if(!menuOpened && emptySearchTextOnMenuClose) {
+      setTimeout(() => {
+        if(!menuOpened && emptySearchTextOnMenuClose) searchText = undefined
+      }, 10);
+    }
+  })
+
+  $effect(() => {
+    if(!!input) {
+      if(!disabled && values.length != 0) {
+        input.style.width = Math.max(searchText?.length || placeholder?.length, 1) + 'ch'
+      } else {
+        input.style.width = 'auto'
+      }
+    }
+  }) 
 
   import Chip from "$lib/components/simple/navigation/Chip.svelte";
   import Menu from "$lib/components/simple/common/Menu.svelte";
-  import { createEventDispatcher, type ComponentProps } from "svelte";
+  import { type ComponentProps, type Snippet } from "svelte";
   import SimpleTextField from "./SimpleTextField.svelte";
   import MenuOrDrawer from '$lib/components/composed/common/MenuOrDrawer.svelte';
 </script>
@@ -229,58 +328,65 @@
   style:min-width={minWidth}
   style:height
   style:opacity={disabled ? "50%" : "100%"}
-  on:click={handleContainerClick}
-  on:keypress={handleContainerClick}
+  onclick={handleContainerClick}
+  onkeypress={handleContainerClick}
   class={clazz.activator || ''}
   role="button"
   tabindex="0"
 >
-  <slot name="selection-container" {values} {searchText} {disabled} {openMenu} {handleKeyDown} {unselect} {select}>
+  {#if selectionContainerSnippet}
+    {@render selectionContainerSnippet({ values, searchText, disabled, openMenu, handleKeyDown, unselect, select})}
+  {:else}
     <div
       class="selection-container"
     >
       {#each (values || []).slice(0, maxVisibleChips) as selection}
-        <slot name="selection" {selection} {unselect} >
+        {#if selectionSnippet}
+          {@render selectionSnippet({ selection, unselect})}
+        {:else}
           <div tabindex="-1">
             <Chip
               close={true}
-              on:close={() => unselect(selection)}
+              onclose={() => unselect(selection)}
               --chip-default-border-radius="var(--autocomplete-border-radius, var(--autocomplete-default-border-radius))"
               buttonTabIndex={-1}
               truncateText
             >
-              <slot name="chip-label" {selection}>
+              {#if chipLabelSnippet}
+                {@render chipLabelSnippet({ selection })}
+              {:else}
                 {selection.label}
-              </slot>
+              {/if}
             </Chip>
           </div>
-        </slot>
+        {/if}
       {/each}
       {#if maxVisibleChips !== undefined && notVisibleChipNumber > 0}
-        <slot name="exceedCounter" {notVisibleChipNumber} {maxVisibleChips} {values} {searchText} {disabled}>
+        {#if exceedCounterSnippet}
+          {@render exceedCounterSnippet({ notVisibleChipNumber, maxVisibleChips, values, searchText, disabled })}
+        {:else}
           <div class="not-visible-chip-number">+ {notVisibleChipNumber}</div>
-        </slot>
+        {/if}
       {/if}
 
       <input
         class="autocomplete-input"
         bind:value={searchText}
-        on:focus={handleTextFieldFocus}
-        on:focus
-        on:blur={handleTextFieldBlur}
-        on:blur
-        on:keydown={handleKeyDown}
-        on:keydown
+        onfocus={handleTextFieldFocus}
+        onblur={handleTextFieldBlur}
+        onkeydown={handleKeyDown}
         {disabled}
         placeholder={placeholder}
         bind:this={input}
       />
     </div>
-  </slot>
+  {/if}
 </div>
 
 {#key searchText}
-  <slot name="menu">
+  {#if menuSnippet}
+    {@render menuSnippet()}
+  {:else}
     {#if !mobileDrawer}
       <Menu
         {activator}
@@ -303,30 +409,32 @@
         >
           {#each filteredItems as item, index}
             <li class="item-{index}">
-              <slot
-                name="item"
-                {item}
-                {index}
-                selected={(values || []).findIndex((i) => {
-                  return i.value == item.value;
-                }) != -1}
-              >
+              {#if itemSnippet}
+                {@render itemSnippet({
+                  item,
+                  index,
+                  selected: (values || [])
+                    .findIndex((i) => { return i.value == item.value }) != -1
+                })}
+              {:else}
                 <div
                   class:selection-item={true}
                   class:focused={index == focusedIndex}
                   class:selected={(values || []).findIndex((i) => {
                     return i.value == item.value;
                   }) != -1}
-                  on:click={() => toggle(item)}
-                  on:keypress={() => toggle(item)}
+                  onclick={() => toggle(item)}
+                  onkeypress={() => toggle(item)}
                   role="button"
                   tabindex="0"
                 >
-                  <slot name="item-label" {item}>
+                  {#if itemLabelSnippet}
+                    {@render itemLabelSnippet({ item })}
+                  {:else}
                     {item.label}
-                  </slot>
+                  {/if}
                 </div>
-              </slot>
+              {/if}
             </li>
           {/each}
         </ul>
@@ -340,7 +448,7 @@
         _boxShadow={menuBoxShadow}
         _borderRadius={menuBorderRadius}
         bind:open={menuOpened}
-        on:close
+        {onclose}
       >
         <ul
           class={clazz.menu || ''}
@@ -348,38 +456,39 @@
         >
           {#each filteredItems as item, index}
             <li class="item-{index}">
-              <slot
-                name="item"
-                {item}
-                {index}
-                selected={(values || []).findIndex((i) => {
-                  return i.value == item.value;
-                }) != -1}
-              >
+              {#if itemSnippet}
+                {@render itemSnippet({
+                  item,
+                  index,
+                  selected: (values || [])
+                    .findIndex((i) => { return i.value == item.value }) != -1
+                })}
+              {:else}
                 <div
                   class:selection-item={true}
                   class:focused={index == focusedIndex}
                   class:selected={(values || []).findIndex((i) => {
                     return i.value == item.value;
                   }) != -1}
-                  on:click={() => toggle(item)}
-                  on:keypress={() => toggle(item)}
+                  onclick={() => toggle(item)}
+                  onkeypress={() => toggle(item)}
                   role="button"
                   tabindex="0"
                 >
-                  <slot name="item-label" {item}>
+                  {#if itemLabelSnippet}
+                    {@render itemLabelSnippet({ item })}
+                  {:else}
                     {item.label}
-                  </slot>
+                  {/if}
                 </div>
-              </slot>
+              {/if}
             </li>
           {/each}
         </ul>
       </MenuOrDrawer>
     {/if}
-  </slot>
+  {/if}
 {/key}
-
 <style>
   ul {
     list-style: none;

@@ -1,40 +1,70 @@
 <script lang="ts">
+  import type { ComponentProps, Snippet } from 'svelte';
   import '../../../css/main.css'
-  import { createEventDispatcher } from "svelte";
+  import Button from '../../simple/buttons/Button.svelte'
 
-  export let loading: boolean = false,
-    marginTop: string = "20px",
-    cancelText: string = "Annulla",
-    confirmText: string = "Salva",
-    confirmDisable: boolean = false,
-    cancelDisable: boolean = false
+  interface Props {
+    loading?: boolean;
+    marginTop?: string;
+    cancelText?: string;
+    confirmText?: string;
+    confirmDisable?: boolean;
+    cancelDisable?: boolean;
+    onconfirmClick?: (event: {
+      detail: {
+        nativeEvent: MouseEvent
+      }
+    }) => void
+    oncancelClick?: (event: {
+      detail: {
+        nativeEvent: MouseEvent | KeyboardEvent
+      }
+    }) => void
+    cancelButtonSnippet?: Snippet<[{
+      loading: boolean
+      handleCancel: typeof handleCancel
+      cancelText: string
+    }]>
+    confirmButtonSnippet?: Snippet<[{
+      loading: boolean
+      handleConfirm: typeof handleConfirm
+      confirmText: string
+      confirmDisable: boolean
+    }]>
+  }
 
-  let dispatch = createEventDispatcher<{
-    "confirm-click": {
-      nativeEvent: MouseEvent
-    },
-    "cancel-click": {
-      nativeEvent: MouseEvent | KeyboardEvent
-    },
-  }>()
+  let {
+    loading = false,
+    marginTop = "20px",
+    cancelText = "Annulla",
+    confirmText = "Salva",
+    confirmDisable = false,
+    cancelDisable = false,
+    oncancelClick,
+    onconfirmClick,
+    cancelButtonSnippet,
+    confirmButtonSnippet,
+  }: Props = $props();
 
-  function handleConfirm(event: any) {
-    if(!confirmDisable) {
-      dispatch('confirm-click', {
-        nativeEvent: event.detail.nativeEvent
+  function handleConfirm(event: Parameters<NonNullable<ComponentProps<typeof Button>['onclick']>>[0]) {
+    if(!confirmDisable && onconfirmClick) {
+      onconfirmClick({
+        detail: {
+          nativeEvent: event.detail.nativeEvent
+        }
       })
     }
   }
 
   function handleCancel(nativeEvent: MouseEvent | KeyboardEvent) {
-    if(!cancelDisable) {
-      dispatch('cancel-click', {
-        nativeEvent
+    if(!cancelDisable && oncancelClick) {
+      oncancelClick({
+        detail: {
+          nativeEvent
+        }
       })
     }
   }
-
-  import Button from '../../simple/buttons/Button.svelte'
 </script>
 
 <div
@@ -45,20 +75,24 @@
     class="link-button-container"
   >
     <div></div>
-    <slot name="cancel-button" {loading} {handleCancel} {cancelText}>
+    {#if cancelButtonSnippet}
+      {@render cancelButtonSnippet({ loading, handleCancel, cancelText })}
+    {:else}
       <button
         class="text-button"
-        on:click={handleCancel}
+        onclick={handleCancel}
       >{cancelText}</button>
-    </slot>
+    {/if}
   </div>
-  <slot name="confirm-button" {loading} {handleConfirm} {confirmDisable} {confirmText}>
+  {#if confirmButtonSnippet}
+    {@render confirmButtonSnippet({ loading, handleConfirm, confirmDisable, confirmText })}
+  {:else}
     <Button
       loading={loading}
-      on:click={handleConfirm}
+      onclick={handleConfirm}
       disabled={confirmDisable}
     >{confirmText}</Button>
-  </slot>
+  {/if}
 </div>
 
 

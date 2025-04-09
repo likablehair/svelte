@@ -38,145 +38,150 @@
       default: "undefined",
       description: "The append icon name."
     }, {
-      name: 'iconSize',
-      type: 'number | undefined',
-      default: "undefined",
-      description: "The append/prepend icon size."
-    }, {
       name: 'target',
       type: 'string',
       default: "undefined",
       description: "The target attribute of the a tag."
-    },
+    }, {
+      name: 'class',
+      type: 'string',
+      default: "''",
+      description: "Additional CSS class for the button."
+    }
   ]}
   styleProps={[
     {
-      name: '_color',
-      type: 'string',
-      default: "inherit",
-      description: "color css property."
-    }, {
-      name: '_fontSize',
-      type: 'string',
-      default: ".875rem",
-      description: "font-size css property."
-    }, {
-      name: '_lineHeight',
-      type: 'string',
-      default: "1.5rem",
-      description: "line-height css property."
-    }, {
-      name: '_padding',
-      type: 'string',
-      default: "0.25rem 0.75rem 0.25rem 0.75rem",
-      description: "padding css property."
-    }, {
-      name: '_backgroundColor',
-      type: 'string',
-      default: "rgb(244 244 245/1)",
-      description: "background-color css property."
-    }, {
-      name: '_borderRadius',
-      type: 'string',
-      default: "9999px",
-      description: "border-radius css property."
-    }, {
-      name: '_width',
-      type: 'string',
-      default: "fit-content",
-      description: "width css property."
-    }, {
-      name: '_height',
-      type: 'string',
-      default: "auto",
-      description: "height css property."
-    }, {
-      name: '_gap',
-      type: 'string',
-      default: "0.5rem",
-      description: "gap css property."
-    }, {
-      name: '_fontWeight',
-      type: 'string',
-      default: "500",
-      description: "font-weight css property."
-    }, {
-      name: '_hoverBackgroundColor',
-      type: 'string',
-      default: "rgb(228 228 231/1)",
-      description: "background-color css property of hover button."
+      name: '--link-button-color',
+      type: 'color',
+      default: 'rgb(var(--global-color-contrast-900))',
+      description: 'The color of the link button.'
+    },
+    {
+      name: '--link-button-width',
+      type: 'size',
+      default: 'fit-content',
+      description: 'The width of the link button.'
+    },
+    {
+      name: '--link-button-height',
+      type: 'size',
+      default: 'auto',
+      description: 'The height of the link button.'
+    },
+    {
+      name: '--link-button-font-size',
+      type: 'size',
+      default: '.875rem',
+      description: 'The font size of the link button.'
+    },
+    {
+      name: '--link-button-font-weight',
+      type: 'number',
+      default: '500',
+      description: 'The font weight of the link button.'
+    },
+    {
+      name: '--link-button-line-height',
+      type: 'size',
+      default: '1.5rem',
+      description: 'The line height of the link button.'
+    },
+    {
+      name: '--link-button-padding',
+      type: 'size',
+      default: '0.25rem 0.75rem 0.25rem 0.75rem',
+      description: 'The padding inside the link button.'
+    },
+    {
+      name: '--link-button-background-color',
+      type: 'color',
+      default: 'rgb(var(--global-color-background-300))',
+      description: 'The background color of the link button.'
+    },
+    {
+      name: '--link-button-border-radius',
+      type: 'size',
+      default: '9999px',
+      description: 'The border radius of the link button.'
+    },
+    {
+      name: '--link-button-gap',
+      type: 'size',
+      default: '.5rem',
+      description: 'The gap between elements inside the link button.'
+    },
+    {
+      name: '--link-button-hover-background-color',
+      type: 'color',
+      default: 'rgb(var(--global-color-background-400))',
+      description: 'The background color on hover.'
     }
   ]}
-></PropsViewer>
+/>
 <h2>Slots</h2>
 <SlotsViewer
   slots={[
     {
       name: 'default',
       description: 'The button content',
-    }, {
+    },
+    {
       name: 'prepend',
       description: 'The button prepend space',
       default: `{#if !!prependIcon}
-  <Icon name={prependIcon} size={iconSize}></Icon>
+  <Icon name={prependIcon}></Icon>
 {/if}`,
       properties: [
         {
           name: 'prependIcon',
           type: 'string',
-          description: 'the prependIcon prop.'
-        }, {
-          name: 'iconSize',
-          type: 'string',
-          description: 'the iconSize prop.'
-        },
+          description: 'The prependIcon prop.'
+        }
       ]
-    }, {
+    },
+    {
       name: 'append',
       description: 'The button append space',
       default: `{#if !!appendIcon}
-  <Icon name={appendIcon} size={iconSize}></Icon>
+  <Icon name={appendIcon}></Icon>
 {/if}`,
       properties: [
         {
           name: 'appendIcon',
           type: 'string',
-          description: 'the appendIcon prop.'
-        }, {
-          name: 'iconSize',
-          type: 'string',
-          description: 'the iconSize prop.'
-        },
+          description: 'The appendIcon prop.'
+        }
       ]
     }
   ]}
-></SlotsViewer>
+/>
 <h2>Events</h2>
 <EventsViewer
   events={[
     {
-      name: 'click',
-      description: 'Occours when the button is clicked',
+      name: 'onclick',
+      description: 'Triggered when the button is clicked.',
       properties: [
         {
-          name: 'NativeEvent',
+          name: 'nativeEvent',
           type: 'MouseEvent',
-          description: 'The native event catched by the handler.'
+          description: 'The native mouse event triggered by the click.'
         }
       ]
-    }, {
-      name: 'keypress',
-      description: 'Occours when the button is focused and a key is pressed',
+    },
+    {
+      name: 'onkeypress',
+      description: 'Triggered when a key is pressed while the button is focused.',
       properties: [
         {
-          name: 'NativeEvent',
+          name: 'nativeEvent',
           type: 'KeyboardEvent',
-          description: 'The native event catched by the handler.'
+          description: 'The native keyboard event triggered by the key press.'
         }
       ]
     }
   ]}
-></EventsViewer>
+/>
 
 <style>
   .example {

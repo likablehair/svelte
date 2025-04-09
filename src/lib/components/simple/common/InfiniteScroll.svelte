@@ -1,15 +1,24 @@
 <script lang="ts">
-  import { onDestroy, createEventDispatcher } from "svelte";
+  import { onDestroy } from "svelte";
 
-  export let threshold: number = 0,
-    horizontal: boolean = false,
-    elementScroll: HTMLElement | null = null,
-    hasMore: boolean = true,
-    direction: 'forward' | 'backward' = 'forward'
+  interface Props {
+    threshold?: number;
+    horizontal?: boolean;
+    elementScroll?: HTMLElement | null;
+    hasMore?: boolean;
+    direction?: 'forward' | 'backward';
+    onloadMore?: () => void
+  }
 
-  const dispatch = createEventDispatcher<{
-    'loadMore': undefined
-  }>();
+  let {
+    threshold = 0,
+    horizontal = false,
+    elementScroll = null,
+    hasMore = true,
+    direction = 'forward',
+    onloadMore
+  }: Props = $props();
+
   let isLoadMore = false,
     component: HTMLElement;
 
@@ -25,8 +34,8 @@
         : element.scrollTop
     
     if (offset <= threshold) {
-      if (!isLoadMore && hasMore) {
-        dispatch("loadMore")
+      if (!isLoadMore && hasMore && onloadMore) {
+        onloadMore()
       }
       isLoadMore = true
     } else {
@@ -34,7 +43,7 @@
     }
   }
 
-  $: {
+  $effect(() => {
     if (component || elementScroll) {
       const element = elementScroll ? elementScroll : component.parentNode as HTMLElement
 
@@ -43,7 +52,7 @@
         element.addEventListener("resize", onScroll)
       }
     }
-  }
+  })
 
   onDestroy(() => {
     if (component || elementScroll) {
@@ -57,4 +66,4 @@
   })
 </script>
 
-<div bind:this={component} style:width="0px" />
+<div bind:this={component} style:width="0px"></div>

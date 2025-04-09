@@ -1,8 +1,9 @@
 <script lang="ts">
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
-
   import AsyncAutocomplete, { type Item } from "$lib/components/composed/forms/AsyncAutocomplete.svelte";
+  import SlotsViewer from "../../SlotsViewer.svelte";
+  import EventsViewer from "../../EventsViewer.svelte";
   let items: Item[] = [
     { value: 'orange', label: 'Orange' },
     { value: 'apple', label: 'Apple' },
@@ -54,24 +55,59 @@
 <h2>Props</h2>
 <PropsViewer
   props={[
-    // {
-    //   name: 'type',
-    //   type: '"button" | "submit"',
-    //   description: "HTML type attribute",
-    //   default: "button"
-    // }
+    { name: "items", type: "Item[]", description: "List of selectable items.", default: "[]" },
+    { name: "values", type: "Item[]", description: "Selected items.", default: "[]" },
+    { name: "multiple", type: "boolean", description: "Allow multiple selections.", default: "false" },
+    { name: "searcher", type: "(params: { searchText: string }) => Promise<Item[]>", description: "Function to fetch items based on search text." },
+    { name: "placeholder", type: "string", description: "Placeholder text.", default: "undefined" },
+    { name: "searchThreshold", type: "number", description: "Minimum search text length before triggering search.", default: "2" },
+    { name: "debounceTimeout", type: "number", description: "Debounce time for search input.", default: "500" },
+    { name: "searching", type: "boolean", description: "Indicates if search is in progress.", default: "false" },
+    { name: "search", type: "boolean", description: "Trigger search manually.", default: "false" },
+    { name: "searchText", type: "string", description: "Current search text.", default: "undefined" },
+    { name: "maxVisibleChips", type: "number", description: "Maximum number of visible selected items.", default: "undefined" },
+    { name: "menuOpened", type: "boolean", description: "Controls menu visibility.", default: "false" },
+    { name: "mobileDrawer", type: "boolean", description: "Enable mobile-friendly drawer mode.", default: "false" },
+    { name: "closeOnSelect", type: "boolean", description: "Close menu when item is selected.", default: "false" },
+    { name: "disabled", type: "boolean", description: "Disable input.", default: "false" },
   ]}
-  styleProps={[
-    // {
-    //   name: '--button-max-width',
-    //   type: 'string',
-    //   default: 'undefined',
-    //   description: 'The max width of the outer element'
-    // }
-  ]}
+  styleProps={[]}
 ></PropsViewer>
 <h2>Slots</h2>
+<SlotsViewer
+  slots={[
+    { 
+      name: 'chipLabelSnippet', 
+      description: 'Renders the label inside each chip.', 
+      default: '{selection.label}', 
+      properties: [
+        { name: 'selection', type: 'ItemData', description: 'The selected item.' }
+      ]
+    },
+    { 
+      name: 'itemLabelSnippet', 
+      description: 'Renders the label of an item.', 
+      default: '{item.label}', 
+      properties: [
+        { name: 'item', type: 'ItemData', description: 'The item to render the label for.' }
+      ]
+    },
+  ]}
+></SlotsViewer>
 <h2>Events</h2>
+<EventsViewer
+  events={[
+    {
+      name: 'onchange',
+      description: 'Fired when the selection changes.',
+      properties: [
+        { name: 'unselect', type: 'ItemData | undefined', description: 'The item that was unselected.' },
+        { name: 'select', type: 'ItemData | undefined', description: 'The item that was selected.' },
+        { name: 'selection', type: 'ItemData[]', description: 'The current selection of items.' }
+      ]
+    },
+  ]}
+></EventsViewer>
 
 <style>
   .example {

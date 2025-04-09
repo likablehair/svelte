@@ -1,4 +1,4 @@
-<script context="module" lang="ts">
+<script module lang="ts">
   export type Item = {
     title?: string;
     icon?: string;
@@ -9,25 +9,42 @@
 </script>
 
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import Icon from "../media/Icon.svelte"
   
-  export let items: Item[] = [],
-    color: string | undefined = undefined,
-    vertical = false,
-    variant: 'standard' | 'underlined' = 'underlined',
-    textColor: string | undefined = '',
-    hoverTextColor: string | undefined = undefined,
-    space = "20px";
+  interface Props {
+    items?: Item[];
+    color?: string;
+    vertical?: boolean;
+    variant?: 'standard' | 'underlined';
+    textColor?: string;
+    hoverTextColor?: string;
+    space?: string;
+    onitemClick?: (event: {
+      detail: {
+        item: Item
+      }
+    }) => void
+  }
 
-  const dispatch = createEventDispatcher<{
-    "item-click": {
-      item: Item;
-    };
-  }>();
+  let {
+    items = [],
+    color = undefined,
+    vertical = false,
+    variant = 'underlined',
+    textColor = '',
+    hoverTextColor = undefined,
+    space = "20px",
+    onitemClick,
+  }: Props = $props();
 
   function handleItemClick(item: Item) {
-    dispatch("item-click", { item });
+    if(onitemClick) {
+      onitemClick({
+        detail: {
+          item
+        }
+      })
+    }
   }
 </script>
 
@@ -45,8 +62,8 @@
       class="link"
       class:bar-link={variant == 'underlined'}
       class:standard-link={variant == 'standard'}
-      on:click={() => handleItemClick(item)}
-      on:keypress={() => handleItemClick(item)}
+      onclick={() => handleItemClick(item)}
+      onkeypress={() => handleItemClick(item)}
       href={item.url}
     >
       {#if !!item.title}

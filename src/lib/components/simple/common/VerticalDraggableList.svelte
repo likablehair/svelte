@@ -1,45 +1,61 @@
 <script lang="ts">
   import { flip } from "svelte/animate";
-  import { dndzone } from "svelte-dnd-action";
-	import { createEventDispatcher } from "svelte"
+  import { dndzone, type DndEvent } from "svelte-dnd-action";
+	import { type Snippet } from "svelte"
   import { Icon } from "$lib";
 
-	type Item = { [key: string]: any }
-  let clazz: string = '';
-  export { clazz as class }
+  interface Props {
+    items?: {
+      id: string;
+      name: string;
+    }[];
+    class?: string;
+    itemSnippet?: Snippet<[{
+      item: typeof items[number]
+    }]>
+    onchangeOrder?: (event: {
+      detail: {
+        items: typeof items
+      }
+    }) => void
+  }
 
-  export let items: {
-    id: string;
-    name: string;
-  }[] = [];
+  let { 
+    items = [],
+    class: clazz = '',
+    itemSnippet,
+    onchangeOrder,
+  }: Props = $props();
 
   const flipDurationMs = 300;
 
-  function handleDndConsider(e: Item) {
+  function handleDndConsider(e: CustomEvent<DndEvent<{
+      id: string;
+      name: string;
+  }>>) {
     items = e.detail.items;
   }
 
-  function handleDndFinalize(e: Item) {
+  function handleDndFinalize(e: CustomEvent<DndEvent<{
+      id: string;
+      name: string;
+  }>>) {
 		items = e.detail.items;
-    dispatch("changeOrder", { items });
+    if(onchangeOrder){
+      onchangeOrder({
+        detail: {
+          items
+        }
+      })
+    }
 	}
-
-  let dispatch = createEventDispatcher<{
-    changeOrder: {
-      items: {
-        id: string;
-        name: string;
-      }[];
-    };
-  }>();
-
 </script>
 
 
 <section 
   use:dndzone={{items, flipDurationMs, dropTargetStyle: {border: '0px dashed #000'}}}
-  on:consider={handleDndConsider} 
-  on:finalize={handleDndFinalize}
+  onconsider={handleDndConsider} 
+  onfinalize={handleDndFinalize}
 >
 	{#each items as item(item.id)}
 		<div
@@ -49,12 +65,22 @@
       <div
         class="item-container {clazz}"
       >
-        <Icon
-          name="mdi-drag" 
-        />
-        <slot name="item" {item}>
-          {item.name}	
-        </slot>
+        <div
+          style:grid-cols=1
+        >
+          <Icon
+            name="mdi-drag" 
+          />
+        </div>
+        <div
+          style:grid-cols=2
+        >
+          {#if itemSnippet}
+            {@render itemSnippet({ item })}
+          {:else}
+            {item.name}
+          {/if}
+        </div>
       </div>
 		</div>
 	{/each}

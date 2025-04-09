@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type Prop = {
     name: string,
     type: string,
@@ -8,8 +8,17 @@
 </script>
 
 <script lang="ts">
-  export let props: Prop[] = [],
-    styleProps: Prop[] = []
+  import NoData from "$lib/components/simple/common/NoData.svelte";
+
+  interface Props {
+    props?: Prop[];
+    styleProps?: Prop[];
+  }
+
+  const { 
+    props = [],
+    styleProps = []
+  }: Props = $props();
 </script>
 
 <ul class="container">
@@ -37,12 +46,12 @@
     <div
       style:display="flex"
       style:height="3rem"
-      style:font-size=".7rem"
+      style:font-size=".9rem"
       style:align-items="center"
       style:justify-content="center"
       style:color="rgb(var(--global-color-contrast-300))"
     >
-      No data
+      <NoData/>
     </div>
   {/if}
   <div class="subhead">🎨 style props</div>
@@ -59,7 +68,9 @@
           </div>
         </div>
         <div class="append-column">
-          <code>{prop.default}</code>
+          {#if !!prop.default}
+            <code>{prop.default}</code>
+          {/if}
         </div>
       </div>
     {/each}
@@ -67,12 +78,12 @@
     <div
       style:display="flex"
       style:height="3rem"
-      style:font-size=".7rem"
+      style:font-size=".9rem"
       style:align-items="center"
       style:justify-content="center"
-      style:color="rgb(var(--global-color-contrast-200))"
+      style:color="rgb(var(--global-color-contrast-300))"
     >
-      No data
+      <NoData/>
     </div>
   {/if}
 </ul>

@@ -1,30 +1,64 @@
 <script lang="ts">
   import type { Filter, NumberMode, SelectMode, StringMode } from "$lib/utils/filters/filters";
-  import Dropdown, { type Item } from "../forms/Dropdown.svelte";
+  import Dropdown from "../forms/Dropdown.svelte";
   import { GENERIC_MODES, SELECT_MODES, STRING_MODES } from '$lib/utils/filters/filters';
   import type { DateMode } from "$lib/utils/filters/filters";
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
   import DatePickerTextField from "$lib/components/composed/forms/DatePickerTextField.svelte";
   import Validator from "$lib/utils/filters/validator";
-  import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
+  import Autocomplete, { type Item } from "$lib/components/simple/forms/Autocomplete.svelte";
   import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
   import type { LabelMapper } from "./Filters.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import ToggleList from "$lib/components/composed/forms/ToggleList.svelte";
-  import { createEventDispatcher } from "svelte";
+  import type { KeyboardEventHandler, MouseEventHandler } from "svelte/elements";
+  import { tick, type Snippet } from "svelte";
 
-  export let filter: Filter | undefined = undefined,
-    lang: 'en' | 'it' = 'en',
-    betweenFromLabel: string = lang == 'en' ? "From" : "Da",
-    betweenToLabel: string = lang == 'en' ? "To" : "A",
-    labelsMapper: LabelMapper,
-    forceApplyValid: boolean = false,
-    editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit',
-    tmpFilter: Filter | undefined = undefined,
-    mobile: boolean = false;
+  interface Props {
+    filter?: Filter;
+    lang?: 'en' | 'it';
+    betweenFromLabel?: string;
+    betweenToLabel?: string;
+    labelsMapper: LabelMapper;
+    forceApplyValid?: boolean;
+    editFilterMode?: 'one-edit' | 'multi-edit';
+    tmpFilter?: Filter;
+    mobile?: boolean;
+    onchange?: (event:{
+      detail: {
+        filter: Filter | undefined
+      }
+    }) => void
+    onclick?: MouseEventHandler<HTMLDivElement>
+    onkeypress?: KeyboardEventHandler<HTMLDivElement>
+    customSnippet?: Snippet<[{
+      filter: typeof tmpFilter
+    }]>
+    filterActionsSnippet?: Snippet<[{
+      applyFilterDisabled: typeof applyFilterDisabled,
+      filter: typeof tmpFilter
+    }]>
+  }
 
-  let advancedModeOptions: Item[],
-    advancedModeSelectedOptions: Item[] | undefined
+  let {
+    filter = $bindable(),
+    lang = 'en',
+    betweenFromLabel = lang === 'en' ? "From" : "Da",
+    betweenToLabel = lang === 'en' ? "To" : "A",
+    labelsMapper,
+    forceApplyValid = false,
+    editFilterMode = 'one-edit',
+    tmpFilter = $bindable(),
+    mobile = false,
+    onchange,
+    onclick: onclickInternal,
+    onkeypress,
+    customSnippet,
+    filterActionsSnippet,
+  }: Props = $props();
+
+  let advancedModeOptions: Item[] | undefined = $state(),
+    advancedModeSelectedOptions: Item[] | undefined = $state()
 
   function initTmpFilter() {
     tmpFilter = filter === undefined ? undefined : {...filter}
@@ -44,42 +78,50 @@
     dropdownOpened = false
   }
 
-  $: if(!!filter) {
-    initTmpFilter()
-    closeDropDown()
-  }
-
-  $: if(!!tmpFilter) {
-    let modes
-    if(tmpFilter.type == 'string') {
-      modes = STRING_MODES
-    } else if(tmpFilter.type == 'date') {
-      modes = GENERIC_MODES
-    } else if(tmpFilter.type == 'number') {
-      modes = GENERIC_MODES
-    } else if(tmpFilter.type == 'select') {
-      modes = SELECT_MODES
-    } else if(tmpFilter.type == 'bool') {
-      modes = undefined
+  $effect(() => {
+    if(!!filter) {
+      tick().then(() => {
+        initTmpFilter();
+        closeDropDown();
+      });
     }
+  }) 
 
-    if(!!modes) {
-      advancedModeOptions = modes.map(mode => {
-        return {
-          value: mode,
-          label: labelsMapper[mode].short || mode
-        }
-      })
+  $effect(() => {
+    if(!!tmpFilter) {
+      let modes
+      if(tmpFilter.type == 'string') {
+        modes = STRING_MODES
+      } else if(tmpFilter.type == 'date') {
+        modes = GENERIC_MODES
+      } else if(tmpFilter.type == 'number') {
+        modes = GENERIC_MODES
+      } else if(tmpFilter.type == 'select') {
+        modes = SELECT_MODES
+      } else if(tmpFilter.type == 'bool') {
+        modes = undefined
+      }
+  
+      if(!!modes) {
+        advancedModeOptions = modes.map(mode => {
+          return {
+            value: mode,
+            label: labelsMapper[mode].short || mode
+          }
+        })
+      }
     }
-  }
+  }) 
 
-  $: if(!tmpFilter?.advanced) {
-    advancedModeSelectedOptions = undefined
-  }
+  $effect(() => {
+    if(!tmpFilter?.advanced) {
+      advancedModeSelectedOptions = undefined
+    }
+  }) 
 
-  let dropdownOpened: boolean = false,
-    calendarOpened: boolean = false,
-    calendarOpened2: boolean = false
+  let dropdownOpened: boolean = $state(false),
+    calendarOpened: boolean = $state(false),
+    calendarOpened2: boolean = $state(false)
 
   // TODO I don't like that there is a singlo dropdow to handle all filter advance mode.
   // In some case would be necessary to handle more than one selection and this code
@@ -96,44 +138,58 @@
     handleChangeValue()
   }
 
-  $: applyFilterDisabled = !Validator.isValid(tmpFilter) && !forceApplyValid
+  let applyFilterDisabled = $derived(!Validator.isValid(tmpFilter) && !forceApplyValid)
 
-  $: if(!!tmpFilter && tmpFilter.type == 'bool') {
-    if(tmpFilter.value === undefined) {
-      tmpFilter.value = false
+  $effect.pre(() => {
+    if(!!tmpFilter && tmpFilter.type == 'bool') {
+      if(tmpFilter.value === undefined) {
+        tmpFilter.value = false
+      }
     }
-  }
+  })
 
-  $: if(!!tmpFilter && tmpFilter.type == 'select') {
-    if(tmpFilter.values === undefined) {
-      tmpFilter.values = []
+  $effect.pre(() => {
+    if(!!tmpFilter && tmpFilter.type == 'select') {
+      if(tmpFilter.values === undefined) {
+        tmpFilter.values = []
+      }
     }
-  }
-
-  const dispatch = createEventDispatcher<{
-		change: Filter | undefined
-	}>()
+  })
   
-  function handleChangeValue() {       
-   dispatch('change', tmpFilter)  
+  function handleChangeValue() {  
+    calendarOpened = false   
+    if(onchange) {
+      onchange({
+        detail: {
+          filter
+        }
+      })
+    }
   }
 
-
+  function onclick(event: MouseEvent & {
+    currentTarget: EventTarget & HTMLDivElement;
+  }) {
+    event.stopPropagation()
+    if(onclickInternal) {
+      onclickInternal(event)
+    }
+  }
 </script>
 
 
 {#if !!filter && !!tmpFilter}
   <div class="filter-editor" style:margin={editFilterMode === 'one-edit' ? '5%' : '0'}>
-    {#if filter.advanced}
+    {#if filter.advanced && advancedModeSelectedOptions}
       <div class="advanced-mode">
         <div class="label">
           {filter.label[0].toUpperCase() + filter.label.slice(1)}
         </div>
-        <div class="advaced-mode-selector" on:click|stopPropagation on:keypress role="presentation" tabindex="-1">
+        <div class="advaced-mode-selector" {onclick} {onkeypress} role="presentation" tabindex="-1">
           <Dropdown
             items={advancedModeOptions}
             bind:values={advancedModeSelectedOptions}
-            on:change={handleAdvancedModeSelection}
+            onchange={handleAdvancedModeSelection}
             bind:menuOpened={dropdownOpened}
             openingId="advanced-filter"
             mobileDrawer={mobile}
@@ -143,7 +199,7 @@
       </div>
     {/if}
 
-    <div class="fields" style:width="100%" on:click|stopPropagation on:keypress role="presentation" tabindex="-1">
+    <div class="fields" style:width="100%" {onclick} {onkeypress} role="presentation" tabindex="-1">
       {#if !tmpFilter.advanced || (!!advancedModeSelectedOptions && advancedModeSelectedOptions.length > 0)}
         {#if tmpFilter.type === "string" }
           <SimpleTextField
@@ -151,7 +207,7 @@
             type="text"
             placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
             --simple-textfield-width="100%"
-            on:change={handleChangeValue}
+            onchange={handleChangeValue}
           ></SimpleTextField>
         {:else if tmpFilter.type === "date" && tmpFilter.mode !== 'between'}
           <div>
@@ -159,23 +215,21 @@
               bind:selectedDate={tmpFilter.value}
               openingId="advanced-filter"
               bind:menuOpened={calendarOpened}
-              on:day-click={() => {calendarOpened = false}}
               --simple-textfield-width="100%"
               flipOnOverflow
-              on:input={handleChangeValue}
-              on:day-click={handleChangeValue}
+              oninput={handleChangeValue}
+              ondayClick={handleChangeValue}
             >
-              <svelte:fragment slot="append-inner">
+              {#snippet appendInnerSnippet()}
                 <Icon
                   name="mdi-close-circle"
-                  click
-                  on:click={() => {
+                  onclick={() => {
                     if(!!tmpFilter && tmpFilter.type === 'date' && tmpFilter.mode !== 'between') {
                       tmpFilter.value = undefined
                     }
                   }}
                 ></Icon>
-              </svelte:fragment>
+              {/snippet}
             </DatePickerTextField>
           </div>
         {:else if tmpFilter.type === "number" && tmpFilter.mode !== 'between'}
@@ -185,7 +239,7 @@
               type="number"
               placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
               --simple-textfield-width="100%"
-              on:change={handleChangeValue}
+              onchange={handleChangeValue}
             ></SimpleTextField>
           </div>
         {:else if tmpFilter.type === "select" && (tmpFilter.view === undefined || tmpFilter.view === 'autocomplete')}
@@ -200,7 +254,7 @@
               --simple-textfield-width="0px"
               --simple-text-field-margin-left="0px"
               mobileDrawer={mobile}
-              on:change={handleChangeValue}
+              onchange={handleChangeValue}
             ></Autocomplete>
           </div>
         {:else if tmpFilter.type === "select" && (tmpFilter.view === 'toggle')}
@@ -220,22 +274,20 @@
               openingId="advanced-filter"
               placeholder={betweenFromLabel}
               bind:menuOpened={calendarOpened}
-              on:day-click={() => {calendarOpened = false}}
               --simple-textfield-width="100%"
-              on:input={handleChangeValue}
-              on:day-click={handleChangeValue}
+              oninput={handleChangeValue}
+              ondayClick={handleChangeValue}
             >
-              <svelte:fragment slot="append-inner">
+              {#snippet appendInnerSnippet()}
                 <Icon
                   name="mdi-close-circle"
-                  click
-                  on:click={() => {
+                  onclick={() => {
                     if(!!tmpFilter && tmpFilter.type === 'date' && tmpFilter.mode === 'between') {
                       tmpFilter.from = undefined
                     }
                   }}
                 ></Icon>
-              </svelte:fragment>
+              {/snippet}
             </DatePickerTextField>
           </div>
           <div>
@@ -244,23 +296,21 @@
               openingId="advanced-filter"
               placeholder={betweenToLabel}
               bind:menuOpened={calendarOpened2}
-              on:day-click={() => {calendarOpened2 = false}}
               --simple-textfield-width="100%"
               flipOnOverflow
-              on:input={handleChangeValue}
-              on:day-click={handleChangeValue}
+              oninput={handleChangeValue}
+              ondayClick={handleChangeValue}
             >
-              <svelte:fragment slot="append-inner">
+              {#snippet appendInnerSnippet()}
                 <Icon
                   name="mdi-close-circle"
-                  click
-                  on:click={() => {
+                  onclick={() => {
                     if(!!tmpFilter && tmpFilter.type === 'date' && tmpFilter.mode === 'between') {
                       tmpFilter.to = undefined
                     }
                   }}
                 ></Icon>
-              </svelte:fragment>
+              {/snippet}
             </DatePickerTextField>
           </div>
         {:else if tmpFilter.type === "number" && tmpFilter.mode === 'between'}
@@ -270,7 +320,7 @@
               type="number"
               placeholder={betweenFromLabel}
               --simple-textfield-width="100%"
-              on:change={handleChangeValue}
+              onchange={handleChangeValue}
             ></SimpleTextField>
           </div>
           <div>
@@ -279,25 +329,25 @@
               type="number"
               placeholder={betweenToLabel}
               --simple-textfield-width="100%"
-              on:change={handleChangeValue}
+              onchange={handleChangeValue}
             ></SimpleTextField>
           </div>
         {:else if tmpFilter.type == 'bool'}
           <div class="bool-filter">
             <Checkbox
               bind:value={tmpFilter.value}
-              on:change={handleChangeValue}
+              onchange={handleChangeValue}
             ></Checkbox>
             <span style:margin-left="10px">
               {tmpFilter.description}
             </span>
           </div>
         {:else if tmpFilter.type == 'custom'}
-          <slot name="custom" filter={tmpFilter}></slot>
+          {@render customSnippet?.({ filter: tmpFilter })}
         {/if}
       {/if}
     </div>
-    <slot name="filter-actions" {applyFilterDisabled} filter={tmpFilter}></slot>
+    {@render filterActionsSnippet?.({ applyFilterDisabled, filter: tmpFilter })}
   </div>
 {/if}
 

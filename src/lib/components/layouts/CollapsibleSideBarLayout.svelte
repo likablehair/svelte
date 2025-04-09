@@ -1,109 +1,148 @@
 <script lang="ts">
   import '../../css/main.css'
   import './CollapsibleSideBarLayout.css'
-  import { createEventDispatcher } from "svelte";
   import CollapsibleDivider from "../simple/common/CollapsibleDivider.svelte";
   import MediaQuery from "../simple/common/MediaQuery.svelte";
   import type { MenuItem } from "../simple/lists/SelectableMenuList.svelte";
   import SelectableMenuList from "../simple/lists/SelectableMenuList.svelte";
   import HeaderMenu from '../simple/navigation/HeaderMenu.svelte';
+  import type { ComponentProps, Snippet } from 'svelte';
 
-  export let drawerOpened: boolean = false,
-    drawerCollapsed: boolean = false,
-    menuItems: MenuItem[] = [],
-    selectedMenuElementName: string | undefined = undefined,
-    fullLogo: string | undefined = undefined,
-    partialLogo: string | undefined = undefined
+  interface Props {
+    drawerOpened?: boolean;
+    drawerCollapsed?: boolean;
+    menuItems?: MenuItem[];
+    selectedMenuElementName?: string;
+    fullLogo?: string;
+    partialLogo?: string;
+    oncollapse?: (event: {
+      detail: {
+        collapsed: boolean
+      }
+    }) => void
+    onmenuSelect?: (event: {
+      detail: {
+        menu: MenuItem
+      }
+    }) => void
+    sidebarFooterSnippet?: Snippet<[{ 
+      collapsed: boolean, 
+      drawer: boolean 
+    }]>
+    children?: Snippet<[]>
+    logoSnippet?: Snippet<[{
+      collapsed: boolean,
+      mAndDown: boolean
+    }]>
+    ondrawerChange?: ComponentProps<typeof HeaderMenu>['ondrawerChange']
+  }
 
-  let dispatch = createEventDispatcher<{
-    'collapse': {
-      collapsed: boolean
-    },
-    'menu-select': {
-      menu: MenuItem
+  let {
+    drawerOpened = $bindable(false),
+    drawerCollapsed = $bindable(false),
+    menuItems = [],
+    selectedMenuElementName = $bindable(undefined),
+    fullLogo = undefined,
+    partialLogo = undefined,
+    oncollapse,
+    onmenuSelect,
+    sidebarFooterSnippet,
+    children,
+    logoSnippet,
+    ondrawerChange,
+  }: Props = $props();
+
+  function handleMenuSelect(event: Parameters<NonNullable<ComponentProps<typeof SelectableMenuList>['onselect']>>[0]) {
+    if(onmenuSelect) {
+      onmenuSelect({
+        detail: {
+          menu: event.detail.item
+        }
+      })
     }
-  }>()
-
-  function handleMenuSelect(event: CustomEvent<{
-    item: MenuItem
-  }>) {
-    dispatch('menu-select', {
-      menu: event.detail.item
-    })
   }
 
   function handleCollpsabledDividerChange() {
-    dispatch('collapse', {
-      collapsed: drawerCollapsed
-    })
+    if(oncollapse) {
+      oncollapse({
+        detail: {
+          collapsed: drawerCollapsed
+        }
+      })
+    }
   }
 </script>
 
-<MediaQuery let:mAndDown>
-  <div>
-    <div 
-      class="sidebar"
-      class:collapsed={drawerCollapsed}
-    >
+<MediaQuery>
+  {#snippet defaultSnippet({ mAndDown})}
+    <div>
       <div 
-        class="logo-container"
+        class="sidebar"
         class:collapsed={drawerCollapsed}
       >
-        <slot name="logo" collapsed={drawerCollapsed} mAndDown>
-          <img src={drawerCollapsed ? partialLogo : fullLogo} alt="logo">
-        </slot>
-      </div>
-      <SelectableMenuList
-        items={menuItems}
-        collapsed={drawerCollapsed}
-        selected={selectedMenuElementName}
-        on:select={handleMenuSelect}
-      ></SelectableMenuList>
-      <CollapsibleDivider
-        bind:collapsed={drawerCollapsed}
-        on:change={handleCollpsabledDividerChange}
-      ></CollapsibleDivider>
-      <div class="sidebar-footer">
-        <slot name="sidebar-footer" collapsed={drawerCollapsed} drawer={false}></slot>
-      </div>
-    </div>
-    <div class="header-menu">
-      <HeaderMenu
-        bind:openDrawer={drawerOpened}
-        on:drawer-change
-      >
-        <svelte:fragment slot="title">
-          <div class="header-logo-container">
-            <img src={fullLogo} alt="logo">
-          </div>
-        </svelte:fragment>
         <div 
-          slot="drawer" 
-          style:padding="0px 10px 10px 0px"
-          style:height="100%"
-          style:display="flex"
-          style:flex-direction="column"
+          class="logo-container"
+          class:collapsed={drawerCollapsed}
         >
-          <SelectableMenuList
-            items={menuItems}
-            collapsed={false}
-            selected={selectedMenuElementName}
-            on:select={handleMenuSelect}
-          ></SelectableMenuList>
-          <div class="sidebar-footer">
-            <slot name="sidebar-footer" collapsed={false} drawer={true}></slot>
-          </div>
+          {#if logoSnippet}
+            {@render logoSnippet({ collapsed: drawerCollapsed, mAndDown })}
+          {:else}
+            <img src={drawerCollapsed ? partialLogo : fullLogo} alt="logo">
+          {/if}
         </div>
-      </HeaderMenu>
+        <SelectableMenuList
+          items={menuItems}
+          collapsed={drawerCollapsed}
+          selected={selectedMenuElementName}
+          onselect={handleMenuSelect}
+        ></SelectableMenuList>
+        <CollapsibleDivider
+          bind:collapsed={drawerCollapsed}
+          onchange={handleCollpsabledDividerChange}
+        ></CollapsibleDivider>
+        <div class="sidebar-footer">
+          {@render sidebarFooterSnippet?.({ collapsed: drawerCollapsed, drawer: false })}
+        </div>
+      </div>
+      <div class="header-menu">
+        <HeaderMenu
+          bind:openDrawer={drawerOpened}
+          {ondrawerChange}
+        >
+          {#snippet titleSnippet()}
+            <div class="header-logo-container">
+              <img src={fullLogo} alt="logo">
+            </div>
+          {/snippet}
+          {#snippet drawerSnippet()}
+            <div 
+              style:padding="0px 10px 10px 0px"
+              style:height="100%"
+              style:display="flex"
+              style:flex-direction="column"
+            >
+              <SelectableMenuList
+                items={menuItems}
+                collapsed={false}
+                selected={selectedMenuElementName}
+                onselect={handleMenuSelect}
+              ></SelectableMenuList>
+              <div class="sidebar-footer">
+                {@render sidebarFooterSnippet?.({ collapsed: false, drawer: true })}
+              </div>
+            </div>
+          {/snippet}
+        </HeaderMenu>
+      </div>
+      <main 
+        class="page-content"
+        class:collapsed={!drawerCollapsed}
+        class:expanded={drawerCollapsed}
+      >
+        {@render children?.()}
+      </main>
     </div>
-    <main 
-      class="page-content"
-      class:collapsed={!drawerCollapsed}
-      class:expanded={drawerCollapsed}
-    >
-      <slot></slot>
-    </main>
-  </div>
+  {/snippet}
 </MediaQuery>
 
 <style>

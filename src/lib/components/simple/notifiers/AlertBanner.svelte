@@ -1,74 +1,99 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import '../../../css/main.css'
   import './AlertBanner.css'
-  import { createEventDispatcher } from "svelte";
 
-  let clazz: {
-    container?: string,
-    border?: string,
-    body?: string
-  } = {};
-	export { clazz as class };
+  interface Props {
+    title?: string
+    description?: string
+    disabled?: boolean
+    class?: {
+      container?: string,
+      border?: string,
+      body?: string
+    },
+    onclick?: (event:{
+      detail: {
+        nativeEvent: MouseEvent
+      }
+    }) => void,
+    onkeypress?: (event:{
+      detail: {
+        nativeEvent: KeyboardEvent
+      }
+    }) => void,
+    contentSnippet?: Snippet<[{
+      title?: string,
+      description?: string
+    }]>,
+    titleSnippet?: Snippet<[{
+      title: string,
+    }]>,
+    descriptionSnippet?: Snippet<[{
+      description: string
+    }]>,
+    appendSnippet?: Snippet<[{
+      disabled: boolean
+    }]>
+  }
 
-  /* 
-    Styles:
-    
-    --alert-banner-color
-    --alert-banner-cursor
-    --alert-banner-border-radius
-    --alert-banner-padding-left
-    --alert-banner-padding-right
-    --alert-banner-padding-top
-    --alert-banner-padding-bottom
-    --alert-banner-border-width
-    --alert-banner-width
-  */
+  let {
+    title,
+    description,
+    disabled = false,
+    class: clazz = { },
+    onclick: onclickInternal,
+    onkeypress: onkeypressInternal,
+    contentSnippet,
+    titleSnippet,
+    descriptionSnippet,
+    appendSnippet
+  }: Props = $props()
 
-  // props
-  export let title: string | undefined = undefined,
-    description: string | undefined = undefined,
-    disabled: boolean = false
+  function onclick(e: MouseEvent) {
+    if(!disabled && !!onclickInternal) onclickInternal({ detail: { nativeEvent: e }})
+  }
 
-    let dispatch = createEventDispatcher<{
-      'click': MouseEvent,
-      'keypress': KeyboardEvent
-    }>()
-
-    function handleClickEvent(e: MouseEvent) {
-      if(!disabled) dispatch('click', e)
-    }
-
-    function handleKeypressEvent(e: KeyboardEvent) {
-      if(!disabled) dispatch('keypress', e)
-    }
+  function onkeypress(e: KeyboardEvent) {
+    if(!disabled && !!onkeypressInternal) onkeypressInternal({ detail: { nativeEvent: e }})
+  }
 </script>
 
 <div 
   class="alert-banner-container {clazz.container || ''}"
-  on:keypress={handleKeypressEvent}
-  on:click={handleClickEvent}
+  {onkeypress}
+  {onclick}
+  role="presentation"
 >
   <div 
     class="border-colored {clazz.border || ''}"
   ></div>
   <div class="body {clazz.body || ''}">
     <div class="content">
-      <slot name="content" title={title} description={description}>
+      {#if !!contentSnippet}
+        {@render contentSnippet({ title, description })}
+      {:else}
         {#if !!title}
-          <slot name="title" title={title}>
+          {#if !!titleSnippet}
+            {@render titleSnippet({ title })}
+          {:else}
             <div class="title">{title}</div>
-          </slot>
+          {/if}
         {/if}
         {#if !!description}
-          <slot name="description" description={description}>
+          {#if !!descriptionSnippet}
+            {@render descriptionSnippet({ description })}
+          {:else}
             <div class="description">{description}</div>
-          </slot>
+          {/if}
         {/if}
-      </slot>
+      {/if}
     </div>
-    <div class="append">
-      <slot name="append" disabled={disabled}></slot>
-    </div>
+    {#if !!appendSnippet}
+      <div class="append">
+        {@render appendSnippet({ disabled })}
+      </div>
+    {/if}
   </div>
 </div>
 

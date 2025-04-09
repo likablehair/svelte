@@ -1,46 +1,53 @@
-<script lang="ts" context="module">
-  export type Result = {
+<script lang="ts" module>
+  export type Result<Data = Record<string, any>> = {
     title: string
     name: string | number,
     subtitle?: string
     url?: string,
-    /* eslint-disable  @typescript-eslint/no-explicit-any */
-    data?: Record<string, any>
+    data?: Data
   };
 </script>
 
-<script lang="ts">
+<script lang="ts" generics="Data">
   import '../../../css/main.css'
   import './SearchResults.css'
   import SelectableVerticalList from "$lib/components/simple/lists/SelectableVerticalList.svelte";
+  import type { ComponentProps, Snippet } from 'svelte';
 
-  let clazz: {
-    container?: string,
-    loading?: string,
-    noData?: string,
-    results?: string
-  } = {};
-	export { clazz as class };
+  interface Props {
+    noDataText?: string;
+    loadingText?: string;
+    results?: Result<Data>[];
+    loading?: boolean;
+    footer?: boolean;
+    activeKeyboard?: boolean;
+    class?: {
+      container?: string,
+      loading?: string,
+      noData?: string,
+      results?: string
+    }
+    loadingSnippet?: Snippet<[]>
+    noDataSnippet?: Snippet<[]>
+    footerSnippet?: Snippet<[]>
+    onfocus?: ComponentProps<typeof SelectableVerticalList<Data>>['onfocus']
+    onselect?: ComponentProps<typeof SelectableVerticalList<Data>>['onselect']
+  }
 
-  /*
-    Styles
-
-    --search-results-width
-    --search-results-max-width
-    --search-results-height
-    --search-results-max-height
-    --search-results-margin
-    --search-results-background-color
-    --search-results-border-color
-    --search-results-border-radius
-  */
-
-  export let noDataText: string = "Sorry, nothing found",
-    loadingText: string = "Searching for references ...",
-    results: Result[] | undefined = [],
-    loading: boolean = false,
-    footer: boolean = true,
-    activeKeyboard: boolean = false
+  let {
+    noDataText = "Sorry, nothing found",
+    loadingText = "Searching for references ...",
+    results = $bindable([]),
+    loading = false,
+    footer = true,
+    activeKeyboard = false,
+    class: clazz = {},
+    footerSnippet,
+    loadingSnippet,
+    noDataSnippet,
+    onfocus,
+    onselect,
+  }: Props = $props();
 </script>
 
 <div 
@@ -48,17 +55,21 @@
 >
   {#if loading}
     <div class="loading-container {clazz.loading || ''}">
-      <slot name="loading">
+      {#if loadingSnippet}
+        {@render loadingSnippet()}
+      {:else}
         <span style:font-size=".875rem">{loadingText}</span>
-      </slot>
+      {/if}
     </div>
   {:else if !results || results.length == 0}
     <div
       class="no-data-container {clazz.noData || ''}"
     >
-      <slot name="no-data">
+      {#if noDataSnippet}
+        {@render noDataSnippet()}
+      {:else}
         <span style:font-size=".875rem">{noDataText}</span>
-      </slot>
+      {/if}
     </div>
   {:else}
     <div class={clazz.results || ''}>
@@ -72,23 +83,25 @@
           }
         })}
         activeKeyboard={activeKeyboard}
-        on:focus
-        on:select
+        {onfocus}
+        {onselect}
       >
-        <div 
-          slot="description" 
-          let:element
-          style:margin-top=".5rem"
-          style:opacity="60%"
-        >
-          {element.description}
-        </div>
+        {#snippet descriptionSnippet({ element })}
+          <div
+            style:margin-top=".5rem"
+            style:opacity="60%"
+          >
+            {element.description} 
+          </div>
+        {/snippet}
       </SelectableVerticalList>
     </div>
   {/if}
   {#if footer}  
     <div class="footer">
-      <slot name="footer">
+      {#if footerSnippet}
+        {@render footerSnippet()}
+      {:else}
         <span
           style:font-size=".875rem"
         >
@@ -96,7 +109,7 @@
             style:opacity=".5"
           >Search with</span> ❤️
         </span>
-      </slot>
+      {/if}
     </div>
   {/if}
 </div>

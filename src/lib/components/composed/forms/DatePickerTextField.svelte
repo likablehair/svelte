@@ -1,54 +1,91 @@
 <script lang="ts">
-  import IMask, { InputMask, type FactoryArg } from 'imask';
+  import IMask, { InputMask } from 'imask';
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
   import DatePicker from "$lib/components/simple/dates/DatePicker.svelte";
   import Menu from "$lib/components/simple/common/Menu.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
-  import { onMount, type ComponentProps } from 'svelte';
+  import { onMount, tick, type ComponentProps, type Snippet } from 'svelte';
   import { DateTime } from 'luxon'
-  import { createEventDispatcher } from 'svelte';
   import type { DateStat } from '../../simple/dates/utils';
   import MediaQuery from '../../simple/common/MediaQuery.svelte';
   import Dialog from '../../simple/dialogs/Dialog.svelte';
 
-  let clazz: {
-    activator?: string,
-    textfield?: ComponentProps<SimpleTextField>['class']
-  } = {};
-	export { clazz as class };
-
-  let dispatch = createEventDispatcher<{
-    'day-click': {
-      dateStat: DateStat
-    },
-    input: {
-      datetime: Date | undefined
+  interface Props {
+    menuOpened?: boolean;
+    openingId?: string;
+    pattern?: string;
+    selectedMonth?: number;
+    selectedYear?: number;
+    visibleMonth?: number;
+    visibleYear?: number;
+    selectedDate?: Date;
+    placeholder?: string;
+    mobileDialog?: boolean;
+    maxYearInRange?: number;
+    minYearInRange?: number;
+    disabled?: boolean;
+    flipOnOverflow?: boolean;
+    class?: {
+      activator?: string,
+      textfield?: ComponentProps<typeof SimpleTextField>['class']
     }
-  }>()
+    ondayClick?: (event: {
+      detail: {
+        dateStat: DateStat
+      }
+    }) => void
+    oninput?: (event: {
+      detail: {
+        datetime: Date | undefined
+      }
+    }) => void
+    activatorSnippet?: Snippet<[{
+      mask: typeof mask
+      handleTextFieldFocus: typeof handleTextFieldFocus
+      handleInputChange: typeof handleInputChange
+      inputElement: HTMLElement | undefined
+      placeholder: string | undefined
+      disabled: boolean
+    }]>
+    appendSnippet?: ComponentProps<typeof SimpleTextField>['appendSnippet']
+    appendInnerSnippet?: ComponentProps<typeof SimpleTextField>['appendInnerSnippet']
+    prependSnippet?: ComponentProps<typeof SimpleTextField>['prependSnippet']
+    prependInnerSnippet?: ComponentProps<typeof SimpleTextField>['prependInnerSnippet']
+  }
 
-  export let menuOpened: boolean = false,
-    openingId: string = 'date-picker-text-field',
-    pattern: string = "dd/MM/yyyy",
-    selectedMonth: number | undefined = undefined,
-    selectedYear: number | undefined = undefined,
-    visibleMonth: number | undefined = undefined,
-    visibleYear: number | undefined = undefined,
-    selectedDate: Date | undefined = undefined,
-    placeholder: string | undefined = undefined,
-    mobileDialog: boolean = true,
-    maxYearInRange: number = 2100,
-    minYearInRange: number = 1970,
-    disabled: boolean = false,
-    flipOnOverflow: boolean = true
+  let {
+    menuOpened = $bindable(false),
+    openingId = $bindable('date-picker-text-field'),
+    pattern = "dd/MM/yyyy",
+    selectedYear = $bindable(new Date().getFullYear()),
+    selectedMonth = $bindable(new Date().getMonth()),
+    selectedDate = $bindable(undefined),
+    visibleMonth = $bindable(selectedMonth),
+    visibleYear = $bindable(selectedYear),
+    placeholder,
+    mobileDialog = true,
+    maxYearInRange = 2100,
+    minYearInRange = 1970,
+    disabled = false,
+    flipOnOverflow = true,
+    class: clazz = {},
+    ondayClick,
+    oninput,
+    activatorSnippet,
+    appendInnerSnippet,
+    appendSnippet,
+    prependInnerSnippet: prependInnerInternalSnippet,
+    prependSnippet,
+  }: Props = $props();
 
 
-  let activator: HTMLElement,
-    refreshPosition = false,
-    menuElement: HTMLElement,
-    inputElement: HTMLElement,
-    mask: InputMask<typeof maskFactoryArgs> | { value: string | undefined } = {
+  let activator: HTMLElement | undefined = $state(),
+    refreshPosition = $state(false),
+    menuElement: HTMLElement | undefined = $state(),
+    inputElement: HTMLElement | undefined = $state(),
+    mask: InputMask<typeof maskFactoryArgs> | { value: string | undefined } = $state({
       value: undefined
-    },
+    }),
     maskFactoryArgs = {
       mask: Date,
       pattern: pattern,
@@ -94,18 +131,22 @@
   }
 
   onMount(() => {
-    mask = IMask(
-      inputElement, maskFactoryArgs
-    )
+    if(inputElement){
+      mask = IMask(
+        inputElement, maskFactoryArgs
+      )
+    }
 
     if(!!selectedDate) {
       mask.value = DateTime.fromJSDate(selectedDate).toFormat(pattern)
     }
   })
 
-  $: if(!selectedDate) {
-    mask.value = ""
-  }
+  $effect(() => {
+    if(!selectedDate) {
+      mask.value = ""
+    }
+  })
 
   function handleInputChange(event: any) {
     setTimeout(() => {
@@ -142,23 +183,29 @@
           selectedDate = undefined
         }
 
-        dispatch('input', {
-          datetime: selectedDate
-        })
+        if(oninput) {
+          oninput({
+            detail: {
+              datetime: selectedDate
+            }
+          })
+        }
       }
     }, 30);
   }
 
-  function handleDateSelect(ev: CustomEvent<{
-    dateStat: DateStat
-  }>) {
+  function handleDateSelect(event: Parameters<NonNullable<ComponentProps<typeof DatePicker>['ondayClick']>>[0]) {
     if(!!selectedDate) {
       mask.value = DateTime.fromJSDate(selectedDate).toFormat(pattern)
     }
 
-    dispatch('day-click', {
-      dateStat: ev.detail.dateStat
-    })
+    if(ondayClick) {
+      ondayClick({
+        detail: {
+          dateStat: event.detail.dateStat
+        }
+      })
+    }
   }
 
   function handleYearSelect() {
@@ -169,120 +216,111 @@
     mask.value = ''
   }
 
-  $: if(!!selectedDate) {
-    setTimeout(() => {
-      if(!!selectedDate) {
-        mask.value = DateTime.fromJSDate(selectedDate).toFormat(pattern)
-      }
-    }, 30);
-  }
+  $effect(() => {
+    if(!!selectedDate) {
+      setTimeout(async () => {
+        if(!!selectedDate) {
+          mask.value = DateTime.fromJSDate(selectedDate).toFormat(pattern)
+        }
+        await tick()
+      }, 30);
+    }
+  }) 
 </script>
 
-<MediaQuery let:mAndDown>
-  <div
-    bind:this={activator}
-    class="date-picker-activator {clazz.activator || ''}"
-    style:width="var(--simple-textfield-width)"
-  >
-    <slot
-      name="activator"
-      {mask}
-      {handleTextFieldFocus}
-      {handleInputChange}
-      {inputElement}
-      {placeholder}
-      {disabled}
+<MediaQuery>
+  {#snippet defaultSnippet({ mAndDown})}
+    <div
+      bind:this={activator}
+      class="date-picker-activator {clazz.activator || ''}"
+      style:width="var(--simple-textfield-width)"
     >
-      <SimpleTextField
-        bind:value={mask.value}
-        on:focus={() => handleTextFieldFocus(mAndDown)}
-        on:keydown={handleInputChange}
-        bind:input={inputElement}
-        bind:placeholder
-        class={clazz.textfield}
-        {disabled}
-      >
-        <svelte:fragment slot="prepend-inner" let:prependInnerIcon let:iconSize>
-          <slot name="prepend-inner" {prependInnerIcon} {iconSize}>
-            <Icon
-              name="mdi-calendar"
-              click
-              on:click={() => menuOpened = !menuOpened}
-              tabindex={-1}
-            ></Icon>
-          </slot>
-        </svelte:fragment>
-        <svelte:fragment slot="append-inner" let:appendInnerIcon let:iconSize>
-          <slot name="append-inner" {appendInnerIcon} {iconSize}>
-          </slot>
-        </svelte:fragment>
-        <svelte:fragment slot="prepend" let:prependIcon let:iconSize>
-          <slot name="prepend" {prependIcon} {iconSize}>
-          </slot>
-        </svelte:fragment>
-        <svelte:fragment slot="append" let:appendIcon let:iconSize>
-          <slot name="append" {appendIcon} {iconSize}>
-          </slot>
-        </svelte:fragment>
-      </SimpleTextField>
-    </slot>
-  </div>
+      {#if activatorSnippet}
+        {@render activatorSnippet({ mask, handleTextFieldFocus, handleInputChange, inputElement, placeholder, disabled })}
+      {:else}
+        <SimpleTextField
+          bind:value={mask.value}
+          onfocus={() => handleTextFieldFocus(mAndDown)}
+          onkeydown={handleInputChange}
+          bind:input={inputElement}
+          {placeholder}
+          class={clazz.textfield}
+          {disabled}
+          {appendInnerSnippet}
+          {prependSnippet}
+          {appendSnippet}
+        >
+          {#snippet prependInnerSnippet({ iconSize, prependInnerIcon })}
+            {#if prependInnerInternalSnippet}
+              {@render prependInnerInternalSnippet({ prependInnerIcon, iconSize })}
+            {:else}
+              <Icon
+                name="mdi-calendar"
+                onclick={() => menuOpened = !menuOpened}
+                tabindex={-1}
+              ></Icon>
+            {/if}
+          {/snippet}
+        </SimpleTextField>
+      {/if}
+    </div>
 
-  {#if mAndDown && mobileDialog}
-    <Dialog
-      bind:open={menuOpened}
-    >
-      <div
-        style:background-color="rgb(var(--global-color-background-100))"
-        style:width="300px"
-        style:border-radius="10px"
+    {#if mAndDown && mobileDialog}
+      <Dialog
+        bind:open={menuOpened}
       >
-        <DatePicker
-          bind:selectedDate={selectedDate}
-          bind:selectedMonth={selectedMonth}
-          bind:selectedYear={selectedYear}
-          bind:visibleMonth
-          bind:visibleYear
-          on:day-click={handleDateSelect}
-          on:year-click={handleYearSelect}
-          on:month-click={handleMonthSelect}
-          skipTabs
-          {disabled}
-        ></DatePicker>
-      </div>
-    </Dialog>
-  {:else}
-    <Menu
-      {activator}
-      _width={"300px"}
-      _boxShadow={"rgb(var(--global-color-background-300), .5) 0px 2px 4px"}
-      _borderRadius={"5px"}
-      bind:open={menuOpened}
-      anchor="bottom-center"
-      closeOnClickOutside
-      bind:refreshPosition
-      bind:menuElement
-      bind:openingId={openingId}
-      flipOnOverflow={flipOnOverflow}
-    >
-      <div
-        style:background-color="rgb(var(--global-color-background-100))"
+        <div
+          style:background-color="rgb(var(--global-color-background-100))"
+          style:width="300px"
+          style:border-radius="10px"
+        >
+          <DatePicker
+            bind:selectedDate={selectedDate}
+            bind:selectedMonth={selectedMonth}
+            bind:selectedYear={selectedYear}
+            bind:visibleMonth
+            bind:visibleYear
+            ondayClick={handleDateSelect}
+            onyearClick={handleYearSelect}
+            onmonthClick={handleMonthSelect}
+            skipTabs
+            {disabled}
+          ></DatePicker>
+        </div>
+      </Dialog>
+    {:else}
+      <Menu
+        {activator}
+        _width={"300px"}
+        _boxShadow={"rgb(var(--global-color-background-300), .5) 0px 2px 4px"}
+        _borderRadius={"5px"}
+        bind:open={menuOpened}
+        anchor="bottom-center"
+        closeOnClickOutside
+        bind:refreshPosition
+        bind:menuElement
+        bind:openingId={openingId}
+        flipOnOverflow={flipOnOverflow}
       >
-        <DatePicker
-          bind:selectedDate={selectedDate}
-          bind:selectedMonth={selectedMonth}
-          bind:selectedYear={selectedYear}
-          bind:visibleMonth
-          bind:visibleYear
-          on:day-click={handleDateSelect}
-          on:year-click={handleYearSelect}
-          on:month-click={handleMonthSelect}
-          skipTabs
-          {disabled}
-        ></DatePicker>
-      </div>
-    </Menu>
-  {/if}
+        <div
+          style:background-color="rgb(var(--global-color-background-100))"
+        >
+          <DatePicker
+            bind:selectedDate={selectedDate}
+            bind:selectedMonth={selectedMonth}
+            bind:selectedYear={selectedYear}
+            bind:visibleMonth
+            bind:visibleYear
+            ondayClick={handleDateSelect}
+            onyearClick={handleYearSelect}
+            onmonthClick={handleMonthSelect}
+            skipTabs
+            {disabled}
+          ></DatePicker>
+        </div>
+      </Menu>
+    {/if}
+  {/snippet}
 </MediaQuery>
 
 <style>

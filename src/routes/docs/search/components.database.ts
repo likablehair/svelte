@@ -20,23 +20,11 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/LinkButton'
   }, {
-    title: 'TextField',
-    description: 'A simple textfield',
-    status: 'deprecated',
-    type: 'simple',
-    url: '/docs/components/simple-components/TextField'
-  }, {
     title: 'Checkbox',
     description: 'A simple checkbox',
     status: 'stable',
     type: 'simple',
     url: '/docs/components/simple-components/Checkbox'
-  }, {
-    title: 'Card',
-    description: 'A card with header, body and footer. The body is scrollable and the header and footer are fixed',
-    status: 'stable',
-    type: 'simple',
-    url: '/docs/components/simple-components/Card'
   }, {
     title: 'Avatar',
     description: 'Circle image.',
@@ -50,11 +38,47 @@ const list: {
     type: 'composed',
     url: '/docs/components/composed-components/DescriptiveAvatar' 
   }, {
-    title: 'Gesture',
-    description: 'Handle touch gesture movements',
+    title: 'CollapsibleDivider',
+    description: 'Make everything collapsable',
     status: 'stable',
     type: 'simple',
-    url: '/docs/components/simple-components/Gesture'
+    url: '/docs/components/simple-components/CollapsibleDivider' 
+  }, {
+    title: 'Divider',
+    description: "Wasn't meant to be together",
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Divider'
+  }, {
+    title: 'NoData',
+    description: "Nothing to see here.",
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/NoData'
+  }, {
+    title: 'Calendar',
+    description: "Just a calendar",
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Calendar'
+  }, {
+    title: 'CollpasibleSideBarLayout',
+    description: "Just a calendar",
+    status: 'stable',
+    type: 'layout',
+    url: '/docs/components/layouts/CollapsibleSideBarLayout'
+  }, {
+    title: 'MonthSelector',
+    description: "Just a month selector",
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/MonthSelector'
+  }, {
+    title: 'BoxList',
+    description: "A lot of boxes.",
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/BoxList'
   }, {
     title: 'ProgressBar',
     description: 'Makes some progress to get there.',
@@ -80,14 +104,8 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/SimpleTimeLine'
   }, {
-    title: 'IntersectionObserver',
-    description: 'Get if there are intersection with the current viewport',
-    status: 'stable',
-    type: 'simple',
-    url: '/docs/components/simple-components/IntersectionObserver'
-  }, {
     title: 'MediaQuery',
-    description: 'Get the viewport size and exposed some variable',
+    description: 'Responsive is the key.',
     status: 'stable',
     type: 'simple',
     url: '/docs/components/simple-components/MediaQuery'
@@ -97,6 +115,96 @@ const list: {
     status: 'stable',
     type: 'simple',
     url: '/docs/components/simple-components/Menu'
+  }, {
+    title: 'Textarea',
+    description: 'Big area of text',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Textarea'
+  }, {
+    title: 'VerticalSwitch',
+    description: 'Switching sides vertically',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/VerticalSwitch'
+  }, {
+    title: 'VerticalTextSwitch',
+    description: 'Switching sides vertically and with text',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/VerticalTextSwitch'
+  }, {
+    title: 'SelectableMenuList',
+    description: 'Choose wisely.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/SelectableMenuList'
+  }, {
+    title: 'ConfirmOrCancelButtons',
+    description: 'Last chance to make the right decision.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/ConfirmOrCancelButtons'
+  }, {
+    title: 'SearchResults',
+    description: 'The answers to all your questions.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/SearchResults'
+  }, {
+    title: 'SearchBar',
+    description: 'The question to all your answers.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/SearchBar'
+  }, {
+    title: 'GlobalSearchTextField',
+    description: 'TextField global friendly.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/GlobalSearchTextField'
+  }, {
+    title: 'FilterEditor',
+    description: 'The key for making it easy',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/FilterEditor'
+  }, {
+    title: 'SideBarMenuList',
+    description: 'Choose wisely, but to the side.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/SideBarMenuList'
+  }, {
+    title: 'CircularLoader',
+    description: 'Like a dog chasing his own tail.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/CircularLoader'
+  }, {
+    title: 'Icon',
+    description: 'Be iconic.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Icon'
+  }, {
+    title: 'Breadcrumb',
+    description: 'Never leave any crumbs left.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Breadcrumb'
+  }, {
+    title: 'HeaderMenu',
+    description: 'Menu that scores an header.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/HeaderMenu'
+  }, {
+    title: 'Navigator',
+    description: 'Better than a TomTom.',
+    status: 'stable',
+    type: 'simple',
+    url: '/docs/components/simple-components/Navigator'
   }, {
     title: 'SimpleTextField',
     description: 'A simple text input',
@@ -133,12 +241,6 @@ const list: {
     status: 'stable',
     type: 'composed',
     url: '/docs/components/composed-components/YearPickerTextField'
-  }, {
-    title: 'TimePicker',
-    description: 'Time to change, always time to change',
-    status: 'stable',
-    type: 'simple',
-    url: '/docs/components/simple-components/TimePicker'
   }, {
     title: 'VerticalDraggableList',
     description: 'Drag all over me',
@@ -308,23 +410,23 @@ const list: {
     type: 'layout',
     url: '/docs/components/layouts/UnstableDividedSideBarLayout'
   }, {
-    title: 'GanymedeBarChart',
-    description: 'Ganymede Bar Chart.',
+    title: 'BarChart',
+    description: ' Bar Chart.',
     status: 'beta',
     type: 'simple',
-    url: '/docs/components/simple-components/GanymedeBarChart'
+    url: '/docs/components/simple-components/BarChart'
   }, {
-    title: 'GanymedeLineChart',
-    description: 'Ganymede Line Chart.',
+    title: 'LineChart',
+    description: ' Line Chart.',
     status: 'beta',
     type: 'simple',
-    url: '/docs/components/simple-components/GanymedeLineChart'
+    url: '/docs/components/simple-components/LineChart'
   }, {
-    title: 'GanymedePieChart',
-    description: 'Ganymede Pie Chart.',
+    title: 'PieChart',
+    description: ' Pie Chart.',
     status: 'beta',
     type: 'simple',
-    url: '/docs/components/simple-components/GanymedePieChart'
+    url: '/docs/components/simple-components/PieChart'
   }, {
     title: 'DashboardGridShaper',
     description: 'Shape new generation dashboards.',
@@ -361,12 +463,6 @@ const list: {
     status: 'stable',
     type: 'composed',
     url: '/docs/components/composed-components/IconsDropdown'
-  }, {
-    title: 'TreeEditor',
-    description: 'Save the trees.',
-    status: 'beta',
-    type: 'composed',
-    url: '/docs/components/composed-components/TreeEditor'
   }, {
     title: 'RadioButton',
     description: 'Tune in and choose you favorite station with our radio buttons.',

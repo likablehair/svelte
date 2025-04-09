@@ -3,6 +3,8 @@
   import PropsViewer from "../../PropsViewer.svelte";
   
   import DashboardGridShaper from "$lib/components/simple/dashboards/DashboardGridShaper.svelte";
+    import SlotsViewer from "../../SlotsViewer.svelte";
+    import EventsViewer from "../../EventsViewer.svelte";
 </script>
 
 <h1>DashboardGridShaper</h1>
@@ -15,24 +17,14 @@
 <h2>Props</h2>
 <PropsViewer
   props={[
-    // {
-    //   name: 'type',
-    //   type: '"button" | "submit"',
-    //   description: "HTML type attribute",
-    //   default: "button"
-    // }
   ]}
   styleProps={[
-    // {
-    //   name: '--button-max-width',
-    //   type: 'string',
-    //   default: 'undefined',
-    //   description: 'The max width of the outer element'
-    // }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>
+<SlotsViewer></SlotsViewer>
 <h2>Events</h2>
+<EventsViewer></EventsViewer>
 
 <style>
   .example {

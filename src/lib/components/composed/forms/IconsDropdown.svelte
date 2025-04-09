@@ -1,114 +1,138 @@
-<script lang="ts" context="module">
-  export type IconItem = {
+<script lang="ts" module>
+  export type IconItem<Data = any> = {
     value: string | number,
     icon: string,
-    data?: any
+    data?: Data
   };
 </script>
 
-<script lang="ts">
-  import Dropdown, { type Item } from "./Dropdown.svelte";
+<script lang="ts" generics="Data">
+  import Dropdown from "./Dropdown.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
-  import { createEventDispatcher } from "svelte";
+  import type { ComponentProps } from "svelte";
+  import Autocomplete, { type Item } from "$lib/components/simple/forms/Autocomplete.svelte";
 
-  let dispatch = createEventDispatcher<{
-    change: {
-      unselect: IconItem | undefined;
-      select: IconItem | undefined;
-      selection: IconItem[];
-    }
-  }>()
+  type IconItemData = IconItem<Data>
 
-  export let items: IconItem[] = [],
-    values: IconItem[] = [],
-    clearable: boolean = false,
-    disabled: boolean = false,
-    width: string | undefined = "auto",
-    minWidth: string | undefined = "auto",
-    menuWidth: string | undefined = "60px"
+  type AutocompleteData = { icon: string, data?: Data }
+  type AutocompleteItem = Item<AutocompleteData>
+  interface Props {
+    items?: IconItemData[];
+    values?: IconItemData[];
+    clearable?: boolean;
+    disabled?: boolean;
+    placeholder?: string;
+    width?: string;
+    minWidth?: string;
+    menuWidth?: string;
+    onchange?: (event: {
+      detail: {
+        unselect: IconItemData | undefined;
+        select: IconItemData | undefined;
+        selection: IconItemData[];
+      }
+    }) => void
+  }
 
-  let dropdownValues: Item[] = []
+  let {
+    items = [],
+    values = $bindable([]),
+    clearable = false,
+    disabled = false,
+    placeholder = '',
+    width = "auto",
+    minWidth = "auto",
+    menuWidth = "60px",
+    onchange,
+  }: Props = $props();
 
-  $: dropdownValues = values.map((e) => ({
+  let dropdownValues: AutocompleteItem[] = $state([])
+
+  $effect(() => {
+    dropdownValues = values.map((e) => ({
+      value: e.value,
+      data: {
+        icon: e.icon,
+        data: e.data
+      }
+    }))
+  })
+
+  let dropDownItems: AutocompleteItem[] = $derived(items.map((e) => ({
     value: e.value,
     data: {
       icon: e.icon,
       data: e.data
     }
-  }))
+  })))
 
-  $: dropDownItems = items.map((e) => ({
-    value: e.value,
-    data: {
-      icon: e.icon,
-      data: e.data
-    }
-  }))
-
-  function handleChange(event: CustomEvent<{
-    unselect: Item | undefined;
-    select: Item | undefined;
-    selection: Item[];
-  }>) {
+  function handleChange(event: Parameters<NonNullable<ComponentProps<typeof Autocomplete<AutocompleteData>>['onchange']>>[0]) {
     values = event.detail.selection.map((e) => ({
       value: e.value,
-      icon: e.data.icon,
-      data: e.data
+      icon: e.data!.icon,
+      data: e.data!.data
     }))
 
-    dispatch('change', {
-      unselect: !!event.detail.unselect ? {
-        value: event.detail.unselect.value,
-        icon: event.detail.unselect.data.icon,
-        data: event.detail.unselect.data
-      } : undefined,
-      select: !!event.detail.select ? {
-        value: event.detail.select.value,
-        icon: event.detail.select.data.icon,
-        data: event.detail.select.data
-      } : undefined,
-      selection: values
-    })
+    if(onchange) {
+      onchange({
+        detail: {
+          unselect: !!event.detail.unselect ? {
+            value: event.detail.unselect.value,
+            icon: event.detail.unselect.data!.icon,
+            data: event.detail.unselect.data!.data
+          } : undefined,
+          select: !!event.detail.select ? {
+            value: event.detail.select.value,
+            icon: event.detail.select.data!.icon,
+            data: event.detail.select.data!.data
+          } : undefined,
+          selection: values
+        }
+      })
+    }
   }
 </script>
 
 <Dropdown
   items={dropDownItems}
   clearable={clearable}
-  placeholder=""
-  bind:disabled
+  {placeholder}
+  {disabled}
   bind:values={dropdownValues}
-  on:change={handleChange}
+  onchange={handleChange}
   {width}
   {minWidth}
   {menuWidth}
 >
-  <svelte:fragment slot="label" let:generatedLabel let:values let:placeholder let:clearable let:handleCloseClick>
+  {#snippet labelSnippet({ generatedLabel, values, placeholder, handleCloseClick })}
     {#if values.length == 0}
       {placeholder}
     {:else if values.length == 1}
-      <Icon name={values[0].data.icon}></Icon> 
+      {#if values[0].data}
+        <Icon name={values[0].data.icon}></Icon> 
+      {/if}
     {:else}
       {generatedLabel}
     {/if}
     {#if clearable && values.length > 0}
       <Icon
         name="mdi-close"
-        click
-        on:click={handleCloseClick}
+        onclick={handleCloseClick}
       ></Icon>
     {:else}
       <Icon name="mdi-chevron-down"></Icon>
     {/if}
-  </svelte:fragment>
-  <svelte:fragment slot="item-label" let:item>
-    <div class="label-container">
-      <Icon
-        name={item.data.icon}
-        --icon-size="20px"
-      ></Icon>
-    </div>
-  </svelte:fragment>
+  {/snippet}
+  {#snippet itemLabelSnippet({ item })}
+    {#if item.data}
+      <div class="label-container">
+        <Icon
+          name={item.data.icon}
+          --icon-size="20px"
+        ></Icon>
+      </div>
+    {/if}
+  {/snippet}
 </Dropdown>
 
 <style>

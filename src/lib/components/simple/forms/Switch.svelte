@@ -1,110 +1,113 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte'
 	import './Switch.css'
 
-	export let label: string = '',
-		value: boolean | undefined = undefined,
-		disabled: boolean = false
-
-	let checked = value
-	const uniqueID = Math.floor(Math.random() * 100)
-
-	function handleClick(event: MouseEvent) {
-		const target = (event.target as HTMLElement) || null
-
-		const state = target.getAttribute('aria-checked')
-		checked = state === 'true' ? false : true
-		value = checked === true ? true : false
-
-		dispatch('change', {
-			label: label,
-			value: checked
-		})
+	interface Props {
+		value?: boolean;
+		disabled?: boolean;
+		onchange?: (event: {
+      detail: {
+        nativeEvent: Event & {
+          currentTarget: EventTarget & HTMLInputElement;
+        },
+        value: boolean
+      }
+    }) => void
 	}
 
-	let dispatch = createEventDispatcher<{
-		change: {
-			label: string
-			value: boolean
-		}
-	}>()
+	let {
+		value = $bindable(undefined),
+		disabled = false,
+		onchange: onchangeInternal,
+	}: Props = $props();
+
+  function onchange(event: Event & {
+    currentTarget: EventTarget & HTMLInputElement;
+  }) {
+    if(onchangeInternal) {
+      onchangeInternal({
+        detail: {
+          nativeEvent: event,
+          value: event.currentTarget.checked
+        }
+      })
+    }
+  }
 </script>
 
-<div class="s s--slider">
-	<span id={`switch-${uniqueID}`}>{label}</span>
-	<button {disabled} role="switch" aria-checked={checked} on:click={handleClick} />
-</div>
+<label class="toggle-switch" class:disabled>
+  <input type="checkbox" bind:checked={value} {disabled} {onchange}>
+  <div class="toggle-switch-background">
+    <div class="toggle-switch-handle"></div>
+  </div>
+</label>
 
 <style>
-	:root {
-		--accent-color: rgb(var(--global-color-primary-500));
-		--size: 40px;
-		--gray: #ccc;
-	}
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: var(--switch-width, var(--switch-default-width));
+  height: var(--switch-height, var(--switch-default-height));
+  cursor: pointer;
+}
 
-	.s--slider {
-		display: flex;
-		justify-content: flex-start;
-		align-items: center;
-		font-size: var(
-			--switch-font-size,
-			var(--switch-default-font-size)
-		);
-		gap: var(
-			--switch-gap,
-			var(--switch-default-gap)
-		);
-	}
+.toggle-switch.disabled {
+	cursor: not-allowed;
+}
 
-	.s--slider button {
-		width: var(--size);
-		height: calc(var(--size) * 0.55);
-		position: relative;
-		margin: 0;
-		background: var(--gray);
-		border: none;
-	}
+.toggle-switch input[type="checkbox"] {
+  display: none;
+}
 
-	.s--slider button::before {
-		content: '';
-		position: absolute;
-		width: calc(var(--size) / 3);
-		height: calc(var(--size) / 3);
-		background: #fff;
-		top: calc(var(--size) / 10);
-		right: calc(var(--size) / 1.7);
-		transition: transform 0.3s;
-	}
+.toggle-switch-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--switch-inactive-background-color, var(--switch-default-inactive-background-color));
+  border-radius: 20px;
+  box-shadow: var(--switch-inactive-box-shadow, var(--switch-default-inactive-box-shadow));
+  transition: background-color 0.3s ease-in-out;
+}
 
-	.s--slider button[aria-checked='true'] {
-		background-color: var(--accent-color);
-	}
+.toggle-switch-handle {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: var(--switch-handle-width, var(--switch-default-handle-width));
+  height: var(--switch-handle-width, var(--switch-default-handle-width));
+  background-color: var(--switch-handle-color, var(--switch-default-handle-color));
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease-in-out;
+}
 
-	.s--slider button[aria-checked='true']::before {
-		transform: translateX(1.3em);
-		transition: transform 0.3s;
-	}
+.toggle-switch input[type="checkbox"]:disabled + .toggle-switch-background {
+  background-color: var(--switch-disabled-inactive-background-color, var(--switch-default-disabled-inactive-background-color));
+  box-shadow: var(--switch-disabled-inactive-box-shadow, var(--switch-default-disabled-inactive-box-shadow));
+}
 
-	.s--slider button:focus {
-		box-shadow: 0 0px 0px 1px var(--accent-color);
-	}
+.toggle-switch input[type="checkbox"]:disabled + .toggle-switch-background .toggle-switch-handle {
+  background-color: var(--switch-disabled-inactive-handle-color, var(--switch-default-disabled-inactive-handle-color));
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+}
 
-	.s--slider button {
-		border-radius: 1.5em;
-	}
+.toggle-switch input[type="checkbox"]:checked + .toggle-switch-background {
+  background-color: var(--switch-active-background-color, var(--switch-default-active-background-color));
+  box-shadow: var(--switch-active-box-shadow, var(--switch-default-active-box-shadow));
+}
 
-	.s--slider button::before {
-		border-radius: 100%;
-	}
+.toggle-switch input[type="checkbox"]:checked + .toggle-switch-background .toggle-switch-handle {
+  transform: translateX(var(--switch-translate-x, var(--switch-default-translate-x)));
+}
 
-	.s--slider button:focus {
-		box-shadow: 0 0px 8px var(--accent-color);
-		border-radius: 1.5em;
-	}
-	span {
-		width: var(
-			--switch-label-width,
-			var(--switch-default-label-width)
-		);
-	}
+.toggle-switch input[type="checkbox"]:disabled:checked + .toggle-switch-background {
+  background-color: var(--switch-disabled-active-background-color, var(--switch-default-disabled-active-background-color));
+  box-shadow: var(--switch-disabled-active-box-shadow, var(--switch-default-disabled-active-box-shadow));
+}
+
+.toggle-switch input[type="checkbox"]:disabled:checked + .toggle-switch-background .toggle-switch-handle {
+  background-color: var(--switch-disabled-active-handle-color, var(--switch-default-disabled-active-handle-color));
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+}
 </style>

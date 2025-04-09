@@ -5,9 +5,11 @@
   import Converter, { type DateMode, type Filter, type NumberMode, type SelectMode, type StringMode } from "$lib/utils/filters/filters";
     import { DynamicFilters, FilterBuilder } from "$lib";
     import type { ComponentProps } from "svelte";
+    import EventsViewer from "../../EventsViewer.svelte";
+    import SlotsViewer from "../../SlotsViewer.svelte";
 
   let searchText = '',
-    filters: ComponentProps<Filters>["filters"] = [
+    filters: ComponentProps<typeof Filters>["filters"] = [
     {
       type: 'string',
       column: 'cbam_declaration_goods.mrn',
@@ -153,74 +155,77 @@
 <div class="example">
 <Filters
   bind:filters
-  on:applyFilter={() => {
+  onapplyFilter={() => {
     handleSearchChange(searchText);
   }}
-  on:removeFilter={() => {
+  onremoveFilter={() => {
     handleSearchChange(searchText);
   }}
-  on:removeAllFilters={() => {
+  onremoveAllFilters={() => {
     handleSearchChange(searchText);
   }}
   --filters-default-wrapper-width="100%"
   lang={'en'}
   editFilterMode='multi-edit'
 >
-  <svelte:fragment slot="append">
-    <slot name="filter-append" />
-  </svelte:fragment>
-  <svelte:fragment slot="custom-chip" let:filter>
-    <slot name="custom-filter-chip" {filter} />
-  </svelte:fragment>
-  <svelte:fragment
-    slot="custom"
-    let:filter
-    let:updateFunction
-    let:mAndDown
-  >
-    <slot name="custom-filter" {filter} {updateFunction} {mAndDown} />
-  </svelte:fragment>
-
-  <svelte:fragment slot="content" let:mAndDown let:filters let:updateMultiFilterValues let:handleRemoveAllFilters={removeAllFilters}>
+  {#snippet contentSnippet({ filters, handleRemoveAllFilters, mAndDown, updateMultiFilterValues, })}
     {#key filters}
       <DynamicFilters
         lang='en'
         {filters}                      
         {mAndDown}
-        on:change={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
-        on:removeAllFilters={() => {
+        onchange={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
+        onremoveAllFilters={() => {
           handleSearchChange(searchText);
         }}
       >
-        <svelte:fragment slot="custom" let:filter let:mAndDown>
-          <slot name="custom-filter" {filter} {updateMultiFilterValues} {mAndDown}></slot>
-        </svelte:fragment>
       </DynamicFilters>
     {/key}
-  </svelte:fragment>
+  {/snippet}
 </Filters>
 </div>
 <h2>Props</h2>
 <PropsViewer
   props={[
-    // {
-    //   name: 'type',
-    //   type: '"button" | "submit"',
-    //   description: "HTML type attribute",
-    //   default: "button"
-    // }
+    { name: "filters", type: "Filter[]", description: "List of filters to show and edit.", default: "[]" },
+    { name: "lang", type: "'it' | 'en'", description: "Language of the component text and labels.", default: '"en"' },
+    { name: "mAndDown", type: "boolean", description: "Enables mobile layout mode if true.", default: "false" },
   ]}
-  styleProps={[
-    // {
-    //   name: '--button-max-width',
-    //   type: 'string',
-    //   default: 'undefined',
-    //   description: 'The max width of the outer element'
-    // }
-  ]}
+  styleProps={[]}
 />
 <h2>Slots</h2>
+<SlotsViewer
+  slots={[
+    {
+      name: "customSnippet",
+      description: "Allows a custom input field or UI element for the filter.",
+      properties: [
+        { name: "filter", type: "Filter", description: "The current filter object." },
+        { name: "onChange", type: "(newFilter: Filter) => void", description: "Callback to update the filter value." }
+      ]
+    }
+  ]}
+></SlotsViewer>
 <h2>Events</h2>
+<EventsViewer
+  events={[
+    {
+      name: "onremoveAllFilters",
+      description: "Emitted when the user clicks to remove all filters.",
+    },
+    {
+      name: "onchange",
+      description: "Emitted when a filter is updated.",
+      properties: [
+        {
+          name: "filter",
+          type: "Filter",
+          description: "The updated filter."
+        }
+      ]
+    }
+  ]}
+></EventsViewer>
 
 <style>
   .example {

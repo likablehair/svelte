@@ -2,18 +2,13 @@
   import '../../../css/main.css'
   import './CircularLoader.css'
 
-  let clazz: string = '';
-	export { clazz as class };
-
-  /*
-    Styles
-
-    --circular-loader-width
-    --circular-loader-height
-    --circular-loader-color
-  */
-
-  export let loading = true
+  let { 
+    loading = true,
+    class: clazz = '',
+  }: {
+    loading?: boolean
+    class?: string
+  } = $props() 
 </script>
 
 <svg

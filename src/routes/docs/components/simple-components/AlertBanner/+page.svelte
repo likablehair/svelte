@@ -3,7 +3,6 @@
   import PropsViewer from "../../PropsViewer.svelte";
   import SlotsViewer from "../../SlotsViewer.svelte";
   import EventsViewer from "../../EventsViewer.svelte";
-
   import AlertBanner from "$lib/components/simple/notifiers/AlertBanner.svelte";
 </script>
 
@@ -24,109 +23,71 @@
 <h2>Props</h2>
 <PropsViewer
   props={[
-    {
-      name: 'title',
-      type: 'string',
-      default: "undefined",
-      description: "The title of the banner."
-    }, {
-      name: 'description',
-      type: 'string',
-      default: "undefined",
-      description: "The description of the banner."
-    }, {
-      name: 'disabled',
-      type: 'boolean',
-      default: "true",
-      description: "Whather the banner is disabled."
-    }
+    { name: 'title', type: 'string', description: 'The title text for the alert banner', default: 'undefined' },
+    { name: 'description', type: 'string', description: 'The description text for the alert banner', default: 'undefined' },
+    { name: 'disabled', type: 'boolean', description: 'Whether the alert banner is disabled and non-interactive', default: 'false' },
+    { name: 'class', type: '{ container?: string, border?: string, body?: string }', description: 'Custom CSS classes for the alert banner container, border, and body', default: 'undefined' },
   ]}
   styleProps={[
-    {
-      name: '--alert-banner-color',
-      type: 'string',
-      default: "grey",
-      description: "Banner color."
-    }, {
-      name: '--alert-banner-cursor',
-      type: 'string',
-      default: "pointer",
-      description: "Cursors css property."
-    }, {
-      name: '--alert-banner-border-radius',
-      type: 'string',
-      default: 'null',
-      description: 'Border radius css property.'
-    }, {
-      name: '--alert-banner-padding-left',
-      type: 'string',
-      default: 'null',
-      description: 'Padding left css property.'
-    }, {
-      name: '--alert-banner-padding-right',
-      type: 'string',
-      default: 'null',
-      description: 'Padding right css property.'
-    }, {
-      name: '--alert-banner-padding-top',
-      type: 'string',
-      default: 'null',
-      description: 'Padding top css property.'
-    }, {
-      name: '--alert-banner-padding-bottom',
-      type: 'string',
-      default: 'null',
-      description: 'Padding bottom value.'
-    }, {
-      name: '--alert-banner-border-width',
-      type: 'string',
-      default: 'null',
-      description: 'Border width css property.'
-    }, {
-      name: '--alert-banner-width',
-      type: 'string',
-      default: 'null',
-      description: 'Container width css property.'
-    }
+    { name: '--alert-banner-border-radius', type: 'size', description: 'Border radius for the alert banner', default: '5px' },
+    { name: '--alert-banner-color', type: 'color', description: 'Color for the alert banner', default: 'var(--my-var-blue)' },
+    { name: '--alert-banner-border-width', type: 'size', description: 'Width of the border on the alert banner', default: '.7rem' },
+    { name: '--alert-banner-padding-left', type: 'size', description: 'Padding on the left side of the alert banner', default: '.5rem' },
+    { name: '--alert-banner-padding-top', type: 'size', description: 'Padding on the top of the alert banner', default: '.3rem' },
+    { name: '--alert-banner-padding-bottom', type: 'size', description: 'Padding on the bottom of the alert banner', default: '.3rem' },
+    { name: '--alert-banner-padding-right', type: 'size', description: 'Padding on the right side of the alert banner', default: '.3rem' },
+    { name: '--alert-banner-cursor', type: 'string', description: 'Cursor style for the alert banner', default: 'pointer' },
+    { name: '--alert-banner-width', type: 'size', description: 'Width of the alert banner', default: '100%' }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>
 <SlotsViewer
   slots={[
-    {
-      name: 'content',
-      description: 'The alert content.',
-      default: `{#if !!title}
-  <slot name="title" title={title}>
+    { 
+      name: 'contentSnippet', 
+      description: 'A snippet to customize the content of the alert banner', 
+      default: `
+{#if !!title}
+  {#if !!titleSnippet}
+    {@render titleSnippet({ title })}
+  {:else}
     <div class="title">{title}</div>
-  </slot>
+  {/if}
 {/if}
 {#if !!description}
-  <slot name="description" description={description}>
+  {#if !!descriptionSnippet}
+    {@render descriptionSnippet({ description })}
+  {:else}
     <div class="description">{description}</div>
-  </slot>
-{/if}`,
+  {/if}
+{/if}
+        `, 
       properties: [
-        {
-          name: 'title',
-          type: 'string',
-          description: 'The alert title.'
-        }, {
-          name: 'description',
-          type: 'string',
-          description: 'The alert description.'
-        },
+        { name: 'title', type: 'string', description: 'The title of the alert banner' },
+        { name: 'description', type: 'string', description: 'The description of the alert banner' }
       ]
-    }, {
-      name: 'append',
-      description: 'The alert append space.',
-      default: ``,
+    },
+    { 
+      name: 'titleSnippet', 
+      description: 'A snippet to customize the title of the alert banner', 
+      default: '<div class="title">{title}</div>', 
       properties: [
-        {
-          name: 'disabled',
-          type: 'boolean',
-          description: 'The disabled prop.'
-        }
+        { name: 'title', type: 'string', description: 'The title of the alert banner' }
+      ]
+    },
+    { 
+      name: 'descriptionSnippet', 
+      description: 'A snippet to customize the description of the alert banner', 
+      default: '<div class="description">{description}</div>', 
+      properties: [
+        { name: 'description', type: 'string', description: 'The description of the alert banner' }
+      ]
+    },
+    { 
+      name: 'appendSnippet', 
+      description: 'A snippet to append additional content to the alert banner', 
+      properties: [
+        { name: 'disabled', type: 'boolean', description: 'Whether the additional content should be disabled' }
       ]
     }
   ]}
@@ -134,12 +95,19 @@
 <h2>Events</h2>
 <EventsViewer
   events={[
-    {
-      name: 'click',
-      description: 'Occours when the alert is clicked',
-    }, {
-      name: 'keypress',
-      description: 'Occours when the alert is focused and a key is pressed',
+    { 
+      name: 'onclick', 
+      description: 'Triggered when the alert banner is clicked', 
+      properties: [
+        { name: 'nativeEvent', type: 'MouseEvent', description: 'The native mouse click event' }
+      ]
+    },
+    { 
+      name: 'onkeypress', 
+      description: 'Triggered when a key is pressed while focusing on the alert banner', 
+      properties: [
+        { name: 'nativeEvent', type: 'KeyboardEvent', description: 'The native keyboard event' }
+      ]
     }
   ]}
 ></EventsViewer>

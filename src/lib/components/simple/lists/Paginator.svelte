@@ -1,17 +1,23 @@
 <script lang="ts">
   import "../../../css/main.css";
   import "./Paginator.css";
-  import { createEventDispatcher } from "svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
 
-  let dispatch = createEventDispatcher<{
-    change: {
-      page: number;
-    };
-  }>();
+  interface Props {
+    page?: number;
+    maxPage?: number;
+    onchange?: (event: {
+      detail: {
+        page: number
+      }
+    }) => void
+  }
 
-  export let page: number = 1,
-    maxPage: number | undefined = undefined;
+  let {
+    page = $bindable(1),
+    maxPage = undefined,
+    onchange,
+  }: Props = $props();
 
   function goToPage(p: number) {
     if (p <= 0 || (!!maxPage && p > maxPage)) return;
@@ -43,23 +49,30 @@
   }
 
   function emitChange() {
-    dispatch("change", {
-      page,
-    });
+    if(onchange) {
+      onchange({
+        detail: {
+          page
+        }
+      })
+    }
   }
 
-  $: if (!!maxPage && page > maxPage) page = maxPage;
+  $effect(() => {
+    if (!!maxPage && page > maxPage) 
+      page = maxPage;
+  }) 
 </script>
 
 <div class="paginator-container">
-  <button class="page-button" on:click={hardPrevious}
+  <button class="page-button" onclick={hardPrevious}
     ><Icon name="mdi-chevron-double-left" /></button
   >
-  <button class="page-button" on:click={previousPage}
+  <button class="page-button" onclick={previousPage}
     ><Icon name="mdi-chevron-left" /></button
   >
   {#if page != 1}
-    <button class="page-button" on:click={() => goToPage(page - 1)}
+    <button class="page-button" onclick={() => goToPage(page - 1)}
       >{page - 1}</button
     >
   {/if}
@@ -67,15 +80,15 @@
     {page}
   </div>
   {#if !maxPage || (!!maxPage && page < maxPage)}
-    <button class="page-button" on:click={() => goToPage(page + 1)}
+    <button class="page-button" onclick={() => goToPage(page + 1)}
       >{page + 1}</button
     >
   {/if}
-  <button class="page-button" on:click={nextPage}
+  <button class="page-button" onclick={nextPage}
     ><Icon name="mdi-chevron-right" /></button
   >
   {#if !!maxPage}
-    <button class="page-button" on:click={hardNext}
+    <button class="page-button" onclick={hardNext}
       ><Icon name="mdi-chevron-double-right" /></button
     >
   {/if}

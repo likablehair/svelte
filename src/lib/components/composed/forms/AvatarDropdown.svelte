@@ -1,87 +1,176 @@
-<script lang="ts" context="module">
-  export type AvatarItem = {
+<script lang="ts" module>
+  export type AvatarItem<Data = any> = {
     value: string | number,
     tooltip?: string | number,
     label?: string | number,
     text?: string
     src?: string
     alt?: string
-    data?: any
+    data?: Data
   };
 </script>
 
-<script lang="ts">
+<script lang="ts" generics="Data">
   import lodash from "lodash";
-  import Autocomplete from "../../../components/simple/forms/Autocomplete.svelte";
+  import Autocomplete, { type Item } from "../../../components/simple/forms/Autocomplete.svelte";
   import Icon from '../../simple/media/Icon.svelte'
-  import { createEventDispatcher } from "svelte";
   import Avatar from "$lib/components/simple/media/Avatar.svelte";
   import ToolTip from "../common/ToolTip.svelte";
+  import type { ComponentProps, Snippet } from "svelte";
 
-  let dispatch = createEventDispatcher<{
-    change: {
-      unselect: AvatarItem | undefined;
-      select: AvatarItem | undefined;
-      selection: AvatarItem[];
-    }
-  }>()
+  type AvatarItemData = AvatarItem<Data>
 
-  export let items: AvatarItem[] = [],
-    values: AvatarItem[] = [],
-    multiple: boolean = true,
-    menuOpened: boolean = false,
-    openingId: string | undefined = undefined,
-    width: string | undefined = undefined,
-    minWidth: string | undefined = 'auto',
-    disabled: boolean = false,
-    menuWidth: string | undefined | null = "144px"
+  type AutocompleteData = {
+    tooltip?: string | number,
+    label?: string | number,
+    text?: string
+    src?: string
+    alt?: string
+    data?: Data
+  }
+  type AutocompleteItem = Item<AutocompleteData>
+
+  interface Props {
+    items?: AvatarItemData[];
+    values?: AvatarItemData[];
+    multiple?: boolean;
+    menuOpened?: boolean;
+    openingId?: string;
+    width?: string;
+    minWidth?: string;
+    disabled?: boolean;
+    menuWidth?: string | null;
+    onchange?: (event: {
+      detail: {
+        unselect: AvatarItemData | undefined;
+        select: AvatarItemData | undefined;
+        selection: AvatarItemData[];
+      }
+    }) => void
+    labelSnippet?: Snippet<[{
+      values: AvatarItemData[]
+      items: AvatarItemData[]
+      handleCloseClick: typeof handleCloseClick
+    }]>
+    noValuesSnippet?: Snippet<[{
+      values: AvatarItemData[]
+      items: AvatarItemData[]
+      handleCloseClick: typeof handleCloseClick
+    }]>
+    itemLabelSnippet?: ComponentProps<typeof Autocomplete<AutocompleteData>>['itemLabelSnippet']
+  }
+
+  let {
+    items = [],
+    values = $bindable([]),
+    multiple = true,
+    menuOpened = $bindable(false),
+    openingId = $bindable("autocomplete-menu"),
+    width,
+    minWidth = 'auto',
+    disabled = false,
+    menuWidth = "144px",
+    onchange: onchangeInternal,
+    labelSnippet,
+    noValuesSnippet,
+    itemLabelSnippet: itemLabelInternalSnippet,
+  }: Props = $props();
 
   function handleCloseClick(params: { index: number }) {
     let unselected = lodash.cloneDeep(values[params.index])
     values.splice(params.index, 1)
     values = [...values]
 
-    dispatch('change', {
-      unselect: unselected,
-      select: undefined,
-      selection: values
-    })
+    if(onchangeInternal){ 
+      onchangeInternal({
+        detail: {
+          unselect: unselected,
+          select: undefined,
+          selection: values
+        }
+      })
+    }
   }
 
-  $: autocompleteItems = items.map((e) => {
-    return {
-      ...e,
+  function onchange(event: Parameters<NonNullable<ComponentProps<typeof Autocomplete<AutocompleteData>>['onchange']>>[0]) {
+    values = event.detail.selection.map((e) => ({
+      value: e.value,
+      tooltip: e.data?.tooltip,
+      label: e.data?.label,
+      text: e.data?.text,
+      src: e.data?.src,
+      alt: e.data?.alt,
+      data: e.data?.data,
+    }))
+
+    if(onchangeInternal) {
+      onchangeInternal({
+        detail: {
+          unselect: !!event.detail.unselect ? {
+            ...event.detail.unselect.data,
+            value: event.detail.unselect.value,
+          } : undefined,
+          select: !!event.detail.select ? {
+            value: event.detail.select.value,
+            ...event.detail.select.data
+          } : undefined,
+          selection: values
+        }
+      })
+    }
+  }
+
+  let autocompleteValues: AutocompleteItem[] = $state([])
+
+  $effect(() => {
+    autocompleteValues = values.map((e) => ({
+      value: e.value,
       label: e.label || e.text,
       data: {
-        ...(e.data || {}),
+        data: e.data,
+        text: e.text,
+        src: e.src,
+        alt: e.alt,
+        label: e.label,
+        tooltip: e.tooltip
+      }
+    }))
+  })
+
+  let autocompleteItems: AutocompleteItem[] = $derived(items.map((e) => {
+    return {
+      value: e.value,
+      label: e.label || e.text,
+      data: {
+        data: e.data,
         text: e.text,
         src: e.src,
         alt: e.alt,
       }
     }
-  })
+  }))
 
   let tooltipsActivator: HTMLElement[] = []
 </script>
 
 <Autocomplete
-  bind:items={autocompleteItems}
-  bind:values
-  bind:multiple
+  items={autocompleteItems}
+  bind:values={autocompleteValues}
+  {multiple}
   searchFunction={() => true}
-  on:change
+  {onchange}
   bind:menuOpened
   bind:openingId
-  bind:width
-  bind:minWidth
-  bind:disabled
-  menuWidth={menuWidth}
+  {width}
+  {minWidth}
+  {disabled}
+  {menuWidth}
 >
-  <svelte:fragment slot="selection-container" let:openMenu let:handleKeyDown>
+  {#snippet selectionContainerSnippet({ handleKeyDown, openMenu })}
     <button
       class="unstyled-button"
-      on:click={openMenu}
-      on:keydown={(event) => {
+      onclick={openMenu}
+      onkeydown={(event) => {
         handleKeyDown(event)
         if(event.key == 'ArrowDown' || event.key == 'ArrowUp') {
           event.stopPropagation()
@@ -89,12 +178,9 @@
         }
       }}
     >
-      <slot 
-        name="label" 
-        {values} 
-        {items}
-        {handleCloseClick}
-      >
+      {#if labelSnippet}
+        {@render labelSnippet({ values, items, handleCloseClick })}
+      {:else}
         {#if values.length > 0}
           <div class="overlapped-avatars">
             {#each values as avatar, i}
@@ -111,10 +197,11 @@
                   --avatar-default-border="2px solid rgb(var(--global-color-background-100))"
                 ></Avatar>
                 <div 
-                  on:click|stopPropagation={() => {
+                  onclick={(e) => {
+                    e.stopPropagation()
                     handleCloseClick({ index: i })
                   }}
-                  on:keypress={(e) => {
+                  onkeypress={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       handleCloseClick({ index: i })
                     }
@@ -129,31 +216,30 @@
             {/each}
           </div>
         {:else}
-          <slot 
-            name="no-values"
-            {values} 
-            {items}
-            {handleCloseClick}
-          >
+          {#if noValuesSnippet}
+            {@render noValuesSnippet({ values, items, handleCloseClick})}
+          {:else}
             <Icon name="mdi-account-plus"></Icon>
-          </slot>
+          {/if}
         {/if}
-      </slot>
+      {/if}
     </button>
-  </svelte:fragment>
-  <svelte:fragment slot="item-label" let:item >
-    <slot name="item-label" {item}>
+  {/snippet}
+  {#snippet itemLabelSnippet({ item })}
+    {#if itemLabelInternalSnippet}
+      {@render itemLabelInternalSnippet({ item })}
+    {:else}
       <div class="item-label-container">
         <Avatar 
-          text={item.data.text}
-          alt={item.data.alt}
-          src={item.data.src}
+          text={item.data!.text}
+          alt={item.data!.alt}
+          src={item.data!.src}
           --avatar-default-border="2px solid rgb(var(--global-color-background-100))"
         ></Avatar>
         {item.label}
       </div>
-    </slot>
-  </svelte:fragment>
+    {/if}
+  {/snippet}
 </Autocomplete>
 
 <style>

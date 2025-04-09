@@ -2,80 +2,91 @@
   import '../../../css/main.css'
   import './Button.css'
 
-  let clazz: string = '';
-	export { clazz as class };
+  interface Props extends Omit<HTMLButtonAttributes, 
+    'onclick' | 'onkeypress' | 'onkeydown' | 'children'> {    
+    buttonType?: "default" | "text" | "icon";
+    type?: "button" | "submit";
+    loading?: boolean;
+    icon?: string;
+    tabindex?: number | null;
+    disabled?: boolean;
+    buttonElement?: HTMLElement | undefined;
+    class?: string
+    onclick?: (event: {
+      detail: {
+        nativeEvent: MouseEvent
+      }
+    }) => void
+    onkeypress?: (event: {
+      detail: {
+        nativeEvent: KeyboardEvent
+      }
+    }) => void
+    onkeydown?: (event: {
+      detail: {
+        nativeEvent: KeyboardEvent
+      }
+    }) => void
+    children?: Snippet<[]>
+    appendSnippet?: Snippet<[]>
+  }
 
-  /*
-    Styles
-
-    --button-width
-    --button-max-width
-    --button-min-width
-    --button-height
-    --button-max-height
-    --button-min-height
-    --button-text-align
-    --button-cursor
-    --button-padding
-    --button-font-size
-    --button-font-weight
-    --button-color
-    --button-display
-    --button-justify-content
-    --button-align-items
-    --button-border
-    --button-border-radius
-    --button-background-color
-    --button-hover-background-color
-    --button-box-shadow
-  */
-
-  export let buttonType: "default" | "text" | "icon" = "default",
-    type: "button" | "submit" = "button",
+  let {
+    buttonType = "default",
+    type = "button",
     loading = false,
-    icon: string | undefined = undefined,
-    tabindex: number | null = null,
+    icon = undefined,
+    tabindex = null,
     disabled = false,
-    buttonElement: HTMLElement | undefined = undefined
-
-  import { createEventDispatcher } from "svelte";
-  const dispatch = createEventDispatcher<{
-    click: {
-      nativeEvent: MouseEvent;
-    };
-    keypress: {
-      nativeEvent: KeyboardEvent;
-    };
-    keydown: {
-      nativeEvent: KeyboardEvent;
-    };
-  }>();
+    buttonElement = $bindable(undefined),
+    class: clazz = '',
+    onclick,
+    onkeydown,
+    onkeypress,
+    appendSnippet,
+    children,
+    ...rest
+  }: Props = $props();
 
   function handleClick(event: MouseEvent) {
     if (disabled) return;
-    dispatch("click", {
-      nativeEvent: event,
-    });
+    if(onclick){
+      onclick({
+        detail: {
+          nativeEvent: event,
+        }
+      })
+    }
   }
 
   function handleKeyPress(event: KeyboardEvent) {
     if (disabled) return;
-    dispatch("keypress", {
-      nativeEvent: event,
-    });
+    if(onkeypress){
+      onkeypress({
+        detail: {
+          nativeEvent: event,
+        }
+      })
+    }
   }
 
   function handleKeyDown(event: KeyboardEvent) {
     if (disabled) return;
-    dispatch("keydown", {
-      nativeEvent: event,
-    });
+    if(onkeydown){
+      onkeydown({
+        detail: {
+          nativeEvent: event,
+        }
+      })
+    }
   }
 
-  $: position = $$slots.append ? "relative" : undefined;
+  let position = $derived(appendSnippet ? "relative" : undefined)
 
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import CircularLoader from "$lib/components/simple/loaders/CircularLoader.svelte";
+  import type { Snippet } from 'svelte';
+  import type { HTMLButtonAttributes } from 'svelte/elements';
 </script>
 
 <button
@@ -85,13 +96,13 @@
   class:button-text={buttonType === "text"}
   class:button-icon={buttonType === "icon"}
   class:disabled={disabled}
-  on:click={handleClick}
-  on:keypress={handleKeyPress}
-  on:keydown={handleKeyDown}
+  onclick={handleClick}
+  onkeypress={handleKeyPress}
+  onkeydown={handleKeyDown}
   tabindex={tabindex}
   class="button no-select {clazz || ''}"
   bind:this={buttonElement}
-  {...$$restProps}
+  {...rest}
 >
   {#if loading}
     <div
@@ -107,11 +118,11 @@
     {#if !!icon}
       <Icon name={icon} />
     {:else}
-      <slot />
+      {@render children?.()}
     {/if}
-    {#if $$slots.append}
+    {#if appendSnippet}
       <span class="append-item">
-        <slot name="append" />
+        {@render appendSnippet()}
       </span>
     {/if}
   {/if}

@@ -9,8 +9,9 @@ const db = await create({
     title: 'string',
     description: 'string',
     status: 'string',
+    type: 'string',
     url: 'string'
-  },
+  }
 })
 
 await insertMultiple(db, componentsDatabase)

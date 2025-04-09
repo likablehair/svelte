@@ -4,6 +4,8 @@
   import ProgressBar from "$lib/components/simple/progress/ProgressBar.svelte";
   import HorizontalStackedProgress, { type ProgressItem } from "$lib/components/composed/progress/HorizontalStackedProgress.svelte";
   import { onMount } from "svelte";
+    import SlotsViewer from "../../SlotsViewer.svelte";
+    import EventsViewer from "../../EventsViewer.svelte";
 
   let progress: ProgressItem[] = [
     { label: 'Prova 1', color: 'red', value: Math.round(Math.random() * 10)},
@@ -40,24 +42,28 @@
 <h2>Props</h2>
 <PropsViewer
   props={[
-    // {
-    //   name: 'type',
-    //   type: '"button" | "submit"',
-    //   description: "HTML type attribute",
-    //   default: "button"
-    // }
+    { name: 'value', type: 'number', description: 'Current value of the progress bar', default: '0' },
+    { name: 'total', type: 'number', description: 'Total value for the progress bar', default: '100' },
+    { name: 'valueTooltip', type: 'boolean', description: 'Toggle the visibility of the tooltip', default: 'false' },
+    { name: 'valueTooltipLabel', type: 'string | number', description: 'Custom label for the tooltip', default: 'undefined' }
   ]}
   styleProps={[
-    // {
-    //   name: '--button-max-width',
-    //   type: 'string',
-    //   default: 'undefined',
-    //   description: 'The max width of the outer element'
-    // }
+    { name: '--progress-bar-background-color', type: 'color', description: 'Background color of the progress bar', default: 'rgb(var(--global-color-background-300), .3)' },
+    { name: '--progress-bar-highlight-color', type: 'color', description: 'Highlight color of the progress bar', default: 'rgb(var(--global-color-primary-500))' },
+    { name: '--progress-bar-height', type: 'size', description: 'Height of the progress bar', default: '5px' },
+    { name: '--progress-bar-width', type: 'size', description: 'Width of the progress bar', default: '100%' },
+    { name: '--progress-bar-border-radius', type: 'size', description: 'Border radius for the progress bar', default: '2px' },
+    { name: '--progress-bar-tooltip-background-color', type: 'color', description: 'Background color of the tooltip', default: 'rgb(var(--global-color-background-100))' },
+    { name: '--progress-bar-tooltip-border-radius', type: 'size', description: 'Border radius of the tooltip', default: '8px' }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>
+<SlotsViewer
+  slots={[
+  ]}
+></SlotsViewer>
 <h2>Events</h2>
+<EventsViewer></EventsViewer>
 
 <style>
   .example {

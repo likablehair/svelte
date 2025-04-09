@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
 	import './Select.css'
 	export type Option = {
 		icon?: string
@@ -6,28 +6,42 @@
 		text: string
 	}
 </script>
-
 <script lang="ts">
-    import { Icon } from "$lib";
+	import { Icon } from "$lib";
+	import type { HTMLOptionAttributes, HTMLSelectAttributes } from 'svelte/elements';
 
+	interface Props extends HTMLSelectAttributes{
+		options: Option[],
+		name?: string,
+		value?: string | number,
+		disabled?: boolean,
+		placeholder?: string,
+		optionAttributes?: HTMLOptionAttributes
+	}
 
-	export let options: Option[],
-		name: string | undefined = undefined,
-		value: string | number | undefined = undefined,
-		disabled: boolean = false,
-		placeholder: string | undefined = undefined
+	let {
+		options,
+		name = undefined,
+		value = $bindable(undefined),
+		disabled = false,
+		placeholder = undefined,
+		onchange,
+		optionAttributes,
+		...rest
+	}: Props = $props();
 </script>
 
 <select
 	{name}
 	bind:value
-	on:change
+	{onchange}
 	{placeholder}
 	class="select"
 	{disabled}
+	{...rest}
 >
 	{#each options as option}
-		<option value={option.value} class="option">
+		<option value={option.value} class="option" {...optionAttributes}>
 			{#if !!option.icon}
 				<Icon name={option.icon} />
 			{/if}

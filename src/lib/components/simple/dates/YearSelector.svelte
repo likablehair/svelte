@@ -2,23 +2,45 @@
   import '../../../css/main.css'
   import './YearSelector.css'
   import { scrollAtCenter } from "$lib/components/simple/common/scroller";
-  import { createEventDispatcher, onMount } from "svelte";
+  import { onMount, type Snippet } from "svelte";
 
-  /*
-    Styles
+  interface Props {
+    selectedYear?: number;
+    selectableYears?: number[];
+    disabled?: boolean;
+    
+    class?: string
+    onclick?: (event: {
+      detail: {
+        year: number
+      }
+    }) => void
+    onchange?: (event: {
+      detail: {
+        year: number | undefined
+      }
+    }) => void
+    selectorSnippet?: Snippet<[{
+      year: number,
+      handleYearClick: (year: number) => void
+    }]>
+    labelSnippet?: Snippet<[{
+      year: number,
+    }]>
+  }
 
-    --year-selector-height
-    --year-selector-width
-  */
-
-  let clazz: string | undefined = undefined;
-	export { clazz as class };
-
-  export let selectedYear: number | undefined = undefined,
-    selectableYears: number[] = [...Array(150).keys()].map(
+  let {
+    selectedYear = $bindable(undefined),
+    selectableYears = [...Array(150).keys()].map(
       (i) => i + (new Date().getFullYear() - 75)
     ),
-    disabled: boolean = false
+    disabled = false,
+    class: clazz = '',
+    onchange,
+    onclick,
+    selectorSnippet,
+    labelSnippet,
+  }: Props = $props();
 
   let container: HTMLElement,
     targetButtons: { [k: string]: HTMLElement } = {};
@@ -28,15 +50,6 @@
       scrollAtCenter(container, targetButtons[selectedYear], "auto");
   });
 
-  const dispatch = createEventDispatcher<{
-    click: {
-      year: number;
-    };
-    change: {
-      year: number | undefined
-    }
-  }>();
-
   function handleYearClick(year: number) {
     if(selectedYear === year) {
       selectedYear = undefined
@@ -45,19 +58,30 @@
       scrollAtCenter(container, targetButtons[selectedYear], "smooth");
     }
 
-    dispatch("click", {
-      year,
-    })
-    dispatch("change", {
-      year: selectedYear
-    })
+    if(onclick){
+      onclick({
+        detail: {
+          year
+        }
+      })
+    }
+
+    if(onchange){
+      onchange({
+        detail: {
+          year: selectedYear
+        }
+      })
+    }
   }
   import Button from "$lib/components/simple/buttons/Button.svelte";
 </script>
 
 <div bind:this={container} class="selector-container {clazz || ''}">
   {#each selectableYears as year}
-    <slot name="selector" {year} {handleYearClick}>
+    {#if selectorSnippet}
+      {@render selectorSnippet({ year, handleYearClick })}
+    {:else}
       <div bind:this={targetButtons[year]} style:width="100%">
         <Button
           --button-background-color={year == selectedYear ? "rgb(var(--global-color-primary-500))" : "trasparent"}
@@ -69,10 +93,12 @@
           --button-width="var(--year-selector-width, var(--year-selector-default-width))"
           --button-padding=".5rem 0px"
           buttonType="text"
-          on:click={() => handleYearClick(year)}
+          onclick={() => handleYearClick(year)}
           disabled={disabled}
         >
-          <slot name="label" {year}>
+          {#if labelSnippet}
+            {@render labelSnippet({ year })}
+          {:else}
             <div
               style:transition="all .1s"
               style:font-weight={year == selectedYear ? "700" : "400"}
@@ -80,10 +106,10 @@
             >
               {year}
             </div>
-          </slot>
+          {/if}
         </Button>
       </div>
-    </slot>
+    {/if}
   {/each}
 </div>
 

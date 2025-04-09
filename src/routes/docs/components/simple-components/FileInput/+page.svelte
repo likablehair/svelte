@@ -15,179 +15,36 @@
 <h2>Props</h2>
 <PropsViewer
   props={[
-    {
-      name: "files",
-      type: "File[] | undefined",
-      default: "undefined",
-      description: "The list of files to upload.",
-    },
-    {
-      name: "disabled",
-      type: "boolean",
-      default: "false",
-      description: "Whether the component is disabled.",
-    },
-    {
-      name: "rounded",
-      type: "boolean",
-      default: "true",
-      description: "Rounded corners or not.",
-    },
-    {
-      name: "persistOverUpload",
-      type: "boolean",
-      default: "true",
-      description: "Gabbo aiutami.",
-    },
-    {
-      name: "disabled",
-      type: "boolean",
-      default: "false",
-      description: "If set to false, the input will not accept new files."
-    },
-    {
-      name: "maxFiles",
-      type: "number | undefined",
-      default: "undefined",
-      description: "If set it limits the number of files that can be uploaded. Exceding files will be ignored."
-    }
+    { name: "files", type: "File[]", description: "The selected files", default: "undefined" },
+    { name: "placeholder", type: "string", description: "Placeholder text for the input", default: "undefined" },
+    { name: "persistOverUpload", type: "boolean", description: "Whether new files are added to the existing ones", default: "true" },
+    { name: "disabled", type: "boolean", description: "Disables the file input", default: "false" },
+    { name: "maxFiles", type: "number", description: "Maximum number of files that can be selected", default: "undefined" },
+    { name: "class", type: "string", description: "Additional CSS classes", default: "''" }
   ]}
   styleProps={[
-    {
-      name: "--file-input-color",
-      type: "string",
-      default: "inherit",
-      description: "color css property.",
-    },
-    {
-      name: "--file-input-background-color",
-      type: "string",
-      default: "rgb(244 244 245/1)",
-      description: "background-color css property.",
-    },
-    {
-      name: "--file-input-width",
-      type: "string",
-      default: "fit-content",
-      description: "width css property.",
-    },
-    {
-      name: "--file-input-height",
-      type: "string",
-      default: "auto",
-      description: "height css property.",
-    },
+    { name: "--file-input-height", type: "size", description: "Height of the file input", default: "64px" },
+    { name: "--file-input-width", type: "size", description: "Width of the file input", default: "" },
+    { name: "--file-input-background-color", type: "color", description: "Background color of the file input", default: "rgb(var(--global-color-background-300))" },
+    { name: "--file-input-color", type: "color", description: "Text color inside the file input", default: "rgb(var(--global-color-contrast-900))" },
+    { name: "--file-input-focus-shadow", type: "shadow", description: "Shadow effect on focus", default: "inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 #0000, 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)" },
+    { name: "--file-input-border-radius", type: "size", description: "Border radius of the file input", default: "5px" },
+    { name: "--file-input-active-background-color", type: "color", description: "Background color when active", default: "rgb(var(--global-color-primary-700))" }
   ]}
 />
 
 <h2>Slots</h2>
 <SlotsViewer
   slots={[
-    {
-      name: "body",
-      description: "Drop area",
-      properties: [
-        {
-          name: "dropAreaActive",
-          type: "boolean",
-          description: "State of activity of the drop area.",
-        },
-      ],
-    },
+    { name: "bodySnippet", description: "Custom content for the file drop area", default: "<span> { placeholder || 'Drop file here or click to upload'}</span>", properties: [{ name: "active", type: "boolean", description: "Indicates if the drop area is active" }] }
   ]}
 />
 <h2>Events</h2>
 <EventsViewer
   events={[
-    {
-      name: "click",
-      description: "Occurs when an item is being clicked over the target area",
-      properties: [
-        {
-          name: "NativeEvent",
-          type: "ClickEvent",
-          description: "The native event caught by the handler.",
-        },
-      ],
-    },
-    {
-      name: "keypress",
-      description: "Occurs when an key is being pressed",
-      properties: [
-        {
-          name: "NativeEvent",
-          type: "KeyEvent",
-          description: "The native event caught by the handler.",
-        },
-      ],
-    },
-    {
-      name: "dragover",
-      description: "Occurs when an item is being dragged over the target area",
-      properties: [
-        {
-          name: "NativeEvent",
-          type: "DragEvent",
-          description: "The native event caught by the handler.",
-        },
-      ],
-    },
-    {
-      name: "dragleave",
-      description:
-        "Occurs when an item is being dragged out of the target area",
-      properties: [
-        {
-          name: "NativeEvent",
-          type: "DragEvent",
-          description: "The native event caught by the handler.",
-        },
-      ],
-    },
-    {
-      name: "dragend",
-      description: "Occurs when the user has finished dragging an item",
-      properties: [
-        {
-          name: "NativeEvent",
-          type: "DragEvent",
-          description: "The native event caught by the handler.",
-        },
-      ],
-    },
-    {
-      name: "drop",
-      description: "Occurs when an item is dropped on the target area",
-      properties: [
-        {
-          name: "NativeEvent",
-          type: "DragEvent",
-          description: "The native event caught by the handler.",
-        },
-      ],
-    },
-    {
-      name: "mouseenter",
-      description: "Occurs when the mouse pointer enters the target area",
-      properties: [
-        {
-          name: "NativeEvent",
-          type: "MouseEvent",
-          description: "The native event caught by the handler.",
-        },
-      ],
-    },
-    {
-      name: "mouseleave",
-      description: "Occurs when the mouse pointer leaves the target area",
-      properties: [
-        {
-          name: "NativeEvent",
-          type: "MouseEvent",
-          description: "The native event caught by the handler.",
-        },
-      ],
-    },
+    { name: "onfileDrop", description: "Triggered when files are dropped", properties: [{ name: "nativeEvent", type: "DragEvent", description: "The native drag event" }, { name: "files", type: "File[]", description: "Dropped files" }] },
+    { name: "onfileSelect", description: "Triggered when files are selected via the file input", properties: [{ name: "nativeEvent", type: "Event", description: "The native input event" }, { name: "files", type: "File[]", description: "Selected files" }] },
+    { name: "onchange", description: "Triggered when the file selection changes" }
   ]}
 />
 

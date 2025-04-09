@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="ts" generics="Item extends {[key: string]: any}">
   import {
     Checkbox,
     Chip,
@@ -15,9 +15,10 @@
     type PaginatedTable
   } from "$lib";
   import { DateTime } from "luxon";
-  import { createEventDispatcher, onMount, tick, type ComponentProps } from "svelte";
+  import { onMount, tick, type ComponentProps, type Snippet } from "svelte";
   import { quintOut } from "svelte/easing";
   import { crossfade, fade } from "svelte/transition";
+  import { type Item as ItemAutocomplete } from "$lib/components/simple/forms/Autocomplete.svelte"
   import Filters from "../search/Filters.svelte";
   import ConfirmOrCancelButtons from "../forms/ConfirmOrCancelButtons.svelte";
   import { flip } from "svelte/animate";
@@ -36,18 +37,20 @@
   import type { QuickFilter } from "$lib/utils/filters/quickFilters";
   import Switch from "$lib/components/simple/forms/Switch.svelte";
   import CircularLoader from "$lib/components/simple/loaders/CircularLoader.svelte";
+  import type { UIEventHandler } from "svelte/elements";
+  import NoData from "$lib/components/simple/common/NoData.svelte";
 
   onMount(() => {
     updateHeaderHeight();
     window.addEventListener('resize', updateHeaderHeight);
-    tableContainer.addEventListener("scroll", setReachedBottomOrTop);
+    tableContainer?.addEventListener("scroll", setReachedBottomOrTop);
     return () => {
       window.removeEventListener('resize', updateHeaderHeight);
-      tableContainer.removeEventListener("scroll", setReachedBottomOrTop);
+      tableContainer?.removeEventListener("scroll", setReachedBottomOrTop);
     }
   });
 
-  let mainHeader: Element
+  let mainHeader: Element | undefined = $state()
 
   function updateHeaderHeight() {
     if (mainHeader) {
@@ -57,25 +60,31 @@
   }
 
   function setReachedBottomOrTop(){
-    reachedBottom = tableContainer.scrollHeight - tableContainer.scrollTop === tableContainer.clientHeight
-    reachedTop = tableContainer.scrollTop === 0
+    if(tableContainer) {
+      reachedBottom = tableContainer.scrollHeight - tableContainer.scrollTop === tableContainer.clientHeight
+      reachedTop = tableContainer.scrollTop === 0
+    }
   }
 
-  $: if(reachedBottom && rows.length < totalRows) {
-    setTimeout(() => {
-      if(reachedBottom) {
-        handleLoadForward()
-      }
-    }, 30)
-  }
+  $effect(() => {
+    if(reachedBottom && rows.length < totalRows) {
+      setTimeout(() => {
+        if(reachedBottom) {
+          handleLoadForward()
+        }
+      }, 30)
+    }
+  })
 
-  $: if(reachedTop && currentSectionNumber > 0) {
-    setTimeout(() => {
-      if(reachedTop) {
-        handleLoadBackward()
-      }
-    }, 30)
-  }
+  $effect(() => {
+    if(reachedTop && currentSectionNumber > 0) {
+      setTimeout(() => {
+        if(reachedTop) {
+          handleLoadBackward()
+        }
+      }, 30)
+    }
+  })
   
   const [send, receive] = crossfade({
     duration: 500,
@@ -94,15 +103,14 @@
     },
   });
 
-  type Item = {
-    [key: string]: any;
+  type RowItem = Item & {
     disableEdit?: boolean,
     rowDisableBackgroundColor?: string
   };
 
   type Row = {
-    item: Item;
-    subItems: Item[];
+    item: RowItem;
+    subItems: RowItem[];
   };
 
   type MenuStringType = {
@@ -152,135 +160,283 @@
     info?: string;
   };
 
-  type Headers = NonNullable<ComponentProps<PaginatedTable>["headers"]>;
+  type Headers = NonNullable<ComponentProps<typeof PaginatedTable>["headers"]>;
   type Header = Headers[number] & {
     cellEditorInfo?: CellEditorInfo;
     info?: string;
   };
   type HeaderType = Header["type"];
 
-  let clazz: {
-    container?: string;
-    header?: string;
-    row?: string;
-    cell?: string;
-  } = {};
-  export { clazz as class };
-
-  const dispatch = createEventDispatcher<{
-    sort: {
-      sortedBy: string | undefined;
-      sortDirection: string;
-    };
-    rowClick: {
-      item: Item;
-    };
-    cellClick: {
-      item: Item;
-    };
-    saveCellEdit: {
-      item: any;
-    };
-    saveHeadersToShow: {
-      headersToShow: {
-        id: string;
-        name: string;
-      }[];
-    };
-    filtersChange: {
-      builder: FilterBuilder;
-    };
-    fetchData: {};
-    removeFilter: {filter: Filter}
-    removeAllFilters: {}
-    removeCustomQuickFilter: {
-      quickFilter: QuickFilter
+  interface Props {
+    headers?: Header[];
+    headersToShowInTable?: Header[];
+    subHeaders?: Header[];
+    customizeHeaders?: boolean;
+    rows?: Row[];
+    sortedBy?: string;
+    sortDirection?: "asc" | "desc";
+    cellEdit?: boolean;
+    noItemsText?: string;
+    showSelect?: boolean;
+    showSelectContainer?: boolean;
+    selectMode?: "single" | "multiple";
+    selectedItems?: RowItem[];
+    showExpand?: boolean;
+    loading?: boolean;
+    disabled?: boolean;
+    filters?: ComponentProps<typeof Filters>["filters"];
+    searchBarColumns?: string[];
+    searchBarVisible?: boolean;
+    searchBarPlaceholder?: string;
+    filtersVisible?: boolean;
+    quickFiltersVisible?: boolean;
+    lang?: "it" | "en";
+    editFilterMode?: "one-edit" | "multi-edit";
+    showActiveFilters?: boolean;
+    quickFilters?: QuickFilter[];
+    actionsForSelectedItems?: Action[];
+    totalRows?: number;
+    searchText?: string;
+    renderedRowsNumber?: number;
+    sectionRowsNumber?: number;
+    sectionThreshold?: number;
+    backwardThresholdPixel?: number;
+    forwardThresholdPixel?: number;
+    uniqueKey?: keyof RowItem;
+    numberOfResultsVisible?: boolean;
+    endLineVisible?: boolean;
+    class?: {
+      container?: string;
+      header?: string;
+      row?: string;
+      cell?: string;
     }
-    applyCustomQuickFilter: { 
-      quickFilter: QuickFilter
-      setQuickFilterValue: (quickFilter: QuickFilter, value?: any) => void
-    }
-  }>();
+    onsort?: (event: {
+      detail: {
+        sortedBy: string | undefined;
+        sortDirection: string;
+      }
+    }) => void
+    onrowClick?: (event: {
+      detail: {
+        item: RowItem;
+      }
+    }) => void
+    oncellClick?: (event: {
+      detail: {
+        item: RowItem;
+      }
+    }) => void
+    onsaveCellEdit?: (event: {
+      detail: {
+        item: any;
+      }
+    }) => void
+    onsaveHeadersToShow?: (event: {
+      detail: {
+        headersToShow: {
+          id: string;
+          name: string;
+        }[];
+      }
+    }) => void
+    onfiltersChange?: (event: {
+      detail: {
+        builder: FilterBuilder;
+      }
+    }) => void
+    onfetchData?: () => void;
+    onremoveFilter?: (event: {
+      detail: {
+        filter: Filter
+      }
+    }) => void
+    onremoveAllFilters?: () => void;
+    onremoveCustomQuickFilter?: (event: {
+      detail: {
+        quickFilter: QuickFilter
+      }
+    }) => void 
+    onapplyCustomQuickFilter?: (event: {
+      detail: {
+        quickFilter: QuickFilter
+        setQuickFilterValue: (quickFilter: QuickFilter, value?: any) => void
+      }
+    }) => void
+    searchBarSnippet?: Snippet<[{
+      handleSearchChange: typeof handleSearchChange
+    }]>
+    filterAppendSnippet?: ComponentProps<typeof Filters>['appendSnippet']
+    customFilterChipSnippet?: ComponentProps<typeof Filters>['customChipSnippet']
+    customFilterSnippet?: Snippet<[{
+      filter: Filter | undefined,
+      updateMultiFilterValues: Parameters<NonNullable<ComponentProps<typeof Filters>['contentSnippet']>>[0]['updateMultiFilterValues']
+    }]>
+    onscroll?: UIEventHandler<HTMLDivElement>
+    selectionSnippet?: ComponentProps<typeof Autocomplete>['selectionSnippet']
+    itemLabelSnippet?: ComponentProps<typeof Autocomplete>['itemLabelSnippet']
+    chipLabelSnippet?: Snippet<[{
+      selection: ItemAutocomplete
+    }]>
+    headerSnippet?: Snippet<[{
+      header: Header
+    }]>
+    headerLabelSnippet?: Snippet<[{
+      header: Header
+    }]>
+    rowAppendSnippet?: Snippet<[{
+      index: number,
+      row?: Row
+    }]>
+    rowActionsSnippet?: Snippet<[{
+      index: number,
+      row?: Row
+    }]>
+    customRowSnippet?: Snippet<[{
+      index: number,
+      columnIndex: number,
+      header: Header,
+      row: Row
+    }]>
+    subHeaderSnippet?: Snippet<[{
+      subHeader: Header
+    }]>
+    subHeaderLabelSnippet?: Snippet<[{
+      subHeader: Header
+    }]>
+    subRowAppendSnippet?: Snippet<[{
+      index: number,
+      row?: RowItem
+    }]>
+    subRowActionsSnippet?: Snippet<[{
+      index: number,
+      row?: RowItem
+    }]>
+    customSubRowSnippet?: Snippet<[{
+      index: number,
+      columnIndex: number,
+      header: Header,
+      row: RowItem
+    }]>
+    customQuickFilterSnippet?: Snippet<[{
+      quickFilter: QuickFilter,
+      setQuickFilterMissingValue: typeof setQuickFilterMissingValue
+    }]>
+    appendSnippet?: Snippet<[]>
+  }
 
-  export let headers: Header[] = [],
-    headersToShowInTable: Header[] = headers,
-    subHeaders: Header[] = [],
-    customizeHeaders: boolean = false,
-    rows: Row[] = [],
-    sortedBy: string | undefined = undefined,
-    sortDirection: "asc" | "desc" = "asc",
-    cellEdit: boolean = false,
-    noItemsText: string = "No items to show",
-    showSelect: boolean = false,
-    showSelectContainer: boolean = true,
-    selectMode: "single" | "multiple" = "single",
-    selectedItems: Item[] = [],
-    showExpand: boolean = false,
-    loading: boolean = false,
-    disabled: boolean = false,
-    filters: ComponentProps<Filters>["filters"] = [],
-    searchBarColumns: string[] | undefined = undefined,
-    searchBarVisible: boolean = false,
-    searchBarPlaceholder: string =
-      "Type to search for identification code, description and MRN...",
-    filtersVisible: boolean = false,
-    quickFiltersVisible: boolean = false,
-    lang: "it" | "en" = "en",
-    editFilterMode: "one-edit" | "multi-edit" = "one-edit",
-    showActiveFilters: boolean = true,
-    quickFilters: QuickFilter[] = [],
-    actionsForSelectedItems: Action[] = [],
-    totalRows: number = rows.length,
-    searchText: string | undefined = undefined,
+  let {
+    headers = [],
+    headersToShowInTable = headers,
+    subHeaders = [],
+    customizeHeaders = false,
+    rows = [],
+    sortedBy = $bindable(),
+    sortDirection = $bindable("asc"),
+    cellEdit = false,
+    lang = "en",
+    noItemsText = lang == 'en' ? "No items to show" : 'Nessun elemento da visualizzare',
+    showSelect = false,
+    showSelectContainer = true,
+    selectMode = "single",
+    selectedItems = $bindable([]),
+    showExpand = false,
+    loading = false,
+    disabled = false,
+    filters = $bindable([]),
+    searchBarColumns,
+    searchBarVisible = false,
+    searchBarPlaceholder = lang == 'en' ? "Type to search..." : "Scrivi per cercare...",
+    filtersVisible = false,
+    quickFiltersVisible = false,
+    editFilterMode = "one-edit",
+    showActiveFilters = true,
+    quickFilters = [],
+    actionsForSelectedItems = [],
+    totalRows = rows.length,
+    searchText = $bindable(),
     renderedRowsNumber = 100,
     sectionRowsNumber = 20,
     sectionThreshold = 2,
     backwardThresholdPixel = 100,
     forwardThresholdPixel = 100,
-    uniqueKey: keyof Item = 'id',
-    numberOfResultsVisible: boolean = false,
-    endLineVisible: boolean = false
+    uniqueKey = 'id',
+    numberOfResultsVisible = false,
+    endLineVisible = false,
+    class: clazz = {},
+    onapplyCustomQuickFilter,
+    oncellClick,
+    onfetchData,
+    onfiltersChange,
+    onsort,
+    onremoveAllFilters,
+    onremoveCustomQuickFilter,
+    onremoveFilter,
+    onrowClick,
+    onsaveCellEdit,
+    onsaveHeadersToShow,
+    searchBarSnippet,
+    customFilterChipSnippet,
+    customFilterSnippet,
+    filterAppendSnippet,
+    onscroll,
+    selectionSnippet: selectionInternalSnippet,
+    itemLabelSnippet: itemLabelInternalSnippet,
+    chipLabelSnippet,
+    headerSnippet,
+    headerLabelSnippet,
+    rowAppendSnippet,
+    rowActionsSnippet,
+    customRowSnippet,
+    subRowAppendSnippet,
+    subHeaderLabelSnippet,
+    subHeaderSnippet,
+    subRowActionsSnippet,
+    customSubRowSnippet,
+    customQuickFilterSnippet,
+    appendSnippet,
+  }: Props = $props();
 
-  let openCellEditor: boolean = false,
-    cellEditorActivator: HTMLElement | undefined,
-    cellEditorContainer: HTMLElement | undefined,
-    menuElementCellEditor: HTMLElement,
-    menuElementQuickFilters: HTMLElement,
+  let openCellEditor: boolean = $state(false),
+    cellEditorActivator: HTMLElement | undefined = $state(),
+    cellEditorContainer: HTMLElement | undefined = $state(),
+    menuElementCellEditor: HTMLElement | undefined = $state(),
+    menuElementQuickFilters: HTMLElement | undefined= $state(),
     cellEditorInfoActive: CellEditorInfo & {
       value?: any;
-      item?: Item;
-    },
-    saveEditDisabled: boolean = false,
-    searchBarInput: HTMLElement | undefined = undefined,
-    openQuickFilter: boolean = false,
-    quickFilterActivator: HTMLElement | undefined,
-    quickFilterActive: QuickFilter,
+      item?: RowItem;
+    } | undefined = $state(),
+    saveEditDisabled: boolean = $state(false),
+    searchBarInput: HTMLElement | undefined = $state(undefined),
+    openQuickFilter: boolean = $state(false),
+    quickFilterActivator: HTMLElement | undefined = $state(),
+    quickFilterActive: QuickFilter | undefined = $state(),
     globalBuilder: FilterBuilder = new FilterBuilder(),
     slotSelectActionsContainer: HTMLElement | undefined,
-    isSelectedAll: boolean = false,
-    calendarOpened: boolean = false,
-    calendarOpened2: boolean = false,
+    isSelectedAll: boolean = $state(false),
+    calendarOpened: boolean = $state(false),
+    calendarOpened2: boolean = $state(false),
     selectedIndexes: number[] = [],
-    cellEditorIndexRow: number | undefined,
-    cellEditorIndexHeader: number | undefined,
-    cellEditorSubItem: boolean | undefined,
-    currentSectionNumber = 0,
-    tableBody: HTMLElement,
-    tableContainer: HTMLElement,
-    userScrolling = true,
-    reachedBottom = false,
+    cellEditorIndexRow: number | undefined = $state(),
+    cellEditorIndexHeader: number | undefined = $state(),
+    cellEditorSubItem: boolean | undefined = $state(),
+    currentSectionNumber = $state(0),
+    tableBody: HTMLElement | undefined = $state(),
+    tableContainer: HTMLElement | undefined = $state(),
+    userScrolling = $state(true),
+    reachedBottom = $state(false),
     reachedTop = false
   
-  $: totalSections = (totalRows - renderedRowsNumber) / sectionRowsNumber
-  $: hasMoreToRender = totalSections > currentSectionNumber
-  $: totalCachedSections = (rows.length - renderedRowsNumber) / sectionRowsNumber
-  $: renderedRows = rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber)
+  let totalSections = $derived((totalRows - renderedRowsNumber) / sectionRowsNumber)
+  let hasMoreToRender = $derived(totalSections > currentSectionNumber)
+  let totalCachedSections = $derived((rows.length - renderedRowsNumber) / sectionRowsNumber)
+  let renderedRows = $derived(rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber))
 
-  let openHeaderDrawer: boolean = false,
+  let openHeaderDrawer: boolean = $state(false),
     headersToSelect: {
       id: string;
       name: string;
-    }[] = !!headers
+    }[] = $state(!!headers
       ? headers
           .filter((h) => {
             return !headersToShowInTable.find((hst) => hst.value == h.value);
@@ -291,25 +447,29 @@
               name: h.label,
             };
           })
-      : [],
+      : []),
     headersToShow: {
       id: string;
       name: string;
-    }[] = headersToShowInTable.map((h) => {
+    }[] = $state(headersToShowInTable.map((h) => {
       return {
         id: h.value,
         name: h.label,
       };
-    }),
-    infoActivators = Array(headersToShowInTable.length)
+    })),
+    infoActivators = $state(Array(headersToShowInTable.length))
 
-  let totalBatchLength: number = 0,
-    expandedRows: Row[] = [];    
+  let totalBatchLength: number = $state(0),
+    expandedRows: Row[] = $state([]);    
 
   function saveHeadersToShow() {
-    dispatch("saveHeadersToShow", {
-      headersToShow: headersToShow,
-    });
+    if(onsaveHeadersToShow){
+      onsaveHeadersToShow({
+        detail: {
+          headersToShow: headersToShow,
+        }
+      })
+    }
     openHeaderDrawer = false;
   }
 
@@ -327,25 +487,33 @@
 
       handleSearchChange(searchText);
 
-      dispatch("sort", {
-        sortedBy,
-        sortDirection,
-      });
+      if(onsort) {
+        onsort({
+          detail: {
+            sortedBy,
+            sortDirection,
+          }
+        })
+      }
     }
   }
 
-  function handleRowClick(item: { [key: string]: any }) {
+  function handleRowClick(item: RowItem) {
     if (disabled || loading) return;
-    dispatch("rowClick", {
-      item,
-    });
+    if(onrowClick) {
+      onrowClick({
+        detail: {
+          item,
+        }
+      })
+    }
   }
 
   function handleCellClick(
     mouseEvent: MouseEvent & {
       currentTarget: EventTarget & HTMLTableCellElement;
     },
-    item: Item,
+    item: RowItem,
     cellEditorInfo?: CellEditorInfo,
     value?: any,
     indexRow?: number,
@@ -394,9 +562,13 @@
       }
     }
 
-    dispatch("cellClick", {
-      item,
-    });
+    if(oncellClick) {
+      oncellClick({
+        detail: {
+          item,
+        }
+      })
+    }
   }
 
   function handleSaveClick() {
@@ -404,9 +576,13 @@
     cellEditorIndexRow = undefined
     cellEditorSubItem = undefined
 
-    dispatch("saveCellEdit", {
-      item: cellEditorInfoActive,
-    });
+    if(onsaveCellEdit) {
+      onsaveCellEdit({
+        detail: {
+          item: cellEditorInfoActive,
+        }
+      })
+    }
 
     cellEditorActivator = undefined;
     openCellEditor = false;
@@ -424,7 +600,7 @@
     openQuickFilter = false;
   }
 
-  function handleSelect(item: Item, shiftKeyPressed: boolean) {
+  function handleSelect(item: RowItem, shiftKeyPressed: boolean) {
     let index = selectedItems.findIndex((i) => i[uniqueKey] == item[uniqueKey]);
     // if item is not in the selected items array, add it
     if (index == -1) {
@@ -489,7 +665,7 @@
     return dateTime.setLocale(dateFormat.locale).toFormat(dateFormat.format);
   }
 
-  $: {
+  $effect(() => {
     if (!showExpand) {
       totalBatchLength = rows.length;
     } else {
@@ -521,7 +697,7 @@
     ) {
       selectedItems = rows.map((r) => r.item);
     }
-  }
+  })
 
   function searchTextBuilder(searchText?: string) {
     let builder: FilterBuilder;
@@ -560,7 +736,9 @@
     }, 800);
   }
 
-  $: if (searchText != undefined) handleSearchChange(searchText);
+  $effect(() => {
+    if (searchText != undefined) handleSearchChange(searchText);
+  })
 
   function handleFiltersChange() {
     if(!!tableContainer) {
@@ -570,9 +748,13 @@
       setTimeout(() => userScrolling = true, 20)
     }
     
-    dispatch("filtersChange", {
-      builder: globalBuilder,
-    });
+    if(onfiltersChange) {
+      onfiltersChange({
+        detail: {
+          builder: globalBuilder,
+        }
+      })
+    }
   }
 
   function handleClearQuickFilter(
@@ -583,7 +765,13 @@
       quickFilter.type.value = undefined;
       quickFilter.type.missingValue = undefined;
       if(dispatchFiltersChange) {
-        dispatch('removeCustomQuickFilter', { quickFilter })
+        if(onremoveCustomQuickFilter) {
+          onremoveCustomQuickFilter({
+            detail: {
+              quickFilter
+            }
+          })
+        }
       }
     }
     else if (quickFilter.type.key == "string") {
@@ -690,7 +878,14 @@
 
   function handleApplyClick(quickFilter: QuickFilter, dispatchCustomFilterClick: boolean = false) {
     if(quickFilter.type.key == 'custom' && dispatchCustomFilterClick) {
-      dispatch('applyCustomQuickFilter', { quickFilter, setQuickFilterValue})
+      if(onapplyCustomQuickFilter) {
+        onapplyCustomQuickFilter({
+          detail: {
+            quickFilter,
+            setQuickFilterValue
+          }
+        })
+      }
     }
     else {
       quickFilter.active = true;
@@ -908,12 +1103,20 @@
     if(!!removeAllFilters) {
       removeAllFilters()
     }
-    dispatch('removeAllFilters', {})
+    if(onremoveAllFilters){
+      onremoveAllFilters()
+    }
     handleSearchChange(searchText);
   }
 
   function handleRemoveFilter(filter: Filter) {
-    dispatch('removeFilter', { filter})
+    if(onremoveFilter) {
+      onremoveFilter({
+        detail: {
+          filter
+        }
+      })
+    }
     handleSearchChange(searchText);
   }
 
@@ -929,7 +1132,7 @@
       let removedRowCount = 0
 
       for (let i = 0; removedRowCount < sectionRowsNumber; i++) {
-        let row = tableBody.children.item(i)
+        let row = tableBody?.children.item(i)
         removedRowCount++
 
         const rowKey = row?.getAttribute("data-key")
@@ -943,19 +1146,24 @@
       currentSectionNumber = currentSectionNumber + 1
 
       await tick()
-      const anchorElementAfter = findAnchorElement(anchorUniqueKey)
-      const anchorOffsetAfter = anchorElementAfter?.getBoundingClientRect().top || 0
-      const offsetDiff = anchorOffsetAfter - anchorOffsetBefore
-      tableContainer.scrollTop += offsetDiff
 
-      userScrolling = true
+      if(tableContainer) {
+        const anchorElementAfter = findAnchorElement(anchorUniqueKey)
+        const anchorOffsetAfter = anchorElementAfter?.getBoundingClientRect().top || 0
+        const offsetDiff = anchorOffsetAfter - anchorOffsetBefore
+        tableContainer.scrollTop += offsetDiff
+
+        userScrolling = true
+      }
     }
 
     if(totalCachedSections - sectionThreshold <= currentSectionNumber 
       && !loading 
       && totalRows > rows.length
     ) {
-      dispatch("fetchData", {});
+      if(onfetchData) {
+        onfetchData()
+      }
     }
   }
 
@@ -970,7 +1178,7 @@
     let removedRowCount = 0
 
     for (let i = renderedRows.length - 1; removedRowCount < sectionRowsNumber; i--) {
-      let row = tableBody.children.item(i)
+      let row = tableBody?.children.item(i)
       removedRowCount++
 
       const rowKey = row?.getAttribute("data-key")
@@ -984,19 +1192,24 @@
     currentSectionNumber = currentSectionNumber - 1
 
     await tick()
-    const anchorElementAfter = findAnchorElement(anchorUniqueKey)
-    const anchorOffsetAfter = anchorElementAfter?.getBoundingClientRect().top || 0
-    const offsetDiff = anchorOffsetAfter - anchorOffsetBefore
-    tableContainer.scrollTop += offsetDiff
 
-    userScrolling = true
+    if(tableContainer) {
+      const anchorElementAfter = findAnchorElement(anchorUniqueKey)
+      const anchorOffsetAfter = anchorElementAfter?.getBoundingClientRect().top || 0
+      const offsetDiff = anchorOffsetAfter - anchorOffsetBefore
+      tableContainer.scrollTop += offsetDiff
+
+      userScrolling = true
+    }
   }
 
-  function findAnchorElement(key: keyof Item) {
-    for (let i = 0; i < tableBody.children.length; i++) {
-      const child = tableBody.children.item(i)
-      if (child?.getAttribute("data-key") == key) {
-        return child
+  function findAnchorElement(key: keyof RowItem) {
+    if(tableBody) {
+      for (let i = 0; i < tableBody.children.length; i++) {
+        const child = tableBody.children.item(i)
+        if (child?.getAttribute("data-key") == key) {
+          return child
+        }
       }
     }
     return undefined
@@ -1016,74 +1229,71 @@
     {lang}
   />
 
-  <slot name="search-bar" {handleSearchChange}>
-    {#if searchBarVisible || filtersVisible}
+  {#if searchBarVisible || filtersVisible || appendSnippet}
+    <div class="filter-container">
       <div class="search-bar-container">
         {#if searchBarVisible}
-          <SimpleTextField
-            placeholder={searchBarPlaceholder}
-            appendInnerIcon="mdi-magnify"
-            bind:value={searchText}
-            bind:input={searchBarInput}
-            on:keydown={handleSearchBoxKeydown}
-            --simple-textfield-default-width="450px"
-            --simple-textfield-border-radius= 0.5rem
-            --simple-textfield-background-color= transparent
-            --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-            --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-          />
+          {#if searchBarSnippet}
+            {@render searchBarSnippet({ handleSearchChange })}
+          {:else}
+            <div style="margin-right: 20px;">
+              <SimpleTextField
+                placeholder={searchBarPlaceholder}
+                appendInnerIcon="mdi-magnify"
+                bind:value={searchText}
+                bind:input={searchBarInput}
+                onkeydown={handleSearchBoxKeydown}
+                --simple-textfield-default-width="450px"
+                --simple-textfield-border-radius= 0.5rem
+                --simple-textfield-background-color= transparent
+                --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+                --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+              />
+            </div>
+          {/if}
         {/if}
-
+  
         {#if filtersVisible}
-          <div style="margin-left: 20px;">
+          <div>
             <Filters
               bind:filters
-              on:applyFilter={() => {
+              onapplyFilter={() => {
                 handleSearchChange(searchText);
               }}
-              on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
-              on:removeAllFilters={() => handleRemoveAllFilters()}
+              onremoveFilter={e => { handleRemoveFilter(e.detail.filter) }}
+              onremoveAllFilters={() => handleRemoveAllFilters()}
               --filters-default-wrapper-width="100%"
               {lang}
               {editFilterMode}
               {showActiveFilters}
+              appendSnippet={filterAppendSnippet}
+              customChipSnippet={customFilterChipSnippet}
             >
-              <svelte:fragment slot="append">
-                <slot name="filter-append" />
-              </svelte:fragment>
-              <svelte:fragment slot="custom-chip" let:filter>
-                <slot name="custom-filter-chip" {filter} />
-              </svelte:fragment>
-              <svelte:fragment
-                slot="custom"
-                let:filter
-                let:updateFunction
-                let:mAndDown
-              >
-                <slot name="custom-filter" {filter} {updateFunction} {mAndDown} />
-              </svelte:fragment>
-
-              <svelte:fragment slot="content" let:mAndDown let:filters let:updateMultiFilterValues let:handleRemoveAllFilters={removeAllFilters}>
+              {#snippet contentSnippet({ filters, mAndDown, updateMultiFilterValues, handleRemoveAllFilters: removeAllFilters })}  
                 {#key filters}
                   <DynamicFilters
                     {lang}
                     {filters}                      
                     {mAndDown}
-                    on:change={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
-                    on:removeAllFilters={() => handleRemoveAllFilters(removeAllFilters)}
+                    onchange={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
+                    onremoveAllFilters={() => handleRemoveAllFilters(removeAllFilters)}
                   >
-                    <svelte:fragment slot="custom" let:filter let:mAndDown>
-                      <slot name="custom-filter" {filter} {updateMultiFilterValues} {mAndDown}></slot>
-                    </svelte:fragment>
+                    {#snippet customSnippet({ filter })}
+                      {@render customFilterSnippet?.({ filter, updateMultiFilterValues })}
+                    {/snippet}
                   </DynamicFilters>
                 {/key}
-              </svelte:fragment>
+              {/snippet}
             </Filters>
           </div>
         {/if}
       </div>
-    {/if}
-  </slot>
+
+      <div>
+        {@render appendSnippet?.()}
+      </div>
+    </div>
+  {/if}
 
   {#if quickFiltersVisible || numberOfResultsVisible}
   <div class="quick-filters-results-container">
@@ -1094,7 +1304,7 @@
             class={quickFilter.active ? "active-quick-filters" : "non-active-quick-filters"}
           >
             <button
-              on:click={(e) => {
+              onclick={(e) => {
                 handleQuickFilterClick(e, quickFilter);
               }}
             >
@@ -1107,9 +1317,8 @@
               <div style:padding-top="1px" style:padding-right="3px">
                 <Icon
                   name="mdi-close-circle"
-                  click
                   --icon-size="14px"
-                  on:click={() => {
+                  onclick={() => {
                     handleClearQuickFilter(quickFilter);
                   }}
                 />
@@ -1136,10 +1345,9 @@
   {/if}
 
   <div class="outer-container">
-    <div class="inner-container" bind:this={tableContainer} on:scroll>
-  <!-- <div class="table-container" bind:this={tableContainer}> -->
+    <div class="inner-container" bind:this={tableContainer} {onscroll}>
     <InfiniteScroll
-      on:loadMore={handleLoadBackward}
+      onloadMore={handleLoadBackward}
       threshold={backwardThresholdPixel}
       hasMore={currentSectionNumber > 0 && userScrolling}
       direction='backward'
@@ -1158,7 +1366,7 @@
                   id="select-all"
                   value={selectedItems.length == totalBatchLength}
                   disabled={disabled || loading}
-                  on:change={handleSelectAll}
+                  onchange={handleSelectAll}
                 />
               {/if}
             </th>
@@ -1167,28 +1375,34 @@
             <th
               style:min-width="60px"
               style:text-align="center"
-            />
+            ></th>
           {/if}
-          {#each headersToShowInTable as head, index}
+          {#each headersToShowInTable as header, index}
             <th
-              style:width={head.width}
-              style:min-width={head.minWidth}
-              class:sortable={head.sortable}
-              on:click={() => handleHeaderClick(head)}
+              style:width={header.width}
+              style:min-width={header.minWidth}
+              class:sortable={header.sortable}
+              onclick={() => handleHeaderClick(header)}
             >
-              <slot name="header" {head}>
+              {#if headerSnippet}
+                {@render headerSnippet({ header })}
+              {:else}
                 <span class="header-label" bind:this={infoActivators[index]}>
-                  <slot name="headerLabel">{head.label}</slot>
-                  {#if !!head.info}
+                  {#if headerLabelSnippet}
+                    {@render headerLabelSnippet({ header })}
+                  {:else}
+                    {header.label}
+                  {/if}
+                  {#if !!header.info}
                     <Icon						
                       name="mdi-help-circle-outline"
                       --icon-size="16px"
                     />
                   {/if}
                 </span>
-                {#if !!head.info}
+                {#if !!header.info}
                   <ToolTip
-                    appearTimeout={1000}
+                    appearTimeout={700}
                     activator={infoActivators[index]}
                   >
                     <div
@@ -1196,14 +1410,14 @@
                       style:border-radius="5px"
                       style:padding="10px"
                     >
-                      {head.info}
+                      {header.info}
                     </div>
                   </ToolTip>
                 {/if}
-                {#if head.sortable}
+                {#if header.sortable}
                   <span
                     class="header-sort-icon"
-                    class:active={sortedBy == head.value}
+                    class:active={sortedBy == header.value}
                     class:asc={sortDirection == "asc"}
                     class:desc={sortDirection == "desc"}
                   >
@@ -1214,12 +1428,12 @@
                     {/if}
                   </span>
                 {/if}
-              </slot>
+              {/if}
             </th>
           {/each}
-          {#if $$slots.rowActions || $$slots.append}
+          {#if rowActionsSnippet || rowAppendSnippet}
             <th>
-              <slot name="append" index={-1} items={undefined} />
+              {@render rowAppendSnippet?.({ index: -1, row: undefined })}
             </th>
           {/if}
           {#if customizeHeaders}
@@ -1231,8 +1445,7 @@
               <div style="display: flex; gap: 8px;">
                 <Icon
                   name="mdi-plus-circle-outline"
-                  click
-                  on:click={() => (openHeaderDrawer = true)}
+                  onclick={() => (openHeaderDrawer = true)}
                 />
               </div>
             </th>
@@ -1249,7 +1462,7 @@
               style:font-size="1.2em"
               style:padding="0px"
             >
-              <div class="loader-line" />
+              <div class="loader-line"></div>
             </th>
           </tr>
         {/if}
@@ -1266,7 +1479,7 @@
               style:padding="10px"
               style:font-size="1.2em"
             >
-              {noItemsText}
+              <NoData {noItemsText} ></NoData>
             </td>
           </tr>
         {:else}
@@ -1286,7 +1499,7 @@
                     ""
                 }
               class:row-activator={cellEditorIndexRow == indexRow && !cellEditorSubItem}
-              on:click={() => handleRowClick(row)}
+              onclick={() => handleRowClick(row.item)}
             >
               {#if !!showSelect && !showExpand}
                 <td style:padding-left="0px" style:text-align="center">
@@ -1296,7 +1509,7 @@
                       (i) => i[uniqueKey] == row.item[uniqueKey]
                     ) != -1}
                     disabled={disabled || loading}
-                    on:change={(e) => handleSelect(row.item, e.detail.shiftKeyPressed)}
+                    onchange={(e) => handleSelect(row.item, e.detail.shiftKeyPressed)}
                   />
                 </td>
               {/if}
@@ -1308,9 +1521,8 @@
                     ) == -1
                       ? "mdi-chevron-down"
                       : "mdi-chevron-up"}
-                    click
                     --icon-size="24px"
-                    on:click={() => expandRow(row)}
+                    onclick={() => expandRow(row)}
                   />
                 </td>
               {/if}
@@ -1318,7 +1530,7 @@
                 <td
                   class:hover-cell={cellEdit && !loading && !!header.cellEditorInfo}
                   class:cell-edit-activator={cellEditorIndexHeader == indexHeader && cellEditorIndexRow == indexRow && !cellEditorSubItem}
-                  on:click={(e) => {
+                  onclick={(e) => {
                     handleCellClick(
                       e,
                       row.item,
@@ -1331,13 +1543,7 @@
                   }}
                 >
                   {#if header.type.key == "custom"}
-                    <slot
-                      name="custom"
-                      index={indexRow}
-                      columnIndex={indexHeader}
-                      {header}
-                      {row}
-                    />
+                    {@render customRowSnippet?.({ index: indexRow, columnIndex: indexHeader, header, row })}
                   {:else if header.type.key == "date"}
                     {formatDate(row.item[header.value], header.type.params)}
                   {:else if header.type.key == "icon"}
@@ -1363,10 +1569,10 @@
                   {/if}
                 </td>
               {/each}
-              {#if $$slots.rowActions || $$slots.append}
+              {#if rowActionsSnippet || rowAppendSnippet}
                 <td class={clazz.cell || ""}>
-                  <slot name="rowActions" index={indexRow} {row} />
-                  <slot name="append" index={indexRow} {row} />
+                  {@render rowActionsSnippet?.({ index: indexRow, row })}
+                  {@render rowAppendSnippet?.({ index: indexRow, row })}
                 </td>
               {/if}
             </tr>
@@ -1385,13 +1591,17 @@
                               style:width={subHeader.width}
                               style:min-width={subHeader.minWidth}
                               class:sortable={subHeader.sortable}
-                              on:click={() => handleHeaderClick(subHeader)}
+                              onclick={() => handleHeaderClick(subHeader)}
                             >
-                              <slot name="header" {subHeader}>
+                              {#if subHeaderSnippet}
+                                {@render subHeaderSnippet({ subHeader })}
+                              {:else}
                                 <span class="header-label">
-                                  <slot name="headerLabel">
+                                  {#if subHeaderLabelSnippet}
+                                    {@render subHeaderLabelSnippet({ subHeader })}
+                                  {:else}
                                     {subHeader.label}
-                                  </slot>
+                                  {/if}
                                 </span>
                                 {#if subHeader.sortable}
                                   <span
@@ -1407,16 +1617,12 @@
                                     {/if}
                                   </span>
                                 {/if}
-                              </slot>
+                              {/if}
                             </th>
                           {/each}
-                          {#if $$slots.subRowActions || $$slots.subAppend}
+                          {#if subRowActionsSnippet || subRowAppendSnippet}
                             <th>
-                              <slot
-                                name="subAppend"
-                                index={-1}
-                                items={undefined}
-                              />
+                              {@render subRowAppendSnippet?.({ index: -1, row: undefined })}
                             </th>
                           {/if}
                         </tr>
@@ -1425,14 +1631,14 @@
                       <tbody>
                         {#each row.subItems as subItem, indexSubItem}
                           <tr
-                            on:click={() => handleRowClick(subItem)}
+                            onclick={() => handleRowClick(subItem)}
                             class:row-activator={cellEditorIndexRow == indexSubItem && cellEditorSubItem}
                           >
                             {#each subHeaders as subHeader, indexSubHeader}
                               <td
                                 class:cell-edit-activator={cellEditorIndexHeader == indexSubHeader && cellEditorIndexRow == indexSubItem && cellEditorSubItem}
                                 class:hover-cell={cellEdit && !loading && !!subHeader.cellEditorInfo}
-                                on:click={(e) => {
+                                onclick={(e) => {
                                   handleCellClick(
                                     e,
                                     subItem,
@@ -1445,13 +1651,7 @@
                                 }}
                               >
                                 {#if subHeader.type.key == "custom"}
-                                  <slot
-                                    name="custom-subheader"
-                                    index={indexSubItem}
-                                    columnIndex={indexSubHeader}
-                                    {subHeader}
-                                    {subItem}
-                                  />
+                                  {@render customSubRowSnippet?.({ index: indexSubItem, columnIndex: indexSubHeader, header: subHeader, row: subItem})}
                                 {:else if subHeader.type.key == "date"}
                                   {formatDate(
                                     subItem[subHeader.value],
@@ -1480,18 +1680,10 @@
                                 {/if}
                               </td>
                             {/each}
-                            {#if $$slots.subRowActions || $$slots.subAppend}
+                            {#if subRowActionsSnippet || subRowAppendSnippet}
                               <td class={clazz.cell || ""}>
-                                <slot
-                                  name="subRowActions"
-                                  index={indexSubItem}
-                                  {subItem}
-                                />
-                                <slot
-                                  name="subAppend"
-                                  index={indexSubItem}
-                                  {subItem}
-                                />
+                                {@render subRowActionsSnippet?.({ index: indexSubItem, row: subItem})}
+                                {@render subRowAppendSnippet?.({ index: indexSubItem, row: subItem})}
                               </td>
                             {/if}
                           </tr>
@@ -1507,7 +1699,7 @@
       </tbody>
     </table>
     <InfiniteScroll
-      on:loadMore={handleLoadForward}
+      onloadMore={handleLoadForward}
       threshold={forwardThresholdPixel}
       hasMore={hasMoreToRender && userScrolling}
     />
@@ -1521,413 +1713,437 @@
   {/if}
   </div>
 {/if}
-
-<Menu
-  bind:open={openCellEditor}
-  activator={cellEditorActivator}
-  bind:menuElement={menuElementCellEditor}
-  _top={undefined}
-  openingId="cell-editor"
->
-  <div
-    class="cell-editor-container"
-    bind:this={cellEditorContainer}
+{#if cellEditorInfoActive}
+  <Menu
+    bind:open={openCellEditor}
+    activator={cellEditorActivator}
+    bind:menuElement={menuElementCellEditor}
+    _top={undefined}
+    openingId="cell-editor"
   >
-    <div style:grid-column="1 / 3">
-      {#if cellEditorInfoActive.type.key === "string"}
-        <LabelAndTextField
-          label={cellEditorInfoActive.title}
-          description={cellEditorInfoActive.description}
-          name={cellEditorInfoActive.title}
-          info={cellEditorInfoActive.info}
-          type="text"
-          orientation="horizontal"
-          bind:value={cellEditorInfoActive.value}
-          --simple-textfield-border-radius= 0.5rem
-          --simple-textfield-background-color= transparent
-          --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-          --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-        />
-      {:else if cellEditorInfoActive.type.key === "number"}
-        <LabelAndTextField
-          label={cellEditorInfoActive.title}
-          description={cellEditorInfoActive.description}
-          name={cellEditorInfoActive.title}
-          info={cellEditorInfoActive.info}
-          type="number"
-          orientation="horizontal"
-          error={saveEditDisabled}
-          bind:value={cellEditorInfoActive.value}
-          --simple-textfield-border-radius= 0.5rem
-          --simple-textfield-background-color= transparent
-          --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-          --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-        />
-      {:else if cellEditorInfoActive.type.key === "select"}
-        <LabelAndSelect
-          label={cellEditorInfoActive.title}
-          description={cellEditorInfoActive.description}
-          name={cellEditorInfoActive.title}
-          info={cellEditorInfoActive.info}
-          options={cellEditorInfoActive.type.params.options}
-          orientation="horizontal"
-          bind:value={cellEditorInfoActive.value}
-        />
-      {:else if cellEditorInfoActive.type.key === "boolean"}
-        <div class="container">
-          <Checkbox
-            id={cellEditorInfoActive.title}
+    <div
+      class="cell-editor-container"
+      bind:this={cellEditorContainer}
+    >
+      <div style:grid-column="1 / 3">
+        {#if cellEditorInfoActive.type.key === "string"}
+          <LabelAndTextField
+            label={cellEditorInfoActive.title}
+            description={cellEditorInfoActive.description}
+            name={cellEditorInfoActive.title}
+            info={cellEditorInfoActive.info}
+            type="text"
+            orientation="horizontal"
+            bind:value={cellEditorInfoActive.value}
+            --simple-textfield-border-radius= 0.5rem
+            --simple-textfield-background-color= transparent
+            --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+            --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+          />
+        {:else if cellEditorInfoActive.type.key === "number"}
+          <LabelAndTextField
+            label={cellEditorInfoActive.title}
+            description={cellEditorInfoActive.description}
+            name={cellEditorInfoActive.title}
+            info={cellEditorInfoActive.info}
+            type="number"
+            orientation="horizontal"
+            error={saveEditDisabled}
+            bind:value={cellEditorInfoActive.value}
+            --simple-textfield-border-radius= 0.5rem
+            --simple-textfield-background-color= transparent
+            --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+            --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+          />
+        {:else if cellEditorInfoActive.type.key === "select"}
+          <LabelAndSelect
+            label={cellEditorInfoActive.title}
+            description={cellEditorInfoActive.description}
+            name={cellEditorInfoActive.title}
+            info={cellEditorInfoActive.info}
+            options={cellEditorInfoActive.type.params.options}
+            orientation="horizontal"
             bind:value={cellEditorInfoActive.value}
           />
-          <label style:margin-left="0.7rem" for={cellEditorInfoActive.title}
-            >{cellEditorInfoActive.title}
-          </label>
-        </div>
-      {/if}
-    </div>
-
-    <div style:margin-top="10px" style:grid-row="2" style:grid-column="1 / 3">
-      <Divider --divider-color=rgb(var(--global-color-contrast-100) />
-    </div>
-    <div style:grid-row="3" style:grid-column="2" style:margin-top="-15px">
-      <ConfirmOrCancelButtons
-        confirmDisable={saveEditDisabled}
-        confirmText="Save"
-        cancelText="Cancel"
-        on:cancel-click={handleCancelClick}
-        on:confirm-click={handleSaveClick}
-      />
-    </div>
-  </div>
-</Menu>
-
-<Menu
-  bind:open={openQuickFilter}
-  activator={quickFilterActivator}
-  bind:menuElement={menuElementQuickFilters}
-  anchor="bottom"
-  openingId="quick-filter"
-  closeOnClickOutside
->
-  <div
-    class="quick-filter-container"
-  >
-    <div style:grid-column="1 / 3">
-      {#if quickFilterActive.type.key == 'custom'}
-        <slot name="custom-quick-filter" quickFilter={quickFilterActive} {setQuickFilterMissingValue}>
-        </slot>
-      {:else if quickFilterActive.type.key === "string"}
-        <div class="space-between" style="font-weight: 500;">
-          {quickFilterActive.title}
-          {#if !!quickFilterActive.type.missingLabel}
-            <button
-              on:click={() =>
-                setQuickFilterMissingValue(quickFilterActive)}
-              >{quickFilterActive.type.missingLabel}</button
-            >
-          {/if}
-        </div>
-        <LabelAndTextField
-          description={quickFilterActive.description}
-          name={quickFilterActive.title}
-          info={quickFilterActive.info}
-          type="text"
-          bind:value={quickFilterActive.type.value}          
-          --simple-textfield-border-radius= 0.5rem
-          --simple-textfield-background-color= transparent
-          --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-          --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-        />
-      {:else if quickFilterActive.type.key === "number"}
-        <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
-          {quickFilterActive.title}
-          {#if !!quickFilterActive.type.missingLabel}
-            <button
-              on:click={() =>
-                setQuickFilterMissingValue(quickFilterActive)}
-              >{quickFilterActive.type.missingLabel}</button
-            >
-          {/if}
-        </div>
-        <LabelAndTextField
-          description={quickFilterActive.description}
-          name={quickFilterActive.title}
-          info={quickFilterActive.info}
-          type="number"
-          error={saveEditDisabled}
-          bind:value={quickFilterActive.type.value}          
-          --simple-textfield-border-radius= 0.5rem
-          --simple-textfield-background-color= transparent
-          --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-          --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-        />
-      {:else if quickFilterActive.type.key === "multi-select"}
-        <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
-          {quickFilterActive.title}
-          {#if !!quickFilterActive.type.missingLabel}
-            <button
-              on:click={() =>
-                setQuickFilterMissingValue(quickFilterActive)}
-              >{quickFilterActive.type.missingLabel}</button
-            >
-          {/if}
-        </div>
-        <div on:click|stopPropagation role="presentation" tabindex="-1">
-          <Autocomplete
-            multiple
-            items={quickFilterActive.type.items}
-            bind:values={quickFilterActive.type.values}
-            --autocomplete-border-radius= 0.5rem
-            --autocomplete-border="1px solid rgb(var(--global-color-background-500))"
-            --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
-          >
-            <svelte:fragment slot="selection" let:selection let:unselect>
-              <slot name="selection" {selection} {unselect}>
-                <div tabindex="-1">
-                  <Chip
-                    close={true}
-                    on:close={() => unselect(selection)}
-                    --chip-default-border-radius="var(--autocomplete-border-radius, var(--autocomplete-default-border-radius))"
-                    buttonTabIndex={-1}
-                    truncateText
-                  >
-                    <slot name="chip-label" {selection}>
-                      {#if !!quickFilterActive.type.countriesAlpha2 && quickFilterActive.type.countriesAlpha2.find((c) => c.value == selection.value)}
-                        <div>
-                          <FlagIcon
-                            alpha2={quickFilterActive.type.countriesAlpha2
-                              .find((c) => c.value == selection.value)
-                              ?.label?.toString()
-                              .toLowerCase() ?? ""}
-                            --flag-icon-size="16px"
-                          />
-                        </div>
-                      {/if}
-                      {selection.label}
-                    </slot>
-                  </Chip>
-                </div>
-              </slot>
-            </svelte:fragment>
-            <svelte:fragment slot="item-label" let:item>
-              <slot name="item-label" {item}>
-                {#if !!quickFilterActive.type.countriesAlpha2 && quickFilterActive.type.countriesAlpha2.find((c) => c.value == item.value)}
-                  <FlagIcon
-                    alpha2={quickFilterActive.type.countriesAlpha2
-                      .find((c) => c.value == item.value)
-                      ?.label?.toString()
-                      .toLowerCase() ?? ""}
-                  />
-                {/if}
-                {item.label}
-              </slot>
-            </svelte:fragment>
-          </Autocomplete>
-        </div>
-      {:else if quickFilterActive.type.key === "boolean"}
-        {#if quickFilterActive.type.params}
-          <div class="vertical-quick-filters">
-            <button
-              on:click={() => setQuickFilterValue(quickFilterActive, true)}
-            >
-              {quickFilterActive.type.params.labelTrue}
-            </button>
-            <button
-              on:click={() => setQuickFilterValue(quickFilterActive, false)}
-            >
-              {quickFilterActive.type.params.labelFalse}
-            </button>
-            <button
-              on:click={() => setQuickFilterValue(quickFilterActive, undefined)}
-            >
-              {lang == 'en' ? 'All' : 'Tutti'}
-            </button>
+        {:else if cellEditorInfoActive.type.key === "boolean"}
+          <div class="container">
+            <Checkbox
+              id={cellEditorInfoActive.title}
+              bind:value={cellEditorInfoActive.value}
+            />
+            <label style:margin-left="0.7rem" for={cellEditorInfoActive.title}
+              >{cellEditorInfoActive.title}
+            </label>
           </div>
         {/if}
-      {:else if quickFilterActive.type.key === "country"}
-        <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
-          {quickFilterActive.title}
-          {#if !!quickFilterActive.type.missingLabel}
-            <button
-              on:click={() =>
-                setQuickFilterMissingValue(quickFilterActive)}
-              >{quickFilterActive.type.missingLabel}</button
-            >
-          {/if}
-        </div>
-        <div on:click|stopPropagation role="presentation" tabindex="-1">
-          <CountriesAutocomplete
-            bind:selected={quickFilterActive.type.selected}
-            {...((!!quickFilterActive.type.countriesOptions && quickFilterActive.type.countriesOptions.length > 0) && {
-              items: quickFilterActive.type.countriesOptions,
-            })}
-            autocompleteProps={{
-              placeholder: !!quickFilterActive.type.selected
-                ? quickFilterActive.type.selected.length > 0
-                  ? ""
-                  : quickFilterActive.description
-                : quickFilterActive.description,
-              multiple: true,
-            }}
-            --autocomplete-border="1px solid rgb(var(--global-color-background-500))"
-            --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
-          />
-        </div>
-      {:else if quickFilterActive.type.key === "date"}
-        <div on:click|stopPropagation role="presentation" tabindex="-1">
-          <div>
-            <DatePickerTextField
-              bind:selectedDate={quickFilterActive.type.from}
-              placeholder={lang == 'en' ? "From" : 'Da'}
-              --simple-textfield-width="100%"
-              --simple-textfield-border-radius= 0.5rem
-              --simple-textfield-background-color= transparent
-              --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-              --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-              flipOnOverflow
-              bind:menuOpened={calendarOpened}
-              on:day-click={() => (calendarOpened = false)}
-            >
-              <svelte:fragment slot="append-inner">
-                <Icon
-                  name="mdi-close-circle"
-                  click
-                  on:click={() => {
-                    if (
-                      !!quickFilterActive &&
-                      quickFilterActive.type.key === "date"
-                    ) {
-                      quickFilterActive.type.from = undefined;
-                    }
-                  }}
-                />
-              </svelte:fragment>
-            </DatePickerTextField>
-          </div>
-          <div>
-            <DatePickerTextField
-              bind:selectedDate={quickFilterActive.type.to}
-              placeholder={lang == 'en' ? "To" : 'A'}
-              --simple-textfield-width="100%"
-              --simple-textfield-border-radius= 0.5rem
-              --simple-textfield-background-color= transparent
-              --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-              --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-              flipOnOverflow
-              bind:menuOpened={calendarOpened2}
-              on:day-click={() => (calendarOpened2 = false)}
-            >
-              <svelte:fragment slot="append-inner">
-                <Icon
-                  name="mdi-close-circle"
-                  click
-                  on:click={() => {
-                    if (
-                      !!quickFilterActive &&
-                      quickFilterActive.type.key === "date"
-                    ) {
-                      quickFilterActive.type.to = undefined;
-                    }
-                  }}
-                />
-              </svelte:fragment>
-            </DatePickerTextField>
-          </div>
-        </div>
-      {/if}
-    </div>
+      </div>
 
-    {#if quickFilterActive.type.key != "boolean"}
       <div style:margin-top="10px" style:grid-row="2" style:grid-column="1 / 3">
-        <Divider --divider-color=rgb(var(--global-color-contrast-100)) />
+        <Divider --divider-color=rgb(var(--global-color-contrast-100) />
       </div>
       <div style:grid-row="3" style:grid-column="2" style:margin-top="-15px">
         <ConfirmOrCancelButtons
           confirmDisable={saveEditDisabled}
-          confirmText={lang == 'en' ? "Apply" : 'Applica'}
-          cancelText={lang == 'en' ? "Cancel" : 'Annulla'}
-          on:cancel-click={handleCancelClick}
-          on:confirm-click={() => handleApplyClick(quickFilterActive, quickFilterActive.type.key == 'custom')}
+          confirmText="Save"
+          cancelText="Cancel"
+          oncancelClick={handleCancelClick}
+          onconfirmClick={handleSaveClick}
         />
       </div>
-    {/if}
-  </div>
-</Menu>
+    </div>
+  </Menu>
+{/if}
 
-<MediaQuery let:sAndDown>
-  <Drawer
-    bind:open={openHeaderDrawer}
-    _space={sAndDown ? "60vh" : "20vw"}
-    position={sAndDown ? "bottom" : "right"}
+{#if quickFilterActive}
+  <Menu
+    bind:open={openQuickFilter}
+    activator={quickFilterActivator}
+    bind:menuElement={menuElementQuickFilters}
+    anchor="bottom"
+    openingId="quick-filter"
+    closeOnClickOutside
   >
-    <div style="padding: 20px;">
-      <div class="personalize-header">{lang == 'en' ? 'Personalize your headers' : 'Personalizza le tue intestazioni'}</div>
-
-      <span class="headers-show grid-col-1">{lang == 'en' ? 'Headers shown in table' : 'Intestazioni visualizzate in tabella'}</span>
-
-      {#if headersToShow}
-        <VerticalDraggableList
-          items={headersToShow}
-          on:changeOrder={(e) => {
-            headersToShow = e.detail.items;
-          }}
-        >
-          <svelte:fragment slot="item" let:item>
-            <Switch
-              --switch-label-width="90%"
-              value={headersToShow.find((h) => h.id == item.id) != undefined}
-              label={item.name}
-              on:change={(e) => {
-                if (e.detail.value == false) {
-                  headersToShow = headersToShow.filter((h) => h.id != item.id);
-                  headersToSelect = [...headersToSelect, item];
-                }
+    <div
+      class="quick-filter-container"
+    >
+      <div style:grid-column="1 / 3">
+        {#if quickFilterActive.type.key == 'custom'}
+          {@render customQuickFilterSnippet?.({ quickFilter: quickFilterActive, setQuickFilterMissingValue })}
+        {:else if quickFilterActive.type.key === "string"}
+          <div class="space-between" style="font-weight: 500;">
+            {quickFilterActive.title}
+            {#if !!quickFilterActive.type.missingLabel}
+              <button
+                onclick={() =>
+                  setQuickFilterMissingValue(quickFilterActive!)}
+                >{quickFilterActive.type.missingLabel}</button
+              >
+            {/if}
+          </div>
+          <LabelAndTextField
+            description={quickFilterActive.description}
+            name={quickFilterActive.title}
+            info={quickFilterActive.info}
+            type="text"
+            bind:value={quickFilterActive.type.value}          
+            --simple-textfield-border-radius= 0.5rem
+            --simple-textfield-background-color= transparent
+            --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+            --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+          />
+        {:else if quickFilterActive.type.key === "number"}
+          <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
+            {quickFilterActive.title}
+            {#if !!quickFilterActive.type.missingLabel}
+              <button
+                onclick={() =>
+                  setQuickFilterMissingValue(quickFilterActive!)}
+                >{quickFilterActive.type.missingLabel}</button
+              >
+            {/if}
+          </div>
+          <LabelAndTextField
+            description={quickFilterActive.description}
+            name={quickFilterActive.title}
+            info={quickFilterActive.info}
+            type="number"
+            error={saveEditDisabled}
+            bind:value={quickFilterActive.type.value}          
+            --simple-textfield-border-radius= 0.5rem
+            --simple-textfield-background-color= transparent
+            --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+            --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+          />
+        {:else if quickFilterActive.type.key === "multi-select"}
+          <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
+            {quickFilterActive.title}
+            {#if !!quickFilterActive.type.missingLabel}
+              <button
+                onclick={() =>
+                  setQuickFilterMissingValue(quickFilterActive!)}
+                >{quickFilterActive.type.missingLabel}</button
+              >
+            {/if}
+          </div>
+          <div onclick={e => e.stopPropagation()} role="presentation" tabindex="-1">
+            <Autocomplete
+              multiple
+              items={quickFilterActive.type.items}
+              bind:values={quickFilterActive.type.values}
+              --autocomplete-border-radius= 0.5rem
+              --autocomplete-border="1px solid rgb(var(--global-color-background-500))"
+              --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
+            >
+              {#snippet selectionSnippet({ selection, unselect })}
+                {#if selectionInternalSnippet}
+                  {@render selectionInternalSnippet({ selection, unselect })}
+                {:else}
+                  <div tabindex="-1">
+                    <Chip
+                      close={true}
+                      onclose={() => unselect(selection)}
+                      --chip-default-border-radius="var(--autocomplete-border-radius, var(--autocomplete-default-border-radius))"
+                      buttonTabIndex={-1}
+                      truncateText
+                    >
+                      {#if chipLabelSnippet}
+                        {@render chipLabelSnippet({ selection })}
+                      {:else}
+                        {#if quickFilterActive!.type.key == 'multi-select' && !!quickFilterActive!.type.countriesAlpha2 && quickFilterActive!.type.countriesAlpha2.find((c) => c.value == selection.value)}
+                          <div>
+                            <FlagIcon
+                              alpha2={quickFilterActive!.type.countriesAlpha2
+                                .find((c) => c.value == selection.value)
+                                ?.label?.toString()
+                                .toLowerCase() ?? ""}
+                              --flag-icon-size="16px"
+                            />
+                          </div>
+                        {/if}
+                        {selection.label}
+                      {/if}
+                    </Chip>
+                  </div>
+                {/if}
+              {/snippet}
+              {#snippet itemLabelSnippet({ item })}
+                {#if itemLabelInternalSnippet}
+                  {@render itemLabelInternalSnippet({ item })}
+                {:else}
+                  {#if quickFilterActive!.type.key == 'multi-select' && !!quickFilterActive!.type.countriesAlpha2 && quickFilterActive!.type.countriesAlpha2.find((c) => c.value == item.value)}
+                    <FlagIcon
+                      alpha2={quickFilterActive!.type.countriesAlpha2
+                        .find((c) => c.value == item.value)
+                        ?.label?.toString()
+                        .toLowerCase() ?? ""}
+                    />
+                  {/if}
+                  {item.label}
+                {/if}
+              {/snippet}
+            </Autocomplete>
+          </div>
+        {:else if quickFilterActive.type.key === "boolean"}
+          {#if quickFilterActive.type.params}
+            <div class="vertical-quick-filters">
+              <button
+                onclick={() => setQuickFilterValue(quickFilterActive!, true)}
+              >
+                {quickFilterActive.type.params.labelTrue}
+              </button>
+              <button
+                onclick={() => setQuickFilterValue(quickFilterActive!, false)}
+              >
+                {quickFilterActive.type.params.labelFalse}
+              </button>
+              <button
+                onclick={() => setQuickFilterValue(quickFilterActive!, undefined)}
+              >
+                {lang == 'en' ? 'All' : 'Tutti'}
+              </button>
+            </div>
+          {/if}
+        {:else if quickFilterActive.type.key === "country"}
+          <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
+            {quickFilterActive.title}
+            {#if !!quickFilterActive.type.missingLabel}
+              <button
+                onclick={() =>
+                  setQuickFilterMissingValue(quickFilterActive!)}
+                >{quickFilterActive.type.missingLabel}</button
+              >
+            {/if}
+          </div>
+          <div onclick={e => e.stopPropagation()} role="presentation" tabindex="-1">
+            <CountriesAutocomplete
+              bind:selected={quickFilterActive.type.selected}
+              {...((!!quickFilterActive.type.countriesOptions && quickFilterActive.type.countriesOptions.length > 0) && {
+                items: quickFilterActive.type.countriesOptions,
+              })}
+              autocompleteProps={{
+                placeholder: !!quickFilterActive.type.selected
+                  ? quickFilterActive.type.selected.length > 0
+                    ? ""
+                    : quickFilterActive.description
+                  : quickFilterActive.description,
+                multiple: true,
               }}
-            />
-          </svelte:fragment>
-        </VerticalDraggableList>
-      {/if}
-      <Divider --divider-color=rgb(var(--global-color-contrast-100) />
-      <span class="headers-show grid-col-1">{lang == 'en' ? 'Headers to show' : 'Intestazioni da mostrare'}</span>
-      {#if headersToSelect && headersToSelect.length > 0}
-        {#each headersToSelect as header (header.id)}
-          <div
-            animate:flip
-            in:receive={{ key: header }}
-            out:send={{ key: header }}
-            class="headers-show grid-col-1"
-          >
-            <Switch
-              --switch-label-width="90%"
-              value={false}
-              label={header.name}
-              on:change={(e) => {
-                if (e.detail.value == true) {
-                  headersToSelect = headersToSelect.filter(
-                    (h) => h.id != header.id
-                  );
-                  headersToShow = [...headersToShow, header];
-                }
-              }}
+              --autocomplete-border="1px solid rgb(var(--global-color-background-500))"
+              --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
             />
           </div>
-        {/each}
-      {:else}
-        <div class="headers-show grid-col-1">
-          <span style="text-align: center;">{lang == 'en' ? 'No headers to add' : 'Nessuna intestazione da aggiungere'}</span>
+        {:else if quickFilterActive.type.key === "date"}
+          <div onclick={e => e.stopPropagation()} role="presentation" tabindex="-1">
+            <div>
+              <DatePickerTextField
+                bind:selectedDate={quickFilterActive.type.from}
+                placeholder={lang == 'en' ? "From" : 'Da'}
+                --simple-textfield-width="100%"
+                --simple-textfield-border-radius= 0.5rem
+                --simple-textfield-background-color= transparent
+                --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+                --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+                flipOnOverflow
+                bind:menuOpened={calendarOpened}
+                ondayClick={() => (calendarOpened = false)}
+              >
+                {#snippet appendInnerSnippet({ appendInnerIcon, iconSize })}
+                  <Icon
+                    name="mdi-close-circle"
+                    onclick={() => {
+                      if (
+                        !!quickFilterActive &&
+                        quickFilterActive.type.key === "date"
+                      ) {
+                        quickFilterActive.type.from = undefined;
+                      }
+                    }}
+                  />
+                {/snippet}
+              </DatePickerTextField>
+            </div>
+            <div>
+              <DatePickerTextField
+                bind:selectedDate={quickFilterActive.type.to}
+                placeholder={lang == 'en' ? "To" : 'A'}
+                --simple-textfield-width="100%"
+                --simple-textfield-border-radius= 0.5rem
+                --simple-textfield-background-color= transparent
+                --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+                --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+                flipOnOverflow
+                bind:menuOpened={calendarOpened2}
+                ondayClick={() => (calendarOpened2 = false)}
+              >
+                {#snippet appendInnerSnippet({ appendInnerIcon, iconSize })}
+                  <Icon
+                    name="mdi-close-circle"
+                    onclick={() => {
+                      if (
+                        !!quickFilterActive &&
+                        quickFilterActive.type.key === "date"
+                      ) {
+                        quickFilterActive.type.to = undefined;
+                      }
+                    }}
+                  />
+                {/snippet}
+              </DatePickerTextField>
+            </div>
+          </div>
+        {/if}
+      </div>
+
+      {#if quickFilterActive.type.key != "boolean"}
+        <div style:margin-top="10px" style:grid-row="2" style:grid-column="1 / 3">
+          <Divider --divider-color=rgb(var(--global-color-contrast-100)) />
+        </div>
+        <div style:grid-row="3" style:grid-column="2" style:margin-top="-15px">
+          <ConfirmOrCancelButtons
+            confirmDisable={saveEditDisabled}
+            confirmText={lang == 'en' ? "Apply" : 'Applica'}
+            cancelText={lang == 'en' ? "Cancel" : 'Annulla'}
+            oncancelClick={handleCancelClick}
+            onconfirmClick={() => handleApplyClick(quickFilterActive!, quickFilterActive!.type.key == 'custom')}
+          />
         </div>
       {/if}
-      <div style="width: 100%; display: flex; justify-content: center;">
-        <Button
-          class="mr-3 mt-5"
-          --button-width="70%"
-          on:click={saveHeadersToShow}
-        >
-          {lang == 'en' ? 'Save preferences' : 'Salva preferenze'}
-        </Button>
-      </div>
     </div>
-  </Drawer>
+  </Menu>
+{/if}
+
+<MediaQuery>
+  {#snippet defaultSnippet({ sAndDown })}
+    <Drawer
+      bind:open={openHeaderDrawer}
+      _space={sAndDown ? "60vh" : "400px"}
+      position={sAndDown ? "bottom" : "right"}
+    >
+      <div class="personalize-header">{lang == 'en' ? 'Personalize your headers' : 'Personalizza le tue intestazioni'}</div>
+      <div style="padding: 20px;">
+
+        <span class="headers-show grid-col-1">{lang == 'en' ? 'Headers shown in table' : 'Intestazioni visualizzate in tabella'}</span>
+
+        {#if headersToShow}
+          <VerticalDraggableList
+            items={headersToShow}
+            onchangeOrder={(e) => {
+              headersToShow = e.detail.items;
+            }}
+          >
+            {#snippet itemSnippet({ item })}
+              <div
+                style:display=flex
+              >
+                <div
+                  style:flex-grow=1
+                >
+                  {item.name}
+                </div>
+                <Switch
+                  --switch-label-width="90%"
+                  value={headersToShow.find((h) => h.id == item.id) != undefined}
+                  onchange={(e) => {
+                    if (e.detail.value == false) {
+                      headersToShow = headersToShow.filter((h) => h.id != item.id);
+                      headersToSelect = [...headersToSelect, item];
+                    }
+                  }}
+                />
+              </div>
+            {/snippet}
+          </VerticalDraggableList>
+        {/if}
+        <Divider --divider-color=rgb(var(--global-color-contrast-100) />
+        <span class="headers-show grid-col-1">{lang == 'en' ? 'Headers to show' : 'Intestazioni da mostrare'}</span>
+        {#if headersToSelect && headersToSelect.length > 0}
+          {#each headersToSelect as header (header.id)}
+            <div
+              animate:flip
+              in:receive={{ key: header }}
+              out:send={{ key: header }}
+              class="headers-show grid-col-1"
+            >
+              <div
+                style:display=flex
+              >
+                <div
+                  style:flex-grow=1
+                >
+                  {header.name}
+                </div>
+                <Switch
+                  --switch-label-width="90%"
+                  value={false}
+                  onchange={(e) => {
+                    if (e.detail.value == true) {
+                      headersToSelect = headersToSelect.filter(
+                        (h) => h.id != header.id
+                      );
+                      headersToShow = [...headersToShow, header];
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          {/each}
+        {:else}
+          <div class="headers-show grid-col-1">
+            <span style="text-align: center;">{lang == 'en' ? 'No headers to add' : 'Nessuna intestazione da aggiungere'}</span>
+          </div>
+        {/if}
+        <div style="width: 100%; display: flex; justify-content: center; padding-top: 15px;">
+          <Button
+            class="mr-3 mt-5"
+            --button-width="100%"
+            onclick={saveHeadersToShow}
+          >
+            {lang == 'en' ? 'Save preferences' : 'Salva preferenze'}
+          </Button>
+        </div>
+      </div>
+    </Drawer>
+  {/snippet}
 </MediaQuery>
 
 <style>
@@ -2157,6 +2373,12 @@
   .search-bar-container {
     display: flex;
     flex-direction: row;
+  }
+
+  .filter-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
     margin-bottom: 20px;
   }
 
@@ -2220,7 +2442,7 @@
     font-size: 20px;
     line-height: 28px;
     font-weight: 700;
-    padding: 20px;
+    padding: 20px 20px 0px 20px;
   }
 
   .headers-show {

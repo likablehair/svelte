@@ -1,13 +1,8 @@
 <script lang="ts">
+    import type { ChangeEventHandler, FocusEventHandler, FormEventHandler, KeyboardEventHandler } from 'svelte/elements';
   import '../../../css/main.css'
   import './SearchBar.css'
-
-  let clazz: {
-    container?: string,
-    icon?: string,
-    input?: string
-  } = {};
-	export { clazz as class };
+    import type { Snippet } from 'svelte';
 
   /*
     Styles:
@@ -23,28 +18,61 @@
     --search-bar-width
   */
 
-  export let input: HTMLElement | undefined = undefined,
-    value: string | undefined = undefined,
-    placeholder: string | undefined = undefined
+  interface Props {
+    input?: HTMLElement;
+    value?: string;
+    placeholder?: string;
+    class?: {
+      container?: string,
+      icon?: string,
+      input?: string
+    }
+    oninput?: FormEventHandler<HTMLInputElement>
+    onchange?: ChangeEventHandler<HTMLInputElement>
+    onkeydown?: KeyboardEventHandler<HTMLInputElement>
+    onfocus?: FocusEventHandler<HTMLInputElement>
+    onblur?: FocusEventHandler<HTMLInputElement>
+    iconSnippet?: Snippet<[]>
+    inputSnippet?: Snippet<[]>
+  }
+
+  let {
+    input = $bindable(undefined),
+    value = $bindable(undefined),
+    placeholder = undefined,
+    class: clazz = {},
+    onblur,
+    onchange,
+    onfocus,
+    oninput,
+    onkeydown,
+    iconSnippet,
+    inputSnippet,
+  }: Props = $props();
 </script>
 
 <div
   class="search-bar-container {clazz.container}"
 >
-  <slot name="icon">
+  {#if iconSnippet}
+    {@render iconSnippet()}
+  {:else}
     <svg
       viewBox="0 0 20 20"
       fill="none"
       aria-hidden="true"
       class="search-icon {clazz.icon}"
-      ><path
+    >
+      <path
         stroke-linecap="round"
         stroke-linejoin="round"
         d="M12.01 12a4.25 4.25 0 1 0-6.02-6 4.25 4.25 0 0 0 6.02 6Zm0 0 3.24 3.25"
-      /></svg
-    >
-  </slot>
-  <slot name="input">
+      />
+    </svg>
+  {/if}
+  {#if inputSnippet}
+    {@render inputSnippet()}
+  {:else}
     <input
       aria-autocomplete="both"
       aria-labelledby="search-content"
@@ -59,14 +87,15 @@
       tabindex="0"
       bind:this={input}
       bind:value={value}
-      on:input
-      on:change
-      on:keydown
-      on:focus
-      on:blur
+      {oninput}
+      {onchange}
+      {onkeydown}
+      {onfocus}
+      {onblur}
       class="input {clazz.input}"
     />
-  </slot>
+  {/if}
+  
 </div>
 
 <style>

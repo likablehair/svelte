@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type Tab = {
     name: string;
     label: string;
@@ -7,22 +7,46 @@
 </script>
 
 <script lang="ts">
-  import { afterUpdate, onMount } from "svelte";
+  import { onMount, type Snippet } from "svelte";
   import './TabSwitcher.css'
   import { BROWSER } from 'esm-env';
+  import Icon from "../media/Icon.svelte";
 
-  let clazz: {
-    container?: string,
-    tabs?: string,
-    selected?: string,
-    bookmark?: string,
-    guide?: string
-  } = {};
-	export { clazz as class };
+  interface Props {
+    tabs?: Tab[];
+    selected?: string;
+    mandatory?: boolean;
+    class?: {
+      container?: string,
+      tabs?: string,
+      selected?: string,
+      bookmark?: string,
+      guide?: string
+    }
+    ontabClick?: (event: {
+      detail: {
+        nativeEvent: MouseEvent;
+        tab: Tab;
+      }
+    }) => void
+    ontabKeypress?: (event: {
+      detail: {
+        nativeEvent: KeyboardEvent;
+        tab: Tab;
+      }
+    }) => void
+    appendSnippet?: Snippet<[]>
+  }
 
-  export let tabs: Tab[] = [],
-    selected: string | undefined = undefined,
-    mandatory = true
+  let {
+    tabs = [],
+    selected = $bindable(undefined),
+    mandatory = true,
+    class: clazz = {},
+    ontabClick,
+    ontabKeypress,
+    appendSnippet,
+  }: Props = $props();
 
   let tabButtons: Record<string, HTMLElement> = {};
   onMount(() => {
@@ -33,42 +57,37 @@
     }
   });
 
-  afterUpdate(() => {
+  $effect(() => {
     setBookmarkPosition();
   });
 
-  import { createEventDispatcher } from "svelte";
-  import Icon from "../media/Icon.svelte";
-  const dispatch = createEventDispatcher<{
-    "tab-click": {
-      nativeEvent: MouseEvent;
-      tab: Tab;
-    };
-    "tab-keypress": {
-      nativeEvent: KeyboardEvent;
-      tab: Tab;
-    };
-  }>();
-
-  let bookmarkWidth = 0,
-    bookmarkLeft = 0;
+  let bookmarkWidth = $state(0),
+    bookmarkLeft = $state(0);
 
   function handleTabClick(clickedTab: Tab, nativeEvent: MouseEvent) {
     selected = clickedTab.name;
     setBookmarkPosition();
-    dispatch("tab-click", {
-      nativeEvent: nativeEvent,
-      tab: clickedTab,
-    });
+    if(ontabClick) {
+      ontabClick({
+        detail: {
+          nativeEvent,
+          tab: clickedTab
+        }
+      })
+    }
   }
 
   function handleTabKeypress(clickedTab: Tab, nativeEvent: KeyboardEvent) {
     selected = clickedTab.name;
     setBookmarkPosition();
-    dispatch("tab-keypress", {
-      nativeEvent: nativeEvent,
-      tab: clickedTab,
-    });
+    if(ontabKeypress) {
+      ontabKeypress({
+        detail: {
+          nativeEvent,
+          tab: clickedTab
+        }
+      })
+    }
   }
 
   function setBookmarkPosition() {
@@ -84,7 +103,7 @@
     }
   }
 
-  $: if(!!selected) setBookmarkPosition()
+  $effect(() => { if(!!selected) setBookmarkPosition() }) 
 </script>
 
 <div
@@ -95,8 +114,8 @@
       role="presentation"
       class:selected-tab={tab.name == selected}
       class="tab-label {clazz.tabs || ''} {tab.name == selected ? clazz.selected || '' : ''}"
-      on:click={(event) => handleTabClick(tab, event)}
-      on:keypress={(event) => handleTabKeypress(tab, event)}
+      onclick={(event) => handleTabClick(tab, event)}
+      onkeypress={(event) => handleTabKeypress(tab, event)}
       bind:this={tabButtons[tab.name]}
     >
       {#if !!tab.icon}
@@ -105,23 +124,23 @@
       {tab.label}
     </div>
   {/each}
-  {#if $$slots.append}
+  {#if appendSnippet}
     <div
       style:flex-grow="1"
       style:display="flex"
       style:justify-content="flex-end"
     >
-      <slot name="append" />
+      {@render appendSnippet()}
     </div>
   {/if}
   <span
     style:left={bookmarkLeft + "px"}
     style:width={bookmarkWidth + "px"}
     class="{clazz.bookmark || ''} bookmark"
-  />
+  ></span>
   <span
     class="{clazz.guide || ''} horizontal-guide"
-  />
+  ></span>
 </div>
 
 <style>

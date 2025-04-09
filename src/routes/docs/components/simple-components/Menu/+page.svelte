@@ -7,39 +7,43 @@
 
   let menuOpened = false
   let activator
+  let menuLabels = ['this', 'is', 'a', 'menu', '!']
 
-  let stickyActivator: HTMLElement
-
-  function handleButtonClick(e: CustomEvent) {
-    e.detail.nativeEvent.stopPropagation()
+  function handleButtonClick(e: MouseEvent) {
+    e.stopPropagation()
     menuOpened = !menuOpened
   }
 
   let secondActivators: Record<string, HTMLElement> = {}
   let secondMenuOpened: Record<string, boolean> = {}
-
-  function handleListClick(menuLabel: string) {
-    secondMenuOpened[menuLabel] = true
-    thirdMenuOpened = {}
-  }
-
   let thirdActivators: Record<string, HTMLElement> = {}
   let thirdMenuOpened: Record<string, boolean> = {}
 
+  menuLabels.forEach(label => {
+    secondMenuOpened[label] = false
+    thirdMenuOpened[label] = false
+  })
+
+  function handleListClick(menuLabel: string) {
+    setTimeout(() => {
+      secondMenuOpened[menuLabel] = true
+      thirdMenuOpened[menuLabel] = false
+    }, 10);
+  }
+
   function handleSubMenuClick(menuLabel: string) {
-    thirdMenuOpened[menuLabel] = true
+    setTimeout(() => {
+      thirdMenuOpened[menuLabel] = true
+    }, 10);
   }
 </script>
-
 <h1>Menu</h1>
 <ComponentSubtitle>Custom elements that appear on the screen wherever you want them to be positioned.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
   <div style:width="fit-content" bind:this={activator}>
     <Button
-      width="200px"
-      maxWidth="90vw"
-      on:click={(e) => handleButtonClick(e)}
+      onclick={(e) => handleButtonClick(e.detail.nativeEvent)}
     >
       Click me
     </Button>
@@ -59,11 +63,12 @@
   <div class="menu-content">
     <div class="list-container">
       <ul>
-        {#each ['this', 'is', 'a', 'menu', '!'] as menuLabel}
+        {#each menuLabels as menuLabel}
           <li
             bind:this={secondActivators[menuLabel]} 
-            on:click={() => handleListClick(menuLabel)}
-            on:keypress={() => handleListClick(menuLabel)}
+            onclick={() => handleListClick(menuLabel)}
+            onkeypress={() => handleListClick(menuLabel)}
+            role="presentation"
           >{menuLabel}</li>
         {/each}
       </ul>
@@ -71,7 +76,7 @@
   </div>
 </Menu>
 
-{#each ['this', 'is', 'a', 'menu', '!'] as menuLabel}
+{#each menuLabels as menuLabel}
   <Menu
     _width="160px"
     activator={secondActivators[menuLabel]}
@@ -86,15 +91,16 @@
     <div 
       style:height="100px"
       bind:this={thirdActivators[menuLabel]}
-      on:click={() => handleSubMenuClick(menuLabel)}
-      on:keypress={() => handleSubMenuClick(menuLabel)}
+      onclick={() => handleSubMenuClick(menuLabel)}
+      onkeypress={() => handleSubMenuClick(menuLabel)}
+      role="presentation"
     >
       {menuLabel}
     </div>
   </Menu>
 {/each}
 
-{#each ['this', 'is', 'a', 'menu', '!'] as menuLabel}
+{#each menuLabels as menuLabel}
   <Menu
     _width="140px"
     activator={thirdActivators[menuLabel]}
@@ -115,103 +121,38 @@
 <h2>Props</h2>
 <PropsViewer
   props={[
-    {
-      name: "open",
-      type: "boolean",
-      description: "Define whether the menu is opened or not",
-      default: "false"
-    }, {
-      name: "refreshPosition",
-      type: "boolean",
-      description: "To be set to true when the position of the menu should be recalculated",
-      default: "false"
-    }, {
-      name: "activator",
-      type: "HTMLElement",
-      default: "undefined",
-      description: "HTML element to bind the menu to"
-    }, {
-      name: "anchor",
-      type: '"bottom" | "bottom-center"',
-      default: '"bottom"',
-      description: 'The position of the menu realtive to the activator'
-    }, {
-      name: "closeOnClickOutside",
-      type: "boolean",
-      description: "Define whether the menu should be closed when clicking outside",
-      default: "false"
-    }, {
-      name: "inAnimation",
-      description: "The animation used to show the menu",
-      type: "(node: Element, params?: SlideParams | FlyParams | FadeParams) => TransitionConfig",
-      default: "fly"
-    }, {
-      name: "inAnimationConfig",
-      type: "SlideParams | FlyParams | FadeParams",
-      description: "The configuration used by the inAnimation function",
-      default: "{ duration: 100, y: 10 }"
-    }, {
-      name: "outAnimation",
-      description: "The animation used to hide the menu",
-      type: "(node: Element, params?: SlideParams | FlyParams | FadeParams) => TransitionConfig",
-      default: "fly"
-    }, {
-      name: "outAnimationConfig",
-      type: "SlideParams | FlyParams | FadeParams",
-      description: "The configuration used by the outAnimation function",
-      default: "{ duration: 100, y: 10 }"
-    }
+    { name: '_top', type: 'number', description: 'Top position of the menu', default: 'undefined' },
+    { name: '_left', type: 'number', description: 'Left position of the menu', default: 'undefined' },
+    { name: '_width', type: 'string', description: 'Width of the menu', default: '"auto"' },
+    { name: '_height', type: 'string', description: 'Height of the menu', default: '"auto"' },
+    { name: '_maxHeight', type: 'string', description: 'Maximum height of the menu', default: 'undefined' },
+    { name: '_minWidth', type: 'string', description: 'Minimum width of the menu', default: 'undefined' },
+    { name: '_overflow', type: 'string', description: 'Overflow behavior of the menu', default: '"auto"' },
+    { name: '_boxShadow', type: 'string', description: 'Box shadow styling for the menu', default: 'undefined' },
+    { name: '_borderRadius', type: 'string', description: 'Border radius of the menu', default: 'undefined' },
+    { name: '_activatorGap', type: 'number', description: 'Gap between the activator and menu', default: '5' },
+    { name: 'open', type: 'boolean', description: 'Controls the visibility of the menu', default: 'false' },
+    { name: 'refreshPosition', type: 'boolean', description: 'Triggers recalculation of menu position', default: 'false' },
+    { name: 'activator', type: 'HTMLElement', description: 'Element that triggers the menu', default: 'undefined' },
+    { name: 'anchor', type: '"bottom" | "bottom-center" | "right-center"', description: 'Defines the menu alignment', default: '"bottom"' },
+    { name: 'closeOnClickOutside', type: 'boolean', description: 'Closes the menu when clicking outside', default: 'false' },
+    { name: 'inAnimation', type: '(node: Element, params?: SlideParams | FlyParams | FadeParams) => TransitionConfig', description: 'Animation for menu entrance', default: 'fly' },
+    { name: 'inAnimationConfig', type: 'SlideParams | FlyParams | FadeParams', description: 'Configuration for inAnimation', default: '{ duration: 100, y: 10 }' },
+    { name: 'outAnimation', type: '(node: Element, params?: SlideParams | FlyParams | FadeParams) => TransitionConfig', description: 'Animation for menu exit', default: 'fly' },
+    { name: 'outAnimationConfig', type: 'SlideParams | FlyParams | FadeParams', description: 'Configuration for outAnimation', default: '{ duration: 100, y: 10 }' },
+    { name: 'menuElement', type: 'HTMLElement', description: 'Reference to the menu element', default: 'undefined' },
+    { name: 'flipOnOverflow', type: 'boolean', description: 'Flips the menu if it overflows viewport', default: 'false' },
+    { name: 'stayInViewport', type: 'boolean', description: 'Keeps the menu within the viewport', default: 'false' },
+    { name: 'openingId', type: 'string', description: 'Unique identifier for the menu instance', default: 'undefined' }
   ]}
-  styleProps={[
-    {
-      name: "_top",
-      type: "number",
-      default: "undefined",
-      description: "Absolute top position (px) used if activator is not defined"
-    }, {
-      name: "_left",
-      type: "number",
-      default: "undefined",
-      description: "Absolute left position (px) used if activator is not defined"
-    }, {
-      name: "_width",
-      type: "string",
-      default: "auto",
-      description: "Width of the menu"
-    }, {
-      name: "_height",
-      type: "string",
-      default: "auto",
-      description: "Height of the menu"
-    }, {
-      name: "_maxHeight",
-      type: "string",
-      default: "undefined",
-      description: "max-height of the menu"
-    }, {
-      name: "_overflow",
-      type: "string",
-      default: "auto",
-      description: "overflow css property"
-    }, {
-      name: "_boxShadow",
-      type: "string",
-      default: "undefined",
-      description: "box-shadow css property"
-    }, {
-      name: "_borderRadius",
-      type: "string",
-      default: "undefined",
-      description: "border-radius css property"
-    }
-  ]}
+  styleProps={[]}
 ></PropsViewer>
 <h2>Slots</h2>
 <SlotsViewer
     slots={[
       {
-        name: 'default',
-        description: 'Content of the menu'
+        description: 'Content of the menu',
+        name: 'Children',
       }
     ]}
 ></SlotsViewer>

@@ -3,45 +3,76 @@
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
   import Menu from "$lib/components/simple/common/Menu.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
-  import { onMount, type ComponentProps } from 'svelte';
+  import { onMount, tick, type ComponentProps, type Snippet } from 'svelte';
   import { DateTime } from 'luxon'
-  import { createEventDispatcher } from 'svelte';
   import MediaQuery from '../../simple/common/MediaQuery.svelte';
   import Dialog from '../../simple/dialogs/Dialog.svelte';
-    import YearSelector from '$lib/components/simple/dates/YearSelector.svelte';
+  import YearSelector from '$lib/components/simple/dates/YearSelector.svelte';
 
-  let clazz: {
-    activator?: string,
-    textfield?: ComponentProps<SimpleTextField>['class']
-  } = {};
-	export { clazz as class };
-
-  let dispatch = createEventDispatcher<{
-    'year-click': {
-      year: number
-    },
-    input: {
-      year: number | undefined
+  interface Props {
+    menuOpened?: boolean;
+    openingId?: string;
+    selectedYear?: number;
+    placeholder?: string;
+    mobileDialog?: boolean;
+    maxYearInRange?: number;
+    minYearInRange?: number;
+    disabled?: boolean;
+    class?: {
+      activator?: string,
+      textfield?: ComponentProps<typeof SimpleTextField>['class']
     }
-  }>()
+    onyearClick?: (event: {
+      detail: {
+        year: number
+      }
+    }) => void
+    oninput?: (event: {
+      detail: {
+        year: number | undefined
+      }
+    }) => void
+    appendSnippet?: ComponentProps<typeof SimpleTextField>['appendSnippet']
+    appendInnerSnippet?: ComponentProps<typeof SimpleTextField>['appendInnerSnippet']
+    prependSnippet?: ComponentProps<typeof SimpleTextField>['prependSnippet']
+    prependInnerSnippet?: ComponentProps<typeof SimpleTextField>['prependInnerSnippet']
+    activatorSnippet?: Snippet<[{
+      mask: typeof mask,
+      handleTextFieldFocus: typeof handleTextFieldFocus,
+      handleInputChange: typeof handleInputChange,
+      inputElement: typeof inputElement,
+      placeholder: typeof placeholder,
+      disabled: typeof disabled,
+    }]>
+  }
 
-  export let menuOpened: boolean = false,
-    openingId: string = 'year-picker-text-field',
-    selectedYear: number | undefined = undefined,
-    placeholder: string | undefined = undefined,
-    mobileDialog: boolean = true,
-    maxYearInRange: number = 2100,
-    minYearInRange: number = 1900,
-    disabled: boolean = false
+  let {
+    menuOpened = $bindable(false),
+    openingId = $bindable('year-picker-text-field'),
+    selectedYear = $bindable(),
+    placeholder,
+    mobileDialog = true,
+    maxYearInRange = 2100,
+    minYearInRange = 1900,
+    disabled = false,
+    class: clazz = {},
+    oninput,
+    onyearClick,
+    appendInnerSnippet,
+    appendSnippet,
+    prependInnerSnippet: prependInnerInternalSnippet,
+    prependSnippet,
+    activatorSnippet,
+  }: Props = $props();
 
-  let activator: HTMLElement,
-    refreshPosition = false,
-    menuElement: HTMLElement,
-    inputElement: HTMLElement,
+  let activator: HTMLElement | undefined = $state(),
+    refreshPosition = $state(false),
+    menuElement: HTMLElement | undefined = $state(),
+    inputElement: HTMLElement | undefined = $state(),
     pattern: string = "yyyy",
-    mask: InputMask<typeof maskFactoryArgs> | { value: string | undefined } = {
+    mask: InputMask<typeof maskFactoryArgs> | { value: string | undefined } = $state({
       value: undefined
-    },
+    }),
     maskFactoryArgs = {
       mask: Date,
       pattern: pattern,
@@ -67,9 +98,11 @@
   }
 
   onMount(() => {
-    mask = IMask(
-      inputElement, maskFactoryArgs
-    )
+    if(inputElement){
+      mask = IMask(
+        inputElement, maskFactoryArgs
+      )
+    }
 
     if(selectedYear !== undefined && selectedYear !== null) {
       mask.value = selectedYear.toString()
@@ -90,24 +123,28 @@
           selectedYear = undefined
         }
 
-        dispatch('input', {
-          year: selectedYear
-        })
+        if(oninput) {
+          oninput({
+            detail: {
+              year: selectedYear
+            }
+          })
+        }
       }
     }, 30);
   }
 
-  function handleYearClick(ev: CustomEvent<{
-    year: number
-  }>) {
-    dispatch('year-click', {
-      year: ev.detail.year
-    })
+  function handleYearClick(event: Parameters<NonNullable<ComponentProps<typeof YearSelector>['onclick']>>[0]) {
+    if(onyearClick) {
+      onyearClick({
+        detail: {
+          year: event.detail.year
+        }
+      })
+    }
   }
 
-  function handleYearChange(ev: CustomEvent<{
-    year: number | undefined
-  }>) {
+  function handleYearChange(event: Parameters<NonNullable<ComponentProps<typeof YearSelector>['onchange']>>[0]) {
     if(!!selectedYear) {
       mask.value = selectedYear.toString()
     } else {
@@ -115,108 +152,106 @@
     }
   }
 
-  $: if(!!selectedYear) {
-    setTimeout(() => {
-      if(!!selectedYear) {
-        mask.value = selectedYear.toString()
-      }
-    }, 30);
-  }
+  $effect(() => {
+    if(!!selectedYear) {
+      setTimeout(async () => {
+        if(!!selectedYear) {
+          mask.value = selectedYear.toString()
+        }
+        await tick()
+      }, 30);
+    }
+  })
 </script>
 
-<MediaQuery let:mAndDown>
-  <div
-    bind:this={activator}
-    class="year-picker-activator {clazz.activator || ''}"
-  >
-    <slot 
-      name="activator"
-      {mask}
-      {handleTextFieldFocus}
-      {handleInputChange}
-      {inputElement}
-      {placeholder}
-      {disabled}
+<MediaQuery>
+  {#snippet defaultSnippet({ mAndDown})}
+    <div
+      bind:this={activator}
+      class="year-picker-activator {clazz.activator || ''}"
     >
-      <SimpleTextField
-        bind:value={mask.value}
-        on:focus={() => handleTextFieldFocus(mAndDown)}
-        on:keydown={handleInputChange}
-        bind:input={inputElement}
-        bind:placeholder
-        class={clazz.textfield}
-        {disabled}
-      >
-        <svelte:fragment slot="prepend-inner" let:prependInnerIcon let:iconSize>
-          <slot name="prepend-inner" {prependInnerIcon} {iconSize}>
-            <Icon
-              name="mdi-calendar"
-              click
-              on:click={() => menuOpened = !menuOpened}
-            ></Icon>
-          </slot>
-        </svelte:fragment>
-        <svelte:fragment slot="append-inner" let:appendInnerIcon let:iconSize>
-          <slot name="append-inner" {appendInnerIcon} {iconSize}>
-          </slot>
-        </svelte:fragment>
-        <svelte:fragment slot="prepend" let:prependIcon let:iconSize>
-          <slot name="append-inner" {prependIcon} {iconSize}>
-          </slot>
-        </svelte:fragment>
-        <svelte:fragment slot="append" let:appendIcon let:iconSize>
-          <slot name="append-inner" {appendIcon} {iconSize}>
-          </slot>
-        </svelte:fragment>
-      </SimpleTextField>
-    </slot>
-  </div>
+      {#if activatorSnippet}
+        {@render activatorSnippet({
+          mask,
+          handleTextFieldFocus,
+          handleInputChange,
+          inputElement,
+          placeholder,
+          disabled,
+        })}
+      {:else}
+        <SimpleTextField
+          bind:value={mask.value}
+          onfocus={() => handleTextFieldFocus(mAndDown)}
+          onkeydown={handleInputChange}
+          bind:input={inputElement}
+          {placeholder}
+          class={clazz.textfield}
+          {disabled}
+          {appendSnippet}
+          {appendInnerSnippet}
+          {prependSnippet}
+        >
+          {#snippet prependInnerSnippet({ iconSize, prependInnerIcon })}
+            {#if prependInnerInternalSnippet}
+              {@render prependInnerInternalSnippet({ prependInnerIcon, iconSize })}
+            {:else}
+              <Icon
+                name="mdi-calendar"
+                onclick={() => menuOpened = !menuOpened}
+              ></Icon>
+            {/if}
+          {/snippet}
+        </SimpleTextField>
+      {/if}
+    </div>
 
-  {#if mAndDown && mobileDialog}
-    <Dialog
-      bind:open={menuOpened}
-    >
-      <div
-        style:background-color="rgb(var(--global-color-background-100))"
-        style:width="300px"
-        style:border-radius="10px"
+    {#if mAndDown && mobileDialog}
+      <Dialog
+        bind:open={menuOpened}
       >
-        <YearSelector
-          bind:selectedYear={selectedYear}
-          on:click={handleYearClick}
-          on:change={handleYearChange}
-          {disabled}
-        ></YearSelector>
-      </div>
-    </Dialog>
-  {:else}
-    <Menu
-      {activator}
-      _width={"300px"}
-      _boxShadow={"rgb(var(--global-color-background-300), .5) 0px 2px 4px"}
-      _borderRadius={"5px"}
-      bind:open={menuOpened}
-      anchor="bottom-center"
-      closeOnClickOutside
-      bind:refreshPosition
-      bind:menuElement
-      bind:openingId={openingId}
-    >
-      <div
-        style:background-color="rgb(var(--global-color-background-100))"
+        <div
+          style:background-color="rgb(var(--global-color-background-100))"
+          style:width="300px"
+          style:border-radius="10px"
+        >
+          <YearSelector
+            bind:selectedYear={selectedYear}
+            onclick={handleYearClick}
+            onchange={handleYearChange}
+            {disabled}
+          ></YearSelector>
+        </div>
+      </Dialog>
+    {:else}
+      <Menu
+        {activator}
+        _width={"300px"}
+        _boxShadow={"rgb(var(--global-color-background-300), .5) 0px 2px 4px"}
+        _borderRadius={"5px"}
+        bind:open={menuOpened}
+        anchor="bottom-center"
+        closeOnClickOutside
+        bind:refreshPosition
+        bind:menuElement
+        bind:openingId={openingId}
       >
-        <YearSelector
-          bind:selectedYear={selectedYear}
-          on:click={handleYearClick}
-          on:change={handleYearChange}
-          {disabled}
-          selectableYears={[...Array((maxYearInRange - minYearInRange) + 1).keys()].map((v) => {
-            return minYearInRange + v
-          })}
-        ></YearSelector>
-      </div>
-    </Menu>
-  {/if}
+        <div
+          style:background-color="rgb(var(--global-color-background-100))"
+        >
+          <YearSelector
+            bind:selectedYear={selectedYear}
+            onclick={handleYearClick}
+            onchange={handleYearChange}
+            {disabled}
+            selectableYears={[...Array((maxYearInRange - minYearInRange) + 1).keys()].map((v) => {
+              return minYearInRange + v
+            })}
+          ></YearSelector>
+        </div>
+      </Menu>
+    {/if}
+  {/snippet}
 </MediaQuery>
 
 <style>

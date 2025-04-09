@@ -2,55 +2,84 @@
   import '../../../css/main.css'
   import './HeaderMenu.css'
   import Button from "$lib/components/simple/buttons/Button.svelte";
-  import Drawer from "$lib/components/simple/navigation/Drawer.svelte";
-  import { createEventDispatcher } from 'svelte';
+  import { Drawer } from '$lib';
+  import type { ComponentProps, Snippet } from 'svelte';
 
-  let dispatch = createEventDispatcher<{
-    'drawer-change': {
-      opened: boolean
-    }
-  }>()
-
-  export let title = "",
-    hideOnScroll = true,
-    initialRemoveShadow = false,
-    color: string | undefined = undefined,
-    mobileMenu = true,
-    zIndex = 25;
-
-  let scrollY: number,
-    lastScrollY: number,
-    visible = true;
-  function handleScroll() {
-    if (hideOnScroll) {
-      if (scrollY > lastScrollY) {
-        visible = false;
-      } else {
-        visible = true;
+  interface Props {
+    openDrawer?: boolean
+    title?: string;
+    hideOnScroll?: boolean;
+    initialRemoveShadow?: boolean;
+    color?: string;
+    mobileMenu?: boolean;
+    zIndex?: number;
+    ondrawerChange?: (event: {
+      detail: {
+        opened: boolean
       }
-    }
-
-    lastScrollY = scrollY;
+    }) => void
+    drawerSnippet?: Snippet<[]>
+    titleSnippet?: Snippet<[]>
+    appendSnippet?: Snippet<[]>
+    prependSnippet?: Snippet<[{
+      toggleDrawer: () => void,
+      openDrawer: boolean
+    }]>
+    onitemClick?: ComponentProps<typeof Drawer>['onitemClick']
   }
 
-  export let openDrawer = false;
+  let {
+    openDrawer = $bindable(false),
+    title = "",
+    hideOnScroll = true,
+    initialRemoveShadow = false,
+    color = undefined,
+    mobileMenu = true,
+    zIndex = 25,
+    ondrawerChange,
+    drawerSnippet,
+    appendSnippet,
+    prependSnippet,
+    titleSnippet,
+    onitemClick,
+  }: Props = $props();
+
+  let scrollY: number | undefined = $state(),
+    lastScrollY: number,
+    visible = $state(true);
+  function handleScroll() {
+    if(scrollY){
+      if (hideOnScroll) {
+        if (scrollY > lastScrollY) {
+          visible = false;
+        } else {
+          visible = true;
+        }
+      }
+
+      lastScrollY = scrollY;
+    }
+  }
+
   function toggleDrawer() {
     openDrawer = !openDrawer;
-    dispatch('drawer-change', {
-      opened: openDrawer
-    })
+    if(ondrawerChange) {
+      ondrawerChange({
+        detail: {
+          opened: openDrawer
+        }
+      })
+    }
   }
 </script>
 
-<svelte:window bind:scrollY on:scroll={handleScroll} />
+<svelte:window bind:scrollY onscroll={handleScroll} />
 
 <Drawer
   bind:open={openDrawer}
-  on:item-click
+  {onitemClick}
 >
-  {#if !!$$slots.drawer}
-    <slot name="drawer" />
-  {/if}
+  {@render drawerSnippet?.()}
 </Drawer>
 <nav
   style:color
@@ -66,7 +95,9 @@
     style:display="flex"
     style:align-items="center"
   >
-    <slot name="prepend" {toggleDrawer} {openDrawer}>
+    {#if prependSnippet}
+      {@render prependSnippet({ toggleDrawer, openDrawer })}
+    {:else}
       <div
         style:width="fit-content"
         style:margin-left="10px"
@@ -76,18 +107,20 @@
         <Button 
           buttonType="icon" 
           icon="mdi-menu" 
-          on:click={toggleDrawer} 
+          onclick={toggleDrawer} 
           --button-default-background-color="transparent"
         />
       </div>
-    </slot>
+    {/if}
   </div>
   <div style:flex-grow="1" style:margin-left="4px" style:align-items="center">
-    <slot name="title">
+    {#if titleSnippet}
+      {@render titleSnippet()}
+    {:else}
       <span style:font-size="24px" style:line-height="32px">{title}</span>
-    </slot>
+    {/if}
   </div>
-  <slot name="append" />
+  {@render appendSnippet?.()}
 </nav>
 
 <style>
@@ -118,19 +151,8 @@
     transition-duration: 150ms;
   }
 
-  .hide-on-mobile {
-    visibility: visible !important;
-  }
-
   .hide-on-desktop {
     visibility: visible !important;
-  }
-
-  @media (max-width: 767.98px) {
-    .hide-on-mobile {
-      visibility: hidden !important;
-      display: none !important;
-    }
   }
 
   @media (min-width: 768px) {

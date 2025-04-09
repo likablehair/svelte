@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
 	export type Option = {
 		icon?: string
 		value: string | number | undefined
@@ -7,29 +7,44 @@
 </script>
 
 <script lang="ts">
-    import { Icon, ToolTip } from "$lib";
-    import Select from "$lib/components/simple/forms/Select.svelte";
-
-	let clazz: {
-		label?: string
-		input?: {
-			container?: string
-			row?: string
-			input?: string
-		}
-	} = {}
-	export { clazz as class }
+	import { Icon, ToolTip } from "$lib";
+	import Select from "$lib/components/simple/forms/Select.svelte";
+    import type { ComponentProps } from "svelte";
   
-	export let value: string | number | undefined = undefined,
-		label: string,
-		description: string | undefined = undefined,
-		info: string | undefined = undefined,
-		name: string,
-		options: Option[],
-		disabled: boolean = false,
-		orientation: 'horizontal' | 'vertical' = 'vertical'
+	interface Props {
+    value?: string | number;
+    label: string;
+    description?: string;
+    info?: string;
+    name: string;
+    options: Option[];
+    disabled?: boolean;
+    orientation?: 'horizontal' | 'vertical';
+		class?: {
+			label?: string
+			input?: {
+				container?: string
+				row?: string
+				input?: string
+			}
+		}
+		onchange?: ComponentProps<typeof Select>['onchange']
+  }
 
-	let infoActivator: HTMLElement
+  let {
+    value = $bindable(undefined),
+    label,
+    description = undefined,
+    info = undefined,
+    name,
+    options,
+    disabled = false,
+    orientation = 'vertical',
+		class: clazz = {},
+		onchange,
+  }: Props = $props();
+
+	let infoActivator: HTMLElement | undefined = $state()
 
 </script>
 
@@ -86,6 +101,6 @@
 		style:grid-column="2"
 		style:grid-row="1"
 	>
-		<Select bind:value {options} {disabled} on:change />
+		<Select bind:value {options} {disabled} {onchange} />
 	</div>
 </div>

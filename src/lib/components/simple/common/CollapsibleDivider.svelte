@@ -1,24 +1,63 @@
 <script lang="ts">
   import '../../../css/main.css'
   import './CollapsibleDivider.css'
-  import { createEventDispatcher } from "svelte";
   import Icon from "../media/Icon.svelte";
 
-  let dispatch = createEventDispatcher<{
-    'change': {
-      collapsed: boolean
-    }
-  }>()
+  interface Props {
+    collapsed?: boolean;
+    openedIconName?: string;
+    collapsedIconName?: string;
+    disabled?: boolean;
+    onchange?: (event: {
+      detail: {
+        collapsed: boolean
+      }
+    }) => void
+    onkeydown?: () => void
+    onkeyup?: () => void
+    onkeypress?: () => void
+  }
 
-  export let collapsed: boolean = false,
-    openedIconName: string = "mdi-chevron-left",
-    collapsedIconName: string = "mdi-chevron-right",
-    disabled: boolean = false
+  let {
+    collapsed = $bindable(false),
+    openedIconName = "mdi-chevron-left",
+    collapsedIconName = "mdi-chevron-right",
+    disabled = false,
+    onchange,
+    onkeydown,
+    onkeypress,
+    onkeyup,
+  }: Props = $props();
 
   function handleCollapseClick() {
     if(!disabled) {
       collapsed = !collapsed
-      dispatch('change', { collapsed })
+    }
+
+    if(onchange){
+      onchange({
+        detail: {
+          collapsed
+        }
+      })
+    }
+  }
+
+  function handleKeydown() {
+    if(onkeydown){
+      onkeydown()
+    }
+  }
+
+  function handleKeyup() {
+    if(onkeyup){
+      onkeyup()
+    }
+  }
+
+  function handleKeypress() {
+    if(onkeypress){
+      onkeypress()
     }
   }
 
@@ -29,15 +68,18 @@
 >
   <div
     class="divider"
-  />
+  ></div>
   <div
+    role="button"
+    tabindex="0"
     class="button"
     class:disabled={disabled}
-    on:click="{handleCollapseClick}"
-    on:click
-    on:keydown
-    on:keyup
-    on:keypress
+    onclick={handleCollapseClick}
+    onkeydown={handleKeydown}
+    onkeyup={handleKeyup}
+    onkeypress={handleKeypress}
+    aria-expanded={!collapsed}
+    aria-label="Toggle collapse"
   >
     <Icon 
       name={collapsed ? collapsedIconName : openedIconName}

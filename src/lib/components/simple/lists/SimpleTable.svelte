@@ -1,4 +1,4 @@
-<script context="module" lang="ts">
+<script module lang="ts">
   export type HeaderType = ColumnBoolean |
     ColumnString |
     ColumnNumber |
@@ -7,73 +7,120 @@
     ColumnCheckBox |
     ColumnCustom
 
-  export type Header = {
+  export type Header<Data = any> = {
     value: string
     label: string
     type: HeaderType
     width?: string
     minWidth?: string
     sortable?: boolean
-    /* eslint-disable  @typescript-eslint/no-explicit-any */
-    data?: { [key: string]: any }
+    data?: Data
   };
 
-  export interface Item {
-    [key: string]: any;
-  }
-
-  export type CalculateRowStyles = (item: Item) => {
+  export type CalculateRowStyles<T> = (item: T) => {
     backgroundColor?: string;
     color?: string;
     fontWeight?: string;
   };
 
-  export type CalculateRowClasses = (item: Item) => string | undefined;
+  export type CalculateRowClasses<T> = (item: T) => string | undefined;
 </script>
 
-<script lang="ts">
+<script lang="ts" generics="Item extends {[key: string]: any}, Data">
   import '../../../css/main.css'
   import './SimpleTable.css'
   import Icon from '../media/Icon.svelte';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
   import type { DateTime } from 'luxon';
   import type { ColumnBoolean, ColumnCheckBox, ColumnCustom, ColumnDate, ColumnIcon, ColumnNumber, ColumnString } from './columnTypes';
+  import NoData from '../common/NoData.svelte';
 
-  let clazz: {
-    container?: string;
-    header?: string;
-    row?: string;
-    cell?: string;
-  } = {};
-	export { clazz as class };
+  type TableHeader = Header<Data>
 
-  const dispatch = createEventDispatcher<{
-    'sort': {
-      sortedBy: string | undefined,
-      sortDirection: string
-    },
-    'rowClick': {
+  interface Props {
+    headers: TableHeader[];
+    items: Item[];
+    sortedBy?: string;
+    sortDirection?: "asc" | "desc";
+    resizableColumns?: boolean;
+    resizedColumnSizeWithPadding?: { [value: string]: number };
+    pointerOnRowHover?: boolean;
+    lang?: 'it' | 'en'
+    calculateRowStyles?: CalculateRowStyles<Item> | undefined
+    calculateRowClasses?: CalculateRowClasses<Item> | undefined
+    onsort?: (event: {
+      detail: {
+        sortedBy: string | undefined,
+        sortDirection: string
+      }
+    }) => void
+    onrowClick?: (event: {
+      detail: {
+        item: Item
+      }
+    }) => void
+    oncolumnResize?: (event: {
+      detail: {
+        id: string,
+        newWidthPx: number
+      }
+    }) => void
+    headerSnippet?: Snippet<[{
+      head: TableHeader
+    }]>
+    headerLabelSnippet?: Snippet<[{
+      head: TableHeader
+    }]>
+    appendSnippet?: Snippet<[{
+      index: number
+      item?: Item
+    }]>
+    rowActionsSnippet?: Snippet<[{
+      index: number
       item: Item
-    },
-    columnResize: {
-      id: string,
-      newWidthPx: number
+    }]>
+    customSnippet?: Snippet<[{
+      index: number
+      columnIndex: number
+      header: TableHeader
+      item: Item
+    }]>
+    noDataSnippet?: Snippet<[]>
+    class?:{
+      container?: string;
+      header?: string;
+      row?: string;
+      cell?: string;
     }
-  }>()
+  }
 
-  export let headers: Header[] = [],
-    items: Item[] = [],
-    sortedBy: string | undefined = undefined,
-    sortDirection: "asc" | "desc" = "asc",
-    resizableColumns: boolean = false,
-    resizedColumnSizeWithPadding: { [value: string]: number } = {},
-    pointerOnRowHover: boolean = false;
-
-  export let calculateRowStyles: CalculateRowStyles | undefined = undefined;
-  export let calculateRowClasses: CalculateRowClasses | undefined = undefined;
+  let {
+    headers = [],
+    items = [],
+    sortedBy = $bindable(undefined),
+    sortDirection = $bindable("asc"),
+    resizableColumns = false,
+    resizedColumnSizeWithPadding = $bindable(),
+    pointerOnRowHover = false,
+    lang = 'en',
+    calculateRowStyles = undefined,
+    calculateRowClasses = undefined,
+    oncolumnResize,
+    onrowClick,
+    onsort,
+    headerSnippet,
+    headerLabelSnippet,
+    appendSnippet,
+    rowActionsSnippet,
+    customSnippet,
+    noDataSnippet,
+    class: clazz = {},
+  }: Props = $props();
 
   onMount(() => {
     if(resizableColumns) {
+      if(!resizedColumnSizeWithPadding) resizedColumnSizeWithPadding = {}
+
       for(const head of [...headers, { value: 'slot-append' }]) {
         let th
         if(head.value == 'slot-append') {
@@ -112,7 +159,7 @@
   })
 
 
-  function handleHeaderClick(header: Header) {
+  function handleHeaderClick(header: TableHeader) {
     if(header.sortable) {
       if(!!sortedBy && header.value == sortedBy) {
         if(sortDirection == 'asc') sortDirection = 'desc'
@@ -123,16 +170,25 @@
         sortedBy = header.value
         sortDirection = 'asc'
       }
-      dispatch('sort', {
-        sortedBy, sortDirection
-      })
+      if(onsort) {
+        onsort({
+          detail: {
+            sortedBy,
+            sortDirection
+          }
+        })
+      }
     }
   }
 
-  function handleRowClick(item: { [key: string]: any }) {
-    dispatch('rowClick', {
-      item
-    })
+  function handleRowClick(item: Item) {
+    if(onrowClick) {
+      onrowClick({
+        detail: {
+          item
+        }
+      })
+    }
   }
 
   function formatDate(dateTime: DateTime, dateFormat: ColumnDate['params']): string  {
@@ -150,6 +206,7 @@
 
       function mouseMoveHandler(e: MouseEvent) {
         if(resizing && !!th) {
+          if(!resizedColumnSizeWithPadding) resizedColumnSizeWithPadding = {}
           width += e.movementX
           let { paddingLeft, paddingRight } = getComputedStyle(th)
 
@@ -163,10 +220,14 @@
           if(width > actualMinWidth) {
             th.style.width = width + 'px'
             resizedColumnSizeWithPadding[th.id] = th.getBoundingClientRect().width
-            dispatch('columnResize', {
-              id: th.id,
-              newWidthPx: width
-            })
+            if(oncolumnResize) {
+              oncolumnResize({
+                detail: {
+                  id: th.id,
+                  newWidthPx: width
+                }
+              })
+            }
           }
         }
       }
@@ -216,8 +277,8 @@
               style={`${resizableColumns || !head.width ? '' : `width: ${head.width}`}`}
               style:min-width={head.minWidth}
               class:sortable={head.sortable}
-              on:mousedown={() => handleHeaderClick(head)}
-              on:keydown={(e) => {
+              onmousedown={() => handleHeaderClick(head)}
+              onkeydown={(e) => {
                 if(e.key == 'Enter') {
                   handleHeaderClick(head)
                 }
@@ -227,11 +288,15 @@
               {#if resizableColumns}
                 <div class="resizer" use:resize></div>
               {/if}
-              <slot name="header" {head}>
+              {#if headerSnippet}
+                {@render headerSnippet({ head })}
+              {:else}
                 <span class="header-label">
-                  <slot name="headerLabel">
+                  {#if headerLabelSnippet}
+                    {@render headerLabelSnippet({ head })}
+                  {:else}
                     {head.label}
-                  </slot>
+                  {/if}
                 </span>
                 {#if head.sortable}
                   <span
@@ -247,77 +312,96 @@
                     {/if}
                   </span>
                 {/if}
-              </slot>
+              {/if}
             </th>
           {/each}
-          {#if $$slots.rowActions || $$slots.append}
+          {#if rowActionsSnippet || appendSnippet}
             <th class="slot-append">
-              <slot name="append" index={-1} items={undefined} />
+              {#if appendSnippet}
+                {@render appendSnippet({ index: -1 })}
+              {/if}
             </th>
           {/if}
         </tr>
       </thead>
       <tbody>
-        {#each items as item, i}
-          {@const styles = !!calculateRowStyles ? calculateRowStyles(item) : {}}
-          {@const classes = !!calculateRowClasses ? calculateRowClasses(item) : ""}
-          <tr
-            class="item-tr {clazz.row || ''} {classes}"
-            on:click={() => handleRowClick(item)}
-            on:keydown={(event) => {
-              if (event.key === 'Enter') {
-                handleRowClick(item);
-              }
-            }}
-            tabindex="0"
-            style:background-color={styles.backgroundColor}
-            style:color={styles.color}
-            style:font-weight={styles.fontWeight}
-            class:pointer={pointerOnRowHover}
-          >
-            {#each headers as header, j}
-              <td class="{clazz.cell || ''}">
-                {#if header.type.key == "custom"}
-                  <slot
-                    name="custom"
-                    index={i}
-                    columnIndex={j}
-                    {header}
-                    {item}
-                  />
-                {:else if  header.type.key == "date"}
-                  {formatDate(item[header.value], header.type.params)}
-                {:else if header.type.key == "icon"}
-                  <Icon
-                    --icon-color={header.type.params?.color}
-                    --icon-size={header.type.params?.size}
-                    name={header.type.params?.name || ""}
-                  />
-                {:else if header.type.key == 'string'}
-                  {#if item[header.value] !== undefined && item[header.value] !== null}
-                    {item[header.value]}
-                  {:else if !!header.type.params?.nullText}
-                    {#if typeof header.type.params.nullText == 'function'}
-                      {header.type.params.nullText(item)}
+        {#if items.length > 0}
+          {#each items as item, i}
+            {@const styles = !!calculateRowStyles ? calculateRowStyles(item) : {}}
+            {@const classes = !!calculateRowClasses ? calculateRowClasses(item) : ""}
+            <tr
+              class="item-tr {clazz.row || ''} {classes}"
+              onclick={() => handleRowClick(item)}
+              onkeydown={(event) => {
+                if (event.key === 'Enter') {
+                  handleRowClick(item);
+                }
+              }}
+              tabindex="0"
+              style:background-color={styles.backgroundColor}
+              style:color={styles.color}
+              style:font-weight={styles.fontWeight}
+              class:pointer={pointerOnRowHover}
+            >
+              {#each headers as header, j}
+                <td class="{clazz.cell || ''}">
+                  {#if header.type.key == "custom"}
+                    {#if customSnippet}
+                      {@render customSnippet({ index: i, columnIndex: j, header, item})}
+                    {/if}
+                  {:else if  header.type.key == "date"}
+                    {formatDate(item[header.value], header.type.params)}
+                  {:else if header.type.key == "icon"}
+                    <Icon
+                      --icon-color={header.type.params?.color}
+                      --icon-size={header.type.params?.size}
+                      name={header.type.params?.name || ""}
+                    />
+                  {:else if header.type.key == 'string'}
+                    {#if item[header.value] !== undefined && item[header.value] !== null}
+                      {item[header.value]}
+                    {:else if !!header.type.params?.nullText}
+                      {#if typeof header.type.params.nullText == 'function'}
+                        {header.type.params.nullText(item)}
+                      {:else}
+                        {header.type.params.nullText}
+                      {/if}
                     {:else}
-                      {header.type.params.nullText}
+                      {item[header.value]}
                     {/if}
                   {:else}
                     {item[header.value]}
                   {/if}
-                {:else}
-                  {item[header.value]}
-                {/if}
-              </td>
-            {/each}
-            {#if $$slots.rowActions || $$slots.append}
-              <td class="{clazz.cell || ''} append" style:width="fit-content">
-                <slot name="rowActions" index={i} {item} />
-                <slot name="append" index={i} {item} />
-              </td>
-            {/if}
+                </td>
+              {/each}
+              {#if rowActionsSnippet || appendSnippet}
+                <td class="{clazz.cell || ''} append" style:width="fit-content">
+                  {#if rowActionsSnippet}
+                    {@render rowActionsSnippet({ index: i, item })}
+                  {/if}
+                  {#if appendSnippet}
+                    {@render appendSnippet({ index: i, item })}
+                  {/if}
+                </td>
+              {/if}
+            </tr>
+          {/each}
+        {:else}
+          <tr>
+            <td
+              colspan={headers.length + 1}
+              style="text-align: center;"
+              style:border="none"
+              style:cursor="default"
+              style:padding="10px"
+              style:font-size="1.2em"
+            >
+              {#if noDataSnippet}{@render noDataSnippet()}{:else}
+                <NoData {lang} />
+              {/if}
+            </td>
           </tr>
-        {/each}
+        {/if}
       </tbody>
     </table>
   </div>

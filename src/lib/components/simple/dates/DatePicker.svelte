@@ -7,48 +7,62 @@
   import MonthSelector from "./MonthSelector.svelte";
   import Calendar from "./Calendar.svelte";
   import Button from "$lib/components/simple/buttons/Button.svelte";
-  import { createEventDispatcher } from 'svelte';
+  import type { ComponentProps } from 'svelte';
 
-  let clazz: {
-    container?: string,
-    header?: string,
-    selectorRow?: string
-  } = {};
-	export { clazz as class };
-
-  export let selectedYear: number = new Date().getFullYear(),
-    selectedMonth: number = new Date().getMonth(),
-    selectedDate: Date | null | undefined = undefined,
-    visibleMonth: number = selectedMonth,
-    visibleYear: number = selectedYear,
-    view: "year" | "month" | "day" = "day",
-    locale: Locale = "it",
-    selectableYears: number[] = [...Array(150).keys()].map(
-      (i) => i + (new Date().getFullYear() - 75)
-    ),
-    skipTabs: boolean = false,
-    disabled: boolean = false
-
-  let dispatch = createEventDispatcher<{
-    'year-click': {
-      year: number
-    },
-    'month-click': {
-      month: number
+  interface Props {
+    selectedYear?: number;
+    selectedMonth?: number;
+    selectedDate?: Date;
+    visibleMonth?: number;
+    visibleYear?: number;
+    view?: "year" | "month" | "day";
+    locale?: Locale;
+    selectableYears?: number[];
+    skipTabs?: boolean;
+    disabled?: boolean;
+    class?: {
+      container?: string,
+      header?: string,
+      selectorRow?: string
     }
-  }>()
-
-  let selectorText: string | undefined = undefined;
-  let elementDisabled: "year" | "date" = "date";
-
-  $: visibleSelector = view == "day" || view == "month";
-  $: {
-    selectorText =
-      view == "day"
-        ? getMonthName(visibleMonth, locale) + " " + visibleYear
-        : visibleYear.toString();
+    onyearClick?: (event: {
+      detail: {
+        year: number
+      }
+    }) => void
+    onmonthClick?: (event: {
+      detail: {
+        month: number
+      }
+    }) => void
+    ondayClick?: ComponentProps<typeof Calendar>['ondayClick']
   }
-  $: elementDisabled = view == "year" ? "year" : "date";
+
+  let {
+    selectedYear = $bindable(new Date().getFullYear()),
+    selectedMonth = $bindable(new Date().getMonth()),
+    selectedDate = $bindable(undefined),
+    visibleMonth = $bindable(selectedMonth),
+    visibleYear = $bindable(selectedYear),
+    view = "day",
+    locale = "it",
+    selectableYears = [...Array(150).keys()].map((i) => i + (new Date().getFullYear() - 75)),
+    skipTabs = false,
+    disabled = false,
+    class: clazz = {},
+    onmonthClick,
+    onyearClick,
+    ondayClick,
+  }: Props = $props();
+
+  let visibleSelector = $derived(view == "day" || view == "month");
+  let selectorText =
+    $derived(view == "day"
+      ? getMonthName(visibleMonth, locale) + " " + visibleYear
+      : visibleYear.toString()
+    )
+  let elementDisabled = $derived(view == "year" ? "year" : "date");
+  let lastSelectedYear: number = selectedYear
 
   function next() {
     if (view == "day") {
@@ -83,16 +97,37 @@
   }
 
   function handleYearChange() {
-    dispatch('year-click', {
-      year: selectedYear
-    })
+    if(visibleYear == undefined) {
+      visibleYear = lastSelectedYear
+    }
+    else {
+      lastSelectedYear = visibleYear
+    }
+
+    visibleYear = selectedYear
+
+    if(onyearClick){
+      onyearClick({
+        detail: {
+          year: selectedYear
+        }
+      })
+    }
+
     view = "month";
   }
 
   function handleMonthChange() {
-    dispatch('month-click', {
-      month: selectedMonth
-    })
+    visibleMonth = selectedMonth
+
+    if(onmonthClick){
+      onmonthClick({
+        detail: {
+          month: selectedMonth
+        }
+      })
+    }
+
     view = "day";
   }
 </script>
@@ -105,10 +140,10 @@
   >
     <button
       class:disabled={elementDisabled == "year"}
-      on:click={() => {
+      onclick={() => {
         view = "year";
       }}
-      on:keypress={() => {
+      onkeypress={() => {
         view = "year";
       }}
       class="unstyled year"
@@ -116,10 +151,10 @@
     >{visibleYear}</button>
     <button
       class:disabled={elementDisabled == "date"}
-      on:click={() => {
+      onclick={() => {
         view = "day";
       }}
-      on:keypress={() => {
+      onkeypress={() => {
         view = "day";
       }}
       class="unstyled day"
@@ -139,7 +174,7 @@
             buttonType="icon"
             --icon-size="25pt"
             icon="mdi-chevron-left"
-            on:click={previous}
+            onclick={previous}
             tabindex={skipTabs ? -1 : undefined}
           />
         </div>
@@ -147,8 +182,8 @@
           {#key selectorText}
             <button
               class="unstyled selector-text"
-              on:click={SelectorHandler}
-              on:keypress={SelectorHandler}
+              onclick={SelectorHandler}
+              onkeypress={SelectorHandler}
               tabindex={skipTabs ? -1 : undefined}
             >
               {selectorText}
@@ -161,7 +196,7 @@
             buttonType="icon"
             --icon-size="25pt"
             icon="mdi-chevron-right"
-            on:click={next}
+            onclick={next}
             tabindex={skipTabs ? -1 : undefined}
           />
         </div>
@@ -171,16 +206,16 @@
       <MonthSelector
         --month-selector-height="calc((var(--date-picker-height, var(--date-picker-default-height)) / 8 * 5) - 10px)"
         --month-selector-width="var(--date-picker-width, var(--date-picker-default-width))"
-        bind:selectedMonth={visibleMonth}
-        on:click={handleMonthChange}
+        bind:selectedMonth={selectedMonth}
+        onclick={handleMonthChange}
         {locale}
       />
     {:else if view == "year"}
       <YearSelector
         --year-selector-height="calc(var(--date-picker-height, var(--date-picker-default-height)) - calc(var(--date-picker-height, var(--date-picker-default-height)) / 4))"
-        bind:selectedYear={visibleYear}
+        bind:selectedYear={selectedYear}
         {selectableYears}
-        on:click={handleYearChange}
+        onclick={handleYearChange}
       />
     {:else}
       <Calendar
@@ -191,7 +226,7 @@
         bind:selectedDate
         {locale}
         disabled={disabled}
-        on:day-click
+        {ondayClick}
       />
     {/if}
   </div>

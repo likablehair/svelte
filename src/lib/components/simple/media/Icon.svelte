@@ -1,27 +1,34 @@
 <script lang="ts">
-  export let name: string,
-    click = false,
-    tabindex: number | null | undefined = undefined;
-
-  let clazz = "";
-  export { clazz as class };
-
   import "../common/materialDesign.css";
+
+  interface Props {
+    name: string;
+    tabindex?: number | null;
+    class?: string
+    onclick?: (event?: KeyboardEvent & { currentTarget: EventTarget & HTMLSpanElement; }) => void
+  }
+
+  let {
+    name,
+    class: clazz = '',
+    onclick,
+    tabindex = !!onclick ? 0 : undefined,
+  }: Props = $props();
+
+  function handleIconClick(e?: KeyboardEvent & { currentTarget: EventTarget & HTMLSpanElement; }) {
+    if(onclick) {
+      onclick(e)
+    }
+  }
 </script>
 
-{#if click}
-  <span
-    role="button"
-    on:click
-    on:keypress
-    class="icon mdi {name} {clazz} click"
-    {tabindex}
-  />
-{:else}
-  <span
-    class="icon mdi {name} {clazz}"
-  />
-{/if}
+<span
+  role="button"
+  onclick={() => handleIconClick()}
+  onkeypress={e => handleIconClick(e)}
+  class="icon mdi {name} {clazz} {onclick ? 'click' : ''}"
+  {tabindex}
+></span>
 
 <style>
   .icon {
@@ -50,11 +57,17 @@
     cursor: var(--icon-cursor, default);
     pointer-events: var(--icon-pointer-events, none);
   }
-
-  .click:focus, .click:active {
+  .click:hover, .click:focus {
+    color: var(
+      --icon-hover-color,
+      rgb(var(--global-color-primary-500))
+    );
+    outline: none;
+  }
+  .click:active {
     color: var(
       --icon-active-color,
-      rgb(var(--global-color-primary-500))
+      rgb(var(--global-color-primary-600))
     );
     outline: none;
   }

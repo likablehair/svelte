@@ -1,30 +1,59 @@
 <script lang="ts">
   import { createId } from '@paralleldrive/cuid2';
 
-  export let label: string | null = null,
+  interface Props {
+    label?: string;
+    placeholder?: string;
+    textAreaId?: string;
+    fontFamily?: string;
+    value?: string;
+    resizable?: boolean;
+    disabled?: boolean;
+    readOnly?: boolean;
+    maxLength?: number;
+    textColor?: string;
+    border?: string;
+    borderRadius?: string;
+    focusedBoxShadow?: string;
+    backgroundColor?: string;
+    padding?: string;
+    paddingLeft?: string;
+    paddingRight?: string;
+    paddingBottom?: string;
+    paddingTop?: string;
+    fontSize?: string;
+    labelFontSize?: string;
+    labelColor?: string;
+    width?: string;
+    height?: string;
+  }
+
+  let {
+    label = undefined,
     placeholder = "placeholder",
-    textAreaId: string = createId(),
+    textAreaId = createId(),
     fontFamily = "inherit",
-    value = "",
+    value = $bindable(""),
     resizable = true,
     disabled = false,
     readOnly = false,
-    maxLength: number | undefined = undefined,
+    maxLength = undefined,
     textColor = "black",
     border = "none",
     borderRadius = "5px",
-    focusedBoxShadow: string | undefined = undefined,
-    backgroundColor: string | null = null,
-    padding: string | undefined = undefined,
-    paddingLeft: string | undefined = undefined,
-    paddingRight: string | undefined = undefined,
-    paddingBottom: string | undefined = undefined,
-    paddingTop: string | undefined = undefined,
-    fontSize: string | undefined = undefined,
-    labelFontSize: string | undefined = undefined,
-    labelColor: string | undefined = undefined,
+    focusedBoxShadow = undefined,
+    backgroundColor = undefined,
+    padding = undefined,
+    paddingLeft = undefined,
+    paddingRight = undefined,
+    paddingBottom = undefined,
+    paddingTop = undefined,
+    fontSize = undefined,
+    labelFontSize = undefined,
+    labelColor = undefined,
     width = "100%",
-    height = "100%";
+    height = "100%"
+  }: Props = $props();
 </script>
 
 <div class="container">
@@ -59,7 +88,7 @@
     maxlength={maxLength}
     {disabled}
     readonly={readOnly}
-  />
+  ></textarea>
 </div>
 
 <style>

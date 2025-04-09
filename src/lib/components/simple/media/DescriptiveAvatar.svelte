@@ -2,14 +2,32 @@
   import './DescriptiveAvatar.css'
   import '../../../css/main.css'
   import Avatar from "$lib/components/simple/media/Avatar.svelte";
+  import type { MouseEventHandler } from 'svelte/elements';
+  import type { Snippet } from 'svelte';
 
-  export let src: string | undefined = undefined,
-    title: string | undefined = undefined,
-    subtitle: string | undefined = undefined,
-    avatarText: string | undefined = !title ? undefined : title.substring(0, 2).toUpperCase(),
-    direction: "row" | "column" = "row",
+  interface Props {
+    src?: string;
+    title?: string;
+    subtitle?: string;
+    avatarText?: string;
+    direction?: "row" | "column";
+    reverse?: boolean;
+    referrerpolicy?: ReferrerPolicy | undefined;
+    onclick?: MouseEventHandler<HTMLDivElement>
+    children?: Snippet<[]>
+  }
+
+  let {
+    src = undefined,
+    title = undefined,
+    subtitle = undefined,
+    avatarText = title?.substring(0, 2).toUpperCase(),
+    direction = "row",
     reverse = false,
-    referrerpolicy: ReferrerPolicy | null | undefined = "no-referrer";
+    referrerpolicy = "no-referrer",
+    onclick,
+    children,
+  }: Props = $props();
 </script>
 
 <div 
@@ -18,15 +36,17 @@
   class:flex-reverse={direction == 'row' && reverse}
   class:flex-col-reverse={direction == 'column' && reverse}
   role="presentation"
-  on:click
+  {onclick}
 >
   <Avatar
     {src}
     {referrerpolicy}
-    bind:text={avatarText}
+    text={avatarText}
   ></Avatar>
   {#if !!title || !!subtitle}
-    <slot {title} {subtitle} {avatarText} {src}>
+    {#if children}
+      {@render children()}
+    {:else}
       <div class="flex flex-col text-gapped">
         {#if !!title}
           <div 
@@ -45,83 +65,9 @@
           >{subtitle}</div>
         {/if}
       </div>
-    </slot>
+    {/if}
   {/if}
 </div>
-
-<!-- <div
-  style:align-items="center"
-  style:flex-direction={reverse ? direction + "-reverse" : direction}
-  class="descriptive-avatar-container"
-  on:click
-  on:keypress
->
-  <div class="avatar-container">
-    <slot name="avatar">
-      <Avatar
-        {src}
-        {width}
-        {maxWidth}
-        {minWidth}
-        {height}
-        {maxHeight}
-        {minHeight}
-        {borderRadius}
-        {lazyLoaded}
-        {referrerpolicy}
-      />
-    </slot>
-  </div>
-  <div
-    style:margin-left={!reverse && direction === "row"
-      ? avatarSpacing
-      : undefined}
-    style:margin-right={reverse && direction === "row"
-      ? avatarSpacing
-      : undefined}
-    style:margin-top={!reverse && direction === "column"
-      ? avatarSpacing
-      : undefined}
-    style:margin-bottom={reverse && direction === "column"
-      ? avatarSpacing
-      : undefined}
-    class="description-container"
-  >
-    {#if !!title}
-      <div style:text-align={textAlignment} class="title">{title}</div>
-    {/if}
-    {#if !!description}
-      <div style:text-align={textAlignment} class="description">
-        {description}
-      </div>
-    {/if}
-  </div>
-</div> -->
-
-<!-- <style>
-  .descriptive-avatar-container {
-    width: fit-content;
-    display: flex;
-  }
-
-  .avatar-container {
-    flex: none;
-  }
-
-  .description-container {
-    flex-grow: 1;
-  }
-
-  .title {
-    font-size: 12pt;
-    font-weight: 700;
-  }
-
-  .description {
-    font-size: 10pt;
-    font-weight: 300;
-  }
-</style> -->
 
 <style>
   .flex {
@@ -144,14 +90,16 @@
     gap: var(
       --descriptive-avatar-image-gap,
       var(--descriptive-avatar-default-image-gap)
-    )
+    );
+    max-width: 100%;
   }
 
   .text-gapped {
     gap: var(
       --descriptive-avatar-text-gap,
       var(--descriptive-avatar-default-text-gap)
-    )
+    );
+    min-width: 0;
   }
 
   .font-bold {
@@ -193,5 +141,12 @@
       --descriptive-avatar-cursor,
       var(--descriptive-avatar-default-cursor)
     );
+  }
+
+  .title,
+  .subtitle {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 </style>

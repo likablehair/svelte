@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type Slot = {
     name: string,
     description: string,
@@ -12,8 +12,14 @@
 </script>
 
 <script lang="ts">
+  import NoData from "$lib/components/simple/common/NoData.svelte";
+
   import Code from "$lib/components/simple/typography/Code.svelte";
-  export let slots: Slot[] = []
+  interface Props {
+    slots?: Slot[];
+  }
+
+  let { slots = [] }: Props = $props();
 </script>
 
 <ul class="container">
@@ -66,12 +72,12 @@
     <div
       style:display="flex"
       style:height="3rem"
-      style:font-size=".7rem"
+      style:font-size=".9rem"
       style:align-items="center"
       style:justify-content="center"
-      style:color="rgb(var(--global-color-contrast-200))"
+      style:color="rgb(var(--global-color-contrast-300))"
     >
-      No data
+      <NoData/>
     </div>
   {/if}
 </ul>

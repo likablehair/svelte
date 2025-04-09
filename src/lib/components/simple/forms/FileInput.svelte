@@ -1,47 +1,55 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import '../../../css/main.css'
   import './FileInput.css'
-  import { createEventDispatcher } from "svelte";
 
-  let clazz: string = '';
-	export { clazz as class };
+  interface Props {
+    files?: File[];
+    placeholder?: string;
+    persistOverUpload?: boolean;
+    disabled?: boolean;
+    maxFiles?: number;
+    class?: string
+    onfileDrop?: (event: {
+      detail: {
+        nativeEvent: DragEvent;
+        files: File[];
+      }
+    }) => void
+    onfileSelect?: (event: {
+      detail: {
+        nativeEvent: Event;
+        files: File[];
+      }
+    }) => void
+    onchange?: () => void
+    bodySnippet?: Snippet<[{
+      active: boolean
+    }]>
+  }
 
-  /*
-    Styles
-
-    --file-input-default-height
-    --file-input-default-width
-    --file-input-default-color
-    --file-input-default-background-color
-    --file-input-default-focus-shadow
-    --file-input-border-radius
-  */
-
-  export let files: File[] | undefined = undefined,
-    placeholder: string | undefined = undefined,
-    persistOverUpload : boolean = true,
-    disabled : boolean = false,
-    maxFiles: number | undefined = undefined;
+  let {
+    files = $bindable(undefined),
+    placeholder = undefined,
+    persistOverUpload = true,
+    disabled = false,
+    maxFiles = undefined,
+    class: clazz = '',
+    onfileDrop,
+    onfileSelect,
+    onchange,
+    bodySnippet,
+  }: Props = $props();
 
   let inputElement: HTMLElement | undefined = undefined;
-  let dropAreaActive = false;
+  let dropAreaActive = $state(false);
 
   const highlight: (highlighted: boolean) => void = (highlighted) => {
     dropAreaActive = highlighted && !disabled;
   };
 
-  const dispatch = createEventDispatcher<{
-    fileDrop: {
-      nativeEvent: DragEvent;
-      files: File[];
-    }
-    fileSelect: {
-      nativeEvent: Event;
-      files: File[];
-    }
-  }>();
-
   function handleFileDrop(event: DragEvent) {
+    highlight(false)
     let droppedFiles: FileList | undefined = event.dataTransfer?.files;
     let limitedFiles: File[]
 
@@ -59,10 +67,14 @@
           ? [...files, ...limitedFiles]
           : limitedFiles;
 
-      dispatch("fileDrop", {
-        nativeEvent: event,
-        files: limitedFiles,
-      });
+      if(onfileDrop){
+        onfileDrop({
+          detail: {
+            nativeEvent: event,
+            files: limitedFiles,
+          }
+        })
+      }
     }
   }
 
@@ -84,37 +96,48 @@
           ? [...files, ...limitedFiles]
           : limitedFiles;
 
-      dispatch("fileSelect", {
-        nativeEvent: event,
-        files: limitedFiles,
-      });
+      if(onfileSelect){
+        onfileSelect({
+          detail: {
+            nativeEvent: event,
+            files: limitedFiles,
+          }
+        })
+      }
     }
   }
 </script>
 
 <div
-  on:click={() => inputElement?.click()}
-  on:keypress={() => inputElement?.click()}
-  on:dragover|preventDefault={() => highlight(true)}
-  on:dragleave={() => highlight(false)}
-  on:dragend={() => highlight(false)}
-  on:drop|preventDefault={(e) => {
+  onclick={() => inputElement?.click()}
+  onkeypress={() => inputElement?.click()}
+  ondragover={(e) => {
+    e.preventDefault()
+    highlight(true)
+  }}
+  ondragleave={() => highlight(false)}
+  ondragend={() => highlight(false)}
+  ondrop={(e) => {
+    e.preventDefault()
     if (!disabled) handleFileDrop(e);
   }}
   class:disabled
   class="drop-area {clazz}"
+  class:active={dropAreaActive}
   role="presentation"
 >
-  <slot name="body" active={dropAreaActive}>
-    <span> { placeholder || 'Drop file here or click to upload'} </span>
-  </slot>
+  {#if bodySnippet}
+    {@render bodySnippet({ active: dropAreaActive})}
+  {:else}
+    <span> { placeholder || 'Drop file here or click to upload'}</span>
+  {/if}
 
   <input
     type="file"
     multiple
     bind:this={inputElement}
-    on:input={handleFileFromInput}
-    on:change
+    oninput={handleFileFromInput}
+    {onchange}
     {disabled}
   />
 </div>
@@ -149,6 +172,13 @@
     transition: 0.2s;
   }
 
+  .drop-area.active {
+    background-color: var(
+      --file-input-active-background-color,
+      var(--file-input-default-active-background-color)
+    );
+  }
+
   .disabled {
     opacity: 0.5;
     cursor: default;
@@ -158,8 +188,8 @@
   }
   .drop-area:hover:not(.disabled) {
     box-shadow: var(
-    --file-input-focus-shadow,
-    var(--file-input-default-focus-shadow)
+      --file-input-focus-shadow,
+      var(--file-input-default-focus-shadow)
     );
   }
 </style>

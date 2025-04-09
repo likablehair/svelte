@@ -1,30 +1,39 @@
-<script context="module" lang="ts">
-  export type Item = {
+<script module lang="ts">
+  export type Item<Data = any> = {
     value: string | number;
     label?: string | number;
-    /* eslint-disable  @typescript-eslint/no-explicit-any */
-    data?: any;
+    data?: Data;
   };
 </script>
 
-<script lang="ts">
+<script lang="ts" generics="Data">
   import '../../../css/main.css'
+  import Chip from "$lib/components/simple/navigation/Chip.svelte";
 
-  export let values: Item[] = [],
-    items: Item[],
+  type ItemData = Item<Data>
+  interface Props {
+    values?: ItemData[];
+    items: ItemData[];
+    multiple?: boolean;
+    disabled?: boolean;
+    onchange?: (event: {
+      detail: {
+        unselect: ItemData | undefined;
+        select: ItemData | undefined;
+        selection: ItemData[];
+      }
+    }) => void
+  }
+
+  let {
+    values = $bindable([]),
+    items,
     multiple = true,
-    disabled = false
+    disabled = false,
+    onchange,
+  }: Props = $props();
 
-  let dispatch = createEventDispatcher<{
-    change: {
-      unselect: Item | undefined;
-      select: Item | undefined;
-      selection: Item[];
-    }
-  }>();
-
-
-  function select(item: Item) {
+  function select(item: ItemData) {
     const alreadyPresent =
       values.findIndex((i) => i.value === item.value) != -1;
 
@@ -32,34 +41,39 @@
       if (multiple) values = [...values, item];
       else values = [item];
 
-      dispatch("change", {
-        unselect: undefined,
-        select: item,
-        selection: values,
-      });
+      if(onchange) {
+        onchange({
+          detail: {
+            unselect: undefined,
+            select: item,
+            selection: values,
+          }
+        })
+      }
     }
   }
 
-  function unselect(item: Item) {
+  function unselect(item: ItemData) {
     values = values.filter((i) => i.value != item.value);
 
-    dispatch("change", {
-      unselect: item,
-      select: undefined,
-      selection: values,
-    });
+    if(onchange) {
+      onchange({
+        detail: {
+          unselect: item,
+          select: undefined,
+          selection: values,
+        }
+      })
+    }
   }
 
-  function toggle(item: Item) {
+  function toggle(item: ItemData) {
     const alreadyPresent =
       values.findIndex((i) => i.value === item.value) != -1;
 
     if (alreadyPresent) unselect(item);
     else select(item);
   }
-
-  import Chip from "$lib/components/simple/navigation/Chip.svelte";
-  import { createEventDispatcher } from "svelte";
 </script>
 
 <svelte:window />
@@ -75,7 +89,7 @@
         <div class="chip">
           <Chip
             outlined={values.findIndex(i => i.value === item.value) === -1}
-            on:click={() => toggle(item)}
+            onclick={() => toggle(item)}
             buttonTabIndex={0}
             truncateText
             --button-focus-color="red"

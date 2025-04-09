@@ -1,3 +1,9 @@
 :root {
-  --divider-default-color: rgb(var(--global-background-color-500));
+  --divider-default-color: rgb(var(--global-color-background-500));
+  --divider-default-weight: 1px;
+  --divider-default-radius: 0.5px;
+  --divider-default-margin-top: 10px;
+  --divider-default-margin-bottom: 10px;
+  --divider-default-margin-left: 5px;
+  --divider-default-margin-right: 5px;
 }
