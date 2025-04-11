@@ -1168,38 +1168,40 @@
   }
 
   async function handleLoadBackward() {
-    userScrolling = false
-
-    const anchorIndex = 0
-    const anchorUniqueKey = renderedRows[anchorIndex].item[uniqueKey]
-    const anchorElement = findAnchorElement(anchorUniqueKey)
-    const anchorOffsetBefore = anchorElement?.getBoundingClientRect().top || 0
-
-    let removedRowCount = 0
-
-    for (let i = renderedRows.length - 1; removedRowCount < sectionRowsNumber; i--) {
-      let row = tableBody?.children.item(i)
-      removedRowCount++
-
-      const rowKey = row?.getAttribute("data-key")
-      const isExpanded = expandedRows.some(r => r.item[uniqueKey] == rowKey)
-      
-      if (isExpanded) {
-        i--
+    if(currentSectionNumber > 0) {
+      userScrolling = false
+  
+      const anchorIndex = 0
+      const anchorUniqueKey = renderedRows[anchorIndex].item[uniqueKey]
+      const anchorElement = findAnchorElement(anchorUniqueKey)
+      const anchorOffsetBefore = anchorElement?.getBoundingClientRect().top || 0
+  
+      let removedRowCount = 0
+  
+      for (let i = renderedRows.length - 1; removedRowCount < sectionRowsNumber; i--) {
+        let row = tableBody?.children.item(i)
+        removedRowCount++
+  
+        const rowKey = row?.getAttribute("data-key")
+        const isExpanded = expandedRows.some(r => r.item[uniqueKey] == rowKey)
+        
+        if (isExpanded) {
+          i--
+        }
       }
-    }
-    
-    currentSectionNumber = currentSectionNumber - 1
-
-    await tick()
-
-    if(tableContainer) {
-      const anchorElementAfter = findAnchorElement(anchorUniqueKey)
-      const anchorOffsetAfter = anchorElementAfter?.getBoundingClientRect().top || 0
-      const offsetDiff = anchorOffsetAfter - anchorOffsetBefore
-      tableContainer.scrollTop += offsetDiff
-
-      userScrolling = true
+      
+      currentSectionNumber = currentSectionNumber - 1
+  
+      await tick()
+  
+      if(tableContainer) {
+        const anchorElementAfter = findAnchorElement(anchorUniqueKey)
+        const anchorOffsetAfter = anchorElementAfter?.getBoundingClientRect().top || 0
+        const offsetDiff = anchorOffsetAfter - anchorOffsetBefore
+        tableContainer.scrollTop += offsetDiff
+  
+        userScrolling = true
+      }
     }
   }
 
