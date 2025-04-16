@@ -47,7 +47,9 @@
     showActiveFilters: boolean = true,
     resizableColumns: boolean = false,
     resizedColumnSizeWithPadding: { [value: string]: number } = {},
-    pointerOnRowHover: boolean | undefined = undefined;
+    pointerOnRowHover: boolean | undefined = undefined,
+    doubleClickActive: ComponentProps<SimpleTable>['doubleClickActive'] = false,
+    doubleClickDelay: ComponentProps<SimpleTable>['doubleClickDelay'] = 250;
 
 
   export let calculateRowStyles: CalculateRowStyles | undefined = undefined;
@@ -175,9 +177,12 @@
     bind:sortedBy
     bind:sortDirection
     bind:pointerOnRowHover
+    {doubleClickActive}
+    {doubleClickDelay}
     on:sort={handleFiltersChange}
     on:sort
     on:rowClick
+    on:rowDoubleClick
     {calculateRowStyles}
     {calculateRowClasses}
     {resizableColumns}
