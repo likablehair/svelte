@@ -1121,7 +1121,7 @@
   }
   
   async function updateRemainingWidth() {
-    if(tableContainer != null || !tableContainer) {
+    if(tableContainer != null && !!tableContainer) {
       const containerWidth = tableContainer?.getBoundingClientRect().width - 30;
 
       if(containerWidth){
@@ -2248,9 +2248,6 @@
     position: relative;
     user-select: none;
     box-sizing: content-box;
-  }
-  .table.resizable .table-header th.sortable {
-    transition: none;
   }
 
   td {
