@@ -55,6 +55,9 @@
     'rowClick': {
       item: Item
     },
+    'rowDoubleClick': {
+      item: Item
+    },
     columnResize: {
       id: string,
       newWidthPx: number
@@ -67,7 +70,11 @@
     sortDirection: "asc" | "desc" = "asc",
     resizableColumns: boolean = false,
     resizedColumnSizeWithPadding: { [value: string]: number } = {},
-    pointerOnRowHover: boolean = false;
+    pointerOnRowHover: boolean = false,
+    doubleClickActive: boolean = false,
+    doubleClickDelay: number = 250;
+
+  let clickTimeout: NodeJS.Timeout | undefined = undefined;
 
   export let calculateRowStyles: CalculateRowStyles | undefined = undefined;
   export let calculateRowClasses: CalculateRowClasses | undefined = undefined;
@@ -130,10 +137,22 @@
   }
 
   function handleRowClick(item: { [key: string]: any }) {
-    dispatch('rowClick', {
-      item
-    })
-  }
+    if(doubleClickActive) {
+      if (clickTimeout) {
+        clearTimeout(clickTimeout);
+        clickTimeout = undefined;
+    
+        dispatch('rowDoubleClick', { item });
+      } else {
+        clickTimeout = setTimeout(() => {
+          dispatch('rowClick', { item });
+          clickTimeout = undefined;
+        }, doubleClickDelay);
+      }
+    } else {
+      dispatch('rowClick', { item });
+    }
+}
 
   function formatDate(dateTime: DateTime, dateFormat: ColumnDate['params']): string  {
     return dateTime.setLocale(dateFormat.locale).toFormat(dateFormat.format)

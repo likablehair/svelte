@@ -185,6 +185,7 @@
     cellEdit
     {rows}
     totalRows={100000000}
+    resizableColumns
     on:fetchData={() => {
       let lastId = rows[rows.length - 1].item.id
       rows = [
