@@ -206,6 +206,7 @@
     customizeHeaders
     searchBarPlaceholder={'Type to search'}
     searchBarVisible
+    resizableColumns
   >
     {#snippet customFilterSnippet({ filter, updateMultiFilterValues })}
       {#if !!filter}
@@ -274,6 +275,8 @@
     { name: "forwardThresholdPixel", type: "number", description: "Scroll threshold below to load new rows", default: "100" },
     { name: "uniqueKey", type: "keyof RowItem", description: "Field used as unique key", default: "'id'" },
     { name: "numberOfResultsVisible", type: "boolean", description: "Show number of results", default: "false" },
+    { name: "resizableColumns", type: "boolean", description: "Enables the resize of the columns", default: "false" },
+    { name: "resizedColumnSizeWithPadding", type: "{ [value: string]: number }", description: "The width of the headers", default: "{}" },
     { name: "endLineVisible", type: "boolean", description: "Show end line at bottom", default: "false" },
     { name: "class", type: "{ container?: string; header?: string; row?: string; cell?: string }", description: "Custom classes for table elements", default: "{}" }
   ]}
@@ -531,7 +534,23 @@
     {
       name: "onscroll",
       description: "Fired on scroll event of the container"
-    }
+    },
+    {
+      name: "oncolumnResize",
+      description: "Fired when a column is resized",
+      properties: [
+        {
+          name: 'id',
+          description: 'The header resized',
+          type: 'string'
+        },
+        {
+          name: 'newWidthPx',
+          description: 'The new header width',
+          type: 'number'
+        },
+      ]
+    },
   ]}
 ></EventsViewer>
 

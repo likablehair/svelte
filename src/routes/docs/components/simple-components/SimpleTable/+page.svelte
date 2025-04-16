@@ -208,6 +208,18 @@
       default: "'en'",
     },
     {
+      name: "doubleClickActive",
+      type: "boolean",
+      description: "Enables the double click of the row.",
+      default: "false",
+    },
+    {
+      name: "doubleClickDelay",
+      type: "number",
+      description: "Time window (in ms) to double click",
+      default: "250",
+    },
+    {
       name: "calculateRowStyles",
       type: "CalculateRowStyles<Item> | undefined",
       description: "Function to calculate row styles.",
@@ -399,6 +411,13 @@
     {
       name: "onrowClick",
       description: "Triggered when a row is clicked.",
+      properties: [
+        { name: "item", type: "Item", description: "The clicked row item." },
+      ],
+    },
+    {
+      name: "onrowDoubleClick",
+      description: "Triggered when a row is double clicked.",
       properties: [
         { name: "item", type: "Item", description: "The clicked row item." },
       ],
