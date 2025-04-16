@@ -42,6 +42,10 @@
     window.addEventListener('resize', updateHeaderHeight);
     tableContainer.addEventListener("scroll", setReachedBottomOrTop);
 
+    if(tableContainer.scrollHeight <= tableContainer.clientHeight) {
+      tableContainer.style.marginRight = '0px'
+    }
+
     if(resizableColumns) {
       for(const head of [...headers, { value: 'non-resizable', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }, { value: 'slot-append', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }]) {
         let th
@@ -1110,6 +1114,7 @@
   }
 
   $: if (
+    resizableColumns &&
     !!tableContainer &&
     resizableColumns &&
     headersToShowInTable.length > 0 &&
