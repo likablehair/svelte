@@ -253,6 +253,18 @@
     { name: "resizedColumnSizeWithPadding", type: "Record<string, number>", description: "Mapping of column names to custom widths.", default: "{}" },
     { name: "pointerOnRowHover", type: "boolean | undefined", description: "If true, shows pointer on row hover.", default: "undefined" },
     {
+      name: "doubleClickActive",
+      type: "boolean",
+      description: "Enables the double click of the row.",
+      default: "false",
+    },
+    {
+      name: "doubleClickDelay",
+      type: "number",
+      description: "Time window (in ms) to double click",
+      default: "250",
+    },
+    {
       name: "calculateRowStyles",
       type: "CalculateRowStyles<Item> | undefined",
       description: "Function to calculate row styles.",
@@ -450,6 +462,25 @@
       description: "Triggered when a row is clicked.",
       properties: [
         { name: "item", type: "Item", description: "The clicked row item." },
+      ],
+    },
+    {
+      name: "onrowDoubleClick",
+      description: "Triggered when a row is double clicked.",
+      properties: [
+        { name: "item", type: "Item", description: "The clicked row item." },
+      ],
+    },
+    {
+      name: "oncolumnResize",
+      description: "Triggered when a column is resized.",
+      properties: [
+        { name: "id", type: "string", description: "Column ID." },
+        {
+          name: "newWidthPx",
+          type: "number",
+          description: "New column width in pixels.",
+        },
       ],
     },
   ]}
