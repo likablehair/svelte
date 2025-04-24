@@ -1352,7 +1352,6 @@
   })
   
   async function updateRemainingWidth() {
-    console.log('aggiorno')
     if(tableContainer != null && !!tableContainer && mainHeader) {
       const containerWidth = tableContainer.getBoundingClientRect().width - 30;
 
