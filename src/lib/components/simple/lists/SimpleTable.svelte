@@ -46,6 +46,8 @@
     resizedColumnSizeWithPadding?: { [value: string]: number };
     pointerOnRowHover?: boolean;
     lang?: 'it' | 'en'
+    doubleClickActive?: boolean,
+    doubleClickDelay?: number;
     calculateRowStyles?: CalculateRowStyles<Item> | undefined
     calculateRowClasses?: CalculateRowClasses<Item> | undefined
     onsort?: (event: {
@@ -55,6 +57,11 @@
       }
     }) => void
     onrowClick?: (event: {
+      detail: {
+        item: Item
+      }
+    }) => void
+    onrowDoubleClick?: (event: {
       detail: {
         item: Item
       }
@@ -103,10 +110,13 @@
     resizedColumnSizeWithPadding = $bindable(),
     pointerOnRowHover = false,
     lang = 'en',
+    doubleClickActive = false,
+    doubleClickDelay = 250,
     calculateRowStyles = undefined,
     calculateRowClasses = undefined,
     oncolumnResize,
     onrowClick,
+    onrowDoubleClick,
     onsort,
     headerSnippet,
     headerLabelSnippet,
@@ -116,6 +126,12 @@
     noDataSnippet,
     class: clazz = {},
   }: Props = $props();
+
+  if(!onrowClick && !!onrowDoubleClick) {
+    throw new Error('cannot define an onrowDoubleClick event without defining an onrowClick event')
+  }
+
+  let clickTimeout: NodeJS.Timeout | undefined = undefined;
 
   onMount(() => {
     if(resizableColumns) {
@@ -182,12 +198,38 @@
   }
 
   function handleRowClick(item: Item) {
-    if(onrowClick) {
-      onrowClick({
-        detail: {
-          item
+    if(doubleClickActive) {
+      if (clickTimeout) {
+        clearTimeout(clickTimeout);
+        clickTimeout = undefined;
+    
+        if(onrowDoubleClick) {
+          onrowDoubleClick({
+            detail: {
+              item
+            }
+          })
         }
-      })
+      } else {
+        clickTimeout = setTimeout(() => {
+          if(onrowClick) {
+            onrowClick({
+              detail: {
+                item
+              }
+            })
+          }
+          clickTimeout = undefined;
+        }, doubleClickDelay);
+      }
+    } else {
+      if(onrowClick) {
+        onrowClick({
+          detail: {
+            item
+          }
+        })
+      }
     }
   }
 

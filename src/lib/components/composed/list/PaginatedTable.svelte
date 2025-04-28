@@ -17,11 +17,7 @@
   import type Builder from "$lib/utils/filters/builder";
   import Converter from "$lib/utils/filters/filters";
 
-  interface Props {
-    headers?: ComponentProps<typeof SimpleTable>["headers"];
-    items?: ComponentProps<typeof SimpleTable>["items"];
-    sortedBy?: ComponentProps<typeof SimpleTable>["sortedBy"];
-    sortDirection?: ComponentProps<typeof SimpleTable>["sortDirection"];
+  interface Props extends Omit<ComponentProps<typeof SimpleTable>, 'class'>{
     page?: NonNullable<ComponentProps<typeof Paginator>["page"]>;
     maxPage?: ComponentProps<typeof Paginator>["maxPage"];
     rowsPerPageOptions?: ComponentProps<typeof Dropdown>["items"];
@@ -32,14 +28,8 @@
     searchBarColumns?: string[];
     searchBarVisible?: boolean;
     searchBarPlaceholder?: string;
-    lang?: "it" | "en";
     editFilterMode?: "one-edit" | "multi-edit";
     showActiveFilters?: boolean;
-    resizableColumns?: boolean;
-    resizedColumnSizeWithPadding?: { [value: string]: number };
-    pointerOnRowHover?: boolean;
-    calculateRowStyles?: ComponentProps<typeof SimpleTable>["calculateRowStyles"];
-    calculateRowClasses?: ComponentProps<typeof SimpleTable>["calculateRowClasses"];
     class?: {
       simpleTable?: ComponentProps<typeof SimpleTable>['class']
     }
@@ -60,14 +50,6 @@
     filterAppendSnippet?: ComponentProps<typeof Filters>['appendSnippet']
     customFilterChipSnippet?: ComponentProps<typeof Filters>['customChipSnippet']
     customFilterSnippet?: ComponentProps<typeof Filters>['customSnippet']
-    onsort?: ComponentProps<typeof SimpleTable>['onsort']
-    onrowClick?: ComponentProps<typeof SimpleTable>['onrowClick']
-    customSnippet?: ComponentProps<typeof SimpleTable>['customSnippet']
-    rowActionsSnippet?: ComponentProps<typeof SimpleTable>['rowActionsSnippet']
-    appendSnippet?: ComponentProps<typeof SimpleTable>['appendSnippet']
-    headerSnippet?: ComponentProps<typeof SimpleTable>['headerSnippet']
-    headerLabelSnippet?: ComponentProps<typeof SimpleTable>['headerLabelSnippet']
-    noDataSnippet?: ComponentProps<typeof SimpleTable>['noDataSnippet']
     searchBarSnippet?: Snippet<[{
       handleSearchChange: typeof handleSearchChange
     }]>
@@ -114,6 +96,8 @@
     resizableColumns = false,
     resizedColumnSizeWithPadding = {},
     pointerOnRowHover = undefined,
+    doubleClickActive = false,
+    doubleClickDelay = 250,
     calculateRowStyles = undefined,
     calculateRowClasses = undefined,
     class: clazz = {},
@@ -125,6 +109,7 @@
     customFilterSnippet,
     filterAppendSnippet,
     onrowClick,
+    onrowDoubleClick,
     appendSnippet,
     customSnippet,
     headerLabelSnippet,
@@ -135,6 +120,7 @@
     rangeDescriptorSnippet,
     searchBarSnippet,
     noDataSnippet,
+    oncolumnResize,
   }: Props = $props();
 
   let searchBarInput: HTMLElement | undefined = $state(),
@@ -285,7 +271,11 @@
     bind:sortDirection
     {pointerOnRowHover}
     onsort={handleOnSort}
+    {doubleClickActive}
+    {doubleClickDelay}
+    {lang}
     {onrowClick}
+    {onrowDoubleClick}
     {calculateRowStyles}
     {calculateRowClasses}
     {resizableColumns}
@@ -296,6 +286,7 @@
     {headerSnippet}
     {headerLabelSnippet}
     {noDataSnippet}
+    {oncolumnResize}
   >
   </SimpleTable>
 
