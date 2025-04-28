@@ -34,7 +34,6 @@
   import type { DateTime } from 'luxon';
   import type { ColumnBoolean, ColumnCheckBox, ColumnCustom, ColumnDate, ColumnIcon, ColumnNumber, ColumnString } from './columnTypes';
   import NoData from '../common/NoData.svelte';
-  import { error } from '@sveltejs/kit';
 
   type TableHeader = Header<Data>
 
@@ -129,9 +128,7 @@
   }: Props = $props();
 
   if(!onrowClick && !!onrowDoubleClick) {
-    error(400, {
-      message: 'cannot define an onrowDoubleClick event without defining an onrowClick event'
-    })
+    throw new Error('cannot define an onrowDoubleClick event without defining an onrowClick event')
   }
 
   let clickTimeout: NodeJS.Timeout | undefined = undefined;
