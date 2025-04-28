@@ -41,6 +41,28 @@
     updateHeaderHeight();
     window.addEventListener('resize', updateHeaderHeight);
     tableContainer.addEventListener("scroll", setReachedBottomOrTop);
+
+    if(tableContainer.scrollHeight <= tableContainer.clientHeight) {
+      tableContainer.style.marginRight = '0px'
+    }
+
+    if(resizableColumns) {
+      for(const head of [...headers, { value: 'non-resizable', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }, { value: 'slot-append', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }]) {
+        let th
+        if(head.value == 'non-resizable' || head.value == 'slot-append') {
+          th = document.getElementsByClassName(head.value).item(0) as HTMLElement
+        } else {
+          th = document.getElementById(head.value) as HTMLElement
+        }
+        if(!!th) {
+          resizeHeader(th, head)
+        }
+      }
+
+      let table = document.getElementsByClassName('table')[0] as HTMLElement
+      table.classList.add('resizable')
+    }
+
     return () => {
       window.removeEventListener('resize', updateHeaderHeight);
       tableContainer.removeEventListener("scroll", setReachedBottomOrTop);
@@ -156,6 +178,7 @@
   type Header = Headers[number] & {
     cellEditorInfo?: CellEditorInfo;
     info?: string;
+    maxWidth?: string
   };
   type HeaderType = Header["type"];
 
@@ -200,6 +223,10 @@
       quickFilter: QuickFilter
       setQuickFilterValue: (quickFilter: QuickFilter, value?: any) => void
     }
+    columnResize: {
+      id: string,
+      newWidthPx: number
+    }
   }>();
 
   export let headers: Header[] = [],
@@ -239,7 +266,9 @@
     forwardThresholdPixel = 100,
     uniqueKey: keyof Item = 'id',
     numberOfResultsVisible: boolean = false,
-    endLineVisible: boolean = false
+    endLineVisible: boolean = false,
+    resizableColumns: boolean= false,
+    resizedColumnSizeWithPadding: { [value: string]: number } = {}
 
   let openCellEditor: boolean = false,
     cellEditorActivator: HTMLElement | undefined,
@@ -269,7 +298,12 @@
     tableContainer: HTMLElement,
     userScrolling = true,
     reachedBottom = false,
-    reachedTop = false
+    reachedTop = false,
+    resizing = false,
+    remainingWidth = 0
+
+  const DEFAULT_MIN_WIDTH_PX = 100,
+    DEFAULT_MAX_WIDTH_PX = 400
   
   $: totalSections = (totalRows - renderedRowsNumber) / sectionRowsNumber
   $: hasMoreToRender = totalSections > currentSectionNumber
@@ -314,7 +348,7 @@
   }
 
   function handleHeaderClick(header: Header) {
-    if (header.sortable && !loading) {
+    if (header.sortable && !loading && !resizing) {
       if (!!sortedBy && header.value == sortedBy) {
         if (sortDirection == "asc") sortDirection = "desc";
         else if (sortDirection == "desc") {
@@ -960,36 +994,38 @@
   }
 
   async function handleLoadBackward() {
-    userScrolling = false
-
-    const anchorIndex = 0
-    const anchorUniqueKey = renderedRows[anchorIndex].item[uniqueKey]
-    const anchorElement = findAnchorElement(anchorUniqueKey)
-    const anchorOffsetBefore = anchorElement?.getBoundingClientRect().top || 0
-
-    let removedRowCount = 0
-
-    for (let i = renderedRows.length - 1; removedRowCount < sectionRowsNumber; i--) {
-      let row = tableBody.children.item(i)
-      removedRowCount++
-
-      const rowKey = row?.getAttribute("data-key")
-      const isExpanded = expandedRows.some(r => r.item[uniqueKey] == rowKey)
-      
-      if (isExpanded) {
-        i--
+    if(currentSectionNumber > 0) {
+      userScrolling = false
+  
+      const anchorIndex = 0
+      const anchorUniqueKey = renderedRows[anchorIndex].item[uniqueKey]
+      const anchorElement = findAnchorElement(anchorUniqueKey)
+      const anchorOffsetBefore = anchorElement?.getBoundingClientRect().top || 0
+  
+      let removedRowCount = 0
+  
+      for (let i = renderedRows.length - 1; removedRowCount < sectionRowsNumber; i--) {
+        let row = tableBody.children.item(i)
+        removedRowCount++
+  
+        const rowKey = row?.getAttribute("data-key")
+        const isExpanded = expandedRows.some(r => r.item[uniqueKey] == rowKey)
+        
+        if (isExpanded) {
+          i--
+        }
       }
+      
+      currentSectionNumber = currentSectionNumber - 1
+  
+      await tick()
+      const anchorElementAfter = findAnchorElement(anchorUniqueKey)
+      const anchorOffsetAfter = anchorElementAfter?.getBoundingClientRect().top || 0
+      const offsetDiff = anchorOffsetAfter - anchorOffsetBefore
+      tableContainer.scrollTop += offsetDiff
+  
+      userScrolling = true
     }
-    
-    currentSectionNumber = currentSectionNumber - 1
-
-    await tick()
-    const anchorElementAfter = findAnchorElement(anchorUniqueKey)
-    const anchorOffsetAfter = anchorElementAfter?.getBoundingClientRect().top || 0
-    const offsetDiff = anchorOffsetAfter - anchorOffsetBefore
-    tableContainer.scrollTop += offsetDiff
-
-    userScrolling = true
   }
 
   function findAnchorElement(key: keyof Item) {
@@ -1000,6 +1036,144 @@
       }
     }
     return undefined
+  }
+
+  function resize(node: HTMLElement) {
+    let th: HTMLElement | null = node.parentElement
+    let resizingInner = false
+
+    if(!!th) {
+      let { width } = th.getBoundingClientRect()
+
+      function mouseMoveHandler(e: MouseEvent) {
+        if (resizingInner && !!th && !!tableContainer) {
+          width += e.movementX;
+          const { paddingLeft, paddingRight } = getComputedStyle(th);
+
+          const minWidth: string | undefined = headers.find(h => h.value === th.id)?.minWidth;
+          let minWidthPx: number | undefined;
+          if (!!minWidth && minWidth.endsWith('px')) {
+            minWidthPx = parseInt(minWidth, 10);
+          }
+
+          const maxWidth: string | undefined = headers.find(h => h.value === th.id)?.maxWidth;
+          let maxWidthPx: number | undefined;
+          if (!!maxWidth && maxWidth.endsWith('px')) {
+            maxWidthPx = parseInt(maxWidth, 10);
+          }
+
+          const actualMinWidth = (minWidthPx || DEFAULT_MIN_WIDTH_PX) - parseFloat(paddingLeft) - parseFloat(paddingRight);
+          const actualMaxWidth = (maxWidthPx || DEFAULT_MAX_WIDTH_PX) - parseFloat(paddingLeft) - parseFloat(paddingRight);
+
+          if (width > actualMinWidth && width < actualMaxWidth) {
+            th.style.width = width + 'px';
+            resizedColumnSizeWithPadding[th.id] = th.getBoundingClientRect().width;
+            resizedColumnSizeWithPadding = resizedColumnSizeWithPadding
+          }
+        }
+      }
+      
+
+      function mouseUpHandler(e: MouseEvent, setResize: boolean = true) {
+        if(!!th) {
+          resizingInner = false
+          let { paddingLeft, paddingRight } = getComputedStyle(th)
+          width = th.getBoundingClientRect().width - parseFloat(paddingLeft) - parseFloat(paddingRight)
+          if(setResize){
+            setTimeout(() => resizing = false, 20)
+          }
+          dispatch('columnResize', {
+            id: th.id,
+            newWidthPx: width
+          })
+        }
+      }
+
+      function mouseDownHandler(e: MouseEvent) {
+        if(!!th) {
+          resizing = true
+          resizingInner = true
+          let { paddingLeft, paddingRight } = getComputedStyle(th)
+          width = th.getBoundingClientRect().width - parseFloat(paddingLeft) - parseFloat(paddingRight)
+        }
+      }
+
+      node.addEventListener('mousedown', mouseDownHandler)
+      document.addEventListener('mouseup', mouseUpHandler)
+      document.addEventListener('mousemove', mouseMoveHandler)
+
+
+      return {
+        destroy() {
+          node.removeEventListener('mousedown', mouseDownHandler)
+          document.removeEventListener('mouseup', mouseUpHandler)
+          document.removeEventListener('mousemove', mouseMoveHandler)
+        }
+      }
+    }
+  }
+
+  $: if (
+    resizableColumns &&
+    !!tableContainer &&
+    resizableColumns &&
+    headersToShowInTable.length > 0 &&
+    resizedColumnSizeWithPadding &&
+    headersToShow.length > 0 &&
+    mainHeader
+  ) {
+    tick().then(updateRemainingWidth);
+  }
+  
+  async function updateRemainingWidth() {
+    if(tableContainer != null && !!tableContainer) {
+      const containerWidth = tableContainer?.getBoundingClientRect().width - 30;
+
+      if(containerWidth){
+        const totalResizableWidth = headersToShowInTable.reduce((sum, head) => {
+          let th = document.getElementById(head.value)
+          if(!!th) {
+            resizeHeader(th, head)
+          }
+          const width = th?.getBoundingClientRect().width || 0
+          return sum + width + 1;
+        }, 0);
+    
+        const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.slot-append, th.customize-headers'))
+          .reduce((sum, th) => sum + th.getBoundingClientRect().width + 1, 0);
+    
+        remainingWidth = Math.max(0, containerWidth - totalResizableWidth - extraStaticWidth);
+      }
+    }
+  }
+
+  function resizeHeader(th: HTMLElement, header: { value: string, minWidth?: string, maxWidth?: string }){
+    if (!resizedColumnSizeWithPadding[header.value]) {
+      let widthWihtPadding = th.getBoundingClientRect().width
+
+      let minWidth = header.minWidth,
+        minWidthPx = DEFAULT_MIN_WIDTH_PX
+      if (!!minWidth && minWidth.endsWith('px')) {
+        minWidthPx = parseInt(minWidth, 10);
+      }
+      if(widthWihtPadding < minWidthPx) {
+        widthWihtPadding = minWidthPx
+      }
+
+      let maxWidth = header.maxWidth,
+        maxWidthPx = DEFAULT_MAX_WIDTH_PX
+      if (!!maxWidth && maxWidth.endsWith('px')) {
+        maxWidthPx = parseInt(maxWidth, 10);
+      }
+      if(widthWihtPadding > maxWidthPx) {
+        widthWihtPadding = maxWidthPx
+      }
+
+      resizedColumnSizeWithPadding[header.value] = widthWihtPadding;
+    }
+    let { paddingLeft, paddingRight } = getComputedStyle(th);
+    let width = resizedColumnSizeWithPadding[header.value] - parseFloat(paddingLeft) - parseFloat(paddingRight);
+    th.style.width = `${width}px`
   }
 </script>
 
@@ -1137,7 +1311,6 @@
 
   <div class="outer-container">
     <div class="inner-container" bind:this={tableContainer} on:scroll>
-  <!-- <div class="table-container" bind:this={tableContainer}> -->
     <InfiniteScroll
       on:loadMore={handleLoadBackward}
       threshold={backwardThresholdPixel}
@@ -1152,6 +1325,7 @@
               style:width="30px"
               style:min-width="30px"
               style:text-align="center"
+              class="non-resizable"
             >
               {#if selectMode === "multiple"}
                 <Checkbox
@@ -1166,16 +1340,22 @@
           {#if showExpand}
             <th
               style:min-width="60px"
+              style:max-width="60px"
               style:text-align="center"
+              class="non-resizable"
             />
           {/if}
           {#each headersToShowInTable as head, index}
             <th
-              style:width={head.width}
+              style={`${resizableColumns || !head.width ? '' : `width: ${head.width}`}`}
               style:min-width={head.minWidth}
               class:sortable={head.sortable}
               on:click={() => handleHeaderClick(head)}
+              id={head.value}
             >
+              {#if resizableColumns}
+                <div class="resizer" use:resize></div>
+              {/if}
               <slot name="header" {head}>
                 <span class="header-label" bind:this={infoActivators[index]}>
                   <slot name="headerLabel">{head.label}</slot>
@@ -1218,17 +1398,27 @@
             </th>
           {/each}
           {#if $$slots.rowActions || $$slots.append}
-            <th>
+            <th
+              class="slot-append"
+            >
               <slot name="append" index={-1} items={undefined} />
             </th>
           {/if}
+          {#if resizableColumns && remainingWidth}
+            <th
+              style:width={remainingWidth + 'px'}
+              class="filler"
+              aria-hidden="true"
+            />
+          {/if}
           {#if customizeHeaders}
             <th
-              style:width="30px"
-              style:min-width="30px"
+              style:width="15px"
+              style:min-width="15px"
               style:text-align="center"
+              class="customize-headers"
             >
-              <div style="display: flex; gap: 8px;">
+              <div style="display: flex; justify-content: center;">
                 <Icon
                   name="mdi-plus-circle-outline"
                   click
@@ -1376,6 +1566,7 @@
                   <td
                     colspan={headersToShowInTable.length + 1}
                     style:border="none"
+                    class="expanded-row"
                   >
                     <table style="display: table;">
                       <thead class="table-header table-subheader">
@@ -1949,10 +2140,25 @@
     border-collapse: separate;
   }
 
+  .table.resizable {
+    table-layout: fixed;
+    width: fit-content;
+  }
+
+  .slot-append {
+    width: 1px;
+    min-width: unset;
+    box-sizing: content-box;
+  }
+
   .table-header {
     position: sticky;
     top: 0;
     z-index: 2;
+    height: var(
+      --dynamic-table-header-height,
+      var(--dynamic-table-default-header-height)
+    );
   }
 
   @media not all and (min-resolution:.001dpcm) { 
@@ -1991,12 +2197,6 @@
       --dynamic-table-subheader-background-color,
       var(--dynamic-table-default-subheader-background-color)
     );
-  }
-
-  .table-header th.sortable {
-    cursor: pointer;
-    transition: all 0.1s ease-in;
-    user-select: none;
   }
 
   .table-header th.sortable:hover {
@@ -2041,13 +2241,6 @@
     );
   }
 
-  .thead {
-    height: var(
-      --dynamic-table-header-height,
-      var(--dynamic-table-default-header-height)
-    );
-  }
-
   table {
     border-collapse: separate;
     width: 100%;
@@ -2057,12 +2250,29 @@
     text-align: start;
     padding-left: 10px;
     min-width: 100px;
+    position: relative;
+    user-select: none;
+    box-sizing: content-box;
   }
 
   td {
     padding-left: 10px;
     border: 1px solid transparent;
   }
+
+  table.table > tbody > tr > td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  table.table > thead > tr > th {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  table.table > tbody > tr > td.expanded-row {
+  overflow: visible;
+}
 
   .hover-cell:hover, .hover-cell:focus, .cell-edit-activator {
     cursor: pointer;
@@ -2266,5 +2476,17 @@
     display: flex;
     align-items: center;
     gap: 4px;
+  }
+  .resizer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 6px;
+    height: 100%;
+    cursor: col-resize;
+    z-index: 100;
+  }
+  .filler {
+    padding: 0 !important;
   }
 </style>
