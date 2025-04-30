@@ -1189,6 +1189,11 @@
       disabled={quickActionsDisabled}
       {actionsForSelectedItems}
       {lang}
+      on:close={() => {
+        selectedAll = false
+        unselectedItems = []
+        selectedItems = []
+      }}
     />
   {/if}
 
