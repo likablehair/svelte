@@ -239,9 +239,11 @@
     cellEdit: boolean = false,
     noItemsText: string = "No items to show",
     showSelect: boolean = false,
-    showSelectContainer: boolean = true,
+    showActions: boolean = true,
     selectMode: "single" | "multiple" = "single",
     selectedItems: Item[] = [],
+    unselectedItems: Item[] = [],
+    selectedAll: boolean = false,
     showExpand: boolean = false,
     loading: boolean = false,
     disabled: boolean = false,
@@ -257,6 +259,7 @@
     showActiveFilters: boolean = true,
     quickFilters: QuickFilter[] = [],
     actionsForSelectedItems: Action[] = [],
+    quickActionsDisabled: boolean = false,
     totalRows: number = rows.length,
     searchText: string | undefined = undefined,
     renderedRowsNumber = 100,
@@ -285,8 +288,6 @@
     quickFilterActivator: HTMLElement | undefined,
     quickFilterActive: QuickFilter,
     globalBuilder: FilterBuilder = new FilterBuilder(),
-    slotSelectActionsContainer: HTMLElement | undefined,
-    isSelectedAll: boolean = false,
     calendarOpened: boolean = false,
     calendarOpened2: boolean = false,
     selectedIndexes: number[] = [],
@@ -459,14 +460,19 @@
   }
 
   function handleSelect(item: Item, shiftKeyPressed: boolean) {
-    let index = selectedItems.findIndex((i) => i[uniqueKey] == item[uniqueKey]);
-    // if item is not in the selected items array, add it
+    let index = -1
+    if(selectedAll) {
+      index = unselectedItems.findIndex((i) => i[uniqueKey] == item[uniqueKey]);
+    } else {
+      index = selectedItems.findIndex((i) => i[uniqueKey] == item[uniqueKey]);
+    }
+    // if item is not in the selected/unselected items array, add it
     if (index == -1) {
       if (selectMode == "single") {
         selectedItems = [item];
         selectedIndexes = [rows.findIndex(r => r.item[uniqueKey] == item[uniqueKey])]
       } else if (selectMode == "multiple") {
-        if(shiftKeyPressed && selectedIndexes.length > 0 && !isSelectedAll) {
+        if(shiftKeyPressed && selectedIndexes.length > 0) {
           let lastSelectedIndex = selectedIndexes[selectedIndexes.length - 1],
             selectedIndex = rows.findIndex(r => r.item[uniqueKey] == item[uniqueKey])
           if(selectedIndex != -1) {
@@ -476,34 +482,43 @@
               selectedIndex = x
             }
             for (let i = lastSelectedIndex + 1; i <= selectedIndex; i++) {
-              if(!selectedItems.find((selectedItem) => selectedItem[uniqueKey] == rows[i].item[uniqueKey])) {
-                selectedItems = [...selectedItems, rows[i].item]
+              if(selectedAll) {
+                if(!unselectedItems.find((unselectedItem) => unselectedItem[uniqueKey] == rows[i].item[uniqueKey])) {
+                  unselectedItems = [...unselectedItems, rows[i].item]
+                }
+              } else {
+                if(!selectedItems.find((selectedItem) => selectedItem[uniqueKey] == rows[i].item[uniqueKey])) {
+                  selectedItems = [...selectedItems, rows[i].item]
+                }
               }
             }
           }
         }
         else {
-          selectedItems = [...selectedItems, item];
+          if(selectedAll) {
+            unselectedItems = [...unselectedItems, item];
+          } else {
+            selectedItems = [...selectedItems, item];
+          }
           selectedIndexes.push(rows.findIndex(r => r.item[uniqueKey] == item[uniqueKey]))
         }
       }
     } else {
-      selectedItems = selectedItems.filter((i) => i[uniqueKey] != item[uniqueKey]);
+      if(selectedAll) {
+        unselectedItems = unselectedItems.filter((i) => i[uniqueKey] != item[uniqueKey]);
+      } else {
+        selectedItems = selectedItems.filter((i) => i[uniqueKey] != item[uniqueKey]);
+      }
       selectedIndexes = selectedIndexes.filter(r => r != rows.findIndex(r => r.item[uniqueKey] == item[uniqueKey]))
-      isSelectedAll = false;
     }
   }
 
   function handleSelectAll() {
     if (selectMode == "multiple") {
-      if (selectedItems.length == rows.length) {
-        selectedItems = [];
-        selectedIndexes = []
-        isSelectedAll = false;
-      } else {
-        selectedItems = rows.map((r) => r.item);
-        isSelectedAll = true;
-      }
+      selectedItems = []
+      selectedIndexes = []
+      unselectedItems = []
+      selectedAll = !selectedAll
     }
   }
 
@@ -544,16 +559,6 @@
       saveEditDisabled = true;
     } else {
       saveEditDisabled = false;
-    }
-
-    if (
-      !!isSelectedAll &&
-      rows.length > 0 &&
-      !loading &&
-      !disabled &&
-      selectedItems.length < rows.length
-    ) {
-      selectedItems = rows.map((r) => r.item);
     }
   }
 
@@ -1178,17 +1183,14 @@
 </script>
 
 {#if !!rows && Array.isArray(rows) && !!headersToShowInTable && Array.isArray(headersToShowInTable)}
-  <QuickActions
-    {selectedItems}
-    {showSelectContainer}
-    {isSelectedAll}
-    {totalRows}
-    {slotSelectActionsContainer}
-    {disabled}
-    {loading}
-    {actionsForSelectedItems}
-    {lang}
-  />
+  {#if showActions}
+    <QuickActions
+      selectedItems={selectedAll ? totalRows - unselectedItems.length : selectedItems.length}
+      disabled={quickActionsDisabled}
+      {actionsForSelectedItems}
+      {lang}
+    />
+  {/if}
 
   <slot name="search-bar" {handleSearchChange}>
     {#if searchBarVisible || filtersVisible}
@@ -1330,7 +1332,7 @@
               {#if selectMode === "multiple"}
                 <Checkbox
                   id="select-all"
-                  value={selectedItems.length == totalBatchLength}
+                  value={selectedAll}
                   disabled={disabled || loading}
                   on:change={handleSelectAll}
                 />
@@ -1465,16 +1467,20 @@
               class="item-row"
               data-key={row.item[uniqueKey]}
               style:background-color={
-                !!row.item.disableEdit ?
-                  !!row.item.rowDisableBackgroundColor ?
-                    row.item.rowDisableBackgroundColor : 
-                    'var(--dynamic-table-row-disabled-background-color, var(--dynamic-table-default-row-disabled-background-color))' : 
-                expandedRows.findIndex((r) => r.item[uniqueKey] == row.item[uniqueKey] ) != -1 ? 
-                  'var(--dynamic-table-expanded-row-background-color, var(--dynamic-table-default-expanded-row-background-color))' :
-                  !!selectedItems.find(i => i[uniqueKey] == row.item[uniqueKey]) ?
-                    'var(--dynamic-table-selected-row-background-color, var(--dynamic-table-default-selected-row-background-color))' :
-                    ""
-                }
+                !!row.item.disableEdit
+                  ? !!row.item.rowDisableBackgroundColor
+                    ? row.item.rowDisableBackgroundColor
+                    : 'var(--dynamic-table-row-disabled-background-color, var(--dynamic-table-default-row-disabled-background-color))'
+                  : expandedRows.findIndex(r => r.item[uniqueKey] == row.item[uniqueKey]) != -1
+                    ? 'var(--dynamic-table-expanded-row-background-color, var(--dynamic-table-default-expanded-row-background-color))'
+                    : selectedAll
+                      ? !unselectedItems.find(i => i[uniqueKey] == row.item[uniqueKey])
+                        ? 'var(--dynamic-table-selected-row-background-color, var(--dynamic-table-default-selected-row-background-color))'
+                        : ''
+                      : selectedItems.find(i => i[uniqueKey] == row.item[uniqueKey])
+                        ? 'var(--dynamic-table-selected-row-background-color, var(--dynamic-table-default-selected-row-background-color))'
+                        : ''
+              }
               class:row-activator={cellEditorIndexRow == indexRow && !cellEditorSubItem}
               on:click={() => handleRowClick(row)}
             >
@@ -1482,9 +1488,15 @@
                 <td style:padding-left="0px" style:text-align="center">
                   <Checkbox
                     id={row.item[uniqueKey]}
-                    value={selectedItems.findIndex(
-                      (i) => i[uniqueKey] == row.item[uniqueKey]
-                    ) != -1}
+                    value={
+                      selectedAll ?
+                        unselectedItems.findIndex(
+                          (i) => i[uniqueKey] == row.item[uniqueKey]
+                        ) == -1 :
+                        selectedItems.findIndex(
+                          (i) => i[uniqueKey] == row.item[uniqueKey]
+                        ) != -1
+                    }
                     disabled={disabled || loading}
                     on:change={(e) => handleSelect(row.item, e.detail.shiftKeyPressed)}
                   />
