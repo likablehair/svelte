@@ -16,6 +16,7 @@
   import { cubicIn } from "svelte/easing";
   import MenuOrDrawer from "./MenuOrDrawer.svelte";
   import './QuickActions.css'
+  import { createEventDispatcher } from "svelte";
 
   export let selectedItems: number,
     disabled: boolean,
@@ -30,6 +31,10 @@
     openMoreActions: boolean = false,
     infoActivators: { [actionLabel: string]: HTMLElement } = {},
     disabledInfoActivators: { [actionLabel: string]: HTMLElement } = {};
+
+  const dispatch = createEventDispatcher<{
+    close: {}
+  }>()
 
   $: {
     if (!!slotSelectActionsContainer) {
@@ -59,7 +64,7 @@
       class="select-container"
     >
       <div>
-        <button class="select-info" {disabled} on:click={() => (infoActivators = {}, disabledInfoActivators = {})}>
+        <button class="select-info" {disabled} on:click={() => (infoActivators = {}, disabledInfoActivators = {}, dispatch('close', {}))}>
           {selectedItems} {lang == 'en' ? 'items selected' : 'righe selezionate'}
           <Icon name="mdi-close" />
         </button>
