@@ -133,7 +133,7 @@
 					{lang}
 					{labelsMapper}
 					editFilterMode="one-edit"
-					bind:tmpFilter={tmpFilters[selectedFilter.name]}
+					bind:tmpFilter={tmpFilters[selectedFilter?.name || '']}
 					mobile={mAndDown}
 					onchange={handleFilterChange}
 					--simple-textfield-border-radius="5px"
