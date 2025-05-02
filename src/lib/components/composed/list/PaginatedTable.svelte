@@ -76,7 +76,7 @@
     items = [],
     sortedBy = $bindable(undefined),
     sortDirection = $bindable('asc'),
-    page = 1,
+    page = $bindable(1),
     maxPage = undefined,
     rowsPerPageOptions = [
       { label: "20", value: 20 },
