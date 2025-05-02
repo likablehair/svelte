@@ -251,7 +251,7 @@
     searchBarColumns: string[] | undefined = undefined,
     searchBarVisible: boolean = false,
     searchBarPlaceholder: string =
-      "Type to search for identification code, description and MRN...",
+      "Type to search...",
     filtersVisible: boolean = false,
     quickFiltersVisible: boolean = false,
     lang: "it" | "en" = "en",
