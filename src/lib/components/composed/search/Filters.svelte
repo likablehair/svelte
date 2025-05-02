@@ -363,7 +363,7 @@
       tmpFilter.values = newValue
     } else if('mode' in tmpFilter && tmpFilter.mode == 'between') {
       if(tmpFilter.type == 'date'){
-        tmpFilter.from = DateTime.fromJSDate(newValue.to).setLocale('it-IT').startOf('day').toJSDate()
+        tmpFilter.from = DateTime.fromJSDate(newValue.from).setLocale('it-IT').startOf('day').toJSDate()
         tmpFilter.to = DateTime.fromJSDate(newValue.to).setLocale('it-IT').endOf('day').toJSDate()
       }
       else {
