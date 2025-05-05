@@ -284,6 +284,12 @@
       type: "size",
       description: "Width of the filter wrapper container.",
       default: "auto"
+    },
+    {
+      name: "--filters-button-height",
+      type: "size",
+      description: "Height of the filter button.",
+      default: "28px"
     }
   ]}
 />
