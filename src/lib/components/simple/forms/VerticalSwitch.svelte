@@ -11,7 +11,7 @@
   }
 
   let {
-    value = $bindable(false),
+    value = $bindable(),
     rounded = false,
     onchange,
     falseOptionSnippet,

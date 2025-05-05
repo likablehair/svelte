@@ -49,7 +49,7 @@
   }
 
   let {
-    value = $bindable(undefined),
+    value = $bindable(),
     type = "text",
     placeholder = undefined,
     disabled = false,

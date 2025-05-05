@@ -33,7 +33,7 @@
     placeholder = "placeholder",
     textAreaId = createId(),
     fontFamily = "inherit",
-    value = $bindable(""),
+    value = $bindable(),
     resizable = true,
     disabled = false,
     readOnly = false,

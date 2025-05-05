@@ -35,7 +35,7 @@
   }
 
   let {
-    files = $bindable([]),
+    files = $bindable(),
     persistOverUpload = true,
     dropAreaActive = true,
     icon = "mdi-file-document",
@@ -69,14 +69,14 @@
   }
 
   function handleRemove(file: File) {
-    files = files.filter((elem) => {
+    files = files?.filter((elem) => {
       return elem != file;
     });
 
     if(onfileChange){
       onfileChange({
         detail: {
-          files
+          files: files || []
         }
       })
     }
@@ -86,7 +86,7 @@
     if(onfileChange){
       onfileChange({
         detail: {
-          files
+          files: files || []
         }
       })
     }
@@ -100,7 +100,7 @@
     if(onfileChange){
       onfileChange({
         detail: {
-          files
+          files: files || []
         }
       })
     }
@@ -115,7 +115,7 @@
   <FileInput
     bind:files
     {persistOverUpload}
-    disabled={disabled || (maxFiles !== undefined && files.length >= maxFiles)}
+    disabled={disabled || (maxFiles !== undefined && !!files && files.length >= maxFiles)}
     --file-input-border-radius="var(--file-input-list-border-radius,var(--file-input-list-default-border-radius))"
     --file-input-background-color="var(--file-input-list-background-color,var(--file-input-list-default-background-color))"
     --file-input-color="var(--file-input-list-color,var(--file-input-list-default-color))"
@@ -136,7 +136,7 @@
           style:display="flex"
         >
           <div class="body-container" class:{active}>
-            {#if files.length == 0}
+            {#if files?.length == 0}
               {#if messageSnippet}
                 {@render messageSnippet({ message })}
               {:else}
@@ -144,11 +144,11 @@
               {/if}
             {:else}
               {#if fileListSnippet}
-                {@render fileListSnippet({ files })}
+                {@render fileListSnippet({ files: files || [] })}
               {:else}
                 <table class="file-list">
                   <tbody>
-                    {#each files as file}
+                    {#each (files || []) as file}
                       <tr
                         onclick={(e) => {
                           e.stopPropagation()

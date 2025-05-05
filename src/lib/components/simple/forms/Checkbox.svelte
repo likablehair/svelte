@@ -16,7 +16,7 @@
   }
 
   let { 
-    value = $bindable(false), 
+    value = $bindable(), 
     id = undefined, 
     disabled = false,
     onchange,

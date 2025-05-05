@@ -15,7 +15,7 @@
 	}
 
 	let {
-		value = $bindable(undefined),
+		value = $bindable(),
 		disabled = false,
 		onchange: onchangeInternal,
 	}: Props = $props();

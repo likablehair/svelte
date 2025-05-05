@@ -29,7 +29,7 @@
   }
 
   let {
-    files = $bindable(undefined),
+    files = $bindable(),
     placeholder = undefined,
     persistOverUpload = true,
     disabled = false,

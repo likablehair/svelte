@@ -22,7 +22,7 @@
 	let {
 		options,
 		name = undefined,
-		value = $bindable(undefined),
+		value = $bindable(),
 		disabled = false,
 		placeholder = undefined,
 		onchange,

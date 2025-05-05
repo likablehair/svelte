@@ -22,7 +22,7 @@
     name,
     value,
     id = undefined,
-    checked = $bindable(false),
+    checked = $bindable(),
     label = undefined,
     disabled = false,
     onblur,
