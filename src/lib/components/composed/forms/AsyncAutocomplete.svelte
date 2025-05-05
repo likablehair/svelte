@@ -3,19 +3,21 @@
   export type { Item }
 </script>
 
-<script lang="ts">
+<script lang="ts" generics="Data">
   import Autocomplete from "../../../components/simple/forms/Autocomplete.svelte";
   import debounceStore from "$lib/stores/debounce";
   import { writable } from 'svelte/store';
   import type { ComponentProps } from "svelte";
 
+  type AsyncAutocompleteItem = Item<Data>
+
   interface Props {
-    items: Item[];
-    values?: Item[];
+    items: AsyncAutocompleteItem[];
+    values?: AsyncAutocompleteItem[];
     multiple?: boolean;
     searcher: (params: {
       searchText: string
-    }) => Promise<Item[]>;
+    }) => Promise<AsyncAutocompleteItem[]>;
     placeholder?: string;
     searchThreshold?: number;
     debounceTimeout?: number;
@@ -27,9 +29,9 @@
     mobileDrawer?: boolean;
     closeOnSelect?: boolean;
     disabled?: boolean;
-    chipLabelSnippet?: ComponentProps<typeof Autocomplete>['chipLabelSnippet']
-    itemLabelSnippet?: ComponentProps<typeof Autocomplete>['itemLabelSnippet']
-    onchange?: ComponentProps<typeof Autocomplete>['onchange']
+    chipLabelSnippet?: ComponentProps<typeof Autocomplete<Data>>['chipLabelSnippet']
+    itemLabelSnippet?: ComponentProps<typeof Autocomplete<Data>>['itemLabelSnippet']
+    onchange?: ComponentProps<typeof Autocomplete<Data>>['onchange']
   }
 
   let {

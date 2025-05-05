@@ -177,7 +177,7 @@
 </script>
 
 <Line 
-  bind:data={(data as ComponentProps<typeof Line>['data'])}
+  data={(data as ComponentProps<typeof Line>['data'])}
   options={chartOptions}
   bind:resetZoom
 ></Line>

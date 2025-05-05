@@ -3,18 +3,12 @@
   import PropsViewer from "../../PropsViewer.svelte";
   import LineChart from "$lib/components/simple/charts/LineChart.svelte";
   import Button from "$lib/components/simple/buttons/Button.svelte";
-    import SlotsViewer from "../../SlotsViewer.svelte";
-    import EventsViewer from "../../EventsViewer.svelte";
+  import SlotsViewer from "../../SlotsViewer.svelte";
+  import EventsViewer from "../../EventsViewer.svelte";
 
   let resetZoom: boolean = false
-</script>
 
-<h1>LineChart</h1>
-<ComponentSubtitle>Line chart.</ComponentSubtitle>
-<h2>Example</h2>
-<div class="example">
-  <LineChart
-    data={{
+  let data = {
       labels: ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dec'],
       datasets: [
         {
@@ -31,7 +25,15 @@
           tension: 0.3
         },
       ]
-    }}
+    }
+</script>
+
+<h1>LineChart</h1>
+<ComponentSubtitle>Line chart.</ComponentSubtitle>
+<h2>Example</h2>
+<div class="example">
+  <LineChart
+    {data}
     showLegend={false}
     enableZoom={true}
     bind:resetZoom={resetZoom}
@@ -39,6 +41,28 @@
   <Button
     onclick={() => { resetZoom = true }}
   >Reset zoom</Button>
+  <Button
+    onclick={() => { 
+      data = {
+        labels: ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dec'],
+        datasets: [
+          {
+            label: 'Vendite',
+            data: [20, 40, 20, 20, 30, 10, 70, 20, 30, 20, 80, 100],
+            backgroundColor: '#0891b2',
+            borderColor: '#7dd3fc',
+            tension: 0.3
+          }, {
+            label: 'Acquisti',
+            data: [60, 20, 30, 20, 80, 100, 20, 30, 20, 40, 50, 10],
+            backgroundColor: '#115e59',
+            borderColor: '#0d9488',
+            tension: 0.3
+          },
+        ]
+      }
+    }}
+  >Change data</Button>
   <div style:height="24px" style:width="48px">
     <LineChart
       data={{

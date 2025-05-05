@@ -17,7 +17,7 @@
   }
 
   let { 
-    data = $bindable(),
+    data,
     options = $bindable(),
     resetZoom = $bindable(),
     ...rest 

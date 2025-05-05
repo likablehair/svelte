@@ -195,7 +195,7 @@
 </script>
 
 <Bar
-  bind:data={data}
+  data={data}
   bind:resetZoom
   options={chartOptions}
   width={width}
