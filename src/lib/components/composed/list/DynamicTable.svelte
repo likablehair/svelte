@@ -2401,6 +2401,12 @@
     margin-bottom: 20px;
   }
 
+  .quick-filters {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 10px;
+  }
+
   .quick-filters-results-container {
     display: flex;
     justify-content: space-between;
