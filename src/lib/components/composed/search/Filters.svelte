@@ -472,6 +472,7 @@
         >
           <Button
             --button-color="var(--chip-color, var(--chip-default-color))"
+            --button-height="var(--filters-button-height, var(--filters-default-button-height))"
             on:click={handleAddFilterClick}
           >
             <div class="filter-button-content">
@@ -493,6 +494,7 @@
       >
         <Button
           --button-color="var(--chip-color, var(--chip-default-color))"
+          --button-height="var(--filters-button-height, var(--filters-default-button-height))"
           on:click={handleAddFilterClick}
         >
           <div class="filter-button-content">
@@ -904,7 +906,7 @@
 
   .filters-wrapper {
     display: flex;
-    align-items: center;
+    align-items: start;
     gap: 20px;
     max-width: 100%;
     width: var(

@@ -1196,26 +1196,30 @@
     />
   {/if}
 
-  <slot name="search-bar" {handleSearchChange}>
-    {#if searchBarVisible || filtersVisible}
+  {#if searchBarVisible || filtersVisible || $$slots.appendFilterRow}
+    <div class="filter-container">
       <div class="search-bar-container">
-        {#if searchBarVisible}
-          <SimpleTextField
-            placeholder={searchBarPlaceholder}
-            appendInnerIcon="mdi-magnify"
-            bind:value={searchText}
-            bind:input={searchBarInput}
-            on:keydown={handleSearchBoxKeydown}
-            --simple-textfield-default-width="450px"
-            --simple-textfield-border-radius= 0.5rem
-            --simple-textfield-background-color= transparent
-            --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-            --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-          />
-        {/if}
+        <slot name="search-bar" {handleSearchChange}>
+          {#if searchBarVisible}
+          <div style="margin-right: 20px;">
+            <SimpleTextField
+              placeholder={searchBarPlaceholder}
+              appendInnerIcon="mdi-magnify"
+              bind:value={searchText}
+              bind:input={searchBarInput}
+              on:keydown={handleSearchBoxKeydown}
+              --simple-textfield-default-width="450px"
+              --simple-textfield-border-radius= 0.5rem
+              --simple-textfield-background-color= transparent
+              --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+              --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+            />
+          </div>
+          {/if}
+        </slot>
 
         {#if filtersVisible}
-          <div style="margin-left: 20px;">
+          <div>
             <Filters
               bind:filters
               on:applyFilter={() => {
@@ -1262,8 +1266,12 @@
           </div>
         {/if}
       </div>
-    {/if}
-  </slot>
+
+      <div>
+        <slot name="appendFilterRow"></slot>
+      </div>
+    </div>
+  {/if}
 
   {#if quickFiltersVisible || numberOfResultsVisible}
   <div class="quick-filters-results-container">
@@ -2384,13 +2392,13 @@
   .search-bar-container {
     display: flex;
     flex-direction: row;
-    margin-bottom: 20px;
   }
 
-  .quick-filters {
+  .filter-container {
     display: flex;
     flex-direction: row;
-    margin-bottom: 10px;
+    justify-content: space-between;
+    margin-bottom: 20px;
   }
 
   .quick-filters-results-container {
