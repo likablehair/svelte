@@ -364,8 +364,12 @@
       tmpFilter.values = newValue
     } else if('mode' in tmpFilter && tmpFilter.mode == 'between') {
       if(tmpFilter.type == 'date'){
-        tmpFilter.from = DateTime.fromJSDate(newValue.from).setLocale('it-IT').startOf('day').toJSDate()
-        tmpFilter.to = DateTime.fromJSDate(newValue.to).setLocale('it-IT').endOf('day').toJSDate()
+        if(newValue.from){
+          tmpFilter.from = DateTime.fromJSDate(newValue.from).setLocale('it-IT').startOf('day').toJSDate()
+        }
+        if(newValue.to){
+          tmpFilter.to = DateTime.fromJSDate(newValue.to).setLocale('it-IT').endOf('day').toJSDate()
+        }
       }
       else {
         tmpFilter.from = newValue.from

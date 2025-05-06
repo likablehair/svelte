@@ -216,6 +216,7 @@
     filtersVisible?: boolean;
     quickFiltersVisible?: boolean;
     lang?: "it" | "en";
+    dateLocale?: "it" | "en";
     editFilterMode?: "one-edit" | "multi-edit";
     showActiveFilters?: boolean;
     quickFilters?: QuickFilter[];
@@ -369,6 +370,7 @@
     sortDirection = $bindable("asc"),
     cellEdit = false,
     lang = "en",
+    dateLocale,
     noItemsText = lang == 'en' ? "No items to show" : 'Nessun elemento da visualizzare',
     showSelect = false,
     showActions = true,
@@ -1461,6 +1463,7 @@
               onremoveAllFilters={() => handleRemoveAllFilters()}
               --filters-default-wrapper-width="100%"
               {lang}
+              {dateLocale}
               {editFilterMode}
               {showActiveFilters}
               appendSnippet={filterAppendSnippet}

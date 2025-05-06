@@ -264,6 +264,7 @@
     { name: "filtersVisible", type: "boolean", description: "Show filters section", default: "false" },
     { name: "quickFiltersVisible", type: "boolean", description: "Show quick filters", default: "false" },
     { name: "lang", type: "'it' | 'en'", description: "Language for internal strings", default: "'en'" },
+    { name: "dateLocale", type: "'it' | 'en'", description: "Locale for filter chips", default: "'it'" },
     { name: "editFilterMode", type: "'one-edit' | 'multi-edit'", description: "Filter editing mode", default: "'one-edit'" },
     { name: "showActiveFilters", type: "boolean", description: "Display currently active filters", default: "true" },
     { name: "quickFilters", type: "QuickFilter[]", description: "Quick filter options", default: "[]" },
