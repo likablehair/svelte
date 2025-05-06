@@ -238,6 +238,7 @@
     sortDirection: "asc" | "desc" = "asc",
     cellEdit: boolean = false,
     lang: "it" | "en" = "en",
+    dateLocale: "it" | "en" | undefined = undefined,
     noItemsText: string = lang == 'en' ? "No items to show" : 'Nessun elemento da visualizzare',
     showSelect: boolean = false,
     showActions: boolean = true,
@@ -1229,6 +1230,7 @@
               on:removeAllFilters={() => handleRemoveAllFilters()}
               --filters-default-wrapper-width="100%"
               {lang}
+              {dateLocale}
               {editFilterMode}
               {showActiveFilters}
             >
