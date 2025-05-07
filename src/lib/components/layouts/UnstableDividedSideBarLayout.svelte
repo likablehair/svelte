@@ -52,7 +52,11 @@
     menuSnippet?: Snippet<[{
       hamburgerVisible?: boolean
       sidebarExpanded?: boolean
-    }]>
+    }]>,
+    headerSnippet?: Snippet<[{
+      hamburgerVisible?: boolean
+      sidebarExpanded?: boolean
+    }]>,
     innerMenuSnippet?: Snippet<[{
       hamburgerVisible: boolean
     }]>
@@ -92,6 +96,7 @@
     innerMenuSnippet,
     logoSnippet,
     menuSnippet,
+    headerSnippet,
     optionSnippet: optionInternalSnippet,
     prependSnippet: prependInternalSnippet,
     sidebarSnippet,
@@ -155,8 +160,8 @@
         class:opened={sidebarExpanded}
         class="header-toolbar"
       >
-        {#if menuSnippet}
-          {@render menuSnippet({})}
+        {#if headerSnippet}
+          {@render headerSnippet({ sidebarExpanded, hamburgerVisible: mAndDown })}
         {:else}
           <div class="inner-menu">
             {#if mAndDown}
