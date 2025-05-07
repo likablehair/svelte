@@ -943,10 +943,7 @@
     updateMultiFilterValues(filter.name, newValue, newValid, newMode)
   }
 
-  function handleRemoveAllFilters(removeAllFilters?: () => void) {
-    if(!!removeAllFilters) {
-      removeAllFilters()
-    }
+  function handleRemoveAllFilters() {
     dispatch('removeAllFilters', {})
     handleSearchChange(searchText);
   }
@@ -1249,7 +1246,7 @@
                 <slot name="custom-filter" {filter} {updateFunction} {mAndDown} />
               </svelte:fragment>
 
-              <svelte:fragment slot="content" let:mAndDown let:filters let:updateMultiFilterValues let:handleRemoveAllFilters={removeAllFilters}>
+              <svelte:fragment slot="content" let:mAndDown let:filters let:updateMultiFilterValues>
                 {#key filters}
                   <DynamicFilters
                     {lang}
@@ -1257,7 +1254,6 @@
                     {mAndDown}
                     {updateMultiFilterValues}
                     on:change={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
-                    on:removeAllFilters={() => handleRemoveAllFilters(removeAllFilters)}
                   >
                     <svelte:fragment slot="custom" let:filter let:mAndDown let:updateCustomFilterValues>
                       <slot name="custom-filter" {filter} {updateCustomFilterValues} {mAndDown}></slot>

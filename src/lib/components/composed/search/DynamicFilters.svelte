@@ -18,7 +18,6 @@
 	}, {} as { [filterName: string]: Filter });
 
   const dispatch = createEventDispatcher<{
-    'removeAllFilters': {},
 		'change': { filter: Filter }
   }>()
 
