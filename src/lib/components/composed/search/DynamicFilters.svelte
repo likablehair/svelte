@@ -147,6 +147,8 @@
 						--autocomplete-border-radius= 0.5rem
 						--autocomplete-border="1px solid rgb(var(--global-color-background-500))"
 						--autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
+						--autocomplete-padding="9.6px 16px"
+						--autocomplete-background-color="transparent"
 					>
 					<svelte:fragment slot="custom" let:filter>
 						<slot name="custom" {filter} {mAndDown} {updateCustomFilterValues}></slot>
