@@ -255,7 +255,8 @@
               --simple-text-field-margin-left="0px"
               mobileDrawer={mobile}
               onchange={handleChangeValue}
-            ></Autocomplete>
+              placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
+              ></Autocomplete>
           </div>
         {:else if tmpFilter.type === "select" && (tmpFilter.view === 'toggle')}
           <div
