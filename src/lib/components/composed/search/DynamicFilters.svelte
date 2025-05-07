@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { FilterEditor, Icon } from "$lib";
-	import type { Filter } from "$lib/utils/filters/filters";
+	import type { DateMode, Filter, NumberMode, SelectMode, StringMode } from "$lib/utils/filters/filters";
 	import { createEventDispatcher } from "svelte"
 
 
 	export let filters: Filter[] = [],
 		lang: "it" | "en" = "en",
-		mAndDown: boolean = false;		
+		mAndDown: boolean = false,
+		updateMultiFilterValues: (filterName: string, newValue: any, newValid: boolean, mode?: NumberMode | StringMode | SelectMode | DateMode) => void;		
 
 	let selectedFilter: Filter | undefined;
 	let tmpFilters: { [filterName: string]: Filter } = filters.reduce((acc, f) => {
@@ -54,11 +55,6 @@
 			selectFilter(filter);
 		}
 	}
-	
-	function clearFilters() {
-		tmpFilters = {};
-		dispatch('removeAllFilters', {})
-	}
 
 	function handleFilterChange() {
 		if(!!selectedFilter){
@@ -86,7 +82,12 @@
       if(!!newValue.from || !!newValue.to) {
         newValid = true
       }
-    } else {
+    } else if (filter.type == 'custom') {
+      newValue = filter.value
+			if ((Array.isArray(newValue) && newValue.length > 0) || (!Array.isArray(newValue) && !!newValue)) {
+				newValid = true;
+			}
+		} else {
       newValue = filter.value
       if(!!newValue) {
         newValid = true
@@ -94,6 +95,15 @@
     }
 
 		return newValid
+  }
+
+	function updateCustomFilterValues(filterName: string, newValue: any, newValid: boolean, mode?: NumberMode | StringMode | SelectMode | DateMode) {
+    let filter = filters.find(f => f.name === filterName)
+    if(!filter) throw new Error('cannot find filter with name ' + filterName)
+    if(filter.type != 'custom') throw new Error('filter is not custom')
+    filter.value = newValue
+    filter.active = newValid
+		updateMultiFilterValues(filterName, newValue, newValid, mode)
   }
 </script>
 
@@ -140,7 +150,7 @@
 						--autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
 					>
 					<svelte:fragment slot="custom" let:filter>
-						<slot name="custom" {filter} {mAndDown}></slot>
+						<slot name="custom" {filter} {mAndDown} {updateCustomFilterValues}></slot>
 					</svelte:fragment>
 					</FilterEditor>
 				{/key}

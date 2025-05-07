@@ -1255,11 +1255,12 @@
                     {lang}
                     {filters}                      
                     {mAndDown}
+                    {updateMultiFilterValues}
                     on:change={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
                     on:removeAllFilters={() => handleRemoveAllFilters(removeAllFilters)}
                   >
-                    <svelte:fragment slot="custom" let:filter let:mAndDown>
-                      <slot name="custom-filter" {filter} {updateMultiFilterValues} {mAndDown}></slot>
+                    <svelte:fragment slot="custom" let:filter let:mAndDown let:updateCustomFilterValues>
+                      <slot name="custom-filter" {filter} {updateCustomFilterValues} {mAndDown}></slot>
                     </svelte:fragment>
                   </DynamicFilters>
                 {/key}
