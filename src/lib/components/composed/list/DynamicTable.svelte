@@ -305,7 +305,8 @@
     customFilterChipSnippet?: ComponentProps<typeof Filters>['customChipSnippet']
     customFilterSnippet?: Snippet<[{
       filter: Filter | undefined,
-      updateMultiFilterValues: Parameters<NonNullable<ComponentProps<typeof Filters>['contentSnippet']>>[0]['updateMultiFilterValues']
+      mAndDown: boolean;
+      updateCustomFilterValues: Parameters<NonNullable<ComponentProps<typeof Filters>['contentSnippet']>>[0]['updateMultiFilterValues']
     }]>
     onscroll?: UIEventHandler<HTMLDivElement>
     selectionSnippet?: ComponentProps<typeof Autocomplete>['selectionSnippet']
@@ -1148,10 +1149,7 @@
     updateMultiFilterValues(filter.name, newValue, newValid, newMode)
   }
 
-  function handleRemoveAllFilters(removeAllFilters?: () => void) {
-    if(!!removeAllFilters) {
-      removeAllFilters()
-    }
+  function handleRemoveAllFilters() {
     if(onremoveAllFilters){
       onremoveAllFilters()
     }
@@ -1469,17 +1467,17 @@
               appendSnippet={filterAppendSnippet}
               customChipSnippet={customFilterChipSnippet}
             >
-              {#snippet contentSnippet({ filters, mAndDown, updateMultiFilterValues, handleRemoveAllFilters: removeAllFilters })}  
+              {#snippet contentSnippet({ filters, mAndDown, updateMultiFilterValues, })}  
                 {#key filters}
                   <DynamicFilters
                     {lang}
                     {filters}                      
                     {mAndDown}
                     onchange={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
-                    onremoveAllFilters={() => handleRemoveAllFilters(removeAllFilters)}
+                    {updateMultiFilterValues}
                   >
-                    {#snippet customSnippet({ filter })}
-                      {@render customFilterSnippet?.({ filter, updateMultiFilterValues })}
+                    {#snippet customSnippet({ filter, mAndDown, updateCustomFilterValues })}
+                      {@render customFilterSnippet?.({ filter, mAndDown, updateCustomFilterValues })}
                     {/snippet}
                   </DynamicFilters>
                 {/key}

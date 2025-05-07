@@ -1,19 +1,23 @@
 <script lang="ts">
 	import { FilterEditor, Icon } from "$lib";
-	import type { Filter } from "$lib/utils/filters/filters";
-	import { type ComponentProps } from "svelte"
+	import type { DateMode, Filter, NumberMode, SelectMode, StringMode } from "$lib/utils/filters/filters";
+	import { type Snippet } from "svelte"
 
 	interface Props {
     filters?: Filter[];
     lang?: "it" | "en";
     mAndDown?: boolean;
-		onremoveAllFilters?: () => void
 		onchange?: (event: {
 			detail: {
 				filter: Filter
 			}
 		}) => void
-		customSnippet?: ComponentProps<typeof FilterEditor>['customSnippet']
+		customSnippet?: Snippet<[{
+			filter: Filter | undefined,
+			mAndDown: boolean,
+			updateCustomFilterValues: typeof updateCustomFilterValues
+		}]>
+		updateMultiFilterValues?: (filterName: string, newValue: any, newValid: boolean, mode?: NumberMode | StringMode | SelectMode | DateMode) => void
   }
 
   let {
@@ -21,8 +25,8 @@
     lang = "en",
     mAndDown = false,
 		onchange,
-		onremoveAllFilters,
-		customSnippet,
+		updateMultiFilterValues,
+		customSnippet: customSnippetInternal,
   }: Props = $props();	
 
 	let selectedFilter: Filter | undefined = $state();
@@ -66,13 +70,6 @@
 			selectFilter(filter);
 		}
 	}
-	
-	function clearFilters() {
-		tmpFilters = {};
-		if(onremoveAllFilters) {
-			onremoveAllFilters()
-		}
-	}
 
 	function handleFilterChange() {
 		if(!!selectedFilter){
@@ -105,14 +102,30 @@
       newValue.from = filter.from
       if(!!newValue.from || !!newValue.to) {
         newValid = true
-      }
-    } else {
+			}
+    } else if (filter.type == 'custom') {
+      newValue = filter.value
+			if ((Array.isArray(newValue) && newValue.length > 0) || (!Array.isArray(newValue) && !!newValue)) {
+				newValid = true;
+			}
+		} else {
       newValue = filter.value
       if(!!newValue) {
         newValid = true
       }
     }
 		return newValid
+  }
+
+	function updateCustomFilterValues(filterName: string, newValue: any, newValid: boolean, mode?: NumberMode | StringMode | SelectMode | DateMode) {
+		let filter = filters.find(f => f.name === filterName)
+    if(!filter) throw new Error('cannot find filter with name ' + filterName)
+    if(filter.type != 'custom') throw new Error('filter is not custom')
+		filter.value = newValue
+		filter.active = newValid
+		if(updateMultiFilterValues){
+			updateMultiFilterValues(filterName, newValue, newValid, mode)
+		}
   }
 </script>
 
@@ -156,8 +169,10 @@
 						--autocomplete-border-radius= 0.5rem
 						--autocomplete-border="1px solid rgb(var(--global-color-background-500))"
 						--autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
-						{customSnippet}
 					>
+						{#snippet customSnippet({ filter })}
+							{@render customSnippetInternal?.({ filter, mAndDown, updateCustomFilterValues })}
+						{/snippet}
 					</FilterEditor>
 				{/key}
 			</div>
