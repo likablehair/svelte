@@ -14,6 +14,7 @@
     width?: string
     minWidth?: string
     sortable?: boolean
+    sortModify?: (params: { builder: FilterBuilder, sortDirection: 'asc' | 'desc' }) => FilterBuilder
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     data?: { [key: string]: any }
   };
@@ -38,6 +39,7 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import type { DateTime } from 'luxon';
   import type { ColumnBoolean, ColumnCheckBox, ColumnCustom, ColumnDate, ColumnIcon, ColumnNumber, ColumnString } from './columnTypes';
+  import type { FilterBuilder } from '$lib';
 
   let clazz: {
     container?: string;
@@ -51,6 +53,7 @@
     'sort': {
       sortedBy: string | undefined,
       sortDirection: string
+      sortModify: Header['sortModify']
     },
     'rowClick': {
       item: Item
@@ -74,7 +77,8 @@
     doubleClickActive: boolean = false,
     doubleClickDelay: number = 250;
 
-  let clickTimeout: NodeJS.Timeout | undefined = undefined;
+  let clickTimeout: NodeJS.Timeout | undefined = undefined,
+    sortModify: Header['sortModify']
 
   export let calculateRowStyles: CalculateRowStyles | undefined = undefined;
   export let calculateRowClasses: CalculateRowClasses | undefined = undefined;
@@ -125,13 +129,15 @@
         if(sortDirection == 'asc') sortDirection = 'desc'
         else if(sortDirection == 'desc') {
           sortedBy = undefined
+          sortModify = undefined
         }
       } else {
         sortedBy = header.value
         sortDirection = 'asc'
+        sortModify = header.sortModify
       }
       dispatch('sort', {
-        sortedBy, sortDirection
+        sortedBy, sortDirection, sortModify
       })
     }
   }

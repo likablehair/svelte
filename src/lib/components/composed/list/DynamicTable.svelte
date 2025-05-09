@@ -301,7 +301,8 @@
     reachedTop = false,
     resizing = false,
     remainingWidth = 0,
-    hideScrollbar = false
+    hideScrollbar = false,
+    sortModify: Header['sortModify']
 
   const DEFAULT_MIN_WIDTH_PX = 100,
     DEFAULT_MAX_WIDTH_PX = 400
@@ -354,10 +355,12 @@
         if (sortDirection == "asc") sortDirection = "desc";
         else if (sortDirection == "desc") {
           sortedBy = undefined;
+          sortModify = undefined
         }
       } else {
         sortedBy = header.value;
         sortDirection = "asc";
+        sortModify = header.sortModify
       }
 
       handleSearchChange(searchText);
@@ -579,10 +582,6 @@
       });
     }
 
-    if (!!sortedBy) {
-      builder.orderBy(sortedBy, sortDirection || "asc");
-    }
-
     return builder;
   }
 
@@ -607,6 +606,15 @@
       currentSectionNumber = 0
       tableContainer.scrollTop = 0
       setTimeout(() => userScrolling = true, 20)
+    }
+
+    if (!!sortedBy) {
+      if(sortModify){
+        globalBuilder = sortModify({ builder: globalBuilder, sortDirection })
+      }
+      else {
+        globalBuilder.orderBy(sortedBy, sortDirection || "asc");
+      }
     }
     
     dispatch("filtersChange", {
@@ -905,10 +913,6 @@
           builder.where(quickFilter.column, value);
         }
       }
-    }
-
-    if (!!sortedBy) {
-      builder.orderBy(sortedBy, sortDirection || "asc");
     }
 
     return builder;
