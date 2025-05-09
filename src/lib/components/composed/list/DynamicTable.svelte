@@ -44,22 +44,20 @@
 
     hideScrollbar = tableContainer.scrollHeight > tableContainer.clientHeight
 
-    if(resizableColumns) {
-      for(const head of [...headers, { value: 'non-resizable', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }, { value: 'slot-append', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }]) {
-        let th
-        if(head.value == 'non-resizable' || head.value == 'slot-append') {
-          th = document.getElementsByClassName(head.value).item(0) as HTMLElement
-        } else {
-          th = document.getElementById(head.value) as HTMLElement
-        }
-        if(!!th) {
-          resizeHeader(th, head)
-        }
+    for(const head of [...headers, { value: 'non-resizable', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }, { value: 'slot-append', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }]) {
+      let th
+      if(head.value == 'non-resizable' || head.value == 'slot-append') {
+        th = document.getElementsByClassName(head.value).item(0) as HTMLElement
+      } else {
+        th = document.getElementById(head.value) as HTMLElement
       }
-
-      let table = document.getElementsByClassName('table')[0] as HTMLElement
-      table.classList.add('resizable')
+      if(!!th) {
+        resizeHeader(th, head)
+      }
     }
+
+    let table = document.getElementsByClassName('table')[0] as HTMLElement
+    table.classList.add('resizable')
 
     return () => {
       window.removeEventListener('resize', updateHeaderHeight);
@@ -1366,6 +1364,7 @@
             <th
               style={`${resizableColumns || !head.width ? '' : `width: ${head.width}`}`}
               style:min-width={head.minWidth}
+              style:max-width={head.maxWidth}
               class:sortable={head.sortable}
               on:click={() => handleHeaderClick(head)}
               id={head.value}
@@ -1602,6 +1601,7 @@
                             <th
                               style:width={subHeader.width}
                               style:min-width={subHeader.minWidth}
+                              style:max-width={subHeader.maxWidth}
                               class:sortable={subHeader.sortable}
                               on:click={() => handleHeaderClick(subHeader)}
                             >
