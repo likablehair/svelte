@@ -208,11 +208,11 @@
     searchBarVisible
     resizableColumns
   >
-    {#snippet customFilterSnippet({ filter, updateMultiFilterValues })}
+    {#snippet customFilterSnippet({ filter, updateCustomFilterValues })}
       {#if !!filter}
         {#if filter.name == 'productCategory'}
           <label for="productCategory">Product Category</label>
-          <SimpleTextField name="productCategory" bind:value oninput={(e) => handleCustomInput(e, filter.name, updateMultiFilterValues)}></SimpleTextField>
+          <SimpleTextField name="productCategory" bind:value oninput={(e) => handleCustomInput(e, filter.name, updateCustomFilterValues)}></SimpleTextField>
         {/if}
       {/if}
     {/snippet}
@@ -337,10 +337,13 @@
         { name: "filter", type: "Filter", description: "The filter to render." }
       ]
     },
-    { name: "customFilterSnippet", description: "Custom filter content", properties: [
-      { name: "filter", type: "Filter | undefined", description: "The filter definition" },
-      { name: "updateMultiFilterValues", type: "function", description: "Updater for multi-filter values" }
-    ] },
+    { 
+      name: "customFilterSnippet", description: "Custom filter content", properties: [
+        { name: "filter", type: "Filter | undefined", description: "The filter definition" },
+        { name: "updateCustomFilterValues", type: "function", description: "Updater for custom filters" },
+        { name: "mAndDown", type: "boolean", description: "Screen size M and lower" }
+      ] 
+    },
     { 
       name: 'selectionSnippet', 
       description: 'Renders each selected item.', 
