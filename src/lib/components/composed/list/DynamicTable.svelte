@@ -45,8 +45,8 @@
     window.addEventListener('resize', updateHeaderHeight);
     tableContainer?.addEventListener("scroll", setReachedBottomOrTop);
 
-    if(tableContainer?.scrollHeight && tableContainer.clientHeight && tableContainer?.scrollHeight <= tableContainer?.clientHeight) {
-      tableContainer.style.marginRight = '0px'
+    if(tableContainer?.scrollHeight && tableContainer.clientHeight){
+      hideScrollbar = tableContainer.scrollHeight > tableContainer.clientHeight
     }
 
     if(resizableColumns) {
@@ -85,6 +85,7 @@
     if(tableContainer) {
       reachedBottom = tableContainer.scrollHeight - tableContainer.scrollTop === tableContainer.clientHeight
       reachedTop = tableContainer.scrollTop === 0
+      hideScrollbar = tableContainer.scrollHeight > tableContainer.clientHeight
     }
   }
 
@@ -468,7 +469,8 @@
     reachedBottom = $state(false),
     reachedTop = false,
     resizing = false,
-    remainingWidth = $state(0)
+    remainingWidth = $state(0),
+    hideScrollbar = $state(false)
 
   const DEFAULT_MIN_WIDTH_PX = 100,
     DEFAULT_MAX_WIDTH_PX = 400
@@ -1543,7 +1545,7 @@
   {/if}
 
   <div class="outer-container">
-    <div class="inner-container" bind:this={tableContainer} {onscroll}>
+    <div class="inner-container" class:hide-scrollbar={hideScrollbar} bind:this={tableContainer} {onscroll}>
     <InfiniteScroll
       onloadMore={handleLoadBackward}
       threshold={backwardThresholdPixel}
@@ -2380,8 +2382,11 @@
 
   .inner-container {
     overflow-y: auto;
-    margin-right: -15px;
     max-height: var(--dynamic-table-max-height, var(--dynamic-table-default-max-height));
+  }
+
+  .hide-scrollbar {
+    margin-right: -15px;
   }
 
   .table {
