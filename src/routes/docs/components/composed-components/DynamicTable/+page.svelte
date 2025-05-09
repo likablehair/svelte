@@ -206,11 +206,11 @@
     searchBarPlaceholder={'Type to search'}
     searchBarVisible
   >
-    <svelte:fragment slot="custom-filter" let:filter let:updateMultiFilterValues>
+    <svelte:fragment slot="custom-filter" let:filter let:updateCustomFilterValues>
       {#if !!filter}
         {#if filter.name == 'productCategory'}
           <label for="productCategory">Product Category</label>
-          <SimpleTextField name="productCategory" bind:value on:input={(e) => handleCustomInput(e, filter.name, updateMultiFilterValues)}></SimpleTextField>
+          <SimpleTextField name="productCategory" bind:value on:input={(e) => handleCustomInput(e, filter.name, updateCustomFilterValues)}></SimpleTextField>
         {/if}
       {/if}
     </svelte:fragment>

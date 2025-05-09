@@ -4,9 +4,7 @@
   import Button from "$lib/components/simple/buttons/Button.svelte";
   import QuickActions from "$lib/components/composed/common/QuickActions.svelte";
 
-  let slotSelectActionsContainer: HTMLElement,
-    showSelectContainer = false,
-    selectedItems = [{}]
+  let selectedItems = 1
 
 </script>
 
@@ -15,23 +13,14 @@
 <h2>Example</h2>
 <div class="example">
   <Button
-    on:click={() => { selectedItems = [
-        {},
-        {}
-      ]
-      showSelectContainer = true 
+    on:click={() => { selectedItems = 2
     }}
   >
     Show Actions
   </Button>
 
   <QuickActions
-    bind:slotSelectActionsContainer={slotSelectActionsContainer}
-    loading={false}
     disabled={false}
-    totalRows={5}
-    isSelectedAll={false}
-    {showSelectContainer}
     actionsForSelectedItems={[
       {
         label: 'Disassociate',
