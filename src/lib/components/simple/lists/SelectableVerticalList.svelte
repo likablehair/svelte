@@ -53,6 +53,7 @@
     elementSnippet?: Snippet<[{
       selected: boolean
       focused: boolean
+      element: ElementData
     }]>
     titleSnippet?: Snippet<[{
       selected: boolean
@@ -203,7 +204,8 @@
       {#if elementSnippet}
         {@render elementSnippet({ 
           focused: focused == element.name,
-          selected: selected == element.name
+          selected: selected == element.name,
+          element: element
         })}
       {:else}
         {#if !!element.icon}
