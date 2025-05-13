@@ -14,6 +14,7 @@
     width?: string
     minWidth?: string
     sortable?: boolean
+    sortModify?: (params: { builder: FilterBuilder, sortDirection: 'asc' | 'desc' }) => FilterBuilder
     data?: Data
   };
 
@@ -34,6 +35,7 @@
   import type { DateTime } from 'luxon';
   import type { ColumnBoolean, ColumnCheckBox, ColumnCustom, ColumnDate, ColumnIcon, ColumnNumber, ColumnString } from './columnTypes';
   import NoData from '../common/NoData.svelte';
+  import type { FilterBuilder } from '$lib';
 
   type TableHeader = Header<Data>
 
@@ -53,7 +55,8 @@
     onsort?: (event: {
       detail: {
         sortedBy: string | undefined,
-        sortDirection: string
+        sortDirection: string,
+        sortModify: Header['sortModify']
       }
     }) => void
     onrowClick?: (event: {
@@ -131,7 +134,8 @@
     throw new Error('cannot define an onrowDoubleClick event without defining an onrowClick event')
   }
 
-  let clickTimeout: NodeJS.Timeout | undefined = undefined;
+  let clickTimeout: NodeJS.Timeout | undefined = undefined,
+    sortModify: Header['sortModify']
 
   onMount(() => {
     if(resizableColumns) {
@@ -181,16 +185,19 @@
         if(sortDirection == 'asc') sortDirection = 'desc'
         else if(sortDirection == 'desc') {
           sortedBy = undefined
+          sortModify = undefined
         }
       } else {
         sortedBy = header.value
         sortDirection = 'asc'
+        sortModify = header.sortModify
       }
       if(onsort) {
         onsort({
           detail: {
             sortedBy,
-            sortDirection
+            sortDirection,
+            sortModify
           }
         })
       }

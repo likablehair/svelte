@@ -175,9 +175,6 @@
         {filters}                      
         {mAndDown}
         onchange={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
-        onremoveAllFilters={() => {
-          handleSearchChange(searchText);
-        }}
       >
       </DynamicFilters>
     {/key}
@@ -190,29 +187,25 @@
     { name: "filters", type: "Filter[]", description: "List of filters to show and edit.", default: "[]" },
     { name: "lang", type: "'it' | 'en'", description: "Language of the component text and labels.", default: '"en"' },
     { name: "mAndDown", type: "boolean", description: "Enables mobile layout mode if true.", default: "false" },
+    { name: "updateMultiFilterValues", type: "function", description: "Function to update the filters", default: "" },
   ]}
   styleProps={[]}
 />
 <h2>Slots</h2>
 <SlotsViewer
   slots={[
-    {
-      name: "customSnippet",
-      description: "Allows a custom input field or UI element for the filter.",
-      properties: [
-        { name: "filter", type: "Filter", description: "The current filter object." },
-        { name: "onChange", type: "(newFilter: Filter) => void", description: "Callback to update the filter value." }
-      ]
-    }
+        { 
+      name: "customSnippet", description: "Custom filter content", properties: [
+        { name: "filter", type: "Filter | undefined", description: "The filter definition" },
+        { name: "updateCustomFilterValues", type: "function", description: "Updater for custom filters" },
+        { name: "mAndDown", type: "boolean", description: "Screen size M and lower" }
+      ] 
+    },
   ]}
 ></SlotsViewer>
 <h2>Events</h2>
 <EventsViewer
   events={[
-    {
-      name: "onremoveAllFilters",
-      description: "Emitted when the user clicks to remove all filters.",
-    },
     {
       name: "onchange",
       description: "Emitted when a filter is updated.",

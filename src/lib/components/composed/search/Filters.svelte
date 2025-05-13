@@ -207,8 +207,9 @@
 
   function handleRemoveFilter(filter: { name: string }) {
     let filterIndex = filters.findIndex((f) => f.name === filter.name)
-    filters[filterIndex].active = false
     let filterName = filter.name
+    filters[filterIndex].active = false
+    tmpFilters[filterName].active = false
     if(Object.keys(filters[filterIndex]).includes('value')) {
       //@ts-ignore
       filters[filterIndex].value = undefined
@@ -363,8 +364,12 @@
       tmpFilter.values = newValue
     } else if('mode' in tmpFilter && tmpFilter.mode == 'between') {
       if(tmpFilter.type == 'date'){
-        tmpFilter.from = DateTime.fromJSDate(newValue.to).setLocale('it-IT').startOf('day').toJSDate()
-        tmpFilter.to = DateTime.fromJSDate(newValue.to).setLocale('it-IT').endOf('day').toJSDate()
+        if(newValue.from){
+          tmpFilter.from = DateTime.fromJSDate(newValue.from).setLocale('it-IT').startOf('day').toJSDate()
+        }
+        if(newValue.to){
+          tmpFilter.to = DateTime.fromJSDate(newValue.to).setLocale('it-IT').endOf('day').toJSDate()
+        }
       }
       else {
         tmpFilter.from = newValue.from
@@ -505,6 +510,7 @@
           >
             <Button
               --button-color="var(--chip-color, var(--chip-default-color))"
+              --button-height="var(--filters-button-height, var(--filters-default-button-height))"
               onclick={handleAddFilterClick}
             >
               <div class="filter-button-content">
@@ -526,6 +532,7 @@
         >
           <Button
             --button-color="var(--chip-color, var(--chip-default-color))"
+            --button-height="var(--filters-button-height, var(--filters-default-button-height))"
             onclick={handleAddFilterClick}
           >
             <div class="filter-button-content">
@@ -945,7 +952,7 @@
 
   .filters-wrapper {
     display: flex;
-    align-items: center;
+    align-items: start;
     gap: 20px;
     max-width: 100%;
     width: var(

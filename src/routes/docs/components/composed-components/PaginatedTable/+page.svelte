@@ -455,6 +455,11 @@
           type: "string",
           description: "Sorting direction.",
         },
+        {
+          name: "sortModify",
+          type: "(params: { builder: FilterBuilder, sortDirection: 'asc' | 'desc' }) => FilterBuilder",
+          description: "Column modify.",
+        },
       ],
     },
     {

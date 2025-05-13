@@ -3,6 +3,7 @@
     label: string;
     icon?: string;
     disabled?: boolean;
+    loading?: boolean;
     info?: string;
     disabledInfo?: string
     onClick: NonNullable<ComponentProps<typeof Button>['onclick']>
@@ -12,40 +13,32 @@
 <script lang="ts">
   import { Button, Icon, mediaQuery, ToolTip } from "$lib";
   import type { ComponentProps } from "svelte";
-  import DynamicTable from "../list/DynamicTable.svelte";
   import { fly } from "svelte/transition";
   import { cubicIn } from "svelte/easing";
   import MenuOrDrawer from "./MenuOrDrawer.svelte";
   import './QuickActions.css'
 
   interface Props {
-    selectedItems: ComponentProps<typeof DynamicTable>["selectedItems"];
-    showSelectContainer: boolean;
-    isSelectedAll: boolean;
-    totalRows: number;
-    slotSelectActionsContainer?: HTMLElement;
+    selectedItems: number;
     disabled: boolean;
-    loading: boolean;
     actionsForSelectedItems: Action[];
     position?: 'top' | 'bottom';
     lang?: 'it' | 'en';
+    onClose?: () => void
   }
 
   let {
     selectedItems,
-    showSelectContainer,
-    isSelectedAll,
-    totalRows,
-    slotSelectActionsContainer = $bindable(),
     disabled,
-    loading,
     actionsForSelectedItems,
     position = 'top',
-    lang = 'en'
+    lang = 'en',
+    onClose,
   }: Props = $props();
 
   let actions: Action[] = $state([]),
     extraActions: Action[] = $state([]),
+    slotSelectActionsContainer: HTMLElement | undefined = $state(),
     moreActionsActivator: HTMLElement | undefined = $state(),
     openMoreActions: boolean = $state(false),
     infoActivators: { [actionLabel: string]: HTMLElement } = $state({}),
@@ -70,7 +63,7 @@
   })
 </script>
 
-{#if selectedItems && selectedItems.length > 0 && showSelectContainer}
+{#if selectedItems > 0}
   <div
     class="container-{position}"
     transition:fly={{ delay: 150, duration: 150, y: -10, easing: cubicIn }}
@@ -79,8 +72,13 @@
       class="select-container"
     >
       <div>
-        <button class="select-info" onclick={() => (selectedItems = [], infoActivators = {}, disabledInfoActivators = {})}>
-          {!!isSelectedAll ? totalRows : selectedItems.length} {lang == 'en' ? 'items selected' : 'righe selezionate'}
+        <button class="select-info" {disabled} onclick={() => {
+            infoActivators = {}
+            disabledInfoActivators = {}
+            if(onClose) onClose()
+          }}
+        >
+          {selectedItems} {lang == 'en' ? 'items selected' : 'righe selezionate'}
           <Icon name="mdi-close" />
         </button>
       </div>
@@ -101,7 +99,9 @@
                 --button-box-shadow: none;
               '
               --button-height="20px"
-              disabled={action.disabled}
+              --circular-loader-height="17px"
+              disabled={action.disabled || action.loading || disabled}
+              loading={action.loading}
               onclick={action.onClick}
             >
               <div class="action" bind:this={disabledInfoActivators[action.label]}>
@@ -116,7 +116,7 @@
                     />
                   </div>
                   <ToolTip
-                    appearTimeout={1000}
+                    appearTimeout={500}
                     activator={infoActivators[action.label]}
                   >
                     <div
@@ -132,7 +132,7 @@
                 {action.label}
                 {#if !!action.disabledInfo && action.disabled}
                   <ToolTip
-                    appearTimeout={1000}
+                    appearTimeout={300}
                     activator={disabledInfoActivators[action.label]}
                   >
                     <div
@@ -166,7 +166,6 @@
                   margin-left: 8px;
                 '
                 --button-height="20px"
-                disabled={disabled || loading}
                 onclick={(e) => {
                   openMoreActions = !openMoreActions;
                 }}
@@ -214,8 +213,10 @@
                 --button-disabled-color: var(--quick-actions-buttons-color-disabled, var(--quick-actions-default-buttons-color-disabled));
                 --button-box-shadow: none;
               '
-              --button-height="35px"
-              disabled={action.disabled}
+              --button-height="30px"
+              --circular-loader-height="25px"
+              disabled={action.disabled || action.loading || disabled}
+              loading={action.loading}
               onclick={action.onClick}
             >
               <div class="action" bind:this={disabledInfoActivators[action.label]}>
@@ -230,7 +231,7 @@
                     />
                   </div>
                   <ToolTip
-                    appearTimeout={1000}
+                    appearTimeout={500}
                     activator={infoActivators[action.label]}
                   >
                     <div
@@ -246,7 +247,7 @@
                 {action.label}
                 {#if !!action.disabledInfo && action.disabled}
                   <ToolTip
-                    appearTimeout={1000}
+                    appearTimeout={300}
                     activator={disabledInfoActivators[action.label]}
                   >
                     <div
@@ -334,6 +335,19 @@
       --quick-actions-selected-items-button-background-color-hover,
       var(--quick-actions-default-selected-items-button-background-color-hover)
     );
+    cursor: pointer;
+  }
+
+  .select-info:disabled {
+    background-color: var(
+      --quick-actions-selected-items-button-background-color-disabled,
+      var(--quick-actions-default-selected-items-button-background-color-disabled)
+    );
+    color: var(
+      --quick-actions-selected-items-button-color-disabled,
+      var(--quick-actions-default-selected-items-button-color-disabled)
+    );
+    cursor: not-allowed;
   }
 
   .select-actions-container {
