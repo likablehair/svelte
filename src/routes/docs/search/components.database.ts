@@ -308,6 +308,12 @@ const list: {
     type: 'layout',
     url: '/docs/components/layouts/UnstableDividedSideBarLayout'
   }, {
+    title: 'CollapsibleSideBarLayout',
+    description: 'Layout of collapsible.',
+    status: 'beta',
+    type: 'layout',
+    url: '/docs/components/layouts/CollapsibleSideBarLayout'
+  }, {
     title: 'GanymedeBarChart',
     description: 'Ganymede Bar Chart.',
     status: 'beta',
