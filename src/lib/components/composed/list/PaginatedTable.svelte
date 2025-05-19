@@ -3,7 +3,7 @@
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import Paginator from "$lib/components/simple/lists/Paginator.svelte";
   import Dropdown from "$lib/components/composed/forms/Dropdown.svelte";
-  import { createEventDispatcher, type ComponentProps } from "svelte";
+  import { createEventDispatcher, type ComponentEvents, type ComponentProps } from "svelte";
 
   type ArrayElement<ArrayType extends readonly unknown[]> =
     ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -56,7 +56,8 @@
   export let calculateRowClasses: CalculateRowClasses | undefined = undefined;
 
   let searchBarInput: HTMLElement,
-    searchText: string | undefined = undefined
+    searchText: string | undefined = undefined,
+    sortModify: Header['sortModify']
 
   let dispatch = createEventDispatcher<{
     paginationChange: {
@@ -100,6 +101,11 @@
 
   $: handleSearchChange(searchText)
 
+  function handleSort(e: ComponentEvents<SimpleTable>['sort']) {
+    sortModify = e.detail.sortModify
+    handleFiltersChange()
+  }
+
   function handleFiltersChange() {
     let builder = buildFilters({searchText})
 
@@ -125,9 +131,15 @@
       })
     }
 
-    if(!!sortedBy){
-      builder.orderBy(sortedBy, sortDirection || 'asc')
+    if (!!sortedBy) {
+      if(sortModify){
+        builder = sortModify({ builder, sortDirection: sortDirection || 'asc' })
+      }
+      else {
+        builder.orderBy(sortedBy, sortDirection || "asc");
+      }
     }
+
     return builder
   }
 
@@ -179,7 +191,7 @@
     bind:pointerOnRowHover
     {doubleClickActive}
     {doubleClickDelay}
-    on:sort={handleFiltersChange}
+    on:sort={handleSort}
     on:sort
     on:rowClick
     on:rowDoubleClick
