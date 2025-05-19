@@ -1,19 +1,23 @@
 <script lang="ts">
 	import { FilterEditor, Icon } from "$lib";
-	import type { Filter } from "$lib/utils/filters/filters";
-	import { type ComponentProps } from "svelte"
+	import type { DateMode, Filter, NumberMode, SelectMode, StringMode } from "$lib/utils/filters/filters";
+	import { type Snippet } from "svelte"
 
 	interface Props {
     filters?: Filter[];
     lang?: "it" | "en";
     mAndDown?: boolean;
-		onremoveAllFilters?: () => void
 		onchange?: (event: {
 			detail: {
 				filter: Filter
 			}
 		}) => void
-		customSnippet?: ComponentProps<typeof FilterEditor>['customSnippet']
+		customSnippet?: Snippet<[{
+			filter: Filter | undefined,
+			mAndDown: boolean,
+			updateCustomFilterValues: typeof updateCustomFilterValues
+		}]>
+		updateMultiFilterValues?: (filterName: string, newValue: any, newValid: boolean, mode?: NumberMode | StringMode | SelectMode | DateMode) => void
   }
 
   let {
@@ -21,8 +25,8 @@
     lang = "en",
     mAndDown = false,
 		onchange,
-		onremoveAllFilters,
-		customSnippet,
+		updateMultiFilterValues,
+		customSnippet: customSnippetInternal,
   }: Props = $props();	
 
 	let selectedFilter: Filter | undefined = $state();
@@ -32,15 +36,6 @@
     }
     return acc;
 	}, {} as { [filterName: string]: Filter }))
-
-	let activeFilter = $derived(Object.values(tmpFilters).reduce((count, filter) => {
-		if ((filter as any).value !== undefined ||
-			(filter as any).from !== undefined ||
-			(filter as any).to !== undefined ||
-			((filter as any).values !== undefined && (filter as any).values.length > 0)
-		) count++;
-		return count;
-	}, 0))
 
 	type LabelMapper = {
 		[label: string]: { extended?: string; short: string };
@@ -75,48 +70,77 @@
 			selectFilter(filter);
 		}
 	}
-	
-	function clearFilters() {
-		tmpFilters = {};
-		if(onremoveAllFilters) {
-			onremoveAllFilters()
-		}
-	}
 
 	function handleFilterChange() {
-		if(!!selectedFilter && onchange){
-			onchange({
-				detail: {
-					filter: tmpFilters[selectedFilter.name]
+		if(!!selectedFilter){
+			if(!!onchange){
+				onchange({
+					detail: {
+						filter: tmpFilters[selectedFilter.name]
+					}
+				})
+			}
+			filters = filters.map(f => {
+				if (f.name === selectedFilter?.name) {
+					return tmpFilters[selectedFilter.name]
 				}
+				return f
 			})
 		}
 	}
+
+	function isActiveFilter(filter: Filter) {
+    let newValue: any = {},
+      newValid: boolean = false
+    if(filter.type == 'select') {
+      newValue = filter.values 
+      if(!!newValue && newValue.length > 0) {
+        newValid = true
+      }
+    } else if('mode' in filter && filter.mode == 'between') {
+      newValue.to = filter.to
+      newValue.from = filter.from
+      if(!!newValue.from || !!newValue.to) {
+        newValid = true
+			}
+    } else if (filter.type == 'custom') {
+      newValue = filter.value
+			if ((Array.isArray(newValue) && newValue.length > 0) || (!Array.isArray(newValue) && !!newValue)) {
+				newValid = true;
+			}
+		} else {
+      newValue = filter.value
+      if(!!newValue) {
+        newValid = true
+      }
+    }
+		return newValid
+  }
+
+	function updateCustomFilterValues(filterName: string, newValue: any, newValid: boolean, mode?: NumberMode | StringMode | SelectMode | DateMode) {
+		let filter = filters.find(f => f.name === filterName)
+    if(!filter) throw new Error('cannot find filter with name ' + filterName)
+    if(filter.type != 'custom') throw new Error('filter is not custom')
+		filter.value = newValue
+		filter.active = newValid
+		if(updateMultiFilterValues){
+			updateMultiFilterValues(filterName, newValue, newValid, mode)
+		}
+  }
 </script>
 
-<div class="custom-filters-container">
+<div class="custom-filters-container" class:yscroll={mAndDown}>
 	<div class="filters-selection">
-	
-		{#if activeFilter > 0}
-			<div class="filter-info">
-				{activeFilter} {lang == 'en' ? 'applied' : activeFilter == 1 ? 'applicato' : 'applicati'}
-				<button class="clear-button" onclick={clearFilters}>✕</button>
-			</div>
-		{/if}
-
-	
 		{#each filters as filter}
 			<div
 				tabindex="0"
 				role="button"
 				class="filters-selection-item"
-				class:selected={filter === selectedFilter}
-				onclick={() => selectFilter(filter)}
+				class:selected={filter.name === selectedFilter?.name || isActiveFilter(filter)}				onclick={() => selectFilter(filter)}
 				onkeydown={(event) => handleKeyPress(event, filter)}
-				aria-pressed={filter === selectedFilter}
-			>
+				aria-pressed={filter.name === selectedFilter?.name}			>
 				<div class="filters-selection-title">
-					{filter.label}
+					<div class="filters-selection-title-label">{filter.label}</div>
 					<Icon name="mdi-chevron-right-circle-outline" />
 				</div>
 			</div>
@@ -127,20 +151,32 @@
 	<div class="filters-content">
 		{#if selectedFilter}
 			<div class="filters-content-box">
-				<h2>{selectedFilter.label}</h2>				
-				<FilterEditor
-					bind:filter={selectedFilter}
-					{lang}
-					{labelsMapper}
-					editFilterMode="one-edit"
-					bind:tmpFilter={tmpFilters[selectedFilter.name]}
-					mobile={mAndDown}
-					onchange={handleFilterChange}
-					--simple-textfield-border-radius="5px"
-					--chip-default-color="rgb(var(--global-color-primary-foreground))"
-					{customSnippet}
-				>
-				</FilterEditor>
+				<h2>{selectedFilter.label}</h2>	
+				{#key selectedFilter.label}			
+					<FilterEditor
+						bind:filter={selectedFilter}
+						{lang}
+						{labelsMapper}
+						editFilterMode="one-edit"
+						bind:tmpFilter={tmpFilters[selectedFilter?.name || '']}
+						mobile={mAndDown}
+						onchange={handleFilterChange}
+						--simple-textfield-border-radius= 0.5rem
+						--simple-textfield-background-color= transparent
+						--simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+						--simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+						--chip-default-color="rgb(var(--global-color-primary-foreground))"
+						--autocomplete-border-radius= 0.5rem
+						--autocomplete-border="1px solid rgb(var(--global-color-background-500))"
+						--autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
+						--autocomplete-padding="9.6px 16px"
+						--autocomplete-background-color="transparent"
+					>
+						{#snippet customSnippet({ filter })}
+							{@render customSnippetInternal?.({ filter, mAndDown, updateCustomFilterValues })}
+						{/snippet}
+					</FilterEditor>
+				{/key}
 			</div>
 		{:else}
 			<div class="filters-content-box">
@@ -149,19 +185,20 @@
 		{/if}
 	</div>
 </div>
-
 <style>
-  
 .custom-filters-container {
     display: flex;
     height: 70vh;
-    overflow-y: scroll;
   }
+
+	.yscroll {
+		overflow-y: auto;
+	}
 
   .filters-selection {
     width: 40%;
     padding: 1rem;
-
+		overflow-y: auto;
   }
 
   .filters-selection-item {
@@ -179,13 +216,19 @@
     justify-content: space-between;
   }
 
+	.filters-selection-title-label{
+		overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .filters-selection-item.selected {
     border: 1px solid rgb(var(--global-color-primary-500));
     background-color:  rgb(var(--global-color-background-500));
   }
 
 	.filters-content {
-    width: 60%;
+    min-width: 60%;
+		max-width: 60%;
   }
   .filters-content-box {
     padding: 1rem;
@@ -195,37 +238,5 @@
     font-size: larger;
     text-align: center;
     font-weight: bold;
-  }
-
-  .filter-info {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.25rem 0.5rem;
-    background-color: rgb(var(--global-color-background-700));
-    color: rgb(var(--global-color-primary-600));
-    border-radius: 1rem;
-    font-weight: bold;
-    font-size: 0.9rem;
-		margin-bottom: 10px;
-  }
-
-  .clear-button {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    width: 1rem;
-    height: 1rem;
-    margin-left: 0.5rem;
-    border-radius: 50%;
-    background-color: rgb(var(--global-color-background-700));
-    color: rgb(var(--global-color-primary-600));
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 0.8rem;
-    border: none;
-  }
-
-  .clear-button:hover {
-    background-color: rgb(var(--global-color-background-500));
   }
 </style>

@@ -124,7 +124,8 @@
   }: Props = $props();
 
   let searchBarInput: HTMLElement | undefined = $state(),
-    searchText: string | undefined = $state()
+    searchText: string | undefined = $state(),
+    sortModify: Header['sortModify']
 
   let rowsPerPageSelection: ComponentProps<typeof Dropdown>['values'] = $state([])
 
@@ -200,6 +201,7 @@
   }
 
   function handleOnSort(event: Parameters<NonNullable<ComponentProps<typeof SimpleTable>['onsort']>>[0]) {
+    sortModify = event.detail.sortModify
     handleFiltersChange()
     
     if(onsort) {
@@ -224,9 +226,15 @@
       })
     }
 
-    if(!!sortedBy){
-      builder.orderBy(sortedBy, sortDirection || 'asc')
+    if (!!sortedBy) {
+      if(sortModify){
+        builder = sortModify({ builder, sortDirection: sortDirection || 'asc' })
+      }
+      else {
+        builder.orderBy(sortedBy, sortDirection || "asc");
+      }
     }
+
     return builder
   }
 

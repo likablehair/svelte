@@ -45,26 +45,24 @@
     window.addEventListener('resize', updateHeaderHeight);
     tableContainer?.addEventListener("scroll", setReachedBottomOrTop);
 
-    if(tableContainer?.scrollHeight && tableContainer.clientHeight && tableContainer?.scrollHeight <= tableContainer?.clientHeight) {
-      tableContainer.style.marginRight = '0px'
+    if(tableContainer?.scrollHeight && tableContainer.clientHeight){
+      hideScrollbar = tableContainer.scrollHeight > tableContainer.clientHeight
     }
 
-    if(resizableColumns) {
-      for(const head of [...headers, { value: 'non-resizable', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }, { value: 'slot-append', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }]) {
-        let th
-        if(head.value == 'non-resizable' || head.value == 'slot-append') {
-          th = document.getElementsByClassName(head.value).item(0) as HTMLElement
-        } else {
-          th = document.getElementById(head.value) as HTMLElement
-        }
-        if(!!th) {
-          resizeHeader(th, head)
-        }
+    for(const head of [...headers, { value: 'non-resizable', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }, { value: 'slot-append', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }]) {
+      let th
+      if(head.value == 'non-resizable' || head.value == 'slot-append') {
+        th = document.getElementsByClassName(head.value).item(0) as HTMLElement
+      } else {
+        th = document.getElementById(head.value) as HTMLElement
       }
-
-      let table = document.getElementsByClassName('table')[0] as HTMLElement
-      table.classList.add('resizable')
+      if(!!th) {
+        resizeHeader(th, head)
+      }
     }
+
+    let table = document.getElementsByClassName('table')[0] as HTMLElement
+    table.classList.add('resizable')
 
     return () => {
       window.removeEventListener('resize', updateHeaderHeight);
@@ -85,6 +83,7 @@
     if(tableContainer) {
       reachedBottom = tableContainer.scrollHeight - tableContainer.scrollTop === tableContainer.clientHeight
       reachedTop = tableContainer.scrollTop === 0
+      hideScrollbar = tableContainer.scrollHeight > tableContainer.clientHeight
     }
   }
 
@@ -201,9 +200,11 @@
     cellEdit?: boolean;
     noItemsText?: string;
     showSelect?: boolean;
-    showSelectContainer?: boolean;
+    showActions?: boolean;
     selectMode?: "single" | "multiple";
     selectedItems?: RowItem[];
+    unselectedItems?: RowItem[];
+    selectedAll?: boolean;
     showExpand?: boolean;
     loading?: boolean;
     disabled?: boolean;
@@ -214,10 +215,12 @@
     filtersVisible?: boolean;
     quickFiltersVisible?: boolean;
     lang?: "it" | "en";
+    dateLocale?: "it" | "en";
     editFilterMode?: "one-edit" | "multi-edit";
     showActiveFilters?: boolean;
     quickFilters?: QuickFilter[];
     actionsForSelectedItems?: Action[];
+    quickActionsDisabled?: boolean;
     totalRows?: number;
     searchText?: string;
     renderedRowsNumber?: number;
@@ -301,7 +304,8 @@
     customFilterChipSnippet?: ComponentProps<typeof Filters>['customChipSnippet']
     customFilterSnippet?: Snippet<[{
       filter: Filter | undefined,
-      updateMultiFilterValues: Parameters<NonNullable<ComponentProps<typeof Filters>['contentSnippet']>>[0]['updateMultiFilterValues']
+      mAndDown: boolean;
+      updateCustomFilterValues: Parameters<NonNullable<ComponentProps<typeof Filters>['contentSnippet']>>[0]['updateMultiFilterValues']
     }]>
     onscroll?: UIEventHandler<HTMLDivElement>
     selectionSnippet?: ComponentProps<typeof Autocomplete>['selectionSnippet']
@@ -366,11 +370,14 @@
     sortDirection = $bindable("asc"),
     cellEdit = false,
     lang = "en",
+    dateLocale,
     noItemsText = lang == 'en' ? "No items to show" : 'Nessun elemento da visualizzare',
     showSelect = false,
-    showSelectContainer = true,
+    showActions = true,
     selectMode = "single",
     selectedItems = $bindable([]),
+    unselectedItems = $bindable([]),
+    selectedAll = $bindable(false),
     showExpand = false,
     loading = false,
     disabled = false,
@@ -384,6 +391,7 @@
     showActiveFilters = true,
     quickFilters = [],
     actionsForSelectedItems = [],
+    quickActionsDisabled = false,
     totalRows = rows.length,
     searchText = $bindable(),
     renderedRowsNumber = 100,
@@ -446,8 +454,6 @@
     quickFilterActivator: HTMLElement | undefined = $state(),
     quickFilterActive: QuickFilter | undefined = $state(),
     globalBuilder: FilterBuilder = new FilterBuilder(),
-    slotSelectActionsContainer: HTMLElement | undefined,
-    isSelectedAll: boolean = $state(false),
     calendarOpened: boolean = $state(false),
     calendarOpened2: boolean = $state(false),
     selectedIndexes: number[] = [],
@@ -461,7 +467,9 @@
     reachedBottom = $state(false),
     reachedTop = false,
     resizing = false,
-    remainingWidth = $state(0)
+    remainingWidth = $state(0),
+    hideScrollbar = $state(false),
+    sortModify: Header['sortModify']
 
   const DEFAULT_MIN_WIDTH_PX = 100,
     DEFAULT_MAX_WIDTH_PX = 400
@@ -518,10 +526,12 @@
         if (sortDirection == "asc") sortDirection = "desc";
         else if (sortDirection == "desc") {
           sortedBy = undefined;
+          sortModify = undefined
         }
       } else {
         sortedBy = header.value;
         sortDirection = "asc";
+        sortModify = header.sortModify
       }
 
       handleSearchChange(searchText);
@@ -639,15 +649,20 @@
     openQuickFilter = false;
   }
 
-  function handleSelect(item: RowItem, shiftKeyPressed: boolean) {
-    let index = selectedItems.findIndex((i) => i[uniqueKey] == item[uniqueKey]);
-    // if item is not in the selected items array, add it
+  function handleSelect(item: Item, shiftKeyPressed: boolean) {
+    let index = -1
+    if(selectedAll) {
+      index = unselectedItems.findIndex((i) => i[uniqueKey] == item[uniqueKey]);
+    } else {
+      index = selectedItems.findIndex((i) => i[uniqueKey] == item[uniqueKey]);
+    }
+    // if item is not in the selected/unselected items array, add it
     if (index == -1) {
       if (selectMode == "single") {
         selectedItems = [item];
         selectedIndexes = [rows.findIndex(r => r.item[uniqueKey] == item[uniqueKey])]
       } else if (selectMode == "multiple") {
-        if(shiftKeyPressed && selectedIndexes.length > 0 && !isSelectedAll) {
+        if(shiftKeyPressed && selectedIndexes.length > 0) {
           let lastSelectedIndex = selectedIndexes[selectedIndexes.length - 1],
             selectedIndex = rows.findIndex(r => r.item[uniqueKey] == item[uniqueKey])
           if(selectedIndex != -1) {
@@ -657,34 +672,43 @@
               selectedIndex = x
             }
             for (let i = lastSelectedIndex + 1; i <= selectedIndex; i++) {
-              if(!selectedItems.find((selectedItem) => selectedItem[uniqueKey] == rows[i].item[uniqueKey])) {
-                selectedItems = [...selectedItems, rows[i].item]
+              if(selectedAll) {
+                if(!unselectedItems.find((unselectedItem) => unselectedItem[uniqueKey] == rows[i].item[uniqueKey])) {
+                  unselectedItems = [...unselectedItems, rows[i].item]
+                }
+              } else {
+                if(!selectedItems.find((selectedItem) => selectedItem[uniqueKey] == rows[i].item[uniqueKey])) {
+                  selectedItems = [...selectedItems, rows[i].item]
+                }
               }
             }
           }
         }
         else {
-          selectedItems = [...selectedItems, item];
+          if(selectedAll) {
+            unselectedItems = [...unselectedItems, item];
+          } else {
+            selectedItems = [...selectedItems, item];
+          }
           selectedIndexes.push(rows.findIndex(r => r.item[uniqueKey] == item[uniqueKey]))
         }
       }
     } else {
-      selectedItems = selectedItems.filter((i) => i[uniqueKey] != item[uniqueKey]);
+      if(selectedAll) {
+        unselectedItems = unselectedItems.filter((i) => i[uniqueKey] != item[uniqueKey]);
+      } else {
+        selectedItems = selectedItems.filter((i) => i[uniqueKey] != item[uniqueKey]);
+      }
       selectedIndexes = selectedIndexes.filter(r => r != rows.findIndex(r => r.item[uniqueKey] == item[uniqueKey]))
-      isSelectedAll = false;
     }
   }
 
   function handleSelectAll() {
     if (selectMode == "multiple") {
-      if (selectedItems.length == rows.length) {
-        selectedItems = [];
-        selectedIndexes = []
-        isSelectedAll = false;
-      } else {
-        selectedItems = rows.map((r) => r.item);
-        isSelectedAll = true;
-      }
+      selectedItems = []
+      selectedIndexes = []
+      unselectedItems = []
+      selectedAll = !selectedAll
     }
   }
 
@@ -726,16 +750,6 @@
     } else {
       saveEditDisabled = false;
     }
-
-    if (
-      !!isSelectedAll &&
-      rows.length > 0 &&
-      !loading &&
-      !disabled &&
-      selectedItems.length < rows.length
-    ) {
-      selectedItems = rows.map((r) => r.item);
-    }
   })
 
   function searchTextBuilder(searchText?: string) {
@@ -753,10 +767,6 @@
           b.orWhere(searchBarColumns![i], "ilike", "%" + searchText + "%");
         }
       });
-    }
-
-    if (!!sortedBy) {
-      builder.orderBy(sortedBy, sortDirection || "asc");
     }
 
     return builder;
@@ -787,6 +797,15 @@
       setTimeout(() => userScrolling = true, 20)
     }
     
+    if (!!sortedBy) {
+      if(sortModify){
+        globalBuilder = sortModify({ builder: globalBuilder, sortDirection })
+      }
+      else {
+        globalBuilder.orderBy(sortedBy, sortDirection || "asc");
+      }
+    }
+
     if(onfiltersChange) {
       onfiltersChange({
         detail: {
@@ -1102,10 +1121,6 @@
       }
     }
 
-    if (!!sortedBy) {
-      builder.orderBy(sortedBy, sortDirection || "asc");
-    }
-
     return builder;
   }
 
@@ -1138,10 +1153,7 @@
     updateMultiFilterValues(filter.name, newValue, newValid, newMode)
   }
 
-  function handleRemoveAllFilters(removeAllFilters?: () => void) {
-    if(!!removeAllFilters) {
-      removeAllFilters()
-    }
+  function handleRemoveAllFilters() {
     if(onremoveAllFilters){
       onremoveAllFilters()
     }
@@ -1404,17 +1416,19 @@
 </script>
 
 {#if !!rows && Array.isArray(rows) && !!headersToShowInTable && Array.isArray(headersToShowInTable)}
-  <QuickActions
-    {selectedItems}
-    {showSelectContainer}
-    {isSelectedAll}
-    {totalRows}
-    {slotSelectActionsContainer}
-    {disabled}
-    {loading}
-    {actionsForSelectedItems}
-    {lang}
-  />
+  {#if showActions}
+    <QuickActions
+      selectedItems={selectedAll ? totalRows - unselectedItems.length : selectedItems.length}
+      disabled={quickActionsDisabled}
+      {actionsForSelectedItems}
+      {lang}
+      onClose={() => {
+        selectedAll = false
+        unselectedItems = []
+        selectedItems = []
+      }}
+    />
+  {/if}
 
   {#if searchBarVisible || filtersVisible || appendSnippet}
     <div class="filter-container">
@@ -1451,22 +1465,23 @@
               onremoveAllFilters={() => handleRemoveAllFilters()}
               --filters-default-wrapper-width="100%"
               {lang}
+              {dateLocale}
               {editFilterMode}
               {showActiveFilters}
               appendSnippet={filterAppendSnippet}
               customChipSnippet={customFilterChipSnippet}
             >
-              {#snippet contentSnippet({ filters, mAndDown, updateMultiFilterValues, handleRemoveAllFilters: removeAllFilters })}  
+              {#snippet contentSnippet({ filters, mAndDown, updateMultiFilterValues, })}  
                 {#key filters}
                   <DynamicFilters
                     {lang}
                     {filters}                      
                     {mAndDown}
                     onchange={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
-                    onremoveAllFilters={() => handleRemoveAllFilters(removeAllFilters)}
+                    {updateMultiFilterValues}
                   >
-                    {#snippet customSnippet({ filter })}
-                      {@render customFilterSnippet?.({ filter, updateMultiFilterValues })}
+                    {#snippet customSnippet({ filter, mAndDown, updateCustomFilterValues })}
+                      {@render customFilterSnippet?.({ filter, mAndDown, updateCustomFilterValues })}
                     {/snippet}
                   </DynamicFilters>
                 {/key}
@@ -1532,7 +1547,7 @@
   {/if}
 
   <div class="outer-container">
-    <div class="inner-container" bind:this={tableContainer} {onscroll}>
+    <div class="inner-container" class:hide-scrollbar={hideScrollbar} bind:this={tableContainer} {onscroll}>
     <InfiniteScroll
       onloadMore={handleLoadBackward}
       threshold={backwardThresholdPixel}
@@ -1552,7 +1567,7 @@
               {#if selectMode === "multiple"}
                 <Checkbox
                   id="select-all"
-                  value={selectedItems.length == totalBatchLength}
+                  value={selectedAll}
                   disabled={disabled || loading}
                   onchange={handleSelectAll}
                 />
@@ -1571,6 +1586,7 @@
             <th
               style={`${resizableColumns || !header.width ? '' : `width: ${header.width}`}`}
               style:min-width={header.minWidth}
+              style:max-width={header.maxWidth}
               class:sortable={header.sortable}
               onclick={() => handleHeaderClick(header)}
               id={header.value}
@@ -1692,15 +1708,19 @@
               class="item-row"
               data-key={row.item[uniqueKey]}
               style:background-color={
-                !!row.item.disableEdit ?
-                  !!row.item.rowDisableBackgroundColor ?
-                    row.item.rowDisableBackgroundColor : 
-                    'var(--dynamic-table-row-disabled-background-color, var(--dynamic-table-default-row-disabled-background-color))' : 
-                expandedRows.findIndex((r) => r.item[uniqueKey] == row.item[uniqueKey] ) != -1 ? 
-                  'var(--dynamic-table-expanded-row-background-color, var(--dynamic-table-default-expanded-row-background-color))' :
-                  !!selectedItems.find(i => i[uniqueKey] == row.item[uniqueKey]) ?
-                    'var(--dynamic-table-selected-row-background-color, var(--dynamic-table-default-selected-row-background-color))' :
-                    ""
+                !!row.item.disableEdit
+                  ? !!row.item.rowDisableBackgroundColor
+                    ? row.item.rowDisableBackgroundColor
+                    : 'var(--dynamic-table-row-disabled-background-color, var(--dynamic-table-default-row-disabled-background-color))'
+                  : expandedRows.findIndex(r => r.item[uniqueKey] == row.item[uniqueKey]) != -1
+                    ? 'var(--dynamic-table-expanded-row-background-color, var(--dynamic-table-default-expanded-row-background-color))'
+                    : selectedAll
+                      ? !unselectedItems.find(i => i[uniqueKey] == row.item[uniqueKey])
+                        ? 'var(--dynamic-table-selected-row-background-color, var(--dynamic-table-default-selected-row-background-color))'
+                        : ''
+                      : selectedItems.find(i => i[uniqueKey] == row.item[uniqueKey])
+                        ? 'var(--dynamic-table-selected-row-background-color, var(--dynamic-table-default-selected-row-background-color))'
+                        : ''
                 }
               class:row-activator={cellEditorIndexRow == indexRow && !cellEditorSubItem}
               onclick={() => handleRowClick(row.item)}
@@ -1709,9 +1729,15 @@
                 <td style:padding-left="0px" style:text-align="center">
                   <Checkbox
                     id={row.item[uniqueKey]}
-                    value={selectedItems.findIndex(
-                      (i) => i[uniqueKey] == row.item[uniqueKey]
-                    ) != -1}
+                    value={
+                      selectedAll ?
+                        unselectedItems.findIndex(
+                          (i) => i[uniqueKey] == row.item[uniqueKey]
+                        ) == -1 :
+                        selectedItems.findIndex(
+                          (i) => i[uniqueKey] == row.item[uniqueKey]
+                        ) != -1
+                    }
                     disabled={disabled || loading}
                     onchange={(e) => handleSelect(row.item, e.detail.shiftKeyPressed)}
                   />
@@ -1795,6 +1821,7 @@
                             <th
                               style:width={subHeader.width}
                               style:min-width={subHeader.minWidth}
+                              style:max-width={subHeader.maxWidth}
                               class:sortable={subHeader.sortable}
                               onclick={() => handleHeaderClick(subHeader)}
                             >
@@ -2173,6 +2200,7 @@
                   : quickFilterActive.description,
                 multiple: true,
               }}
+              --autocomplete-border-radius= 0.5rem
               --autocomplete-border="1px solid rgb(var(--global-color-background-500))"
               --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
             />
@@ -2358,8 +2386,11 @@
 
   .inner-container {
     overflow-y: auto;
-    margin-right: -15px;
     max-height: var(--dynamic-table-max-height, var(--dynamic-table-default-max-height));
+  }
+
+  .hide-scrollbar {
+    margin-right: -15px;
   }
 
   .table {

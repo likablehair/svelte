@@ -2,4 +2,5 @@
   --filters-button-cancel-default-background-color: transparent;
   --filters-button-cancel-default-color: rgb(var(--global-color-primary-400));
   --filters-default-wrapper-width: auto;
+  --filters-default-button-height: 28px;
 }

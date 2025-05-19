@@ -208,11 +208,11 @@
     searchBarVisible
     resizableColumns
   >
-    {#snippet customFilterSnippet({ filter, updateMultiFilterValues })}
+    {#snippet customFilterSnippet({ filter, updateCustomFilterValues })}
       {#if !!filter}
         {#if filter.name == 'productCategory'}
           <label for="productCategory">Product Category</label>
-          <SimpleTextField name="productCategory" bind:value oninput={(e) => handleCustomInput(e, filter.name, updateMultiFilterValues)}></SimpleTextField>
+          <SimpleTextField name="productCategory" bind:value oninput={(e) => handleCustomInput(e, filter.name, updateCustomFilterValues)}></SimpleTextField>
         {/if}
       {/if}
     {/snippet}
@@ -249,9 +249,11 @@
     { name: "cellEdit", type: "boolean", description: "Enable inline cell editing", default: "false" },
     { name: "noItemsText", type: "string", description: "Text shown when no data is present", default: "'No items to show'" },
     { name: "showSelect", type: "boolean", description: "Enable row selection", default: "false" },
-    { name: "showSelectContainer", type: "boolean", description: "Show selection container", default: "true" },
+    { name: "showActions", type: "boolean", description: "Show actions", default: "true" },
     { name: "selectMode", type: "'single' | 'multiple'", description: "Selection mode", default: "'single'" },
     { name: "selectedItems", type: "RowItem[]", description: "Currently selected items", default: "[]" },
+    { name: "unselectedItems", type: "RowItem[]", description: "Unselected items if selectedAll is active", default: "[]" },
+    { name: "selectedAll", type: "boolean", description: "Toggles the selectedAll checkbox", default: "false" },
     { name: "showExpand", type: "boolean", description: "Allow row expansion", default: "false" },
     { name: "loading", type: "boolean", description: "Show loading state", default: "false" },
     { name: "disabled", type: "boolean", description: "Disable the table", default: "false" },
@@ -262,10 +264,12 @@
     { name: "filtersVisible", type: "boolean", description: "Show filters section", default: "false" },
     { name: "quickFiltersVisible", type: "boolean", description: "Show quick filters", default: "false" },
     { name: "lang", type: "'it' | 'en'", description: "Language for internal strings", default: "'en'" },
+    { name: "dateLocale", type: "'it' | 'en'", description: "Locale for filter chips", default: "'it'" },
     { name: "editFilterMode", type: "'one-edit' | 'multi-edit'", description: "Filter editing mode", default: "'one-edit'" },
     { name: "showActiveFilters", type: "boolean", description: "Display currently active filters", default: "true" },
     { name: "quickFilters", type: "QuickFilter[]", description: "Quick filter options", default: "[]" },
     { name: "actionsForSelectedItems", type: "Action[]", description: "Actions to show for selected items", default: "[]" },
+    { name: "quickActionsDisabled", type: "boolean", description: "Disables quick actions", default: "false" },
     { name: "totalRows", type: "number", description: "Total number of rows", default: "rows.length" },
     { name: "searchText", type: "string", description: "Current search string", default: "undefined" },
     { name: "renderedRowsNumber", type: "number", description: "Number of rows rendered in viewport", default: "100" },
@@ -333,10 +337,13 @@
         { name: "filter", type: "Filter", description: "The filter to render." }
       ]
     },
-    { name: "customFilterSnippet", description: "Custom filter content", properties: [
-      { name: "filter", type: "Filter | undefined", description: "The filter definition" },
-      { name: "updateMultiFilterValues", type: "function", description: "Updater for multi-filter values" }
-    ] },
+    { 
+      name: "customFilterSnippet", description: "Custom filter content", properties: [
+        { name: "filter", type: "Filter | undefined", description: "The filter definition" },
+        { name: "updateCustomFilterValues", type: "function", description: "Updater for custom filters" },
+        { name: "mAndDown", type: "boolean", description: "Screen size M and lower" }
+      ] 
+    },
     { 
       name: 'selectionSnippet', 
       description: 'Renders each selected item.', 
