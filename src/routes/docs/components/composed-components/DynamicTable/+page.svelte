@@ -59,6 +59,23 @@
       sortable: true,
     }
   ],
+  quickFilters: ComponentProps<DynamicTable>['quickFilters'] = [
+    {
+      title: 'ID',
+      type: {
+        key: 'number',
+      },
+      column: 'id',
+      icon: 'mdi-card-account-details-outline	'
+    },
+    {
+      title: 'Scadenza',
+      type: {
+        key: 'date',
+      },
+      column: 'validUntil',
+      icon: 'mdi-calendar-clock	'
+    }],
   filters: Filter[] | undefined  = [
     {
       label: "Business name",
@@ -184,6 +201,8 @@
     filtersVisible
     cellEdit
     {rows}
+    {quickFilters}
+    quickFiltersVisible={true}
     totalRows={100000000}
     resizableColumns
     on:fetchData={() => {
