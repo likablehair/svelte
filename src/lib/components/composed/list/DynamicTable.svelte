@@ -44,9 +44,9 @@
 
     hideScrollbar = tableContainer.scrollHeight > tableContainer.clientHeight
 
-    for(const head of [...headers, { value: 'non-resizable', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }, { value: 'slot-append', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }]) {
+    for(const head of [...headers, { value: 'non-resizable', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }, { value: 'customize-headers', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }]) {
       let th
-      if(head.value == 'non-resizable' || head.value == 'slot-append') {
+      if(head.value == 'non-resizable' || head.value == 'customize-headers') {
         th = document.getElementsByClassName(head.value).item(0) as HTMLElement
       } else {
         th = document.getElementById(head.value) as HTMLElement
@@ -59,13 +59,17 @@
     let table = document.getElementsByClassName('dynamic-table')[0] as HTMLElement
     table.classList.add('dynamic-resizable')
 
+    resizeObserver = new ResizeObserver(() => {
+      updateRemainingWidth();
+    });
+    resizeObserver.observe(tableContainer);
+
     return () => {
       window.removeEventListener('resize', updateHeaderHeight);
       tableContainer.removeEventListener("scroll", setReachedBottomOrTop);
+      resizeObserver?.disconnect();
     }
   });
-
-  let mainHeader: Element
 
   function updateHeaderHeight() {
     if (mainHeader) {
@@ -301,7 +305,9 @@
     resizing = false,
     remainingWidth = 0,
     hideScrollbar = false,
-    sortModify: Header['sortModify']
+    sortModify: Header['sortModify'],
+    mainHeader: Element,
+    resizeObserver: ResizeObserver
 
   const DEFAULT_MIN_WIDTH_PX = 100,
     DEFAULT_MAX_WIDTH_PX = 400
@@ -1445,13 +1451,6 @@
               </slot>
             </th>
           {/each}
-          {#if $$slots.rowActions || $$slots.append}
-            <th
-              class="slot-append"
-            >
-              <slot name="append" index={-1} items={undefined} />
-            </th>
-          {/if}
           {#if resizableColumns && remainingWidth}
             <th
               style:width={remainingWidth + 'px'}
@@ -1459,20 +1458,22 @@
               aria-hidden="true"
             />
           {/if}
-          {#if customizeHeaders}
+          {#if customizeHeaders || $$slots.rowActions || $$slots.append}
             <th
-              style:width="15px"
-              style:min-width="15px"
               style:text-align="center"
               class="customize-headers"
             >
-              <div style="display: flex; justify-content: center;">
-                <Icon
-                  name="mdi-plus-circle-outline"
-                  click
-                  on:click={() => (openHeaderDrawer = true)}
-                />
-              </div>
+              {#if customizeHeaders}
+                <div style="display: flex; justify-content: start;">
+                  <Icon
+                    name="mdi-plus-circle-outline"
+                    click
+                    on:click={() => (openHeaderDrawer = true)}
+                  />
+                </div>
+              {:else}
+                <slot name="append" index={-1} items={undefined} />
+              {/if}
             </th>
           {/if}
         </tr>
@@ -1611,6 +1612,9 @@
                   {/if}
                 </td>
               {/each}
+              {#if resizableColumns && remainingWidth}
+                <td/>
+              {/if}
               {#if $$slots.rowActions || $$slots.append}
                 <td class={clazz.cell || ""}>
                   <slot name="rowActions" index={indexRow} {row} />
