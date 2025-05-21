@@ -268,7 +268,8 @@
     numberOfResultsVisible: boolean = false,
     endLineVisible: boolean = false,
     resizableColumns: boolean= false,
-    resizedColumnSizeWithPadding: { [value: string]: number } = {}
+    resizedColumnSizeWithPadding: { [value: string]: number } = {},
+    dynamicFilters: boolean = true
 
   let openCellEditor: boolean = false,
     cellEditorActivator: HTMLElement | undefined,
@@ -1220,50 +1221,81 @@
 
         {#if filtersVisible}
           <div>
-            <Filters
-              bind:filters
-              on:applyFilter={() => {
-                handleSearchChange(searchText);
-              }}
-              on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
-              on:removeAllFilters={() => handleRemoveAllFilters()}
-              --filters-default-wrapper-width="100%"
-              {lang}
-              {dateLocale}
-              {editFilterMode}
-              {showActiveFilters}
-            >
-              <svelte:fragment slot="append">
-                <slot name="filter-append" />
-              </svelte:fragment>
-              <svelte:fragment slot="custom-chip" let:filter>
-                <slot name="custom-filter-chip" {filter} />
-              </svelte:fragment>
-              <svelte:fragment
-                slot="custom"
-                let:filter
-                let:updateFunction
-                let:mAndDown
+            {#if dynamicFilters}
+              <Filters
+                bind:filters
+                on:applyFilter={() => {
+                  handleSearchChange(searchText);
+                }}
+                on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
+                on:removeAllFilters={() => handleRemoveAllFilters()}
+                --filters-default-wrapper-width="100%"
+                {lang}
+                {dateLocale}
+                {editFilterMode}
+                {showActiveFilters}
               >
-                <slot name="custom-filter" {filter} {updateFunction} {mAndDown} />
-              </svelte:fragment>
+                <svelte:fragment slot="append">
+                  <slot name="filter-append" />
+                </svelte:fragment>
+                <svelte:fragment slot="custom-chip" let:filter>
+                  <slot name="custom-filter-chip" {filter} />
+                </svelte:fragment>
+                <svelte:fragment
+                  slot="custom"
+                  let:filter
+                  let:updateFunction
+                  let:mAndDown
+                >
+                  <slot name="custom-filter" {filter} {updateFunction} {mAndDown} />
+                </svelte:fragment>
 
-              <svelte:fragment slot="content" let:mAndDown let:filters let:updateMultiFilterValues>
-                {#key filters}
-                  <DynamicFilters
-                    {lang}
-                    {filters}                      
-                    {mAndDown}
-                    {updateMultiFilterValues}
-                    on:change={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
-                  >
-                    <svelte:fragment slot="custom" let:filter let:mAndDown let:updateCustomFilterValues>
-                      <slot name="custom-filter" {filter} {updateCustomFilterValues} {mAndDown}></slot>
-                    </svelte:fragment>
-                  </DynamicFilters>
-                {/key}
-              </svelte:fragment>
-            </Filters>
+                <svelte:fragment slot="content" let:mAndDown let:filters let:updateMultiFilterValues>
+                  {#key filters}
+                    <DynamicFilters
+                      {lang}
+                      {filters}                      
+                      {mAndDown}
+                      {updateMultiFilterValues}
+                      on:change={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
+                    >
+                      <svelte:fragment slot="custom" let:filter let:mAndDown let:updateCustomFilterValues>
+                        <slot name="custom-filter" {filter} {updateCustomFilterValues} {mAndDown}></slot>
+                      </svelte:fragment>
+                    </DynamicFilters>
+                  {/key}
+                </svelte:fragment>
+              </Filters>
+            {:else}
+              <Filters
+                bind:filters
+                on:applyFilter={() => {
+                  handleSearchChange(searchText);
+                }}
+                on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
+                on:removeAllFilters={() => handleRemoveAllFilters()}
+                --filters-default-wrapper-width="100%"
+                {lang}
+                {dateLocale}
+                {editFilterMode}
+                {showActiveFilters}
+              >
+                <svelte:fragment slot="append">
+                  <slot name="filter-append" />
+                </svelte:fragment>
+                <svelte:fragment slot="custom-chip" let:filter>
+                  <slot name="custom-filter-chip" {filter} />
+                </svelte:fragment>
+                <svelte:fragment
+                  slot="custom"
+                  let:filter
+                  let:updateFunction
+                  let:mAndDown
+                >
+                  <slot name="custom-filter" {filter} {updateFunction} {mAndDown} />
+                </svelte:fragment>
+              </Filters>
+            {/if}
           </div>
         {/if}
       </div>
