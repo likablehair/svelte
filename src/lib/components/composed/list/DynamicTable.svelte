@@ -56,8 +56,8 @@
       }
     }
 
-    let table = document.getElementsByClassName('table')[0] as HTMLElement
-    table.classList.add('resizable')
+    let table = document.getElementsByClassName('dynamic-table')[0] as HTMLElement
+    table.classList.add('dynamic-resizable')
 
     return () => {
       window.removeEventListener('resize', updateHeaderHeight);
@@ -1332,7 +1332,7 @@
       hasMore={currentSectionNumber > 0 && userScrolling}
       direction='backward'
     />
-    <table style="display: table;" class="table">
+    <table style="display: table;" class="dynamic-table">
       <thead class="table-header" bind:this={mainHeader}>
         <tr>
           {#if !!showSelect && !showExpand && rows.length > 0}
@@ -2163,7 +2163,7 @@
     margin-right: -15px;
   }
 
-  .table {
+  .dynamic-table {
     background-color: var(
       --dynamic-table-background-color,
       var(--dynamic-table-default-background-color)
@@ -2171,7 +2171,7 @@
     border-collapse: separate;
   }
 
-  .table.resizable {
+  .dynamic-table.dynamic-resizable {
     table-layout: fixed;
     width: fit-content;
   }
@@ -2291,17 +2291,17 @@
     border: 1px solid transparent;
   }
 
-  table.table > tbody > tr > td {
+  table.dynamic-table > tbody > tr > td {
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  table.table > thead > tr > th {
+  table.dynamic-table > thead > tr > th {
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  table.table > tbody > tr > td.expanded-row {
+  table.dynamic-table > tbody > tr > td.expanded-row {
   overflow: visible;
 }
 
