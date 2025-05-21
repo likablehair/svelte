@@ -233,6 +233,7 @@
     endLineVisible?: boolean;
     resizableColumns?: boolean;
     resizedColumnSizeWithPadding?: { [value: string]: number };
+    dynamicFilters?: boolean;
     class?: {
       container?: string;
       header?: string;
@@ -305,7 +306,8 @@
     customFilterSnippet?: Snippet<[{
       filter: Filter | undefined,
       mAndDown: boolean;
-      updateCustomFilterValues: Parameters<NonNullable<ComponentProps<typeof Filters>['contentSnippet']>>[0]['updateMultiFilterValues']
+      updateCustomFilterValues?: Parameters<NonNullable<ComponentProps<typeof Filters>['contentSnippet']>>[0]['updateMultiFilterValues'],
+      updateFunction?: Parameters<NonNullable<ComponentProps<typeof Filters>['customSnippet']>>[0]['updateFunction']
     }]>
     onscroll?: UIEventHandler<HTMLDivElement>
     selectionSnippet?: ComponentProps<typeof Autocomplete>['selectionSnippet']
@@ -404,6 +406,7 @@
     endLineVisible = false,
     resizableColumns = false,
     resizedColumnSizeWithPadding = {},
+    dynamicFilters = true,
     class: clazz = {},
     onapplyCustomQuickFilter,
     oncellClick,
@@ -1456,37 +1459,57 @@
   
         {#if filtersVisible}
           <div>
-            <Filters
-              bind:filters
-              onapplyFilter={() => {
-                handleSearchChange(searchText);
-              }}
-              onremoveFilter={e => { handleRemoveFilter(e.detail.filter) }}
-              onremoveAllFilters={() => handleRemoveAllFilters()}
-              --filters-default-wrapper-width="100%"
-              {lang}
-              {dateLocale}
-              {editFilterMode}
-              {showActiveFilters}
-              appendSnippet={filterAppendSnippet}
-              customChipSnippet={customFilterChipSnippet}
-            >
-              {#snippet contentSnippet({ filters, mAndDown, updateMultiFilterValues, })}  
-                {#key filters}
-                  <DynamicFilters
-                    {lang}
-                    {filters}                      
-                    {mAndDown}
-                    onchange={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
-                    {updateMultiFilterValues}
-                  >
-                    {#snippet customSnippet({ filter, mAndDown, updateCustomFilterValues })}
-                      {@render customFilterSnippet?.({ filter, mAndDown, updateCustomFilterValues })}
-                    {/snippet}
-                  </DynamicFilters>
-                {/key}
-              {/snippet}
-            </Filters>
+            {#if dynamicFilters}
+              <Filters
+                bind:filters
+                onapplyFilter={() => {
+                  handleSearchChange(searchText);
+                }}
+                onremoveFilter={e => { handleRemoveFilter(e.detail.filter) }}
+                onremoveAllFilters={() => handleRemoveAllFilters()}
+                --filters-default-wrapper-width="100%"
+                {lang}
+                {dateLocale}
+                {editFilterMode}
+                {showActiveFilters}
+                appendSnippet={filterAppendSnippet}
+                customChipSnippet={customFilterChipSnippet}
+              >
+                {#snippet contentSnippet({ filters, mAndDown, updateMultiFilterValues, })}  
+                  {#key filters}
+                    <DynamicFilters
+                      {lang}
+                      {filters}                      
+                      {mAndDown}
+                      onchange={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
+                      {updateMultiFilterValues}
+                    >
+                      {#snippet customSnippet({ filter, mAndDown, updateCustomFilterValues })}
+                        {@render customFilterSnippet?.({ filter, mAndDown, updateCustomFilterValues })}
+                      {/snippet}
+                    </DynamicFilters>
+                  {/key}
+                {/snippet}
+              </Filters>
+            {:else}
+              <Filters
+                bind:filters
+                onapplyFilter={() => {
+                  handleSearchChange(searchText);
+                }}
+                onremoveFilter={e => { handleRemoveFilter(e.detail.filter) }}
+                onremoveAllFilters={() => handleRemoveAllFilters()}
+                --filters-default-wrapper-width="100%"
+                {lang}
+                {dateLocale}
+                {editFilterMode}
+                {showActiveFilters}
+                appendSnippet={filterAppendSnippet}
+                customChipSnippet={customFilterChipSnippet}
+                customSnippet={customFilterSnippet}
+              >
+              </Filters>
+            {/if}
           </div>
         {/if}
       </div>
