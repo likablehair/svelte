@@ -332,10 +332,6 @@
       index: number,
       row?: Row
     }]>
-    rowActionsSnippet?: Snippet<[{
-      index: number,
-      row?: Row
-    }]>
     customRowSnippet?: Snippet<[{
       index: number,
       columnIndex: number,
@@ -438,7 +434,6 @@
     headerSnippet,
     headerLabelSnippet,
     rowAppendSnippet,
-    rowActionsSnippet,
     customRowSnippet,
     subRowAppendSnippet,
     subHeaderLabelSnippet,
@@ -1680,7 +1675,7 @@
               aria-hidden="true"
             ></th>
           {/if}
-          {#if customizeHeaders || rowActionsSnippet || rowAppendSnippet}
+          {#if customizeHeaders || rowAppendSnippet}
             <th
               style:text-align="center"
               class="customize-headers"
@@ -1829,9 +1824,8 @@
               {#if resizableColumns && remainingWidth}
                 <td></td>
               {/if}
-              {#if rowActionsSnippet || rowAppendSnippet}
+              {#if rowAppendSnippet}
                 <td class={clazz.cell || ""}>
-                  {@render rowActionsSnippet?.({ index: indexRow, row })}
                   {@render rowAppendSnippet?.({ index: indexRow, row })}
                 </td>
               {/if}

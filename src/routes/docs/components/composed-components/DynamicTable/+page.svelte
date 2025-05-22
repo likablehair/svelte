@@ -434,7 +434,6 @@
     `, properties: [{ name: "header", type: "Header", description: "Header object" }] },
     { name: "headerLabelSnippet", description: "Custom header label", default: "{header.label}", properties: [{ name: "header", type: "Header", description: "Header object" }] },
     { name: "rowAppendSnippet", description: "Slot appended to each row", properties: [{ name: "index", type: "number", description: "Row index" }, { name: "row", type: "Row", description: "Row item" }] },
-    { name: "rowActionsSnippet", description: "Row action buttons", properties: [{ name: "index", type: "number", description: "Row index" }, { name: "row", type: "Row", description: "Row item" }] },
     { name: "customRowSnippet", description: "Custom row cell content", properties: [
       { name: "index", type: "number", description: "Row index" },
       { name: "columnIndex", type: "number", description: "Column index" },
