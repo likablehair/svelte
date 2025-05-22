@@ -1298,7 +1298,7 @@
                   let:updateFunction
                   let:mAndDown
                 >
-                  <slot name="custom-filter" {filter} {updateFunction} {mAndDown} />
+                  <slot name="custom-static-filter" {filter} {updateFunction} {mAndDown}/>
                 </svelte:fragment>
               </Filters>
             {/if}
