@@ -163,11 +163,13 @@
     ]
   }));
 
-  function handleCustomInput(e: Event, filterName: string, updateFunction: (filterName: string, newValue: any, newValid: boolean) => void) {
+  function handleCustomInput(e: Event, filterName: string, updateFunction?: (filterName: string, newValue: any, newValid: boolean) => void) {
     //@ts-ignore
     let newValue: string = e.target.value
     let isValid = !!newValue && newValue.length > 2
-    updateFunction(filterName, newValue, isValid)
+    if(updateFunction){
+      updateFunction(filterName, newValue, isValid)
+    }
   }
 
 </script>
@@ -282,6 +284,7 @@
     { name: "resizableColumns", type: "boolean", description: "Enables the resize of the columns", default: "false" },
     { name: "resizedColumnSizeWithPadding", type: "{ [value: string]: number }", description: "The width of the headers", default: "{}" },
     { name: "endLineVisible", type: "boolean", description: "Show end line at bottom", default: "false" },
+    { name: "dynamicFilters", type: "boolean", description: "Switch Between Dynamic and normal filters", default: "true" },
     { name: "class", type: "{ container?: string; header?: string; row?: string; cell?: string }", description: "Custom classes for table elements", default: "{}" }
   ]}
   styleProps={[
@@ -340,7 +343,8 @@
     { 
       name: "customFilterSnippet", description: "Custom filter content", properties: [
         { name: "filter", type: "Filter | undefined", description: "The filter definition" },
-        { name: "updateCustomFilterValues", type: "function", description: "Updater for custom filters" },
+        { name: "updateCustomFilterValues", type: "function", description: "Updater for custom dynamic filters" },
+        { name: "updateFunction", type: "function", description: "Updater for custom normal filters" },
         { name: "mAndDown", type: "boolean", description: "Screen size M and lower" }
       ] 
     },
@@ -430,7 +434,6 @@
     `, properties: [{ name: "header", type: "Header", description: "Header object" }] },
     { name: "headerLabelSnippet", description: "Custom header label", default: "{header.label}", properties: [{ name: "header", type: "Header", description: "Header object" }] },
     { name: "rowAppendSnippet", description: "Slot appended to each row", properties: [{ name: "index", type: "number", description: "Row index" }, { name: "row", type: "Row", description: "Row item" }] },
-    { name: "rowActionsSnippet", description: "Row action buttons", properties: [{ name: "index", type: "number", description: "Row index" }, { name: "row", type: "Row", description: "Row item" }] },
     { name: "customRowSnippet", description: "Custom row cell content", properties: [
       { name: "index", type: "number", description: "Row index" },
       { name: "columnIndex", type: "number", description: "Column index" },

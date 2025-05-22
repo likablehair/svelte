@@ -31,7 +31,7 @@
   import '../../../css/main.css'
   import './SimpleTable.css'
   import Icon from '../media/Icon.svelte';
-  import { onMount, type Snippet } from 'svelte';
+  import { onMount, tick, type Snippet } from 'svelte';
   import type { DateTime } from 'luxon';
   import type { ColumnBoolean, ColumnCheckBox, ColumnCustom, ColumnDate, ColumnIcon, ColumnNumber, ColumnString } from './columnTypes';
   import NoData from '../common/NoData.svelte';
@@ -135,7 +135,11 @@
   }
 
   let clickTimeout: NodeJS.Timeout | undefined = undefined,
-    sortModify: Header['sortModify']
+    sortModify: Header['sortModify'],
+    tableContainer: HTMLElement | undefined = $state(),
+    mainHeader: HTMLElement | undefined = $state(),
+    remainingWidth: number = $state(0),
+    resizeObserver: ResizeObserver
 
   onMount(() => {
     if(resizableColumns) {
@@ -175,6 +179,18 @@
 
       let table = document.getElementsByClassName('table')[0] as HTMLElement
       table.classList.add('resizable')
+
+      resizeObserver = new ResizeObserver(() => {
+        updateRemainingWidth();
+      });
+
+      if(tableContainer){
+        resizeObserver.observe(tableContainer);
+      }
+
+      return () => {
+        resizeObserver?.disconnect();
+      };
     }
   })
 
@@ -313,12 +329,59 @@
     }
   }
 
+  $effect(() => {
+    if (
+      resizableColumns &&
+      !!tableContainer &&
+      resizableColumns &&
+      headers.length > 0 &&
+      resizedColumnSizeWithPadding &&
+      mainHeader
+    ) {
+      tick().then(updateRemainingWidth);
+    }
+  })
+
+  async function updateRemainingWidth() {
+    if(tableContainer != null && !!tableContainer && mainHeader) {
+      const containerWidth = tableContainer?.getBoundingClientRect().width - 30;
+
+      if(containerWidth){
+        const totalResizableWidth = headers.reduce((sum, head) => {
+          let th = document.getElementById(head.value)
+          if(!!th) {
+            resizeHeader(th, head)
+          }
+          const width = th?.getBoundingClientRect().width || 0
+          return sum + width + 1;
+        }, 0);
+    
+        const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.slot-append, th.customize-headers'))
+          .reduce((sum, th) => sum + th.getBoundingClientRect().width + 1, 0);
+    
+        remainingWidth = Math.max(0, containerWidth - totalResizableWidth - extraStaticWidth);
+      }
+    }
+  }
+
+  function resizeHeader(th: HTMLElement, header: { value: string, minWidth?: string, maxWidth?: string }){
+    if(resizedColumnSizeWithPadding){
+      if (!resizedColumnSizeWithPadding[header.value]) {
+        let widthWihtPadding = th.getBoundingClientRect().width
+        resizedColumnSizeWithPadding[header.value] = widthWihtPadding;
+      }
+      let { paddingLeft, paddingRight } = getComputedStyle(th);
+      let width = resizedColumnSizeWithPadding[header.value] - parseFloat(paddingLeft) - parseFloat(paddingRight);
+      th.style.width = `${width}px`
+    }
+  }
+
 </script>
 
 {#if !!items && Array.isArray(items)}
-  <div class="simple-table-container {clazz.container || ''}" class:resizable={resizableColumns}>
+  <div class="simple-table-container {clazz.container || ''}" class:resizable={resizableColumns} bind:this={tableContainer}>
     <table class="table">
-      <thead class="thead {clazz.header || ''}">
+      <thead class="thead {clazz.header || ''}" bind:this={mainHeader}>
         <tr>
           {#each headers as head}
             <th
@@ -364,6 +427,13 @@
               {/if}
             </th>
           {/each}
+          {#if resizableColumns && remainingWidth}
+            <th
+              style:width={remainingWidth + 'px'}
+              class="filler"
+              aria-hidden="true"
+            ></th>
+          {/if}
           {#if rowActionsSnippet || appendSnippet}
             <th class="slot-append">
               {#if appendSnippet}
@@ -423,6 +493,9 @@
                   {/if}
                 </td>
               {/each}
+              {#if resizableColumns && remainingWidth}
+                <td></td>
+              {/if}
               {#if rowActionsSnippet || appendSnippet}
                 <td class="{clazz.cell || ''} append" style:width="fit-content">
                   {#if rowActionsSnippet}
