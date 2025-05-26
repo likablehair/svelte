@@ -2112,11 +2112,11 @@
 <MediaQuery let:sAndDown>
   <Drawer
     bind:open={openHeaderDrawer}
-    _space={sAndDown ? "60vh" : "20vw"}
+    _space={sAndDown ? "60vh" : "400px"}
     position={sAndDown ? "bottom" : "right"}
   >
+    <div class="personalize-header">{lang == 'en' ? 'Personalize your headers' : 'Personalizza le tue intestazioni'}</div>
     <div style="padding: 20px;">
-      <div class="personalize-header">{lang == 'en' ? 'Personalize your headers' : 'Personalizza le tue intestazioni'}</div>
 
       <span class="headers-show grid-col-1">{lang == 'en' ? 'Headers shown in table' : 'Intestazioni visualizzate in tabella'}</span>
 
@@ -2127,19 +2127,26 @@
             headersToShow = e.detail.items;
           }}
         >
-          <svelte:fragment slot="item" let:item>
-            <Switch
-              --switch-label-width="90%"
-              value={headersToShow.find((h) => h.id == item.id) != undefined}
-              label={item.name}
-              on:change={(e) => {
-                if (e.detail.value == false) {
-                  headersToShow = headersToShow.filter((h) => h.id != item.id);
-                  headersToSelect = [...headersToSelect, item];
-                }
-              }}
-            />
-          </svelte:fragment>
+          <div slot="item" let:item>
+            <div
+              style:display=flex
+            >
+              <div
+                style:flex-grow=1
+              >
+                {item.name}
+              </div>
+              <Switch
+                value={headersToShow.find((h) => h.id == item.id) != undefined}
+                on:change={(e) => {
+                  if (e.detail.value == false) {
+                    headersToShow = headersToShow.filter((h) => h.id != item.id);
+                    headersToSelect = [...headersToSelect, item];
+                  }
+                }}
+              />
+            </div>
+          </div>
         </VerticalDraggableList>
       {/if}
       <Divider --divider-color=rgb(var(--global-color-contrast-100) />
@@ -2152,19 +2159,26 @@
             out:send={{ key: header }}
             class="headers-show grid-col-1"
           >
-            <Switch
-              --switch-label-width="90%"
-              value={false}
-              label={header.name}
-              on:change={(e) => {
-                if (e.detail.value == true) {
-                  headersToSelect = headersToSelect.filter(
-                    (h) => h.id != header.id
-                  );
-                  headersToShow = [...headersToShow, header];
-                }
-              }}
-            />
+            <div
+              style:display=flex
+            >
+              <div
+                style:flex-grow=1
+              >
+                {header.name}
+              </div>
+              <Switch
+                value={false}
+                on:change={(e) => {
+                  if (e.detail.value == true) {
+                    headersToSelect = headersToSelect.filter(
+                      (h) => h.id != header.id
+                    );
+                    headersToShow = [...headersToShow, header];
+                  }
+                }}
+              />
+            </div>
           </div>
         {/each}
       {:else}
@@ -2172,10 +2186,10 @@
           <span style="text-align: center;">{lang == 'en' ? 'No headers to add' : 'Nessuna intestazione da aggiungere'}</span>
         </div>
       {/if}
-      <div style="width: 100%; display: flex; justify-content: center;">
+      <div style="width: 100%; display: flex; justify-content: center; padding-top: 15px;">
         <Button
           class="mr-3 mt-5"
-          --button-width="70%"
+          --button-width="100%"
           on:click={saveHeadersToShow}
         >
           {lang == 'en' ? 'Save preferences' : 'Salva preferenze'}
