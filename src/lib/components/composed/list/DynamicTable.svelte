@@ -1668,7 +1668,7 @@
               {/if}
             </th>
           {/each}
-          {#if resizableColumns && remainingWidth}
+          {#if remainingWidth}
             <th
               style:width={remainingWidth + 'px'}
               class="filler"
@@ -1821,7 +1821,7 @@
                   {/if}
                 </td>
               {/each}
-              {#if resizableColumns && remainingWidth}
+              {#if remainingWidth}
                 <td></td>
               {/if}
               {#if rowAppendSnippet}
