@@ -1,5 +1,20 @@
 :root {
-  --collapsible-side-bar-layout-default-sidebar-width: 16rem;
-  --collapsible-side-bar-layout-default-sidebar-collapsed-width: 3.5rem;
-  --collapsible-side-bar-layout-default-logo-height: 3.8rem;
+  --collapsible-divided-side-bar-layout-default-content-padding: 1rem 2rem 1rem 2rem;
+  --collapsible-divided-side-bar-layout-default-side-bar-width: 4rem;
+  --collapsible-divided-side-bar-layout-default-side-bar-hover-width: 18rem;
+  --collapsible-divided-side-bar-layout-default-side-bar-border: none;
+  --collapsible-divided-side-bar-layout-default-side-bar-padding: 0rem;
+  --collapsible-divided-side-bar-layout-default-header-menu-height: 3.5rem;
+  --collapsible-divided-side-bar-layout-default-header-menu-border: none;
+  --collapsible-divided-side-bar-layout-default-header-menu-padding: 0rem 2rem 0rem 2rem;
+  --collapsible-divided-side-bar-layout-default-inner-header-menu-background-color: var(--global-color-background-100);
+  --collapsible-divided-side-bar-layout-default-drawer-background-color: rgb(var(--global-color-background-100));
+  --collapsible-divided-side-bar-layout-default-drawer-width: 24rem;
+  --collapsible-divided-side-bar-layout-default-header-menu-backdrop-filter: blur(4px);
+  --collapsible-divided-side-bar-layout-default-header-menu-position: fixed;
+}
+
+.collapsible-layout {
+  --csbl-side-bar-default-bg: rgb(var(--global-color-background-100));
+  --csbl-side-bar-expanded-bg: rgb(var(--global-color-background-200));
 }
