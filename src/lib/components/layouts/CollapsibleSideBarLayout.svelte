@@ -17,18 +17,12 @@
   }
 
   export let drawerOpened = false;
-  export let options: Option[] = [];
-  export let selectedIndex: number | undefined = undefined;
   export let sidebarExpanded: boolean = false;
-  export let isPinned: boolean = false;
-
-  //export let $$restProps: Record<string, any>;
 
   let clazz: ClassProps = {};
   export { clazz as class };
 
   const sidebarPinned = writable(false);
-  $sidebarPinned = isPinned;
 
   let headerElement: HTMLElement;
 
@@ -57,21 +51,6 @@
     dispatch("drawer-change", { opened: drawerOpened });
   }
 
-  function handleMenuSelection(option: Option): void {
-    if (!$sidebarPinned) {
-      sidebarExpanded = false;
-    }
-
-    drawerOpened = false;
-    dispatch("drawer-change", { opened: drawerOpened });
-    dispatch("menu-select", { option });
-  }
-
-  // function togglePin(): void {
-  //   sidebarExpanded = $sidebarPinned;
-  //   dispatch("pinned-change", { pinned: $sidebarPinned });
-  // }
-
   function toggleSidebar(): void {
     sidebarExpanded = !sidebarExpanded;
     dispatch("sidebar-toggle", { expanded: sidebarExpanded });
@@ -99,7 +78,7 @@
           {:else if !sidebarExpanded}
             <div style:margin-right="2rem">
               <Icon
-                name="mdi-menu-open"
+                name="mdi-menu-close"
                 click
                 --icon-default-size="1.5rem"
                 on:click={toggleSidebar}
@@ -131,7 +110,7 @@
                     hamburgerVisible={mAndDown}
                     {sidebarExpanded}
                   >
-                    <div class="logo">logo</div>
+                    <div class="logo">Logo</div>
                   </slot>
                 </div>
                 <div class="pin-container">
@@ -142,7 +121,6 @@
                         click
                         --icon-default-size="1.5rem"
                         on:click={toggleSidebar}
-                        class="toggle-icon"
                       />
                     </div>
                   {/if}
@@ -150,37 +128,6 @@
               </div>
               <slot name="menu" hamburgerVisible={mAndDown} {sidebarExpanded}>
                 <div class="menu-container" class:expanded={sidebarExpanded}>
-                  <ColorInvertedSelector
-                    {options}
-                    {selectedIndex}
-                    --color-inverted-selector-default-background-color="transparent"
-                    --color-inverted-selector-default-font-size="1.2rem"
-                    --color-inverted-selector-default-icon-gap="1.2rem"
-                    --color-inverted-selector-default-element-height="3rem"
-                    --color-inverted-selector-default-element-padding="8px 8px 8px 11px"
-                    --color-inverted-selector-default-element-border-radius="16px"
-                    --color-inverted-selector-default-selected-font-weight="400"
-                    --icon-default-size="1.3rem"
-                    deletable={false}
-                    on:select={(e) => handleMenuSelection(e.detail.option)}
-                  >
-                    <svelte:fragment slot="prepend" let:option let:handleClickClose let:index>
-                      <slot name="prepend" {option} {handleClickClose} {index} {sidebarExpanded}>
-                        {#if !!option.icon}
-                          <Icon
-                            name={option.icon}
-                          ></Icon>
-                        {/if}
-                      </slot>
-                    </svelte:fragment>
-                    <svelte:fragment slot="option" let:option>
-                      <slot name="option" {option}>
-                        <div class="label">
-                          {option.label}
-                        </div>
-                      </slot>
-                    </svelte:fragment>
-                  </ColorInvertedSelector>
                 </div>
               </slot>
             </div>
@@ -230,8 +177,14 @@
       var(--collapsible-divided-side-bar-layout-default-side-bar-padding)
     );
     z-index: 10;
-    overflow: clip;
     transition: all .2s cubic-bezier(.4,0,.2,1);
+    overflow: clip;
+  }
+
+  .side-bar-content {
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
   }
 
   .sidebar-header-container {
@@ -283,7 +236,6 @@
 
   @media (min-width: 1024.1px) {
     .side-bar.opened {
-      background-color: var(--csbl-side-bar-expanded-bg);
       width: var(
         --collapsible-divided-side-bar-layout-side-bar-hover-width, 
         var(--collapsible-divided-side-bar-layout-default-side-bar-hover-width)
