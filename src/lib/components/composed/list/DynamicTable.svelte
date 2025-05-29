@@ -1358,9 +1358,7 @@
 
   $effect(() => {
     if (
-      resizableColumns &&
       !!tableContainer &&
-      resizableColumns &&
       headersToShowInTable.length > 0 &&
       resizedColumnSizeWithPadding &&
       headersToShow.length > 0 &&
