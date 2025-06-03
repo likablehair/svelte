@@ -147,7 +147,7 @@
         class="overlay {clazz.overlay || ''}"
         role="presentation"
         tabindex="-1"
-      />
+      ></div>
       <div class="content" class:blurred={drawerOpened}>
         <slot>Content</slot>
       </div>
@@ -158,7 +158,10 @@
 
 <style>
   .side-bar {
-    background-color: var(--csbl-side-bar-default-bg);
+    background-color: var(
+      --collapsible-divided-side-bar-layout-background-color, 
+      var(--collapsible-divided-side-bar-layout-default-background-color)
+    );
     position: fixed;
     width: var(
       --collapsible-divided-side-bar-layout-side-bar-width, 
@@ -268,7 +271,10 @@
       top: var(--collapsible-divided-side-bar-layout-header-menu-height,
         var(--collapsible-divided-side-bar-layout-default-header-menu-height)
       );
-      background-color: var(--csbl-side-bar-default-bg);
+      background-color: var(
+        --collapsible-divided-side-bar-layout-background-color, 
+        var(--collapsible-divided-side-bar-layout-default-background-color)
+      );
       bottom: 0;
       z-index: 30;
       width: var(
