@@ -143,6 +143,7 @@
 <h2>Example</h2>
 <div class="example">
   <PaginatedTable
+    numberOfResultsVisible={true}
     resizableColumns={true}
     filters={filters}
     headers={headers}
@@ -197,7 +198,6 @@
   <div slot="filter-append"
     style:margin-left="auto"
   >
-    <button>Ciao</button>
   </div>
   <svelte:fragment slot="append">rowActions</svelte:fragment>
   <svelte:fragment slot="rowActions">rowActions</svelte:fragment>
