@@ -11,6 +11,7 @@
 <h2>Example</h2>
 <div class="example">
   <FileInputList
+    previewFiles={true}
     --file-input-list-height="100%"
     --file-input-list-width="100%"
     --file-input-list-border-radius="10px"
@@ -26,7 +27,8 @@
     { name: "message", type: "string", description: "Message displayed when no files are selected", default: "'Drop file here or click to upload'" },
     { name: "disabled", type: "boolean", description: "Whether the file input is disabled", default: "false" },
     { name: "maxFiles", type: "number", description: "Maximum number of files allowed", default: "undefined" },
-    { name: "class", type: "string", description: "Additional CSS classes", default: "''" }
+    { name: "class", type: "string", description: "Additional CSS classes", default: "''" },
+    { name: "previewFiles", type: "boolean", description: "When true, image files are displayed as a preview. Non-image files will show the document title and icon.", default: "false" }
   ]}
   styleProps={[
     { name: "--file-input-list-height", type: "size", description: "Height of the file input list", default: "64px" },
