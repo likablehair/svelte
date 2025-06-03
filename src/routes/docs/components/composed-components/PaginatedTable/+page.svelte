@@ -7,7 +7,6 @@
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import type Builder from "$lib/utils/filters/builder";
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
-  import type { ComponentProps } from "svelte";
 
   let headers : Header[] =[
       {
@@ -101,24 +100,7 @@
       }).where('categories.name', value)
     }
   }
-],
-quickFilters: ComponentProps<PaginatedTable>['quickFilters'] = [
-      {
-        title: 'ID',
-        type: {
-          key: 'number',
-        },
-        column: 'id',
-        icon: 'mdi-card-account-details-outline	'
-      },
-      {
-        title: 'Scadenza',
-        type: {
-          key: 'date',
-        },
-        column: 'validUntil',
-        icon: 'mdi-calendar-clock	'
-      }]
+]
   let value: string | number | undefined = undefined
 
   function handleFiltersChange(e: CustomEvent) {
@@ -192,7 +174,6 @@ quickFilters: ComponentProps<PaginatedTable>['quickFilters'] = [
     showActiveFilters={true}
     {calculateRowStyles}
     {calculateRowClasses}
-    {quickFilters}
   >
   <svelte:fragment slot="custom-filter" let:filter let:updateFunction>
     {#if !!filter}
@@ -216,6 +197,7 @@ quickFilters: ComponentProps<PaginatedTable>['quickFilters'] = [
   <div slot="filter-append"
     style:margin-left="auto"
   >
+    <button>Ciao</button>
   </div>
   <svelte:fragment slot="append">rowActions</svelte:fragment>
   <svelte:fragment slot="rowActions">rowActions</svelte:fragment>
