@@ -11,6 +11,7 @@
 <h2>Example</h2>
 <div class="example">
   <FileInputList
+    previewFiles={true}
     --file-input-list-height="100%"
     --file-input-list-width="100%"
     --file-input-list-border-radius="10px"
@@ -53,6 +54,12 @@
       type: "number | undefined",
       default: "undefined",
       description: "If set it limits the number of files that can be uploaded. Exceding files will be ignored."
+    },
+    {
+      name: "previewFiles",
+      type: "boolean",
+      default: "false",
+      description: "When true, image files are displayed as a preview. Non-image files will show the document title and icon."
     }
   ]}
   styleProps={[
