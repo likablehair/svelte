@@ -64,7 +64,8 @@
     pointerOnRowHover: boolean | undefined = undefined,
     doubleClickActive: ComponentProps<SimpleTable>['doubleClickActive'] = false,
     doubleClickDelay: ComponentProps<SimpleTable>['doubleClickDelay'] = 250,
-    quickFilters: QuickFilter[] = [];
+    quickFilters: QuickFilter[] = [],
+    customResultsText: string | undefined = undefined;
 
   export let calculateRowStyles: CalculateRowStyles | undefined = undefined;
   export let calculateRowClasses: CalculateRowClasses | undefined = undefined;
@@ -567,7 +568,11 @@
     </div>
     {#if totalElements}
       <div class='results-number'>
-        { lang == 'en' ? 'Results: ' : 'Risultati: '}
+         {#if customResultsText}
+          {customResultsText}
+        {:else}
+          {lang == 'en' ? 'Results: ' : 'Risultati: '}
+        {/if}
         {#if !loading && !!items}
           {totalElements || items.length}
         {:else}
@@ -1039,6 +1044,13 @@
     .per-page-dropdown {
       display: none;
     }
+  }
+
+   .results-number {
+    margin: 0px 0px 4px 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 
 </style>
