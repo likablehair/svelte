@@ -12,6 +12,6 @@
   --collapsible-divided-side-bar-layout-default-drawer-width: 24rem;
   --collapsible-divided-side-bar-layout-default-header-menu-backdrop-filter: blur(4px);
   --collapsible-divided-side-bar-layout-default-header-menu-position: fixed;
-  --csbl-side-bar-default-bg: rgb(var(--global-color-background-100));
-  --csbl-side-bar-expanded-bg: rgb(var(--global-color-background-200));
+  --collapsible-divided-side-bar-layout-default-background-color: rgb(var(--global-color-background-100));
+  --collapsible-divided-side-bar-layout-default-expanded-background-color: rgb(var(--global-color-background-200));
 }
