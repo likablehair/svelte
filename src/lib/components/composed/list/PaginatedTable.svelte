@@ -18,6 +18,7 @@
   import SearchBar from "../search/SearchBar.svelte";
   import type Builder from "$lib/utils/filters/builder";
   import Converter from "$lib/utils/filters/filters";
+  import CircularLoader from "$lib/components/simple/loaders/CircularLoader.svelte";
 
   let clazz: {
     simpleTable?: ComponentProps<SimpleTable>['class']
@@ -49,7 +50,11 @@
     resizedColumnSizeWithPadding: { [value: string]: number } = {},
     pointerOnRowHover: boolean | undefined = undefined,
     doubleClickActive: ComponentProps<SimpleTable>['doubleClickActive'] = false,
-    doubleClickDelay: ComponentProps<SimpleTable>['doubleClickDelay'] = 250;
+    doubleClickDelay: ComponentProps<SimpleTable>['doubleClickDelay'] = 250,
+    numberOfResultsVisible: boolean = false,
+    loading: boolean = false,
+    customResultsText: string | undefined = undefined;
+
 
 
   export let calculateRowStyles: CalculateRowStyles | undefined = undefined;
@@ -182,6 +187,30 @@
       </svelte:fragment>
     </Filters>
   </div>
+  <slot name="totals">
+  <div class="totals-container">
+      <div></div>
+      <div>
+        {#if numberOfResultsVisible}
+          <div class='results-number'>
+              {#if customResultsText}
+              {customResultsText}
+            {:else}
+              {lang == 'en' ? 'Results: ' : 'Risultati: '}
+            {/if}
+            {#if !loading && !!items}
+              {totalElements || items.length}
+            {:else}
+              <CircularLoader
+                {loading}
+                --circular-loader-height='10px'
+              ></CircularLoader>
+            {/if}
+          </div>
+        {/if}
+      </div>  
+    </div>
+  </slot>
   <SimpleTable
     bind:headers
     bind:class={clazz.simpleTable}
@@ -324,10 +353,22 @@
     );
   }
 
+  .results-number {
+    margin: 0px 0px 4px 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .totals-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: -25px;
+  }
   @media only screen and (max-width: 768px) {
     .per-page-dropdown {
       display: none;
     }
   }
+
 
 </style>
