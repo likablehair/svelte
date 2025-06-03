@@ -49,9 +49,9 @@
       hideScrollbar = tableContainer.scrollHeight > tableContainer.clientHeight
     }
 
-    for(const head of [...headers, { value: 'non-resizable', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }, { value: 'slot-append', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }]) {
+    for(const head of [...headers, { value: 'non-resizable', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }, { value: 'customize-headers', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }]) {
       let th
-      if(head.value == 'non-resizable' || head.value == 'slot-append') {
+      if(head.value == 'non-resizable' || head.value == 'customize-headers') {
         th = document.getElementsByClassName(head.value).item(0) as HTMLElement
       } else {
         th = document.getElementById(head.value) as HTMLElement
@@ -61,16 +61,23 @@
       }
     }
 
-    let table = document.getElementsByClassName('table')[0] as HTMLElement
-    table.classList.add('resizable')
+    let table = document.getElementsByClassName('dynamic-table')[0] as HTMLElement
+    table.classList.add('dynamic-resizable')
 
+    resizeObserver = new ResizeObserver(() => {
+      updateRemainingWidth();
+    });
+
+    if(tableContainer){
+      resizeObserver.observe(tableContainer);
+    }
+    
     return () => {
       window.removeEventListener('resize', updateHeaderHeight);
       tableContainer?.removeEventListener("scroll", setReachedBottomOrTop);
+      resizeObserver?.disconnect();
     }
   });
-
-  let mainHeader: Element | undefined = $state()
 
   function updateHeaderHeight() {
     if (mainHeader) {
@@ -233,6 +240,7 @@
     endLineVisible?: boolean;
     resizableColumns?: boolean;
     resizedColumnSizeWithPadding?: { [value: string]: number };
+    dynamicFilters?: boolean;
     class?: {
       container?: string;
       header?: string;
@@ -305,7 +313,8 @@
     customFilterSnippet?: Snippet<[{
       filter: Filter | undefined,
       mAndDown: boolean;
-      updateCustomFilterValues: Parameters<NonNullable<ComponentProps<typeof Filters>['contentSnippet']>>[0]['updateMultiFilterValues']
+      updateCustomFilterValues?: Parameters<NonNullable<ComponentProps<typeof Filters>['contentSnippet']>>[0]['updateMultiFilterValues'],
+      updateFunction?: Parameters<NonNullable<ComponentProps<typeof Filters>['customSnippet']>>[0]['updateFunction']
     }]>
     onscroll?: UIEventHandler<HTMLDivElement>
     selectionSnippet?: ComponentProps<typeof Autocomplete>['selectionSnippet']
@@ -320,10 +329,6 @@
       header: Header
     }]>
     rowAppendSnippet?: Snippet<[{
-      index: number,
-      row?: Row
-    }]>
-    rowActionsSnippet?: Snippet<[{
       index: number,
       row?: Row
     }]>
@@ -404,6 +409,7 @@
     endLineVisible = false,
     resizableColumns = false,
     resizedColumnSizeWithPadding = {},
+    dynamicFilters = true,
     class: clazz = {},
     onapplyCustomQuickFilter,
     oncellClick,
@@ -428,7 +434,6 @@
     headerSnippet,
     headerLabelSnippet,
     rowAppendSnippet,
-    rowActionsSnippet,
     customRowSnippet,
     subRowAppendSnippet,
     subHeaderLabelSnippet,
@@ -469,7 +474,9 @@
     resizing = false,
     remainingWidth = $state(0),
     hideScrollbar = $state(false),
-    sortModify: Header['sortModify']
+    sortModify: Header['sortModify'],
+    mainHeader: Element | undefined = $state(),
+    resizeObserver: ResizeObserver
 
   const DEFAULT_MIN_WIDTH_PX = 100,
     DEFAULT_MAX_WIDTH_PX = 400
@@ -1351,9 +1358,7 @@
 
   $effect(() => {
     if (
-      resizableColumns &&
       !!tableContainer &&
-      resizableColumns &&
       headersToShowInTable.length > 0 &&
       resizedColumnSizeWithPadding &&
       headersToShow.length > 0 &&
@@ -1456,37 +1461,57 @@
   
         {#if filtersVisible}
           <div>
-            <Filters
-              bind:filters
-              onapplyFilter={() => {
-                handleSearchChange(searchText);
-              }}
-              onremoveFilter={e => { handleRemoveFilter(e.detail.filter) }}
-              onremoveAllFilters={() => handleRemoveAllFilters()}
-              --filters-default-wrapper-width="100%"
-              {lang}
-              {dateLocale}
-              {editFilterMode}
-              {showActiveFilters}
-              appendSnippet={filterAppendSnippet}
-              customChipSnippet={customFilterChipSnippet}
-            >
-              {#snippet contentSnippet({ filters, mAndDown, updateMultiFilterValues, })}  
-                {#key filters}
-                  <DynamicFilters
-                    {lang}
-                    {filters}                      
-                    {mAndDown}
-                    onchange={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
-                    {updateMultiFilterValues}
-                  >
-                    {#snippet customSnippet({ filter, mAndDown, updateCustomFilterValues })}
-                      {@render customFilterSnippet?.({ filter, mAndDown, updateCustomFilterValues })}
-                    {/snippet}
-                  </DynamicFilters>
-                {/key}
-              {/snippet}
-            </Filters>
+            {#if dynamicFilters}
+              <Filters
+                bind:filters
+                onapplyFilter={() => {
+                  handleSearchChange(searchText);
+                }}
+                onremoveFilter={e => { handleRemoveFilter(e.detail.filter) }}
+                onremoveAllFilters={() => handleRemoveAllFilters()}
+                --filters-default-wrapper-width="100%"
+                {lang}
+                {dateLocale}
+                {editFilterMode}
+                {showActiveFilters}
+                appendSnippet={filterAppendSnippet}
+                customChipSnippet={customFilterChipSnippet}
+              >
+                {#snippet contentSnippet({ filters, mAndDown, updateMultiFilterValues, })}  
+                  {#key filters}
+                    <DynamicFilters
+                      {lang}
+                      {filters}                      
+                      {mAndDown}
+                      onchange={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
+                      {updateMultiFilterValues}
+                    >
+                      {#snippet customSnippet({ filter, mAndDown, updateCustomFilterValues })}
+                        {@render customFilterSnippet?.({ filter, mAndDown, updateCustomFilterValues })}
+                      {/snippet}
+                    </DynamicFilters>
+                  {/key}
+                {/snippet}
+              </Filters>
+            {:else}
+              <Filters
+                bind:filters
+                onapplyFilter={() => {
+                  handleSearchChange(searchText);
+                }}
+                onremoveFilter={e => { handleRemoveFilter(e.detail.filter) }}
+                onremoveAllFilters={() => handleRemoveAllFilters()}
+                --filters-default-wrapper-width="100%"
+                {lang}
+                {dateLocale}
+                {editFilterMode}
+                {showActiveFilters}
+                appendSnippet={filterAppendSnippet}
+                customChipSnippet={customFilterChipSnippet}
+                customSnippet={customFilterSnippet}
+              >
+              </Filters>
+            {/if}
           </div>
         {/if}
       </div>
@@ -1554,7 +1579,7 @@
       hasMore={currentSectionNumber > 0 && userScrolling}
       direction='backward'
     />
-    <table style="display: table;" class="table">
+    <table style="display: table;" class="dynamic-table">
       <thead class="table-header" bind:this={mainHeader}>
         <tr>
           {#if !!showSelect && !showExpand && rows.length > 0}
@@ -1641,33 +1666,28 @@
               {/if}
             </th>
           {/each}
-          {#if rowActionsSnippet || rowAppendSnippet}
-            <th
-              class="slot-append"
-            >
-              {@render rowAppendSnippet?.({ index: -1, row: undefined })}
-            </th>
-          {/if}
-          {#if resizableColumns && remainingWidth}
+          {#if remainingWidth && (customizeHeaders || resizableColumns)}
             <th
               style:width={remainingWidth + 'px'}
               class="filler"
               aria-hidden="true"
             ></th>
           {/if}
-          {#if customizeHeaders}
+          {#if customizeHeaders || rowAppendSnippet}
             <th
-              style:width="15px"
-              style:min-width="15px"
               style:text-align="center"
               class="customize-headers"
             >
-              <div style="display: flex; justify-content: center;">
-                <Icon
-                  name="mdi-plus-circle-outline"
-                  onclick={() => (openHeaderDrawer = true)}
-                />
-              </div>
+              {#if customizeHeaders}
+                <div style="display: flex; justify-content: center;">
+                  <Icon
+                    name="mdi-plus-circle-outline"
+                    onclick={() => (openHeaderDrawer = true)}
+                  />
+                </div>
+              {:else}
+                {@render rowAppendSnippet?.({ index: -1, row: undefined })}
+              {/if}
             </th>
           {/if}
         </tr>
@@ -1799,9 +1819,11 @@
                   {/if}
                 </td>
               {/each}
-              {#if rowActionsSnippet || rowAppendSnippet}
+              {#if remainingWidth && (customizeHeaders || resizableColumns)}
+                <td></td>
+              {/if}
+              {#if rowAppendSnippet}
                 <td class={clazz.cell || ""}>
-                  {@render rowActionsSnippet?.({ index: indexRow, row })}
                   {@render rowAppendSnippet?.({ index: indexRow, row })}
                 </td>
               {/if}
@@ -2393,7 +2415,7 @@
     margin-right: -15px;
   }
 
-  .table {
+  .dynamic-table {
     background-color: var(
       --dynamic-table-background-color,
       var(--dynamic-table-default-background-color)
@@ -2401,7 +2423,7 @@
     border-collapse: separate;
   }
 
-  .table.resizable {
+  .dynamic-table.dynamic-resizable {
     table-layout: fixed;
     width: fit-content;
   }
@@ -2520,17 +2542,17 @@
     padding-left: 10px;
     border: 1px solid transparent;
   }
-  table.table > tbody > tr > td {
+  table.dynamic-table > tbody > tr > td {
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  table.table > thead > tr > th {
+  table.dynamic-table > thead > tr > th {
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  table.table > tbody > tr > td.expanded-row {
+  table.dynamic-table > tbody > tr > td.expanded-row {
   overflow: visible;
 }
 
