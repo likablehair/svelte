@@ -306,7 +306,7 @@
     }
     filters = filters
     tmpFilters = {}
-    customToBeInitialized = false
+    customToBeInitialized = true
     if(onremoveAllFilters) {
       onremoveAllFilters()
     }
