@@ -61,6 +61,7 @@
 
     resizeObserver = new ResizeObserver(() => {
       updateRemainingWidth();
+      updateHeaderHeight();
     });
     resizeObserver.observe(tableContainer);
 
