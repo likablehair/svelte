@@ -1450,7 +1450,7 @@
               </slot>
             </th>
           {/each}
-          {#if remainingWidth && (customizeHeaders || resizableColumns)}
+          {#if remainingWidth && (customizeHeaders || $$slots.rowActions || $$slots.append || resizableColumns)}
             <th
               style:width={remainingWidth + 'px'}
               class="filler"
@@ -1611,7 +1611,7 @@
                   {/if}
                 </td>
               {/each}
-              {#if remainingWidth && (customizeHeaders || resizableColumns)}
+              {#if remainingWidth && (customizeHeaders || $$slots.rowActions || $$slots.append || resizableColumns)}
                 <td/>
               {/if}
               {#if $$slots.rowActions || $$slots.append}
