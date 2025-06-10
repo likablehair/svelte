@@ -66,6 +66,7 @@
 
     resizeObserver = new ResizeObserver(() => {
       updateRemainingWidth();
+      updateHeaderHeight();
     });
 
     if(tableContainer){
@@ -1666,7 +1667,7 @@
               {/if}
             </th>
           {/each}
-          {#if remainingWidth && (customizeHeaders || resizableColumns)}
+          {#if remainingWidth && (customizeHeaders || rowAppendSnippet || resizableColumns)}
             <th
               style:width={remainingWidth + 'px'}
               class="filler"
@@ -1819,7 +1820,7 @@
                   {/if}
                 </td>
               {/each}
-              {#if remainingWidth && (customizeHeaders || resizableColumns)}
+              {#if remainingWidth && (customizeHeaders || rowAppendSnippet || resizableColumns)}
                 <td></td>
               {/if}
               {#if rowAppendSnippet}
