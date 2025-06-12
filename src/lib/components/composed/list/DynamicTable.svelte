@@ -45,19 +45,13 @@
     hideScrollbar = tableContainer.scrollHeight > tableContainer.clientHeight
 
     for(const head of [...headers, { value: 'non-resizable', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }, { value: 'customize-headers', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }]) {
-      let th
-      if(head.value == 'non-resizable' || head.value == 'customize-headers') {
-        th = document.getElementsByClassName(head.value).item(0) as HTMLElement
-      } else {
-        th = document.getElementById(head.value) as HTMLElement
-      }
+      let th = headersHTML[head.value]
       if(!!th) {
         resizeHeader(th, head)
       }
     }
 
-    let table = document.getElementsByClassName('dynamic-table')[0] as HTMLElement
-    table.classList.add('dynamic-resizable')
+    tableHTML.classList.add('dynamic-resizable')
 
     resizeObserver = new ResizeObserver(() => {
       updateRemainingWidth();
@@ -300,6 +294,8 @@
     currentSectionNumber = 0,
     tableBody: HTMLElement,
     tableContainer: HTMLElement,
+    tableHTML: HTMLElement,
+    headersHTML: { [value: string]: HTMLElement } = {},
     userScrolling = true,
     reachedBottom = false,
     reachedTop = false,
@@ -1141,7 +1137,7 @@
 
       if(containerWidth){
         const totalResizableWidth = headersToShowInTable.reduce((sum, head) => {
-          let th = document.getElementById(head.value)
+          let th = headersHTML[head.value]
           if(!!th) {
             resizeHeader(th, head)
           }
@@ -1149,7 +1145,7 @@
           return sum + width + 1;
         }, 0);
     
-        const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.slot-append, th.customize-headers'))
+        const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.customize-headers'))
           .reduce((sum, th) => sum + th.getBoundingClientRect().width + 1, 0);
     
         remainingWidth = Math.max(0, containerWidth - totalResizableWidth - extraStaticWidth);
@@ -1369,7 +1365,7 @@
       hasMore={currentSectionNumber > 0 && userScrolling}
       direction='backward'
     />
-    <table style="display: table;" class="dynamic-table">
+    <table style="display: table;" class="dynamic-table" bind:this={tableHTML}>
       <thead class="table-header" bind:this={mainHeader}>
         <tr>
           {#if !!showSelect && !showExpand && rows.length > 0}
@@ -1378,6 +1374,7 @@
               style:min-width="30px"
               style:text-align="center"
               class="non-resizable"
+              bind:this={headersHTML['non-resizable']}
             >
               {#if selectMode === "multiple"}
                 <Checkbox
@@ -1395,6 +1392,7 @@
               style:max-width="60px"
               style:text-align="center"
               class="non-resizable"
+              bind:this={headersHTML['non-resizable']}
             />
           {/if}
           {#each headersToShowInTable as head, index}
@@ -1404,7 +1402,7 @@
               style:max-width={head.maxWidth}
               class:sortable={head.sortable}
               on:click={() => handleHeaderClick(head)}
-              id={head.value}
+              bind:this={headersHTML[head.value]}
             >
               {#if resizableColumns}
                 <div class="resizer" use:resize></div>
@@ -1450,7 +1448,7 @@
               </slot>
             </th>
           {/each}
-          {#if remainingWidth && (customizeHeaders || $$slots.rowActions || $$slots.append || resizableColumns)}
+          {#if remainingWidth}
             <th
               style:width={remainingWidth + 'px'}
               class="filler"
@@ -1461,6 +1459,7 @@
             <th
               style:text-align="center"
               class="customize-headers"
+              bind:this={headersHTML['customize-headers']}
             >
               {#if customizeHeaders}
                 <div style="display: flex; justify-content: start;">
@@ -1611,7 +1610,7 @@
                   {/if}
                 </td>
               {/each}
-              {#if remainingWidth && (customizeHeaders || $$slots.rowActions || $$slots.append || resizableColumns)}
+              {#if remainingWidth}
                 <td/>
               {/if}
               {#if $$slots.rowActions || $$slots.append}
@@ -2223,12 +2222,6 @@
   .dynamic-table.dynamic-resizable {
     table-layout: fixed;
     width: fit-content;
-  }
-
-  .slot-append {
-    width: 1px;
-    min-width: unset;
-    box-sizing: content-box;
   }
 
   .table-header {
