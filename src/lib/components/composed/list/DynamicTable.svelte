@@ -2234,18 +2234,11 @@
     position: sticky;
     top: 0;
     z-index: 2;
+    top: -1px;
     height: var(
       --dynamic-table-header-height,
       var(--dynamic-table-default-header-height)
     );
-  }
-
-  @media not all and (min-resolution:.001dpcm) { 
-    .table-header {
-      position: sticky;
-      top: -2px;
-      z-index: 2;
-    }
   }
 
   .table-subheader {
