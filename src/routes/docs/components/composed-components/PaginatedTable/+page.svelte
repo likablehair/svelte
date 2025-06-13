@@ -174,6 +174,7 @@
     showActiveFilters={true}
     {calculateRowStyles}
     {calculateRowClasses}
+    --one-edit-filters-menu-max-height="50vh"
   >
   <svelte:fragment slot="custom-filter" let:filter let:updateFunction>
     {#if !!filter}
@@ -214,12 +215,12 @@
     // }
   ]}
   styleProps={[
-    // {
-    //   name: '--button-max-width',
-    //   type: 'string',
-    //   default: 'undefined',
-    //   description: 'The max width of the outer element'
-    // }
+    {
+      name: '--one-edit-filters-menu-max-height',
+      type: 'string',
+      default: '100%',
+      description: 'The max height of the filters dropdown element when "one-edit" mode is active'
+    }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>

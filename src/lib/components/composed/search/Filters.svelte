@@ -681,6 +681,7 @@
         _boxShadow="rgb(var(--global-color-grey-900), .5) 0px 2px 4px"
         _height="fit-content"
         _minWidth="10vw"
+        _maxHeight="var(--one-edit-filters-menu-max-height, 100%)"
         _borderRadius="5px"
         anchor="bottom"
         openingId="select-filter"
