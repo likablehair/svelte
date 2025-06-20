@@ -473,7 +473,8 @@
     hideScrollbar = $state(false),
     sortModify: Header['sortModify'],
     mainHeader: Element | undefined = $state(),
-    resizeObserver: ResizeObserver
+    resizeObserver: ResizeObserver,
+    allRowsFetched = rows.length == totalRows
 
   const DEFAULT_MIN_WIDTH_PX = 100,
     DEFAULT_MAX_WIDTH_PX = 400
@@ -655,7 +656,7 @@
 
   function handleSelect(item: Item, shiftKeyPressed: boolean) {
     let index = -1
-    if(selectedAll) {
+    if(selectedAll && !allRowsFetched) {
       index = unselectedItems.findIndex((i) => i[uniqueKey] == item[uniqueKey]);
     } else {
       index = selectedItems.findIndex((i) => i[uniqueKey] == item[uniqueKey]);
@@ -676,7 +677,7 @@
               selectedIndex = x
             }
             for (let i = lastSelectedIndex + 1; i <= selectedIndex; i++) {
-              if(selectedAll) {
+              if(selectedAll && !allRowsFetched) {
                 if(!unselectedItems.find((unselectedItem) => unselectedItem[uniqueKey] == rows[i].item[uniqueKey])) {
                   unselectedItems = [...unselectedItems, rows[i].item]
                 }
@@ -689,7 +690,7 @@
           }
         }
         else {
-          if(selectedAll) {
+          if(selectedAll && !allRowsFetched) {
             unselectedItems = [...unselectedItems, item];
           } else {
             selectedItems = [...selectedItems, item];
@@ -698,7 +699,7 @@
         }
       }
     } else {
-      if(selectedAll) {
+      if(selectedAll && !allRowsFetched) {
         unselectedItems = unselectedItems.filter((i) => i[uniqueKey] != item[uniqueKey]);
       } else {
         selectedItems = selectedItems.filter((i) => i[uniqueKey] != item[uniqueKey]);
@@ -709,7 +710,12 @@
 
   function handleSelectAll() {
     if (selectMode == "multiple") {
-      selectedItems = []
+      if(!selectedAll && allRowsFetched) {
+        selectedItems = rows.map(r => r.item)
+      }
+      else {
+        selectedItems = []
+      }
       selectedIndexes = []
       unselectedItems = []
       selectedAll = !selectedAll
@@ -1734,7 +1740,7 @@
                     : 'var(--dynamic-table-row-disabled-background-color, var(--dynamic-table-default-row-disabled-background-color))'
                   : expandedRows.findIndex(r => r.item[uniqueKey] == row.item[uniqueKey]) != -1
                     ? 'var(--dynamic-table-expanded-row-background-color, var(--dynamic-table-default-expanded-row-background-color))'
-                    : selectedAll
+                    : selectedAll && !allRowsFetched
                       ? !unselectedItems.find(i => i[uniqueKey] == row.item[uniqueKey])
                         ? 'var(--dynamic-table-selected-row-background-color, var(--dynamic-table-default-selected-row-background-color))'
                         : ''
@@ -1750,7 +1756,7 @@
                   <Checkbox
                     id={row.item[uniqueKey]}
                     value={
-                      selectedAll ?
+                      selectedAll && !allRowsFetched ?
                         unselectedItems.findIndex(
                           (i) => i[uniqueKey] == row.item[uniqueKey]
                         ) == -1 :
