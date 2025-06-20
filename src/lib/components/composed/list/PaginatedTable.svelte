@@ -1,14 +1,10 @@
 <script lang="ts" module>
   type ArrayElement<ArrayType extends readonly unknown[]> =
     ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
-    
-    export type Header = ArrayElement<
-    NonNullable<ComponentProps<typeof SimpleTable>["headers"]>
-      >;
 </script>
 
 <script lang="ts" generics="Item extends {[key: string]: any}, Data">
-  import SimpleTable from "$lib/components/simple/lists/SimpleTable.svelte";
+  import SimpleTable, { type Header } from "$lib/components/simple/lists/SimpleTable.svelte";
   import Paginator from "$lib/components/simple/lists/Paginator.svelte";
   import Dropdown from "$lib/components/composed/forms/Dropdown.svelte";
   import { type ComponentProps, type Snippet } from "svelte";
@@ -125,7 +121,7 @@
 
   let searchBarInput: HTMLElement | undefined = $state(),
     searchText: string | undefined = $state(),
-    sortModify: Header['sortModify']
+    sortModify: Header<Data>['sortModify']
 
   let rowsPerPageSelection: ComponentProps<typeof Dropdown>['values'] = $state([])
 

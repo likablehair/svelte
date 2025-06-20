@@ -11,13 +11,16 @@
   import SlotsViewer from "../../SlotsViewer.svelte";
   import EventsViewer from "../../EventsViewer.svelte";
 
-  let headers : Header[] =[
+  let headers : Header<{ ciao: string }>[] =[
     {
       value: 'businessName',
       label: 'Business name',
       type: {
         key: "string",
       },
+      data: {
+        ciao: 'sddfd'
+      }
     },
     {
       value: "productName",
@@ -26,6 +29,9 @@
         key: "string",
       },
       sortable: true,
+      data: {
+        ciao: 'sddfd'
+      }
     },
     {
       value: "progress",
@@ -33,6 +39,9 @@
       type: {
         key: "string",
       },
+      data: {
+        ciao: 'sddfd'
+      }
     },
     {
       value: "rating",
@@ -41,8 +50,11 @@
         key: "custom",
       },
       sortable: true,
-      }
-    ]
+      data: {
+        ciao: 'sddfd'
+      },
+    }
+  ]
 
   let items: {
     businessName: string,
