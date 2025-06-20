@@ -10,8 +10,16 @@
   import type { ComponentProps } from "svelte";
   import SlotsViewer from "../../SlotsViewer.svelte";
   import EventsViewer from "../../EventsViewer.svelte";
+  import SimpleTable from "$lib/components/simple/lists/SimpleTable.svelte";
 
-  let headers : Header<{ ciao: string }>[] =[
+  type Row = {
+    businessName: string,
+    productName: string,
+    progress: string,
+    rating: number
+  }
+
+  let headers: ComponentProps<typeof SimpleTable<Row, { ciao: string }>>['headers'] = [
     {
       value: 'businessName',
       label: 'Business name',
@@ -56,12 +64,7 @@
     }
   ]
 
-  let items: {
-    businessName: string,
-    productName: string,
-    progress: string,
-    rating: number
-  }[] = [
+  let items: Row[] = [
     {
       businessName: "GQ Creators",
       productName: "Data Protection",

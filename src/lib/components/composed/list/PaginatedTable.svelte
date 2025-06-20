@@ -1,8 +1,3 @@
-<script lang="ts" module>
-  type ArrayElement<ArrayType extends readonly unknown[]> =
-    ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
-</script>
-
 <script lang="ts" generics="Item extends {[key: string]: any}, Data">
   import SimpleTable, { type Header } from "$lib/components/simple/lists/SimpleTable.svelte";
   import Paginator from "$lib/components/simple/lists/Paginator.svelte";
