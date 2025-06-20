@@ -5,9 +5,9 @@
     export type Header = ArrayElement<
     NonNullable<ComponentProps<typeof SimpleTable>["headers"]>
       >;
-    </script>
+</script>
 
-<script lang="ts">
+<script lang="ts" generics="Item extends {[key: string]: any}, Data">
   import SimpleTable from "$lib/components/simple/lists/SimpleTable.svelte";
   import Paginator from "$lib/components/simple/lists/Paginator.svelte";
   import Dropdown from "$lib/components/composed/forms/Dropdown.svelte";
@@ -17,7 +17,7 @@
   import type Builder from "$lib/utils/filters/builder";
   import Converter from "$lib/utils/filters/filters";
 
-  interface Props extends Omit<ComponentProps<typeof SimpleTable>, 'class'>{
+  interface Props extends Omit<ComponentProps<typeof SimpleTable<Item, Data>>, 'class'>{
     page?: NonNullable<ComponentProps<typeof Paginator>["page"]>;
     maxPage?: ComponentProps<typeof Paginator>["maxPage"];
     rowsPerPageOptions?: ComponentProps<typeof Dropdown>["items"];
@@ -31,7 +31,7 @@
     editFilterMode?: "one-edit" | "multi-edit";
     showActiveFilters?: boolean;
     class?: {
-      simpleTable?: ComponentProps<typeof SimpleTable>['class']
+      simpleTable?: ComponentProps<typeof SimpleTable<Item, Data>>['class']
     }
     onpaginationChange?: (event: {
       detail: {
@@ -200,7 +200,7 @@
     }
   }
 
-  function handleOnSort(event: Parameters<NonNullable<ComponentProps<typeof SimpleTable>['onsort']>>[0]) {
+  function handleOnSort(event: Parameters<NonNullable<ComponentProps<typeof SimpleTable<Item, Data>>['onsort']>>[0]) {
     sortModify = event.detail.sortModify
     handleFiltersChange()
     

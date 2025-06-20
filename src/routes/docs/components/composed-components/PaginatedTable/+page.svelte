@@ -44,6 +44,32 @@
       }
     ]
 
+  let items: {
+    businessName: string,
+    productName: string,
+    progress: string,
+    rating: number
+  }[] = [
+    {
+      businessName: "GQ Creators",
+      productName: "Data Protection",
+      progress: "339 sold",
+      rating: 5,
+    },
+    {
+      businessName: "Dribblers Agency",
+      productName: "Job Search",
+      progress: "212 sold",
+      rating: 4.5,
+    },
+    {
+      businessName: "Popular My",
+      productName: "Financial Transactions",
+      progress: "94 sold",
+      rating: 4.2,
+    },
+  ]
+
   let filters: Filter[] | undefined  = [{
     label: "Business name",
     active: false,
@@ -147,26 +173,7 @@
     resizableColumns={true}
     filters={filters}
     headers={headers}
-    items={[
-      {
-        businessName: "GQ Creators",
-        productName: "Data Protection",
-        progress: "339 sold",
-        rating: 5,
-      },
-      {
-        businessName: "Dribblers Agency",
-        productName: "Job Search",
-        progress: "212 sold",
-        rating: 4.5,
-      },
-      {
-        businessName: "Popular My",
-        productName: "Financial Transactions",
-        progress: "94 sold",
-        rating: 4.2,
-      },
-    ]}
+    {items}
     searchBarColumns={['businessName', 'productName']}
     totalElements={40}
     onfiltersChange={handleFiltersChange}
