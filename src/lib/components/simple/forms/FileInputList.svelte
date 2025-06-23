@@ -27,7 +27,15 @@
   let fileActive: File | null = null
 
   function isImageFile(file: File): boolean {
-    return file.type.startsWith("image/")
+    if (file.type.startsWith("image/") && (
+      file.type.endsWith("/jpg") 
+      || file.type.endsWith("/png")
+      || file.type.endsWith("/jpeg")
+      || file.type.endsWith("/webp")
+    )) {
+      return true
+    }
+    return false
   }
 
   function handleFileMouseEnter(file: File) {
@@ -112,7 +120,11 @@
                       {:else}
                         <div class="preview-file">
                           <Icon name={icon} />
-                          <span class="file-name-preview">{file.name}</span>
+                          {#if file.name.length > 40}
+                            <span class="file-name-preview">{file.name.slice(0, 40)}...</span>
+                          {:else}
+                            <span class="file-name-preview">{file.name}</span>
+                          {/if}
                         </div>
                       {/if}
                       <button
@@ -120,8 +132,10 @@
                         class="preview-remove"
                         on:click|stopPropagation={() => handleRemove(file)}
                         aria-label="Rimuovi {file.name}"
+                        style:height="24px"
+                        style:width="24px"
                       >
-                        <Icon name="mdi-close" />
+                        <Icon name="mdi-close" --icon-container-height="16px" --icon-container-width="16px" />
                       </button>
                     </div>
                   {/each}
@@ -174,7 +188,7 @@
     );
     height: var(--file-input-list-height, var(--file-input-list-default-height));
     width: var(
-      --file-input-list-background-width,
+      --file-input-list-width,
       var(--file-input-list-default-width)
     );
   }
@@ -306,7 +320,7 @@
     justify-content: center;
     height: 120px;
     padding: 0.5rem;
-    background: rgba(244, 244, 245, 0.5);
+    background: rgb(var(--global-color-background-600));
     border-radius: 4px;
     box-sizing: border-box;
   }
@@ -327,7 +341,7 @@
     position: absolute;
     top: 4px;
     right: 4px;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(51, 51, 51, 0.6);
     border: none;
     border-radius: 50%;
     padding: 4px;

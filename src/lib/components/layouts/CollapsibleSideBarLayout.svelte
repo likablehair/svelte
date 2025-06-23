@@ -442,9 +442,7 @@
       rgb(var(--collapsible-divided-side-bar-layout-default-inner-header-menu-background-color), .5)
     );
     height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    
   }
 
   * {
