@@ -8,7 +8,16 @@
 
 <h1>FileInputList</h1>
 <ComponentSubtitle>Drop it like it's hot (the list).</ComponentSubtitle>
-<h2>Example</h2>
+<h2>Example with standard input</h2>
+<div class="example">
+  <FileInputList
+    --file-input-list-height="100%"
+    --file-input-list-width="100%"
+    --file-input-list-border-radius="10px"
+  />
+</div>
+
+<h2>Example with preview input</h2>
 <div class="example">
   <FileInputList
     previewFiles={true}
