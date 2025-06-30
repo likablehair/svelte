@@ -87,6 +87,7 @@
     { name: 'menuBorderRadius', type: 'string', description: 'The border-radius for the menu.', default: '"5px"' },
     { name: 'mobileDrawer', type: 'boolean', description: 'If true, a drawer menu is used for mobile devices.', default: 'false' },
     { name: 'menuWidth', type: 'string | null', description: 'The width of the menu.', default: 'null' },
+    { name: 'menuAnchor', type: '"bottom" | "bottom-center" | "right-center"', description: 'The anchor of the menu.', default: '"bottom-center"' },
     { name: 'class', type: 'object', description: 'CSS classes to apply to different parts of the component.', default: 'undefined' },
   ]}
   styleProps={[

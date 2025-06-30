@@ -70,6 +70,8 @@
     { name: "mobileDrawer", type: "boolean", description: "Enable mobile-friendly drawer mode.", default: "false" },
     { name: "closeOnSelect", type: "boolean", description: "Close menu when item is selected.", default: "false" },
     { name: "disabled", type: "boolean", description: "Disable input.", default: "false" },
+    { name: 'menuWidth', type: 'string | null', description: 'The width of the menu.', default: 'null' },
+    { name: 'menuAnchor', type: '"bottom" | "bottom-center" | "right-center"', description: 'The anchor of the menu.', default: '' },
   ]}
   styleProps={[]}
 ></PropsViewer>
