@@ -285,6 +285,7 @@
     { name: "resizedColumnSizeWithPadding", type: "{ [value: string]: number }", description: "The width of the headers", default: "{}" },
     { name: "endLineVisible", type: "boolean", description: "Show end line at bottom", default: "false" },
     { name: "dynamicFilters", type: "boolean", description: "Switch Between Dynamic and normal filters", default: "true" },
+    { name: "useSelectedItemsOnly", type: "boolean", description: "Uses only selectedItems if all rows are fetched initially", default: "false" },
     { name: "class", type: "{ container?: string; header?: string; row?: string; cell?: string }", description: "Custom classes for table elements", default: "{}" }
   ]}
   styleProps={[
