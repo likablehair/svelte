@@ -268,7 +268,8 @@
     endLineVisible: boolean = false,
     resizableColumns: boolean= false,
     resizedColumnSizeWithPadding: { [value: string]: number } = {},
-    dynamicFilters: boolean = true
+    dynamicFilters: boolean = true,
+    useSelectedItemsOnly = false
 
   let openCellEditor: boolean = false,
     cellEditorActivator: HTMLElement | undefined,
@@ -305,7 +306,7 @@
     sortModify: Header['sortModify'],
     mainHeader: Element,
     resizeObserver: ResizeObserver,
-    allRowsFetched = rows.length == totalRows
+    ignoreSelectAll = rows.length == totalRows && useSelectedItemsOnly
 
   const DEFAULT_MIN_WIDTH_PX = 100,
     DEFAULT_MAX_WIDTH_PX = 400
@@ -467,7 +468,7 @@
 
   function handleSelect(item: Item, shiftKeyPressed: boolean) {
     let index = -1
-    if(selectedAll && !allRowsFetched) {
+    if(selectedAll && !ignoreSelectAll) {
       index = unselectedItems.findIndex((i) => i[uniqueKey] == item[uniqueKey]);
     } else {
       index = selectedItems.findIndex((i) => i[uniqueKey] == item[uniqueKey]);
@@ -488,7 +489,7 @@
               selectedIndex = x
             }
             for (let i = lastSelectedIndex + 1; i <= selectedIndex; i++) {
-              if(selectedAll && !allRowsFetched) {
+              if(selectedAll && !ignoreSelectAll) {
                 if(!unselectedItems.find((unselectedItem) => unselectedItem[uniqueKey] == rows[i].item[uniqueKey])) {
                   unselectedItems = [...unselectedItems, rows[i].item]
                 }
@@ -501,7 +502,7 @@
           }
         }
         else {
-          if(selectedAll && !allRowsFetched) {
+          if(selectedAll && !ignoreSelectAll) {
             unselectedItems = [...unselectedItems, item];
           } else {
             selectedItems = [...selectedItems, item];
@@ -510,7 +511,7 @@
         }
       }
     } else {
-      if(selectedAll && !allRowsFetched) {
+      if(selectedAll && !ignoreSelectAll) {
         unselectedItems = unselectedItems.filter((i) => i[uniqueKey] != item[uniqueKey]);
       } else {
         selectedItems = selectedItems.filter((i) => i[uniqueKey] != item[uniqueKey]);
@@ -521,7 +522,7 @@
 
   function handleSelectAll() {
     if (selectMode == "multiple") {
-      if(!selectedAll && allRowsFetched) {
+      if(!selectedAll && ignoreSelectAll) {
         selectedItems = rows.map(r => r.item)
       }
       else {
@@ -1524,7 +1525,7 @@
                     : 'var(--dynamic-table-row-disabled-background-color, var(--dynamic-table-default-row-disabled-background-color))'
                   : expandedRows.findIndex(r => r.item[uniqueKey] == row.item[uniqueKey]) != -1
                     ? 'var(--dynamic-table-expanded-row-background-color, var(--dynamic-table-default-expanded-row-background-color))'
-                    : selectedAll && !allRowsFetched
+                    : selectedAll && !ignoreSelectAll
                       ? !unselectedItems.find(i => i[uniqueKey] == row.item[uniqueKey])
                         ? 'var(--dynamic-table-selected-row-background-color, var(--dynamic-table-default-selected-row-background-color))'
                         : ''
@@ -1540,7 +1541,7 @@
                   <Checkbox
                     id={row.item[uniqueKey]}
                     value={
-                      selectedAll && !allRowsFetched ?
+                      selectedAll && !ignoreSelectAll ?
                         unselectedItems.findIndex(
                           (i) => i[uniqueKey] == row.item[uniqueKey]
                         ) == -1 :
