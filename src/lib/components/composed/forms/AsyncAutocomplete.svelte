@@ -8,6 +8,7 @@
   import debounceStore from "$lib/stores/debounce";
   import { writable } from 'svelte/store';
   import type { ComponentProps } from "svelte";
+  import Menu from "$lib/components/simple/common/Menu.svelte";
 
   type AsyncAutocompleteItem = Item<Data>
 
@@ -29,6 +30,8 @@
     mobileDrawer?: boolean;
     closeOnSelect?: boolean;
     disabled?: boolean;
+    menuWidth?: string;
+    menuAnchor?: ComponentProps<typeof Menu>['anchor']
     chipLabelSnippet?: ComponentProps<typeof Autocomplete<Data>>['chipLabelSnippet']
     itemLabelSnippet?: ComponentProps<typeof Autocomplete<Data>>['itemLabelSnippet']
     onchange?: ComponentProps<typeof Autocomplete<Data>>['onchange']
@@ -50,6 +53,8 @@
     mobileDrawer = false,
     closeOnSelect = false,
     disabled = false,
+    menuAnchor,
+    menuWidth,
     chipLabelSnippet,
     itemLabelSnippet,
     onchange,
@@ -95,6 +100,8 @@
   {placeholder}
   {closeOnSelect}
   {disabled}
+  {menuWidth}
+  {menuAnchor}
   searchFunction={() => true}
   {onchange}
   {chipLabelSnippet}

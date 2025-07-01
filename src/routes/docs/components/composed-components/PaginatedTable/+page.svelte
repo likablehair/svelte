@@ -10,14 +10,25 @@
   import type { ComponentProps } from "svelte";
   import SlotsViewer from "../../SlotsViewer.svelte";
   import EventsViewer from "../../EventsViewer.svelte";
+  import SimpleTable from "$lib/components/simple/lists/SimpleTable.svelte";
 
-  let headers : Header[] =[
+  type Row = {
+    businessName: string,
+    productName: string,
+    progress: string,
+    rating: number
+  }
+
+  let headers: ComponentProps<typeof SimpleTable<Row, { ciao: string }>>['headers'] = [
     {
       value: 'businessName',
       label: 'Business name',
       type: {
         key: "string",
       },
+      data: {
+        ciao: 'sddfd'
+      }
     },
     {
       value: "productName",
@@ -26,6 +37,9 @@
         key: "string",
       },
       sortable: true,
+      data: {
+        ciao: 'sddfd'
+      }
     },
     {
       value: "progress",
@@ -33,6 +47,9 @@
       type: {
         key: "string",
       },
+      data: {
+        ciao: 'sddfd'
+      }
     },
     {
       value: "rating",
@@ -41,8 +58,32 @@
         key: "custom",
       },
       sortable: true,
-      }
-    ]
+      data: {
+        ciao: 'sddfd'
+      },
+    }
+  ]
+
+  let items: Row[] = [
+    {
+      businessName: "GQ Creators",
+      productName: "Data Protection",
+      progress: "339 sold",
+      rating: 5,
+    },
+    {
+      businessName: "Dribblers Agency",
+      productName: "Job Search",
+      progress: "212 sold",
+      rating: 4.5,
+    },
+    {
+      businessName: "Popular My",
+      productName: "Financial Transactions",
+      progress: "94 sold",
+      rating: 4.2,
+    },
+  ]
 
   let filters: Filter[] | undefined  = [{
     label: "Business name",
@@ -147,26 +188,7 @@
     resizableColumns={true}
     filters={filters}
     headers={headers}
-    items={[
-      {
-        businessName: "GQ Creators",
-        productName: "Data Protection",
-        progress: "339 sold",
-        rating: 5,
-      },
-      {
-        businessName: "Dribblers Agency",
-        productName: "Job Search",
-        progress: "212 sold",
-        rating: 4.5,
-      },
-      {
-        businessName: "Popular My",
-        productName: "Financial Transactions",
-        progress: "94 sold",
-        rating: 4.2,
-      },
-    ]}
+    {items}
     searchBarColumns={['businessName', 'productName']}
     totalElements={40}
     onfiltersChange={handleFiltersChange}
