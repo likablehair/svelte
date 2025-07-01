@@ -24,7 +24,9 @@
     menuOpened: boolean = false,
     mobileDrawer: boolean = false,
     closeOnSelect: boolean = false,
-    disabled: boolean = false
+    disabled: boolean = false,
+    menuWidth: string | undefined | null = undefined,
+    menuAnchor: "bottom" | "bottom-center" | "right-center" | undefined = 'bottom-center'
 
   const searchTextValue = writable<string | undefined>(searchText)
   $: searchTextDebounce = debounceStore(searchTextValue, debounceTimeout)
@@ -60,6 +62,8 @@
   bind:placeholder
   bind:closeOnSelect
   bind:disabled
+  {menuWidth}
+  {menuAnchor}
   searchFunction={() => true}
   on:change
 >

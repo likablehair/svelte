@@ -41,7 +41,8 @@
     menuBoxShadow = "rgb(var(--global-color-background-300), .5) 0px 2px 4px",
     menuBorderRadius = "5px",
     mobileDrawer: boolean = false,
-    menuWidth: string | undefined | null = undefined
+    menuWidth: string | undefined | null = undefined,
+    menuAnchor: "bottom" | "bottom-center" | "right-center" | undefined = 'bottom-center'
 
   let dispatch = createEventDispatcher<{
     change: {
@@ -290,7 +291,7 @@
         _boxShadow={menuBoxShadow}
         _borderRadius={menuBorderRadius}
         bind:open={menuOpened}
-        anchor="bottom-center"
+        anchor={menuAnchor}
         closeOnClickOutside
         bind:refreshPosition
         bind:menuElement
