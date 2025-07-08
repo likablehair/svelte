@@ -36,7 +36,7 @@
     stayInViewport = true,
     flipOnOverflow = false,
     _boxShadow = "rgb(var(--global-color-grey-900), .5) 0px 2px 4px",
-    _height = "300px",
+    _height = "fit-content",
     _maxHeight = undefined,
     _minWidth = "100px",
     _borderRadius = "5px",
@@ -96,6 +96,5 @@
   .selectable-list-wrapper {
     background-color: rgb(var(--global-color-background-100));
     overflow: auto;
-    height: 100%
   }
 </style>
