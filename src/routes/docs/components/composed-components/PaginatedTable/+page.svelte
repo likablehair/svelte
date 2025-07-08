@@ -197,6 +197,7 @@
     showActiveFilters={true}
     {calculateRowStyles}
     {calculateRowClasses}
+    --one-edit-filters-menu-max-height="50vh"
   >
   {#snippet customFilterSnippet({ filter, mAndDown, updateFunction, })}
     {#if !!filter}
@@ -300,7 +301,14 @@
     },
     { name: "class", type: '{ simpleTable?: { container?: string, header?: string, row?: string, cell?: string } }', description: "Custom class mappings for inner components.", default: "{}" }
   ]}
-  styleProps={[]}
+  styleProps={[
+    {
+      name: '--one-edit-filters-menu-max-height',
+      type: 'string',
+      default: '100%',
+      description: 'The max height of the filters dropdown element when "one-edit" mode is active'
+    }
+  ]}
 ></PropsViewer>
 <h2>Slots</h2>
 <SlotsViewer
