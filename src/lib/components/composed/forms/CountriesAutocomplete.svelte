@@ -22,7 +22,7 @@
 
   let {
     autocompleteProps = {},
-    selected = $bindable([]),
+    selected = $bindable(),
     items = countriesOptions,
     onblur,
     onchange,

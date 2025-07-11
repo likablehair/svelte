@@ -66,7 +66,7 @@
     if(tableContainer){
       resizeObserver.observe(tableContainer);
     }
-    
+
     return () => {
       window.removeEventListener('resize', updateHeaderHeight);
       tableContainer?.removeEventListener("scroll", setReachedBottomOrTop);
@@ -881,7 +881,12 @@
     }
 
     if (dispatchFiltersChange) {
-      quickFilters = quickFilters;
+      quickFilters = quickFilters.map(f => {
+        if (f.title == quickFilter.title) {
+          return { ...quickFilter }
+        }
+        return f
+      });
       handleFiltersChange();
     }
 
@@ -958,8 +963,13 @@
       }
     }
     else {
-      quickFilter.active = true;
-      quickFilters = quickFilters;
+      quickFilter.active = true
+      quickFilters = quickFilters.map(f => {
+        if (f.title == quickFilter.title) {
+          return { ...quickFilter }
+        }
+        return f
+      })
       globalBuilder = quickFilterBuilder(globalBuilder, quickFilter);
   
       handleFiltersChange();
@@ -1375,7 +1385,7 @@
   
   async function updateRemainingWidth() {
     if(tableContainer != null && !!tableContainer && mainHeader) {
-      const containerWidth = tableContainer.getBoundingClientRect().width - 30;
+      const containerWidth = tableContainer.getBoundingClientRect().width - 26;
 
       if(containerWidth){
         const totalResizableWidth = headersToShowInTable.reduce((sum, head) => {
@@ -1687,7 +1697,7 @@
               bind:this={headersHTML['customize-headers']}
             >
               {#if customizeHeaders}
-                <div style="display: flex; justify-content: center;">
+                <div style="display: flex; justify-content: start;">
                   <Icon
                     name="mdi-plus-circle-outline"
                     onclick={() => (openHeaderDrawer = true)}
@@ -1734,6 +1744,7 @@
           {#each renderedRows as row, indexRow}
             <tr
               class="item-row"
+              class:pointer={!!onrowClick}
               data-key={row.item[uniqueKey]}
               style:background-color={
                 !!row.item.disableEdit
@@ -2772,5 +2783,8 @@
   }
   .filler {
     padding: 0 !important;
+  }
+  .pointer {
+    cursor: pointer;
   }
 </style>
