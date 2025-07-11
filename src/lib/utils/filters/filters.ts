@@ -88,7 +88,8 @@ type NumberFilter = {
     mode: 'between',
     modify?: (params: {
       builder: Builder,
-      value: { from?: number, to?: number }
+      value: { from?: number, to?: number },
+      mode: 'between'
     }) => Builder,
     from?: number,
     to?: number
@@ -96,7 +97,8 @@ type NumberFilter = {
     mode: 'equal' | 'greater' | 'lower',
     modify?: (params: {
       builder: Builder,
-      value?: number
+      value?: number,
+      mode: 'equal' | 'greater' | 'lower',
     }) => Builder,
     value?: number,
   }
@@ -163,14 +165,18 @@ export default class Converter {
       if(!filter.active) continue
 
       if (!!filter.modify) {
-        if('value' in filter && filter.value !== undefined) {
-          builder = filter.modify({ builder, value: filter.value })
+        if ('value' in filter && filter.value !== undefined) {
+          builder = filter.modify({
+            builder,
+            value: filter.value,
+            mode: filter.type === 'number' ? filter.mode : 'equal'
+          })
         } else if ('values' in filter && filter.values !== undefined) {
           builder = filter.modify({ builder, values: filter.values })
         } else if (filter.type === 'date' && ('from' in filter || 'to' in filter)) {
           builder = filter.modify({ builder, value: { from: filter.from, to: filter.to } })
         } else if (filter.type === 'number' && ('from' in filter || 'to' in filter)) {
-          builder = filter.modify({ builder, value: { from: filter.from, to: filter.to } })
+          builder = filter.modify({ builder, value: { from: filter.from, to: filter.to }, mode: 'between' })
         }
       } else if(filter.type == 'string') {
         this.applyStringFilter({ builder, filter })

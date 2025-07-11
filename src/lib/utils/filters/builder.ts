@@ -111,36 +111,36 @@ export default class Builder {
   }
 
   public whereIn(key: string, callback: (builder: Builder) => void): Builder
-  public whereIn(key: string, values: WhereFilterValue[]): Builder 
+  public whereIn(key: string, values: WhereFilterValue[]): Builder
   public whereIn(
-    key: string, 
+    key: string,
     second: ((builder: Builder) => void) | WhereFilterValue[]
   ): Builder {
     return this.applyWhereInClause('and', key, second)
   }
 
   public orWhereIn(key: string, callback: (builder: Builder) => void): Builder
-  public orWhereIn(key: string, values: WhereFilterValue[]): Builder 
+  public orWhereIn(key: string, values: WhereFilterValue[]): Builder
   public orWhereIn(
-    key: string, 
+    key: string,
     second: ((builder: Builder) => void) | WhereFilterValue[]
   ): Builder {
     return this.applyWhereInClause('or', key, second)
   }
 
   public notWhereIn(key: string, callback: (builder: Builder) => void): Builder
-  public notWhereIn(key: string, values: WhereFilterValue[]): Builder 
+  public notWhereIn(key: string, values: WhereFilterValue[]): Builder
   public notWhereIn(
-    key: string, 
+    key: string,
     second: ((builder: Builder) => void) | WhereFilterValue[]
   ): Builder {
     return this.applyWhereInClause('andNot', key, second)
   }
 
   public orNotWhereIn(key: string, callback: (builder: Builder) => void): Builder
-  public orNotWhereIn(key: string, values: WhereFilterValue[]): Builder 
+  public orNotWhereIn(key: string, values: WhereFilterValue[]): Builder
   public orNotWhereIn(
-    key: string, 
+    key: string,
     second: ((builder: Builder) => void) | WhereFilterValue[]
   ): Builder {
     return this.applyWhereInClause('orNot', key, second)
@@ -151,7 +151,7 @@ export default class Builder {
     key: string,
     second: WhereFilterValue[] | ((builder: Builder) => void)
   ): Builder {
-    if(typeof second == 'function') {
+    if (typeof second == 'function') {
       let inBuilder = new Builder()
       second(inBuilder)
 
@@ -174,7 +174,7 @@ export default class Builder {
 
     return this
   }
-  
+
   public whereNull(
     key: string
   ): Builder {
@@ -238,7 +238,7 @@ export default class Builder {
           logicalOperator
         })
       }
-    } else if (typeof first == 'string' && second !== undefined ) {      
+    } else if (typeof first == 'string' && second !== undefined) {
       this._modifiers.push({
         method: 'where',
         kind: 'simple',
@@ -289,6 +289,34 @@ export default class Builder {
     return this
   }
 
+  public whereRaw(
+    clause: string,
+    bindings?: WhereFilterValue[]
+  ): Builder {
+    this._modifiers.push({
+      method: 'where',
+      kind: 'raw',
+      logicalOperator: 'and',
+      clause,
+      bindings
+    })
+    return this
+  }
+
+  public orWhereRaw(
+    clause: string,
+    bindings?: WhereFilterValue[]
+  ): Builder {
+    this._modifiers.push({
+      method: 'where',
+      kind: 'raw',
+      logicalOperator: 'or',
+      clause,
+      bindings
+    })
+    return this
+  }
+
   private applyWhereJsonSupersetClause(
     logicalOperator: 'and' | 'or',
     first: string,
@@ -335,21 +363,21 @@ export default class Builder {
     for (let i = 0; i < parameterBuilder._modifiers.length; i += 1) {
       let modifierToSearch = parameterBuilder._modifiers[i]
       let found = false
-      for(let k = 0; k < this._modifiers.length; k += 1) {
+      for (let k = 0; k < this._modifiers.length; k += 1) {
         let currentModifier = this._modifiers[k]
 
         found = lodash.isEqual(modifierToSearch, currentModifier)
-        if(found) break
+        if (found) break
       }
 
-      if(!found) return false
+      if (!found) return false
     }
     return true
   }
 
   public hasWhereOnColumn(column: string, modifiers: Modifier[] | undefined = undefined): boolean {
     return (modifiers || this._modifiers).some((m) => {
-      return m.method == 'where' && 
+      return m.method == 'where' &&
         (
           (
             m.kind == 'column' && m.key == column
@@ -403,7 +431,7 @@ export default class Builder {
     })
     return this
   }
-  
+
   public orderBy(sortBy: string, sortDirection: "asc" | "desc") {
     this._modifiers.push({
       method: 'orderBy',
@@ -412,7 +440,7 @@ export default class Builder {
     })
     return this
   }
-  
+
 }
 
 import type { JoinModifierOnClause } from "./modifiers/join"
