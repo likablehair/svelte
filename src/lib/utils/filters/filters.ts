@@ -66,7 +66,8 @@ type DateFilter = {
     mode: 'between',
     modify?: (params: {
       builder: Builder,
-      value: { from?: Date, to?: Date }
+      value: { from?: Date, to?: Date },
+      mode: 'between'
     }) => Builder,
     from?: Date,
     to?: Date
@@ -74,7 +75,8 @@ type DateFilter = {
     mode: 'equal' | 'greater' | 'lower',
     modify?: (params: {
       builder: Builder,
-      value?: Date
+      value?: Date,
+      mode: 'equal' | 'greater' | 'lower',
     }) => Builder,
     value?: Date,
   }
@@ -151,7 +153,6 @@ export type Filter = {
 
 export default class Converter {
   constructor() {
-
   }
 
   public createBuilder(params: {
@@ -165,16 +166,16 @@ export default class Converter {
       if(!filter.active) continue
 
       if (!!filter.modify) {
-        if ('value' in filter && filter.value !== undefined) {
-          builder = filter.modify({
-            builder,
-            value: filter.value,
-            mode: filter.type === 'number' ? filter.mode : 'equal'
+        if('value' in filter && filter.value !== undefined) {
+          builder = filter.modify({ 
+            builder, 
+            value: filter.value, 
+            mode: filter.type === 'number' || filter.type === 'date' ? filter.mode : 'equal' 
           })
         } else if ('values' in filter && filter.values !== undefined) {
           builder = filter.modify({ builder, values: filter.values })
         } else if (filter.type === 'date' && ('from' in filter || 'to' in filter)) {
-          builder = filter.modify({ builder, value: { from: filter.from, to: filter.to } })
+          builder = filter.modify({ builder, value: { from: filter.from, to: filter.to }, mode: 'between' })
         } else if (filter.type === 'number' && ('from' in filter || 'to' in filter)) {
           builder = filter.modify({ builder, value: { from: filter.from, to: filter.to }, mode: 'between' })
         }
