@@ -1140,7 +1140,7 @@
   
   async function updateRemainingWidth() {
     if(tableContainer != null && !!tableContainer) {
-      const containerWidth = tableContainer?.getBoundingClientRect().width - 30;
+      const containerWidth = tableContainer?.getBoundingClientRect().width - 26;
 
       if(containerWidth){
         const totalResizableWidth = headersToShowInTable.reduce((sum, head) => {

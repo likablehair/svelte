@@ -56,6 +56,7 @@
       -webkit-appearance: none;
       -moz-appearance: none;
       height: 21px;
+      min-height: 21px;
       outline: none;
       display: inline-block;
       vertical-align: top;
@@ -72,7 +73,8 @@
       ));
       transition: background 0.3s, border-color 0.3s, box-shadow 0.2s;
       width: 21px;
-      border-radius: 7px;
+      min-width: 21px;
+      border-radius: 8px;
     }
 
     input[type="checkbox"]:after {
