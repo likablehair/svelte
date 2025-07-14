@@ -43,7 +43,6 @@
   $effect(() => {
     if(autoDetectUrl && !!page) {
       const results = getMenuNameMatchingUrl({ menus: menus })
-      console.log(results)
       selected = results.name
     }
   }) 
