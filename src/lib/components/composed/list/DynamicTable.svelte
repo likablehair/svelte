@@ -1,4 +1,4 @@
-<script lang="ts" generics="Item extends {[key: string]: any}, SubItem extends {[key: string]: any}">
+<script lang="ts" generics="Item extends {[key: string]: any} = {[key: string]: any}, SubItem extends {[key: string]: any} = {[key: string]: any}">
   import {
     Checkbox,
     Chip,
