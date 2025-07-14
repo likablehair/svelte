@@ -1683,26 +1683,9 @@
 
                       <tbody>
                         {#each row.subItems as subItem, indexSubItem}
-                          <tr
-                            on:click={() => handleRowClick(subItem)}
-                            class:row-activator={cellEditorIndexRow == indexSubItem && cellEditorSubItem}
-                          >
+                          <tr>
                             {#each subHeaders as subHeader, indexSubHeader}
-                              <td
-                                class:cell-edit-activator={cellEditorIndexHeader == indexSubHeader && cellEditorIndexRow == indexSubItem && cellEditorSubItem}
-                                class:hover-cell={cellEdit && !loading && !!subHeader.cellEditorInfo}
-                                on:click={(e) => {
-                                  handleCellClick(
-                                    e,
-                                    subItem,
-                                    subHeader.cellEditorInfo,
-                                    subItem[subHeader.value],
-                                    indexSubItem,
-                                    indexSubHeader,
-                                    true
-                                  );
-                                }}
-                              >
+                              <td>
                                 {#if subHeader.type.key == "custom"}
                                   <slot
                                     name="custom-subheader"
