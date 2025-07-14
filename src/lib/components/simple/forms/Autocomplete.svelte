@@ -125,7 +125,7 @@
     maxWidth = undefined,
     minWidth = "200px",
     openingId = $bindable("autocomplete-menu"),
-    searchText = $bindable(undefined),
+    searchText = $bindable(),
     maxVisibleChips = undefined,
     menuOpened = $bindable(false),
     closeOnSelect = !multiple,

@@ -39,7 +39,7 @@
 
   let {
     items = [],
-    values = [],
+    values = $bindable(),
     multiple = false,
     searcher,
     placeholder,
@@ -47,9 +47,9 @@
     debounceTimeout = 500,
     searching = false,
     search = false,
-    searchText,
+    searchText = $bindable(),
     maxVisibleChips,
-    menuOpened = false,
+    menuOpened = $bindable(false),
     mobileDrawer = false,
     closeOnSelect = false,
     disabled = false,
