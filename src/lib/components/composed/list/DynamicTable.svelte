@@ -1,4 +1,4 @@
-<script lang="ts" generics="Item extends {[key: string]: any}">
+<script lang="ts" generics="Item extends {[key: string]: any}, SubItem extends {[key: string]: any}">
   import {
     Checkbox,
     Chip,
@@ -131,9 +131,14 @@
     rowDisableBackgroundColor?: string
   };
 
+  type SubRowItem = SubItem & {
+    disableEdit?: boolean,
+    rowDisableBackgroundColor?: string
+  };
+
   type Row = {
     item: RowItem;
-    subItems: RowItem[];
+    subItems: SubRowItem[];
   };
 
   type MenuStringType = {
@@ -342,17 +347,17 @@
     }]>
     subRowAppendSnippet?: Snippet<[{
       index: number,
-      row?: RowItem
+      row?: SubRowItem
     }]>
     subRowActionsSnippet?: Snippet<[{
       index: number,
-      row?: RowItem
+      row?: SubRowItem
     }]>
     customSubRowSnippet?: Snippet<[{
       index: number,
       columnIndex: number,
       header: Header,
-      row: RowItem
+      row: SubRowItem
     }]>
     customQuickFilterSnippet?: Snippet<[{
       quickFilter: QuickFilter,
@@ -1904,24 +1909,9 @@
                       <tbody>
                         {#each row.subItems as subItem, indexSubItem}
                           <tr
-                            onclick={() => handleRowClick(subItem)}
-                            class:row-activator={cellEditorIndexRow == indexSubItem && cellEditorSubItem}
                           >
                             {#each subHeaders as subHeader, indexSubHeader}
                               <td
-                                class:cell-edit-activator={cellEditorIndexHeader == indexSubHeader && cellEditorIndexRow == indexSubItem && cellEditorSubItem}
-                                class:hover-cell={cellEdit && !loading && !!subHeader.cellEditorInfo}
-                                onclick={(e) => {
-                                  handleCellClick(
-                                    e,
-                                    subItem,
-                                    subHeader.cellEditorInfo,
-                                    subItem[subHeader.value],
-                                    indexSubItem,
-                                    indexSubHeader,
-                                    true
-                                  );
-                                }}
                               >
                                 {#if subHeader.type.key == "custom"}
                                   {@render customSubRowSnippet?.({ index: indexSubItem, columnIndex: indexSubHeader, header: subHeader, row: subItem})}
