@@ -1,78 +1,64 @@
 <script lang="ts">
-  import Pie from './Pie.svelte'
   import {
-    Chart as ChartJS,
-    Title,
+    Chart,
     Tooltip,
-    Legend,
-    LinearScale,
-    PointElement,
-    CategoryScale,
-    ArcElement,
-  } from "chart.js";
-  import type { ComponentProps } from "svelte";
+    type ChartData,
+    type ChartOptions,
+  } from 'chart.js';
+  import type { HTMLCanvasAttributes } from 'svelte/elements';
+  import lodash from 'lodash'
+  import 'chart.js/auto';
+  import 'chartjs-adapter-date-fns';
 
-  ChartJS.register(
-    Title,
-    Tooltip,
-    Legend,
-    ArcElement,
-    LinearScale,
-    PointElement,
-    CategoryScale
-  );
-
-  interface Props {
-    data: {
-      labels: string[];
-      datasets: {
-        label: string;
-        data: number[];
-        backgroundColor?: string[];
-        borderColor?: string;
-        hoverBackgroundColor?: string[];
-        hoverOffset?: number;
-      }[];
-      options?: {
-        title: {
-          display: boolean;
-          text: string;
-        };
-      };
-    };
-    showLegend?: boolean;
-    responsive?: boolean;
-    maintainAspectRatio?: boolean
+  interface Props extends HTMLCanvasAttributes {
+    data: ChartData<'pie', number[], string>;
+    options?: ChartOptions<'pie'>;
+    chart?: Chart;
   }
 
-  let {
-    data = {
-      labels: [],
-      datasets: [],
-      options: {
-        title: {
-          display: false,
-          text: "",
-        },
-      },
-    },
-    responsive = true,
-    maintainAspectRatio = false,
-    showLegend = true
+  let { 
+    data = $bindable(),
+    options: userOptions = $bindable(),
+    chart = $bindable(),
+    ...rest 
   }: Props = $props();
 
-  let chartOptions: ComponentProps<typeof Pie>['options'] = $derived({
-    responsive,
-    maintainAspectRatio,
+  const defaultOptions: ChartOptions<'pie'> = {
+    responsive: true, //responsive
+    maintainAspectRatio: false, //maintainAspectRatio
     plugins: {
       legend: {
-        display: showLegend
+        display: true //showLegend
       }
     }
-  })
+  }
+
+  let options: ChartOptions<'pie'> = $derived(
+    lodash.clone(lodash.merge(defaultOptions, userOptions))
+  )
+
+  Chart.register(Tooltip);
+
+  let canvasElem: HTMLCanvasElement;
+
+  $effect(() => {
+    chart = new Chart(canvasElem, {
+      type: 'pie',
+      data: data,
+      options,
+    });
+
+    return () => {
+      chart?.destroy();
+    };
+  });
+
+  $effect(() => {
+    if (chart) {
+      chart.data = data;
+      chart.update();
+    }
+  });
 </script>
 
-<Pie 
-  bind:data 
-  options={chartOptions}
-></Pie>
+<canvas bind:this={canvasElem} {...rest}></canvas>
