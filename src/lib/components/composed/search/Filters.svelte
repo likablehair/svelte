@@ -42,6 +42,7 @@
     falseString?: string;
     editFilterMode?: 'one-edit' | 'multi-edit';
     labelsMapper?: LabelMapper;
+    drawerSpace?: string
     onaddFilterClick?: () => void
     onapplyFilter?: () => void
     onremoveAllFilters?: () => void
@@ -103,6 +104,7 @@
           between: { short: 'compreso', extended: 'è compreso tra' },
           different: { short: 'diverso', extended: 'diverso da' }
         },
+    drawerSpace = '20rem',
     onaddFilterClick,
     onapplyFilter,
     onremoveAllFilters,
@@ -554,7 +556,7 @@
         position="bottom"
         onclose={() => {closeFilterMenu(200)}}
         _borderRadius="20px 20px 0px 0px"
-        _margin="5px 5px 0px 5px"
+        _space={drawerSpace}
       >
         <div class="drawer-content">
           {#if editFilterMode === 'one-edit'}
@@ -1059,6 +1061,12 @@
 
   .hidden {
     display: none;
+  }
+
+  .header {
+    font-weight: 600;
+    font-size: 1.5rem;
+    padding: 0 0 8px 8px;
   }
 
 </style>

@@ -256,6 +256,7 @@
               mobileDrawer={mobile}
               onchange={handleChangeValue}
               placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
+              minWidth={''}
               ></Autocomplete>
           </div>
         {:else if tmpFilter.type === "select" && (tmpFilter.view === 'toggle')}
