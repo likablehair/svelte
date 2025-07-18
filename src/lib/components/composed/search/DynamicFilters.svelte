@@ -131,8 +131,8 @@
 </script>
 
 <MediaQuery>
-	{#snippet defaultSnippet({ mAndDown})}
-		<div class="custom-filters-container {mAndDown ? 'mobile' : 'desktop'}" class:yscroll={mAndDown}>
+	{#snippet defaultSnippet({ mAndDown:internalMAndDown })}
+		<div class="custom-filters-container {internalMAndDown ? 'mobile' : 'desktop'}" class:yscroll={mAndDown}>
 			<div class="filters-selection">
 				{#each filters as filter}
 					<div
@@ -153,7 +153,7 @@
 			
 			<div class="filters-content">
 				{#if selectedFilter}
-					<div class="filters-content-box {mAndDown ? 'mobile' : 'desktop'}">
+					<div class="filters-content-box {internalMAndDown ? 'mobile' : 'desktop'}">
 						<h2>{selectedFilter.label}</h2>	
 						{#key selectedFilter.label}			
 							<FilterEditor

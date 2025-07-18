@@ -2676,7 +2676,10 @@
     white-space: nowrap;
     padding-bottom: 4px;
     gap: 8px;
-    scrollbar-width: thin;
+  }
+
+  .quick-filters::-webkit-scrollbar:horizontal {
+    height: 12px;
   }
 
   .quick-filters-results-container {
