@@ -63,10 +63,9 @@
 
 
 <style>
-  @media (max-width: 768px){
-  	.button-container {
-      flex-direction: column-reverse;
-    }
+  .button-container {
+    display: flex;
+    flex-direction: column-reverse;
   }
 
   @media (min-width: 769px){
@@ -74,6 +73,7 @@
       justify-content: end;
       align-items: center;
       gap: 15px;
+      flex-direction: row;
     }
   }
 
@@ -92,10 +92,6 @@
 
   .text-button:hover {
     cursor: pointer;
-  }
-
-  .button-container {
-    display: flex;
   }
 
   .link-button-container {
