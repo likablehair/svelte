@@ -31,7 +31,10 @@
     }]>
     fileListSnippet?: Snippet<[{
       files: File[]
-    }]>
+      previewFiles: boolean
+      fileActive: File | null
+    }]>,
+    previewFiles?: boolean
   }
 
   let {
@@ -50,6 +53,7 @@
     bodySnippet: bodyOuterSnippet,
     messageSnippet,
     fileListSnippet,
+    previewFiles = false
   }: Props = $props();
 
   let fileActive: File | null = $state(null);
@@ -70,7 +74,7 @@
 
   function handleRemove(file: File) {
     files = files?.filter((elem) => {
-      return elem != file;
+      return elem !== file;
     });
 
     if(onfileChange){
@@ -109,6 +113,18 @@
       onfileSelect()
     }
   }
+
+  function isImageFile(file: File): boolean {
+    if (file.type.startsWith('image/') && (
+      file.type.endsWith("/jpg") 
+      || file.type.endsWith("/png")
+      || file.type.endsWith("/jpeg")
+      || file.type.endsWith("/webp")
+    )) {
+      return true
+    }
+    return false
+  }
 </script>
 
 <div class="card-container {clazz}">
@@ -136,58 +152,107 @@
           style:display="flex"
         >
           <div class="body-container" class:{active}>
-            {#if files?.length == 0}
+            {#if !files || files.length === 0}
               {#if messageSnippet}
                 {@render messageSnippet({ message })}
               {:else}
-                <span>{message}</span>
+                <span class="message-text">{message}</span>
               {/if}
             {:else}
-              {#if fileListSnippet}
-                {@render fileListSnippet({ files: files || [] })}
-              {:else}
-                <table class="file-list">
-                  <tbody>
-                    {#each (files || []) as file}
-                      <tr
-                        onclick={(e) => {
-                          e.stopPropagation()
-                          handleFileClick(file);
-                        }}
-                        onmouseenter={(e) => {
-                          e.stopPropagation()
-                          handleFileMouseEnter(file);
-                        }}
-                        onmouseleave={(e) => {
-                          e.stopPropagation()
-                          handleFileMouseLeave();
-                        }}
-                        class:file-active={fileActive == file}
-                      >
-                        <td>
-                          <Icon name={icon} />
-                        </td>
-                        <td class="file-name">
-                          {file.name}
-                        </td>
-                        <td>
-                          {file.size}
-                        </td>
-                        <td style:width="10%" style:margin-right="10px">
-                          <Button
-                            buttonType="text"
-                            icon="mdi-close"
+              <div class="file-container {previewFiles ? 'grid-mode' : ''}">
+                {#if fileListSnippet}
+                  {@render fileListSnippet({ files: files || [], previewFiles, fileActive })}
+                {:else}
+                  {#if previewFiles}
+                    <div class="preview-grid">
+                      {#each files as file (file.name)}
+                        <div
+                          class="preview-item"
+                          role="button"
+                          tabindex="0"
+                          draggable="false"
+                          ondragstart={(e) => e.preventDefault()}
+                          onclick={(e) => {
+                            e.stopPropagation();
+                            handleFileClick(file);
+                          }}
+                          onkeydown={(e) => {
+                            e.stopPropagation();
+                            if (e.key === 'Enter' || e.key === ' ') handleFileClick(file);
+                          }}
+                          onmouseenter={(e) => {
+                            e.stopPropagation();
+                            handleFileMouseEnter(file);
+                          }}
+                          onmouseleave={(e) => {
+                            e.stopPropagation();
+                            handleFileMouseLeave();
+                          }}
+                          class:file-active={fileActive === file}
+                        >
+                          {#if isImageFile(file)}
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt={file.name}
+                              class="preview-img"
+                              draggable="false"
+                            />
+                          {:else}
+                            <div class="preview-file">
+                              <Icon name={icon} />
+                              {#if file.name.length > 40}
+                                <span class="file-name-preview">{file.name.slice(0, 40)}...</span>
+                              {:else}
+                                <span class="file-name-preview">{file.name}</span>
+                              {/if}
+                            </div>
+                          {/if}
+                          <button
+                            type="button"
+                            class="preview-remove"
                             onclick={(e) => {
-                              e.detail.nativeEvent.stopPropagation();
+                              e.stopPropagation();
                               handleRemove(file);
                             }}
-                          />
-                        </td>
-                      </tr>
-                    {/each}
-                  </tbody>
-                </table>
-              {/if}
+                            aria-label="Remove {file.name}"
+                            style:height="24px"
+                            style:width="24px"
+                          >
+                            <Icon name="mdi-close" --icon-container-height="16px" --icon-container-width="16px" />
+                          </button>
+                        </div>
+                      {/each}
+                    </div>
+                  {:else}
+                    <table class="file-list">
+                      <tbody>
+                        {#each files as file}
+                          <tr
+                            onclick={(e) => { e.stopPropagation(); handleFileClick(file); }}
+                            onmouseenter={(e) => { e.stopPropagation(); handleFileMouseEnter(file); }}
+                            onmouseleave={(e) => { e.stopPropagation(); handleFileMouseLeave(); }}
+                            class:file-active={fileActive === file}
+                          >
+                            <td><Icon name={icon} /></td>
+                            <td class="file-name">{file.name}</td>
+                            <td>{file.size}</td>
+                            <td style="width: 10%; margin-right: 10px;">
+                              <Button
+                                buttonType="text"
+                                icon="mdi-close"
+                                onclick={(e) => {
+                                  e.detail.nativeEvent.stopPropagation();
+                                  handleRemove(file);
+                                }}
+                              />
+                            </td>
+                          </tr>
+                        {/each}
+                      </tbody>
+                    </table>
+                  {/if}
+                {/if}
+              </div>
             {/if}
           </div>
         </span>
@@ -197,11 +262,6 @@
 </div>
 
 <style>
-  .body-span {
-    height: 100px;
-    width: 100%;
-    display: flex;
-  }
   .card-container {
     display: flex;
     justify-content: center;
@@ -213,8 +273,11 @@
       --file-input-list-border-color,
       var(--file-input-list-default-border-color)
     );
-    height: var(--file-input-list-height,var(--file-input-list-default-height));
-    width: var(--file-input-list-background-width,var(--file-input-list-default-width));
+    height: var(--file-input-list-height, var(--file-input-list-default-height));
+    width: var(
+      --file-input-list-width,
+      var(--file-input-list-default-width)
+    );
   }
 
   .card-container:hover {
@@ -246,7 +309,7 @@
     overflow-y: auto;
   }
 
-  .active {
+  .body-container.active {
     border-color: var(
       --file-input-list-selected-row-background,
       var(--file-input-list-default-selected-row-background)
@@ -256,7 +319,25 @@
       var(--file-input-list-default-selected-row-color)
     );
   }
-  .file-active {
+
+  .file-container {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    position: relative;
+  }
+
+  .file-container:not(.grid-mode) .file-list {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+  }
+
+  .file-container:not(.grid-mode) .file-list tr {
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  .file-container:not(.grid-mode) .file-list tr.file-active {
     color: var(
       --file-input-list-selected-row-color,
       var(--file-input-list-default-selected-row-color)
@@ -266,16 +347,105 @@
       var(--file-input-list-default-selected-row-background)
     );
   }
-  .file-list {
-    width: 100%;
-    table-layout: fixed;
-    position: absolute;
-    top: 0;
-    right: 0;
-    border-collapse: collapse;
-  }
+
   .file-name {
     width: 40%;
     overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* --- preview grid --- */
+  .file-container.grid-mode {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow-y: auto;
+  }
+
+  .preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .preview-item {
+    position: relative;
+    cursor: pointer;
+    border-radius: 4px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  .preview-item:hover,
+  .preview-item:focus,
+  .preview-item.file-active {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .preview-img {
+    display: block;
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+  }
+
+  .preview-file {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 120px;
+    padding: 0.5rem;
+    background: rgb(var(--global-color-background-600));
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  .file-name-preview {
+    font-size: 0.75rem;
+    text-align: center;
+    word-break: break-word;
+    margin-top: 0.5rem;
+    line-height: 1.2;
+    max-height: 2.4rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+  }
+
+  .preview-remove {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(51, 51, 51, 0.6);
+    border: none;
+    border-radius: 50%;
+    padding: 4px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .preview-remove:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  /* Messaggio centrale quando non ci sono file */
+  .message-slot {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .message-text {
+    text-align: center;
+    font-size: 1rem;
   }
 </style>
