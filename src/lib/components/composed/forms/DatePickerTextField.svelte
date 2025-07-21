@@ -1,5 +1,5 @@
 <script lang="ts">
-  import IMask, { InputMask } from 'imask';
+  import IMask, { type InputMask } from 'imask';
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
   import DatePicker from "$lib/components/simple/dates/DatePicker.svelte";
   import Menu from "$lib/components/simple/common/Menu.svelte";

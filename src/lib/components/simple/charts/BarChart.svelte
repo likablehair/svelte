@@ -1,203 +1,161 @@
 <script lang="ts">
-  import Bar from './Bar.svelte';
-  import { theme } from '$lib';
   import {
-    Chart as ChartJS,
-    Title,
+    Chart,
     Tooltip,
-    Legend,
-    LineElement,
-    LinearScale,
-    PointElement,
-    CategoryScale,
-    BarElement,
+    type ChartData,
+    type ChartOptions,
   } from 'chart.js';
-  import { type ComponentProps } from 'svelte';
+  import type { HTMLCanvasAttributes } from 'svelte/elements';
+  import 'chart.js/auto';
+  import 'chartjs-adapter-date-fns';
+  import lodash from 'lodash'
 
-  ChartJS.register(
-    Title,
-    Tooltip,
-    Legend,
-    LineElement,
-    BarElement,
-    LinearScale,
-    PointElement,
-    CategoryScale,
-  );
-
-  type TooltipLabelParameter = Parameters<NonNullable<NonNullable<NonNullable<NonNullable<NonNullable<ComponentProps<typeof Bar>['options']>['plugins']>['tooltip']>['callbacks']>['label']>>[0]
-
-  interface Props {
-    data?: {
-      labels: string[];
-      datasets: {
-        label: string,
-        data: number[],
-        backgroundColor?: string,
-        borderColor?: string,
-        hoverBackgroundColor?: string[]
-        tension?: number,
-      }[];
-    };
-    horizontal?: boolean;
-    responsive?: boolean;
-    maintainAspectRatio?: boolean;
-    showLegend?: boolean;
-    showYTicks?: boolean;
-    showXTicks?: boolean;
-    displayYGrid?: boolean;
-    lineWidth?: number;
-    enableZoom?: boolean;
-    resetZoom?: boolean;
-    tooltipLabel?: (tooltip: TooltipLabelParameter) => string;
-    yTickLabel?: (tickValue: string | number, index: number, ticks: any[]) => string | number;
-    xTickLabel?: (tickValue: string | number, index: number, ticks: any[]) => string | number;
-    xTickStepSize?: number;
-    yTickStepSize?: number;
-    xMax?: number;
-    yMax?: number;
-    rgbTooltipColor?: string;
-    rgbTooltipBackgroundColor?: string;
-    rgbBackgroundColor?: string;
-    width?: string | number;
-    height?: string | number;
+  interface Props extends HTMLCanvasAttributes {
+    data: ChartData<'bar', number[], string>
+    options?: ChartOptions<'bar'>
+    resetZoom?: boolean
   }
 
-  let {
-    data = { labels: [], datasets: [] },
-    horizontal = false,
-    responsive = true,
-    maintainAspectRatio = true,
-    showLegend = true,
-    showYTicks = false,
-    showXTicks = false,
-    displayYGrid = true,
-    lineWidth = 1,
-    enableZoom = true,
-    resetZoom = $bindable(false),
-    tooltipLabel = undefined,
-    yTickLabel = undefined,
-    xTickLabel = undefined,
-    xTickStepSize = undefined,
-    yTickStepSize = undefined,
-    xMax = undefined,
-    yMax = undefined,
-    rgbTooltipColor = undefined,
-    rgbTooltipBackgroundColor = undefined,
-    rgbBackgroundColor = undefined,
-    width = undefined,
-    height = undefined,
+  let { 
+    data,
+    options: userOptions,
+    resetZoom = $bindable(),
+    ...rest 
   }: Props = $props();
 
-
-  $effect(() => {
-    if(!rgbTooltipColor && !!$theme.colors?.[$theme.active]['dark']['primary']['300']) 
-      rgbTooltipColor = $theme.colors?.[$theme.active]['dark']['primary']['300']
-  })
-
-  $effect(() => {
-    if(!rgbTooltipBackgroundColor && !!$theme.colors?.[$theme.active]['dark']['primary']['900']) 
-      rgbTooltipBackgroundColor = $theme.colors?.[$theme.active]['dark']['primary']['900']
-  })
-
-  $effect(() => {
-    if(!rgbBackgroundColor && !!$theme.colors?.[$theme.active]['dark']['background']['200']) 
-      rgbBackgroundColor = $theme.colors?.[$theme.active]['dark']['background']['200']
-  })
-
-  let finalTooltipColor = $derived(!!rgbTooltipColor ? `rgb(${rgbTooltipColor})` : undefined)
-  let finalTooltipBackgroundColor = $derived(!!rgbTooltipBackgroundColor ? `rgb(${rgbTooltipBackgroundColor})` : undefined)
-  let finalBackgroundColor = $derived(!!rgbBackgroundColor ? `rgb(${rgbBackgroundColor}, .3)` : undefined)  
-
-  let chartOptions: ComponentProps<typeof Bar>['options'] = $derived({
-      barPercentage: 0.9,
-      borderRadius: 2,
-      categoryPercentage: 0.3,
-      indexAxis: horizontal ? 'y' : 'x',
-      responsive: responsive,
-      maintainAspectRatio: maintainAspectRatio,
-      plugins: {
-        tooltip: {
-          displayColors: false,
-          titleColor: finalTooltipColor,
-          backgroundColor: finalTooltipBackgroundColor,
-          titleFont: {
-            size: 14
-          },
-          bodyFont: {
-            size: 14,
-            weight: "bold"
-          },
-          callbacks: {
-            label: tooltipLabel
-          }
+  const defaultOptions: ChartOptions<'bar'> = {
+    bar: {
+      datasets: {
+        barPercentage: 0.9,
+        borderRadius: 2,
+        categoryPercentage: 0.3
+      }
+    },
+    indexAxis: 'x', //horizontal ? 'y' : 'x'
+    responsive: true, //responsive
+    maintainAspectRatio: true,  //maintainAspectRatio 
+    plugins: {
+      tooltip: {
+        displayColors: false,
+        titleColor: undefined,  //`rgb(${rgbTooltipColor})`
+        backgroundColor: undefined,  //`rgb(${rgbTooltipBackgroundColor})`
+        titleFont: {
+          size: 14
         },
-        legend: {
-          display: showLegend
+        bodyFont: {
+          size: 14,
+          weight: "bold"
+        },
+        callbacks: {
+          label: undefined  //tooltipLabel
+        }
+      },
+      legend: {
+        display: true //showLegend
+      },
+      zoom: {
+        pan: {
+          enabled: true,  //enableZoom
+          mode: 'x',
+          modifierKey: 'ctrl',
         },
         zoom: {
-          pan: {
-            enabled: enableZoom,
-            mode: 'x',
-            modifierKey: 'ctrl',
+          drag: {
+            enabled: true //enableZoom
           },
-          zoom: {
-            drag: {
-              enabled: enableZoom
-            },
-            mode: 'x',
-          },
+          mode: 'x',
+        },
+      }
+    },
+    interaction: {
+      intersect: false,
+    },
+    scales: {
+      x: {
+        max: undefined, //xMax 
+        display: true,
+        title: {
+          display: true
+        },
+        grid: {
+          display: false
+        },
+        border: {
+          display: false
+        },
+        ticks: {
+          display: false, //showXTicks
+          callback: undefined,  //xTickLabel
+          stepSize: undefined //xTickStepSize
         }
       },
-      interaction: {
-        intersect: false,
-      },
-      scales: {
-        x: {
-          max: xMax,
-          display: true,
-          title: {
-            display: true
-          },
-          grid: {
-            display: false
-          },
-          border: {
-            display: false
-          },
-          ticks: {
-            display: showXTicks,
-            callback: xTickLabel,
-            stepSize: xTickStepSize
-          }
+      y: {
+        max: undefined, //yMax
+        display: true,  //displayYGrid
+        title: {
         },
-        y: {
-          max: yMax,
-          display: displayYGrid,
-          title: {
-          },
-          grid: {
-            lineWidth: lineWidth,
-            color: finalBackgroundColor
-          },
-          border: {
-            dash: [10,10],
-            display: false
-          },
-          ticks: {
-            display: showYTicks,
-            callback: yTickLabel,
-            stepSize: yTickStepSize
-          }
+        grid: {
+          lineWidth: 1, //lineWidth
+          color: undefined,  //`rgb(${rgbBackgroundColor}, .3)`
+        },
+        border: {
+          dash: [10,10],
+          display: false
+        },
+        ticks: {
+          display: false, //showYTicks
+          callback: undefined,  //yTickLabel
+          stepSize: undefined //yTickStepSize
         }
       }
+    }
+  }
+
+  let options: ChartOptions<'bar'> = $derived(
+    lodash.clone(lodash.merge(defaultOptions, userOptions))
+  )
+
+  Chart.register(Tooltip);
+
+  let canvasElem: HTMLCanvasElement,
+    chart: Chart;
+
+  $effect(() => {
+    import("chartjs-plugin-zoom").then(({ default: zoomPlugin}) => {
+      Chart.register(zoomPlugin)
+      setTimeout(() => {
+        if(!!chart.resetZoom)
+          chart.resetZoom()
+      }, 40);
     })
+
+    chart = new Chart(canvasElem, {
+      type: 'bar',
+      data,
+      options,
+    })
+
+    return () => {
+      chart.destroy();
+    };
+  });
+
+  $effect(() => {
+    if (chart) {
+      chart.data = data;
+      chart.update();
+    }
+  });
+
+  $effect(() => {
+    if(!!chart && !!resetZoom && !!chart.resetZoom) {
+      setTimeout(() => {
+        if(!!chart.resetZoom)
+          chart.resetZoom()
+          resetZoom = false
+      }, 40);
+    }
+  });
 </script>
 
-<Bar
-  data={data}
-  bind:resetZoom
-  options={chartOptions}
-  width={width}
-  height={height}
-></Bar>
+<canvas bind:this={canvasElem} {...rest}></canvas>

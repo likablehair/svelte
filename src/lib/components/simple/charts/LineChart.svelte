@@ -1,183 +1,149 @@
 <script lang="ts">
-  import Line from './Line.svelte';
   import {
-    Chart as ChartJS,
-    Title,
+    Chart,
     Tooltip,
-    Legend,
-    LineElement,
-    LinearScale,
-    PointElement,
-    CategoryScale,
+    type ChartData,
+    type ChartOptions,
   } from 'chart.js';
-  import { onMount, type ComponentProps } from 'svelte';
+  import type { HTMLCanvasAttributes } from 'svelte/elements';
+  import lodash from 'lodash'
+  import 'chart.js/auto';
+  import 'chartjs-adapter-date-fns';
 
-  ChartJS.register(
-    Title,
-    Tooltip,
-    Legend,
-    LineElement,
-    LinearScale,
-    PointElement,
-    CategoryScale
-  );
-
-  let background: string | undefined = undefined,
-    mounted: boolean = false
-
-  onMount(async () => {
-    let style = getComputedStyle(document.body);
-    background = style.getPropertyValue('--global-color-background-200');
-    mounted = true
-  })
-
-  interface Props {
-    data: {
-      labels: string[];
-      datasets: {
-        label: string;
-        data: (number | null)[];
-        backgroundColor?: string;
-        borderColor?: string;
-        hoverBackgroundColor?: string[];
-        tension?: number;
-        spanGaps?: boolean | number | undefined;
-      }[];
-    };
-    horizontal?: boolean;
-    responsive?: boolean;
-    maintainAspectRatio?: boolean;
-    showLegend?: boolean;
-    showYTicks?: boolean;
-    showXTicks?: boolean;
-    displayYGrid?: boolean;
-    displayXGrid?: boolean;
-    gridLineWidth?: number;
-    lineWidth?: number;
-    enableZoom?: boolean;
-    resetZoom?: boolean;
-    xTickStepSize?: number;
-    yTickStepSize?: number;
-    xMax?: number;
-    yMax?: number;
-    xMin?: number;
-    yMin?: number;
-    pointRadius?: number;
-    hitRadius?: number;
-    hoverRadius?: number;
-    tooltipsDisabled?: boolean;
+  interface Props extends HTMLCanvasAttributes {
+    data: ChartData<'line', number[], string>
+    options: ChartOptions<'line'>
+    resetZoom?: boolean
   }
 
-  let {
-    data = { labels: [], datasets: [] },
-    horizontal = false,
-    responsive = true,
-    maintainAspectRatio = true,
-    showLegend = true,
-    showYTicks = false,
-    showXTicks = false,
-    displayYGrid = true,
-    displayXGrid = true,
-    gridLineWidth = 1,
-    lineWidth = 3,
-    enableZoom = false,
-    resetZoom = $bindable(false),
-    xTickStepSize = undefined,
-    yTickStepSize = undefined,
-    xMax = undefined,
-    yMax = undefined,
-    xMin = undefined,
-    yMin = undefined,
-    pointRadius = undefined,
-    hitRadius = undefined,
-    hoverRadius = undefined,
-    tooltipsDisabled = false,
+  let { 
+    data,
+    options: userOptions = $bindable(),
+    resetZoom = $bindable(),
+    ...rest 
   }: Props = $props();
 
-  let gridColor = $derived('rgb(' + (background || '200, 200, 200') + ', .3)')
-
-  let chartOptions: ComponentProps<typeof Line>['options'] = $derived({
-      indexAxis: horizontal ? 'y' : 'x',
-      responsive: responsive,
-      maintainAspectRatio: maintainAspectRatio,
-      elements: {
-        line: {
-          borderWidth: lineWidth
-        },
-        point: {
-          radius: pointRadius,
-          hitRadius: hitRadius,
-          hoverRadius: hoverRadius
-        }
+  const defaultOptions: ChartOptions<'line'> = {
+    indexAxis: 'x', //horizontal ? 'y' : 'x'
+    responsive: true, //responsive
+    maintainAspectRatio: true,  //maintainAspectRatio
+    elements: {
+      line: {
+        borderWidth: 3  //lineWidth
       },
-      plugins: {
-        legend: {
-          display: showLegend
+      point: {
+        radius: undefined,  //pointRadius
+        hitRadius: undefined, //hitRadius
+        hoverRadius: undefined  //hoverRadius
+      }
+    },
+    plugins: {
+      legend: {
+        display: true //showLegend
+      },
+      zoom: {
+        pan: {
+          enabled: true, //enableZoom
+          mode: 'x',
+          modifierKey: 'ctrl',
         },
         zoom: {
-          pan: {
-            enabled: enableZoom,
-            mode: 'x',
-            modifierKey: 'ctrl',
+          drag: {
+            enabled: true //enableZoom
           },
-          zoom: {
-            drag: {
-              enabled: enableZoom
-            },
-            mode: 'x',
-          },
+          mode: 'x',
         },
-        tooltip: {
-          enabled: !tooltipsDisabled
+      },
+      tooltip: {
+        enabled: true //!tooltipsDisabled
+      }
+    },
+    interaction: {
+      intersect: false,
+    },
+    scales: {
+      x: {
+        max: undefined, //xMax
+        min: undefined, //xMin
+        display: true,  //displayXGrid
+        title: {
+          display: true
+        },
+        grid: {
+          display: false
+        },
+        border: {
+          display: false
+        },
+        ticks: {
+          display: false, //showYTicks
+          stepSize: undefined //yTickStepSize
         }
       },
-      interaction: {
-        intersect: false,
-      },
-      scales: {
-        x: {
-          max: xMax,
-          min: xMin,
-          display: displayXGrid,
-          title: {
-            display: true
-          },
-          grid: {
-            display: false
-          },
-          border: {
-            display: false
-          },
-          ticks: {
-            display: showYTicks,
-            stepSize: yTickStepSize
-          }
+      y: {
+        max: undefined, //yMax
+        min: undefined, //yMin
+        display: true,  //displayYGrid
+        title: {
         },
-        y: {
-          max: yMax,
-          min: yMin,
-          display: displayYGrid,
-          title: {
-          },
-          grid: {
-            lineWidth: gridLineWidth,
-            color: gridColor
-          },
-          border: {
-            dash: [10,10],
-            display: false
-          },
-          ticks: {
-            display: showXTicks,
-            stepSize: xTickStepSize
-          }
+        grid: {
+          lineWidth: 1, //gridLineWidth
+          color: undefined, //'rgb(' + (style.getPropertyValue('--global-color-background-200') || '200, 200, 200') + ', .3)'
+        },
+        border: {
+          dash: [10,10],
+          display: false
+        },
+        ticks: {
+          display: false, //showXTicks
+          stepSize: undefined //xTickStepSize
         }
       }
+    }
+  }
+
+  let options: ChartOptions<'line'> = $derived(
+    lodash.clone(lodash.merge(defaultOptions, userOptions))
+  )
+
+  Chart.register(Tooltip);
+
+  let canvasElem: HTMLCanvasElement,
+    chart: Chart;
+
+  $effect(() => {
+    import('chartjs-plugin-zoom').then(({ default: zoomPlugin }) => {
+      Chart.register(zoomPlugin)
+      setTimeout(() => {
+        if(!!chart.resetZoom)
+          chart.resetZoom()
+      }, 40);
     })
+
+    chart = new Chart(canvasElem, {
+      type: 'line',
+      data,
+      options,
+    })
+
+    return () => {
+      chart.destroy();
+    };
+  });
+
+  $effect(() => {
+    if (chart) {
+      chart.data = data;
+      chart.update();
+    }
+  });
+
+  $effect(() => {
+    if(!!chart && !!resetZoom) {
+      chart.resetZoom()
+      resetZoom = false
+    }
+  });
 </script>
 
-<Line 
-  data={(data as ComponentProps<typeof Line>['data'])}
-  options={chartOptions}
-  bind:resetZoom
-></Line>
+<canvas bind:this={canvasElem} {...rest}></canvas>

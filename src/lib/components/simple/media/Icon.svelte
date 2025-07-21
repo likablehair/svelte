@@ -5,7 +5,7 @@
     name: string;
     tabindex?: number | null;
     class?: string
-    onclick?: (event?: KeyboardEvent & { currentTarget: EventTarget & HTMLSpanElement; }) => void
+    onclick?: (event?: (KeyboardEvent | MouseEvent) & { currentTarget: EventTarget & HTMLSpanElement; }) => void
   }
 
   let {
@@ -15,7 +15,7 @@
     tabindex = !!onclick ? 0 : undefined,
   }: Props = $props();
 
-  function handleIconClick(e?: KeyboardEvent & { currentTarget: EventTarget & HTMLSpanElement; }) {
+  function handleIconClick(e: (KeyboardEvent | MouseEvent) & { currentTarget: EventTarget & HTMLSpanElement; }) {
     if(onclick) {
       onclick(e)
     }
@@ -24,8 +24,8 @@
 
 <span
   role="button"
-  onclick={() => handleIconClick()}
-  onkeypress={e => handleIconClick(e)}
+  onclick={handleIconClick}
+  onkeypress={handleIconClick}
   class="icon mdi {name} {clazz} {onclick ? 'click' : ''}"
   {tabindex}
 ></span>

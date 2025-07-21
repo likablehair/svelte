@@ -74,9 +74,9 @@
     _maxHeight = undefined,
     _minWidth = undefined,
     _top = undefined,
-    activator = $bindable(undefined),
-    menuElement = $bindable(undefined),
-    openingId = $bindable(undefined),
+    activator = $bindable(),
+    menuElement = $bindable(),
+    openingId = $bindable(),
     onkeydown,
     children,
   }: Props = $props()
@@ -385,7 +385,7 @@
         let controller = document.querySelector(`[data-operation="close"][data-uid="${uid}"]`)
         if(!!controller) {
           const clickEvent = new MouseEvent('click', {
-              bubbles: false,
+              bubbles: true,
               cancelable: true,
               view: window
             })

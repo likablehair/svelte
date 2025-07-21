@@ -1,4 +1,4 @@
-<script lang="ts" generics="Item extends {[key: string]: any}">
+<script lang="ts" generics="Item extends {[key: string]: any} = {[key: string]: any}, SubItem extends {[key: string]: any} = {[key: string]: any}">
   import {
     Checkbox,
     Chip,
@@ -66,7 +66,7 @@
     if(tableContainer){
       resizeObserver.observe(tableContainer);
     }
-    
+
     return () => {
       window.removeEventListener('resize', updateHeaderHeight);
       tableContainer?.removeEventListener("scroll", setReachedBottomOrTop);
@@ -131,9 +131,14 @@
     rowDisableBackgroundColor?: string
   };
 
+  type SubRowItem = SubItem & {
+    disableEdit?: boolean,
+    rowDisableBackgroundColor?: string
+  };
+
   type Row = {
     item: RowItem;
-    subItems: RowItem[];
+    subItems: SubRowItem[];
   };
 
   type MenuStringType = {
@@ -342,17 +347,17 @@
     }]>
     subRowAppendSnippet?: Snippet<[{
       index: number,
-      row?: RowItem
+      row?: SubRowItem
     }]>
     subRowActionsSnippet?: Snippet<[{
       index: number,
-      row?: RowItem
+      row?: SubRowItem
     }]>
     customSubRowSnippet?: Snippet<[{
       index: number,
       columnIndex: number,
       header: Header,
-      row: RowItem
+      row: SubRowItem
     }]>
     customQuickFilterSnippet?: Snippet<[{
       quickFilter: QuickFilter,
@@ -881,7 +886,12 @@
     }
 
     if (dispatchFiltersChange) {
-      quickFilters = quickFilters;
+      quickFilters = quickFilters.map(f => {
+        if (f.title == quickFilter.title) {
+          return { ...quickFilter }
+        }
+        return f
+      });
       handleFiltersChange();
     }
 
@@ -958,8 +968,13 @@
       }
     }
     else {
-      quickFilter.active = true;
-      quickFilters = quickFilters;
+      quickFilter.active = true
+      quickFilters = quickFilters.map(f => {
+        if (f.title == quickFilter.title) {
+          return { ...quickFilter }
+        }
+        return f
+      })
       globalBuilder = quickFilterBuilder(globalBuilder, quickFilter);
   
       handleFiltersChange();
@@ -1375,7 +1390,7 @@
   
   async function updateRemainingWidth() {
     if(tableContainer != null && !!tableContainer && mainHeader) {
-      const containerWidth = tableContainer.getBoundingClientRect().width - 30;
+      const containerWidth = tableContainer.getBoundingClientRect().width - 26;
 
       if(containerWidth){
         const totalResizableWidth = headersToShowInTable.reduce((sum, head) => {
@@ -1441,90 +1456,95 @@
   {/if}
 
   {#if searchBarVisible || filtersVisible || appendSnippet}
-    <div class="filter-container">
-      <div class="search-bar-container">
-        {#if searchBarVisible}
-          {#if searchBarSnippet}
-            {@render searchBarSnippet({ handleSearchChange })}
-          {:else}
-            <div style="margin-right: 20px;">
-              <SimpleTextField
-                placeholder={searchBarPlaceholder}
-                appendInnerIcon="mdi-magnify"
-                bind:value={searchText}
-                bind:input={searchBarInput}
-                onkeydown={handleSearchBoxKeydown}
-                --simple-textfield-default-width="450px"
-                --simple-textfield-border-radius= 0.5rem
-                --simple-textfield-background-color= transparent
-                --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-                --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-              />
-            </div>
-          {/if}
-        {/if}
-  
-        {#if filtersVisible}
-          <div>
-            {#if dynamicFilters}
-              <Filters
-                bind:filters
-                onapplyFilter={() => {
-                  handleSearchChange(searchText);
-                }}
-                onremoveFilter={e => { handleRemoveFilter(e.detail.filter) }}
-                onremoveAllFilters={() => handleRemoveAllFilters()}
-                --filters-default-wrapper-width="100%"
-                {lang}
-                {dateLocale}
-                {editFilterMode}
-                {showActiveFilters}
-                appendSnippet={filterAppendSnippet}
-                customChipSnippet={customFilterChipSnippet}
-              >
-                {#snippet contentSnippet({ filters, mAndDown, updateMultiFilterValues, })}  
-                  {#key filters}
-                    <DynamicFilters
-                      {lang}
-                      {filters}                      
-                      {mAndDown}
-                      onchange={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
-                      {updateMultiFilterValues}
-                    >
-                      {#snippet customSnippet({ filter, mAndDown, updateCustomFilterValues })}
-                        {@render customFilterSnippet?.({ filter, mAndDown, updateCustomFilterValues })}
-                      {/snippet}
-                    </DynamicFilters>
-                  {/key}
-                {/snippet}
-              </Filters>
+    <MediaQuery>
+      {#snippet defaultSnippet({ mAndDown })}
+        <div class="searchbar-and-filter-container {mAndDown ? 'mobile' : 'desktop'}">
+          {#if searchBarVisible}
+            {#if searchBarSnippet}
+              {@render searchBarSnippet({ handleSearchChange })}
             {:else}
-              <Filters
-                bind:filters
-                onapplyFilter={() => {
-                  handleSearchChange(searchText);
-                }}
-                onremoveFilter={e => { handleRemoveFilter(e.detail.filter) }}
-                onremoveAllFilters={() => handleRemoveAllFilters()}
-                --filters-default-wrapper-width="100%"
-                {lang}
-                {dateLocale}
-                {editFilterMode}
-                {showActiveFilters}
-                appendSnippet={filterAppendSnippet}
-                customChipSnippet={customFilterChipSnippet}
-                customSnippet={customFilterSnippet}
-              >
-              </Filters>
+              <div style="margin-right: {mAndDown ? '0px' : '20px'};">
+                <SimpleTextField
+                  placeholder={searchBarPlaceholder}
+                  appendInnerIcon="mdi-magnify"
+                  bind:value={searchText}
+                  bind:input={searchBarInput}
+                  onkeydown={handleSearchBoxKeydown}
+                  --simple-textfield-width={mAndDown ? "100%" : "450px"}
+                  --simple-textfield-border-radius= 0.5rem
+                  --simple-textfield-background-color= transparent
+                  --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+                  --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+                />
+              </div>
             {/if}
+          {/if}
+          
+          <div class="filter-container">
+            {#if filtersVisible}
+              <div>
+                {#if dynamicFilters}
+                  <Filters
+                    bind:filters
+                    onapplyFilter={() => {
+                      handleSearchChange(searchText);
+                    }}
+                    onremoveFilter={e => { handleRemoveFilter(e.detail.filter) }}
+                    onremoveAllFilters={() => handleRemoveAllFilters()}
+                    --filters-default-wrapper-width="100%"
+                    {lang}
+                    {dateLocale}
+                    {editFilterMode}
+                    {showActiveFilters}
+                    drawerSpace='40rem'
+                    appendSnippet={filterAppendSnippet}
+                    customChipSnippet={customFilterChipSnippet}
+                  >
+                    {#snippet contentSnippet({ filters, mAndDown, updateMultiFilterValues, })}  
+                      {#key filters}
+                        <DynamicFilters
+                          {lang}
+                          {filters}                      
+                          {mAndDown}
+                          onchange={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
+                          {updateMultiFilterValues}
+                        >
+                          {#snippet customSnippet({ filter, mAndDown, updateCustomFilterValues })}
+                            {@render customFilterSnippet?.({ filter, mAndDown, updateCustomFilterValues })}
+                          {/snippet}
+                        </DynamicFilters>
+                      {/key}
+                    {/snippet}
+                  </Filters>
+                {:else}
+                  <Filters
+                    bind:filters
+                    onapplyFilter={() => {
+                      handleSearchChange(searchText);
+                    }}
+                    onremoveFilter={e => { handleRemoveFilter(e.detail.filter) }}
+                    onremoveAllFilters={() => handleRemoveAllFilters()}
+                    --filters-default-wrapper-width="100%"
+                    {lang}
+                    {dateLocale}
+                    {editFilterMode}
+                    {showActiveFilters}
+                    appendSnippet={filterAppendSnippet}
+                    customChipSnippet={customFilterChipSnippet}
+                    customSnippet={customFilterSnippet}
+                  >
+                  </Filters>
+                {/if}
+              </div>
+            {/if}
+  
+            <div>
+              {@render appendSnippet?.()}
+            </div>
           </div>
-        {/if}
-      </div>
-
-      <div>
-        {@render appendSnippet?.()}
-      </div>
-    </div>
+        </div>
+      {/snippet}
+    </MediaQuery>
   {/if}
 
   {#if quickFiltersVisible || numberOfResultsVisible}
@@ -1687,7 +1707,7 @@
               bind:this={headersHTML['customize-headers']}
             >
               {#if customizeHeaders}
-                <div style="display: flex; justify-content: center;">
+                <div style="display: flex; justify-content: start;">
                   <Icon
                     name="mdi-plus-circle-outline"
                     onclick={() => (openHeaderDrawer = true)}
@@ -1734,6 +1754,7 @@
           {#each renderedRows as row, indexRow}
             <tr
               class="item-row"
+              class:pointer={!!onrowClick}
               data-key={row.item[uniqueKey]}
               style:background-color={
                 !!row.item.disableEdit
@@ -1893,24 +1914,9 @@
                       <tbody>
                         {#each row.subItems as subItem, indexSubItem}
                           <tr
-                            onclick={() => handleRowClick(subItem)}
-                            class:row-activator={cellEditorIndexRow == indexSubItem && cellEditorSubItem}
                           >
                             {#each subHeaders as subHeader, indexSubHeader}
                               <td
-                                class:cell-edit-activator={cellEditorIndexHeader == indexSubHeader && cellEditorIndexRow == indexSubItem && cellEditorSubItem}
-                                class:hover-cell={cellEdit && !loading && !!subHeader.cellEditorInfo}
-                                onclick={(e) => {
-                                  handleCellClick(
-                                    e,
-                                    subItem,
-                                    subHeader.cellEditorInfo,
-                                    subItem[subHeader.value],
-                                    indexSubItem,
-                                    indexSubHeader,
-                                    true
-                                  );
-                                }}
                               >
                                 {#if subHeader.type.key == "custom"}
                                   {@render customSubRowSnippet?.({ index: indexSubItem, columnIndex: indexSubHeader, header: subHeader, row: subItem})}
@@ -2236,6 +2242,9 @@
             />
           </div>
         {:else if quickFilterActive.type.key === "date"}
+          <div style="font-weight: 500; margin-bottom: 8px;">
+            {quickFilterActive.title}
+          </div>
           <div onclick={e => e.stopPropagation()} role="presentation" tabindex="-1">
             <div>
               <DatePickerTextField
@@ -2298,10 +2307,7 @@
       </div>
 
       {#if quickFilterActive.type.key != "boolean"}
-        <div style:margin-top="10px" style:grid-row="2" style:grid-column="1 / 3">
-          <Divider --divider-color=rgb(var(--global-color-contrast-100)) />
-        </div>
-        <div style:grid-row="3" style:grid-column="2" style:margin-top="-15px">
+        <div style:grid-row="3" style:grid-column="2" style:margin-top="-10px">
           <ConfirmOrCancelButtons
             confirmDisable={saveEditDisabled}
             confirmText={lang == 'en' ? "Apply" : 'Applica'}
@@ -2646,22 +2652,44 @@
     flex-direction: row;
   }
 
+  .searchbar-and-filter-container {
+    display: flex;
+    margin-bottom: 16px;
+  }
+  
+  .searchbar-and-filter-container.desktop {
+    flex-direction: row;
+  }
+
+  .searchbar-and-filter-container.mobile {
+    flex-direction: column;
+    gap: 8px;
+  }
+
   .filter-container {
     display: flex;
-    flex-direction: row;
     justify-content: space-between;
-    margin-bottom: 20px;
+    flex-grow: 1;
   }
 
   .quick-filters {
     display: flex;
     flex-direction: row;
-    margin-bottom: 10px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 4px;
+    gap: 8px;
+  }
+
+  .quick-filters::-webkit-scrollbar:horizontal {
+    height: 12px;
   }
 
   .quick-filters-results-container {
     display: flex;
     justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
   }
 
   .vertical-quick-filters {
@@ -2759,6 +2787,7 @@
     display: flex;
     align-items: center;
     gap: 4px;
+    min-width: 90px;
   }
 
   .resizer {
@@ -2772,5 +2801,8 @@
   }
   .filler {
     padding: 0 !important;
+  }
+  .pointer {
+    cursor: pointer;
   }
 </style>

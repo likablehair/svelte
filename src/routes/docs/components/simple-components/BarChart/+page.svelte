@@ -22,25 +22,42 @@
           data: [20, 30, 20, 40, 50, 10, 60, 20, 30, 20, 80, 100],
           backgroundColor: '#0891b2',
           borderColor: '#7dd3fc',
-          tension: 0.3
         }, {
           label: 'Acquisti',
           data: [60, 20, 30, 20, 80, 100, 20, 30, 20, 40, 50, 10],
           backgroundColor: '#115e59',
           borderColor: '#0d9488',
-          tension: 0.3
         },
       ]
     }}
-    showLegend={false}
-    showXTicks={true}
-    showYTicks={true}
-    enableZoom={true}
-    lineWidth={0}
     bind:resetZoom={resetZoom}
-    rgbTooltipBackgroundColor={'255 0 0'}
-    rgbTooltipColor={'0 255 0'}
-  ></BarChart>
+    options={{
+      scales: {
+        y: {
+          grid: {
+            lineWidth: 0
+          },
+          ticks: {
+            display: true
+          }
+        },
+        x: {
+          ticks: {
+            display: true
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: `rgb(255 0 0)`,
+          titleColor: `rgb(0 255 0)`
+        }
+      }
+    }}
+    ></BarChart>
   <Button
     onclick={() => { resetZoom = true }}
   >Reset zoom</Button>
@@ -49,28 +66,8 @@
 <PropsViewer
   props={[
     { name: "data", type: "object", description: "Chart data including labels and datasets", default: "{ labels: [], datasets: [] }" },
-    { name: "horizontal", type: "boolean", description: "Display chart in horizontal mode", default: "false" },
-    { name: "responsive", type: "boolean", description: "Make chart responsive", default: "true" },
-    { name: "maintainAspectRatio", type: "boolean", description: "Maintain aspect ratio", default: "true" },
-    { name: "showLegend", type: "boolean", description: "Show legend in chart", default: "true" },
-    { name: "showYTicks", type: "boolean", description: "Display Y-axis ticks", default: "false" },
-    { name: "showXTicks", type: "boolean", description: "Display X-axis ticks", default: "false" },
-    { name: "displayYGrid", type: "boolean", description: "Show grid lines along Y-axis", default: "true" },
-    { name: "lineWidth", type: "number", description: "Width of line in the chart", default: "1" },
-    { name: "enableZoom", type: "boolean", description: "Allow zooming in the chart", default: "true" },
+    { name: "options", type: "ChartOptions<'bar'>", description: "Options for the chart", },
     { name: "resetZoom", type: "boolean", description: "Control for resetting zoom", default: "false" },
-    { name: "tooltipLabel", type: "function", description: "Custom tooltip label formatter", default: "undefined" },
-    { name: "yTickLabel", type: "function", description: "Custom Y-axis tick label formatter", default: "undefined" },
-    { name: "xTickLabel", type: "function", description: "Custom X-axis tick label formatter", default: "undefined" },
-    { name: "xTickStepSize", type: "number", description: "Step size for X-axis ticks", default: "undefined" },
-    { name: "yTickStepSize", type: "number", description: "Step size for Y-axis ticks", default: "undefined" },
-    { name: "xMax", type: "number", description: "Maximum value for X-axis", default: "undefined" },
-    { name: "yMax", type: "number", description: "Maximum value for Y-axis", default: "undefined" },
-    { name: "rgbTooltipColor", type: "string", description: "RGB color for tooltip text", default: "undefined" },
-    { name: "rgbTooltipBackgroundColor", type: "string", description: "RGB background color for tooltip", default: "undefined" },
-    { name: "rgbBackgroundColor", type: "string", description: "RGB background color for chart", default: "undefined" },
-    { name: "width", type: "string | number", description: "Width of the chart", default: "undefined" },
-    { name: "height", type: "string | number", description: "Height of the chart", default: "undefined" }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>

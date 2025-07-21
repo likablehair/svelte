@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { FilterEditor, Icon } from "$lib";
+	import MediaQuery from "$lib/components/simple/common/MediaQuery.svelte";
 	import type { DateMode, Filter, NumberMode, SelectMode, StringMode } from "$lib/utils/filters/filters";
 	import { type Snippet } from "svelte"
 
@@ -129,67 +130,75 @@
   }
 </script>
 
-<div class="custom-filters-container" class:yscroll={mAndDown}>
-	<div class="filters-selection">
-		{#each filters as filter}
-			<div
-				tabindex="0"
-				role="button"
-				class="filters-selection-item"
-				class:selected={filter.name === selectedFilter?.name || isActiveFilter(filter)}				onclick={() => selectFilter(filter)}
-				onkeydown={(event) => handleKeyPress(event, filter)}
-				aria-pressed={filter.name === selectedFilter?.name}			>
-				<div class="filters-selection-title">
-					<div class="filters-selection-title-label">{filter.label}</div>
-					<Icon name="mdi-chevron-right-circle-outline" />
-				</div>
+<MediaQuery>
+	{#snippet defaultSnippet({ mAndDown:internalMAndDown })}
+		<div class="custom-filters-container {internalMAndDown ? 'mobile' : 'desktop'}" class:yscroll={mAndDown}>
+			<div class="filters-selection">
+				{#each filters as filter}
+					<div
+						tabindex="0"
+						role="button"
+						class="filters-selection-item"
+						class:selected={filter.name === selectedFilter?.name || isActiveFilter(filter)}				onclick={() => selectFilter(filter)}
+						onkeydown={(event) => handleKeyPress(event, filter)}
+						aria-pressed={filter.name === selectedFilter?.name}			>
+						<div class="filters-selection-title">
+							<div class="filters-selection-title-label">{filter.label}</div>
+							<Icon name="mdi-chevron-right-circle-outline" />
+						</div>
+					</div>
+				{/each}
 			</div>
-		{/each}
-	</div>
-
-	
-	<div class="filters-content">
-		{#if selectedFilter}
-			<div class="filters-content-box">
-				<h2>{selectedFilter.label}</h2>	
-				{#key selectedFilter.label}			
-					<FilterEditor
-						bind:filter={selectedFilter}
-						{lang}
-						{labelsMapper}
-						editFilterMode="one-edit"
-						bind:tmpFilter={tmpFilters[selectedFilter?.name || '']}
-						mobile={mAndDown}
-						onchange={handleFilterChange}
-						--simple-textfield-border-radius= 0.5rem
-						--simple-textfield-background-color= transparent
-						--simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-						--simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-						--chip-default-color="rgb(var(--global-color-primary-foreground))"
-						--autocomplete-border-radius= 0.5rem
-						--autocomplete-border="1px solid rgb(var(--global-color-background-500))"
-						--autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
-						--autocomplete-padding="9.6px 16px"
-						--autocomplete-background-color="transparent"
-					>
-						{#snippet customSnippet({ filter })}
-							{@render customSnippetInternal?.({ filter, mAndDown, updateCustomFilterValues })}
-						{/snippet}
-					</FilterEditor>
-				{/key}
+		
+			
+			<div class="filters-content">
+				{#if selectedFilter}
+					<div class="filters-content-box {internalMAndDown ? 'mobile' : 'desktop'}">
+						<h2>{selectedFilter.label}</h2>	
+						{#key selectedFilter.label}			
+							<FilterEditor
+								bind:filter={selectedFilter}
+								{lang}
+								{labelsMapper}
+								editFilterMode="one-edit"
+								bind:tmpFilter={tmpFilters[selectedFilter?.name || '']}
+								mobile={mAndDown}
+								onchange={handleFilterChange}
+								--simple-textfield-border-radius= 0.5rem
+								--simple-textfield-background-color= transparent
+								--simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+								--simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+								--chip-default-color="rgb(var(--global-color-primary-foreground))"
+								--autocomplete-border-radius= 0.5rem
+								--autocomplete-border="1px solid rgb(var(--global-color-background-500))"
+								--autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
+								--autocomplete-padding="9.6px 16px"
+								--autocomplete-background-color="transparent"
+							>
+								{#snippet customSnippet({ filter })}
+									{@render customSnippetInternal?.({ filter, mAndDown, updateCustomFilterValues })}
+								{/snippet}
+							</FilterEditor>
+						{/key}
+					</div>
+				{:else}
+					<div class="filters-content-box">
+						<p>{lang == 'en' ? 'Please select a filter to display content.' : 'Seleziona un filtro per mostrarne il contenuto.'}</p>
+					</div>
+				{/if}
 			</div>
-		{:else}
-			<div class="filters-content-box">
-				<p>{lang == 'en' ? 'Please select a filter to display content.' : 'Seleziona un filtro per mostrarne il contenuto.'}</p>
-			</div>
-		{/if}
-	</div>
-</div>
+		</div>
+	{/snippet}
+</MediaQuery>
 <style>
-.custom-filters-container {
+	.custom-filters-container {
     display: flex;
     height: 70vh;
   }
+
+	.custom-filters-container.mobile {
+		max-height: 29rem;
+	}
 
 	.yscroll {
 		overflow-y: auto;
@@ -232,6 +241,10 @@
   }
   .filters-content-box {
     padding: 1rem;
+  }
+
+	.filters-content-box.mobile {
+    padding: 0;
   }
 
   .filters-content-box>h2 {
