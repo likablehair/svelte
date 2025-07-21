@@ -2019,6 +2019,9 @@
           />
         </div>
       {:else if quickFilterActive.type.key === "date"}
+        <div style="font-weight: 500; margin-bottom: 8px;">
+          {quickFilterActive.title}
+        </div>
         <div on:click|stopPropagation role="presentation" tabindex="-1">
           <div>
             <DatePickerTextField
