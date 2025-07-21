@@ -5,9 +5,8 @@
   import Converter, { type Filter } from "$lib/utils/filters/filters";
   import type Builder from "$lib/utils/filters/builder";
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
-    import { FilterEditor } from "$lib";
-    import EventsViewer from "../../EventsViewer.svelte";
-    import SlotsViewer from "../../SlotsViewer.svelte";
+  import EventsViewer from "../../EventsViewer.svelte";
+  import SlotsViewer from "../../SlotsViewer.svelte";
 
   let filters: Filter[] = [
     {
@@ -264,6 +263,12 @@
       type: "LabelMapper",
       description: "Maps operators to display labels.",
       default: "Based on language"
+    },
+    {
+      name: "drawerSpace",
+      type: "string",
+      description: "Drawer space on mobile screen size",
+      default: "20rem"
     }
   ]}
   styleProps={[

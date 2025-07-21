@@ -48,16 +48,14 @@
         }
       ],
     }}
-    showLegend={true}
   />
 </div>
 <h2>Props</h2>
 <PropsViewer
   props={[
     { name: "data", type: "object", description: "Chart data including labels, datasets, and options", default: "{ labels: [], datasets: [], options: object } }" },
-    { name: "showLegend", type: "boolean", description: "Show legend in chart", default: "true" },
-    { name: "responsive", type: "boolean", description: "Make chart responsive", default: "true" },
-    { name: "maintainAspectRatio", type: "boolean", description: "Maintain aspect ratio", default: "false" }
+    { name: "options", type: "ChartOptions<'pie'>", description: "Options for the chart", },
+    { name: "resetZoom", type: "boolean", description: "Control for resetting zoom", default: "false" },
   ]}
   styleProps={[]}
 />

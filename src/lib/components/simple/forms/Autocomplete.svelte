@@ -125,7 +125,7 @@
     maxWidth = undefined,
     minWidth = "200px",
     openingId = $bindable("autocomplete-menu"),
-    searchText = $bindable(undefined),
+    searchText = $bindable(),
     maxVisibleChips = undefined,
     menuOpened = $bindable(false),
     closeOnSelect = !multiple,
@@ -151,14 +151,14 @@
   }: Props = $props();
 
   let notVisibleChipNumber = $derived(
-    Math.max((values?.length || 0) - (maxVisibleChips || 0), 0),
+    Math.max(((values || []).length || 0) - (maxVisibleChips || 0), 0),
   );
 
   function select(item: ItemData) {
     if (disabled) return;
 
     const alreadyPresent =
-      values?.findIndex((i) => i.value === item.value) !== -1;
+      (values || []).findIndex((i) => i.value === item.value) !== -1;
 
     if (!alreadyPresent) {
       if (multiple) values = [...(values || []), item];
@@ -183,7 +183,7 @@
     if (disabled) return;
 
     if (!!values && values.length == 1 && mandatory) return;
-    values = values?.filter((i) => i.value != item.value);
+    values = (values || []).filter((i) => i.value != item.value);
     refreshMenuWidth();
 
     if (onchange) {
@@ -199,7 +199,7 @@
 
   function pop() {
     if (!!values && values.length == 1 && mandatory) return;
-    let poppedElement = values?.pop();
+    let poppedElement = (values || []).pop();
     values = [...(values || [])];
     refreshMenuWidth();
 
@@ -216,7 +216,7 @@
 
   function toggle(item: ItemData) {
     const alreadyPresent =
-      values?.findIndex((i) => i.value === item.value) != -1;
+      (values || []).findIndex((i) => i.value === item.value) != -1;
 
     if (alreadyPresent) unselect(item);
     else select(item);
@@ -344,7 +344,7 @@
 
   $effect(() => {
     if (!!input) {
-      if (!disabled && values?.length !== 0) {
+      if (!disabled && (values || []).length !== 0) {
         input.style.width =
           Math.max(searchText?.length || placeholder?.length, 1) + "ch";
       } else {

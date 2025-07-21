@@ -34,8 +34,13 @@
 <div class="example">
   <LineChart
     {data}
-    showLegend={false}
-    enableZoom={true}
+    options={{
+      plugins: {
+        legend: {
+          display: false
+        }
+      }
+    }}
     bind:resetZoom={resetZoom}
   ></LineChart>
   <Button
@@ -77,19 +82,48 @@
           }
         ]
       }}
-      showLegend={false}
-      enableZoom={false}
-      showXTicks={false}
-      showYTicks={false}
-      displayYGrid={false}
-      displayXGrid={false}
-      maintainAspectRatio={false}
-      pointRadius={0}
-      hitRadius={0}
-      hoverRadius={0}
-      gridLineWidth={0}
-      lineWidth={1}
-      tooltipsDisabled={true}
+      options={{
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          zoom: {
+            pan: {
+              enabled: false
+            },
+            zoom: {
+              drag: {
+                enabled: false
+              }
+            }
+          },
+          tooltip: {
+            enabled: false
+          }
+        },
+        elements: {
+          point: {
+            radius: 0,
+            hitRadius: 0,
+            hoverRadius: 0
+          },
+          line: {
+            borderWidth: 1
+          },
+        },
+        scales: {
+          y: {
+            display: false,
+            grid: {
+              lineWidth: 0
+            }
+          },
+          x: {
+            display: false,
+          }
+        }
+      }}
       bind:resetZoom={resetZoom}
     ></LineChart>
   </div>
@@ -98,28 +132,8 @@
 <PropsViewer
   props={[
     { name: "data", type: "object", description: "Chart data including labels and datasets", default: "{ labels: [], datasets: [] }" },
-    { name: "horizontal", type: "boolean", description: "Display chart in horizontal mode", default: "false" },
-    { name: "responsive", type: "boolean", description: "Make chart responsive", default: "true" },
-    { name: "maintainAspectRatio", type: "boolean", description: "Maintain aspect ratio", default: "true" },
-    { name: "showLegend", type: "boolean", description: "Show legend in chart", default: "true" },
-    { name: "showYTicks", type: "boolean", description: "Display Y-axis ticks", default: "false" },
-    { name: "showXTicks", type: "boolean", description: "Display X-axis ticks", default: "false" },
-    { name: "displayYGrid", type: "boolean", description: "Show grid lines along Y-axis", default: "true" },
-    { name: "displayXGrid", type: "boolean", description: "Show grid lines along X-axis", default: "true" },
-    { name: "gridLineWidth", type: "number", description: "Width of grid lines", default: "1" },
-    { name: "lineWidth", type: "number", description: "Width of line in the chart", default: "3" },
-    { name: "enableZoom", type: "boolean", description: "Allow zooming in the chart", default: "false" },
+    { name: "options", type: "ChartOptions<'line'>", description: "Options for the chart", },
     { name: "resetZoom", type: "boolean", description: "Control for resetting zoom", default: "false" },
-    { name: "xTickStepSize", type: "number", description: "Step size for X-axis ticks", default: "undefined" },
-    { name: "yTickStepSize", type: "number", description: "Step size for Y-axis ticks", default: "undefined" },
-    { name: "xMax", type: "number", description: "Maximum value for X-axis", default: "undefined" },
-    { name: "yMax", type: "number", description: "Maximum value for Y-axis", default: "undefined" },
-    { name: "xMin", type: "number", description: "Minimum value for X-axis", default: "undefined" },
-    { name: "yMin", type: "number", description: "Minimum value for Y-axis", default: "undefined" },
-    { name: "pointRadius", type: "number", description: "Radius of data points", default: "undefined" },
-    { name: "hitRadius", type: "number", description: "Hit detection radius of data points", default: "undefined" },
-    { name: "hoverRadius", type: "number", description: "Hover radius of data points", default: "undefined" },
-    { name: "tooltipsDisabled", type: "boolean", description: "Disable tooltips in chart", default: "false" }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>
