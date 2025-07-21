@@ -1140,7 +1140,7 @@
   
   async function updateRemainingWidth() {
     if(tableContainer != null && !!tableContainer) {
-      const containerWidth = tableContainer?.getBoundingClientRect().width - 30;
+      const containerWidth = tableContainer?.getBoundingClientRect().width - 26;
 
       if(containerWidth){
         const totalResizableWidth = headersToShowInTable.reduce((sum, head) => {
@@ -1206,112 +1206,114 @@
   {/if}
 
   {#if searchBarVisible || filtersVisible || $$slots.appendFilterRow}
-    <div class="filter-container">
-      <div class="search-bar-container">
+    <MediaQuery let:mAndDown>
+      <div class="searchbar-and-filter-container {mAndDown ? 'mobile' : 'desktop'}">
         <slot name="search-bar" {handleSearchChange}>
           {#if searchBarVisible}
-          <div style="margin-right: 20px;">
-            <SimpleTextField
-              placeholder={searchBarPlaceholder}
-              appendInnerIcon="mdi-magnify"
-              bind:value={searchText}
-              bind:input={searchBarInput}
-              on:keydown={handleSearchBoxKeydown}
-              --simple-textfield-default-width="450px"
-              --simple-textfield-border-radius= 0.5rem
-              --simple-textfield-background-color= transparent
-              --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-              --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-            />
-          </div>
+            <div style="margin-right: {mAndDown ? '0px' : '20px'};">
+              <SimpleTextField
+                placeholder={searchBarPlaceholder}
+                appendInnerIcon="mdi-magnify"
+                bind:value={searchText}
+                bind:input={searchBarInput}
+                on:keydown={handleSearchBoxKeydown}
+                --simple-textfield-width={mAndDown ? "100%" : "450px"}
+                --simple-textfield-border-radius= 0.5rem
+                --simple-textfield-background-color= transparent
+                --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+                --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+              />
+            </div>
           {/if}
         </slot>
-
-        {#if filtersVisible}
+        
+        <div class="filter-container">
+          {#if filtersVisible}
+            <div>
+              {#if dynamicFilters}
+                <Filters
+                  bind:filters
+                  on:applyFilter={() => {
+                    handleSearchChange(searchText);
+                  }}
+                  on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
+                  on:removeAllFilters={() => handleRemoveAllFilters()}
+                  --filters-default-wrapper-width="100%"
+                  {lang}
+                  {dateLocale}
+                  {editFilterMode}
+                  {showActiveFilters}
+                  drawerSpace='40rem'
+                >
+                  <svelte:fragment slot="append">
+                    <slot name="filter-append" />
+                  </svelte:fragment>
+                  <svelte:fragment slot="custom-chip" let:filter>
+                    <slot name="custom-filter-chip" {filter} />
+                  </svelte:fragment>
+                  <svelte:fragment
+                    slot="custom"
+                    let:filter
+                    let:updateFunction
+                    let:mAndDown
+                  >
+                    <slot name="custom-filter" {filter} {updateFunction} {mAndDown} />
+                  </svelte:fragment>
+  
+                  <svelte:fragment slot="content" let:mAndDown let:filters let:updateMultiFilterValues>
+                    {#key filters}
+                      <DynamicFilters
+                        {lang}
+                        {filters}                      
+                        {mAndDown}
+                        {updateMultiFilterValues}
+                        on:change={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
+                      >
+                        <svelte:fragment slot="custom" let:filter let:mAndDown let:updateCustomFilterValues>
+                          <slot name="custom-filter" {filter} {updateCustomFilterValues} {mAndDown}></slot>
+                        </svelte:fragment>
+                      </DynamicFilters>
+                    {/key}
+                  </svelte:fragment>
+                </Filters>
+              {:else}
+                <Filters
+                  bind:filters
+                  on:applyFilter={() => {
+                    handleSearchChange(searchText);
+                  }}
+                  on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
+                  on:removeAllFilters={() => handleRemoveAllFilters()}
+                  --filters-default-wrapper-width="100%"
+                  {lang}
+                  {dateLocale}
+                  {editFilterMode}
+                  {showActiveFilters}
+                >
+                  <svelte:fragment slot="append">
+                    <slot name="filter-append" />
+                  </svelte:fragment>
+                  <svelte:fragment slot="custom-chip" let:filter>
+                    <slot name="custom-filter-chip" {filter} />
+                  </svelte:fragment>
+                  <svelte:fragment
+                    slot="custom"
+                    let:filter
+                    let:updateFunction
+                    let:mAndDown
+                  >
+                    <slot name="custom-static-filter" {filter} {updateFunction} {mAndDown}/>
+                  </svelte:fragment>
+                </Filters>
+              {/if}
+            </div>
+          {/if}
           <div>
-            {#if dynamicFilters}
-              <Filters
-                bind:filters
-                on:applyFilter={() => {
-                  handleSearchChange(searchText);
-                }}
-                on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
-                on:removeAllFilters={() => handleRemoveAllFilters()}
-                --filters-default-wrapper-width="100%"
-                {lang}
-                {dateLocale}
-                {editFilterMode}
-                {showActiveFilters}
-              >
-                <svelte:fragment slot="append">
-                  <slot name="filter-append" />
-                </svelte:fragment>
-                <svelte:fragment slot="custom-chip" let:filter>
-                  <slot name="custom-filter-chip" {filter} />
-                </svelte:fragment>
-                <svelte:fragment
-                  slot="custom"
-                  let:filter
-                  let:updateFunction
-                  let:mAndDown
-                >
-                  <slot name="custom-filter" {filter} {updateFunction} {mAndDown} />
-                </svelte:fragment>
-
-                <svelte:fragment slot="content" let:mAndDown let:filters let:updateMultiFilterValues>
-                  {#key filters}
-                    <DynamicFilters
-                      {lang}
-                      {filters}                      
-                      {mAndDown}
-                      {updateMultiFilterValues}
-                      on:change={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
-                    >
-                      <svelte:fragment slot="custom" let:filter let:mAndDown let:updateCustomFilterValues>
-                        <slot name="custom-filter" {filter} {updateCustomFilterValues} {mAndDown}></slot>
-                      </svelte:fragment>
-                    </DynamicFilters>
-                  {/key}
-                </svelte:fragment>
-              </Filters>
-            {:else}
-              <Filters
-                bind:filters
-                on:applyFilter={() => {
-                  handleSearchChange(searchText);
-                }}
-                on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
-                on:removeAllFilters={() => handleRemoveAllFilters()}
-                --filters-default-wrapper-width="100%"
-                {lang}
-                {dateLocale}
-                {editFilterMode}
-                {showActiveFilters}
-              >
-                <svelte:fragment slot="append">
-                  <slot name="filter-append" />
-                </svelte:fragment>
-                <svelte:fragment slot="custom-chip" let:filter>
-                  <slot name="custom-filter-chip" {filter} />
-                </svelte:fragment>
-                <svelte:fragment
-                  slot="custom"
-                  let:filter
-                  let:updateFunction
-                  let:mAndDown
-                >
-                  <slot name="custom-static-filter" {filter} {updateFunction} {mAndDown}/>
-                </svelte:fragment>
-              </Filters>
-            {/if}
+            <slot name="appendFilterRow"></slot>
           </div>
-        {/if}
+        </div>
       </div>
-
-      <div>
-        <slot name="appendFilterRow"></slot>
-      </div>
-    </div>
+    </MediaQuery>
   {/if}
 
   {#if quickFiltersVisible || numberOfResultsVisible}
@@ -1683,26 +1685,9 @@
 
                       <tbody>
                         {#each row.subItems as subItem, indexSubItem}
-                          <tr
-                            on:click={() => handleRowClick(subItem)}
-                            class:row-activator={cellEditorIndexRow == indexSubItem && cellEditorSubItem}
-                          >
+                          <tr>
                             {#each subHeaders as subHeader, indexSubHeader}
-                              <td
-                                class:cell-edit-activator={cellEditorIndexHeader == indexSubHeader && cellEditorIndexRow == indexSubItem && cellEditorSubItem}
-                                class:hover-cell={cellEdit && !loading && !!subHeader.cellEditorInfo}
-                                on:click={(e) => {
-                                  handleCellClick(
-                                    e,
-                                    subItem,
-                                    subHeader.cellEditorInfo,
-                                    subItem[subHeader.value],
-                                    indexSubItem,
-                                    indexSubHeader,
-                                    true
-                                  );
-                                }}
-                              >
+                              <td>
                                 {#if subHeader.type.key == "custom"}
                                   <slot
                                     name="custom-subheader"
@@ -2034,6 +2019,9 @@
           />
         </div>
       {:else if quickFilterActive.type.key === "date"}
+        <div style="font-weight: 500; margin-bottom: 8px;">
+          {quickFilterActive.title}
+        </div>
         <div on:click|stopPropagation role="presentation" tabindex="-1">
           <div>
             <DatePickerTextField
@@ -2098,10 +2086,7 @@
     </div>
 
     {#if quickFilterActive.type.key != "boolean"}
-      <div style:margin-top="10px" style:grid-row="2" style:grid-column="1 / 3">
-        <Divider --divider-color=rgb(var(--global-color-contrast-100)) />
-      </div>
-      <div style:grid-row="3" style:grid-column="2" style:margin-top="-15px">
+      <div style:grid-row="3" style:grid-column="2" style:margin-top="-10px">
         <ConfirmOrCancelButtons
           confirmDisable={saveEditDisabled}
           confirmText={lang == 'en' ? "Apply" : 'Applica'}
@@ -2442,22 +2427,40 @@
     flex-direction: row;
   }
 
+  .searchbar-and-filter-container {
+    display: flex;
+    margin-bottom: 16px;
+  }
+  
+  .searchbar-and-filter-container.desktop {
+    flex-direction: row;
+  }
+  .searchbar-and-filter-container.mobile {
+    flex-direction: column;
+    gap: 8px;
+  }
   .filter-container {
     display: flex;
-    flex-direction: row;
     justify-content: space-between;
-    margin-bottom: 20px;
+    flex-grow: 1;
   }
-
   .quick-filters {
     display: flex;
     flex-direction: row;
-    margin-bottom: 10px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 4px;
+    gap: 8px;
+  }
+  .quick-filters::-webkit-scrollbar:horizontal {
+    height: 12px;
   }
 
   .quick-filters-results-container {
     display: flex;
     justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
   }
 
   .vertical-quick-filters {
@@ -2555,6 +2558,7 @@
     display: flex;
     align-items: center;
     gap: 4px;
+    min-width: 90px;
   }
   .resizer {
     position: absolute;

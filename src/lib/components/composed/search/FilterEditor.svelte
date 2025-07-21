@@ -201,6 +201,7 @@
               --simple-text-field-margin-left="0px"
               mobileDrawer={mobile}
               placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
+              minWidth={''}
               on:change={handleChangeValue}
             ></Autocomplete>
           </div>
