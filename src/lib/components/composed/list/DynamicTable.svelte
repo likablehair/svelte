@@ -44,28 +44,27 @@
 
     hideScrollbar = tableContainer.scrollHeight > tableContainer.clientHeight
 
-    for(const head of [...headers, { value: 'non-resizable', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }, { value: 'slot-append', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }]) {
-      let th
-      if(head.value == 'non-resizable' || head.value == 'slot-append') {
-        th = document.getElementsByClassName(head.value).item(0) as HTMLElement
-      } else {
-        th = document.getElementById(head.value) as HTMLElement
-      }
+    for(const head of [...headers, { value: 'non-resizable', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }, { value: 'customize-headers', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }]) {
+      let th = headersHTML[head.value]
       if(!!th) {
         resizeHeader(th, head)
       }
     }
 
-    let table = document.getElementsByClassName('table')[0] as HTMLElement
-    table.classList.add('resizable')
+    tableHTML.classList.add('dynamic-resizable')
+
+    resizeObserver = new ResizeObserver(() => {
+      updateRemainingWidth();
+      updateHeaderHeight();
+    });
+    resizeObserver.observe(tableContainer);
 
     return () => {
       window.removeEventListener('resize', updateHeaderHeight);
       tableContainer.removeEventListener("scroll", setReachedBottomOrTop);
+      resizeObserver?.disconnect();
     }
   });
-
-  let mainHeader: Element
 
   function updateHeaderHeight() {
     if (mainHeader) {
@@ -268,7 +267,9 @@
     numberOfResultsVisible: boolean = false,
     endLineVisible: boolean = false,
     resizableColumns: boolean= false,
-    resizedColumnSizeWithPadding: { [value: string]: number } = {}
+    resizedColumnSizeWithPadding: { [value: string]: number } = {},
+    dynamicFilters: boolean = true,
+    useSelectedItemsOnly = false
 
   let openCellEditor: boolean = false,
     cellEditorActivator: HTMLElement | undefined,
@@ -294,13 +295,18 @@
     currentSectionNumber = 0,
     tableBody: HTMLElement,
     tableContainer: HTMLElement,
+    tableHTML: HTMLElement,
+    headersHTML: { [value: string]: HTMLElement } = {},
     userScrolling = true,
     reachedBottom = false,
     reachedTop = false,
     resizing = false,
     remainingWidth = 0,
     hideScrollbar = false,
-    sortModify: Header['sortModify']
+    sortModify: Header['sortModify'],
+    mainHeader: Element,
+    resizeObserver: ResizeObserver,
+    ignoreSelectAll = rows.length == totalRows && useSelectedItemsOnly
 
   const DEFAULT_MIN_WIDTH_PX = 100,
     DEFAULT_MAX_WIDTH_PX = 400
@@ -462,7 +468,7 @@
 
   function handleSelect(item: Item, shiftKeyPressed: boolean) {
     let index = -1
-    if(selectedAll) {
+    if(selectedAll && !ignoreSelectAll) {
       index = unselectedItems.findIndex((i) => i[uniqueKey] == item[uniqueKey]);
     } else {
       index = selectedItems.findIndex((i) => i[uniqueKey] == item[uniqueKey]);
@@ -483,7 +489,7 @@
               selectedIndex = x
             }
             for (let i = lastSelectedIndex + 1; i <= selectedIndex; i++) {
-              if(selectedAll) {
+              if(selectedAll && !ignoreSelectAll) {
                 if(!unselectedItems.find((unselectedItem) => unselectedItem[uniqueKey] == rows[i].item[uniqueKey])) {
                   unselectedItems = [...unselectedItems, rows[i].item]
                 }
@@ -496,7 +502,7 @@
           }
         }
         else {
-          if(selectedAll) {
+          if(selectedAll && !ignoreSelectAll) {
             unselectedItems = [...unselectedItems, item];
           } else {
             selectedItems = [...selectedItems, item];
@@ -505,7 +511,7 @@
         }
       }
     } else {
-      if(selectedAll) {
+      if(selectedAll && !ignoreSelectAll) {
         unselectedItems = unselectedItems.filter((i) => i[uniqueKey] != item[uniqueKey]);
       } else {
         selectedItems = selectedItems.filter((i) => i[uniqueKey] != item[uniqueKey]);
@@ -516,7 +522,12 @@
 
   function handleSelectAll() {
     if (selectMode == "multiple") {
-      selectedItems = []
+      if(!selectedAll && ignoreSelectAll) {
+        selectedItems = rows.map(r => r.item)
+      }
+      else {
+        selectedItems = []
+      }
       selectedIndexes = []
       unselectedItems = []
       selectedAll = !selectedAll
@@ -1118,9 +1129,7 @@
   }
 
   $: if (
-    resizableColumns &&
     !!tableContainer &&
-    resizableColumns &&
     headersToShowInTable.length > 0 &&
     resizedColumnSizeWithPadding &&
     headersToShow.length > 0 &&
@@ -1135,7 +1144,7 @@
 
       if(containerWidth){
         const totalResizableWidth = headersToShowInTable.reduce((sum, head) => {
-          let th = document.getElementById(head.value)
+          let th = headersHTML[head.value]
           if(!!th) {
             resizeHeader(th, head)
           }
@@ -1143,7 +1152,7 @@
           return sum + width + 1;
         }, 0);
     
-        const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.slot-append, th.customize-headers'))
+        const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.customize-headers'))
           .reduce((sum, th) => sum + th.getBoundingClientRect().width + 1, 0);
     
         remainingWidth = Math.max(0, containerWidth - totalResizableWidth - extraStaticWidth);
@@ -1220,50 +1229,81 @@
 
         {#if filtersVisible}
           <div>
-            <Filters
-              bind:filters
-              on:applyFilter={() => {
-                handleSearchChange(searchText);
-              }}
-              on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
-              on:removeAllFilters={() => handleRemoveAllFilters()}
-              --filters-default-wrapper-width="100%"
-              {lang}
-              {dateLocale}
-              {editFilterMode}
-              {showActiveFilters}
-            >
-              <svelte:fragment slot="append">
-                <slot name="filter-append" />
-              </svelte:fragment>
-              <svelte:fragment slot="custom-chip" let:filter>
-                <slot name="custom-filter-chip" {filter} />
-              </svelte:fragment>
-              <svelte:fragment
-                slot="custom"
-                let:filter
-                let:updateFunction
-                let:mAndDown
+            {#if dynamicFilters}
+              <Filters
+                bind:filters
+                on:applyFilter={() => {
+                  handleSearchChange(searchText);
+                }}
+                on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
+                on:removeAllFilters={() => handleRemoveAllFilters()}
+                --filters-default-wrapper-width="100%"
+                {lang}
+                {dateLocale}
+                {editFilterMode}
+                {showActiveFilters}
               >
-                <slot name="custom-filter" {filter} {updateFunction} {mAndDown} />
-              </svelte:fragment>
+                <svelte:fragment slot="append">
+                  <slot name="filter-append" />
+                </svelte:fragment>
+                <svelte:fragment slot="custom-chip" let:filter>
+                  <slot name="custom-filter-chip" {filter} />
+                </svelte:fragment>
+                <svelte:fragment
+                  slot="custom"
+                  let:filter
+                  let:updateFunction
+                  let:mAndDown
+                >
+                  <slot name="custom-filter" {filter} {updateFunction} {mAndDown} />
+                </svelte:fragment>
 
-              <svelte:fragment slot="content" let:mAndDown let:filters let:updateMultiFilterValues>
-                {#key filters}
-                  <DynamicFilters
-                    {lang}
-                    {filters}                      
-                    {mAndDown}
-                    {updateMultiFilterValues}
-                    on:change={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
-                  >
-                    <svelte:fragment slot="custom" let:filter let:mAndDown let:updateCustomFilterValues>
-                      <slot name="custom-filter" {filter} {updateCustomFilterValues} {mAndDown}></slot>
-                    </svelte:fragment>
-                  </DynamicFilters>
-                {/key}
-              </svelte:fragment>
-            </Filters>
+                <svelte:fragment slot="content" let:mAndDown let:filters let:updateMultiFilterValues>
+                  {#key filters}
+                    <DynamicFilters
+                      {lang}
+                      {filters}                      
+                      {mAndDown}
+                      {updateMultiFilterValues}
+                      on:change={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
+                    >
+                      <svelte:fragment slot="custom" let:filter let:mAndDown let:updateCustomFilterValues>
+                        <slot name="custom-filter" {filter} {updateCustomFilterValues} {mAndDown}></slot>
+                      </svelte:fragment>
+                    </DynamicFilters>
+                  {/key}
+                </svelte:fragment>
+              </Filters>
+            {:else}
+              <Filters
+                bind:filters
+                on:applyFilter={() => {
+                  handleSearchChange(searchText);
+                }}
+                on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
+                on:removeAllFilters={() => handleRemoveAllFilters()}
+                --filters-default-wrapper-width="100%"
+                {lang}
+                {dateLocale}
+                {editFilterMode}
+                {showActiveFilters}
+              >
+                <svelte:fragment slot="append">
+                  <slot name="filter-append" />
+                </svelte:fragment>
+                <svelte:fragment slot="custom-chip" let:filter>
+                  <slot name="custom-filter-chip" {filter} />
+                </svelte:fragment>
+                <svelte:fragment
+                  slot="custom"
+                  let:filter
+                  let:updateFunction
+                  let:mAndDown
+                >
+                  <slot name="custom-static-filter" {filter} {updateFunction} {mAndDown}/>
+                </svelte:fragment>
+              </Filters>
+            {/if}
           </div>
         {/if}
       </div>
@@ -1332,7 +1372,7 @@
       hasMore={currentSectionNumber > 0 && userScrolling}
       direction='backward'
     />
-    <table style="display: table;" class="table">
+    <table style="display: table;" class="dynamic-table" bind:this={tableHTML}>
       <thead class="table-header" bind:this={mainHeader}>
         <tr>
           {#if !!showSelect && !showExpand && rows.length > 0}
@@ -1341,6 +1381,7 @@
               style:min-width="30px"
               style:text-align="center"
               class="non-resizable"
+              bind:this={headersHTML['non-resizable']}
             >
               {#if selectMode === "multiple"}
                 <Checkbox
@@ -1358,6 +1399,7 @@
               style:max-width="60px"
               style:text-align="center"
               class="non-resizable"
+              bind:this={headersHTML['non-resizable']}
             />
           {/if}
           {#each headersToShowInTable as head, index}
@@ -1367,7 +1409,7 @@
               style:max-width={head.maxWidth}
               class:sortable={head.sortable}
               on:click={() => handleHeaderClick(head)}
-              id={head.value}
+              bind:this={headersHTML[head.value]}
             >
               {#if resizableColumns}
                 <div class="resizer" use:resize></div>
@@ -1413,34 +1455,30 @@
               </slot>
             </th>
           {/each}
-          {#if $$slots.rowActions || $$slots.append}
-            <th
-              class="slot-append"
-            >
-              <slot name="append" index={-1} items={undefined} />
-            </th>
-          {/if}
-          {#if resizableColumns && remainingWidth}
+          {#if remainingWidth}
             <th
               style:width={remainingWidth + 'px'}
               class="filler"
               aria-hidden="true"
             />
           {/if}
-          {#if customizeHeaders}
+          {#if customizeHeaders || $$slots.rowActions || $$slots.append}
             <th
-              style:width="15px"
-              style:min-width="15px"
               style:text-align="center"
               class="customize-headers"
+              bind:this={headersHTML['customize-headers']}
             >
-              <div style="display: flex; justify-content: center;">
-                <Icon
-                  name="mdi-plus-circle-outline"
-                  click
-                  on:click={() => (openHeaderDrawer = true)}
-                />
-              </div>
+              {#if customizeHeaders}
+                <div style="display: flex; justify-content: start;">
+                  <Icon
+                    name="mdi-plus-circle-outline"
+                    click
+                    on:click={() => (openHeaderDrawer = true)}
+                  />
+                </div>
+              {:else}
+                <slot name="append" index={-1} items={undefined} />
+              {/if}
             </th>
           {/if}
         </tr>
@@ -1487,7 +1525,7 @@
                     : 'var(--dynamic-table-row-disabled-background-color, var(--dynamic-table-default-row-disabled-background-color))'
                   : expandedRows.findIndex(r => r.item[uniqueKey] == row.item[uniqueKey]) != -1
                     ? 'var(--dynamic-table-expanded-row-background-color, var(--dynamic-table-default-expanded-row-background-color))'
-                    : selectedAll
+                    : selectedAll && !ignoreSelectAll
                       ? !unselectedItems.find(i => i[uniqueKey] == row.item[uniqueKey])
                         ? 'var(--dynamic-table-selected-row-background-color, var(--dynamic-table-default-selected-row-background-color))'
                         : ''
@@ -1503,7 +1541,7 @@
                   <Checkbox
                     id={row.item[uniqueKey]}
                     value={
-                      selectedAll ?
+                      selectedAll && !ignoreSelectAll ?
                         unselectedItems.findIndex(
                           (i) => i[uniqueKey] == row.item[uniqueKey]
                         ) == -1 :
@@ -1579,6 +1617,9 @@
                   {/if}
                 </td>
               {/each}
+              {#if remainingWidth}
+                <td/>
+              {/if}
               {#if $$slots.rowActions || $$slots.append}
                 <td class={clazz.cell || ""}>
                   <slot name="rowActions" index={indexRow} {row} />
@@ -2076,11 +2117,11 @@
 <MediaQuery let:sAndDown>
   <Drawer
     bind:open={openHeaderDrawer}
-    _space={sAndDown ? "60vh" : "20vw"}
+    _space={sAndDown ? "60vh" : "400px"}
     position={sAndDown ? "bottom" : "right"}
   >
+    <div class="personalize-header">{lang == 'en' ? 'Personalize your headers' : 'Personalizza le tue intestazioni'}</div>
     <div style="padding: 20px;">
-      <div class="personalize-header">{lang == 'en' ? 'Personalize your headers' : 'Personalizza le tue intestazioni'}</div>
 
       <span class="headers-show grid-col-1">{lang == 'en' ? 'Headers shown in table' : 'Intestazioni visualizzate in tabella'}</span>
 
@@ -2091,19 +2132,26 @@
             headersToShow = e.detail.items;
           }}
         >
-          <svelte:fragment slot="item" let:item>
-            <Switch
-              --switch-label-width="90%"
-              value={headersToShow.find((h) => h.id == item.id) != undefined}
-              label={item.name}
-              on:change={(e) => {
-                if (e.detail.value == false) {
-                  headersToShow = headersToShow.filter((h) => h.id != item.id);
-                  headersToSelect = [...headersToSelect, item];
-                }
-              }}
-            />
-          </svelte:fragment>
+          <div slot="item" let:item>
+            <div
+              style:display=flex
+            >
+              <div
+                style:flex-grow=1
+              >
+                {item.name}
+              </div>
+              <Switch
+                value={headersToShow.find((h) => h.id == item.id) != undefined}
+                on:change={(e) => {
+                  if (e.detail.value == false) {
+                    headersToShow = headersToShow.filter((h) => h.id != item.id);
+                    headersToSelect = [...headersToSelect, item];
+                  }
+                }}
+              />
+            </div>
+          </div>
         </VerticalDraggableList>
       {/if}
       <Divider --divider-color=rgb(var(--global-color-contrast-100) />
@@ -2116,19 +2164,26 @@
             out:send={{ key: header }}
             class="headers-show grid-col-1"
           >
-            <Switch
-              --switch-label-width="90%"
-              value={false}
-              label={header.name}
-              on:change={(e) => {
-                if (e.detail.value == true) {
-                  headersToSelect = headersToSelect.filter(
-                    (h) => h.id != header.id
-                  );
-                  headersToShow = [...headersToShow, header];
-                }
-              }}
-            />
+            <div
+              style:display=flex
+            >
+              <div
+                style:flex-grow=1
+              >
+                {header.name}
+              </div>
+              <Switch
+                value={false}
+                on:change={(e) => {
+                  if (e.detail.value == true) {
+                    headersToSelect = headersToSelect.filter(
+                      (h) => h.id != header.id
+                    );
+                    headersToShow = [...headersToShow, header];
+                  }
+                }}
+              />
+            </div>
           </div>
         {/each}
       {:else}
@@ -2136,10 +2191,10 @@
           <span style="text-align: center;">{lang == 'en' ? 'No headers to add' : 'Nessuna intestazione da aggiungere'}</span>
         </div>
       {/if}
-      <div style="width: 100%; display: flex; justify-content: center;">
+      <div style="width: 100%; display: flex; justify-content: center; padding-top: 15px;">
         <Button
           class="mr-3 mt-5"
-          --button-width="70%"
+          --button-width="100%"
           on:click={saveHeadersToShow}
         >
           {lang == 'en' ? 'Save preferences' : 'Salva preferenze'}
@@ -2163,7 +2218,7 @@
     margin-right: -15px;
   }
 
-  .table {
+  .dynamic-table {
     background-color: var(
       --dynamic-table-background-color,
       var(--dynamic-table-default-background-color)
@@ -2171,33 +2226,20 @@
     border-collapse: separate;
   }
 
-  .table.resizable {
+  .dynamic-table.dynamic-resizable {
     table-layout: fixed;
     width: fit-content;
-  }
-
-  .slot-append {
-    width: 1px;
-    min-width: unset;
-    box-sizing: content-box;
   }
 
   .table-header {
     position: sticky;
     top: 0;
     z-index: 2;
+    top: -1px;
     height: var(
       --dynamic-table-header-height,
       var(--dynamic-table-default-header-height)
     );
-  }
-
-  @media not all and (min-resolution:.001dpcm) { 
-    .table-header {
-      position: sticky;
-      top: -2px;
-      z-index: 2;
-    }
   }
 
   .table-subheader {
@@ -2291,17 +2333,17 @@
     border: 1px solid transparent;
   }
 
-  table.table > tbody > tr > td {
+  table.dynamic-table > tbody > tr > td {
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  table.table > thead > tr > th {
+  table.dynamic-table > thead > tr > th {
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  table.table > tbody > tr > td.expanded-row {
+  table.dynamic-table > tbody > tr > td.expanded-row {
   overflow: visible;
 }
 

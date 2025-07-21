@@ -289,6 +289,34 @@ export default class Builder {
     return this
   }
 
+  public whereRaw(
+    clause: string,
+    bindings?: WhereFilterValue[]
+  ): Builder {
+    this._modifiers.push({
+      method: 'where',
+      kind: 'raw',
+      logicalOperator: 'and',
+      clause,
+      bindings
+    })
+    return this
+  }
+
+  public orWhereRaw(
+    clause: string,
+    bindings?: WhereFilterValue[]
+  ): Builder {
+    this._modifiers.push({
+      method: 'where',
+      kind: 'raw',
+      logicalOperator: 'or',
+      clause,
+      bindings
+    })
+    return this
+  }
+
   private applyWhereJsonSupersetClause(
     logicalOperator: 'and' | 'or',
     first: string,
