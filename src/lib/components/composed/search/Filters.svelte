@@ -245,6 +245,7 @@
       }
     }
     singleFilterMenuOpened = false
+    filters = [...filters];
     if(onremoveFilter) {
       onremoveFilter({
         detail: {

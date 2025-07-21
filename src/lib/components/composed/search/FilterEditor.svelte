@@ -58,7 +58,7 @@
   }: Props = $props();
 
   let advancedModeOptions: Item[] | undefined = $state(),
-    advancedModeSelectedOptions: Item[] | undefined = $state()
+    advancedModeSelectedOptions: Item[] = $state([])
 
   function initTmpFilter() {
     tmpFilter = filter === undefined ? undefined : {...filter}
@@ -115,7 +115,7 @@
 
   $effect(() => {
     if(!tmpFilter?.advanced) {
-      advancedModeSelectedOptions = undefined
+      advancedModeSelectedOptions = []
     }
   }) 
 
@@ -127,7 +127,7 @@
   // In some case would be necessary to handle more than one selection and this code
   // could become non sense
   function handleAdvancedModeSelection() {
-    if(!!advancedModeSelectedOptions && advancedModeSelectedOptions.length > 0 && !!tmpFilter) {
+    if(advancedModeSelectedOptions.length > 0 && !!tmpFilter) {
       if(tmpFilter.type == 'date') tmpFilter.mode = advancedModeSelectedOptions[0].value as DateMode
       else if(tmpFilter.type == 'number') tmpFilter.mode = advancedModeSelectedOptions[0].value as NumberMode
       else if(tmpFilter.type == 'string') tmpFilter.mode = advancedModeSelectedOptions[0].value as StringMode
@@ -180,7 +180,7 @@
 
 {#if !!filter && !!tmpFilter}
   <div class="filter-editor" style:margin={editFilterMode === 'one-edit' ? '5%' : '0'}>
-    {#if filter.advanced && advancedModeSelectedOptions}
+    {#if filter.advanced}
       <div class="advanced-mode">
         <div class="label">
           {filter.label[0].toUpperCase() + filter.label.slice(1)}
@@ -200,7 +200,7 @@
     {/if}
 
     <div class="fields" style:width="100%" {onclick} {onkeypress} role="presentation" tabindex="-1">
-      {#if !tmpFilter.advanced || (!!advancedModeSelectedOptions && advancedModeSelectedOptions.length > 0)}
+      {#if !tmpFilter.advanced || (advancedModeSelectedOptions.length > 0)}
         {#if tmpFilter.type === "string" }
           <SimpleTextField
             bind:value={tmpFilter.value}
