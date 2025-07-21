@@ -290,7 +290,7 @@
     }
     filters = filters
     tmpFilters = {}
-    customToBeInitialized = false
+    customToBeInitialized = true
     dispatch('removeAllFilters')
   }
 

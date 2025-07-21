@@ -93,56 +93,34 @@
           icon: 'mdi-face-agent',
         },
       ]
-		}
-	];
-
-	let overviewOptions: NonNullable<ComponentProps<HierarchyMenu>['options']> = [
-		{
-			name: 'home',
-			label: 'Dashboard',
-			icon: 'mdi-monitor-dashboard'
 		},
-		{
-			label: 'Articoli',
-			name: 'products',
-			icon: 'mdi-view-grid-outline'
-		},
-		{
-			label: 'Movimenti',
-			name: 'handlings',
-			icon: 'mdi-cart'
-		},
-		{
-			label: 'Statistiche',
-			name: 'analysis',
-			icon: 'mdi-google-analytics',
+    {
+			label: 'Altri movimenti',
+			name: 'other-handlings',
+			icon: 'mdi-warehouse',
       options: [
         {
-          label: 'Statistica Movimenti',
-          name: 'handling-statistics',
-          icon: 'mdi-chart-bar',
-        },
-      ]
-		},
-		{
-			label: 'Anagrafiche',
-			name: 'anagraphics',
-			icon: 'mdi-card-account-details',
-      options: [
-        {
-          label: 'Clienti',
-          name: 'customers',
-          icon: 'mdi-store',
+          label: 'Acquisto',
+          name: 'purchase',
+          icon: 'mdi-cart-arrow-down',
         }, {
-          label: 'Fornitori',
-          name: 'suppliers',
-          icon: 'mdi-truck',
+          label: 'Vendita',
+          name: 'sales',
+          icon: 'mdi-brightness-percent',
+        }, {
+          label: 'Carico',
+          name: 'load',
+          icon: 'mdi-database-arrow-left',
+        }, {
+          label: 'Scarico',
+          name: 'unload',
+          icon: 'mdi-database-arrow-right-outline',
         }
       ]
 		},
-		{
-			label: 'Impostazioni',
-			name: 'settings',
+    {
+			label: 'Altre impostazioni',
+			name: 'other-settings',
 			icon: 'mdi-tune-variant',
       options: [
         {
@@ -160,7 +138,7 @@
           icon: 'mdi-face-agent',
         },
       ]
-		}
+		},
 	];
 
   let selectedItem = 0;
@@ -191,7 +169,6 @@
 
 <CollapsibleSideBarLayout
   bind:sidebarExpanded={sidebarExpanded}
-  bind:isPinned={isPinned}
   bind:drawerOpened={drawerOpened}
   on:menu-select={handleMenuSelect}
   on:pinned-change={handlePinnedChange}
@@ -199,7 +176,6 @@
   on:drawer-change={handleDrawerChange}
   --collapsible-divided-side-bar-layout-content-padding="4px 16px"
   --color-inverted-selector-selected-background-color="rgb(var(--global-color-primary-500))"
-  --collapsible-divided-side-bar-layout-inner-header-menu-background-color="rgb(var(--global-color-background-50),.5)"
   --collapsible-divided-side-bar-layout-drawer-background-color="rgb(var(--global-color-background-50))"
   --collapsible-divided-side-bar-layout-header-menu-padding="8px 4px 8px 16px"
 >
@@ -214,7 +190,6 @@
   </svelte:fragment>
 
   <svelte:fragment slot="menu" let:hamburgerVisible let:sidebarExpanded >
-    <!-- <div class="ml-4 mt-4 mr-2" style=""> -->
     <div class="hierarchyMenu">
       <HierarchyMenu
         options={baseOptions}
