@@ -4,20 +4,42 @@
   import TabSwitcher from "$lib/components/simple/navigation/TabSwitcher.svelte";
   import EventsViewer from "../../EventsViewer.svelte";
   import SlotsViewer from "../../SlotsViewer.svelte";
+    import type { ComponentProps } from "svelte";
+
+  let dynamicTabs: ComponentProps<typeof TabSwitcher>['tabs'] = $state([
+    { name: 'tab1', label: 'Tab 1', icon: 'mdi-plus'},
+  ])
+
+  $effect(() => {
+    setTimeout(() => {
+      dynamicTabs = [
+        { name: 'tab2', label: 'Tab 2', icon: 'mdi-minus'},
+        ...(dynamicTabs || []),
+      ]
+    }, 1000);
+  })
 </script>
 
 <h1>TabSwitcher</h1>
 <ComponentSubtitle>Switch to a new tab, switch to a new life.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
-  <TabSwitcher 
-    tabs={[
-      { name: 'pippo', label: 'Pippo', icon: 'mdi-cog'},
-      { name: 'pluto', label: 'Pluto', icon: 'mdi-cog'},
-      { name: 'paperino', label: 'Paperino', icon: 'mdi-cog'},
-    ]}
-    selected="pippo"
-  ></TabSwitcher>
+  <div style:width="100%">
+    <TabSwitcher 
+      tabs={[
+        { name: 'pippo', label: 'Pippo', icon: 'mdi-cog'},
+        { name: 'pluto', label: 'Pluto', icon: 'mdi-cog'},
+        { name: 'paperino', label: 'Paperino', icon: 'mdi-cog'},
+      ]}
+      selected="pippo"
+    ></TabSwitcher>
+  </div>
+  <div style:width="100%">
+    <TabSwitcher 
+      tabs={dynamicTabs}
+      selected="tab1"
+    ></TabSwitcher>
+  </div>
 </div>
 <h2>Props</h2>
 <PropsViewer
@@ -71,6 +93,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
     gap: 10px;
     margin-bottom: 20px;
   }

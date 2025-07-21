@@ -80,7 +80,7 @@
   }
 </script>
 
-<div class="container {clazz.container || ''}">
+<div class="calendar-container {clazz.container || ''}">
   {#key visibleMonth}
     <div
       in:fly={{ delay: animationDuration, duration: animationDuration, y: 30 }}
@@ -127,7 +127,7 @@
 </div>
 
 <style>
-  .container {
+  .calendar-container {
     height: var(
       --calendar-height,
       var(--calendar-default-height)

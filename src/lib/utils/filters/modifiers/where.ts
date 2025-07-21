@@ -9,7 +9,7 @@ type GroupedWhere = {
   method: 'where',
   kind: 'grouped',
   logicalOperator?: 'and' | 'or' | 'andNot' | 'orNot',
-  children: (ObjectWhere | SimpleWhere | GroupedWhere | InWhere | ColumnWhere | JsonSupersetWhere | InBuilderWhere | NullWhere)[]
+  children: (ObjectWhere | SimpleWhere | GroupedWhere | InWhere | ColumnWhere | JsonSupersetWhere | InBuilderWhere | NullWhere | RawWhere)[]
 }
 
 type ObjectWhere = {
@@ -37,6 +37,15 @@ type ColumnWhere = {
   column: string
 }
 
+type RawWhere = {
+  method: 'where',
+  kind: 'raw',
+  logicalOperator?: 'and' | 'or',
+  clause: string,
+  bindings?: WhereFilterValue[],
+}
+
+
 type InWhere = {
   method: 'where',
   kind: 'in',
@@ -50,7 +59,7 @@ type InBuilderWhere = {
   kind: 'inBuilder',
   logicalOperator?: 'and' | 'or' | 'andNot' | 'orNot',
   key: string,
-  children: (ObjectWhere | SimpleWhere | GroupedWhere | InWhere | ColumnWhere | JsonSupersetWhere | InBuilderWhere | NullWhere | SelectModifier | JoinModifier | FromModifier)[]
+  children: (ObjectWhere | SimpleWhere | GroupedWhere | InWhere | ColumnWhere | JsonSupersetWhere | InBuilderWhere | NullWhere | RawWhere | SelectModifier | JoinModifier | FromModifier)[]
 }
 
 type JsonSupersetWhere = {
@@ -68,4 +77,4 @@ type NullWhere = {
   key: string
 }
 
-export type WhereModifier = SimpleWhere | ObjectWhere | GroupedWhere | InWhere | ColumnWhere | JsonSupersetWhere | InBuilderWhere | NullWhere
+export type WhereModifier = SimpleWhere | ObjectWhere | GroupedWhere | InWhere | ColumnWhere | JsonSupersetWhere | InBuilderWhere | NullWhere | RawWhere

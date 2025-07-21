@@ -37,6 +37,7 @@
     menuBorderRadius?: string;
     mobileDrawer?: boolean;
     menuWidth?: string | null;
+    menuAnchor?: ComponentProps<typeof Menu>['anchor']
     class?: {
       activator?: string;
       menu?: string;
@@ -133,6 +134,7 @@
     menuBorderRadius = "5px",
     mobileDrawer = false,
     menuWidth = undefined,
+    menuAnchor = 'bottom-center',
     class: clazz = {},
     selectionContainerSnippet,
     selectionSnippet,
@@ -446,7 +448,7 @@
       _boxShadow={menuBoxShadow}
       _borderRadius={menuBorderRadius}
       bind:open={menuOpened}
-      anchor="bottom-center"
+      anchor={menuAnchor}
       closeOnClickOutside
       bind:refreshPosition
       bind:menuElement
