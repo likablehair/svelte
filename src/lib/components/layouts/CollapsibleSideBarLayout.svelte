@@ -4,10 +4,8 @@
   import MediaQuery from "$lib/components/simple/common/MediaQuery.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import { createEventDispatcher } from "svelte";
-  import ColorInvertedSelector, {
-    type Option,
-  } from "../simple/lists/ColorInvertedSelector.svelte";
   import { writable } from "svelte/store";
+  import mediaQuery from "$lib/stores/mediaQuery";
 
   interface ClassProps {
     container?: string;
@@ -29,9 +27,6 @@
   const dispatch = createEventDispatcher<{
     "drawer-change": {
       opened: boolean;
-    };
-    "menu-select": {
-      option: Option;
     };
     "pinned-change": {
       pinned: boolean;
@@ -55,6 +50,10 @@
     sidebarExpanded = !sidebarExpanded;
     dispatch("sidebar-toggle", { expanded: sidebarExpanded });
   }
+
+  $: if($mediaQuery.m || $mediaQuery.s || $mediaQuery.xs) {
+    sidebarExpanded = false
+  }
 </script>
 
 <MediaQuery let:mAndDown>
@@ -75,15 +74,26 @@
                 on:click={toggleMenu}
               />
             </div>
-          {:else if !sidebarExpanded}
-            <div style:margin-right="2rem">
-              <Icon
-                name="mdi-menu-close"
-                click
-                --icon-default-size="1.5rem"
-                on:click={toggleSidebar}
-              />
-            </div>
+          {:else}
+            {#if !sidebarExpanded}
+              <div style:margin-right="2rem">
+                <Icon
+                  name="mdi-menu-close"
+                  click
+                  --icon-default-size="1.5rem"
+                  on:click={toggleSidebar}
+                />
+              </div>
+            {:else}
+              <div style:margin-right="2rem">
+                <Icon
+                  name="mdi-menu-open"
+                  click
+                  --icon-default-size="1.5rem"
+                  on:click={toggleSidebar}
+                />
+              </div>
+            {/if}
           {/if}
           <slot name="inner-menu" hamburgerVisible={mAndDown}>
             <div class="menu">Menu</div>
@@ -112,18 +122,6 @@
                   >
                     <div class="logo">Logo</div>
                   </slot>
-                </div>
-                <div class="pin-container">
-                  {#if sidebarExpanded}
-                    <div class="sidebar-close-button">
-                      <Icon
-                        name="mdi-menu-open"
-                        click
-                        --icon-default-size="1.5rem"
-                        on:click={toggleSidebar}
-                      />
-                    </div>
-                  {/if}
                 </div>
               </div>
               <slot name="menu" hamburgerVisible={mAndDown} {sidebarExpanded}>
@@ -202,7 +200,6 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    width: 70%;
     margin-bottom: 1rem;
   }
 

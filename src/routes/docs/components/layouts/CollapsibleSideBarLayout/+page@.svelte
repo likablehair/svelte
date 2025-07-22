@@ -175,8 +175,6 @@
   on:sidebar-toggle={handleSidebarToggle}
   on:drawer-change={handleDrawerChange}
   --collapsible-divided-side-bar-layout-content-padding="4px 16px"
-  --color-inverted-selector-selected-background-color="rgb(var(--global-color-primary-500))"
-  --collapsible-divided-side-bar-layout-drawer-background-color="rgb(var(--global-color-background-50))"
   --collapsible-divided-side-bar-layout-header-menu-padding="8px 4px 8px 16px"
 >
   <svelte:fragment slot="inner-menu" let:hamburgerVisible>
