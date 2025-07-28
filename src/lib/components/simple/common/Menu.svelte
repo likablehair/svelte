@@ -211,7 +211,8 @@
     return scroll
   }
 
-
+  let positionedAncestor: HTMLElement | undefined = undefined
+  
   $effect(() => {
     if (open) {
       if (!menuElement || !activator) return;
@@ -266,6 +267,12 @@
         calculateMenuPosition({ activator, menuElement });
   
       if (maxZIndex) zIndex = maxZIndex + 2;
+
+      if(!!menuElement && !!activator) {
+        let elem = getPositionedAncestor(menuElement.parentElement)
+        positionedAncestor = elem == null ? undefined : elem
+        calculateMenuPosition({menuElement, activator})
+      }
     }
   }) 
   $effect(() => {
@@ -309,16 +316,6 @@
       menuElement.addEventListener("touchstart", (event) => {
         event.stopPropagation();
       });
-    }
-  })
-
-
-  let positionedAncestor: HTMLElement | undefined = undefined
-  $effect(() => {
-    if(!!menuElement && !!activator) {
-      let elem = getPositionedAncestor(menuElement.parentElement)
-      positionedAncestor = elem == null ? undefined : elem
-      calculateMenuPosition({menuElement, activator})
     }
   })
 
