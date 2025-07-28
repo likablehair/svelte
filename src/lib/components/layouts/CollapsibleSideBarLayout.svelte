@@ -124,13 +124,23 @@
                 />
               </div>
             {:else if !sidebarExpanded}
-              <div style:margin-right="2rem">
-                <Icon
-                  name="mdi-menu-close"
-                  --icon-default-size="1.5rem"
-                  onclick={toggleSidebar}
-                />
-              </div>
+              {#if !sidebarExpanded}
+                <div style:margin-right="2rem">
+                  <Icon
+                    name="mdi-dock-left"
+                    --icon-default-size="1.5rem"
+                    onclick={toggleSidebar}
+                  />
+                </div>
+              {:else}
+                <div style:margin-right="2rem">
+                  <Icon
+                    name="mdi-dock-left"
+                    --icon-default-size="1.5rem"
+                    onclick={toggleSidebar}
+                  />
+                </div>
+              {/if}
             {/if}
             {#if innerMenuSnippet}
               {@render innerMenuSnippet({ hamburgerVisible: mAndDown })}
@@ -160,17 +170,6 @@
                       {@render logoSnippet({ hamburgerVisible: mAndDown, sidebarExpanded })}
                     {:else}
                       <div class="logo">Logo</div>
-                    {/if}
-                  </div>
-                  <div class="pin-container">
-                    {#if sidebarExpanded}
-                      <div class="sidebar-close-button">
-                        <Icon
-                          name="mdi-menu-open"
-                          --icon-default-size="1.5rem"
-                          onclick={toggleSidebar}
-                        />
-                      </div>
                     {/if}
                   </div>
                 </div>
@@ -261,15 +260,6 @@
     align-items: center;
     width: 70%;
     margin-bottom: 1rem;
-  }
-
-  .pin-container {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: 30%;
-    margin-bottom: 1rem;
-    margin-right: 1rem;
   }
 
   .sidebar-close-button {
