@@ -914,6 +914,9 @@
 
 
 <style>
+  * {
+    box-sizing: border-box;
+  }
 
   .sub-filter-button {
     display: flex;
@@ -1095,7 +1098,7 @@
     font-weight: 600;
     font-size: 1.5rem;
     padding: 16px;
-    height: 32px;
+    height: 64px;
     display: flex;
     align-items: center;
     border-bottom: 1px solid rgb(var(--global-color-background-200));
@@ -1107,13 +1110,13 @@
 
   .dialog-body {
     padding: 16px;
-    height: calc(90vh - 96px);
+    height: calc(90vh - 164px);
     max-height: calc(90vh - 164px);
     overflow-y: auto;
   }
 
   .dialog-footer {
-    height: 32px;
+    height: 64px;
     padding: 16px;
     display: flex;
     align-items: center;
