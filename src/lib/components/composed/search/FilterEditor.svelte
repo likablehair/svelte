@@ -79,6 +79,7 @@
   }
 
   $effect(() => {
+    console.log('effect 1')
     if(!!filter) {
       tick().then(() => {
         initTmpFilter();
@@ -88,6 +89,7 @@
   }) 
 
   $effect(() => {
+    console.log('effect 2')
     if(!!tmpFilter) {
       let modes
       if(tmpFilter.type == 'string') {
@@ -114,6 +116,7 @@
   }) 
 
   $effect(() => {
+    console.log('effect 3')
     if(!tmpFilter?.advanced) {
       advancedModeSelectedOptions = []
     }
@@ -141,6 +144,7 @@
   let applyFilterDisabled = $derived(!Validator.isValid(tmpFilter) && !forceApplyValid)
 
   $effect.pre(() => {
+    console.log('effect 4')
     if(!!tmpFilter && tmpFilter.type == 'bool') {
       if(tmpFilter.value === undefined) {
         tmpFilter.value = false
@@ -149,6 +153,7 @@
   })
 
   $effect.pre(() => {
+    console.log('effect 5')
     if(!!tmpFilter && tmpFilter.type == 'select') {
       if(tmpFilter.values === undefined) {
         tmpFilter.values = []

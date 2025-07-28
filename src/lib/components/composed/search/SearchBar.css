@@ -1,5 +1,6 @@
 :root {
   --search-bar-default-ring-color: rgb(var(--global-color-contrast-100));
+  --search-bar-default-ring-width: 1px;
   --search-bar-default-background-color: rgb(var(--global-color-background-100));
   --search-bar-default-border-radius: 0.5rem;
   --search-bar-default-height: 3rem;

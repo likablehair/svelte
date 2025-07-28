@@ -26,7 +26,7 @@
   }
 
   let {
-    values = $bindable([]),
+    values = $bindable(),
     items,
     multiple = true,
     disabled = false,
@@ -35,10 +35,10 @@
 
   function select(item: ItemData) {
     const alreadyPresent =
-      values.findIndex((i) => i.value === item.value) != -1;
+      values?.findIndex((i) => i.value === item.value) !== -1;
 
     if (!alreadyPresent) {
-      if (multiple) values = [...values, item];
+      if (multiple) values = [...(values || []), item];
       else values = [item];
 
       if(onchange) {
@@ -54,14 +54,14 @@
   }
 
   function unselect(item: ItemData) {
-    values = values.filter((i) => i.value != item.value);
+    values = values?.filter((i) => i.value != item.value);
 
     if(onchange) {
       onchange({
         detail: {
           unselect: item,
           select: undefined,
-          selection: values,
+          selection: values || [],
         }
       })
     }
@@ -69,7 +69,7 @@
 
   function toggle(item: ItemData) {
     const alreadyPresent =
-      values.findIndex((i) => i.value === item.value) != -1;
+      values?.findIndex((i) => i.value === item.value) !== -1;
 
     if (alreadyPresent) unselect(item);
     else select(item);
@@ -88,7 +88,7 @@
       {#each (items || []) as item}
         <div class="chip">
           <Chip
-            outlined={values.findIndex(i => i.value === item.value) === -1}
+            outlined={!values || values?.findIndex(i => i.value === item.value) === -1}
             onclick={() => toggle(item)}
             buttonTabIndex={0}
             truncateText

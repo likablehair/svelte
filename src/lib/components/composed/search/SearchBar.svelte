@@ -1,39 +1,30 @@
 <script lang="ts">
-    import type { ChangeEventHandler, FocusEventHandler, FormEventHandler, KeyboardEventHandler } from 'svelte/elements';
-  import '../../../css/main.css'
-  import './SearchBar.css'
-    import type { Snippet } from 'svelte';
-
-  /*
-    Styles:
-
-    --search-bar-ring-color
-    --search-bar-background-color
-    --search-bar-border-radius
-    --search-bar-height
-    --search-bar-padding
-    --search-bar-line-height
-    --search-bar-font-size
-    --search-bar-max-width
-    --search-bar-width
-  */
+  import type {
+    ChangeEventHandler,
+    FocusEventHandler,
+    FormEventHandler,
+    KeyboardEventHandler,
+  } from "svelte/elements";
+  import "../../../css/main.css";
+  import "./SearchBar.css";
+  import type { Snippet } from "svelte";
 
   interface Props {
     input?: HTMLElement;
     value?: string;
     placeholder?: string;
     class?: {
-      container?: string,
-      icon?: string,
-      input?: string
-    }
-    oninput?: FormEventHandler<HTMLInputElement>
-    onchange?: ChangeEventHandler<HTMLInputElement>
-    onkeydown?: KeyboardEventHandler<HTMLInputElement>
-    onfocus?: FocusEventHandler<HTMLInputElement>
-    onblur?: FocusEventHandler<HTMLInputElement>
-    iconSnippet?: Snippet<[]>
-    inputSnippet?: Snippet<[]>
+      container?: string;
+      icon?: string;
+      input?: string;
+    };
+    oninput?: FormEventHandler<HTMLInputElement>;
+    onchange?: ChangeEventHandler<HTMLInputElement>;
+    onkeydown?: KeyboardEventHandler<HTMLInputElement>;
+    onfocus?: FocusEventHandler<HTMLInputElement>;
+    onblur?: FocusEventHandler<HTMLInputElement>;
+    iconSnippet?: Snippet<[]>;
+    inputSnippet?: Snippet<[]>;
   }
 
   let {
@@ -51,9 +42,7 @@
   }: Props = $props();
 </script>
 
-<div
-  class="search-bar-container {clazz.container}"
->
+<div class="search-bar-container {clazz.container}">
   {#if iconSnippet}
     {@render iconSnippet()}
   {:else}
@@ -82,11 +71,11 @@
       autocapitalize="off"
       enterkeyhint="search"
       spellcheck="false"
-      placeholder={placeholder}
+      {placeholder}
       maxlength="512"
       tabindex="0"
       bind:this={input}
-      bind:value={value}
+      bind:value
       {oninput}
       {onchange}
       {onkeydown}
@@ -95,15 +84,12 @@
       class="input {clazz.input}"
     />
   {/if}
-  
 </div>
 
 <style>
   .search-bar-container {
-    box-shadow: inset 0 0 0 1px var(
-      --search-bar-ring-color,
-      var(--search-bar-default-ring-color)
-    );
+    box-shadow: inset 0 0 0 var(--search-bar-ring-width, var(--search-bar-default-ring-width))
+      var(--search-bar-ring-color, var(--search-bar-default-ring-color));
     background-color: var(
       --search-bar-background-color,
       var(--search-bar-default-background-color)
@@ -112,33 +98,18 @@
       --search-bar-border-radius,
       var(--search-bar-default-border-radius)
     );
-    height: var(
-      --search-bar-height,
-      var(--search-bar-default-height)
-    );
+    height: var(--search-bar-height, var(--search-bar-default-height));
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: var(
-      --search-bar-padding,
-      var(--search-bar-default-padding)
-    );
+    padding: var(--search-bar-padding, var(--search-bar-default-padding));
     box-sizing: border-box;
-    max-width: var(
-      --search-bar-max-width,
-      var(--search-bar-default-max-width)
-    );
-    width: var(
-      --search-bar-width,
-      var(--search-bar-default-width)
-    );
+    max-width: var(--search-bar-max-width, var(--search-bar-default-max-width));
+    width: var(--search-bar-width, var(--search-bar-default-width));
   }
 
   .input {
-    font-size: var(
-      --search-bar-font-size,
-      var(--search-bar-default-font-size)
-    );
+    font-size: var(--search-bar-font-size, var(--search-bar-default-font-size));
     line-height: var(
       --search-bar-line-height,
       var(--search-bar-default-line-height)

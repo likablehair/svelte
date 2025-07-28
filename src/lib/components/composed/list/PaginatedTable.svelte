@@ -1,5 +1,7 @@
 <script lang="ts" generics="Item extends {[key: string]: any}, Data">
-  import SimpleTable, { type Header } from "$lib/components/simple/lists/SimpleTable.svelte";
+  import SimpleTable, {
+    type Header,
+  } from "$lib/components/simple/lists/SimpleTable.svelte";
   import Paginator from "$lib/components/simple/lists/Paginator.svelte";
   import Dropdown from "$lib/components/composed/forms/Dropdown.svelte";
   import { type ComponentProps, type Snippet } from "svelte";
@@ -8,7 +10,8 @@
   import type Builder from "$lib/utils/filters/builder";
   import Converter from "$lib/utils/filters/filters";
 
-  interface Props extends Omit<ComponentProps<typeof SimpleTable<Item, Data>>, 'class'>{
+  interface Props
+    extends Omit<ComponentProps<typeof SimpleTable<Item, Data>>, "class"> {
     page?: NonNullable<ComponentProps<typeof Paginator>["page"]>;
     maxPage?: ComponentProps<typeof Paginator>["maxPage"];
     rowsPerPageOptions?: ComponentProps<typeof Dropdown>["items"];
@@ -22,51 +25,65 @@
     editFilterMode?: "one-edit" | "multi-edit";
     showActiveFilters?: boolean;
     class?: {
-      simpleTable?: ComponentProps<typeof SimpleTable<Item, Data>>['class']
-    }
+      simpleTable?: ComponentProps<typeof SimpleTable<Item, Data>>["class"];
+    };
     onpaginationChange?: (event: {
       detail: {
-        rowsPerPage: number,
-        page: number,
-        builder: Builder
-      }
-    }) => void
+        rowsPerPage: number;
+        page: number;
+        builder: Builder;
+      };
+    }) => void;
     onfiltersChange?: (event: {
       detail: {
-        builder: Builder
-      }
-    }) => void
-    onremoveFilter?: ComponentProps<typeof Filters>['onremoveFilter']
-    onremoveAllFilters?: ComponentProps<typeof Filters>['onremoveAllFilters']
-    filterAppendSnippet?: ComponentProps<typeof Filters>['appendSnippet']
-    customFilterChipSnippet?: ComponentProps<typeof Filters>['customChipSnippet']
-    customFilterSnippet?: ComponentProps<typeof Filters>['customSnippet']
-    searchBarSnippet?: Snippet<[{
-      handleSearchChange: typeof handleSearchChange
-    }]>
-    footerSnippet?: Snippet<[{
-      hideRowsPerPage: typeof hideRowsPerPage,
-      rowsPerPageOptions: typeof rowsPerPageOptions,
-      rowsPerPageSelection: typeof rowsPerPageSelection,
-      totalElements: typeof totalElements,
-      page: typeof page,
-      maxPage: typeof maxPage,
-      rowsPerPage: typeof rowsPerPage,
-      handlePaginationChange: typeof handlePaginationChange
-    }]>
-    rangeDescriptorSnippet?: Snippet<[{
-      totalElements: typeof totalElements,
-      page: typeof page,
-      maxPage: typeof maxPage,
-      rowsPerPage: typeof rowsPerPage,
-    }]>
+        builder: Builder;
+      };
+    }) => void;
+    onremoveFilter?: ComponentProps<typeof Filters>["onremoveFilter"];
+    onremoveAllFilters?: ComponentProps<typeof Filters>["onremoveAllFilters"];
+    filterAppendSnippet?: ComponentProps<typeof Filters>["appendSnippet"];
+    customFilterChipSnippet?: ComponentProps<
+      typeof Filters
+    >["customChipSnippet"];
+    customFilterSnippet?: ComponentProps<typeof Filters>["customSnippet"];
+    searchBarSnippet?: Snippet<
+      [
+        {
+          handleSearchChange: typeof handleSearchChange;
+        },
+      ]
+    >;
+    footerSnippet?: Snippet<
+      [
+        {
+          hideRowsPerPage: typeof hideRowsPerPage;
+          rowsPerPageOptions: typeof rowsPerPageOptions;
+          rowsPerPageSelection: typeof rowsPerPageSelection;
+          totalElements: typeof totalElements;
+          page: typeof page;
+          maxPage: typeof maxPage;
+          rowsPerPage: typeof rowsPerPage;
+          handlePaginationChange: typeof handlePaginationChange;
+        },
+      ]
+    >;
+    rangeDescriptorSnippet?: Snippet<
+      [
+        {
+          totalElements: typeof totalElements;
+          page: typeof page;
+          maxPage: typeof maxPage;
+          rowsPerPage: typeof rowsPerPage;
+        },
+      ]
+    >;
   }
 
   let {
     headers = [],
     items = [],
     sortedBy = $bindable(undefined),
-    sortDirection = $bindable('asc'),
+    sortDirection = $bindable("asc"),
     page = $bindable(1),
     maxPage = undefined,
     rowsPerPageOptions = [
@@ -80,7 +97,6 @@
     filters = $bindable([]),
     searchBarColumns = undefined,
     searchBarVisible = true,
-    searchBarPlaceholder = "Type something to search...",
     lang = "en",
     editFilterMode = "one-edit",
     showActiveFilters = true,
@@ -116,151 +132,177 @@
 
   let searchBarInput: HTMLElement | undefined = $state(),
     searchText: string | undefined = $state(),
-    sortModify: Header<Data>['sortModify']
+    sortModify: Header<Data>["sortModify"];
 
-  let rowsPerPageSelection: ComponentProps<typeof Dropdown>['values'] = $state([])
+  let rowsPerPageSelection: ComponentProps<typeof Dropdown>["values"] = $state(
+    [],
+  );
 
   $effect(() => {
     rowsPerPageSelection = [
-      { label: rowsPerPage.toString(), value: rowsPerPage }
-    ]
-  })
+      { label: rowsPerPage.toString(), value: rowsPerPage },
+    ];
+  });
 
   $effect(() => {
-    if(totalElements !== undefined) maxPage = Math.max(Math.round(totalElements/rowsPerPage), 1)
-  })
+    if (totalElements !== undefined)
+      maxPage = Math.max(Math.round(totalElements / rowsPerPage), 1);
+  });
 
-  function handleRowsPerPageChange(event: Parameters<NonNullable<ComponentProps<typeof Dropdown>['onchange']>>[0]) {
-    rowsPerPage = Number(event.detail.selection?.[0].value)
-    handlePaginationChange()
+  function handleRowsPerPageChange(
+    event: Parameters<
+      NonNullable<ComponentProps<typeof Dropdown>["onchange"]>
+    >[0],
+  ) {
+    rowsPerPage = Number(event.detail.selection?.[0].value);
+    handlePaginationChange();
   }
 
   function handlePaginationChange() {
-    let builder = buildFilters()
+    let builder = buildFilters();
 
-    if(onpaginationChange) {
+    if (onpaginationChange) {
       onpaginationChange({
         detail: {
-          rowsPerPage, page, builder
-        }
-      })
+          rowsPerPage,
+          page,
+          builder,
+        },
+      });
     }
   }
 
   function handleSearchChange(searchText: string | undefined) {
-    let builder = buildFilters({searchText})
+    let builder = buildFilters({ searchText });
 
-    if(onfiltersChange) {
+    if (onfiltersChange) {
       onfiltersChange({
         detail: {
-          builder
-        }
-      })
+          builder,
+        },
+      });
     }
   }
 
   $effect(() => {
-    handleSearchChange(searchText)
-  })
+    handleSearchChange(searchText);
+  });
 
   function handleFiltersChange() {
-    let builder = buildFilters({searchText})
+    let builder = buildFilters({ searchText });
 
-    if(onfiltersChange) {
+    if (onfiltersChange) {
       onfiltersChange({
         detail: {
-          builder
-        }
-      })
+          builder,
+        },
+      });
     }
   }
 
-  function handleRemoveFilter(event: Parameters<NonNullable<ComponentProps<typeof Filters>['onremoveFilter']>>[0]) {
-    handleFiltersChange()
-    
-    if(onremoveFilter) {
-      onremoveFilter(event)
+  function handleRemoveFilter(
+    event: Parameters<
+      NonNullable<ComponentProps<typeof Filters>["onremoveFilter"]>
+    >[0],
+  ) {
+    handleFiltersChange();
+
+    if (onremoveFilter) {
+      onremoveFilter(event);
     }
   }
 
   function handleRemoveAllFilters() {
-    handleFiltersChange()
-    
-    if(onremoveAllFilters) {
-      onremoveAllFilters()
+    handleFiltersChange();
+
+    if (onremoveAllFilters) {
+      onremoveAllFilters();
     }
   }
 
-  function handleOnSort(event: Parameters<NonNullable<ComponentProps<typeof SimpleTable<Item, Data>>['onsort']>>[0]) {
-    sortModify = event.detail.sortModify
-    handleFiltersChange()
-    
-    if(onsort) {
-      onsort(event)
+  function handleOnSort(
+    event: Parameters<
+      NonNullable<ComponentProps<typeof SimpleTable<Item, Data>>["onsort"]>
+    >[0],
+  ) {
+    sortModify = event.detail.sortModify;
+    handleFiltersChange();
+
+    if (onsort) {
+      onsort(event);
     }
   }
 
-  function buildFilters(params?:{searchText?:string | undefined}){
-    let converter = new Converter()
-    let builder: Builder
+  function buildFilters(params?: { searchText?: string | undefined }) {
+    let converter = new Converter();
+    let builder: Builder;
     builder = converter.createBuilder({
-      filters: filters || []
-    })
+      filters: filters || [],
+    });
 
-    if(!!params?.searchText && !!searchBarColumns && searchBarColumns.length > 0) {
-
-      builder.where(b => {
-        b.where(searchBarColumns![0], 'ilike', '%' + params?.searchText + '%')
-        for(let i = 1; i < searchBarColumns!.length; i += 1) {
-          b.orWhere(searchBarColumns![i], 'ilike', '%' + params?.searchText + '%')
+    if (
+      !!params?.searchText &&
+      !!searchBarColumns &&
+      searchBarColumns.length > 0
+    ) {
+      builder.where((b) => {
+        b.where(searchBarColumns![0], "ilike", "%" + params?.searchText + "%");
+        for (let i = 1; i < searchBarColumns!.length; i += 1) {
+          b.orWhere(
+            searchBarColumns![i],
+            "ilike",
+            "%" + params?.searchText + "%",
+          );
         }
-      })
+      });
     }
 
     if (!!sortedBy) {
-      if(sortModify){
-        builder = sortModify({ builder, sortDirection: sortDirection || 'asc' })
-      }
-      else {
+      if (sortModify) {
+        builder = sortModify({
+          builder,
+          sortDirection: sortDirection || "asc",
+        });
+      } else {
         builder.orderBy(sortedBy, sortDirection || "asc");
       }
     }
 
-    return builder
+    return builder;
   }
-
 </script>
 
 <div class="paginated-table">
-  {#if searchBarVisible}
-    {#if searchBarSnippet}
-      {@render searchBarSnippet({ handleSearchChange })}
-    {:else}
-      <div class="search-bar-container">
-        <SearchBar
-          placeholder={searchBarPlaceholder}
-          bind:input={searchBarInput}
-          bind:value={searchText}
-        >
-        </SearchBar>
-      </div>
-    {/if}
-  {/if}
   <div class="filter-container">
+    {#if searchBarVisible}
+      {#if searchBarSnippet}
+        {@render searchBarSnippet({ handleSearchChange })}
+      {:else}
+        <div class="search-bar-container">
+          <SearchBar
+            bind:input={searchBarInput}
+            bind:value={searchText}
+            --search-bar-default-height="36px"
+            --search-bar-default-border-radius="4px"
+            --search-bar-default-ring-color="rgb(var(--global-color-background-300),.6)"
+            --search-bar-default-background-color="rgb(var(--global-color-background-300),.4)"
+          ></SearchBar>
+        </div>
+      {/if}
+    {/if}
     <Filters
       bind:filters
       onapplyFilter={handleFiltersChange}
       onremoveFilter={handleRemoveFilter}
       onremoveAllFilters={handleRemoveAllFilters}
-      --filters-default-wrapper-width="100%"
+      --filters-default-wrapper-width={!!searchBarVisible ? undefined : "100%"}
       {lang}
       {editFilterMode}
       {showActiveFilters}
       appendSnippet={filterAppendSnippet}
       customChipSnippet={customFilterChipSnippet}
       customSnippet={customFilterSnippet}
-    >
-    </Filters>
+    ></Filters>
   </div>
   <SimpleTable
     {headers}
@@ -286,12 +328,11 @@
     {headerLabelSnippet}
     {noDataSnippet}
     {oncolumnResize}
-  >
-  </SimpleTable>
+  ></SimpleTable>
 
   <div class="footer">
     {#if footerSnippet}
-      {@render footerSnippet({ 
+      {@render footerSnippet({
         hideRowsPerPage,
         rowsPerPageOptions,
         rowsPerPageSelection,
@@ -299,7 +340,7 @@
         page,
         maxPage,
         rowsPerPage,
-        handlePaginationChange
+        handlePaginationChange,
       })}
     {:else}
       {#if !hideRowsPerPage}
@@ -317,17 +358,20 @@
       {/if}
       {#if totalElements !== undefined}
         {#if rangeDescriptorSnippet}
-          {@render rangeDescriptorSnippet({ page, maxPage, rowsPerPage, totalElements })}
+          {@render rangeDescriptorSnippet({
+            page,
+            maxPage,
+            rowsPerPage,
+            totalElements,
+          })}
         {:else}
           <div class="range-descriptor">
-            viewing {((page || 1) - 1) * rowsPerPage} - {(page || 1) * rowsPerPage} of {totalElements}
+            viewing {((page || 1) - 1) * rowsPerPage} - {(page || 1) *
+              rowsPerPage} of {totalElements}
           </div>
         {/if}
       {/if}
-      <Paginator
-        bind:page
-        {maxPage}
-        onchange={handlePaginationChange}
+      <Paginator bind:page {maxPage} onchange={handlePaginationChange}
       ></Paginator>
     {/if}
   </div>
@@ -342,7 +386,7 @@
   }
 
   .range-descriptor {
-    font-size: .7rem;
+    font-size: 0.7rem;
   }
 
   .footer {
@@ -353,11 +397,10 @@
   }
 
   .filter-container {
-    margin-top: var(--paginated-table-filter-container-margin-top, 10px);
     display: flex;
     align-items: center;
     flex-direction: row;
-    gap: 10px;
+    gap: 12px;
     width: 100%;
   }
 
@@ -366,6 +409,7 @@
       --paginated-table-search-bar-container-padding,
       var(--paginated-table-search-bar-container-default-padding, 0)
     );
+    flex-grow: 1;
   }
 
   @media only screen and (max-width: 768px) {
@@ -373,5 +417,4 @@
       display: none;
     }
   }
-
 </style>

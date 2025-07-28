@@ -20,6 +20,6 @@
   --button-default-text-active-background-color: rgb(var(--global-color-primary-500), 0.4);
   --button-default-icon-active-color: rgb(var(--global-color-primary-500));
   --button-default-icon-focus-color: rgb(var(--global-color-primary-500));
-  --button-default-box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.3);
+  --button-default-box-shadow: none;
   --button-default-text-font-weight: 600;
 }

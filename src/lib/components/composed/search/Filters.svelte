@@ -75,7 +75,7 @@
     lang = 'en',
     addFilterLabel = lang === 'en' ? "Filters" : "Filtri",
     cancelFilterLabel = lang === 'en' ? "Cancel" : "Annulla",
-    applyFilterLabel = lang === 'en' ? "Apply filter" : "Applica filtro",
+    applyFilterLabel = lang === 'en' ? "Apply filters" : "Applica filtri",
     showActiveFilters = true,
     filterTitleLabel = lang === 'en' ? "Filter by" : "Filtra per",
     dateLocale = lang === 'en' ? 'en' : 'it',
@@ -104,7 +104,7 @@
           between: { short: 'compreso', extended: 'è compreso tra' },
           different: { short: 'diverso', extended: 'diverso da' }
         },
-    drawerSpace = '20rem',
+    drawerSpace = '60vh',
     onaddFilterClick,
     onapplyFilter,
     onremoveAllFilters,
@@ -426,7 +426,7 @@
 
 <MediaQuery>
   {#snippet defaultSnippet({ mAndDown})}
-    <div class="filters-wrapper" class:mobile={mAndDown} style:--filter-dot-size={activeFilters.length > 0 ? '22px' : '0px'} style:--filter-dot-content={activeFilters.length > 0 ? `"${activeFilters.length}"` : '""'}>
+    <div class="filters-wrapper" class:mobile={mAndDown} style:--filter-dot-size={activeFilters.length > 0 ? '16px' : '0px'} style:--filter-dot-content={activeFilters.length > 0 ? `"${activeFilters.length}"` : '""'}>
       <div class="filters-container" class:mobile={mAndDown} class:hidden={mAndDown && (!showActiveFilters || activeFilters.length == 0)}>
         {#if showActiveFilters}
           {#each activeFilters as filter}
@@ -437,6 +437,7 @@
               <Chip
                 label
                 close
+                --chip-border-radius="4px"
                 onclose={() => handleRemoveFilter(filter)}
                 onclick={() => handleActiveFilterClick(filter)}
               >
@@ -490,7 +491,7 @@
                       <span class="more-items" bind:this={moreItemsActivator}>+{filter.values.length - 1}</span>
                       <ToolTip activator={moreItemsActivator}>
                         <div class="more-tooltip-content">
-                          <ul>
+                          <ul style:margin="0px">
                             {#each filter.values as value}
                               <li><div class="truncate-text">{value.label}</div></li>
                             {/each}
@@ -513,6 +514,7 @@
           >
             <Button
               --button-color="var(--chip-color, var(--chip-default-color))"
+              --button-border-radius="4px"
               --button-height="var(--filters-button-height, var(--filters-default-button-height))"
               onclick={handleAddFilterClick}
             >
@@ -520,7 +522,11 @@
                 <Icon name="mdi-filter"></Icon>
                 {addFilterLabel}
                 <div class="remove-filters" class:hidden={activeFilters.length <= 0}>
-                  <Icon name="mdi-close-circle" onclick={handleRemoveAllFilters}></Icon>
+                  <Icon 
+                    name="mdi-close-circle" 
+                    onclick={handleRemoveAllFilters} 
+                    --icon-hover-color="var(--chip-color, var(--chip-default-color))"
+                  ></Icon>
                 </div>
               </div>
             </Button>
@@ -535,6 +541,8 @@
         >
           <Button
             --button-color="var(--chip-color, var(--chip-default-color))"
+            --button-hover-color="var(--chip-color, var(--chip-default-color))"
+            --button-border-radius="4px"
             --button-height="var(--filters-button-height, var(--filters-default-button-height))"
             onclick={handleAddFilterClick}
           >
@@ -542,7 +550,11 @@
               <Icon name="mdi-filter"></Icon>
               {addFilterLabel}
               <div class="remove-filters" class:hidden={activeFilters.length <= 0}>
-                <Icon name="mdi-close-circle" onclick={handleRemoveAllFilters}></Icon>
+                <Icon 
+                  name="mdi-close-circle" 
+                  onclick={handleRemoveAllFilters}
+                  --icon-hover-color="var(--chip-color, var(--chip-default-color))"
+                ></Icon>
               </div>
             </div>
           </Button>
@@ -641,9 +653,9 @@
             >
               <div class="form-container" style:background-color={mAndDown ? 'transparent' : 'rgb(var(--global-color-background-100))'} style:width={mAndDown ? '100%' : '50vw'} style:box-sizing="border-box">
                 <div class="header">
-                  <h1>{addFilterLabel}</h1>
+                  <div>{addFilterLabel}</div>
                 </div>
-                <div class="body">
+                <div class="drawer-body">
                   {#if contentSnippet}
                     {@render contentSnippet({ mAndDown, updateMultiFilterValues, filters, handleRemoveAllFilters })}
                   {:else}
@@ -811,12 +823,19 @@
       {:else if editFilterMode === 'multi-edit'}
         <Dialog
           bind:open={open}
+          _overlayOpacity="50%"
+          _overlayBackdropFilter="blur(4px)"
         >
-          <div class="form-container" style:background-color={mAndDown ? 'transparent' : 'rgb(var(--global-color-background-100))'} style:width={mAndDown ? '100%' : '50vw'} style:box-sizing="border-box">
+          <div 
+            class="form-container" 
+            style:background-color={mAndDown ? 'transparent' : 'rgb(var(--global-color-background-100))'} 
+            style:width={mAndDown ? '100%' : '800px'} 
+            style:box-sizing="border-box"
+          >
             <div class="header">
-              <h1>{addFilterLabel}</h1>
+              <div>{addFilterLabel}</div>
             </div>
-            <div class="body">
+            <div class="dialog-body">
               {#if contentSnippet}
                 {@render contentSnippet({ mAndDown, updateMultiFilterValues, filters, handleRemoveAllFilters })}
               {:else}
@@ -849,30 +868,37 @@
                 </div>
               {/if}
             </div>
-            <div class="footer">
+            <div class="dialog-footer">
               <div class="actions" style:padding-bottom={mAndDown ? '20px' : undefined}>
                 <Button
-                  --button-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
-                  --button-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
-                  --button-hover-background-color="rgb(var(--global-color-primary-500))"
-                  --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
+                  --button-color="rgb(var(--global-color-contrast-900))"
+                  --button-background-color="transparent"
+                  --button-focus-background-color="rgb(var(--global-color-background-200, .5))"
+                  --button-active-background-color="rgb(var(--global-color-background-200, .5))"
+                  --button-hover-background-color="rgb(var(--global-color-background-200, .5))"
+                  --button-hover-box-shadow="none"
                   --button-box-shadow="none"
+                  --button-padding="12px 16px"
                   onclick={handleCancelFilterClick}
                 >
                   {cancelFilterLabel}
                 </Button>
                 <Button
-                  --button-color="rgb(var(--global-color-primary-400))"
+                  --button-color="rgb(var(--global-color-contrast-900))"
                   --button-background-color="transparent"
-                  --button-hover-background-color="rgb(var(--global-color-primary-500))"
-                  --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
+                  --button-focus-background-color="rgb(var(--global-color-background-200, .5))"
+                  --button-active-background-color="rgb(var(--global-color-background-200, .5))"
+                  --button-hover-background-color="rgb(var(--global-color-background-200, .5))"
+                  --button-hover-box-shadow="none"
                   --button-box-shadow="none"
+                  --button-padding="12px 16px"
                   onclick={handleMultiEditRemoveClick}
                 >
                   {lang == 'en' ? "Remove filters" : "Rimuovi filtri"}
                 </Button>
                 <Button
-                  --button-min-width="100px"
+                  --button-min-width="fit-content"
+                  --button-padding="12px 16px"
                   onclick={handleApplyMultiFilterClick}
                 >
                   {applyFilterLabel}
@@ -903,7 +929,6 @@
   }
 
   .filter-button-content .remove-filters {
-    margin: 0px 8px 0px 8px;
     color: rgb(var(--global-color-primary-100));
   }
 
@@ -918,15 +943,16 @@
   .filter-button::before {
     content: var(--filter-dot-content, '0');
     text-align: center;
-    font-size: .6rem;
+    font-size: .5rem;
     background-color: rgb(var(--global-color-background-500));
     color: rgb(var(--global-color-contrast-700));
     position: absolute;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-    top: -40%;
-    left: calc(100% - 10px);
+    top: -16%;
+    right: -8%;
     border-radius: 100px;
     width: var(--filter-dot-size, 0px);
+    line-height: 16px;
     height: var(--filter-dot-size, 0px);
   }
 
@@ -945,7 +971,7 @@
   .filters-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
+    gap: 8px;
     align-items: center;
   }
 
@@ -957,7 +983,7 @@
   .filters-wrapper {
     display: flex;
     align-items: start;
-    gap: 20px;
+    gap: 8px;
     max-width: 100%;
     width: var(
       --filters-wrapper-width,
@@ -978,13 +1004,13 @@
 
   .more-items {
     position: relative;
-    padding: 2px 8px 2px 8px;
-    border-radius: 20px;
-    margin-left: 5px;
+    padding: 0px 6px;
+    border-radius: 8px;
+    margin-left: 2px;
     background-color: rgb(var(--global-color-grey-50));
     color: rgb(var(--global-color-primary-500));
     font-weight: 800;
-    font-size: .7rem;
+    font-size: 10px;
   }
 
   .more-tooltip-content {
@@ -992,7 +1018,7 @@
     text-overflow: ellipsis;
     width: fit-content;
     border-radius: 6px;
-    padding: 10px 20px 10px 20px;
+    padding: 16px;
     text-align: left;
     background-color: rgb(var(--global-color-background-200));
     color: rgb(var(--global-color-background-950));
@@ -1018,7 +1044,7 @@
 
   .form-container {
     border-radius: 10px;
-    padding: 20px;
+    box-shadow: 0 0 1px 1px rgb(var(--global-color-background-200));
     height: 100%;
     max-height: 90vh;
     overflow-y: auto;
@@ -1068,7 +1094,31 @@
   .header {
     font-weight: 600;
     font-size: 1.5rem;
-    padding: 0 0 8px 8px;
+    padding: 16px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgb(var(--global-color-background-200));
+  }
+
+  .drawer-body {
+    padding: 16px;
+  }
+
+  .dialog-body {
+    padding: 16px;
+    height: calc(90vh - 96px);
+    max-height: calc(90vh - 164px);
+    overflow-y: auto;
+  }
+
+  .dialog-footer {
+    height: 32px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    border-top: 1px solid rgb(var(--global-color-background-200));
   }
 
 </style>

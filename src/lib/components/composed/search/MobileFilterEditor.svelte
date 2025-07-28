@@ -14,6 +14,7 @@
   import ToggleList from "$lib/components/composed/forms/ToggleList.svelte";
   import type { KeyboardEventHandler, MouseEventHandler } from "svelte/elements";
   import type { ComponentProps, Snippet } from "svelte";
+  import lodash from 'lodash'
 
     interface Props {
     filter?: Filter;
@@ -39,14 +40,14 @@
   }
 
   let {
-    filter = $bindable(undefined),
+    filter = $bindable(),
     lang = 'en',
     backIcon = "mdi-arrow-left",
     betweenFromLabel = lang === 'en' ? "From" : "Da",
     betweenToLabel = lang === 'en' ? "To" : "A",
     labelsMapper,
     forceApplyValid = false,
-    tmpFilter = $bindable(undefined),
+    tmpFilter = $bindable(),
     onbackClick,
     onkeypress,
     onclick: onclickInternal,
@@ -56,18 +57,10 @@
     titleSnippet,
   }: Props = $props();
 
-  // function handleApplyFilterClick() {
-  //   if(!!filter && !!tmpFilter) {
-  //     filter = {...tmpFilter}
-  //     filter.active = true
-  //     dispatch('apply')
-  //   }
-  // }
-
   let step: 'advanced' | 'editor' | undefined = $state()
 
   function initTmpFilter() {
-    tmpFilter = filter === undefined ? undefined : {...filter}
+    tmpFilter = filter === undefined ? undefined : lodash.cloneDeep(filter)
     if(!!tmpFilter && tmpFilter.advanced) {
       if(['string', 'number', 'date', 'select'].includes(tmpFilter.type) && Object.keys(tmpFilter).includes('mode')) {
         //@ts-ignore
@@ -87,50 +80,14 @@
   }
 
 
-  $effect(() => {
-    if(!!filter) {
-      initTmpFilter()
-    }
-  })
-
 
   let advancedModeOptions: Element[] | undefined = $state(),
     advancedModeSelectedOption: string | undefined = $state()
 
-  $effect(() => {
-    if(!!tmpFilter) {
-      let modes
-      if(tmpFilter.type == 'string') {
-        modes = STRING_MODES
-      } else if(tmpFilter.type == 'date') {
-        modes = GENERIC_MODES
-      } else if(tmpFilter.type == 'number') {
-        modes = GENERIC_MODES
-      } else if(tmpFilter.type == 'select') {
-        modes = SELECT_MODES
-      }
-  
-      if(!!modes) {
-        advancedModeOptions = modes.map(mode => {
-          return {
-            title: labelsMapper[mode].short || mode,
-            name: mode
-          }
-        })
-      }
-    }
-  })
-
-  $effect(() => {
-    if(!tmpFilter?.advanced) {
-      advancedModeSelectedOption = undefined
-    }
-  })
-
   let calendarOpened: boolean = $state(false),
     calendarOpened2: boolean = $state(false)
 
-  // TODO I don't like that there is a singlo dropdow to handle all filter advance mode.
+  // TODO I don't like that there is a single dropdown to handle all filter advance mode.
   // In some case would be necessary to handle more than one selection and this code
   // could become non sense
   function handleAdvancedModeSelection() {
@@ -150,18 +107,49 @@
 
   let applyFilterDisabled = $derived(!Validator.isValid(tmpFilter) && !forceApplyValid)
 
+  let lastSyncedFilter = $state(filter)
   $effect(() => {
-    if(!!tmpFilter && tmpFilter.type == 'bool') {
-      if(tmpFilter.value === undefined) {
-        tmpFilter.value = false
-      }
+    if(!tmpFilter || !step || (!!filter && !lodash.isEqual($state.snapshot(filter), $state.snapshot(lastSyncedFilter)))) {
+      initTmpFilter()
+      lastSyncedFilter = filter
     }
-  })
 
-  $effect(() => {
-    if(!!tmpFilter && tmpFilter.type == 'select') {
-      if(tmpFilter.values === undefined) {
-        tmpFilter.values = []
+    if(!!tmpFilter) {
+      if(tmpFilter.type == 'bool') {
+        if(tmpFilter.value === undefined) {
+          tmpFilter.value = false
+        }
+      } else if(tmpFilter.type == 'select') {
+        if(tmpFilter.values === undefined) {
+          tmpFilter.values = []
+        }
+      } else if(tmpFilter.type == 'date' && tmpFilter.mode == 'between') {
+        if(!tmpFilter.from) tmpFilter.from = new Date()
+        if(!tmpFilter.to) tmpFilter.to = new Date()
+      }
+
+      if(!tmpFilter.advanced) {
+        advancedModeSelectedOption = undefined
+      }
+
+      let modes
+      if(tmpFilter.type == 'string') {
+        modes = STRING_MODES
+      } else if(tmpFilter.type == 'date') {
+        modes = GENERIC_MODES
+      } else if(tmpFilter.type == 'number') {
+        modes = GENERIC_MODES
+      } else if(tmpFilter.type == 'select') {
+        modes = SELECT_MODES
+      }
+  
+      if(!!modes) {
+        advancedModeOptions = modes.map(mode => {
+          return {
+            title: labelsMapper[mode].short || mode,
+            name: mode
+          }
+        })
       }
     }
   })
@@ -185,13 +173,6 @@
       }, 100)
     }
   }
-
-  $effect(() => {
-    if(!!tmpFilter && tmpFilter.type == 'date' && tmpFilter.mode == 'between') {
-      if(!tmpFilter.from) tmpFilter.from = new Date()
-      if(!tmpFilter.to) tmpFilter.to = new Date()
-    }
-  }) 
 
   function onclick(event: MouseEvent & {
       currentTarget: EventTarget & HTMLDivElement;
