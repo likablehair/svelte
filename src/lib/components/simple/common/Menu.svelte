@@ -60,7 +60,7 @@
       duration: 100,
       y: 10,
     },
-    open = $bindable(false),
+    open = $bindable(),
     outAnimation = fly,
     outAnimationConfig = {
       duration: 100,
