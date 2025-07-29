@@ -5,7 +5,7 @@
   import Keyboarder, { type CallbackFunction } from '$lib/utils/keyboarder';
 
   interface Props {
-    open: boolean;
+    open?: boolean;
     transition?: 'fly-down' | 'fly-up' | 'fly-horizontal' | 'scale' | 'fade';
     _overlayOpacity?: string;
     _overlayColor?: string;
@@ -19,7 +19,7 @@
   }
 
   let {
-    open = $bindable(false),
+    open = $bindable(),
     transition = 'fly-up',
     _overlayOpacity = "30%",
     _overlayColor = "#282828",
@@ -34,7 +34,7 @@
 
 
   let zIndex = $state(50),
-    localOpen: boolean = $state(open),
+    localOpen: boolean = $state(open || false),
     dialogElement: HTMLElement,
     teleportedUid: string | undefined = undefined,
     hasBeenOpened: boolean = $state(false);
@@ -103,7 +103,7 @@
       }
     }
 
-    localOpen = open;
+    localOpen = open || false;
   });
 
   function closeDialog() {

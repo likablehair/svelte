@@ -999,6 +999,7 @@
     flex-grow: 0;
     height: fit-content;
     position: relative;
+    line-height: var(--filters-button-height, var(--filters-default-button-height));
   }
 
   .drawer-content{

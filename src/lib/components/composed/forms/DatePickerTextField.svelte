@@ -54,12 +54,12 @@
   }
 
   let {
-    menuOpened = $bindable(false),
-    openingId = $bindable('date-picker-text-field'),
+    menuOpened = $bindable(),
+    openingId = $bindable(),
     pattern = "dd/MM/yyyy",
     selectedYear = $bindable(new Date().getFullYear()),
     selectedMonth = $bindable(new Date().getMonth()),
-    selectedDate = $bindable(undefined),
+    selectedDate = $bindable(),
     visibleMonth = $bindable(selectedMonth),
     visibleYear = $bindable(selectedYear),
     placeholder,

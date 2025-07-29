@@ -42,6 +42,7 @@
     { name: "class", type: "string", description: "Additional CSS classes for item containers.", default: "''" }  
   ]}
   styleProps={[
+    { name: '--vertical-draggable-list-item-padding', type: 'size', description: 'Defines the row padding.', default: '8px' },
   ]}
 ></PropsViewer>
 <h2>Slots</h2>

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import '../../../css/main.css'
+  import './VerticalDraggableList.css'
   import { flip } from "svelte/animate";
   import { dndzone, type DndEvent } from "svelte-dnd-action";
 	import { type Snippet } from "svelte"
@@ -60,11 +62,8 @@
 	{#each items as item(item.id)}
 		<div
       animate:flip="{{duration: flipDurationMs}}"
-      style="margin-bottom: 12px;"
     > 
-      <div
-        class="item-container {clazz}"
-      >
+      <div class="item-container {clazz}">
         <div
           style:grid-cols=1
         >
@@ -90,7 +89,10 @@
   .item-container {
     display: grid;
     gap: 12px;
-    padding: 8px;
+    padding: var(
+      --vertical-draggable-list-item-padding,
+      var(--vertical-draggable-list-default-item-padding)
+    );
     cursor: move;
     grid-template-columns: 10px auto;
   }
