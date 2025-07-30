@@ -6,6 +6,7 @@
   import { type Option } from "../simple/lists/ColorInvertedSelector.svelte";
   import { writable } from "svelte/store";
   import { type Snippet } from "svelte";
+  import mediaQuery from "$lib/stores/mediaQuery";
 
   interface Props {
     drawerOpened?: boolean;
@@ -101,6 +102,12 @@
       onsidebarToggle({ detail: { expanded: sidebarExpanded } });
     }
   }
+
+  $effect(() => {
+    if($mediaQuery.m || $mediaQuery.s || $mediaQuery.xs) {
+      sidebarExpanded = false
+    }
+  })
 </script>
 
 <MediaQuery>
@@ -123,7 +130,7 @@
                   onclick={toggleMenu}
                 />
               </div>
-            {:else if !sidebarExpanded}
+            {:else}
               {#if !sidebarExpanded}
                 <div style:margin-right="2rem">
                   <Icon
