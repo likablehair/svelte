@@ -9,6 +9,7 @@
   import SearchBar from "../search/SearchBar.svelte";
   import type Builder from "$lib/utils/filters/builder";
   import Converter from "$lib/utils/filters/filters";
+    import MediaQuery from "$lib/components/simple/common/MediaQuery.svelte";
 
   interface Props
     extends Omit<ComponentProps<typeof SimpleTable<Item, Data>>, "class"> {
@@ -98,6 +99,7 @@
     searchBarColumns = undefined,
     searchBarVisible = true,
     lang = "en",
+    searchBarPlaceholder = lang == 'en' ? "Type to search..." : "Scrivi per cercare...",
     editFilterMode = "one-edit",
     showActiveFilters = true,
     resizableColumns = false,
@@ -273,37 +275,41 @@
 </script>
 
 <div class="paginated-table">
-  <div class="filter-container">
-    {#if searchBarVisible}
-      {#if searchBarSnippet}
-        {@render searchBarSnippet({ handleSearchChange })}
-      {:else}
-        <div class="search-bar-container">
-          <SearchBar
-            bind:input={searchBarInput}
-            bind:value={searchText}
-            --search-bar-default-height="36px"
-            --search-bar-default-border-radius="4px"
-            --search-bar-default-ring-color="rgb(var(--global-color-background-300),.6)"
-            --search-bar-default-background-color="rgb(var(--global-color-background-300),.4)"
-          ></SearchBar>
-        </div>
-      {/if}
-    {/if}
-    <Filters
-      bind:filters
-      onapplyFilter={handleFiltersChange}
-      onremoveFilter={handleRemoveFilter}
-      onremoveAllFilters={handleRemoveAllFilters}
-      --filters-default-wrapper-width={!!searchBarVisible ? undefined : "100%"}
-      {lang}
-      {editFilterMode}
-      {showActiveFilters}
-      appendSnippet={filterAppendSnippet}
-      customChipSnippet={customFilterChipSnippet}
-      customSnippet={customFilterSnippet}
-    ></Filters>
-  </div>
+  <MediaQuery>
+    {#snippet defaultSnippet({ mAndDown })}
+      <div class="searchbar-and-filter-container {mAndDown ? 'mobile' : 'desktop'}">
+        {#if searchBarVisible}
+          {#if searchBarSnippet}
+            {@render searchBarSnippet({ handleSearchChange })}
+          {:else}
+            <SearchBar
+              placeholder={searchBarPlaceholder}
+              bind:input={searchBarInput}
+              bind:value={searchText}
+              --search-bar-default-width={mAndDown ? "100%" : "450px"}
+              --search-bar-default-height="36px"
+              --search-bar-default-border-radius="4px"
+              --search-bar-default-ring-color="rgb(var(--global-color-background-300),.6)"
+              --search-bar-default-background-color="rgb(var(--global-color-background-300),.4)"
+            ></SearchBar>
+          {/if}
+        {/if}
+        <Filters
+          bind:filters
+          onapplyFilter={handleFiltersChange}
+          onremoveFilter={handleRemoveFilter}
+          onremoveAllFilters={handleRemoveAllFilters}
+          --filters-default-wrapper-width={!!searchBarVisible ? undefined : "100%"}
+          {lang}
+          {editFilterMode}
+          {showActiveFilters}
+          appendSnippet={filterAppendSnippet}
+          customChipSnippet={customFilterChipSnippet}
+          customSnippet={customFilterSnippet}
+        ></Filters>
+      </div>
+    {/snippet}
+  </MediaQuery>
   <SimpleTable
     {headers}
     class={clazz.simpleTable}
@@ -396,20 +402,17 @@
     width: 100%;
   }
 
-  .filter-container {
+  .searchbar-and-filter-container {
     display: flex;
-    align-items: center;
-    flex-direction: row;
     gap: 12px;
-    width: 100%;
   }
 
-  .search-bar-container {
-    padding: var(
-      --paginated-table-search-bar-container-padding,
-      var(--paginated-table-search-bar-container-default-padding, 0)
-    );
-    flex-grow: 1;
+  .searchbar-and-filter-container.desktop {
+    flex-direction: row;
+  }
+
+  .searchbar-and-filter-container.mobile {
+    flex-direction: column;
   }
 
   @media only screen and (max-width: 768px) {
