@@ -1228,8 +1228,8 @@
         </slot>
         
         <div class="filter-container">
-          {#if filtersVisible}
-            <div>
+          <div>
+            {#if filtersVisible}
               {#if dynamicFilters}
                 <Filters
                   bind:filters
@@ -1239,6 +1239,7 @@
                   on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
                   on:removeAllFilters={() => handleRemoveAllFilters()}
                   --filters-default-wrapper-width="100%"
+                  --filters-button-height=29px
                   {lang}
                   {dateLocale}
                   {editFilterMode}
@@ -1285,6 +1286,7 @@
                   on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
                   on:removeAllFilters={() => handleRemoveAllFilters()}
                   --filters-default-wrapper-width="100%"
+                  --filters-button-height=29px
                   {lang}
                   {dateLocale}
                   {editFilterMode}
@@ -1306,8 +1308,8 @@
                   </svelte:fragment>
                 </Filters>
               {/if}
-            </div>
-          {/if}
+            {/if}
+          </div>
           <div>
             <slot name="appendFilterRow"></slot>
           </div>
@@ -1411,6 +1413,7 @@
               style:max-width={head.maxWidth}
               class:sortable={head.sortable}
               on:click={() => handleHeaderClick(head)}
+              id={head.value}
               bind:this={headersHTML[head.value]}
             >
               {#if resizableColumns}
@@ -2556,7 +2559,7 @@
   .results-number {
     margin: 0px 0px 4px 4px;
     display: flex;
-    align-items: center;
+    align-items: top;
     gap: 4px;
     min-width: 90px;
   }
