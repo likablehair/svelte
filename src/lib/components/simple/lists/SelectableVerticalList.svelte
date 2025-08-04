@@ -138,6 +138,9 @@
 
   function handleElementClick(element: Element) {
     selected = element.name
+
+    if(element.disabled) return
+
     if(onselect) {
       onselect({
         detail: {
