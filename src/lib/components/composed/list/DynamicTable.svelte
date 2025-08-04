@@ -2788,7 +2788,7 @@
   .results-number {
     margin: 0px 0px 4px 4px;
     display: flex;
-    align-items: center;
+    align-items: top;
     gap: 4px;
     min-width: 90px;
   }
