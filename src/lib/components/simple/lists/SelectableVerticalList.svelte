@@ -78,6 +78,7 @@
 
   function handleElementClick(element: Element) {
     selected = element.name
+    if(element.disabled) return
     dispatch('select', { element })
   }
 

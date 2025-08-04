@@ -201,10 +201,9 @@
   }
 
   .body-container {
-    border: dotted;
-    border-color: var(
-      --file-input-list-border-color,
-      var(--file-input-list-default-border-color)
+    border: var(
+      --file-input-list-border,
+      var(--file-input-list-default-border)
     );
     border-radius: var(
       --file-input-list-border-radius,
