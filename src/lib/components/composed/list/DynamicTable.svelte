@@ -409,7 +409,7 @@
     numberOfResultsVisible = false,
     endLineVisible = false,
     resizableColumns = false,
-    resizedColumnSizeWithPadding = {},
+    resizedColumnSizeWithPadding = $bindable({}),
     dynamicFilters = true,
     useSelectedItemsOnly = false,
     class: clazz = {},
