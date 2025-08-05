@@ -269,7 +269,8 @@
     resizableColumns: boolean= false,
     resizedColumnSizeWithPadding: { [value: string]: number } = {},
     dynamicFilters: boolean = true,
-    useSelectedItemsOnly = false
+    useSelectedItemsOnly = false,
+    selectedAllDisabled = false
 
   let openCellEditor: boolean = false,
     cellEditorActivator: HTMLElement | undefined,
@@ -1387,7 +1388,7 @@
               class="non-resizable"
               bind:this={headersHTML['non-resizable']}
             >
-              {#if selectMode === "multiple"}
+              {#if selectMode === "multiple" && !selectedAllDisabled}
                 <Checkbox
                   id="select-all"
                   value={selectedAll}
