@@ -409,7 +409,7 @@
     numberOfResultsVisible = false,
     endLineVisible = false,
     resizableColumns = false,
-    resizedColumnSizeWithPadding = {},
+    resizedColumnSizeWithPadding = $bindable({}),
     dynamicFilters = true,
     useSelectedItemsOnly = false,
     class: clazz = {},
@@ -1481,8 +1481,8 @@
           {/if}
           
           <div class="filter-container">
-            {#if filtersVisible}
-              <div>
+            <div>
+              {#if filtersVisible}
                 {#if dynamicFilters}
                   <Filters
                     bind:filters
@@ -1492,6 +1492,7 @@
                     onremoveFilter={e => { handleRemoveFilter(e.detail.filter) }}
                     onremoveAllFilters={() => handleRemoveAllFilters()}
                     --filters-default-wrapper-width="100%"
+                    --filters-button-height=29px
                     {lang}
                     {dateLocale}
                     {editFilterMode}
@@ -1525,6 +1526,7 @@
                     onremoveFilter={e => { handleRemoveFilter(e.detail.filter) }}
                     onremoveAllFilters={() => handleRemoveAllFilters()}
                     --filters-default-wrapper-width="100%"
+                    --filters-button-height=29px
                     {lang}
                     {dateLocale}
                     {editFilterMode}
@@ -1535,8 +1537,8 @@
                   >
                   </Filters>
                 {/if}
-              </div>
-            {/if}
+              {/if}
+            </div>
   
             <div>
               {@render appendSnippet?.()}
@@ -1641,6 +1643,7 @@
               style:max-width={header.maxWidth}
               class:sortable={header.sortable}
               onclick={() => handleHeaderClick(header)}
+              id={header.value}
               bind:this={headersHTML[header.value]}
             >
               {#if resizableColumns}
@@ -2785,7 +2788,7 @@
   .results-number {
     margin: 0px 0px 4px 4px;
     display: flex;
-    align-items: center;
+    align-items: top;
     gap: 4px;
     min-width: 90px;
   }

@@ -276,33 +276,17 @@
       --quick-actions-z-index,
       var(--quick-actions-default-z-index)
     );
-    width: 90%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
   }
 
   .container-top {
     top: 16px;
-    left: 250px;
   }
 
   .container-bottom {
     bottom: 64px;
-  }
-
-  @media (max-width: 1025px) {
-    .container-top, .container-bottom {
-      position: fixed;
-      z-index: 48;
-      width: 80%;
-    }
-
-    .container-top {
-      top: 16px;
-      left: auto;
-    }
-
-    .container-bottom {
-      bottom: 64px;
-    }
   }
   
   .select-container {
