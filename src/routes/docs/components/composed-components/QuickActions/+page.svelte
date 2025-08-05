@@ -86,6 +86,7 @@
       }
     ]}
     {selectedItems}
+    onClose={() => selectedItems = 0}
   >
   </QuickActions>
 </div>
