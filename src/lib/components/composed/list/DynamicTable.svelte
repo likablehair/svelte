@@ -269,7 +269,8 @@
     resizableColumns: boolean= false,
     resizedColumnSizeWithPadding: { [value: string]: number } = {},
     dynamicFilters: boolean = true,
-    useSelectedItemsOnly = false
+    useSelectedItemsOnly = false,
+    selectedAllDisabled = false
 
   let openCellEditor: boolean = false,
     cellEditorActivator: HTMLElement | undefined,
@@ -1228,8 +1229,8 @@
         </slot>
         
         <div class="filter-container">
-          {#if filtersVisible}
-            <div>
+          <div>
+            {#if filtersVisible}
               {#if dynamicFilters}
                 <Filters
                   bind:filters
@@ -1239,6 +1240,7 @@
                   on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
                   on:removeAllFilters={() => handleRemoveAllFilters()}
                   --filters-default-wrapper-width="100%"
+                  --filters-button-height=29px
                   {lang}
                   {dateLocale}
                   {editFilterMode}
@@ -1285,6 +1287,7 @@
                   on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
                   on:removeAllFilters={() => handleRemoveAllFilters()}
                   --filters-default-wrapper-width="100%"
+                  --filters-button-height=29px
                   {lang}
                   {dateLocale}
                   {editFilterMode}
@@ -1306,8 +1309,8 @@
                   </svelte:fragment>
                 </Filters>
               {/if}
-            </div>
-          {/if}
+            {/if}
+          </div>
           <div>
             <slot name="appendFilterRow"></slot>
           </div>
@@ -1385,7 +1388,7 @@
               class="non-resizable"
               bind:this={headersHTML['non-resizable']}
             >
-              {#if selectMode === "multiple"}
+              {#if selectMode === "multiple" && !selectedAllDisabled}
                 <Checkbox
                   id="select-all"
                   value={selectedAll}
@@ -1411,6 +1414,7 @@
               style:max-width={head.maxWidth}
               class:sortable={head.sortable}
               on:click={() => handleHeaderClick(head)}
+              id={head.value}
               bind:this={headersHTML[head.value]}
             >
               {#if resizableColumns}
@@ -2556,7 +2560,7 @@
   .results-number {
     margin: 0px 0px 4px 4px;
     display: flex;
-    align-items: center;
+    align-items: top;
     gap: 4px;
     min-width: 90px;
   }
