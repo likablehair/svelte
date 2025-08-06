@@ -39,6 +39,7 @@
   import CircularLoader from "$lib/components/simple/loaders/CircularLoader.svelte";
   import type { UIEventHandler } from "svelte/elements";
   import NoData from "$lib/components/simple/common/NoData.svelte";
+    import SearchBar from "../search/SearchBar.svelte";
 
   onMount(() => {
     updateHeaderHeight();
@@ -1465,23 +1466,20 @@
             {#if searchBarSnippet}
               {@render searchBarSnippet({ handleSearchChange })}
             {:else}
-              <div style="margin-right: {mAndDown ? '0px' : '20px'};">
-                <SimpleTextField
-                  placeholder={searchBarPlaceholder}
-                  appendInnerIcon="mdi-magnify"
-                  bind:value={searchText}
-                  bind:input={searchBarInput}
-                  onkeydown={handleSearchBoxKeydown}
-                  --simple-textfield-width={mAndDown ? "100%" : "450px"}
-                  --simple-textfield-border-radius= 0.5rem
-                  --simple-textfield-background-color= transparent
-                  --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-                  --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-                />
-              </div>
+              <SearchBar
+                placeholder={searchBarPlaceholder}
+                bind:input={searchBarInput}
+                bind:value={searchText}
+                onkeydown={handleSearchBoxKeydown}
+                --search-bar-default-width={mAndDown ? "100%" : "450px"}
+                --search-bar-default-height="36px"
+                --search-bar-default-border-radius="4px"
+                --search-bar-default-ring-color="rgb(var(--global-color-background-300),.6)"
+                --search-bar-default-background-color="rgb(var(--global-color-background-300),.4)"
+              />
             {/if}
           {/if}
-          
+
           <div class="filter-container">
             <div>
               {#if filtersVisible}
@@ -1494,7 +1492,6 @@
                     onremoveFilter={e => { handleRemoveFilter(e.detail.filter) }}
                     onremoveAllFilters={() => handleRemoveAllFilters()}
                     --filters-default-wrapper-width="100%"
-                    --filters-button-height=29px
                     {lang}
                     {dateLocale}
                     {editFilterMode}
@@ -1528,7 +1525,6 @@
                     onremoveFilter={e => { handleRemoveFilter(e.detail.filter) }}
                     onremoveAllFilters={() => handleRemoveAllFilters()}
                     --filters-default-wrapper-width="100%"
-                    --filters-button-height=29px
                     {lang}
                     {dateLocale}
                     {editFilterMode}
@@ -1541,7 +1537,7 @@
                 {/if}
               {/if}
             </div>
-  
+
             <div>
               {@render appendSnippet?.()}
             </div>
@@ -2659,7 +2655,8 @@
 
   .searchbar-and-filter-container {
     display: flex;
-    margin-bottom: 16px;
+    gap: 12px;
+    margin-bottom: 24px;
   }
   
   .searchbar-and-filter-container.desktop {
@@ -2668,7 +2665,6 @@
 
   .searchbar-and-filter-container.mobile {
     flex-direction: column;
-    gap: 8px;
   }
 
   .filter-container {
