@@ -242,6 +242,7 @@
     resizedColumnSizeWithPadding?: { [value: string]: number };
     dynamicFilters?: boolean;
     useSelectedItemsOnly?: boolean;
+    selectedAllDisabled?: boolean;
     class?: {
       container?: string;
       header?: string;
@@ -412,6 +413,7 @@
     resizedColumnSizeWithPadding = $bindable({}),
     dynamicFilters = true,
     useSelectedItemsOnly = false,
+    selectedAllDisabled = false,
     class: clazz = {},
     onapplyCustomQuickFilter,
     oncellClick,
@@ -1617,7 +1619,7 @@
               class="non-resizable"
               bind:this={headersHTML['non-resizable']}
             > 
-              {#if selectMode === "multiple"}
+              {#if selectMode === "multiple" && !selectedAllDisabled}
                 <Checkbox
                   id="select-all"
                   value={selectedAll}
