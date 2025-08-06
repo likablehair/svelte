@@ -280,8 +280,8 @@
     justify-content: center;
     left: 0px;
     right: 0px;
-    padding-top: 16px;
-    padding-bottom: 16px;
+    padding-top: 24px;
+    padding-bottom: 24px;
     backdrop-filter: blur(2px);
     background-color: rgb(var(--global-color-background-100),.6);
     mask: linear-gradient(to top, transparent 0%, black 30%, black 100%);
@@ -304,8 +304,8 @@
       var(--quick-actions-default-background-color)
     );
     border-radius: 8px;
-    padding: 5px;
-    margin-bottom: 10px;
+    padding: 8px;
+    margin-bottom: 16px;
   }
 
   @media (max-width: 1024px) {
@@ -355,7 +355,7 @@
 
   .select-actions {
     display: flex;
-    margin: 0 8px;
+    margin-left: 8px;
     justify-content: flex-end;
     width: 100%;
     gap: 8px;
