@@ -46,7 +46,7 @@
     appendSnippet,
   }: Props = $props();
 
-  let tabButtons: Record<string, HTMLElement> = {};
+  let tabButtons: Record<string, HTMLElement> = $state({});
   onMount(() => {
     if (mandatory && !selected && tabs.length > 0) selected = tabs[0].name;
   });

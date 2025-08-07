@@ -148,9 +148,10 @@
     }
   })
 
-  function handleInputChange(event: any) {
+  function handleInputChange(e: Event) {
     setTimeout(() => {
-      const typedValue = mask.value
+      // @ts-ignore
+      const typedValue = e.target?.value as string
 
       if(typedValue !== undefined && typedValue !== null) {
         // find day of month
@@ -239,7 +240,7 @@
         {@render activatorSnippet({ mask, handleTextFieldFocus, handleInputChange, inputElement, placeholder, disabled })}
       {:else}
         <SimpleTextField
-          bind:value={mask.value}
+          value={mask.value}
           onfocus={() => handleTextFieldFocus(mAndDown)}
           onkeydown={handleInputChange}
           bind:input={inputElement}

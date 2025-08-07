@@ -255,7 +255,7 @@
     }
   }
 
-  let activeFiltersActivators: Record<string, HTMLElement> = {}
+  let activeFiltersActivators: Record<string, HTMLElement> = $state({})
   function handleActiveFilterClick(filter: { name: string, type: 'custom' | string }) {
     singleFilterActivator = activeFiltersActivators[filter.name]
     singleFilterMenuAnchor = 'bottom-center'
@@ -670,12 +670,16 @@
                             {/if}
                             <div class="field">
                               <FilterEditor
-                                bind:filter={filters[i]}
+                                filter={filters[i]}
                                 {lang}
                                 {labelsMapper}
                                 editFilterMode="multi-edit"
                                 bind:tmpFilter={tmpFilters[filter.name]}
                                 mobile={mAndDown}
+                                onchange={(e) => {
+                                  if(!!e.detail.filter)
+                                    filters[i] = e.detail.filter
+                                }}
                               >
                                 {#snippet customSnippet({ filter })}
                                   {@render customInternalSnippet?.({ filter, updateFunction, mAndDown })}
@@ -850,12 +854,16 @@
                         {/if}
                         <div class="field">
                           <FilterEditor
-                            bind:filter={filters[i]}
+                            filter={filters[i]}
                             {lang}
                             {labelsMapper}
                             editFilterMode="multi-edit"
                             bind:tmpFilter={tmpFilters[filter.name]}
                             mobile={mAndDown}
+                            onchange={(e) => {
+                              if(!!e.detail.filter)
+                                filters[i] = e.detail.filter
+                            }}
                           >
                             {#snippet customSnippet({ filter })}
                               {@render customInternalSnippet?.({ filter, updateFunction, mAndDown })}

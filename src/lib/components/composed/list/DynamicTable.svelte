@@ -473,7 +473,7 @@
     tableBody: HTMLElement | undefined = $state(),
     tableContainer: HTMLElement | undefined = $state(),
     tableHTML: HTMLElement | undefined = $state(),
-    headersHTML: { [value: string]: HTMLElement } = {},
+    headersHTML: { [value: string]: HTMLElement } = $state({}),
     userScrolling = $state(true),
     reachedBottom = $state(false),
     reachedTop = false,
