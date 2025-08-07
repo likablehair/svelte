@@ -187,6 +187,7 @@
     showExpand
     filtersVisible
     cellEdit
+    dynamicFilters={false}
     {rows}
     totalRows={100000000}
     onfetchData={() => {

@@ -79,7 +79,7 @@
   }
 
   $effect(() => {
-    if(!!filter) {
+    if(!!filter && !tmpFilter) {
       tick().then(() => {
         initTmpFilter();
         closeDropDown();
