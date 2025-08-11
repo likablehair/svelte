@@ -12,7 +12,7 @@
 
   type AsyncAutocompleteItem = Item<Data>
 
-  interface Props {
+  type Props = {
     items: AsyncAutocompleteItem[];
     values?: AsyncAutocompleteItem[];
     multiple?: boolean;
@@ -32,10 +32,7 @@
     disabled?: boolean;
     menuWidth?: string;
     menuAnchor?: ComponentProps<typeof Menu>['anchor']
-    chipLabelSnippet?: ComponentProps<typeof Autocomplete<Data>>['chipLabelSnippet']
-    itemLabelSnippet?: ComponentProps<typeof Autocomplete<Data>>['itemLabelSnippet']
-    onchange?: ComponentProps<typeof Autocomplete<Data>>['onchange']
-  }
+  } & ComponentProps<typeof Autocomplete<Data>>
 
   let {
     items = [],
@@ -55,9 +52,8 @@
     disabled = false,
     menuAnchor,
     menuWidth,
-    chipLabelSnippet,
-    itemLabelSnippet,
     onchange,
+    ...restProps
   }: Props = $props();
 
   const searchTextValue = writable<string | undefined>(searchText)
@@ -104,7 +100,5 @@
   {menuAnchor}
   searchFunction={() => true}
   {onchange}
-  {chipLabelSnippet}
-  {itemLabelSnippet}
->
-</Autocomplete>
+  {...restProps}
+></Autocomplete>
