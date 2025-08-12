@@ -38,6 +38,8 @@
     mobileDrawer?: boolean;
     menuWidth?: string | null;
     menuAnchor?: ComponentProps<typeof Menu>['anchor']
+    menuStayInViewport: ComponentProps<typeof Menu>['stayInViewport']
+    menuFlipOnOverflow: ComponentProps<typeof Menu>['flipOnOverflow']
     class?: {
       activator?: string;
       menu?: string;
@@ -136,6 +138,8 @@
     menuWidth = undefined,
     menuAnchor = 'bottom-center',
     class: clazz = {},
+    menuStayInViewport,
+    menuFlipOnOverflow = true,
     selectionContainerSnippet,
     selectionSnippet,
     chipLabelSnippet,
@@ -450,10 +454,11 @@
       bind:open={menuOpened}
       anchor={menuAnchor}
       closeOnClickOutside
+      stayInViewport={menuStayInViewport}
+      flipOnOverflow={menuFlipOnOverflow}
       bind:refreshPosition
       bind:menuElement
       bind:openingId
-      flipOnOverflow
     >
       <ul
         class={clazz.menu || ""}
