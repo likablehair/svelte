@@ -100,6 +100,35 @@
     multiple={true}
   ></Dropdown>
 </div>
+<div 
+  style:position="relative"
+  style:height="500px"
+  style:overflow="auto"
+>
+  <table style:width="150vw">
+    <thead>
+      <tr style:position="sticky" style:top="0px">
+        <th style:width="800px">Header 1</th>
+        <th style:width="800px">Header 2</th>
+        <th style:width="50vw">Header 3</th>
+      </tr>
+    </thead>
+    <tbody>
+      {#each Array.from({ length: 15 }, (_, i) => i + 1) as n}
+        <tr>
+          <td></td>
+          <td>
+            <Dropdown 
+              {items}
+              multiple={true}
+            ></Dropdown>
+          </td>
+          <td></td>
+        </tr>
+      {/each}
+    </tbody>
+  </table>
+</div>
 <h2>Props</h2>
 <PropsViewer
   props={[

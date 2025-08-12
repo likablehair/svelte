@@ -38,8 +38,8 @@
     mobileDrawer?: boolean;
     menuWidth?: string | null;
     menuAnchor?: ComponentProps<typeof Menu>['anchor']
-    menuStayInViewport: ComponentProps<typeof Menu>['stayInViewport']
-    menuFlipOnOverflow: ComponentProps<typeof Menu>['flipOnOverflow']
+    menuStayInViewport?: ComponentProps<typeof Menu>['stayInViewport']
+    menuFlipOnOverflow?: ComponentProps<typeof Menu>['flipOnOverflow']
     class?: {
       activator?: string;
       menu?: string;

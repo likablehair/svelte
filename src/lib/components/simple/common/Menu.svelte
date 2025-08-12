@@ -177,8 +177,8 @@
         if(!_left) _left = 0
         if(!_top) _top = 0
 
-        _left = _left - (positionedAncestorLeft + window.scrollX)
-        _top = _top - (positionedAncestorTop + window.scrollY)
+        _left = _left - (positionedAncestorLeft + window.scrollX - positionedAncestor.scrollLeft)
+        _top = _top - (positionedAncestorTop + window.scrollY - positionedAncestor.scrollTop)
 
         if(!!activator) {
           let { validStickyParent, fixedParent } = getParentInstanceFromViewport(activator?.parentElement)
