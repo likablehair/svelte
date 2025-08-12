@@ -273,6 +273,24 @@
       RowActions
     {/snippet}
   </PaginatedTable>
+  <PaginatedTable
+    resizableColumns={true}
+    {filters}
+    {headers}
+    {items}
+    searchBarColumns={["businessName", "productName"]}
+    totalElements={40}
+    onfiltersChange={handleFiltersChange}
+    onremoveFilter={(e) => {
+      if (e.detail.filter.name == "productCategory") {
+        value = undefined;
+      }
+    }}
+    showActiveFilters={true}
+    {calculateRowStyles}
+    {calculateRowClasses}
+    --filters-one-edit-menu-max-height="50vh"
+  ></PaginatedTable>
 </div>
 <h2>Props</h2>
 <PropsViewer
@@ -730,6 +748,7 @@
     justify-content: center;
     gap: 10px;
     margin-bottom: 20px;
+    flex-direction: column;
   }
 
   :global(.calculated-class) {

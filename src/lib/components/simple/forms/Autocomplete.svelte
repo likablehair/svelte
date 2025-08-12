@@ -344,7 +344,7 @@
 
   $effect(() => {
     if (!!input) {
-      if (!disabled && (values || []).length !== 0) {
+      if ((values || []).length !== 0) {
         input.style.width =
           Math.max(searchText?.length || placeholder?.length, 1) + "ch";
       } else {
@@ -421,7 +421,7 @@
           <div class="not-visible-chip-number">+ {notVisibleChipNumber}</div>
         {/if}
       {/if}
-
+      
       <input
         class="autocomplete-input"
         bind:value={searchText}
