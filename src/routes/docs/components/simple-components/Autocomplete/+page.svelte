@@ -86,6 +86,7 @@
     { name: 'menuBoxShadow', type: 'string', description: 'The CSS box-shadow for the menu.', default: '"rgb(var(--global-color-background-300), .5) 0px 2px 4px"' },
     { name: 'menuBorderRadius', type: 'string', description: 'The border-radius for the menu.', default: '"5px"' },
     { name: 'mobileDrawer', type: 'boolean', description: 'If true, a drawer menu is used for mobile devices.', default: 'false' },
+    { name: 'adaptInputWidth', type: 'boolean', description: 'If true the width of the search input adapt based on the content inside.', default: 'true' },
     { name: 'menuWidth', type: 'string | null', description: 'The width of the menu.', default: 'null' },
     { name: 'menuAnchor', type: '"bottom" | "bottom-center" | "right-center"', description: 'The anchor of the menu.', default: '"bottom-center"' },
     { name: 'class', type: 'object', description: 'CSS classes to apply to different parts of the component.', default: 'undefined' },
@@ -105,7 +106,8 @@
     { name: "--autocomplete-padding", type: "spacing", description: "The padding inside the selection container.", default: "0.5rem .5rem .5rem .5rem" },
     { name: "--autocomplete-min-height", type: "size", description: "The minimum height of the selection container.", default: "2rem" },
     { name: "--autocomplete-options-max-width", type: "size", description: "The maximum width of the selection options.", default: "100%" },
-    { name: "--autocomplete-input-margin-left", type: "spacing", description: "The margin-left for the autocomplete input.", default: "4px" }
+    { name: "--autocomplete-input-margin-left", type: "spacing", description: "The margin-left for the autocomplete input.", default: "4px" },
+    { name: "--autocomplete-input-width", type: "spacing", description: "The width for the autocomplete search input.", default: "" }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>

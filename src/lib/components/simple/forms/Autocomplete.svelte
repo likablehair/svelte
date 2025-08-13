@@ -40,6 +40,7 @@
     menuAnchor?: ComponentProps<typeof Menu>['anchor']
     menuStayInViewport?: ComponentProps<typeof Menu>['stayInViewport']
     menuFlipOnOverflow?: ComponentProps<typeof Menu>['flipOnOverflow']
+    adaptInputWidth?: boolean
     class?: {
       activator?: string;
       menu?: string;
@@ -140,6 +141,7 @@
     class: clazz = {},
     menuStayInViewport,
     menuFlipOnOverflow = true,
+    adaptInputWidth = true,
     selectionContainerSnippet,
     selectionSnippet,
     chipLabelSnippet,
@@ -347,7 +349,7 @@
   });
 
   $effect(() => {
-    if (!!input) {
+    if (!!input && adaptInputWidth) {
       if ((values || []).length !== 0) {
         input.style.width =
           Math.max(searchText?.length || placeholder?.length, 1) + "ch";
@@ -647,6 +649,10 @@
     margin-left: var(
       --autocomplete-input-margin-left,
       var(--autocomplete-default-input-margin-left)
+    );
+    width: var(
+      --autocomplete-input-width,
+      var(--autocomplete-default-input-width)
     );
     outline: none;
     border: none;
