@@ -290,7 +290,7 @@
     } else if (event.key == "Backspace" && searchText == "") {
       pop();
     } else if (event.key == "Escape" || event.key == "Tab") {
-      searchText = "";
+      if(emptySearchTextOnMenuClose) searchText = "";
       if (!!input) input.blur();
       menuOpened = false;
     }
