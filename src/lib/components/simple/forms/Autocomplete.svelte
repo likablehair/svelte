@@ -52,7 +52,7 @@
           searchText: string | undefined;
           disabled: boolean;
           openMenu: () => void;
-          handleKeyDown: (event: { key: string }) => void;
+          handleKeyDown: (event: KeyboardEvent) => void;
           unselect: (item: ItemData) => void;
           select: (item: ItemData) => void;
         },
@@ -110,7 +110,7 @@
     }) => void;
     onfocus?: () => void;
     onblur?: () => void;
-    onkeydown?: () => void;
+    onkeydown?: (e: KeyboardEvent) => void;
     onclose?: ComponentProps<typeof MenuOrDrawer>["onclose"];
   }
 
@@ -266,9 +266,9 @@
   }
 
   let menuElement: HTMLElement | undefined = $state();
-  function handleKeyDown(event: { key: string }) {
+  function handleKeyDown(event: KeyboardEvent) {
     if (onkeydown) {
-      onkeydown();
+      onkeydown(event);
     }
 
     if (disabled) return;
