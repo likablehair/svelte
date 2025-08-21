@@ -39,7 +39,8 @@ class Teleporter {
 
   destroyNode(uid: string) {
     let node = this.nodes[uid]
-    node.remove()
+    if(!!node)
+      node.remove()
   }
 }
 
