@@ -1,23 +1,27 @@
 <script lang="ts">
-  import '../../../css/main.css'
-  import './QuickFilters.css'
-  import { ENGLISH_LABELS_MAPPER, ITALIAN_LABELS_MAPPER, type Filter } from "$lib/utils/filters/filters";
-  import Icon from '$lib/components/simple/media/Icon.svelte';
-  import type { Snippet } from 'svelte';
-  import Menu from '$lib/components/simple/common/Menu.svelte';
-  import FilterEditor from './FilterEditor.svelte';
-  import Button from '$lib/components/simple/buttons/Button.svelte';
-    import MediaQuery from '$lib/components/simple/common/MediaQuery.svelte';
-    import Drawer from '$lib/components/simple/navigation/Drawer.svelte';
+  import "../../../css/main.css";
+  import "./QuickFilters.css";
+  import {
+    ENGLISH_LABELS_MAPPER,
+    ITALIAN_LABELS_MAPPER,
+    type Filter,
+  } from "$lib/utils/filters/filters";
+  import Icon from "$lib/components/simple/media/Icon.svelte";
+  import type { Snippet } from "svelte";
+  import Menu from "$lib/components/simple/common/Menu.svelte";
+  import FilterEditor from "./FilterEditor.svelte";
+  import Button from "$lib/components/simple/buttons/Button.svelte";
+  import MediaQuery from "$lib/components/simple/common/MediaQuery.svelte";
+  import Drawer from "$lib/components/simple/navigation/Drawer.svelte";
 
   type QuickFilter = Filter & {
-    icon?: string
-  }
+    icon?: string;
+  };
 
   type Props = {
-    filters?: QuickFilter[],
-    lang?: 'it' | 'en',
-    onapply?: (params: { filter: QuickFilter, filters: QuickFilter[] }) => void,
+    filters?: QuickFilter[];
+    lang?: "it" | "en";
+    onapply?: (params: { filter: QuickFilter; filters: QuickFilter[] }) => void;
     buttonLabelSnippet?: Snippet<
       [
         {
@@ -25,44 +29,42 @@
         },
       ]
     >;
-  }
+  };
 
-  let { 
+  let {
     filters = $bindable(),
     buttonLabelSnippet,
     onapply,
-    lang
-  }: Props = $props()
-
+    lang,
+  }: Props = $props();
 
   let activators: Record<string, HTMLElement> = $state({}),
-    openMenus: Record<string, boolean> = $state({})
+    openMenus: Record<string, boolean> = $state({});
 
   function handleApplyFilter(params: { index: number }) {
-    if(!!filters) {
-      filters[params.index].active = true
-      openMenus[filters[params.index].name] = false
-      onapply?.({ filter: filters[params.index], filters: filters || [] })
+    if (!!filters) {
+      filters[params.index].active = true;
+      openMenus[filters[params.index].name] = false;
+      onapply?.({ filter: filters[params.index], filters: filters || [] });
     }
   }
 
   function handleClearFilter(params: { index: number }) {
-    if(!!filters) {
-      filters[params.index].active = false
-      onapply?.({ filter: filters[params.index], filters: filters || [] })
+    if (!!filters) {
+      filters[params.index].active = false;
+      onapply?.({ filter: filters[params.index], filters: filters || [] });
     }
   }
 </script>
 
-
 <div class="quick-filters-container">
   {#if !!filters}
     {#each filters as filter, index}
-      <button 
+      <button
         class="quick-filters-button"
         class:active={filter.active}
         bind:this={activators[filter.name]}
-        onclick={() => openMenus[filter.name] = true}
+        onclick={() => (openMenus[filter.name] = true)}
       >
         {#if buttonLabelSnippet}
           {@render buttonLabelSnippet({ filter })}
@@ -77,8 +79,8 @@
             <div
               class="clear-button"
               onclick={(e) => {
-                e.stopPropagation()
-                handleClearFilter({ index })
+                e.stopPropagation();
+                handleClearFilter({ index });
               }}
               role="presentation"
             >
@@ -90,38 +92,37 @@
       <MediaQuery>
         {#snippet defaultSnippet({ mAndDown })}
           {#if mAndDown}
-            <Drawer 
-              bind:open={openMenus[filter.name]}
-              position="bottom"
-            >
+            <Drawer bind:open={openMenus[filter.name]} position="bottom">
               <div class="quick-filter-editor-container">
                 <div class="editing-filter-title">
                   {filter.label}
                 </div>
                 <FilterEditor
                   filter={filters[index]}
-                  labelsMapper={lang === 'en' ? ENGLISH_LABELS_MAPPER : ITALIAN_LABELS_MAPPER}
+                  labelsMapper={lang === "en"
+                    ? ENGLISH_LABELS_MAPPER
+                    : ITALIAN_LABELS_MAPPER}
                   editFilterMode="multi-edit"
                 >
                   {#snippet filterActionsSnippet({ filter })}
                     <div class="apply-button-container">
-                      <Button 
+                      <Button
                         --button-default-width="100%"
                         --button-default-border-radius="4px"
                         onclick={() => {
-                          if(!!filter) {
-                            filters[index] = filter
+                          if (!!filter) {
+                            filters[index] = filter;
                           }
-                          handleApplyFilter({ index })
-                        }}
-                      >Applica</Button>
+                          handleApplyFilter({ index });
+                        }}>Applica</Button
+                      >
                     </div>
                   {/snippet}
                 </FilterEditor>
               </div>
             </Drawer>
           {:else}
-            <Menu 
+            <Menu
               activator={activators[filter.name]}
               bind:open={openMenus[filter.name]}
               closeOnClickOutside
@@ -131,21 +132,23 @@
               <div class="quick-filter-editor-container">
                 <FilterEditor
                   filter={filters[index]}
-                  labelsMapper={lang === 'en' ? ENGLISH_LABELS_MAPPER : ITALIAN_LABELS_MAPPER}
+                  labelsMapper={lang === "en"
+                    ? ENGLISH_LABELS_MAPPER
+                    : ITALIAN_LABELS_MAPPER}
                   editFilterMode="multi-edit"
                 >
                   {#snippet filterActionsSnippet({ filter })}
                     <div class="apply-button-container">
-                      <Button 
+                      <Button
                         --button-default-width="100%"
                         --button-default-border-radius="4px"
                         onclick={() => {
-                          if(!!filter) {
-                            filters[index] = filter
+                          if (!!filter) {
+                            filters[index] = filter;
                           }
-                          handleApplyFilter({ index })
-                        }}
-                      >Applica</Button>
+                          handleApplyFilter({ index });
+                        }}>Applica</Button
+                      >
                     </div>
                   {/snippet}
                 </FilterEditor>
@@ -159,7 +162,6 @@
 </div>
 
 <style>
-
   * {
     box-sizing: border-box;
   }
@@ -174,10 +176,7 @@
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
-    width: var(
-      --quick-filters-width,
-      var(--quick-filters-default-width)
-    );
+    width: var(--quick-filters-width, var(--quick-filters-default-width));
   }
 
   .quick-filters-button {
