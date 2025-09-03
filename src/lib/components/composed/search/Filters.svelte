@@ -15,7 +15,7 @@
   import Button from '$lib/components/simple/buttons/Button.svelte';
   import Icon from '$lib/components/simple/media/Icon.svelte';
   import { type ComponentProps, type Snippet } from 'svelte';
-  import { isDateMode, isSelectMode, isStringMode, type DateMode, type Filter, type NumberMode, type SelectMode, type StringMode } from '$lib/utils/filters/filters';
+  import { ENGLISH_LABELS_MAPPER, isDateMode, isSelectMode, isStringMode, ITALIAN_LABELS_MAPPER, type DateMode, type Filter, type NumberMode, type SelectMode, type StringMode } from '$lib/utils/filters/filters';
   import SelectableVerticalList from '$lib/components/simple/lists/SelectableVerticalList.svelte';
   import Chip from '$lib/components/simple/navigation/Chip.svelte';
   import type { Locale } from '$lib/components/simple/dates/utils';
@@ -84,26 +84,8 @@
     falseString = lang === 'en' ? "false" : "falso",
     editFilterMode = 'one-edit',
     labelsMapper = lang === 'en'
-      ? {
-          equal: { extended: 'equal to', short: 'equal' },
-          like: { short: 'includes' },
-          ilike: { short: 'includes' },
-          contains: { short: 'contains' },
-          greater: { short: 'greater', extended: 'greater than' },
-          lower: { short: 'lower', extended: 'lower than' },
-          between: { short: 'between', extended: 'is between' },
-          different: { short: 'different', extended: 'different from' }
-        }
-      : {
-          equal: { extended: 'uguale a', short: 'uguale' },
-          like: { short: 'include' },
-          ilike: { short: 'include' },
-          contains: { short: 'contiene' },
-          greater: { short: 'maggiore', extended: 'maggiore di' },
-          lower: { short: 'minore', extended: 'minore di' },
-          between: { short: 'compreso', extended: 'è compreso tra' },
-          different: { short: 'diverso', extended: 'diverso da' }
-        },
+      ? ENGLISH_LABELS_MAPPER
+      : ITALIAN_LABELS_MAPPER,
     drawerSpace = '60vh',
     onaddFilterClick,
     onapplyFilter,

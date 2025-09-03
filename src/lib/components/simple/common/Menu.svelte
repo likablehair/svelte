@@ -215,19 +215,6 @@
   
   $effect(() => {
     if (open) {
-      if (!menuElement || !activator) return;
-      if (_top !== undefined && _left !== undefined) return;
-
-      if(!!activator) {
-        let parent = activator.parentElement
-        while(!!parent) {
-          let parentPosition = getComputedStyle(parent).position
-          parent.addEventListener('scroll', refreshMenuPosition)
-          if(parentPosition == 'absolute' || parentPosition == 'fixed' || parentPosition === 'relative') break
-          parent = parent.parentElement
-        }
-      }
-  
       if(!!openingId) {
         const controllers = document.querySelectorAll(`[data-operation="close"][data-opening-id="${openingId}"]`)
         for(let k = 0; k < controllers.length; k += 1) {
@@ -240,6 +227,19 @@
   
             controllers[k].dispatchEvent(clickEvent)
           }
+        }
+      }
+
+      if (!menuElement || !activator) return;
+      if (_top !== undefined && _left !== undefined) return;
+
+      if(!!activator) {
+        let parent = activator.parentElement
+        while(!!parent) {
+          let parentPosition = getComputedStyle(parent).position
+          parent.addEventListener('scroll', refreshMenuPosition)
+          if(parentPosition == 'absolute' || parentPosition == 'fixed' || parentPosition === 'relative') break
+          parent = parent.parentElement
         }
       }
   

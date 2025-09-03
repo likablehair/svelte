@@ -2,7 +2,7 @@
   --simple-textfield-default-padding: 0.65rem 1rem 0.65rem 1rem;
   --simple-textfield-default-width: 280px;
   --simple-textfield-default-background-color: rgb(var(--global-color-background-300), .5);
-  --simple-textfield-default-border-radius: 9999px;
+  --simple-textfield-default-border-radius: 4px;
   --simple-textfield-default-box-shadow: none;
   --simple-textfield-default-transition: .2s;
   --simple-textfield-default-font-size: .9rem;

@@ -87,7 +87,7 @@
     },
   ];
 
-  let filters: Filter[] | undefined = [
+  let filters: Filter[] | undefined = $state([
     {
       label: "Business name",
       active: false,
@@ -156,8 +156,39 @@
           .where("categories.name", value);
       },
     },
-  ];
-  let value: string | number | undefined = undefined;
+  ]);
+  let value: string | number | undefined = $state(undefined);
+  let quickFilters: (Filter & { icon?: string })[] = $state([
+    {
+      label: "Business name",
+      active: false,
+      type: "string",
+      name: "businessName",
+      column: "businessName",
+      mode: "contains",
+      modify: function ({ builder, value }) {
+        return builder.whereJsonSuperset("products.categories", {
+          data: [
+            {
+              name: "Tipologie Gomme",
+              tags: { data: [{ value: value, selected: true }] },
+            },
+          ],
+        });
+      },
+      icon: 'mdi-card-account-details'
+    },
+    {
+      label: "Product name",
+      active: false,
+      type: "string",
+      name: "productName",
+      column: "productName",
+      advanced: true,
+      mode: "like",
+      icon: 'mdi-cube'
+    },
+  ])
 
   function handleFiltersChange(
     e: Parameters<
@@ -233,6 +264,8 @@
         value = undefined;
       }
     }}
+    quickFilters={quickFilters}
+    quickFiltersVisible={true}
     editFilterMode="multi-edit"
     showActiveFilters={true}
     {calculateRowStyles}

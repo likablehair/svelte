@@ -1,0 +1,16 @@
+:root {
+  --quick-filters-default-width: 100%;
+  --quick-filters-default-button-padding: 8px;
+  --quick-filters-default-button-border-radius: 4px;
+  --quick-filters-default-button-background-color: rgb(var(--global-color-background-200));
+  --quick-filters-default-button-hover-background-color: rgb(var(--global-color-background-300),.7);
+  --quick-filters-default-button-box-shadow: 0 0 0 1px rgb(var(--global-color-background-300));
+  --quick-filters-default-editor-background-color: rgb(var(--global-color-background-200));
+  --quick-filters-default-editor-border: 1px solid rgb(var(--global-color-background-300));
+  --quick-filters-default-editor-min-width: 120px;
+  --quick-filters-default-editor-border-radius: 4px;
+  --quick-filters-default-editor-padding: 8px;
+  --quick-filters-default-editor-backdrop-filter: none;
+  --quick-filters-default-button-active-background-color: rgb(var(--global-color-primary-500),.5);
+  --quick-filters-default-button-active-box-shadow: 0 0 0 2px rgb(var(--global-color-primary-500));
+}

@@ -10,6 +10,7 @@
   import type Builder from "$lib/utils/filters/builder";
   import Converter from "$lib/utils/filters/filters";
     import MediaQuery from "$lib/components/simple/common/MediaQuery.svelte";
+    import QuickFilters from "../search/QuickFilters.svelte";
 
   interface Props
     extends Omit<ComponentProps<typeof SimpleTable<Item, Data>>, "class"> {
@@ -23,6 +24,8 @@
     searchBarColumns?: string[];
     searchBarVisible?: boolean;
     searchBarPlaceholder?: string;
+    quickFiltersVisible?: boolean;
+    quickFilters?: ComponentProps<typeof QuickFilters>["filters"];
     editFilterMode?: "one-edit" | "multi-edit";
     showActiveFilters?: boolean;
     class?: {
@@ -96,8 +99,10 @@
     totalElements = undefined,
     rowsPerPage = $bindable(20),
     filters = $bindable([]),
+    quickFilters = $bindable(),
     searchBarColumns = undefined,
     searchBarVisible = true,
+    quickFiltersVisible = false,
     lang = "en",
     searchBarPlaceholder = lang == 'en' ? "Type to search..." : "Scrivi per cercare...",
     editFilterMode = "one-edit",
@@ -238,8 +243,12 @@
   function buildFilters(params?: { searchText?: string | undefined }) {
     let converter = new Converter();
     let builder: Builder;
+    
     builder = converter.createBuilder({
-      filters: filters || [],
+      filters: [
+        ...(filters || []),
+        ...(quickFilters || [])
+      ],
     });
 
     if (
@@ -277,36 +286,47 @@
 <div class="paginated-table">
   <MediaQuery>
     {#snippet defaultSnippet({ mAndDown })}
-      <div class="searchbar-and-filter-container {mAndDown ? 'mobile' : 'desktop'}">
-        {#if searchBarVisible}
-          {#if searchBarSnippet}
-            {@render searchBarSnippet({ handleSearchChange })}
-          {:else}
-            <SearchBar
-              placeholder={searchBarPlaceholder}
-              bind:input={searchBarInput}
-              bind:value={searchText}
-              --search-bar-default-width={mAndDown ? "100%" : "450px"}
-              --search-bar-default-height="36px"
-              --search-bar-default-border-radius="4px"
-              --search-bar-default-ring-color="rgb(var(--global-color-background-300),.6)"
-              --search-bar-default-background-color="rgb(var(--global-color-background-300),.4)"
-            ></SearchBar>
+      <div>
+        <div class="searchbar-and-filter-container {mAndDown ? 'mobile' : 'desktop'}">
+          {#if searchBarVisible}
+            {#if searchBarSnippet}
+              {@render searchBarSnippet({ handleSearchChange })}
+            {:else}
+              <SearchBar
+                placeholder={searchBarPlaceholder}
+                bind:input={searchBarInput}
+                bind:value={searchText}
+                --search-bar-default-width={mAndDown ? "100%" : "450px"}
+                --search-bar-default-height="36px"
+                --search-bar-default-border-radius="4px"
+                --search-bar-default-ring-color="rgb(var(--global-color-background-300),.6)"
+                --search-bar-default-background-color="rgb(var(--global-color-background-300),.4)"
+              ></SearchBar>
+            {/if}
           {/if}
+          <Filters
+            bind:filters
+            onapplyFilter={handleFiltersChange}
+            onremoveFilter={handleRemoveFilter}
+            onremoveAllFilters={handleRemoveAllFilters}
+            --filters-default-wrapper-width={!!searchBarVisible ? undefined : "100%"}
+            {lang}
+            {editFilterMode}
+            {showActiveFilters}
+            appendSnippet={filterAppendSnippet}
+            customChipSnippet={customFilterChipSnippet}
+            customSnippet={customFilterSnippet}
+          ></Filters>
+        </div>
+        {#if quickFiltersVisible}
+          <div class="quick-filters-container">
+            <QuickFilters
+              bind:filters={quickFilters}
+              {lang}
+              onapply={handleFiltersChange}
+            ></QuickFilters>
+          </div>
         {/if}
-        <Filters
-          bind:filters
-          onapplyFilter={handleFiltersChange}
-          onremoveFilter={handleRemoveFilter}
-          onremoveAllFilters={handleRemoveAllFilters}
-          --filters-default-wrapper-width={!!searchBarVisible ? undefined : "100%"}
-          {lang}
-          {editFilterMode}
-          {showActiveFilters}
-          appendSnippet={filterAppendSnippet}
-          customChipSnippet={customFilterChipSnippet}
-          customSnippet={customFilterSnippet}
-        ></Filters>
       </div>
     {/snippet}
   </MediaQuery>
@@ -388,7 +408,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 12px;
   }
 
   .range-descriptor {
@@ -413,6 +433,10 @@
 
   .searchbar-and-filter-container.mobile {
     flex-direction: column;
+  }
+
+  .quick-filters-container {
+    margin-top: 12px
   }
 
   @media only screen and (max-width: 768px) {

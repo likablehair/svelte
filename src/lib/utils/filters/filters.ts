@@ -1,4 +1,27 @@
+import type { LabelMapper } from "$lib/components/composed/search/Filters.svelte"
 import Builder from "./builder"
+
+export const ITALIAN_LABELS_MAPPER: LabelMapper = {
+  equal: { extended: 'uguale a', short: 'uguale' },
+  like: { short: 'include' },
+  ilike: { short: 'include' },
+  contains: { short: 'contiene' },
+  greater: { short: 'maggiore', extended: 'maggiore di' },
+  lower: { short: 'minore', extended: 'minore di' },
+  between: { short: 'compreso', extended: 'è compreso tra' },
+  different: { short: 'diverso', extended: 'diverso da' }
+}
+
+export const ENGLISH_LABELS_MAPPER: LabelMapper = {
+  equal: { extended: 'equal to', short: 'equal' },
+  like: { short: 'includes' },
+  ilike: { short: 'includes' },
+  contains: { short: 'contains' },
+  greater: { short: 'greater', extended: 'greater than' },
+  lower: { short: 'lower', extended: 'lower than' },
+  between: { short: 'between', extended: 'is between' },
+  different: { short: 'different', extended: 'different from' }
+}
 
 export const STRING_MODES = ['equal', 'like', 'ilike', 'contains'] as const
 export type StringMode = typeof STRING_MODES[number]

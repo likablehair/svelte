@@ -26,7 +26,8 @@
     mobile?: boolean;
     onchange?: (event:{
       detail: {
-        filter: Filter | undefined
+        filter: Filter | undefined,
+        tmpFilter: Filter | undefined
       }
     }) => void
     onclick?: MouseEventHandler<HTMLDivElement>
@@ -161,7 +162,8 @@
     if(onchange) {
       onchange({
         detail: {
-          filter
+          filter,
+          tmpFilter
         }
       })
     }
@@ -207,7 +209,7 @@
             type="text"
             placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
             --simple-textfield-width="100%"
-            onchange={handleChangeValue}
+            oninput={handleChangeValue}
           ></SimpleTextField>
         {:else if tmpFilter.type === "date" && tmpFilter.mode !== 'between'}
           <div>

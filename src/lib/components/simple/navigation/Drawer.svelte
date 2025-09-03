@@ -31,7 +31,7 @@
   }
 
   let {
-    open = $bindable(false),
+    open = $bindable(),
     position = $bindable("left"),
     overlay = $bindable(false),
     closeOnClickOutside = true,
