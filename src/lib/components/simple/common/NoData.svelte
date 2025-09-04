@@ -33,6 +33,10 @@
       --no-data-gap, 
       var(--no-data-default-gap)
     );
+    height: var(
+      --no-data-height, 
+      var(--no-data-default-height)
+    );
     opacity: 50%;
   }
 

@@ -1,3 +1,4 @@
 :root {
-  --no-data-default-gap: 16px
+  --no-data-default-gap: 16px;
+  --no-data-default-height: 200px;
 }
