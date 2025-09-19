@@ -4,49 +4,46 @@
   import Menu from '$lib/components/simple/common/Menu.svelte';
   import MediaQuery from '$lib/components/simple/common/MediaQuery.svelte';
   import type { ComponentProps } from 'svelte';
+  import lodash from 'lodash'
 
   export let open: boolean = false,
-    activator: HTMLElement,
-    drawerPosition: ComponentProps<Drawer>['position'] = 'bottom',
-    menuAnchor: ComponentProps<Menu>['anchor'] = 'bottom-center',
-    stayInViewport: ComponentProps<Menu>['stayInViewport'] = true,
-    flipOnOverflow: ComponentProps<Menu>['flipOnOverflow'] = false,
-    _boxShadow: string = "rgb(var(--global-color-grey-900), .5) 0px 2px 4px",
-    _height: string = "fit-content",
-    _width: string | undefined = undefined,
-    _maxHeight: string | undefined = undefined,
-    _minWidth: string = "100px",
-    _borderRadius: string = "5px",
-    openingId: ComponentProps<Menu>['openingId'] = undefined,
-    _drawerOverflow: string | undefined = undefined;
+    drawerProps: Omit<ComponentProps<Drawer>, 'open'> | undefined = undefined,
+    menuProps: Omit<ComponentProps<Menu>, 'open'> | undefined = undefined
+
+  const menuPropsDefaultValue = {
+    closeOnClickOutside: true,
+    _boxShadow: "rgb(var(--global-color-grey-900), .5) 0px 2px 4px",
+    _height: "fit-content",
+    _minWidth: "100px",
+    _borderRadius: "5px",
+    _width: "",
+    anchor: 'bottom-center',
+    stayInViewport: true
+  }
+
+  $: finalMenuProps = lodash.clone(lodash.merge(menuPropsDefaultValue, menuProps))
+
+  const drawerPropsDefaultValue = {
+    position: 'bottom'
+  }
+
+  $: finalDrawerProps = lodash.clone(lodash.merge(drawerPropsDefaultValue, drawerProps))
 </script>
 
 <MediaQuery let:mAndDown>
   {#if mAndDown}
     <Drawer
       bind:open={open}
-      bind:position={drawerPosition}
+      {...finalDrawerProps}
       on:close
       on:item-click
-      _overflow={_drawerOverflow}
     >
       <slot isDrawer={true} isMenu={false}></slot>
     </Drawer>
   {:else}
     <Menu
-      bind:activator={activator}
       bind:open={open}
-      closeOnClickOutside
-      _boxShadow={_boxShadow}
-      _height={_height}
-      _maxHeight={_maxHeight}
-      _minWidth={_minWidth}
-      _borderRadius={_borderRadius}
-      _width={_width || ""}
-      anchor={menuAnchor}
-      bind:stayInViewport={stayInViewport}
-      bind:flipOnOverflow={flipOnOverflow}
-      bind:openingId
+      {...finalMenuProps}
     >
       <slot isDrawer={false} isMenu={true}></slot>
     </Menu>
