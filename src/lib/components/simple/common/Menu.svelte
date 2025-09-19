@@ -268,6 +268,10 @@
             0
           );
         }
+
+        if ((_left || 0) < window.scrollX) {
+          _left = window.scrollX;
+        }
       }
 
       if(!!positionedAncestor) {
