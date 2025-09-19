@@ -325,7 +325,8 @@
     return getPositionedAncestor(elem.parentElement)
   }
 
-  function handleCloseControllerClick() {
+  function handleCloseControllerClick(event: MouseEvent) {
+    event.stopPropagation()
     open = false
   }
 
@@ -406,7 +407,6 @@
   data-opening-id={openingId}
   data-uid={currentUid}
   onclick={handleCloseControllerClick}
-  onkeypress={handleCloseControllerClick}
   bind:this={closeController}
   role="presentation"
   tabindex="-1"
