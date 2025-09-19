@@ -6,43 +6,45 @@
   import '../../../css/main.css'
   import type { ComponentProps } from 'svelte';
   import MenuOrDrawer from "./MenuOrDrawer.svelte";
-  import type Drawer from '$lib/components/simple/navigation/Drawer.svelte';
-  import type Menu from '$lib/components/simple/common/Menu.svelte';
   import SelectableVerticalList from '$lib/components/simple/lists/SelectableVerticalList.svelte';
+  import lodash from 'lodash'
 
-  interface Props {
-    open?: boolean;
-    activator: HTMLElement;
-    drawerPosition?: ComponentProps<typeof Drawer>['position'];
-    menuAnchor?: ComponentProps<typeof Menu>['anchor'];
+  interface Props extends ComponentProps<typeof MenuOrDrawer> {
     elements?: ComponentProps<typeof SelectableVerticalList>['elements'];
-    stayInViewport?: ComponentProps<typeof MenuOrDrawer>['stayInViewport'];
-    flipOnOverflow?: ComponentProps<typeof MenuOrDrawer>['flipOnOverflow'];
-    _boxShadow?: string;
-    _height?: string;
-    _maxHeight?: string;
-    _minWidth?: string;
-    _borderRadius?: string;
-    openingId?: ComponentProps<typeof MenuOrDrawer>['openingId'];
     onselect?: ComponentProps<typeof SelectableVerticalList>['onselect']
   }
 
   let { 
     open = $bindable(false),
-    activator = $bindable(),
-    drawerPosition = 'bottom',
-    menuAnchor = 'bottom-center',
     elements = [],
-    stayInViewport = true,
-    flipOnOverflow = false,
-    _boxShadow = "rgb(var(--global-color-grey-900), .5) 0px 2px 4px",
-    _height = "fit-content",
-    _maxHeight = undefined,
-    _minWidth = "100px",
-    _borderRadius = "5px",
-    openingId = undefined,
     onselect,
+    menuProps,
+    drawerProps,
   }: Props = $props();
+
+  const menuPropsDefaultValue = {
+    anchor: 'bottom-center',
+    stayInViewport: true,
+    flipOnOverflow: false,
+    _boxShadow: "rgb(var(--global-color-grey-900), .5) 0px 2px 4px",
+    _height: 'fit-content',
+    _maxHeight: undefined,
+    _minWidth: '100px',
+    _borderRadius: '5px',
+    openingId: undefined
+  }
+
+  let finalMenuProps = $derived(
+    lodash.clone(lodash.merge(menuPropsDefaultValue, menuProps))
+  )
+
+  const drawerPropsDefaultValue = {
+    position: 'bottom'
+  }
+
+  let finalDrawerProps = $derived(
+    lodash.clone(lodash.merge(drawerPropsDefaultValue, drawerProps))
+  )
 
   let selected: ArrayElement<NonNullable<ComponentProps<typeof SelectableVerticalList>['elements']>>['name'] | undefined = $state()
   let focused: ArrayElement<NonNullable<ComponentProps<typeof SelectableVerticalList>['elements']>>['name'] | undefined = $state()
@@ -64,18 +66,9 @@
 
 <MenuOrDrawer
   bind:open
-  bind:activator
-  bind:drawerPosition
-  bind:menuAnchor
-  bind:stayInViewport
-  bind:flipOnOverflow
-  {_boxShadow}
-  {_height}
-  {_maxHeight}
-  {_minWidth}
-  {_borderRadius}
+  drawerProps={finalDrawerProps}
+  menuProps={finalMenuProps}
   --drawer-default-space={`${Math.min(elements?.length || 0, 5) * 56}px`}
-  bind:openingId
 >
   {#snippet children({ isDrawer, isMenu })}
     <div class="selectable-list-wrapper">

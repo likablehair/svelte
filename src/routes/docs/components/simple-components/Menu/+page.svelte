@@ -134,7 +134,7 @@
     { name: 'open', type: 'boolean', description: 'Controls the visibility of the menu', default: 'false' },
     { name: 'refreshPosition', type: 'boolean', description: 'Triggers recalculation of menu position', default: 'false' },
     { name: 'activator', type: 'HTMLElement', description: 'Element that triggers the menu', default: 'undefined' },
-    { name: 'anchor', type: '"bottom" | "bottom-center" | "right-center"', description: 'Defines the menu alignment', default: '"bottom"' },
+    { name: 'anchor', type: '"bottom" | "bottom-center" | "right" | "right-center" | "up" | "up-center" | "left" | "left-center"', description: 'Defines the menu alignment', default: '"bottom"' },
     { name: 'closeOnClickOutside', type: 'boolean', description: 'Closes the menu when clicking outside', default: 'false' },
     { name: 'inAnimation', type: '(node: Element, params?: SlideParams | FlyParams | FadeParams) => TransitionConfig', description: 'Animation for menu entrance', default: 'fly' },
     { name: 'inAnimationConfig', type: 'SlideParams | FlyParams | FadeParams', description: 'Configuration for inAnimation', default: '{ duration: 100, y: 10 }' },

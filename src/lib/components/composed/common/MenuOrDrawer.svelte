@@ -4,49 +4,49 @@
   import Menu from '$lib/components/simple/common/Menu.svelte';
   import MediaQuery from '$lib/components/simple/common/MediaQuery.svelte';
   import type { ComponentProps, Snippet } from 'svelte';
+  import lodash from 'lodash'
 
   interface Props {
-    open?: boolean;
-    activator: HTMLElement;
-    drawerPosition?: ComponentProps<typeof Drawer>['position'];
-    menuAnchor?: ComponentProps<typeof Menu>['anchor'];
-    stayInViewport?: ComponentProps<typeof Menu>['stayInViewport'];
-    flipOnOverflow?: ComponentProps<typeof Menu>['flipOnOverflow'];
-    _boxShadow?: string;
-    _height?: string;
-    _width?: string;
-    _maxHeight?: string;
-    _minWidth?: string;
-    _borderRadius?: string;
-    openingId?: ComponentProps<typeof Menu>['openingId'];
-    _drawerOverflow?: string;
-    children?: Snippet<[{
-      isDrawer: boolean,
-      isMenu: boolean
-    }]>
-    onclose?: ComponentProps<typeof Drawer>['onclose']
-    onitemClick?: ComponentProps<typeof Drawer>['onitemClick']
+    open?: boolean
+    drawerProps?: Omit<ComponentProps<typeof Drawer>, 'open'>
+    menuProps?: Omit<ComponentProps<typeof Menu>, 'open'>
+    children?: Snippet<[
+      {
+        isDrawer: boolean,
+        isMenu: boolean
+      }
+    ]>
   }
 
   let { 
     open = $bindable(false),
-    activator = $bindable(),
-    drawerPosition = $bindable('bottom'),
-    menuAnchor = $bindable('bottom-center'),
-    stayInViewport = $bindable(true),
-    flipOnOverflow = $bindable(false),
-    _boxShadow = "rgb(var(--global-color-grey-900), .5) 0px 2px 4px",
-    _height = "fit-content",
-    _width = undefined,
-    _maxHeight = undefined,
-    _minWidth = "100px",
-    _borderRadius = "5px",
-    openingId = $bindable(undefined),
-    _drawerOverflow = undefined,
+    drawerProps,
+    menuProps,
     children,
-    onclose,
-    onitemClick,
   }: Props = $props();
+
+  const menuPropsDefaultValue = {
+    closeOnClickOutside: true,
+    _boxShadow: "rgb(var(--global-color-grey-900), .5) 0px 2px 4px",
+    _height: "fit-content",
+    _minWidth: "100px",
+    _borderRadius: "5px",
+    _width: "",
+    anchor: 'bottom-center',
+    stayInViewport: true
+  }
+
+  let finalMenuProps = $derived(
+    lodash.clone(lodash.merge(menuPropsDefaultValue, menuProps))
+  )
+
+  const drawerPropsDefaultValue = {
+    position: 'bottom'
+  }
+
+  let finalDrawerProps = $derived(
+    lodash.clone(lodash.merge(drawerPropsDefaultValue, drawerProps))
+  )
 </script>
 
 <MediaQuery>
@@ -54,28 +54,14 @@
     {#if mAndDown}
       <Drawer
         bind:open={open}
-        bind:position={drawerPosition}
-        _overflow={_drawerOverflow}
-        {onclose}
-        {onitemClick}
+        {...finalDrawerProps}
       >
         {@render children?.({ isDrawer: true, isMenu: false })}
       </Drawer>
     {:else}
       <Menu
-        bind:activator={activator}
         bind:open={open}
-        closeOnClickOutside
-        _boxShadow={_boxShadow}
-        _height={_height}
-        _maxHeight={_maxHeight}
-        _minWidth={_minWidth}
-        _borderRadius={_borderRadius}
-        _width={_width || ""}
-        anchor={menuAnchor}
-        bind:stayInViewport={stayInViewport}
-        bind:flipOnOverflow={flipOnOverflow}
-        bind:openingId
+        {...finalMenuProps}
       >
         {@render children?.({ isDrawer: false, isMenu: true })}
       </Menu>

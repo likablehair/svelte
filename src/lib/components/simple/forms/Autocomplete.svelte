@@ -112,7 +112,7 @@
     onfocus?: () => void;
     onblur?: () => void;
     onkeydown?: (e: KeyboardEvent) => void;
-    onclose?: ComponentProps<typeof MenuOrDrawer>["onclose"];
+    onclose?: ComponentProps<typeof Drawer>["onclose"];
   }
 
   let {
@@ -364,6 +364,7 @@
   import { type ComponentProps, type Snippet } from "svelte";
   import SimpleTextField from "./SimpleTextField.svelte";
   import MenuOrDrawer from "$lib/components/composed/common/MenuOrDrawer.svelte";
+  import Drawer from "../navigation/Drawer.svelte";
 </script>
 
 <svelte:window />
@@ -502,14 +503,18 @@
     </Menu>
   {:else}
     <MenuOrDrawer
-      {activator}
-      _width={localMenuWidth || ""}
-      _height={menuHeight}
-      _maxHeight="300px"
-      _boxShadow={menuBoxShadow}
-      _borderRadius={menuBorderRadius}
+      menuProps={{
+        activator,
+        _width: localMenuWidth || "", 
+        _height: menuHeight,
+        _maxHeight: "300px",
+        _boxShadow: menuBoxShadow,
+        _borderRadius: menuBorderRadius,
+      }}
+      drawerProps={{
+        onclose
+      }}
       bind:open={menuOpened}
-      {onclose}
     >
       <ul
         class={clazz.menu || ""}
