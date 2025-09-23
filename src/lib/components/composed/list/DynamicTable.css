@@ -19,4 +19,6 @@
   --dynamic-table-default-end-line-background-color: transparent;
   --dynamic-table-default-end-line-color: rgb(var(--global-color-contrast-500));
   --dynamic-table-default-end-line-text-color: rgb(var(--global-color-contrast-500));
+  --dynamic-table-default-border-collapse: separate;
+  --dynamic-table-default-cell-border: 1px solid transparent;
 }

@@ -26,7 +26,6 @@
   import Divider from "$lib/components/simple/common/Divider.svelte";
   import VerticalDraggableList from "$lib/components/simple/common/VerticalDraggableList.svelte";
   import Button from "$lib/components/simple/buttons/Button.svelte";
-  import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
   import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
   import LabelAndSelect from "../forms/LabelAndSelect.svelte";
   import LabelAndTextField from "../forms/LabelAndTextField.svelte";
@@ -1596,7 +1595,7 @@
   </div>
   {/if}
 
-  <div class="outer-container">
+  <div class="outer-container {clazz.container}">
     <div class="inner-container" class:hide-scrollbar={hideScrollbar} bind:this={tableContainer} {onscroll}>
     <InfiniteScroll
       onloadMore={handleLoadBackward}
@@ -1605,7 +1604,7 @@
       direction='backward'
     />
     <table style="display: table;" class="dynamic-table" bind:this={tableHTML}>
-      <thead class="table-header" bind:this={mainHeader}>
+      <thead class="table-header {clazz.header}" bind:this={mainHeader}>
         <tr>
           {#if !!showSelect && !showExpand && rows.length > 0}
             <th
@@ -1754,7 +1753,7 @@
         {:else}
           {#each renderedRows as row, indexRow}
             <tr
-              class="item-row"
+              class="item-row {clazz.row}"
               class:pointer={!!onrowClick}
               data-key={row.item[uniqueKey]}
               style:background-color={
@@ -1821,6 +1820,7 @@
                       false
                     );
                   }}
+                  class={clazz.cell}
                 >
                   {#if header.type.key == "custom"}
                     {@render customRowSnippet?.({ index: indexRow, columnIndex: indexHeader, header, row })}
@@ -2435,7 +2435,10 @@
       --dynamic-table-background-color,
       var(--dynamic-table-default-background-color)
     );
-    border-collapse: separate;
+    border-collapse: var(
+      --dynamic-table-border-collapse,
+      var(--dynamic-table-default-border-collapse)
+    );
   }
 
   .dynamic-table.dynamic-resizable {
@@ -2527,7 +2530,10 @@
   }
 
   table {
-    border-collapse: separate;
+    border-collapse: var(
+      --dynamic-table-border-collapse,
+      var(--dynamic-table-default-border-collapse)
+    );
     width: 100%;
   }
 
@@ -2542,7 +2548,10 @@
 
   td {
     padding-left: 10px;
-    border: 1px solid transparent;
+    border: var(
+      --dynamic-table-cell-border,
+      var(--dynamic-table-default-cell-border)
+    );
   }
   table.dynamic-table > tbody > tr > td {
     overflow: hidden;
@@ -2555,8 +2564,8 @@
   }
 
   table.dynamic-table > tbody > tr > td.expanded-row {
-  overflow: visible;
-}
+    overflow: visible;
+  }
 
   .hover-cell:hover, .hover-cell:focus, .cell-edit-activator {
     cursor: pointer;
