@@ -10,6 +10,7 @@
     items?: {
       id: string;
       name: string;
+      icon?: string;
     }[];
     class?: string;
     itemSnippet?: Snippet<[{

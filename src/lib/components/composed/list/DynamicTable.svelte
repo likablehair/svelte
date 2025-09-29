@@ -193,7 +193,8 @@
   type Header = Headers[number] & {
     cellEditorInfo?: CellEditorInfo;
     info?: string;
-    maxWidth?: string
+    maxWidth?: string;
+    icon?: string;
   };
   type HeaderType = Header["type"];
 
@@ -498,6 +499,7 @@
     headersToSelect: {
       id: string;
       name: string;
+      icon?: string;
     }[] = $state(!!headers
       ? headers
           .filter((h) => {
@@ -507,16 +509,19 @@
             return {
               id: h.value,
               name: h.label,
+              icon: h.icon
             };
           })
       : []),
     headersToShow: {
       id: string;
       name: string;
+      icon?: string;
     }[] = $state(headersToShowInTable.map((h) => {
       return {
         id: h.value,
         name: h.label,
+        icon: h.icon
       };
     })),
     infoActivators = $state(Array(headersToShowInTable.length))
@@ -2348,6 +2353,9 @@
                 <div
                   style:flex-grow=1
                 >
+                  {#if !!item.icon}
+                    <Icon name={item.icon} />
+                  {/if}
                   {item.name}
                 </div>
                 <Switch
@@ -2380,6 +2388,9 @@
                 <div
                   style:flex-grow=1
                 >
+                  {#if !!header.icon}
+                    <Icon name={header.icon} />
+                  {/if}
                   {header.name}
                 </div>
                 <Switch
