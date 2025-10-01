@@ -1369,7 +1369,7 @@
   </div>
   {/if}
 
-  <div class="outer-container">
+  <div class="outer-container {clazz.container}">
     <div class="inner-container" class:hide-scrollbar={hideScrollbar} bind:this={tableContainer} on:scroll>
     <InfiniteScroll
       on:loadMore={handleLoadBackward}
@@ -1378,7 +1378,7 @@
       direction='backward'
     />
     <table style="display: table;" class="dynamic-table" bind:this={tableHTML}>
-      <thead class="table-header" bind:this={mainHeader}>
+      <thead class="table-header {clazz.header}" bind:this={mainHeader}>
         <tr>
           {#if !!showSelect && !showExpand && rows.length > 0}
             <th
@@ -1466,7 +1466,7 @@
               style:width={remainingWidth + 'px'}
               class="filler"
               aria-hidden="true"
-            />
+            ></th>
           {/if}
           {#if customizeHeaders || $$slots.rowActions || $$slots.append}
             <th
@@ -1499,7 +1499,7 @@
               style:font-size="1.2em"
               style:padding="0px"
             >
-              <div class="loader-line" />
+              <div class="loader-line" ></div>
             </th>
           </tr>
         {/if}
@@ -1522,7 +1522,7 @@
         {:else}
           {#each renderedRows as row, indexRow}
             <tr
-              class="item-row"
+              class="item-row {clazz.row}"
               data-key={row.item[uniqueKey]}
               style:background-color={
                 !!row.item.disableEdit
@@ -1589,6 +1589,7 @@
                       false
                     );
                   }}
+                  class={clazz.cell}
                 >
                   {#if header.type.key == "custom"}
                     <slot
@@ -1623,8 +1624,8 @@
                   {/if}
                 </td>
               {/each}
-              {#if remainingWidth}
-                <td/>
+              {#if remainingWidth && (customizeHeaders || $$slots.rowActions || $$slots.append || resizableColumns)}
+                <td></td>
               {/if}
               {#if $$slots.rowActions || $$slots.append}
                 <td class={clazz.cell || ""}>
@@ -2212,7 +2213,10 @@
       --dynamic-table-background-color,
       var(--dynamic-table-default-background-color)
     );
-    border-collapse: separate;
+    border-collapse: var(
+      --dynamic-table-border-collapse,
+      var(--dynamic-table-default-border-collapse)
+    );
   }
 
   .dynamic-table.dynamic-resizable {
@@ -2304,7 +2308,10 @@
   }
 
   table {
-    border-collapse: separate;
+    border-collapse: var(
+      --dynamic-table-border-collapse,
+      var(--dynamic-table-default-border-collapse)
+    );
     width: 100%;
   }
 
@@ -2319,7 +2326,10 @@
 
   td {
     padding-left: 10px;
-    border: 1px solid transparent;
+    border: var(
+      --dynamic-table-cell-border,
+      var(--dynamic-table-default-cell-border)
+    );
   }
 
   table.dynamic-table > tbody > tr > td {
@@ -2333,8 +2343,8 @@
   }
 
   table.dynamic-table > tbody > tr > td.expanded-row {
-  overflow: visible;
-}
+    overflow: visible;
+  }
 
   .hover-cell:hover, .hover-cell:focus, .cell-edit-activator {
     cursor: pointer;
