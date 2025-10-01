@@ -292,6 +292,7 @@
   ]}
   styleProps={[
     { name: "--dynamic-table-cell-editor-background-color", type: "color", description: "Background color for editable cells", default: "rgb(var(--global-color-background-300))" },
+    { name: "--dynamic-table-default-cell-border", type: "color", description: "Border color of each cell", default: "1px solid transparent" },
     { name: "--dynamic-table-quick-filter-background-color", type: "color", description: "Background of quick filter bar", default: "rgb(var(--global-color-background-300))" },
     { name: "--dynamic-table-row-background-color-hover", type: "color", description: "Hover background color for rows", default: "rgb(var(--global-color-background-400))" },
     { name: "--dynamic-table-expanded-row-background-color", type: "color", description: "Background color for expanded rows", default: "rgb(var(--global-color-background-500))" },
@@ -310,7 +311,8 @@
     { name: "--dynamic-table-row-min-height", type: "size", description: "Minimum height for rows", default: "auto" },
     { name: "--dynamic-table-end-line-background-color", type: "color", description: "Background color of end line", default: "transparent" },
     { name: "--dynamic-table-end-line-color", type: "color", description: "Border color of end line", default: "rgb(var(--global-color-contrast-500))" },
-    { name: "--dynamic-table-end-line-text-color", type: "color", description: "Text color in end line", default: "rgb(var(--global-color-contrast-500))" }
+    { name: "--dynamic-table-end-line-text-color", type: "color", description: "Text color in end line", default: "rgb(var(--global-color-contrast-500))" },
+    { name: "--dynamic-table-default-border-collapse", type: "border", description: "Table borders collapsed or separated", default: "separate" }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>
