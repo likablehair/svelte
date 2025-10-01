@@ -193,11 +193,11 @@
 <style>
 	.custom-filters-container {
     display: flex;
-    height: 70vh;
+    height: 68vh;
   }
 
 	.custom-filters-container.mobile {
-		max-height: 29rem;
+		max-height: 27rem;
 	}
 
 	.yscroll {
