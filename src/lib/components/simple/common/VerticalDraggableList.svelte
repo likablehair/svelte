@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="ts" generics="Item extends { id: string, name: string }">
   import '../../../css/main.css'
   import './VerticalDraggableList.css'
   import { flip } from "svelte/animate";
@@ -7,11 +7,7 @@
   import { Icon } from "$lib";
 
   interface Props {
-    items?: {
-      id: string;
-      name: string;
-      icon?: string;
-    }[];
+    items?: Item[];
     class?: string;
     itemSnippet?: Snippet<[{
       item: typeof items[number]
@@ -32,17 +28,11 @@
 
   const flipDurationMs = 300;
 
-  function handleDndConsider(e: CustomEvent<DndEvent<{
-      id: string;
-      name: string;
-  }>>) {
+  function handleDndConsider(e: CustomEvent<DndEvent<Item>>) {
     items = e.detail.items;
   }
 
-  function handleDndFinalize(e: CustomEvent<DndEvent<{
-      id: string;
-      name: string;
-  }>>) {
+  function handleDndFinalize(e: CustomEvent<DndEvent<Item>>) {
 		items = e.detail.items;
     if(onchangeOrder){
       onchangeOrder({
