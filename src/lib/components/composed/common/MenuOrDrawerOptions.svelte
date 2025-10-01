@@ -18,7 +18,7 @@
     stayInViewport: ComponentProps<MenuOrDrawer>['stayInViewport'] = true,
     flipOnOverflow: ComponentProps<MenuOrDrawer>['flipOnOverflow'] = false,
     _boxShadow: string = "rgb(var(--global-color-grey-900), .5) 0px 2px 4px",
-    _height: string = "fit-content",
+    _height: string = "300px",
     _maxHeight: string | undefined = undefined,
     _minWidth: string = "100px",
     _borderRadius: string = "5px",

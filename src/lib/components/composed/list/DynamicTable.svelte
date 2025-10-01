@@ -45,19 +45,13 @@
     hideScrollbar = tableContainer.scrollHeight > tableContainer.clientHeight
 
     for(const head of [...headers, { value: 'non-resizable', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }, { value: 'customize-headers', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }]) {
-      let th
-      if(head.value == 'non-resizable' || head.value == 'customize-headers') {
-        th = document.getElementsByClassName(head.value).item(0) as HTMLElement
-      } else {
-        th = document.getElementById(head.value) as HTMLElement
-      }
+      let th = headersHTML[head.value]
       if(!!th) {
         resizeHeader(th, head)
       }
     }
 
-    let table = document.getElementsByClassName('dynamic-table')[0] as HTMLElement
-    table.classList.add('dynamic-resizable')
+    tableHTML.classList.add('dynamic-resizable')
 
     resizeObserver = new ResizeObserver(() => {
       updateRemainingWidth();
@@ -274,7 +268,9 @@
     endLineVisible: boolean = false,
     resizableColumns: boolean= false,
     resizedColumnSizeWithPadding: { [value: string]: number } = {},
-    dynamicFilters: boolean = true
+    dynamicFilters: boolean = true,
+    useSelectedItemsOnly = false,
+    selectedAllDisabled = false
 
   let openCellEditor: boolean = false,
     cellEditorActivator: HTMLElement | undefined,
@@ -300,6 +296,8 @@
     currentSectionNumber = 0,
     tableBody: HTMLElement,
     tableContainer: HTMLElement,
+    tableHTML: HTMLElement,
+    headersHTML: { [value: string]: HTMLElement } = {},
     userScrolling = true,
     reachedBottom = false,
     reachedTop = false,
@@ -308,7 +306,8 @@
     hideScrollbar = false,
     sortModify: Header['sortModify'],
     mainHeader: Element,
-    resizeObserver: ResizeObserver
+    resizeObserver: ResizeObserver,
+    ignoreSelectAll = rows.length == totalRows && useSelectedItemsOnly
 
   const DEFAULT_MIN_WIDTH_PX = 100,
     DEFAULT_MAX_WIDTH_PX = 400
@@ -470,7 +469,7 @@
 
   function handleSelect(item: Item, shiftKeyPressed: boolean) {
     let index = -1
-    if(selectedAll) {
+    if(selectedAll && !ignoreSelectAll) {
       index = unselectedItems.findIndex((i) => i[uniqueKey] == item[uniqueKey]);
     } else {
       index = selectedItems.findIndex((i) => i[uniqueKey] == item[uniqueKey]);
@@ -491,7 +490,7 @@
               selectedIndex = x
             }
             for (let i = lastSelectedIndex + 1; i <= selectedIndex; i++) {
-              if(selectedAll) {
+              if(selectedAll && !ignoreSelectAll) {
                 if(!unselectedItems.find((unselectedItem) => unselectedItem[uniqueKey] == rows[i].item[uniqueKey])) {
                   unselectedItems = [...unselectedItems, rows[i].item]
                 }
@@ -504,7 +503,7 @@
           }
         }
         else {
-          if(selectedAll) {
+          if(selectedAll && !ignoreSelectAll) {
             unselectedItems = [...unselectedItems, item];
           } else {
             selectedItems = [...selectedItems, item];
@@ -513,7 +512,7 @@
         }
       }
     } else {
-      if(selectedAll) {
+      if(selectedAll && !ignoreSelectAll) {
         unselectedItems = unselectedItems.filter((i) => i[uniqueKey] != item[uniqueKey]);
       } else {
         selectedItems = selectedItems.filter((i) => i[uniqueKey] != item[uniqueKey]);
@@ -524,7 +523,12 @@
 
   function handleSelectAll() {
     if (selectMode == "multiple") {
-      selectedItems = []
+      if(!selectedAll && ignoreSelectAll) {
+        selectedItems = rows.map(r => r.item)
+      }
+      else {
+        selectedItems = []
+      }
       selectedIndexes = []
       unselectedItems = []
       selectedAll = !selectedAll
@@ -1137,11 +1141,11 @@
   
   async function updateRemainingWidth() {
     if(tableContainer != null && !!tableContainer) {
-      const containerWidth = tableContainer?.getBoundingClientRect().width - 30;
+      const containerWidth = tableContainer?.getBoundingClientRect().width - 26;
 
       if(containerWidth){
         const totalResizableWidth = headersToShowInTable.reduce((sum, head) => {
-          let th = document.getElementById(head.value)
+          let th = headersHTML[head.value]
           if(!!th) {
             resizeHeader(th, head)
           }
@@ -1149,7 +1153,7 @@
           return sum + width + 1;
         }, 0);
     
-        const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.slot-append, th.customize-headers'))
+        const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.customize-headers'))
           .reduce((sum, th) => sum + th.getBoundingClientRect().width + 1, 0);
     
         remainingWidth = Math.max(0, containerWidth - totalResizableWidth - extraStaticWidth);
@@ -1203,112 +1207,116 @@
   {/if}
 
   {#if searchBarVisible || filtersVisible || $$slots.appendFilterRow}
-    <div class="filter-container">
-      <div class="search-bar-container">
+    <MediaQuery let:mAndDown>
+      <div class="searchbar-and-filter-container {mAndDown ? 'mobile' : 'desktop'}">
         <slot name="search-bar" {handleSearchChange}>
           {#if searchBarVisible}
-          <div style="margin-right: 20px;">
-            <SimpleTextField
-              placeholder={searchBarPlaceholder}
-              appendInnerIcon="mdi-magnify"
-              bind:value={searchText}
-              bind:input={searchBarInput}
-              on:keydown={handleSearchBoxKeydown}
-              --simple-textfield-default-width="450px"
-              --simple-textfield-border-radius= 0.5rem
-              --simple-textfield-background-color= transparent
-              --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-              --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-            />
-          </div>
+            <div style="margin-right: {mAndDown ? '0px' : '20px'};">
+              <SimpleTextField
+                placeholder={searchBarPlaceholder}
+                appendInnerIcon="mdi-magnify"
+                bind:value={searchText}
+                bind:input={searchBarInput}
+                on:keydown={handleSearchBoxKeydown}
+                --simple-textfield-width={mAndDown ? "100%" : "450px"}
+                --simple-textfield-border-radius= 0.5rem
+                --simple-textfield-background-color= transparent
+                --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+                --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+              />
+            </div>
           {/if}
         </slot>
-
-        {#if filtersVisible}
+        
+        <div class="filter-container">
           <div>
-            {#if dynamicFilters}
-              <Filters
-                bind:filters
-                on:applyFilter={() => {
-                  handleSearchChange(searchText);
-                }}
-                on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
-                on:removeAllFilters={() => handleRemoveAllFilters()}
-                --filters-default-wrapper-width="100%"
-                {lang}
-                {dateLocale}
-                {editFilterMode}
-                {showActiveFilters}
-              >
-                <svelte:fragment slot="append">
-                  <slot name="filter-append" />
-                </svelte:fragment>
-                <svelte:fragment slot="custom-chip" let:filter>
-                  <slot name="custom-filter-chip" {filter} />
-                </svelte:fragment>
-                <svelte:fragment
-                  slot="custom"
-                  let:filter
-                  let:updateFunction
-                  let:mAndDown
+            {#if filtersVisible}
+              {#if dynamicFilters}
+                <Filters
+                  bind:filters
+                  on:applyFilter={() => {
+                    handleSearchChange(searchText);
+                  }}
+                  on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
+                  on:removeAllFilters={() => handleRemoveAllFilters()}
+                  --filters-default-wrapper-width="100%"
+                  --filters-button-height=29px
+                  {lang}
+                  {dateLocale}
+                  {editFilterMode}
+                  {showActiveFilters}
+                  drawerSpace='40rem'
                 >
-                  <slot name="custom-filter" {filter} {updateFunction} {mAndDown} />
-                </svelte:fragment>
-
-                <svelte:fragment slot="content" let:mAndDown let:filters let:updateMultiFilterValues>
-                  {#key filters}
-                    <DynamicFilters
-                      {lang}
-                      {filters}                      
-                      {mAndDown}
-                      {updateMultiFilterValues}
-                      on:change={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
-                    >
-                      <svelte:fragment slot="custom" let:filter let:mAndDown let:updateCustomFilterValues>
-                        <slot name="custom-filter" {filter} {updateCustomFilterValues} {mAndDown}></slot>
-                      </svelte:fragment>
-                    </DynamicFilters>
-                  {/key}
-                </svelte:fragment>
-              </Filters>
-            {:else}
-              <Filters
-                bind:filters
-                on:applyFilter={() => {
-                  handleSearchChange(searchText);
-                }}
-                on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
-                on:removeAllFilters={() => handleRemoveAllFilters()}
-                --filters-default-wrapper-width="100%"
-                {lang}
-                {dateLocale}
-                {editFilterMode}
-                {showActiveFilters}
-              >
-                <svelte:fragment slot="append">
-                  <slot name="filter-append" />
-                </svelte:fragment>
-                <svelte:fragment slot="custom-chip" let:filter>
-                  <slot name="custom-filter-chip" {filter} />
-                </svelte:fragment>
-                <svelte:fragment
-                  slot="custom"
-                  let:filter
-                  let:updateFunction
-                  let:mAndDown
+                  <svelte:fragment slot="append">
+                    <slot name="filter-append" />
+                  </svelte:fragment>
+                  <svelte:fragment slot="custom-chip" let:filter>
+                    <slot name="custom-filter-chip" {filter} />
+                  </svelte:fragment>
+                  <svelte:fragment
+                    slot="custom"
+                    let:filter
+                    let:updateFunction
+                    let:mAndDown
+                  >
+                    <slot name="custom-filter" {filter} {updateFunction} {mAndDown} />
+                  </svelte:fragment>
+  
+                  <svelte:fragment slot="content" let:mAndDown let:filters let:updateMultiFilterValues>
+                    {#key filters}
+                      <DynamicFilters
+                        {lang}
+                        {filters}                      
+                        {mAndDown}
+                        {updateMultiFilterValues}
+                        on:change={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
+                      >
+                        <svelte:fragment slot="custom" let:filter let:mAndDown let:updateCustomFilterValues>
+                          <slot name="custom-filter" {filter} {updateCustomFilterValues} {mAndDown}></slot>
+                        </svelte:fragment>
+                      </DynamicFilters>
+                    {/key}
+                  </svelte:fragment>
+                </Filters>
+              {:else}
+                <Filters
+                  bind:filters
+                  on:applyFilter={() => {
+                    handleSearchChange(searchText);
+                  }}
+                  on:removeFilter={e => { handleRemoveFilter(e.detail.filter) }}
+                  on:removeAllFilters={() => handleRemoveAllFilters()}
+                  --filters-default-wrapper-width="100%"
+                  --filters-button-height=29px
+                  {lang}
+                  {dateLocale}
+                  {editFilterMode}
+                  {showActiveFilters}
                 >
-                  <slot name="custom-static-filter" {filter} {updateFunction} {mAndDown}/>
-                </svelte:fragment>
-              </Filters>
+                  <svelte:fragment slot="append">
+                    <slot name="filter-append" />
+                  </svelte:fragment>
+                  <svelte:fragment slot="custom-chip" let:filter>
+                    <slot name="custom-filter-chip" {filter} />
+                  </svelte:fragment>
+                  <svelte:fragment
+                    slot="custom"
+                    let:filter
+                    let:updateFunction
+                    let:mAndDown
+                  >
+                    <slot name="custom-static-filter" {filter} {updateFunction} {mAndDown}/>
+                  </svelte:fragment>
+                </Filters>
+              {/if}
             {/if}
           </div>
-        {/if}
+          <div>
+            <slot name="appendFilterRow"></slot>
+          </div>
+        </div>
       </div>
-
-      <div>
-        <slot name="appendFilterRow"></slot>
-      </div>
-    </div>
+    </MediaQuery>
   {/if}
 
   {#if quickFiltersVisible || numberOfResultsVisible}
@@ -1369,7 +1377,7 @@
       hasMore={currentSectionNumber > 0 && userScrolling}
       direction='backward'
     />
-    <table style="display: table;" class="dynamic-table">
+    <table style="display: table;" class="dynamic-table" bind:this={tableHTML}>
       <thead class="table-header {clazz.header}" bind:this={mainHeader}>
         <tr>
           {#if !!showSelect && !showExpand && rows.length > 0}
@@ -1378,8 +1386,9 @@
               style:min-width="30px"
               style:text-align="center"
               class="non-resizable"
+              bind:this={headersHTML['non-resizable']}
             >
-              {#if selectMode === "multiple"}
+              {#if selectMode === "multiple" && !selectedAllDisabled}
                 <Checkbox
                   id="select-all"
                   value={selectedAll}
@@ -1395,7 +1404,8 @@
               style:max-width="60px"
               style:text-align="center"
               class="non-resizable"
-            ></th>
+              bind:this={headersHTML['non-resizable']}
+            />
           {/if}
           {#each headersToShowInTable as head, index}
             <th
@@ -1405,6 +1415,7 @@
               class:sortable={head.sortable}
               on:click={() => handleHeaderClick(head)}
               id={head.value}
+              bind:this={headersHTML[head.value]}
             >
               {#if resizableColumns}
                 <div class="resizer" use:resize></div>
@@ -1450,7 +1461,7 @@
               </slot>
             </th>
           {/each}
-          {#if remainingWidth && (customizeHeaders || $$slots.rowActions || $$slots.append || resizableColumns)}
+          {#if remainingWidth}
             <th
               style:width={remainingWidth + 'px'}
               class="filler"
@@ -1461,6 +1472,7 @@
             <th
               style:text-align="center"
               class="customize-headers"
+              bind:this={headersHTML['customize-headers']}
             >
               {#if customizeHeaders}
                 <div style="display: flex; justify-content: start;">
@@ -1519,7 +1531,7 @@
                     : 'var(--dynamic-table-row-disabled-background-color, var(--dynamic-table-default-row-disabled-background-color))'
                   : expandedRows.findIndex(r => r.item[uniqueKey] == row.item[uniqueKey]) != -1
                     ? 'var(--dynamic-table-expanded-row-background-color, var(--dynamic-table-default-expanded-row-background-color))'
-                    : selectedAll
+                    : selectedAll && !ignoreSelectAll
                       ? !unselectedItems.find(i => i[uniqueKey] == row.item[uniqueKey])
                         ? 'var(--dynamic-table-selected-row-background-color, var(--dynamic-table-default-selected-row-background-color))'
                         : ''
@@ -1535,7 +1547,7 @@
                   <Checkbox
                     id={row.item[uniqueKey]}
                     value={
-                      selectedAll ?
+                      selectedAll && !ignoreSelectAll ?
                         unselectedItems.findIndex(
                           (i) => i[uniqueKey] == row.item[uniqueKey]
                         ) == -1 :
@@ -1678,26 +1690,9 @@
 
                       <tbody>
                         {#each row.subItems as subItem, indexSubItem}
-                          <tr
-                            on:click={() => handleRowClick(subItem)}
-                            class:row-activator={cellEditorIndexRow == indexSubItem && cellEditorSubItem}
-                          >
+                          <tr>
                             {#each subHeaders as subHeader, indexSubHeader}
-                              <td
-                                class:cell-edit-activator={cellEditorIndexHeader == indexSubHeader && cellEditorIndexRow == indexSubItem && cellEditorSubItem}
-                                class:hover-cell={cellEdit && !loading && !!subHeader.cellEditorInfo}
-                                on:click={(e) => {
-                                  handleCellClick(
-                                    e,
-                                    subItem,
-                                    subHeader.cellEditorInfo,
-                                    subItem[subHeader.value],
-                                    indexSubItem,
-                                    indexSubHeader,
-                                    true
-                                  );
-                                }}
-                              >
+                              <td>
                                 {#if subHeader.type.key == "custom"}
                                   <slot
                                     name="custom-subheader"
@@ -2029,6 +2024,9 @@
           />
         </div>
       {:else if quickFilterActive.type.key === "date"}
+        <div style="font-weight: 500; margin-bottom: 8px;">
+          {quickFilterActive.title}
+        </div>
         <div on:click|stopPropagation role="presentation" tabindex="-1">
           <div>
             <DatePickerTextField
@@ -2093,10 +2091,7 @@
     </div>
 
     {#if quickFilterActive.type.key != "boolean"}
-      <div style:margin-top="10px" style:grid-row="2" style:grid-column="1 / 3">
-        <Divider --divider-color=rgb(var(--global-color-contrast-100)) />
-      </div>
-      <div style:grid-row="3" style:grid-column="2" style:margin-top="-15px">
+      <div style:grid-row="3" style:grid-column="2" style:margin-top="-10px">
         <ConfirmOrCancelButtons
           confirmDisable={saveEditDisabled}
           confirmText={lang == 'en' ? "Apply" : 'Applica'}
@@ -2229,28 +2224,15 @@
     width: fit-content;
   }
 
-  .slot-append {
-    width: 1px;
-    min-width: unset;
-    box-sizing: content-box;
-  }
-
   .table-header {
     position: sticky;
     top: 0;
     z-index: 2;
+    top: -1px;
     height: var(
       --dynamic-table-header-height,
       var(--dynamic-table-default-header-height)
     );
-  }
-
-  @media not all and (min-resolution:.001dpcm) { 
-    .table-header {
-      position: sticky;
-      top: -2px;
-      z-index: 2;
-    }
   }
 
   .table-subheader {
@@ -2459,22 +2441,40 @@
     flex-direction: row;
   }
 
+  .searchbar-and-filter-container {
+    display: flex;
+    margin-bottom: 16px;
+  }
+  
+  .searchbar-and-filter-container.desktop {
+    flex-direction: row;
+  }
+  .searchbar-and-filter-container.mobile {
+    flex-direction: column;
+    gap: 8px;
+  }
   .filter-container {
     display: flex;
-    flex-direction: row;
     justify-content: space-between;
-    margin-bottom: 20px;
+    flex-grow: 1;
   }
-
   .quick-filters {
     display: flex;
     flex-direction: row;
-    margin-bottom: 10px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 4px;
+    gap: 8px;
+  }
+  .quick-filters::-webkit-scrollbar:horizontal {
+    height: 12px;
   }
 
   .quick-filters-results-container {
     display: flex;
     justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
   }
 
   .vertical-quick-filters {
@@ -2570,8 +2570,9 @@
   .results-number {
     margin: 0px 0px 4px 4px;
     display: flex;
-    align-items: center;
+    align-items: top;
     gap: 4px;
+    min-width: 90px;
   }
   .resizer {
     position: absolute;

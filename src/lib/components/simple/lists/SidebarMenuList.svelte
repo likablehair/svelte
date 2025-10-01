@@ -99,20 +99,20 @@
     for(let i = 0; i < params.menus.length; i += 1) {
       let currentMenu = params.menus[i]
 
-      if(!!currentMenu.children) {
-        let found = getMenuNameMatchingUrl({ menus: currentMenu.children })
-        if(found.name !== undefined) {
-          foundName = found.name
-          foundMatchType = found.matchType
-        }
-      }
-      
       if(!!currentMenu.url && $page.url.pathname === currentMenu.url) {
         foundName = currentMenu.name
         foundMatchType = 'equal'
       } else if(foundMatchType !== 'equal' && !!currentMenu.url && $page.url.pathname.startsWith(currentMenu.url)) {
         foundName = currentMenu.name
         foundMatchType = 'startsWith'
+      }
+
+      if(!!currentMenu.children) {
+        let found = getMenuNameMatchingUrl({ menus: currentMenu.children })
+        if(found.name !== undefined) {
+          foundName = found.name
+          foundMatchType = found.matchType
+        }
       }
     }
 

@@ -4,10 +4,8 @@
   import MediaQuery from "$lib/components/simple/common/MediaQuery.svelte";
   import Icon from "$lib/components/simple/media/Icon.svelte";
   import { createEventDispatcher } from "svelte";
-  import ColorInvertedSelector, {
-    type Option,
-  } from "../simple/lists/ColorInvertedSelector.svelte";
   import { writable } from "svelte/store";
+  import mediaQuery from "$lib/stores/mediaQuery";
 
   interface ClassProps {
     container?: string;
@@ -17,27 +15,18 @@
   }
 
   export let drawerOpened = false;
-  export let options: Option[] = [];
-  export let selectedIndex: number | undefined = undefined;
   export let sidebarExpanded: boolean = false;
-  export let isPinned: boolean = false;
-
-  //export let $$restProps: Record<string, any>;
 
   let clazz: ClassProps = {};
   export { clazz as class };
 
   const sidebarPinned = writable(false);
-  $sidebarPinned = isPinned;
 
   let headerElement: HTMLElement;
 
   const dispatch = createEventDispatcher<{
     "drawer-change": {
       opened: boolean;
-    };
-    "menu-select": {
-      option: Option;
     };
     "pinned-change": {
       pinned: boolean;
@@ -57,24 +46,13 @@
     dispatch("drawer-change", { opened: drawerOpened });
   }
 
-  function handleMenuSelection(option: Option): void {
-    if (!$sidebarPinned) {
-      sidebarExpanded = false;
-    }
-
-    drawerOpened = false;
-    dispatch("drawer-change", { opened: drawerOpened });
-    dispatch("menu-select", { option });
-  }
-
-  // function togglePin(): void {
-  //   sidebarExpanded = $sidebarPinned;
-  //   dispatch("pinned-change", { pinned: $sidebarPinned });
-  // }
-
   function toggleSidebar(): void {
     sidebarExpanded = !sidebarExpanded;
     dispatch("sidebar-toggle", { expanded: sidebarExpanded });
+  }
+
+  $: if($mediaQuery.m || $mediaQuery.s || $mediaQuery.xs) {
+    sidebarExpanded = false
   }
 </script>
 
@@ -96,15 +74,26 @@
                 on:click={toggleMenu}
               />
             </div>
-          {:else if !sidebarExpanded}
-            <div style:margin-right="2rem">
-              <Icon
-                name="mdi-menu-open"
-                click
-                --icon-default-size="1.5rem"
-                on:click={toggleSidebar}
-              />
-            </div>
+          {:else}
+            {#if !sidebarExpanded}
+              <div style:margin-right="2rem">
+                <Icon
+                  name="mdi-menu-close"
+                  click
+                  --icon-default-size="1.5rem"
+                  on:click={toggleSidebar}
+                />
+              </div>
+            {:else}
+              <div style:margin-right="2rem">
+                <Icon
+                  name="mdi-menu-open"
+                  click
+                  --icon-default-size="1.5rem"
+                  on:click={toggleSidebar}
+                />
+              </div>
+            {/if}
           {/if}
           <slot name="inner-menu" hamburgerVisible={mAndDown}>
             <div class="menu">Menu</div>
@@ -131,56 +120,12 @@
                     hamburgerVisible={mAndDown}
                     {sidebarExpanded}
                   >
-                    <div class="logo">logo</div>
+                    <div class="logo">Logo</div>
                   </slot>
-                </div>
-                <div class="pin-container">
-                  {#if sidebarExpanded}
-                    <div class="sidebar-close-button">
-                      <Icon
-                        name="mdi-menu-open"
-                        click
-                        --icon-default-size="1.5rem"
-                        on:click={toggleSidebar}
-                        class="toggle-icon"
-                      />
-                    </div>
-                  {/if}
                 </div>
               </div>
               <slot name="menu" hamburgerVisible={mAndDown} {sidebarExpanded}>
                 <div class="menu-container" class:expanded={sidebarExpanded}>
-                  <ColorInvertedSelector
-                    {options}
-                    {selectedIndex}
-                    --color-inverted-selector-default-background-color="transparent"
-                    --color-inverted-selector-default-font-size="1.2rem"
-                    --color-inverted-selector-default-icon-gap="1.2rem"
-                    --color-inverted-selector-default-element-height="3rem"
-                    --color-inverted-selector-default-element-padding="8px 8px 8px 11px"
-                    --color-inverted-selector-default-element-border-radius="16px"
-                    --color-inverted-selector-default-selected-font-weight="400"
-                    --icon-default-size="1.3rem"
-                    deletable={false}
-                    on:select={(e) => handleMenuSelection(e.detail.option)}
-                  >
-                    <svelte:fragment slot="prepend" let:option let:handleClickClose let:index>
-                      <slot name="prepend" {option} {handleClickClose} {index} {sidebarExpanded}>
-                        {#if !!option.icon}
-                          <Icon
-                            name={option.icon}
-                          ></Icon>
-                        {/if}
-                      </slot>
-                    </svelte:fragment>
-                    <svelte:fragment slot="option" let:option>
-                      <slot name="option" {option}>
-                        <div class="label">
-                          {option.label}
-                        </div>
-                      </slot>
-                    </svelte:fragment>
-                  </ColorInvertedSelector>
                 </div>
               </slot>
             </div>
@@ -200,7 +145,7 @@
         class="overlay {clazz.overlay || ''}"
         role="presentation"
         tabindex="-1"
-      />
+      ></div>
       <div class="content" class:blurred={drawerOpened}>
         <slot>Content</slot>
       </div>
@@ -211,7 +156,10 @@
 
 <style>
   .side-bar {
-    background-color: var(--csbl-side-bar-default-bg);
+    background-color: var(
+      --collapsible-divided-side-bar-layout-background-color, 
+      var(--collapsible-divided-side-bar-layout-default-background-color)
+    );
     position: fixed;
     width: var(
       --collapsible-divided-side-bar-layout-side-bar-width, 
@@ -230,8 +178,14 @@
       var(--collapsible-divided-side-bar-layout-default-side-bar-padding)
     );
     z-index: 10;
-    overflow: clip;
     transition: all .2s cubic-bezier(.4,0,.2,1);
+    overflow: clip;
+  }
+
+  .side-bar-content {
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
   }
 
   .sidebar-header-container {
@@ -246,7 +200,6 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    width: 70%;
     margin-bottom: 1rem;
   }
 
@@ -283,7 +236,6 @@
 
   @media (min-width: 1024.1px) {
     .side-bar.opened {
-      background-color: var(--csbl-side-bar-expanded-bg);
       width: var(
         --collapsible-divided-side-bar-layout-side-bar-hover-width, 
         var(--collapsible-divided-side-bar-layout-default-side-bar-hover-width)
@@ -316,7 +268,10 @@
       top: var(--collapsible-divided-side-bar-layout-header-menu-height,
         var(--collapsible-divided-side-bar-layout-default-header-menu-height)
       );
-      background-color: var(--csbl-side-bar-default-bg);
+      background-color: var(
+        --collapsible-divided-side-bar-layout-background-color, 
+        var(--collapsible-divided-side-bar-layout-default-background-color)
+      );
       bottom: 0;
       z-index: 30;
       width: var(
@@ -484,9 +439,7 @@
       rgb(var(--collapsible-divided-side-bar-layout-default-inner-header-menu-background-color), .5)
     );
     height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    
   }
 
   * {
