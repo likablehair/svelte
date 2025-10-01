@@ -5,8 +5,8 @@
   import PropsViewer from "../../PropsViewer.svelte";
   import SlotsViewer from "../../SlotsViewer.svelte";
 
-  let menuOpened = false
-  let activator
+  let menuOpened = $state(false)
+  let activator: HTMLElement | undefined = $state()
   let menuLabels = ['this', 'is', 'a', 'menu', '!']
 
   function handleButtonClick(e: MouseEvent) {
@@ -14,8 +14,8 @@
     menuOpened = !menuOpened
   }
 
-  let secondActivators: Record<string, HTMLElement> = {}
-  let secondMenuOpened: Record<string, boolean> = {}
+  let secondActivators: Record<string, HTMLElement> = $state({})
+  let secondMenuOpened: Record<string, boolean> = $state({})
   let thirdActivators: Record<string, HTMLElement> = {}
   let thirdMenuOpened: Record<string, boolean> = {}
 
