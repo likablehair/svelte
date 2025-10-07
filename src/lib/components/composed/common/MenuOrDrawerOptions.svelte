@@ -2,7 +2,7 @@
   export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 </script>
 
-<script lang="ts">
+<script lang="ts" generics="Data">
   import '../../../css/main.css'
   import type { ComponentProps } from 'svelte';
   import MenuOrDrawer from "./MenuOrDrawer.svelte";
@@ -15,7 +15,7 @@
     activator: HTMLElement;
     drawerPosition?: ComponentProps<typeof Drawer>['position'];
     menuAnchor?: ComponentProps<typeof Menu>['anchor'];
-    elements?: ComponentProps<typeof SelectableVerticalList>['elements'];
+    elements?: ComponentProps<typeof SelectableVerticalList<Data>>['elements'];
     stayInViewport?: ComponentProps<typeof MenuOrDrawer>['stayInViewport'];
     flipOnOverflow?: ComponentProps<typeof MenuOrDrawer>['flipOnOverflow'];
     _boxShadow?: string;
@@ -24,7 +24,7 @@
     _minWidth?: string;
     _borderRadius?: string;
     openingId?: ComponentProps<typeof MenuOrDrawer>['openingId'];
-    onselect?: ComponentProps<typeof SelectableVerticalList>['onselect']
+    onselect?: ComponentProps<typeof SelectableVerticalList<Data>>['onselect']
   }
 
   let { 
@@ -44,8 +44,8 @@
     onselect,
   }: Props = $props();
 
-  let selected: ArrayElement<NonNullable<ComponentProps<typeof SelectableVerticalList>['elements']>>['name'] | undefined = $state()
-  let focused: ArrayElement<NonNullable<ComponentProps<typeof SelectableVerticalList>['elements']>>['name'] | undefined = $state()
+  let selected: ArrayElement<NonNullable<ComponentProps<typeof SelectableVerticalList<Data>>['elements']>>['name'] | undefined = $state()
+  let focused: ArrayElement<NonNullable<ComponentProps<typeof SelectableVerticalList<Data>>['elements']>>['name'] | undefined = $state()
   $effect(() => {
     if(!!selected) selected = undefined
   })
@@ -53,7 +53,7 @@
     if(!!focused && !open) focused = undefined
   })
 
-  function handleOnSelect(e: Parameters<NonNullable<ComponentProps<typeof SelectableVerticalList>['onselect']>>[0]){
+  function handleOnSelect(e: Parameters<NonNullable<ComponentProps<typeof SelectableVerticalList<Data>>['onselect']>>[0]){
     open = false
 
     if(onselect){
