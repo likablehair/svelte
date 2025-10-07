@@ -200,7 +200,11 @@
     let filterIndex = filters.findIndex((f) => f.name === filter.name)
     let filterName = filter.name
     filters[filterIndex].active = false
-    tmpFilters[filterName].active = false
+    
+    if (tmpFilters[filterName]) {
+      tmpFilters[filterName].active = false
+    }
+    
     if(Object.keys(filters[filterIndex]).includes('value')) {
       //@ts-ignore
       filters[filterIndex].value = undefined
