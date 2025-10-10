@@ -82,6 +82,7 @@
         },
       ]
     >;
+    totalsSnippet?: Snippet<[]>
   }
 
   let {
@@ -137,6 +138,7 @@
     rangeDescriptorSnippet,
     searchBarSnippet,
     noDataSnippet,
+    totalsSnippet,
     oncolumnResize,
   }: Props = $props();
 
@@ -334,11 +336,15 @@
       </div>
     {/snippet}
   </MediaQuery>
-  {#if numberOfResultsVisible && totalElements != undefined}
-    <div class='results-number'>
-      { lang == 'en' ? 'Results: ' : 'Risultati: '}
-      {totalElements}
-    </div>
+  {#if totalsSnippet}
+    {@render totalsSnippet()}
+  {:else}
+    {#if numberOfResultsVisible && totalElements != undefined}
+      <div class='results-number'>
+        { lang == 'en' ? 'Results: ' : 'Risultati: '}
+        {totalElements}
+      </div>
+    {/if}
   {/if}
   <SimpleTable
     {headers}
@@ -418,7 +424,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
   }
 
   .range-descriptor {

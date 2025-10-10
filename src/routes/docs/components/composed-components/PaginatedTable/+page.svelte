@@ -462,6 +462,12 @@
       default: "250",
     },
     {
+      name: "numberOfResultsVisible",
+      type: "boolean",
+      description: "Shows the number of totalElements",
+      default: "false",
+    },
+    {
       name: "calculateRowStyles",
       type: "CalculateRowStyles<Item> | undefined",
       description: "Function to calculate row styles.",
@@ -675,6 +681,18 @@
       default: `
 <NoData {lang} />
       `,
+    },
+    {
+      name: "totalsSnippet",
+      description: "Slot to display number of results",
+      default: `
+{#if numberOfResultsVisible && totalElements != undefined}
+  <div class='results-number'>
+    { lang == 'en' ? 'Results: ' : 'Risultati: '}
+    {totalElements}
+  </div>
+{/if}
+      `
     },
   ]}
 ></SlotsViewer>
