@@ -28,6 +28,7 @@
     editFilterMode?: "one-edit" | "multi-edit";
     showActiveFilters?: boolean;
     dateLocale?: 'it' | 'en'
+    numberOfResultsVisible?: boolean
     class?: {
       simpleTable?: ComponentProps<typeof SimpleTable<Item, Data>>["class"];
     };
@@ -113,6 +114,7 @@
     pointerOnRowHover = undefined,
     doubleClickActive = false,
     doubleClickDelay = 250,
+    numberOfResultsVisible,
     calculateRowStyles = undefined,
     calculateRowClasses = undefined,
     class: clazz = {},
@@ -332,6 +334,12 @@
       </div>
     {/snippet}
   </MediaQuery>
+  {#if numberOfResultsVisible && totalElements != undefined}
+    <div class='results-number'>
+      { lang == 'en' ? 'Results: ' : 'Risultati: '}
+      {totalElements}
+    </div>
+  {/if}
   <SimpleTable
     {headers}
     class={clazz.simpleTable}
@@ -410,7 +418,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
   }
 
   .range-descriptor {
@@ -445,5 +453,11 @@
     .per-page-dropdown {
       display: none;
     }
+  }
+
+  .results-number {
+    display: flex;
+    justify-content: end;
+    padding-right: 4px;
   }
 </style>
