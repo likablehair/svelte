@@ -69,10 +69,10 @@
     class="border-colored {clazz.border || ''}"
   ></div>
   <div class="body {clazz.body || ''}">
-    <div class="content">
-      {#if !!contentSnippet}
-        {@render contentSnippet({ title, description })}
-      {:else}
+    {#if !!contentSnippet}
+      {@render contentSnippet({ title, description })}
+    {:else}
+      <div class="content">
         {#if !!title}
           {#if !!titleSnippet}
             {@render titleSnippet({ title })}
@@ -87,8 +87,8 @@
             <div class="description">{description}</div>
           {/if}
         {/if}
-      {/if}
-    </div>
+      </div>
+    {/if}
     {#if !!appendSnippet}
       <div class="append">
         {@render appendSnippet({ disabled })}
@@ -100,7 +100,7 @@
 <style>
   .alert-banner-container {
     position: relative;
-    box-shadow: 0 3px 1px -2px rgba(0,0,0,.2),0 2px 2px 0 rgba(0,0,0,.14),0 1px 5px 0 rgba(0,0,0,.12)!important;
+    box-shadow: var(--alert-banner-box-shadow, var(--alert-banner-default-box-shadow))!important;
     border-radius: var(--alert-banner-border-radius, var(--alert-banner-default-border-radius));
     cursor: var(--alert-banner-cursor, var(--alert-banner-default-cursor));
     width: var(--alert-banner-width, var(--alert-banner-default-width));
