@@ -52,8 +52,8 @@
     class="border-colored {clazz.border || ''}"
   ></div>
   <div class="body {clazz.body || ''}">
-    <div class="content">
-      <slot name="content" title={title} description={description}>
+    <slot name="content" title={title} description={description}>
+      <div class="content">
         {#if !!title}
           <slot name="title" title={title}>
             <div class="title">{title}</div>
@@ -64,8 +64,8 @@
             <div class="description">{description}</div>
           </slot>
         {/if}
-      </slot>
-    </div>
+      </div>
+    </slot>
     <div class="append">
       <slot name="append" disabled={disabled}></slot>
     </div>
@@ -75,7 +75,7 @@
 <style>
   .alert-banner-container {
     position: relative;
-    box-shadow: 0 3px 1px -2px rgba(0,0,0,.2),0 2px 2px 0 rgba(0,0,0,.14),0 1px 5px 0 rgba(0,0,0,.12)!important;
+    box-shadow: var(--alert-banner-box-shadow, var(--alert-banner-default-box-shadow))!important;
     border-radius: var(--alert-banner-border-radius, var(--alert-banner-default-border-radius));
     cursor: var(--alert-banner-cursor, var(--alert-banner-default-cursor));
     width: var(--alert-banner-width, var(--alert-banner-default-width));
