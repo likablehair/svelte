@@ -185,12 +185,14 @@
       </svelte:fragment>
     </Filters>
   </div>
-  {#if numberOfResultsVisible && totalElements != undefined}
-    <div class='results-number'>
-      { lang == 'en' ? 'Results: ' : 'Risultati: '}
-      {totalElements}
-    </div>
-  {/if}
+  <slot name="totals">
+    {#if numberOfResultsVisible && totalElements != undefined}
+      <div class='results-number'>
+        { lang == 'en' ? 'Results: ' : 'Risultati: '}
+        {totalElements}
+      </div>
+    {/if}
+  </slot>
   <SimpleTable
     bind:headers
     bind:class={clazz.simpleTable}
