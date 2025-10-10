@@ -396,6 +396,7 @@
   ) {
     if (disabled || loading) return;
     if (cellEdit && cellEditorInfo && !item.disableEdit) {
+      mouseEvent.stopPropagation()
       if (!cellEditorActivator) {
         let target = mouseEvent.target as unknown as HTMLElement;
         cellEditorActivator = target;
@@ -1555,6 +1556,7 @@
                         ) != -1
                     }
                     disabled={disabled || loading}
+                    on:click={e => e.stopPropagation()}
                     on:change={(e) => handleSelect(row.item, e.detail.shiftKeyPressed)}
                   />
                 </td>
@@ -1569,7 +1571,10 @@
                       : "mdi-chevron-up"}
                     click
                     --icon-size="24px"
-                    on:click={() => expandRow(row)}
+                    on:click={e => {
+                      e?.stopPropagation()
+                      expandRow(row)
+                    }}
                   />
                 </td>
               {/if}
