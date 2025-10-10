@@ -2,8 +2,10 @@
   import './Checkbox.css'
   import '../../../css/main.css'
   import { onMount } from 'svelte';
+  import type { HTMLInputAttributes } from 'svelte/elements';
 
-  interface Props {
+  interface Props extends Omit<HTMLInputAttributes,
+  'onchange' | 'disabled' | 'id' | 'type' | 'checked'> {
     value?: boolean;
     id?: string;
     disabled?: boolean;
@@ -20,6 +22,7 @@
     id = undefined, 
     disabled = false,
     onchange,
+    ...rest
   }: Props = $props();
 
   onMount(() => {
@@ -64,6 +67,7 @@
   bind:checked={value}
   onchange={handleChange}
   {disabled}
+  {...rest}
 />
 
 <style>
