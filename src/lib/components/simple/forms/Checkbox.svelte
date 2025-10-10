@@ -48,6 +48,7 @@
   bind:checked={value}
   on:change={handleChange}
   {disabled}
+  on:click
 />
 
 <style>

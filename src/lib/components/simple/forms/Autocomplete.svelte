@@ -334,12 +334,14 @@
       </Menu>
     {:else}
       <MenuOrDrawer
-        {activator}
-        _width={localMenuWidth || ""}
-        _height={menuHeight}
-        _maxHeight="300px"
-        _boxShadow={menuBoxShadow}
-        _borderRadius={menuBorderRadius}
+        menuProps={{
+          activator,
+          _width: localMenuWidth || "", 
+          _height: menuHeight,
+          _maxHeight: "300px",
+          _boxShadow: menuBoxShadow,
+          _borderRadius: menuBorderRadius,
+        }}
         bind:open={menuOpened}
         on:close
       >

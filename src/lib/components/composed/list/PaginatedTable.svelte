@@ -43,11 +43,13 @@
     searchBarVisible: boolean = true,
     searchBarPlaceholder: string = "Type something to search...",
     lang: 'it' | 'en' = 'en',
+    dateLocale: 'it' | 'en' | undefined = undefined,
     editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit',
     showActiveFilters: boolean = true,
     resizableColumns: boolean = false,
     resizedColumnSizeWithPadding: { [value: string]: number } = {},
     pointerOnRowHover: boolean | undefined = undefined,
+    numberOfResultsVisible: boolean | undefined = undefined,
     doubleClickActive: ComponentProps<SimpleTable>['doubleClickActive'] = false,
     doubleClickDelay: ComponentProps<SimpleTable>['doubleClickDelay'] = 250;
 
@@ -168,6 +170,7 @@
       on:removeAllFilters
       --filters-default-wrapper-width="100%"
       {lang}
+      {dateLocale}
       {editFilterMode}
       {showActiveFilters}
     >
@@ -182,6 +185,14 @@
       </svelte:fragment>
     </Filters>
   </div>
+  <slot name="totals">
+    {#if numberOfResultsVisible && totalElements != undefined}
+      <div class='results-number'>
+        { lang == 'en' ? 'Results: ' : 'Risultati: '}
+        {totalElements}
+      </div>
+    {/if}
+  </slot>
   <SimpleTable
     bind:headers
     bind:class={clazz.simpleTable}
@@ -286,7 +297,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 8px;
   }
 
   .header-sort-icon {
@@ -328,6 +339,12 @@
     .per-page-dropdown {
       display: none;
     }
+  }
+
+  .results-number {
+    display: flex;
+    justify-content: end;
+    padding-right: 4px;
   }
 
 </style>

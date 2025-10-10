@@ -145,7 +145,6 @@
 							--simple-textfield-background-color= transparent
 							--simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
 							--simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-							--chip-default-color="rgb(var(--global-color-primary-foreground))"
 							--autocomplete-border-radius= 0.5rem
 							--autocomplete-border="1px solid rgb(var(--global-color-background-500))"
 							--autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"

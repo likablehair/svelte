@@ -27,7 +27,9 @@
   {#if !!activator}
     <MenuOrDrawerOptions
       bind:open={open}
-      activator={activator}
+      menuProps={{
+        activator,
+      }}
       elements={[
         {name: 'new', title: 'Nuovo', icon: 'mdi-plus' },
         {name: 'edit', title: 'Modifica', icon: 'mdi-pencil'},

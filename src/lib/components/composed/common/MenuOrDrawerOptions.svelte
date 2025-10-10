@@ -9,42 +9,45 @@
   import type Drawer from '$lib/components/simple/navigation/Drawer.svelte';
   import type Menu from '$lib/components/simple/common/Menu.svelte';
   import SelectableVerticalList from '$lib/components/simple/lists/SelectableVerticalList.svelte';
+  import lodash from 'lodash'
 
   export let open: boolean = false,
-    activator: HTMLElement,
-    drawerPosition: ComponentProps<Drawer>['position'] = 'bottom',
-    menuAnchor: ComponentProps<Menu>['anchor'] = 'bottom-center',
     elements: ComponentProps<SelectableVerticalList>['elements'] = [],
-    stayInViewport: ComponentProps<MenuOrDrawer>['stayInViewport'] = true,
-    flipOnOverflow: ComponentProps<MenuOrDrawer>['flipOnOverflow'] = false,
-    _boxShadow: string = "rgb(var(--global-color-grey-900), .5) 0px 2px 4px",
-    _height: string = "300px",
-    _maxHeight: string | undefined = undefined,
-    _minWidth: string = "100px",
-    _borderRadius: string = "5px",
-    openingId: ComponentProps<MenuOrDrawer>['openingId'] = undefined;
+    drawerProps: Omit<ComponentProps<Drawer>, 'open'> | undefined = undefined,
+    menuProps: Omit<ComponentProps<Menu>, 'open'> | undefined = undefined
 
   let selected: ArrayElement<NonNullable<ComponentProps<SelectableVerticalList>['elements']>>['name'] | undefined
   let focused: ArrayElement<NonNullable<ComponentProps<SelectableVerticalList>['elements']>>['name'] | undefined
   $: if(!!selected) selected = undefined
   $: if(!!focused && !open) focused = undefined
+
+  const menuPropsDefaultValue = {
+    anchor: 'bottom-center',
+    stayInViewport: true,
+    flipOnOverflow: false,
+    _boxShadow: "rgb(var(--global-color-grey-900), .5) 0px 2px 4px",
+    _height: 'fit-content',
+    _maxHeight: undefined,
+    _minWidth: '100px',
+    _borderRadius: '5px',
+    openingId: undefined
+  }
+
+  $: finalMenuProps = lodash.clone(lodash.merge(menuPropsDefaultValue, menuProps))
+
+  const drawerPropsDefaultValue = {
+    position: 'bottom'
+  }
+
+  $: finalDrawerProps = lodash.clone(lodash.merge(drawerPropsDefaultValue, drawerProps))
 </script>
 
 <MenuOrDrawer
   bind:open
-  bind:activator
-  bind:drawerPosition
-  bind:menuAnchor
-  bind:stayInViewport
-  bind:flipOnOverflow
-  {_boxShadow}
-  {_height}
-  {_maxHeight}
-  {_minWidth}
-  {_borderRadius}
+  drawerProps={finalDrawerProps}
+  menuProps={finalMenuProps}
   let:isDrawer
   --drawer-default-space={`${Math.min(elements?.length || 0, 5) * 56}px`}
-  bind:openingId
 >
   <div class="selectable-list-wrapper">
     <SelectableVerticalList
