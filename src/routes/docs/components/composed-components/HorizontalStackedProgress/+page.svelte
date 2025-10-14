@@ -1,10 +1,9 @@
 <script lang="ts">
   import ComponentSubtitle from "../../../ComponentSubtitle.svelte";
   import PropsViewer from "../../PropsViewer.svelte";
-  
   import HorizontalStackedProgress from "$lib/components/composed/progress/HorizontalStackedProgress.svelte";
-    import SlotsViewer from "../../SlotsViewer.svelte";
-    import EventsViewer from "../../EventsViewer.svelte";
+  import SlotsViewer from "../../SlotsViewer.svelte";
+  import EventsViewer from "../../EventsViewer.svelte";
 </script>
 
 <h1>HorizontalStackedProgress</h1>
@@ -30,6 +29,7 @@
       }
     ]}
     --horizontal-stacked-progress-width="300px"
+    tooltipVisible={false}
     labelTextVisible={false}
   ></HorizontalStackedProgress>
   <HorizontalStackedProgress
@@ -88,15 +88,20 @@
     { name: "legendVisible", type: "boolean", description: "Controls the visibility of the legend.", default: "false" },
     { name: "legendValueVisible", type: "boolean", description: "Controls the visibility of the legend values.", default: "true" },
     { name: "legendTextVisible", type: "boolean", description: "Controls the visibility of the legend text.", default: "true" },
-    { name: "hideLabelUnderPercentage", type: "number", description: "Percentage threshold to hide labels.", default: "undefined" }
+    { name: "hideLabelUnderPercentage", type: "number", description: "Percentage threshold to hide labels.", default: "undefined" },
+    { name: "tooltipVisible", type: "boolean", description: "Controls the visibility of the progress bar tooltip", default: "true" },
   ]}
   styleProps={[
-    { name: "--horizontal-stacked-progress-default-gap", type: "size", description: "Gap between stacked progress bars.", default: "4px" },
-    { name: "--horizontal-stacked-progress-default-dot-height", type: "size", description: "Height of the dot representing progress.", default: "10px" },
-    { name: "--horizontal-stacked-progress-default-dot-width", type: "size", description: "Width of the dot representing progress.", default: "10px" },
-    { name: "--horizontal-stacked-progress-default-dot-min-width", type: "size", description: "Minimum width of the dot representing progress.", default: "10px" },
+    { name: "--horizontal-stacked-progress-gap", type: "size", description: "Gap between stacked progress bars.", default: "4px" },
+    { name: "--horizontal-stacked-progress-dot-height", type: "size", description: "Height of the dot representing progress.", default: "10px" },
+    { name: "--horizontal-stacked-progress-dot-width", type: "size", description: "Width of the dot representing progress.", default: "10px" },
+    { name: "--horizontal-stacked-progress-dot-min-width", type: "size", description: "Minimum width of the dot representing progress.", default: "10px" },
     { name: "--horizontal-stacked-progress-label-gap", type: "size", description: "Gap between label and progress bar.", default: "12px" },
     { name: "--horizontal-stacked-progress-legend-margin-top", type: "size", description: "Margin top for the legend.", default: "8px" },
+    { name: "--horizontal-stacked-progress-label-font-size", type: "size", description: "Font size for the label of the progress", default: ".8rem" },
+    { name: "--horizontal-stacked-progress-label-font-weight", type: "size", description: "Font weight for the label of the progress", default: "300" },
+    { name: "--horizontal-stacked-progress-value-font-size", type: "size", description: "Font size for the value of the progress", default: "1.1rem" },
+    { name: "--horizontal-stacked-progress-value-font-weight", type: "size", description: "Font weight for the value of the progress", default: "700" },
   ]}
 ></PropsViewer>
 <h2>Slots</h2>
