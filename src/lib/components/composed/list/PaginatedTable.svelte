@@ -49,7 +49,6 @@
     resizableColumns: boolean = false,
     resizedColumnSizeWithPadding: { [value: string]: number } = {},
     pointerOnRowHover: boolean | undefined = undefined,
-    numberOfResultsVisible: boolean | undefined = undefined,
     doubleClickActive: ComponentProps<SimpleTable>['doubleClickActive'] = false,
     doubleClickDelay: ComponentProps<SimpleTable>['doubleClickDelay'] = 250;
 
@@ -185,14 +184,9 @@
       </svelte:fragment>
     </Filters>
   </div>
-  <slot name="totals">
-    {#if numberOfResultsVisible && totalElements != undefined}
-      <div class='results-number'>
-        { lang == 'en' ? 'Results: ' : 'Risultati: '}
-        {totalElements}
-      </div>
-    {/if}
-  </slot>
+
+  <slot name="totals"></slot>
+
   <SimpleTable
     bind:headers
     bind:class={clazz.simpleTable}
@@ -339,12 +333,6 @@
     .per-page-dropdown {
       display: none;
     }
-  }
-
-  .results-number {
-    display: flex;
-    justify-content: end;
-    padding-right: 4px;
   }
 
 </style>
