@@ -40,7 +40,7 @@
     legendValueVisible = true,
     legendTextVisible = true,
     hideLabelUnderPercentage,
-    tooltipVisible= true,
+    tooltipVisible = true,
   }: Props = $props();
 
   let colors = [
