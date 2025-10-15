@@ -9,8 +9,8 @@
   import SearchBar from "../search/SearchBar.svelte";
   import type Builder from "$lib/utils/filters/builder";
   import Converter from "$lib/utils/filters/filters";
-    import MediaQuery from "$lib/components/simple/common/MediaQuery.svelte";
-    import QuickFilters from "../search/QuickFilters.svelte";
+  import MediaQuery from "$lib/components/simple/common/MediaQuery.svelte";
+  import QuickFilters from "../search/QuickFilters.svelte";
 
   interface Props extends Omit<ComponentProps<typeof SimpleTable<Item, Data>>, "class"> {
     page?: NonNullable<ComponentProps<typeof Paginator>["page"]>;
@@ -28,7 +28,6 @@
     editFilterMode?: "one-edit" | "multi-edit";
     showActiveFilters?: boolean;
     dateLocale?: 'it' | 'en'
-    numberOfResultsVisible?: boolean
     class?: {
       simpleTable?: ComponentProps<typeof SimpleTable<Item, Data>>["class"];
     };
@@ -115,7 +114,6 @@
     pointerOnRowHover = undefined,
     doubleClickActive = false,
     doubleClickDelay = 250,
-    numberOfResultsVisible,
     calculateRowStyles = undefined,
     calculateRowClasses = undefined,
     class: clazz = {},
@@ -336,16 +334,9 @@
       </div>
     {/snippet}
   </MediaQuery>
-  {#if totalsSnippet}
-    {@render totalsSnippet()}
-  {:else}
-    {#if numberOfResultsVisible && totalElements != undefined}
-      <div class='results-number'>
-        { lang == 'en' ? 'Results: ' : 'Risultati: '}
-        {totalElements}
-      </div>
-    {/if}
-  {/if}
+
+  {@render totalsSnippet?.()}
+
   <SimpleTable
     {headers}
     class={clazz.simpleTable}
@@ -459,11 +450,5 @@
     .per-page-dropdown {
       display: none;
     }
-  }
-
-  .results-number {
-    display: flex;
-    justify-content: end;
-    padding-right: 4px;
   }
 </style>
