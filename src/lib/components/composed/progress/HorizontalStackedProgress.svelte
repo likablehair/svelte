@@ -29,7 +29,8 @@
     legendVisible: boolean = false,
     legendValueVisible: boolean = true,
     legendTextVisible: boolean = true,
-    hideLabelUnderPercentage: number | undefined = undefined
+    hideLabelUnderPercentage: number | undefined = undefined,
+    tooltipVisible: boolean = true
 
   let colors = [
     'rgb(var(--global-color-primary-500))',
@@ -79,7 +80,7 @@
           total={progress.value}
           value={progress.value}
           --progress-bar-highlight-color={progress.color}
-          valueTooltip
+          valueTooltip={tooltipVisible}
           valueTooltipLabel={progress.valueLabel || progress.value}
         ></ProgressBar>
         {#if progress.label && labelVisible && (hideLabelUnderPercentage === undefined || progress.percentage > hideLabelUnderPercentage)}
@@ -154,8 +155,14 @@
   }
 
   .label-text {
-    font-size: .8rem;
-    font-weight: 300;
+    font-size: var(
+      --horizontal-stacked-progress-label-font-size,
+      var(--horizontal-stacked-progress-default-label-font-size)
+    );
+    font-weight: var(
+      --horizontal-stacked-progress-label-font-weight,
+      var(--horizontal-stacked-progress-default-label-font-weight)
+    );
   }
 
   .label {
@@ -172,8 +179,14 @@
   }
 
   .value-text {
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: var(
+      --horizontal-stacked-progress-value-font-size,
+      var(--horizontal-stacked-progress-default-value-font-size)
+    );
+    font-weight: var(
+      --horizontal-stacked-progress-value-font-weight,
+      var(--horizontal-stacked-progress-default-value-font-weight)
+    );
   }
 
   .dot {

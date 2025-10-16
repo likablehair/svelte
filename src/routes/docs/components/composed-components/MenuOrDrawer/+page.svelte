@@ -27,7 +27,9 @@
   {#if !!activator}
     <MenuOrDrawer
       bind:open={open}
-      activator={activator}
+      menuProps={{
+        activator,
+      }}
       let:isDrawer
     >
       {#if isDrawer}

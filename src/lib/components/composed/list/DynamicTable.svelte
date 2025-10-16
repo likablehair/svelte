@@ -36,6 +36,7 @@
   import type { QuickFilter } from "$lib/utils/filters/quickFilters";
   import Switch from "$lib/components/simple/forms/Switch.svelte";
   import CircularLoader from "$lib/components/simple/loaders/CircularLoader.svelte";
+  import MenuOrDrawer from "../common/MenuOrDrawer.svelte";
 
   onMount(() => {
     updateHeaderHeight();
@@ -275,8 +276,6 @@
   let openCellEditor: boolean = false,
     cellEditorActivator: HTMLElement | undefined,
     cellEditorContainer: HTMLElement | undefined,
-    menuElementCellEditor: HTMLElement,
-    menuElementQuickFilters: HTMLElement,
     cellEditorInfoActive: CellEditorInfo & {
       value?: any;
       item?: Item;
@@ -397,6 +396,7 @@
   ) {
     if (disabled || loading) return;
     if (cellEdit && cellEditorInfo && !item.disableEdit) {
+      mouseEvent.stopPropagation()
       if (!cellEditorActivator) {
         let target = mouseEvent.target as unknown as HTMLElement;
         cellEditorActivator = target;
@@ -1556,6 +1556,7 @@
                         ) != -1
                     }
                     disabled={disabled || loading}
+                    on:click={e => e.stopPropagation()}
                     on:change={(e) => handleSelect(row.item, e.detail.shiftKeyPressed)}
                   />
                 </td>
@@ -1570,7 +1571,10 @@
                       : "mdi-chevron-up"}
                     click
                     --icon-size="24px"
-                    on:click={() => expandRow(row)}
+                    on:click={e => {
+                      e?.stopPropagation()
+                      expandRow(row)
+                    }}
                   />
                 </td>
               {/if}
@@ -1771,338 +1775,357 @@
   </div>
 {/if}
 
-<Menu
+<MenuOrDrawer
   bind:open={openCellEditor}
-  activator={cellEditorActivator}
-  bind:menuElement={menuElementCellEditor}
-  _top={undefined}
-  openingId="cell-editor"
+  menuProps={{
+    activator: cellEditorActivator,
+    openingId: "cell-editor",
+  }}
+  drawerProps={{
+    _space: '60vh',
+    _borderRadius: '10px',
+  }}
+  let:isMenu
 >
-  <div
-    class="cell-editor-container"
-    bind:this={cellEditorContainer}
-  >
-    <div style:grid-column="1 / 3">
-      {#if cellEditorInfoActive.type.key === "string"}
-        <LabelAndTextField
-          label={cellEditorInfoActive.title}
-          description={cellEditorInfoActive.description}
-          name={cellEditorInfoActive.title}
-          info={cellEditorInfoActive.info}
-          type="text"
-          orientation="horizontal"
-          bind:value={cellEditorInfoActive.value}
-          --simple-textfield-border-radius= 0.5rem
-          --simple-textfield-background-color= transparent
-          --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-          --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-        />
-      {:else if cellEditorInfoActive.type.key === "number"}
-        <LabelAndTextField
-          label={cellEditorInfoActive.title}
-          description={cellEditorInfoActive.description}
-          name={cellEditorInfoActive.title}
-          info={cellEditorInfoActive.info}
-          type="number"
-          orientation="horizontal"
-          error={saveEditDisabled}
-          bind:value={cellEditorInfoActive.value}
-          --simple-textfield-border-radius= 0.5rem
-          --simple-textfield-background-color= transparent
-          --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-          --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-        />
-      {:else if cellEditorInfoActive.type.key === "select"}
-        <LabelAndSelect
-          label={cellEditorInfoActive.title}
-          description={cellEditorInfoActive.description}
-          name={cellEditorInfoActive.title}
-          info={cellEditorInfoActive.info}
-          options={cellEditorInfoActive.type.params.options}
-          orientation="horizontal"
-          bind:value={cellEditorInfoActive.value}
-        />
-      {:else if cellEditorInfoActive.type.key === "boolean"}
-        <div class="container">
-          <Checkbox
-            id={cellEditorInfoActive.title}
+  {#if cellEditorInfoActive}
+    <div
+      class:cell-editor-container={isMenu}
+      style:padding='10px'
+      bind:this={cellEditorContainer}
+    >
+      <div style:grid-column="1 / 3">
+        {#if cellEditorInfoActive.type.key === "string"}
+          <LabelAndTextField
+            label={cellEditorInfoActive.title}
+            description={cellEditorInfoActive.description}
+            name={cellEditorInfoActive.title}
+            info={cellEditorInfoActive.info}
+            type="text"
+            orientation="horizontal"
+            bind:value={cellEditorInfoActive.value}
+            --simple-textfield-border-radius= 0.5rem
+            --simple-textfield-background-color= transparent
+            --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+            --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+          />
+        {:else if cellEditorInfoActive.type.key === "number"}
+          <LabelAndTextField
+            label={cellEditorInfoActive.title}
+            description={cellEditorInfoActive.description}
+            name={cellEditorInfoActive.title}
+            info={cellEditorInfoActive.info}
+            type="number"
+            orientation="horizontal"
+            error={saveEditDisabled}
+            bind:value={cellEditorInfoActive.value}
+            --simple-textfield-border-radius= 0.5rem
+            --simple-textfield-background-color= transparent
+            --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+            --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+          />
+        {:else if cellEditorInfoActive.type.key === "select"}
+          <LabelAndSelect
+            label={cellEditorInfoActive.title}
+            description={cellEditorInfoActive.description}
+            name={cellEditorInfoActive.title}
+            info={cellEditorInfoActive.info}
+            options={cellEditorInfoActive.type.params.options}
+            orientation="horizontal"
             bind:value={cellEditorInfoActive.value}
           />
-          <label style:margin-left="0.7rem" for={cellEditorInfoActive.title}
-            >{cellEditorInfoActive.title}
-          </label>
-        </div>
-      {/if}
-    </div>
-
-    <div style:margin-top="10px" style:grid-row="2" style:grid-column="1 / 3">
-      <Divider --divider-color=rgb(var(--global-color-contrast-100) />
-    </div>
-    <div style:grid-row="3" style:grid-column="2" style:margin-top="-15px">
-      <ConfirmOrCancelButtons
-        confirmDisable={saveEditDisabled}
-        confirmText="Save"
-        cancelText="Cancel"
-        on:cancel-click={handleCancelClick}
-        on:confirm-click={handleSaveClick}
-      />
-    </div>
-  </div>
-</Menu>
-
-<Menu
-  bind:open={openQuickFilter}
-  activator={quickFilterActivator}
-  bind:menuElement={menuElementQuickFilters}
-  anchor="bottom"
-  openingId="quick-filter"
-  closeOnClickOutside
->
-  <div
-    class="quick-filter-container"
-  >
-    <div style:grid-column="1 / 3">
-      {#if quickFilterActive.type.key == 'custom'}
-        <slot name="custom-quick-filter" quickFilter={quickFilterActive} {setQuickFilterMissingValue}>
-        </slot>
-      {:else if quickFilterActive.type.key === "string"}
-        <div class="space-between" style="font-weight: 500;">
-          {quickFilterActive.title}
-          {#if !!quickFilterActive.type.missingLabel}
-            <button
-              on:click={() =>
-                setQuickFilterMissingValue(quickFilterActive)}
-              >{quickFilterActive.type.missingLabel}</button
-            >
-          {/if}
-        </div>
-        <LabelAndTextField
-          description={quickFilterActive.description}
-          name={quickFilterActive.title}
-          info={quickFilterActive.info}
-          type="text"
-          bind:value={quickFilterActive.type.value}          
-          --simple-textfield-border-radius= 0.5rem
-          --simple-textfield-background-color= transparent
-          --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-          --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-        />
-      {:else if quickFilterActive.type.key === "number"}
-        <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
-          {quickFilterActive.title}
-          {#if !!quickFilterActive.type.missingLabel}
-            <button
-              on:click={() =>
-                setQuickFilterMissingValue(quickFilterActive)}
-              >{quickFilterActive.type.missingLabel}</button
-            >
-          {/if}
-        </div>
-        <LabelAndTextField
-          description={quickFilterActive.description}
-          name={quickFilterActive.title}
-          info={quickFilterActive.info}
-          type="number"
-          error={saveEditDisabled}
-          bind:value={quickFilterActive.type.value}          
-          --simple-textfield-border-radius= 0.5rem
-          --simple-textfield-background-color= transparent
-          --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-          --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-        />
-      {:else if quickFilterActive.type.key === "multi-select"}
-        <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
-          {quickFilterActive.title}
-          {#if !!quickFilterActive.type.missingLabel}
-            <button
-              on:click={() =>
-                setQuickFilterMissingValue(quickFilterActive)}
-              >{quickFilterActive.type.missingLabel}</button
-            >
-          {/if}
-        </div>
-        <div on:click|stopPropagation role="presentation" tabindex="-1">
-          <Autocomplete
-            multiple
-            items={quickFilterActive.type.items}
-            bind:values={quickFilterActive.type.values}
-            --autocomplete-border-radius= 0.5rem
-            --autocomplete-border="1px solid rgb(var(--global-color-background-500))"
-            --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
-          >
-            <svelte:fragment slot="selection" let:selection let:unselect>
-              <slot name="selection" {selection} {unselect}>
-                <div tabindex="-1">
-                  <Chip
-                    close={true}
-                    on:close={() => unselect(selection)}
-                    --chip-default-border-radius="var(--autocomplete-border-radius, var(--autocomplete-default-border-radius))"
-                    buttonTabIndex={-1}
-                    truncateText
-                  >
-                    <slot name="chip-label" {selection}>
-                      {#if !!quickFilterActive.type.countriesAlpha2 && quickFilterActive.type.countriesAlpha2.find((c) => c.value == selection.value)}
-                        <div>
-                          <FlagIcon
-                            alpha2={quickFilterActive.type.countriesAlpha2
-                              .find((c) => c.value == selection.value)
-                              ?.label?.toString()
-                              .toLowerCase() ?? ""}
-                            --flag-icon-size="16px"
-                          />
-                        </div>
-                      {/if}
-                      {selection.label}
-                    </slot>
-                  </Chip>
-                </div>
-              </slot>
-            </svelte:fragment>
-            <svelte:fragment slot="item-label" let:item>
-              <slot name="item-label" {item}>
-                {#if !!quickFilterActive.type.countriesAlpha2 && quickFilterActive.type.countriesAlpha2.find((c) => c.value == item.value)}
-                  <FlagIcon
-                    alpha2={quickFilterActive.type.countriesAlpha2
-                      .find((c) => c.value == item.value)
-                      ?.label?.toString()
-                      .toLowerCase() ?? ""}
-                  />
-                {/if}
-                {item.label}
-              </slot>
-            </svelte:fragment>
-          </Autocomplete>
-        </div>
-      {:else if quickFilterActive.type.key === "boolean"}
-        {#if quickFilterActive.type.params}
-          <div class="vertical-quick-filters">
-            <button
-              on:click={() => setQuickFilterValue(quickFilterActive, true)}
-            >
-              {quickFilterActive.type.params.labelTrue}
-            </button>
-            <button
-              on:click={() => setQuickFilterValue(quickFilterActive, false)}
-            >
-              {quickFilterActive.type.params.labelFalse}
-            </button>
-            <button
-              on:click={() => setQuickFilterValue(quickFilterActive, undefined)}
-            >
-              {lang == 'en' ? 'All' : 'Tutti'}
-            </button>
+        {:else if cellEditorInfoActive.type.key === "boolean"}
+          <div class="container">
+            <Checkbox
+              id={cellEditorInfoActive.title}
+              bind:value={cellEditorInfoActive.value}
+            />
+            <label style:margin-left="0.7rem" for={cellEditorInfoActive.title}
+              >{cellEditorInfoActive.title}
+            </label>
           </div>
         {/if}
-      {:else if quickFilterActive.type.key === "country"}
-        <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
-          {quickFilterActive.title}
-          {#if !!quickFilterActive.type.missingLabel}
-            <button
-              on:click={() =>
-                setQuickFilterMissingValue(quickFilterActive)}
-              >{quickFilterActive.type.missingLabel}</button
-            >
-          {/if}
-        </div>
-        <div on:click|stopPropagation role="presentation" tabindex="-1">
-          <CountriesAutocomplete
-            bind:selected={quickFilterActive.type.selected}
-            {...((!!quickFilterActive.type.countriesOptions && quickFilterActive.type.countriesOptions.length > 0) && {
-              items: quickFilterActive.type.countriesOptions,
-            })}
-            autocompleteProps={{
-              placeholder: !!quickFilterActive.type.selected
-                ? quickFilterActive.type.selected.length > 0
-                  ? ""
-                  : quickFilterActive.description
-                : quickFilterActive.description,
-              multiple: true,
-            }}
-            --autocomplete-border-radius= 0.5rem
-            --autocomplete-border="1px solid rgb(var(--global-color-background-500))"
-            --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
+      </div>
+
+      <div style:grid-column="2" style:margin-top="-15px">
+        <ConfirmOrCancelButtons
+          confirmDisable={saveEditDisabled}
+          confirmText="Save"
+          cancelText="Cancel"
+          on:cancel-click={handleCancelClick}
+          on:confirm-click={handleSaveClick}
+        />
+      </div>
+    </div>
+  {/if}
+</MenuOrDrawer>
+
+<MenuOrDrawer
+  bind:open={openQuickFilter}
+  menuProps={{
+    activator: quickFilterActivator,
+    anchor: 'bottom',
+    openingId: 'quick-filter',
+    closeOnClickOutside: true
+  }}
+  drawerProps={{
+    _space: '60vh',
+    _borderRadius: '10px',
+  }}
+  let:isMenu
+  let:isDrawer
+>
+  {#if quickFilterActive}
+    <div
+      class:quick-filter-container={isMenu}
+      style:padding='10px'
+    >
+      <div style:grid-column="1 / 3">
+        {#if quickFilterActive.type.key == 'custom'}
+          <slot name="custom-quick-filter" quickFilter={quickFilterActive} {setQuickFilterMissingValue}>
+          </slot>
+        {:else if quickFilterActive.type.key === "string"}
+          <div class="space-between" style="font-weight: 500;">
+            {quickFilterActive.title}
+            {#if !!quickFilterActive.type.missingLabel}
+              <button
+                on:click={() =>
+                  setQuickFilterMissingValue(quickFilterActive)}
+                >{quickFilterActive.type.missingLabel}</button
+              >
+            {/if}
+          </div>
+          <LabelAndTextField
+            description={quickFilterActive.description}
+            name={quickFilterActive.title}
+            info={quickFilterActive.info}
+            type="text"
+            bind:value={quickFilterActive.type.value}          
+            --simple-textfield-border-radius= 0.5rem
+            --simple-textfield-background-color= transparent
+            --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+            --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
           />
-        </div>
-      {:else if quickFilterActive.type.key === "date"}
-        <div style="font-weight: 500; margin-bottom: 8px;">
-          {quickFilterActive.title}
-        </div>
-        <div on:click|stopPropagation role="presentation" tabindex="-1">
-          <div>
-            <DatePickerTextField
-              bind:selectedDate={quickFilterActive.type.from}
-              placeholder={lang == 'en' ? "From" : 'Da'}
-              --simple-textfield-width="100%"
-              --simple-textfield-border-radius= 0.5rem
-              --simple-textfield-background-color= transparent
-              --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-              --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-              flipOnOverflow
-              bind:menuOpened={calendarOpened}
-              on:day-click={() => (calendarOpened = false)}
-            >
-              <svelte:fragment slot="append-inner">
-                <Icon
-                  name="mdi-close-circle"
-                  click
-                  on:click={() => {
-                    if (
-                      !!quickFilterActive &&
-                      quickFilterActive.type.key === "date"
-                    ) {
-                      quickFilterActive.type.from = undefined;
-                    }
-                  }}
-                />
-              </svelte:fragment>
-            </DatePickerTextField>
+        {:else if quickFilterActive.type.key === "number"}
+          <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
+            {quickFilterActive.title}
+            {#if !!quickFilterActive.type.missingLabel}
+              <button
+                on:click={() =>
+                  setQuickFilterMissingValue(quickFilterActive)}
+                >{quickFilterActive.type.missingLabel}</button
+              >
+            {/if}
           </div>
-          <div>
-            <DatePickerTextField
-              bind:selectedDate={quickFilterActive.type.to}
-              placeholder={lang == 'en' ? "To" : 'A'}
-              --simple-textfield-width="100%"
-              --simple-textfield-border-radius= 0.5rem
-              --simple-textfield-background-color= transparent
-              --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
-              --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
-              flipOnOverflow
-              bind:menuOpened={calendarOpened2}
-              on:day-click={() => (calendarOpened2 = false)}
-            >
-              <svelte:fragment slot="append-inner">
-                <Icon
-                  name="mdi-close-circle"
-                  click
-                  on:click={() => {
-                    if (
-                      !!quickFilterActive &&
-                      quickFilterActive.type.key === "date"
-                    ) {
-                      quickFilterActive.type.to = undefined;
-                    }
-                  }}
-                />
-              </svelte:fragment>
-            </DatePickerTextField>
+          <LabelAndTextField
+            description={quickFilterActive.description}
+            name={quickFilterActive.title}
+            info={quickFilterActive.info}
+            type="number"
+            error={saveEditDisabled}
+            bind:value={quickFilterActive.type.value}          
+            --simple-textfield-border-radius= 0.5rem
+            --simple-textfield-background-color= transparent
+            --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+            --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+          />
+        {:else if quickFilterActive.type.key === "multi-select"}
+          <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
+            {quickFilterActive.title}
+            {#if !!quickFilterActive.type.missingLabel}
+              <button
+                on:click={() =>
+                  setQuickFilterMissingValue(quickFilterActive)}
+                >{quickFilterActive.type.missingLabel}</button
+              >
+            {/if}
           </div>
+          <div on:click|stopPropagation role="presentation" tabindex="-1">
+            <Autocomplete
+              multiple
+              items={quickFilterActive.type.items}
+              bind:values={quickFilterActive.type.values}
+              mobileDrawer={isDrawer}
+              --autocomplete-border-radius= 0.5rem
+              --autocomplete-border="1px solid rgb(var(--global-color-background-500))"
+              --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
+            >
+              <svelte:fragment slot="selection" let:selection let:unselect>
+                <slot name="selection" {selection} {unselect}>
+                  <div tabindex="-1">
+                    <Chip
+                      close={true}
+                      on:close={() => unselect(selection)}
+                      --chip-default-border-radius="var(--autocomplete-border-radius, var(--autocomplete-default-border-radius))"
+                      buttonTabIndex={-1}
+                      truncateText
+                    >
+                      <slot name="chip-label" {selection}>
+                        {#if !!quickFilterActive.type.countriesAlpha2 && quickFilterActive.type.countriesAlpha2.find((c) => c.value == selection.value)}
+                          <div>
+                            <FlagIcon
+                              alpha2={quickFilterActive.type.countriesAlpha2
+                                .find((c) => c.value == selection.value)
+                                ?.label?.toString()
+                                .toLowerCase() ?? ""}
+                              --flag-icon-size="16px"
+                            />
+                          </div>
+                        {/if}
+                        {selection.label}
+                      </slot>
+                    </Chip>
+                  </div>
+                </slot>
+              </svelte:fragment>
+              <svelte:fragment slot="item-label" let:item>
+                <slot name="item-label" {item}>
+                  {#if !!quickFilterActive.type.countriesAlpha2 && quickFilterActive.type.countriesAlpha2.find((c) => c.value == item.value)}
+                    <FlagIcon
+                      alpha2={quickFilterActive.type.countriesAlpha2
+                        .find((c) => c.value == item.value)
+                        ?.label?.toString()
+                        .toLowerCase() ?? ""}
+                    />
+                  {/if}
+                  {item.label}
+                </slot>
+              </svelte:fragment>
+            </Autocomplete>
+          </div>
+        {:else if quickFilterActive.type.key === "boolean"}
+          {#if quickFilterActive.type.params}
+            <div class="vertical-quick-filters">
+              <button
+                on:click={() => setQuickFilterValue(quickFilterActive, true)}
+              >
+                {quickFilterActive.type.params.labelTrue}
+              </button>
+              <button
+                on:click={() => setQuickFilterValue(quickFilterActive, false)}
+              >
+                {quickFilterActive.type.params.labelFalse}
+              </button>
+              <button
+                on:click={() => setQuickFilterValue(quickFilterActive, undefined)}
+              >
+                {lang == 'en' ? 'All' : 'Tutti'}
+              </button>
+            </div>
+          {/if}
+        {:else if quickFilterActive.type.key === "country"}
+          <div class="space-between" style="font-weight: 500; margin-bottom: 8px;">
+            {quickFilterActive.title}
+            {#if !!quickFilterActive.type.missingLabel}
+              <button
+                on:click={() =>
+                  setQuickFilterMissingValue(quickFilterActive)}
+                >{quickFilterActive.type.missingLabel}</button
+              >
+            {/if}
+          </div>
+          <div on:click|stopPropagation role="presentation" tabindex="-1">
+            <CountriesAutocomplete
+              bind:selected={quickFilterActive.type.selected}
+              {...((!!quickFilterActive.type.countriesOptions && quickFilterActive.type.countriesOptions.length > 0) && {
+                items: quickFilterActive.type.countriesOptions,
+              })}
+              autocompleteProps={{
+                placeholder: !!quickFilterActive.type.selected
+                  ? quickFilterActive.type.selected.length > 0
+                    ? ""
+                    : quickFilterActive.description
+                  : quickFilterActive.description,
+                multiple: true,
+                mobileDrawer: isDrawer,
+              }}
+              --autocomplete-border-radius= 0.5rem
+              --autocomplete-border="1px solid rgb(var(--global-color-background-500))"
+              --autocomplete-focus-box-shadow="0 0 0 2px rgb(var(--global-color-primary-500))"
+            />
+          </div>
+        {:else if quickFilterActive.type.key === "date"}
+          <div style="font-weight: 500; margin-bottom: 8px;">
+            {quickFilterActive.title}
+          </div>
+          <div on:click|stopPropagation role="presentation" tabindex="-1">
+            <div>
+              <DatePickerTextField
+                bind:selectedDate={quickFilterActive.type.from}
+                placeholder={lang == 'en' ? "From" : 'Da'}
+                --simple-textfield-width="100%"
+                --simple-textfield-border-radius= 0.5rem
+                --simple-textfield-background-color= transparent
+                --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+                --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+                flipOnOverflow
+                mobileDialog={isDrawer}
+                bind:menuOpened={calendarOpened}
+                on:day-click={() => (calendarOpened = false)}
+              >
+                <svelte:fragment slot="append-inner">
+                  <Icon
+                    name="mdi-close-circle"
+                    click
+                    on:click={() => {
+                      if (
+                        !!quickFilterActive &&
+                        quickFilterActive.type.key === "date"
+                      ) {
+                        quickFilterActive.type.from = undefined;
+                      }
+                    }}
+                  />
+                </svelte:fragment>
+              </DatePickerTextField>
+            </div>
+            <div>
+              <DatePickerTextField
+                bind:selectedDate={quickFilterActive.type.to}
+                placeholder={lang == 'en' ? "To" : 'A'}
+                --simple-textfield-width="100%"
+                --simple-textfield-border-radius= 0.5rem
+                --simple-textfield-background-color= transparent
+                --simple-textfield-box-shadow= 'inset 0 0 0 1px rgb(var(--global-color-background-500))'
+                --simple-textfield-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+                flipOnOverflow
+                mobileDialog={isDrawer}
+                bind:menuOpened={calendarOpened2}
+                on:day-click={() => (calendarOpened2 = false)}
+              >
+                <svelte:fragment slot="append-inner">
+                  <Icon
+                    name="mdi-close-circle"
+                    click
+                    on:click={() => {
+                      if (
+                        !!quickFilterActive &&
+                        quickFilterActive.type.key === "date"
+                      ) {
+                        quickFilterActive.type.to = undefined;
+                      }
+                    }}
+                  />
+                </svelte:fragment>
+              </DatePickerTextField>
+            </div>
+          </div>
+        {/if}
+      </div>
+
+      {#if quickFilterActive.type.key != "boolean"}
+        <div style:grid-column="2" style:margin-top="-10px">
+          <ConfirmOrCancelButtons
+            confirmDisable={saveEditDisabled}
+            confirmText={lang == 'en' ? "Apply" : 'Applica'}
+            cancelText={lang == 'en' ? "Cancel" : 'Annulla'}
+            on:cancel-click={handleCancelClick}
+            on:confirm-click={() => handleApplyClick(quickFilterActive, quickFilterActive.type.key == 'custom')}
+          />
         </div>
       {/if}
     </div>
-
-    {#if quickFilterActive.type.key != "boolean"}
-      <div style:grid-row="3" style:grid-column="2" style:margin-top="-10px">
-        <ConfirmOrCancelButtons
-          confirmDisable={saveEditDisabled}
-          confirmText={lang == 'en' ? "Apply" : 'Applica'}
-          cancelText={lang == 'en' ? "Cancel" : 'Annulla'}
-          on:cancel-click={handleCancelClick}
-          on:confirm-click={() => handleApplyClick(quickFilterActive, quickFilterActive.type.key == 'custom')}
-        />
-      </div>
-    {/if}
-  </div>
-</Menu>
+  {/if}
+</MenuOrDrawer>
 
 <MediaQuery let:sAndDown>
   <Drawer
@@ -2373,14 +2396,12 @@
     align-items: center;
     box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.2);
     position: fixed;
-    padding: 10px;
     border-radius: 10px;
     background-color: var(
       --dynamic-table-cell-editor-background-color,
       var(--dynamic-table-default-cell-editor-background-color)
     );
-    height: 200px;
-    width: 500px;
+    width: 400px;
   }
 
   .row-activator {
@@ -2397,7 +2418,6 @@
     align-items: center;
     box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.2);
     position: fixed;
-    padding: 10px;
     border-radius: 10px;
     background-color: var(
       --dynamic-table-quick-filter-background-color,

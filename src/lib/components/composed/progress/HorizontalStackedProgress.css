@@ -6,4 +6,8 @@
   --horizontal-stacked-progress-label-gap: 12px;
   --horizontal-stacked-progress-legend-margin-top: 8px;
   --progress-bar-default-tooltip-padding: 8px;
+  --horizontal-stacked-progress-default-label-font-size: .8rem;
+  --horizontal-stacked-progress-default-label-font-weight: 300;
+  --horizontal-stacked-progress-default-value-font-size: 1.1rem;
+  --horizontal-stacked-progress-default-value-font-weight: 700;
 }

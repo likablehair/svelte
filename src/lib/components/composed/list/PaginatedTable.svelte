@@ -43,6 +43,7 @@
     searchBarVisible: boolean = true,
     searchBarPlaceholder: string = "Type something to search...",
     lang: 'it' | 'en' = 'en',
+    dateLocale: 'it' | 'en' | undefined = undefined,
     editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit',
     showActiveFilters: boolean = true,
     resizableColumns: boolean = false,
@@ -168,6 +169,7 @@
       on:removeAllFilters
       --filters-default-wrapper-width="100%"
       {lang}
+      {dateLocale}
       {editFilterMode}
       {showActiveFilters}
     >
@@ -182,6 +184,9 @@
       </svelte:fragment>
     </Filters>
   </div>
+
+  <slot name="totals"></slot>
+
   <SimpleTable
     bind:headers
     bind:class={clazz.simpleTable}
@@ -286,7 +291,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 8px;
   }
 
   .header-sort-icon {
