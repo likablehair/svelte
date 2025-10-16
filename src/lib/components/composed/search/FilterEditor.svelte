@@ -255,6 +255,9 @@
               maxVisibleChips={2}
               --simple-textfield-width="0px"
               --simple-text-field-margin-left="0px"
+              --autocomplete-default-border-radius='4px'
+              --autocomplete-min-height="0px"
+              --chip-min-height="12px"
               mobileDrawer={mobile}
               onchange={handleChangeValue}
               placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
@@ -269,6 +272,7 @@
               bind:values={tmpFilter.values}
               items={tmpFilter.items}
               multiple
+              onchange={handleChangeValue}
             ></ToggleList>
           </div>
         {:else if tmpFilter.type === "date" && tmpFilter.mode === 'between'}

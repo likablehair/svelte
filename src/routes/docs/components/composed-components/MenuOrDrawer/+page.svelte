@@ -27,7 +27,9 @@
   {#if !!activator}
     <MenuOrDrawer
       bind:open={open}
-      activator={activator}
+      menuProps={{
+        activator,
+      }}
     >
       {#snippet children({ isDrawer, isMenu })}
         {#if isDrawer}
@@ -43,19 +45,8 @@
 <PropsViewer
   props={[
     { name: 'open', type: 'boolean', description: 'Controls whether the menu or drawer is open', default: 'false' },
-    { name: 'activator', type: 'HTMLElement', description: 'Element that triggers the menu or drawer', default: 'undefined' },
-    { name: 'drawerPosition', type: '"left" | "top" | "right" | "bottom"', description: 'Position of the drawer', default: "'bottom'" },
-    { name: 'menuAnchor', type: '"bottom" | "bottom-center" | "right-center"', description: 'Anchor position of the menu', default: "'bottom-center'" },
-    { name: 'stayInViewport', type: 'boolean', description: 'Prevents the menu from overflowing the viewport', default: 'true' },
-    { name: 'flipOnOverflow', type: 'boolean', description: 'Flips the menu position if it overflows', default: 'false' },
-    { name: '_boxShadow', type: 'string', description: 'Box shadow applied to the menu', default: '"rgb(var(--global-color-grey-900), .5) 0px 2px 4px"' },
-    { name: '_height', type: 'string', description: 'Height of the menu', default: '"fit-content"' },
-    { name: '_width', type: 'string', description: 'Width of the menu', default: 'undefined' },
-    { name: '_maxHeight', type: 'string', description: 'Maximum height of the menu', default: 'undefined' },
-    { name: '_minWidth', type: 'string', description: 'Minimum width of the menu', default: '"100px"' },
-    { name: '_borderRadius', type: 'string', description: 'Border radius of the menu', default: '"5px"' },
-    { name: 'openingId', type: 'string', description: 'Identifier for the opening state of the menu', default: 'undefined' },
-    { name: '_drawerOverflow', type: 'string', description: 'Overflow behavior of the drawer', default: 'undefined' }
+    { name: 'menuProps', type: 'ComponentProps<typeof Menu>', description: 'Props for the menu', },
+    { name: 'drawerProps', type: 'ComponentProps<typeof Drawer>', description: 'Props for the drawer', },
   ]}
   styleProps={[]}
 ></PropsViewer>
@@ -68,8 +59,6 @@
 <h2>Events</h2>
 <EventsViewer
   events={[
-    { name: 'onclose', description: 'Triggered when the menu or drawer is closed',  },
-    { name: "onitemClick", description: "Triggered when an item is clicked", properties: [{ name: "item", type: "Item", description: "The clicked item" }] },
   ]}
 ></EventsViewer>
 

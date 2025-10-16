@@ -676,6 +676,10 @@
 <NoData {lang} />
       `,
     },
+    {
+      name: "totalsSnippet",
+      description: "Slot to display number of results",
+    },
   ]}
 ></SlotsViewer>
 <h2>Events</h2>

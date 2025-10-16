@@ -187,11 +187,15 @@
   <div class="menu-or-drawer">
     <MenuOrDrawer
       bind:open={openMoreActions}
-      activator={moreActionsActivator}
-      drawerPosition={position == 'bottom' ? 'top' : 'bottom'}
-      menuAnchor='bottom-center'
-      openingId='more-actions'
-      _drawerOverflow='hidden'
+      menuProps={{
+        activator: moreActionsActivator,
+        anchor: 'bottom-center',
+        openingId: 'more-actions',
+      }}
+      drawerProps={{
+        position: position == 'bottom' ? 'top' : 'bottom',
+        _overflow: 'hidden'  
+      }}
     >
       {#snippet children({ isDrawer, isMenu })}
         <div 

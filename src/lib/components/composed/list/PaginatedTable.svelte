@@ -9,11 +9,10 @@
   import SearchBar from "../search/SearchBar.svelte";
   import type Builder from "$lib/utils/filters/builder";
   import Converter from "$lib/utils/filters/filters";
-    import MediaQuery from "$lib/components/simple/common/MediaQuery.svelte";
-    import QuickFilters from "../search/QuickFilters.svelte";
+  import MediaQuery from "$lib/components/simple/common/MediaQuery.svelte";
+  import QuickFilters from "../search/QuickFilters.svelte";
 
-  interface Props
-    extends Omit<ComponentProps<typeof SimpleTable<Item, Data>>, "class"> {
+  interface Props extends Omit<ComponentProps<typeof SimpleTable<Item, Data>>, "class"> {
     page?: NonNullable<ComponentProps<typeof Paginator>["page"]>;
     maxPage?: ComponentProps<typeof Paginator>["maxPage"];
     rowsPerPageOptions?: ComponentProps<typeof Dropdown>["items"];
@@ -28,6 +27,7 @@
     quickFilters?: ComponentProps<typeof QuickFilters>["filters"];
     editFilterMode?: "one-edit" | "multi-edit";
     showActiveFilters?: boolean;
+    dateLocale?: 'it' | 'en'
     class?: {
       simpleTable?: ComponentProps<typeof SimpleTable<Item, Data>>["class"];
     };
@@ -81,6 +81,7 @@
         },
       ]
     >;
+    totalsSnippet?: Snippet<[]>
   }
 
   let {
@@ -104,6 +105,7 @@
     searchBarVisible = true,
     quickFiltersVisible = false,
     lang = "en",
+    dateLocale,
     searchBarPlaceholder = lang == 'en' ? "Type to search..." : "Scrivi per cercare...",
     editFilterMode = "one-edit",
     showActiveFilters = true,
@@ -134,6 +136,7 @@
     rangeDescriptorSnippet,
     searchBarSnippet,
     noDataSnippet,
+    totalsSnippet,
     oncolumnResize,
   }: Props = $props();
 
@@ -311,6 +314,7 @@
             onremoveAllFilters={handleRemoveAllFilters}
             --filters-default-wrapper-width={!!searchBarVisible ? undefined : "100%"}
             {lang}
+            {dateLocale}
             {editFilterMode}
             {showActiveFilters}
             appendSnippet={filterAppendSnippet}
@@ -330,6 +334,9 @@
       </div>
     {/snippet}
   </MediaQuery>
+
+  {@render totalsSnippet?.()}
+
   <SimpleTable
     {headers}
     class={clazz.simpleTable}

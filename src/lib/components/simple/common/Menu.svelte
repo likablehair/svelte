@@ -27,7 +27,7 @@
     open?: boolean;
     refreshPosition?: boolean;
     activator?: HTMLElement;
-    anchor?: "bottom" | "bottom-center" | "right-center";
+    anchor?: "bottom" | "bottom-center" | "right-center" | "left-center" | "up" | "left" | "right" | "up-center";
     closeOnClickOutside?: boolean;
     inAnimation?: (
       node: Element,
@@ -140,6 +140,92 @@
 
           _top = activatorTop + window.scrollY + (activatorHeight / 2) - (menuHeight / 2) - fixedParentTop;
           _left = activatorLeft + window.scrollX + activatorWidth + _activatorGap - fixedParentLeft;
+        } else if (anchor == 'left-center') {
+          let { left: activatorLeft, top: activatorTop } =
+            params.activator.getBoundingClientRect();
+          let activatorHeight = params.activator.offsetHeight;
+          let menuHeight = params.menuElement.offsetHeight;
+          let menuWidth = params.menuElement.offsetWidth;
+          let { top: fixedParentTop, left: fixedParentLeft, fixedParent, validStickyParent } = getParentInstanceFromViewport(activator?.parentElement);
+
+          _top = activatorTop + (activatorHeight / 2) - (menuHeight / 2);
+          _left = activatorLeft - menuWidth - _activatorGap;
+
+          if(!!fixedParent) {
+            _top = _top - fixedParentTop
+            _left = _left - fixedParentLeft
+          } else if(!validStickyParent && !fixedParent) {
+            _top = _top + window.scrollY
+            _left = _left + window.scrollX
+          }
+        } else if (anchor == 'up') {
+          let { left: activatorLeft, top: activatorTop } =
+            params.activator.getBoundingClientRect();
+          let menuHeight = params.menuElement.offsetHeight;
+          _top = activatorTop - menuHeight - _activatorGap;
+          _left = activatorLeft;
+
+          let { top: fixedParentTop, left: fixedParentLeft, fixedParent, validStickyParent } = getParentInstanceFromViewport(activator?.parentElement);
+          if(!!fixedParent) {
+            _top = _top - fixedParentTop
+            _left = _left - fixedParentLeft
+          } else if(!validStickyParent && !fixedParent) {
+            _top = _top + window.scrollY
+            _left = _left + window.scrollX
+          }
+        } else if (anchor == 'left') {
+          let { left: activatorLeft, top: activatorTop } =
+            params.activator.getBoundingClientRect();
+          let menuWidth = params.menuElement.offsetWidth;
+          _top = activatorTop;
+          _left = activatorLeft - menuWidth - _activatorGap;
+
+          let { top: fixedParentTop, left: fixedParentLeft, fixedParent, validStickyParent } = getParentInstanceFromViewport(activator?.parentElement);
+          if(!!fixedParent) {
+            _top = _top - fixedParentTop
+            _left = _left - fixedParentLeft
+          } else if(!validStickyParent && !fixedParent) {
+            _top = _top + window.scrollY
+            _left = _left + window.scrollX
+          }
+        } else if (anchor == 'right') {
+          let { left: activatorLeft, top: activatorTop } =
+            params.activator.getBoundingClientRect();
+          let activatorWidth = params.activator.offsetWidth;
+          _top = activatorTop;
+          _left = activatorLeft + activatorWidth + _activatorGap;
+
+          let { top: fixedParentTop, left: fixedParentLeft, fixedParent, validStickyParent } = getParentInstanceFromViewport(activator?.parentElement);
+          if(!!fixedParent) {
+            _top = _top - fixedParentTop
+            _left = _left - fixedParentLeft
+          } else if(!validStickyParent && !fixedParent) {
+            _top = _top + window.scrollY
+            _left = _left + window.scrollX
+          }
+        } else if (anchor == 'up-center') {
+          let { left: activatorLeft, top: activatorTop } =
+            params.activator.getBoundingClientRect();
+          let activatorWidth = params.activator.offsetWidth;
+          let menuHeight = params.menuElement.offsetHeight;
+          let menuWidth = params.menuElement.offsetWidth;
+          _top = activatorTop - menuHeight - _activatorGap;
+          _left = activatorLeft;
+
+          let { top: fixedParentTop, left: fixedParentLeft, fixedParent, validStickyParent } = getParentInstanceFromViewport(activator?.parentElement);
+          if(!!fixedParent) {
+            _top = _top - fixedParentTop
+            _left = _left - fixedParentLeft
+          } else if(!validStickyParent && !fixedParent) {
+            _top = _top + window.scrollY
+            _left = _left + window.scrollX
+          }
+
+          if (menuWidth > activatorWidth) {
+            _left = _left - (menuWidth - activatorWidth) / 2;
+          } else {
+            _left = _left + (activatorWidth - menuWidth) / 2;
+          }
         }
       }
 
@@ -157,6 +243,52 @@
           let { left: activatorLeft } = params.activator.getBoundingClientRect();
           _left = activatorLeft + window.scrollX - _activatorGap - (menuElement?.offsetWidth || 0)
         }
+
+        if (
+          anchor == 'left-center' &&
+          (_left || 0) < 0
+        ) {
+          let { left: activatorLeft } = params.activator.getBoundingClientRect();
+          let activatorWidth = params.activator.offsetWidth;
+          _left = activatorLeft + window.scrollX + activatorWidth + _activatorGap
+        }
+
+        if (
+          anchor == 'left' &&
+          (_left || 0) < 0
+        ) {
+          let { left: activatorLeft } = params.activator.getBoundingClientRect();
+          let activatorWidth = params.activator.offsetWidth;
+          _left = activatorLeft + window.scrollX + activatorWidth + _activatorGap
+        }
+
+        if (
+          anchor == 'right' &&
+          window.innerWidth + window.scrollX <
+          (_left || 0) + (menuElement?.offsetWidth || 0)
+        ) {
+          let { left: activatorLeft } = params.activator.getBoundingClientRect();
+          let menuWidth = params.menuElement.offsetWidth;
+          _left = activatorLeft + window.scrollX - menuWidth - _activatorGap
+        }
+
+        if (
+          anchor == 'up' &&
+          (_top || 0) < window.scrollY
+        ) {
+          let { top: activatorTop } = params.activator.getBoundingClientRect();
+          let activatorHeight = params.activator.offsetHeight;
+          _top = activatorTop + window.scrollY + activatorHeight + _activatorGap
+        }
+
+        if (
+          anchor == 'up-center' &&
+          (_top || 0) < window.scrollY
+        ) {
+          let { top: activatorTop } = params.activator.getBoundingClientRect();
+          let activatorHeight = params.activator.offsetHeight;
+          _top = activatorTop + window.scrollY + activatorHeight + _activatorGap
+        }
       }
 
       if(stayInViewport) {
@@ -168,6 +300,10 @@
             window.innerWidth + window.scrollX - (menuElement?.offsetWidth || 0),
             0
           );
+        }
+
+        if ((_left || 0) < window.scrollX) {
+          _left = window.scrollX;
         }
       }
 

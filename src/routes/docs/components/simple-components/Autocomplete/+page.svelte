@@ -274,14 +274,18 @@
   </Menu>
 {:else}
   <MenuOrDrawer
-    {activator}
-    _width={localMenuWidth || ""}
-    _height={menuHeight}
-    _maxHeight="300px"
-    _boxShadow={menuBoxShadow}
-    _borderRadius={menuBorderRadius}
+    menuProps={{
+      activator,
+      _width: localMenuWidth || "", 
+      _height: menuHeight,
+      _maxHeight: "300px",
+      _boxShadow: menuBoxShadow,
+      _borderRadius: menuBorderRadius,
+    }}
+    drawerProps={{
+      onclose
+    }}
     bind:open={menuOpened}
-    {onclose}
   >
     <ul
       class={clazz.menu || ''}
