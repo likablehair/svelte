@@ -2,7 +2,7 @@
   export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 </script>
 
-<script lang="ts">
+<script lang="ts" generics="Data">
   import '../../../css/main.css'
   import type { ComponentProps } from 'svelte';
   import MenuOrDrawer from "./MenuOrDrawer.svelte";
@@ -10,8 +10,8 @@
   import lodash from 'lodash'
 
   interface Props extends ComponentProps<typeof MenuOrDrawer> {
-    elements?: ComponentProps<typeof SelectableVerticalList>['elements'];
-    onselect?: ComponentProps<typeof SelectableVerticalList>['onselect']
+    elements?: ComponentProps<typeof SelectableVerticalList<Data>>['elements'];
+    onselect?: ComponentProps<typeof SelectableVerticalList<Data>>['onselect']
   }
 
   let { 
@@ -46,8 +46,8 @@
     lodash.clone(lodash.merge(drawerPropsDefaultValue, drawerProps))
   )
 
-  let selected: ArrayElement<NonNullable<ComponentProps<typeof SelectableVerticalList>['elements']>>['name'] | undefined = $state()
-  let focused: ArrayElement<NonNullable<ComponentProps<typeof SelectableVerticalList>['elements']>>['name'] | undefined = $state()
+  let selected: ArrayElement<NonNullable<ComponentProps<typeof SelectableVerticalList<Data>>['elements']>>['name'] | undefined = $state()
+  let focused: ArrayElement<NonNullable<ComponentProps<typeof SelectableVerticalList<Data>>['elements']>>['name'] | undefined = $state()
   $effect(() => {
     if(!!selected) selected = undefined
   })
@@ -55,7 +55,7 @@
     if(!!focused && !open) focused = undefined
   })
 
-  function handleOnSelect(e: Parameters<NonNullable<ComponentProps<typeof SelectableVerticalList>['onselect']>>[0]){
+  function handleOnSelect(e: Parameters<NonNullable<ComponentProps<typeof SelectableVerticalList<Data>>['onselect']>>[0]){
     open = false
 
     if(onselect){
