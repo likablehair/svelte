@@ -6,7 +6,7 @@
   import type { ComponentProps, Snippet } from 'svelte';
   import lodash from 'lodash'
 
-  interface Props {
+  export interface Props {
     open?: boolean
     drawerProps?: Omit<ComponentProps<typeof Drawer>, 'open'>
     menuProps?: Omit<ComponentProps<typeof Menu>, 'open'>
