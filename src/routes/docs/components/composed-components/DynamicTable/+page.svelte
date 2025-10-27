@@ -292,27 +292,29 @@
   ]}
   styleProps={[
     { name: "--dynamic-table-cell-editor-background-color", type: "color", description: "Background color for editable cells", default: "rgb(var(--global-color-background-300))" },
-    { name: "--dynamic-table-default-cell-border", type: "color", description: "Border color of each cell", default: "1px solid transparent" },
+    { name: "--dynamic-table-default-cell-border", type: "color", description: "Border color of each cell", default: "none" },
     { name: "--dynamic-table-quick-filter-background-color", type: "color", description: "Background of quick filter bar", default: "rgb(var(--global-color-background-300))" },
-    { name: "--dynamic-table-row-background-color-hover", type: "color", description: "Hover background color for rows", default: "rgb(var(--global-color-background-400))" },
-    { name: "--dynamic-table-expanded-row-background-color", type: "color", description: "Background color for expanded rows", default: "rgb(var(--global-color-background-500))" },
+    { name: "--dynamic-table-row-background-color-hover", type: "color", description: "Hover background color for rows", default: "rgb(var(--global-color-background-200))" },
+    { name: "--dynamic-table-expanded-row-background-color", type: "color", description: "Background color for expanded rows", default: "rgb(var(--global-color-background-300))" },
     { name: "--dynamic-table-selected-row-background-color", type: "color", description: "Background color of selected rows", default: "rgb(var(--global-color-primary-200))" },
     { name: "--dynamic-table-row-disabled-background-color", type: "color", description: "Background of disabled rows", default: "rgb(var(--global-color-primary-400))" },
-    { name: "--dynamic-table-header-background-color", type: "color", description: "Table header background color", default: "rgb(var(--global-color-background-500))" },
+    { name: "--dynamic-table-header-background-color", type: "color", description: "Table header background color", default: "rgb(var(--global-color-background-400))" },
     { name: "--dynamic-table-background-color", type: "color", description: "Overall background color of table", default: "transparent" },
     { name: "--dynamic-table-max-height", type: "size", description: "Maximum height of table scroll area", default: "70vh" },
-    { name: "--dynamic-table-header-padding", type: "size", description: "Padding for header cells", default: ".2rem .5rem" },
+    { name: "--dynamic-table-header-padding", type: "size", description: "Padding for header cells", default: "4px 0 4px 8px" },
     { name: "--dynamic-table-header-font-size", type: "size", description: "Font size for headers", default: "13px" },
     { name: "--dynamic-table-header-font-weight", type: "weight", description: "Font weight of headers", default: "700" },
     { name: "--dynamic-table-subheader-background-color", type: "color", description: "Subheader background color", default: "rgb(var(--global-color-background-100))" },
     { name: "--dynamic-table-hover-color", type: "color", description: "Text color on hover", default: "rgb(var(--global-color-contrast-800), .7)" },
     { name: "--dynamic-table-header-border-radius", type: "size", description: "Border radius of header cells", default: "5px" },
-    { name: "--dynamic-table-header-height", type: "size", description: "Height of header row", default: "30px" },
-    { name: "--dynamic-table-row-min-height", type: "size", description: "Minimum height for rows", default: "auto" },
+    { name: "--dynamic-table-header-height", type: "size", description: "Height of header row", default: "25px" },
+    { name: "--dynamic-table-row-min-height", type: "size", description: "Minimum height for rows", default: "45px" },
     { name: "--dynamic-table-end-line-background-color", type: "color", description: "Background color of end line", default: "transparent" },
     { name: "--dynamic-table-end-line-color", type: "color", description: "Border color of end line", default: "rgb(var(--global-color-contrast-500))" },
     { name: "--dynamic-table-end-line-text-color", type: "color", description: "Text color in end line", default: "rgb(var(--global-color-contrast-500))" },
-    { name: "--dynamic-table-default-border-collapse", type: "border", description: "Table borders collapsed or separated", default: "separate" }
+    { name: "--dynamic-table-default-border-collapse", type: "border", description: "Table borders collapsed or separated", default: "collapse" },
+    { name: "--dynamic-table-default-label-margin", type: "margin", description: "Table header label margin", default: "0px 4px 0px 0px" },
+    { name: "--dynamic-table-default-label-font-size", type: "font-size", description: "Table header label font size", default: "small" }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>
