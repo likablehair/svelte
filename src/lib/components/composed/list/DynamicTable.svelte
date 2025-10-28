@@ -5,27 +5,20 @@
     Converter,
     CountriesAutocomplete,
     DatePickerTextField,
-    Drawer,
     FilterBuilder,
     FlagIcon,
     Icon,
     MediaQuery,
-    Menu,
     ToolTip,
     type PaginatedTable
   } from "$lib";
   import { DateTime } from "luxon";
   import { onMount, tick, type ComponentProps, type Snippet } from "svelte";
-  import { quintOut } from "svelte/easing";
-  import { crossfade, fade } from "svelte/transition";
+  import { fade } from "svelte/transition";
   import { type Item as ItemAutocomplete } from "$lib/components/simple/forms/Autocomplete.svelte"
   import Filters from "../search/Filters.svelte";
   import ConfirmOrCancelButtons from "../forms/ConfirmOrCancelButtons.svelte";
-  import { flip } from "svelte/animate";
   import InfiniteScroll from "$lib/components/simple/common/InfiniteScroll.svelte";
-  import Divider from "$lib/components/simple/common/Divider.svelte";
-  import VerticalDraggableList from "$lib/components/simple/common/VerticalDraggableList.svelte";
-  import Button from "$lib/components/simple/buttons/Button.svelte";
   import Autocomplete from "$lib/components/simple/forms/Autocomplete.svelte";
   import LabelAndSelect from "../forms/LabelAndSelect.svelte";
   import LabelAndTextField from "../forms/LabelAndTextField.svelte";
@@ -34,12 +27,12 @@
   import QuickActions, { type Action } from "../common/QuickActions.svelte";
   import './DynamicTable.css'
   import type { QuickFilter } from "$lib/utils/filters/quickFilters";
-  import Switch from "$lib/components/simple/forms/Switch.svelte";
   import CircularLoader from "$lib/components/simple/loaders/CircularLoader.svelte";
   import type { UIEventHandler } from "svelte/elements";
   import NoData from "$lib/components/simple/common/NoData.svelte";
   import SearchBar from "../search/SearchBar.svelte";
   import MenuOrDrawer from "../common/MenuOrDrawer.svelte";
+  import HeadersDrawer from "../common/HeadersDrawer.svelte";
 
   onMount(() => {
     updateHeaderHeight();
@@ -109,23 +102,6 @@
       }, 30)
     }
   })
-  
-  const [send, receive] = crossfade({
-    duration: 500,
-    fallback(node, params) {
-      const style = getComputedStyle(node);
-      const transform = style.transform === "none" ? "" : style.transform;
-
-      return {
-        duration: 500,
-        easing: quintOut,
-        css: (t) => `
-        transform: ${transform} scale(${t});
-        opacity: ${t}
-      `,
-      };
-    },
-  });
 
   type RowItem = Item & {
     disableEdit?: boolean,
@@ -245,6 +221,7 @@
     dynamicFilters?: boolean;
     useSelectedItemsOnly?: boolean;
     selectedAllDisabled?: boolean;
+    headerDrawerProps?: ComponentProps<typeof HeadersDrawer>['drawerProps']
     class?: {
       container?: string;
       header?: string;
@@ -272,14 +249,7 @@
         item: any;
       }
     }) => void
-    onsaveHeadersToShow?: (event: {
-      detail: {
-        headersToShow: {
-          id: string;
-          name: string;
-        }[];
-      }
-    }) => void
+    onsaveHeadersToShow?: ComponentProps<typeof HeadersDrawer>['onsaveHeadersToShow']
     onfiltersChange?: (event: {
       detail: {
         builder: FilterBuilder;
@@ -367,6 +337,9 @@
       setQuickFilterMissingValue: typeof setQuickFilterMissingValue
     }]>
     appendSnippet?: Snippet<[]>
+    headerDrawerContentSnippet?: ComponentProps<typeof HeadersDrawer>['contentSnippet']
+    headerDrawerHeadersToAddSnippet?: ComponentProps<typeof HeadersDrawer>['headersToAddSnippet']
+    headerDrawerItemSnippet?: ComponentProps<typeof HeadersDrawer>['itemSnippet']
   }
 
   let {
@@ -416,6 +389,7 @@
     dynamicFilters = true,
     useSelectedItemsOnly = false,
     selectedAllDisabled = false,
+    headerDrawerProps,
     class: clazz = {},
     onapplyCustomQuickFilter,
     oncellClick,
@@ -448,6 +422,9 @@
     customSubRowSnippet,
     customQuickFilterSnippet,
     appendSnippet,
+    headerDrawerContentSnippet,
+    headerDrawerHeadersToAddSnippet,
+    headerDrawerItemSnippet,
   }: Props = $props();
 
   let openCellEditor: boolean = $state(false),
@@ -494,7 +471,7 @@
   let renderedRows = $derived(rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber))
 
   let openHeaderDrawer: boolean = $state(false),
-    headersToSelect: {
+    availableHeaders: {
       id: string;
       name: string;
       icon?: string;
@@ -526,17 +503,6 @@
 
   let totalBatchLength: number = $state(0),
     expandedRows: Row[] = $state([]);    
-
-  function saveHeadersToShow() {
-    if(onsaveHeadersToShow){
-      onsaveHeadersToShow({
-        detail: {
-          headersToShow: headersToShow,
-        }
-      })
-    }
-    openHeaderDrawer = false;
-  }
 
   function handleHeaderClick(header: Header) {
     if (header.sortable && !loading && !resizing) {
@@ -2347,105 +2313,17 @@
   {/snippet}
 </MenuOrDrawer>
 
-<MediaQuery>
-  {#snippet defaultSnippet({ sAndDown })}
-    <Drawer
-      bind:open={openHeaderDrawer}
-      _space={sAndDown ? "60vh" : "400px"}
-      position={sAndDown ? "bottom" : "right"}
-    >
-      <div class="personalize-header">{lang == 'en' ? 'Personalize your headers' : 'Personalizza le tue intestazioni'}</div>
-      <div style="padding: 20px;">
-
-        <span class="headers-show grid-col-1">{lang == 'en' ? 'Headers shown in table' : 'Intestazioni visualizzate in tabella'}</span>
-
-        {#if headersToShow}
-          <VerticalDraggableList
-            items={headersToShow}
-            onchangeOrder={(e) => {
-              headersToShow = e.detail.items;
-            }}
-          >
-            {#snippet itemSnippet({ item })}
-              <div
-                style:display=flex
-              >
-                <div
-                  style:flex-grow=1
-                >
-                  {#if !!item.icon}
-                    <Icon name={item.icon} />
-                  {/if}
-                  {item.name}
-                </div>
-                <Switch
-                  --switch-label-width="90%"
-                  value={headersToShow.find((h) => h.id == item.id) != undefined}
-                  onchange={(e) => {
-                    if (e.detail.value == false) {
-                      headersToShow = headersToShow.filter((h) => h.id != item.id);
-                      headersToSelect = [...headersToSelect, item];
-                    }
-                  }}
-                />
-              </div>
-            {/snippet}
-          </VerticalDraggableList>
-        {/if}
-        <Divider --divider-color=rgb(var(--global-color-contrast-100) />
-        <span class="headers-show grid-col-1">{lang == 'en' ? 'Headers to show' : 'Intestazioni da mostrare'}</span>
-        {#if headersToSelect && headersToSelect.length > 0}
-          {#each headersToSelect as header (header.id)}
-            <div
-              animate:flip
-              in:receive={{ key: header }}
-              out:send={{ key: header }}
-              class="headers-show grid-col-1"
-            >
-              <div
-                style:display=flex
-              >
-                <div
-                  style:flex-grow=1
-                >
-                  {#if !!header.icon}
-                    <Icon name={header.icon} />
-                  {/if}
-                  {header.name}
-                </div>
-                <Switch
-                  --switch-label-width="90%"
-                  value={false}
-                  onchange={(e) => {
-                    if (e.detail.value == true) {
-                      headersToSelect = headersToSelect.filter(
-                        (h) => h.id != header.id
-                      );
-                      headersToShow = [...headersToShow, header];
-                    }
-                  }}
-                />
-              </div>
-            </div>
-          {/each}
-        {:else}
-          <div class="headers-show grid-col-1">
-            <span style="text-align: center;">{lang == 'en' ? 'No headers to add' : 'Nessuna intestazione da aggiungere'}</span>
-          </div>
-        {/if}
-        <div style="width: 100%; display: flex; justify-content: center; padding-top: 15px;">
-          <Button
-            class="mr-3 mt-5"
-            --button-width="100%"
-            onclick={saveHeadersToShow}
-          >
-            {lang == 'en' ? 'Save preferences' : 'Salva preferenze'}
-          </Button>
-        </div>
-      </div>
-    </Drawer>
-  {/snippet}
-</MediaQuery>
+<HeadersDrawer
+  bind:open={openHeaderDrawer}
+  {lang}
+  {onsaveHeadersToShow}
+  {availableHeaders}
+  {headersToShow}
+  contentSnippet={headerDrawerContentSnippet}
+  drawerProps={headerDrawerProps}
+  headersToAddSnippet={headerDrawerHeadersToAddSnippet}
+  itemSnippet={headerDrawerItemSnippet}
+/>
 
 <style>
   .outer-container {
@@ -2779,19 +2657,6 @@
     display: flex;
     gap: 4px;
     margin: 0 8px;
-  }
-
-  .personalize-header {
-    font-size: 20px;
-    line-height: 28px;
-    font-weight: 700;
-    padding: 20px 20px 0px 20px;
-  }
-
-  .headers-show {
-    display: grid;
-    gap: 12px;
-    padding: 8px;
   }
 
   .line-container {

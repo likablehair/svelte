@@ -326,6 +326,12 @@ const list: {
     type: 'composed',
     url: '/docs/components/composed-components/PaginatedTable'
   }, {
+    title: 'EnhancedPaginatedTable',
+    description: 'Table and pagination agreement, with an upgrade.',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/EnhancedPaginatedTable'
+  }, {
     title: 'QuickActions',
     description: 'Fast actions available only to you.',
     status: 'stable',

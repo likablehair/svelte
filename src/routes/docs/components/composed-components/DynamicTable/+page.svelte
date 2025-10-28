@@ -6,9 +6,9 @@
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
   import DynamicTable from "$lib/components/composed/list/DynamicTable.svelte";
   import type { ComponentProps } from "svelte";
-    import FlagIcon from "$lib/components/simple/media/FlagIcon.svelte";
-    import EventsViewer from "../../EventsViewer.svelte";
-    import SlotsViewer from "../../SlotsViewer.svelte";
+  import FlagIcon from "$lib/components/simple/media/FlagIcon.svelte";
+  import EventsViewer from "../../EventsViewer.svelte";
+  import SlotsViewer from "../../SlotsViewer.svelte";
 
   let headers : ComponentProps<typeof DynamicTable>['headers'] = [
     {
@@ -288,6 +288,7 @@
     { name: "dynamicFilters", type: "boolean", description: "Switch Between Dynamic and normal filters", default: "true" },
     { name: "useSelectedItemsOnly", type: "boolean", description: "Uses only selectedItems if all rows are fetched initially", default: "false" },
     { name: "selectedAllDisabled", type: "boolean", description: "Disabled the selected all", default: "false" },
+    { name: "headerDrawerProps", type: "object", description: "Props of the headers drawer", },
     { name: "class", type: "{ container?: string; header?: string; row?: string; cell?: string }", description: "Custom classes for table elements", default: "{}" }
   ]}
   styleProps={[
@@ -483,7 +484,87 @@
       { name: "quickFilter", type: "QuickFilter", description: "Quick filter object" },
       { name: "setQuickFilterMissingValue", type: "function", description: "Callback to mark quick filter as incomplete" }
     ] },
-    { name: "appendSnippet", description: "General purpose append slot", default: "undefined" }
+    { name: "appendSnippet", description: "General purpose append slot" },
+    { name: "headerDrawerContentSnippet", description: "Headers drawer custom content", },
+    { 
+      name: "headerDrawerHeadersToAddSnippet", 
+      description: "Headers drawer custom items", 
+      properties: [
+        { name: "item", type: "{ id: string; name: string; }", description: "The item being rendered." }
+      ],
+      default: `
+<div
+  style:display=flex
+>
+  <div
+    style:flex-grow=1
+  >
+    {#if !!item.icon}
+      <Icon name={item.icon} />
+    {/if}
+    {item.name}
+  </div>
+  <div
+    style:display=flex
+    style:min-width=50px
+    style:justify-content=end
+  >
+    <Switch
+      --switch-label-width="90%"
+      value={headersToShow.find((h) => h.id == item.id) != undefined}
+      onchange={(e) => {
+        if (e.detail.value == false) {
+          headersToShow = headersToShow.filter((h) => h.id != item.id);
+          availableHeaders = [...availableHeaders, item];
+        }
+      }}
+    />
+  </div>
+</div>
+`
+    },
+    { 
+      name: "headerDrawerItemSnippet",
+      description: "Headers drawer custom headers to add", 
+      properties: [
+        { name: "header", type: "{ id: string; name: string; }", description: "The item being rendered." }
+      ],
+      default: `
+<div
+  class="headers-show"
+>
+  <div
+    style:display=flex
+  >
+    <div
+      style:flex-grow=1
+    >
+      {#if !!header.icon}
+        <Icon name={header.icon} />
+      {/if}
+      {header.name}
+    </div>
+    <div
+      style:display=flex
+      style:min-width=50px
+      style:justify-content=end
+    >
+      <Switch
+        --switch-label-width="90%"
+        value={false}
+        onchange={(e) => {
+          if (e.detail.value == true) {
+            availableHeaders = availableHeaders.filter(
+              (h) => h.id != header.id
+            );
+            headersToShow = [...headersToShow, header];
+          }
+        }}
+      />
+    </div>
+  </div>
+</div>`
+    },
   ]}
 ></SlotsViewer>
 <h2>Events</h2>
