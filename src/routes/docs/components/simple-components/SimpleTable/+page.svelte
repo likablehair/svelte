@@ -208,6 +208,12 @@
       default: "'en'",
     },
     {
+      name: "noItemsText",
+      type: "string",
+      description: "Message to appear when there are no items",
+      default: "No data available",
+    },
+    {
       name: "doubleClickActive",
       type: "boolean",
       description: "Enables the double click of the row.",

@@ -48,6 +48,7 @@
     resizedColumnSizeWithPadding?: { [value: string]: number };
     pointerOnRowHover?: boolean;
     lang?: 'it' | 'en'
+    noItemsText?: string
     doubleClickActive?: boolean,
     doubleClickDelay?: number;
     calculateRowStyles?: CalculateRowStyles<Item> | undefined
@@ -115,6 +116,7 @@
     lang = 'en',
     doubleClickActive = false,
     doubleClickDelay = 250,
+    noItemsText,
     calculateRowStyles = undefined,
     calculateRowClasses = undefined,
     oncolumnResize,
@@ -519,7 +521,7 @@
               style:font-size="1.2em"
             >
               {#if noDataSnippet}{@render noDataSnippet()}{:else}
-                <NoData {lang} />
+                <NoData {lang} {noItemsText} />
               {/if}
             </td>
           </tr>

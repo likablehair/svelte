@@ -420,6 +420,12 @@
       default: "'en'",
     },
     {
+      name: "noItemsText",
+      type: "string",
+      description: "Message to appear when there are no items",
+      default: "No data available",
+    },
+    {
       name: "editFilterMode",
       type: "'one-edit' | 'multi-edit'",
       description: "Mode for editing filters.",
