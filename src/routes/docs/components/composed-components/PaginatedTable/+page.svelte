@@ -196,6 +196,7 @@
     >[0],
   ) {
     let filterBuilder: Builder = e.detail.builder;
+    console.log(filterBuilder)
   }
 
   function handleCustomInput(
@@ -466,6 +467,12 @@
       type: "number",
       description: "Time window (in ms) to double click",
       default: "250",
+    },
+    {
+      name: "searchTimeoutDelay",
+      type: "number",
+      description: "Search debounce delay (ms)",
+      default: "300",
     },
     {
       name: "calculateRowStyles",

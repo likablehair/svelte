@@ -28,6 +28,7 @@
     editFilterMode?: "one-edit" | "multi-edit";
     showActiveFilters?: boolean;
     dateLocale?: 'it' | 'en'
+    searchTimeoutDelay?: number
     class?: {
       simpleTable?: ComponentProps<typeof SimpleTable<Item, Data>>["class"];
     };
@@ -114,6 +115,7 @@
     pointerOnRowHover = undefined,
     doubleClickActive = false,
     doubleClickDelay = 250,
+    searchTimeoutDelay = 300,
     calculateRowStyles = undefined,
     calculateRowClasses = undefined,
     class: clazz = {},
@@ -138,11 +140,13 @@
     noDataSnippet,
     totalsSnippet,
     oncolumnResize,
+    ...rest
   }: Props = $props();
 
   let searchBarInput: HTMLElement | undefined = $state(),
     searchText: string | undefined = $state(),
-    sortModify: Header<Data>["sortModify"];
+    sortModify: Header<Data>["sortModify"],
+    searchTimeout: NodeJS.Timeout
 
   let rowsPerPageSelection: ComponentProps<typeof Dropdown>["values"] = $state(
     [],
@@ -183,20 +187,16 @@
   }
 
   function handleSearchChange(searchText: string | undefined) {
-    let builder = buildFilters({ searchText });
+    clearTimeout(searchTimeout)
 
-    if (onfiltersChange) {
-      onfiltersChange({
-        detail: {
-          builder,
-        },
+    searchTimeout = setTimeout(() => {
+      let builder = buildFilters({ searchText })
+
+      onfiltersChange?.({
+        detail: { builder },
       });
-    }
+    }, searchTimeoutDelay);
   }
-
-  $effect(() => {
-    handleSearchChange(searchText);
-  });
 
   function handleFiltersChange() {
     let builder = buildFilters({ searchText });
@@ -304,6 +304,7 @@
                 --search-bar-default-border-radius="4px"
                 --search-bar-default-ring-color="rgb(var(--global-color-background-300),.6)"
                 --search-bar-default-background-color="rgb(var(--global-color-background-300),.4)"
+                oninput={() => handleSearchChange(searchText)}
               ></SearchBar>
             {/if}
           {/if}
@@ -338,6 +339,7 @@
   {@render totalsSnippet?.()}
 
   <SimpleTable
+    {...rest}
     {headers}
     class={clazz.simpleTable}
     {items}
