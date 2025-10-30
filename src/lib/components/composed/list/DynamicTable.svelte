@@ -1359,10 +1359,15 @@
         {#if !loading}
           {totalRows || rows.length}
         {:else}
-          <CircularLoader 
-            {loading}
-            --circular-loader-height='10px'
-          ></CircularLoader>
+          <div
+            style:display=flex
+            style:align-items=center
+          >
+            <CircularLoader 
+              {loading}
+              --circular-loader-height='10px'
+            ></CircularLoader>
+          </div>
         {/if}
       </div>
     {/if}
