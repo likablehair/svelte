@@ -101,7 +101,7 @@
     } else if('mode' in filter && filter.mode == 'between') {
       newValue.to = filter.to
       newValue.from = filter.from
-      if(!!newValue.from || !!newValue.to) {
+      if(newValue.from != undefined || newValue.to != undefined) {
         newValid = true
 			}
     } else if (filter.type == 'custom') {
@@ -111,7 +111,7 @@
 			}
 		} else {
       newValue = filter.value
-      if(!!newValue) {
+      if(newValue != undefined) {
         newValid = true
       }
     }
@@ -139,7 +139,7 @@
 						tabindex="0"
 						role="button"
 						class="filters-selection-item"
-						class:selected={filter.name === selectedFilter?.name || isActiveFilter(filter)}				onclick={() => selectFilter(filter)}
+						class:selected={filter.name === selectedFilter?.name || isActiveFilter(filter)} onclick={() => selectFilter(filter)}
 						onkeydown={(event) => handleKeyPress(event, filter)}
 						aria-pressed={filter.name === selectedFilter?.name}			>
 						<div class="filters-selection-title">
