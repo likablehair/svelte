@@ -79,17 +79,17 @@
     } else if('mode' in filter && filter.mode == 'between') {
       newValue.to = filter.to
       newValue.from = filter.from
-      if(!!newValue.from || !!newValue.to) {
+      if(newValue.from != undefined || newValue.to != undefined) {
         newValid = true
       }
     } else if (filter.type == 'custom') {
       newValue = filter.value
-			if ((Array.isArray(newValue) && newValue.length > 0) || (!Array.isArray(newValue) && !!newValue)) {
+			if ((Array.isArray(newValue) && newValue.length > 0) || (!Array.isArray(newValue) && newValue != undefined)) {
 				newValid = true;
 			}
 		} else {
       newValue = filter.value
-      if(!!newValue) {
+      if(newValue != undefined) {
         newValid = true
       }
     }
