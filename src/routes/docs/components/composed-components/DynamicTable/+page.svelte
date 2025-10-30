@@ -51,6 +51,7 @@
         key: "custom",
       },
       sortable: true,
+      icon: 'mdi-check'
     },
     {
       value: "id",
@@ -293,7 +294,7 @@
   ]}
   styleProps={[
     { name: "--dynamic-table-cell-editor-background-color", type: "color", description: "Background color for editable cells", default: "rgb(var(--global-color-background-300))" },
-    { name: "--dynamic-table-default-cell-border", type: "color", description: "Border color of each cell", default: "none" },
+    { name: "--dynamic-table-cell-border", type: "color", description: "Border color of each cell", default: "none" },
     { name: "--dynamic-table-quick-filter-background-color", type: "color", description: "Background of quick filter bar", default: "rgb(var(--global-color-background-300))" },
     { name: "--dynamic-table-row-background-color-hover", type: "color", description: "Hover background color for rows", default: "rgb(var(--global-color-background-200))" },
     { name: "--dynamic-table-expanded-row-background-color", type: "color", description: "Background color for expanded rows", default: "rgb(var(--global-color-background-300))" },
@@ -313,9 +314,9 @@
     { name: "--dynamic-table-end-line-background-color", type: "color", description: "Background color of end line", default: "transparent" },
     { name: "--dynamic-table-end-line-color", type: "color", description: "Border color of end line", default: "rgb(var(--global-color-contrast-500))" },
     { name: "--dynamic-table-end-line-text-color", type: "color", description: "Text color in end line", default: "rgb(var(--global-color-contrast-500))" },
-    { name: "--dynamic-table-default-border-collapse", type: "border", description: "Table borders collapsed or separated", default: "collapse" },
-    { name: "--dynamic-table-default-label-margin", type: "margin", description: "Table header label margin", default: "0px 4px 0px 0px" },
-    { name: "--dynamic-table-default-label-font-size", type: "font-size", description: "Table header label font size", default: "small" }
+    { name: "--dynamic-table-border-collapse", type: "border", description: "Table borders collapsed or separated", default: "collapse" },
+    { name: "--dynamic-table-header-label-margin", type: "margin", description: "Table header label margin", default: "0px 4px 0px 0px" },
+    { name: "--dynamic-table-header-label-font-size", type: "font-size", description: "Table header label font size", default: "small" }
   ]}
 ></PropsViewer>
 <h2>Slots</h2>
@@ -402,6 +403,9 @@
   {#if headerLabelSnippet}
     {@render headerLabelSnippet({ header })}
   {:else}
+    {#if !!header.icon}
+      <Icon name={header.icon} --icon-size=12px />
+    {/if}
     {header.label}
   {/if}
   {#if !!header.info}
@@ -440,7 +444,12 @@
   </span>
 {/if}
     `, properties: [{ name: "header", type: "Header", description: "Header object" }] },
-    { name: "headerLabelSnippet", description: "Custom header label", default: "{header.label}", properties: [{ name: "header", type: "Header", description: "Header object" }] },
+    { name: "headerLabelSnippet", description: "Custom header label", default: `
+{#if !!header.icon}
+  <Icon name={header.icon} --icon-size=12px />
+{/if}
+{header.label}`
+      , properties: [{ name: "header", type: "Header", description: "Header object" }] },
     { name: "rowAppendSnippet", description: "Slot appended to each row", properties: [{ name: "index", type: "number", description: "Row index" }, { name: "row", type: "Row", description: "Row item" }] },
     { name: "customRowSnippet", description: "Custom row cell content", properties: [
       { name: "index", type: "number", description: "Row index" },

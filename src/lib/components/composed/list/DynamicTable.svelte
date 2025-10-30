@@ -170,7 +170,6 @@
     cellEditorInfo?: CellEditorInfo;
     info?: string;
     maxWidth?: string;
-    icon?: string;
   };
   type HeaderType = Header["type"];
 
@@ -1629,6 +1628,9 @@
                   {#if headerLabelSnippet}
                     {@render headerLabelSnippet({ header })}
                   {:else}
+                    {#if !!header.icon}
+                      <Icon name={header.icon} --icon-size=12px />
+                    {/if}
                     {header.label}
                   {/if}
                   {#if !!header.info}
@@ -2411,11 +2413,11 @@
   .header-label {
     margin-right: var(
       --dynamic-table-header-label-margin,
-      var(--dynamic-table-default-label-margin)
+      var(--dynamic-table-default-header-label-margin)
     );
     font-size: var(
       --dynamic-table-header-label-font-size,
-      var(--dynamic-table-default-label-font-size)
+      var(--dynamic-table-default-header-label-font-size)
     );
   }
 

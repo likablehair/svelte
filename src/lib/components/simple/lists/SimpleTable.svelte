@@ -14,6 +14,7 @@
     width?: string
     minWidth?: string
     sortable?: boolean
+    icon?: string
     sortModify?: (params: { builder: FilterBuilder, sortDirection: 'asc' | 'desc' }) => FilterBuilder
     data?: Data
   };
@@ -419,6 +420,9 @@
                   {#if headerLabelSnippet}
                     {@render headerLabelSnippet({ head })}
                   {:else}
+                    {#if !!head.icon}
+                      <Icon name={head.icon}/>
+                    {/if}
                     {head.label}
                   {/if}
                 </span>
@@ -654,7 +658,10 @@
   }
 
   .header-label {
-    margin-right: 5px;
+    margin: var(
+      --simple-table-header-label-margin,
+      var(--simple-table-default-header-label-margin)
+    );
   }
 
   .header-sort-icon {

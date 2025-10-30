@@ -21,6 +21,6 @@
   --dynamic-table-default-end-line-text-color: rgb(var(--global-color-contrast-500));
   --dynamic-table-default-border-collapse: collapse;
   --dynamic-table-default-cell-border: none;
-  --dynamic-table-default-label-margin: 0px 4px 0px 0px;
-  --dynamic-table-default-label-font-size: small;
+  --dynamic-table-default-header-label-margin: 0px 4px 0px 0px;
+  --dynamic-table-default-header-label-font-size: small;
 }

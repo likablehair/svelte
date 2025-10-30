@@ -676,6 +676,9 @@
   {#if headerLabelSnippet}
     {@render headerLabelSnippet({ head })}
   {:else}
+    {#if !!head.icon}
+      <Icon name={head.icon}/>
+    {/if}
     {head.label}
   {/if}
 </span>
@@ -701,7 +704,11 @@
       properties: [
         { name: "head", type: "TableHeader", description: "Header object." },
       ],
-      default: "{head.label}",
+      default: `
+{#if !!head.icon}
+  <Icon name={head.icon}/>
+{/if}
+{head.label}`,
     },
     {
       name: "appendSnippet",

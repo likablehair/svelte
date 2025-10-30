@@ -41,6 +41,7 @@
             return {
               id: h.value,
               name: h.label,
+              icon: h.icon,
             };
           })
       : []),
@@ -52,6 +53,7 @@
       return {
         id: h.value,
         name: h.label,
+        icon: h.icon,
       };
     }))
 </script>

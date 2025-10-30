@@ -64,6 +64,7 @@
       data: {
         ciao: "sddfd",
       },
+      icon: 'mdi-check'
     },
   ];
 
