@@ -2296,8 +2296,14 @@
   }
 
   .header-label {
-    margin-right: 5px;
-    font-size: small;
+    margin-right: var(
+      --dynamic-table-header-label-margin,
+      var(--dynamic-table-default-label-margin)
+    );
+    font-size: var(
+      --dynamic-table-header-label-font-size,
+      var(--dynamic-table-default-label-font-size)
+    );
   }
 
   .header-sort-icon {
