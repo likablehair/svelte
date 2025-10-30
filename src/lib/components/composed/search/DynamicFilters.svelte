@@ -106,7 +106,7 @@
 			}
     } else if (filter.type == 'custom') {
       newValue = filter.value
-			if ((Array.isArray(newValue) && newValue.length > 0) || (!Array.isArray(newValue) && !!newValue)) {
+			if ((Array.isArray(newValue) && newValue.length > 0) || (!Array.isArray(newValue) && newValue != undefined)) {
 				newValid = true;
 			}
 		} else {
