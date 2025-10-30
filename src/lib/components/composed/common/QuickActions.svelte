@@ -20,7 +20,7 @@
 
   interface Props {
     selectedItems: number;
-    disabled: boolean;
+    disabled?: boolean;
     actionsForSelectedItems: Action[];
     position?: 'top' | 'bottom';
     lang?: 'it' | 'en';

@@ -265,6 +265,8 @@
         value = undefined;
       }
     }}
+    showSelection
+    uniqueKey='businessName'
     quickFilters={quickFilters}
     quickFiltersVisible={true}
     editFilterMode="multi-edit"
@@ -475,6 +477,51 @@
       default: "300",
     },
     {
+      name: "showSelection",
+      type: "boolean",
+      description: "Shows selection at the start of each row",
+      default: "false",
+    },
+    {
+      name: "selectionMode",
+      type: "'single' | 'multiple'",
+      description: "Choose between one of multiple elements to select",
+      default: "'multiple'",
+    },
+    {
+      name: "hideSelectAll",
+      type: "boolean",
+      description: "Hides the select all for multiple selection",
+      default: "false",
+    },
+    {
+      name: "selectedAll",
+      type: "boolean",
+      description: "True if every row is selected",
+    },
+    {
+      name: "selectedItems",
+      type: "Item[]",
+      description: "Contains selected items. Empty if selectedAll is true",
+    },
+    {
+      name: "uniqueKey",
+      type: "keyof Item",
+      description: "Unique key for selecting items",
+      default: "id",
+    },
+    {
+      name: "hideActions",
+      type: "boolean",
+      description: "Hides quick actions",
+      default: "false",
+    },
+    {
+      name: "actionsForSelectedItems",
+      type: "Action",
+      description: "Actions for the selected items",
+    },
+    {
       name: "calculateRowStyles",
       type: "CalculateRowStyles<Item> | undefined",
       description: "Function to calculate row styles.",
@@ -614,7 +661,7 @@
       ],
     },
     {
-      name: "appendSnippet",
+      name: "filterAppendSnippet",
       description:
         "Slot for appending additional elements to the filter component.",
     },
@@ -659,6 +706,14 @@
     {
       name: "appendSnippet",
       description: "Custom rendering at the end of rows.",
+      properties: [
+        { name: "index", type: "number", description: "Row index." },
+        { name: "item", type: "Item", description: "Row item." },
+      ],
+    },
+    {
+      name: "prependSnippet",
+      description: "Custom rendering at the start of rows.",
       properties: [
         { name: "index", type: "number", description: "Row index." },
         { name: "item", type: "Item", description: "Row item." },

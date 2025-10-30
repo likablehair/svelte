@@ -369,6 +369,14 @@
       ],
     },
     {
+      name: "prependSnippet",
+      description: "Custom rendering at the start of rows.",
+      properties: [
+        { name: "index", type: "number", description: "Row index." },
+        { name: "item", type: "Item", description: "Row item." },
+      ],
+    },
+    {
       name: "rowActionsSnippet",
       description: "Custom actions for rows.",
       properties: [
