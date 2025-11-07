@@ -1359,10 +1359,15 @@
         {#if !loading}
           {totalRows || rows.length}
         {:else}
-          <CircularLoader 
-            {loading}
-            --circular-loader-height='10px'
-          ></CircularLoader>
+          <div
+            style:display=flex
+            style:align-items=center
+          >
+            <CircularLoader 
+              {loading}
+              --circular-loader-height='10px'
+            ></CircularLoader>
+          </div>
         {/if}
       </div>
     {/if}
@@ -1426,24 +1431,10 @@
                   {#if !!head.info}
                     <Icon						
                       name="mdi-help-circle-outline"
-                      --icon-size="16px"
+                      --icon-size="14px"
                     />
                   {/if}
                 </span>
-                {#if !!head.info}
-                  <ToolTip
-                    appearTimeout={1000}
-                    activator={infoActivators[index]}
-                  >
-                    <div
-                      style:background-color='rgb(var(--global-color-background-300), .95)'
-                      style:border-radius="5px"
-                      style:padding="10px"
-                    >
-                      {head.info}
-                    </div>
-                  </ToolTip>
-                {/if}
                 {#if head.sortable}
                   <span
                     class="header-sort-icon"
@@ -1460,6 +1451,20 @@
                 {/if}
               </slot>
             </th>
+            {#if !!head.info}
+              <ToolTip
+                appearTimeout={1000}
+                activator={infoActivators[index]}
+              >
+                <div
+                  style:background-color='rgb(var(--global-color-background-300), .95)'
+                  style:border-radius="5px"
+                  style:padding="10px"
+                >
+                  {head.info}
+                </div>
+              </ToolTip>
+            {/if}
           {/each}
           {#if remainingWidth}
             <th
@@ -2296,8 +2301,14 @@
   }
 
   .header-label {
-    margin-right: 5px;
-    font-size: small;
+    margin-right: var(
+      --dynamic-table-header-label-margin,
+      var(--dynamic-table-default-label-margin)
+    );
+    font-size: var(
+      --dynamic-table-header-label-font-size,
+      var(--dynamic-table-default-label-font-size)
+    );
   }
 
   .header-sort-icon {

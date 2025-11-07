@@ -50,7 +50,8 @@
     resizedColumnSizeWithPadding: { [value: string]: number } = {},
     pointerOnRowHover: boolean | undefined = undefined,
     doubleClickActive: ComponentProps<SimpleTable>['doubleClickActive'] = false,
-    doubleClickDelay: ComponentProps<SimpleTable>['doubleClickDelay'] = 250;
+    doubleClickDelay: ComponentProps<SimpleTable>['doubleClickDelay'] = 250,
+    searchTimeoutDelay: number = 300;
 
 
   export let calculateRowStyles: CalculateRowStyles | undefined = undefined;
@@ -58,7 +59,8 @@
 
   let searchBarInput: HTMLElement,
     searchText: string | undefined = undefined,
-    sortModify: Header['sortModify']
+    sortModify: Header['sortModify'],
+    searchTimeout: NodeJS.Timeout
 
   let dispatch = createEventDispatcher<{
     paginationChange: {
@@ -93,14 +95,15 @@
   }
 
   function handleSearchChange(searchText: string | undefined) {
-    let builder = buildFilters({searchText})
-
-    dispatch('filtersChange', {
-      builder
-    })
+    clearTimeout(searchTimeout)
+    searchTimeout = setTimeout(() => {
+      let builder = buildFilters({searchText})
+  
+      dispatch('filtersChange', {
+        builder
+      })
+    }, searchTimeoutDelay);
   }
-
-  $: handleSearchChange(searchText)
 
   function handleSort(e: ComponentEvents<SimpleTable>['sort']) {
     sortModify = e.detail.sortModify
@@ -154,6 +157,7 @@
           placeholder={searchBarPlaceholder}
           bind:input={searchBarInput}
           bind:value={searchText}
+          on:input={() => handleSearchChange(searchText)}
         >
         </SearchBar>
       </div>
