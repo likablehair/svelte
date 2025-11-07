@@ -20,7 +20,7 @@
 
   interface Props {
     selectedItems: number;
-    disabled: boolean;
+    disabled?: boolean;
     actionsForSelectedItems: Action[];
     position?: 'top' | 'bottom';
     lang?: 'it' | 'en';
@@ -64,6 +64,38 @@
 </script>
 
 {#if selectedItems > 0}
+  {#each actions as action}
+    {#if !!action.info && !action.disabled}
+      <ToolTip
+        appearTimeout={500}
+        activator={infoActivators[action.label]}
+      >
+        <div
+          style:background-color='rgb(var(--global-color-background-300), .95)'
+          style:border-radius="5px"
+          style:padding="10px"
+          style:color='rgb(var(--global-color-contrast-900))'
+        > 
+          {action.info}
+        </div>
+      </ToolTip>
+    {/if}
+    {#if !!action.disabledInfo && action.disabled}
+      <ToolTip
+        appearTimeout={300}
+        activator={disabledInfoActivators[action.label]}
+      >
+        <div
+          style:background-color='rgb(var(--global-color-background-300), .95)'
+          style:border-radius="5px"
+          style:padding="10px"
+          style:color='rgb(var(--global-color-contrast-900))'
+        > 
+          {action.disabledInfo}
+        </div>
+      </ToolTip>
+    {/if}
+  {/each}
   <div
     class="container-{position}"
     transition:fly={{ delay: 150, duration: 150, y: -10, easing: cubicIn }}
@@ -115,36 +147,8 @@
                       --icon-size="16px"
                     />
                   </div>
-                  <ToolTip
-                    appearTimeout={500}
-                    activator={infoActivators[action.label]}
-                  >
-                    <div
-                      style:background-color='rgb(var(--global-color-background-300), .95)'
-                      style:border-radius="5px"
-                      style:padding="10px"
-                      style:color='rgb(var(--global-color-contrast-900))'
-                    > 
-                      {action.info}
-                    </div>
-                  </ToolTip>
                 {/if}
                 {action.label}
-                {#if !!action.disabledInfo && action.disabled}
-                  <ToolTip
-                    appearTimeout={300}
-                    activator={disabledInfoActivators[action.label]}
-                  >
-                    <div
-                      style:background-color='rgb(var(--global-color-background-300), .95)'
-                      style:border-radius="5px"
-                      style:padding="10px"
-                      style:color='rgb(var(--global-color-contrast-900))'
-                    > 
-                      {action.disabledInfo}
-                    </div>
-                  </ToolTip>
-                {/if}
               </div>
             </Button>
           {/each}

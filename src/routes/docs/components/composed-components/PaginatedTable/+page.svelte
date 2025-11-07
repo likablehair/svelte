@@ -196,6 +196,7 @@
     >[0],
   ) {
     let filterBuilder: Builder = e.detail.builder;
+    console.log(filterBuilder)
   }
 
   function handleCustomInput(
@@ -264,6 +265,8 @@
         value = undefined;
       }
     }}
+    showSelection
+    uniqueKey='businessName'
     quickFilters={quickFilters}
     quickFiltersVisible={true}
     editFilterMode="multi-edit"
@@ -420,6 +423,12 @@
       default: "'en'",
     },
     {
+      name: "noItemsText",
+      type: "string",
+      description: "Message to appear when there are no items",
+      default: "No data available",
+    },
+    {
       name: "editFilterMode",
       type: "'one-edit' | 'multi-edit'",
       description: "Mode for editing filters.",
@@ -460,6 +469,57 @@
       type: "number",
       description: "Time window (in ms) to double click",
       default: "250",
+    },
+    {
+      name: "searchTimeoutDelay",
+      type: "number",
+      description: "Search debounce delay (ms)",
+      default: "300",
+    },
+    {
+      name: "showSelection",
+      type: "boolean",
+      description: "Shows selection at the start of each row",
+      default: "false",
+    },
+    {
+      name: "selectionMode",
+      type: "'single' | 'multiple'",
+      description: "Choose between one of multiple elements to select",
+      default: "'multiple'",
+    },
+    {
+      name: "hideSelectAll",
+      type: "boolean",
+      description: "Hides the select all for multiple selection",
+      default: "false",
+    },
+    {
+      name: "selectedAll",
+      type: "boolean",
+      description: "True if every row is selected",
+    },
+    {
+      name: "selectedItems",
+      type: "Item[]",
+      description: "Contains selected items. Empty if selectedAll is true",
+    },
+    {
+      name: "uniqueKey",
+      type: "keyof Item",
+      description: "Unique key for selecting items",
+      default: "id",
+    },
+    {
+      name: "hideActions",
+      type: "boolean",
+      description: "Hides quick actions",
+      default: "false",
+    },
+    {
+      name: "actionsForSelectedItems",
+      type: "Action",
+      description: "Actions for the selected items",
     },
     {
       name: "calculateRowStyles",
@@ -601,7 +661,7 @@
       ],
     },
     {
-      name: "appendSnippet",
+      name: "filterAppendSnippet",
       description:
         "Slot for appending additional elements to the filter component.",
     },
@@ -616,6 +676,9 @@
   {#if headerLabelSnippet}
     {@render headerLabelSnippet({ head })}
   {:else}
+    {#if !!head.icon}
+      <Icon name={head.icon}/>
+    {/if}
     {head.label}
   {/if}
 </span>
@@ -641,11 +704,23 @@
       properties: [
         { name: "head", type: "TableHeader", description: "Header object." },
       ],
-      default: "{head.label}",
+      default: `
+{#if !!head.icon}
+  <Icon name={head.icon}/>
+{/if}
+{head.label}`,
     },
     {
       name: "appendSnippet",
       description: "Custom rendering at the end of rows.",
+      properties: [
+        { name: "index", type: "number", description: "Row index." },
+        { name: "item", type: "Item", description: "Row item." },
+      ],
+    },
+    {
+      name: "prependSnippet",
+      description: "Custom rendering at the start of rows.",
       properties: [
         { name: "index", type: "number", description: "Row index." },
         { name: "item", type: "Item", description: "Row item." },

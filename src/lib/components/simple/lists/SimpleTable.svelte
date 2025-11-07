@@ -14,6 +14,7 @@
     width?: string
     minWidth?: string
     sortable?: boolean
+    icon?: string
     sortModify?: (params: { builder: FilterBuilder, sortDirection: 'asc' | 'desc' }) => FilterBuilder
     data?: Data
   };
@@ -48,6 +49,7 @@
     resizedColumnSizeWithPadding?: { [value: string]: number };
     pointerOnRowHover?: boolean;
     lang?: 'it' | 'en'
+    noItemsText?: string
     doubleClickActive?: boolean,
     doubleClickDelay?: number;
     calculateRowStyles?: CalculateRowStyles<Item> | undefined
@@ -85,6 +87,10 @@
       index: number
       item?: Item
     }]>
+    prependSnippet?: Snippet<[{
+      index: number
+      item?: Item
+    }]>
     rowActionsSnippet?: Snippet<[{
       index: number
       item: Item
@@ -115,6 +121,7 @@
     lang = 'en',
     doubleClickActive = false,
     doubleClickDelay = 250,
+    noItemsText,
     calculateRowStyles = undefined,
     calculateRowClasses = undefined,
     oncolumnResize,
@@ -124,6 +131,7 @@
     headerSnippet,
     headerLabelSnippet,
     appendSnippet,
+    prependSnippet,
     rowActionsSnippet,
     customSnippet,
     noDataSnippet,
@@ -145,9 +153,9 @@
     if(resizableColumns) {
       if(!resizedColumnSizeWithPadding) resizedColumnSizeWithPadding = {}
 
-      for(const head of [...headers, { value: 'slot-append' }]) {
+      for(const head of [...headers, { value: 'slot-append' }, { value: 'slot-prepend' }]) {
         let th
-        if(head.value == 'slot-append') {
+        if(head.value == 'slot-append' || head.value == 'slot-prepend') {
           th = document.getElementsByClassName(head.value).item(0) as HTMLElement
         } else {
           th = document.getElementById(head.value) as HTMLElement
@@ -163,9 +171,9 @@
         }
       }
 
-      for(const head of [...headers, { value: 'slot-append' }]) {
+      for(const head of [...headers, { value: 'slot-append' }, { value: 'slot-prepend' }]) {
         let th
-        if(head.value == 'slot-append') {
+        if(head.value == 'slot-append' || head.value == 'slot-prepend') {
           th = document.getElementsByClassName(head.value).item(0) as HTMLElement
         } else {
           th = document.getElementById(head.value) as HTMLElement
@@ -356,7 +364,7 @@
           return sum + width + 1;
         }, 0);
     
-        const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.slot-append, th.customize-headers'))
+        const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.slot-append, th.slot-prepend, th.customize-headers'))
           .reduce((sum, th) => sum + th.getBoundingClientRect().width + 1, 0);
     
         remainingWidth = Math.max(0, containerWidth - totalResizableWidth - extraStaticWidth);
@@ -383,6 +391,11 @@
     <table class="table">
       <thead class="thead {clazz.header || ''}" bind:this={mainHeader}>
         <tr>
+          {#if prependSnippet}
+            <th class="slot-prepend">
+              {@render prependSnippet({ index: -1 })}
+            </th>
+          {/if}
           {#each headers as head}
             <th
               tabindex="0"
@@ -407,6 +420,9 @@
                   {#if headerLabelSnippet}
                     {@render headerLabelSnippet({ head })}
                   {:else}
+                    {#if !!head.icon}
+                      <Icon name={head.icon}/>
+                    {/if}
                     {head.label}
                   {/if}
                 </span>
@@ -462,6 +478,11 @@
               style:font-weight={styles.fontWeight}
               class:pointer={pointerOnRowHover}
             >
+              {#if prependSnippet}
+                <td class="{clazz.cell || ''} prepend" style:width="fit-content">
+                  {@render prependSnippet({ index: i, item })}
+                </td>
+              {/if}
               {#each headers as header, j}
                 <td class="{clazz.cell || ''}">
                   {#if header.type.key == "custom"}
@@ -519,7 +540,7 @@
               style:font-size="1.2em"
             >
               {#if noDataSnippet}{@render noDataSnippet()}{:else}
-                <NoData {lang} />
+                <NoData {lang} {noItemsText} />
               {/if}
             </td>
           </tr>
@@ -531,16 +552,16 @@
 
 <style>
 
-  th.slot-append {
+  th.slot-append, th.slot-prepend {
     width: 1px;
     min-width: unset;
   }
 
-  .table.resizable .slot-append {
+  .table.resizable .slot-append, .table.resizable .slot-prepend {
     box-sizing: content-box;
   }
 
-  .table.resizable td.append {
+  .table.resizable td.append, .table.resizable td.prepend {
     padding: 0;
   }
 
@@ -637,7 +658,10 @@
   }
 
   .header-label {
-    margin-right: 5px;
+    margin: var(
+      --simple-table-header-label-margin,
+      var(--simple-table-default-header-label-margin)
+    );
   }
 
   .header-sort-icon {

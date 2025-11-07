@@ -64,6 +64,7 @@
           key: "custom",
         },
         sortable: true,
+        icon: 'mdi-check',
       },
       {
         value: "startDate",
@@ -208,6 +209,12 @@
       default: "'en'",
     },
     {
+      name: "noItemsText",
+      type: "string",
+      description: "Message to appear when there are no items",
+      default: "No data available",
+    },
+    {
       name: "doubleClickActive",
       type: "boolean",
       description: "Enables the double click of the row.",
@@ -311,6 +318,12 @@
       description: "Table horizontal overflow behavior.",
       default: "auto",
     },
+    {
+      name: "--simple-table-header-label-margin",
+      type: "margin",
+      description: "Table header label margin.",
+      default: "0 5px 0 0",
+    },
   ]}
 ></PropsViewer>
 <h2>Slots</h2>
@@ -327,6 +340,9 @@
   {#if headerLabelSnippet}
     {@render headerLabelSnippet({ head })}
   {:else}
+    {#if !!head.icon}
+      <Icon name={head.icon}/>
+    {/if}
     {head.label}
   {/if}
 </span>
@@ -352,11 +368,23 @@
       properties: [
         { name: "head", type: "TableHeader", description: "Header object." },
       ],
-      default: '{head.label}'
+      default: `
+{#if !!head.icon}
+  <Icon name={head.icon}/>
+{/if}
+{head.label}`
     },
     {
       name: "appendSnippet",
       description: "Custom rendering at the end of rows.",
+      properties: [
+        { name: "index", type: "number", description: "Row index." },
+        { name: "item", type: "Item", description: "Row item." },
+      ],
+    },
+    {
+      name: "prependSnippet",
+      description: "Custom rendering at the start of rows.",
       properties: [
         { name: "index", type: "number", description: "Row index." },
         { name: "item", type: "Item", description: "Row item." },
