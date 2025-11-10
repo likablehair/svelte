@@ -1,32 +1,24 @@
-<script lang="ts">
+<script lang="ts" generics="Item extends {[key: string]: any}, Data">
   import { Button, Divider, Drawer, Icon, MediaQuery, Switch, VerticalDraggableList } from "$lib";
   import type { ComponentProps, Snippet } from "svelte";
   import { flip } from "svelte/animate";
   import { quintOut } from "svelte/easing";
   import { crossfade } from "svelte/transition";
-
-  type Item = {
-    id: string;
-    name: string;
-    icon?: string;
-  }
+  import EnhancedPaginatedTable from "../list/EnhancedPaginatedTable.svelte";
   
   interface Props {
     drawerProps?: Omit<ComponentProps<typeof Drawer>, 'open'>
     open?: boolean,
     lang: 'en' | 'it',
-    availableHeaders: Item[],
-    headersToShow: Item[],
+    availableHeaders: ComponentProps<typeof EnhancedPaginatedTable<Item, Data>>['headers'],
+    headersToShow: ComponentProps<typeof EnhancedPaginatedTable<Item, Data>>['headers'],
     onsaveHeadersToShow?: (event: {
       detail: {
-        headersToShow: {
-          id: string;
-          name: string;
-        }[];
+        headersToShow: ComponentProps<typeof EnhancedPaginatedTable<Item, Data>>['headers'];
       }
     }) => void
     itemSnippet?: ComponentProps<typeof VerticalDraggableList>['itemSnippet']
-    headersToAddSnippet?: Snippet<[{ header: Item }]>
+    headersToAddSnippet?: Snippet<[{ header: ComponentProps<typeof EnhancedPaginatedTable<Item, Data>>['headers'][number] }]>
     contentSnippet?: Snippet<[]>
   }
 
@@ -35,7 +27,7 @@
     open = $bindable(),
     lang,
     availableHeaders,
-    headersToShow,
+    headersToShow = $bindable(),
     onsaveHeadersToShow,
     itemSnippet: internalItemSnippet,
     headersToAddSnippet,
@@ -89,9 +81,22 @@
   
             {#if headersToShow}
               <VerticalDraggableList
-                items={headersToShow}
+                items={headersToShow.map((e) => {
+                  return {
+                    ...e,
+                    id: e.value,
+                    name: e.label,
+                  }
+                })}
                 onchangeOrder={(e) => {
-                  headersToShow = e.detail.items;
+                  let newHeaders: typeof headersToShow = []
+                  for(let i = 0; i < e.detail.items.length; i += 1) {
+                    let item = headersToShow.find(hts => hts.value === e.detail.items[i].id)
+                    if(!!item) {
+                      newHeaders.push(item)
+                    }
+                  }
+                  headersToShow = newHeaders;
                 }}
               >
                 {#snippet itemSnippet({ item })}
@@ -116,10 +121,10 @@
                       >
                         <Switch
                           --switch-label-width="90%"
-                          value={headersToShow.find((h) => h.id == item.id) != undefined}
+                          value={headersToShow.find((h) => h.value == item.id) != undefined}
                           onchange={(e) => {
                             if (e.detail.value == false) {
-                              headersToShow = headersToShow.filter((h) => h.id != item.id);
+                              headersToShow = headersToShow.filter((h) => h.value != item.id);
                               availableHeaders = [...availableHeaders, item];
                             }
                           }}
@@ -136,7 +141,7 @@
             <span class="headers-show">{lang == 'en' ? 'Available headers' : 'Intestazioni disponibili'}</span>
   
             {#if availableHeaders && availableHeaders.length > 0}
-              {#each availableHeaders as header (header.id)}
+              {#each availableHeaders as header (header.value)}
                 <div
                   animate:flip
                   in:receive={{ key: header }}
@@ -157,7 +162,7 @@
                           {#if !!header.icon}
                             <Icon name={header.icon} />
                           {/if}
-                          {header.name}
+                          {header.label}
                         </div>
                         <div
                           style:display=flex
@@ -170,7 +175,7 @@
                             onchange={(e) => {
                               if (e.detail.value == true) {
                                 availableHeaders = availableHeaders.filter(
-                                  (h) => h.id != header.id
+                                  (h) => h.value != header.value
                                 );
                                 headersToShow = [...headersToShow, header];
                               }

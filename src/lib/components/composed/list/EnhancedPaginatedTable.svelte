@@ -15,7 +15,7 @@
   }
 
   let {
-    headersToShowInTable,
+    headersToShowInTable = $bindable(),
     headerDrawerProps,
     onsaveHeadersToShow,
     headerDrawerContentSnippet,
@@ -36,34 +36,12 @@
   }: Props = $props()
 
   let openHeaderDrawer: boolean = $state(false),
-    availableHeaders: {
-      id: string;
-      name: string;
-      icon?: string;
-    }[] = $state(!!headers
+    availableHeaders = $state(!!headers
       ? headers
           .filter((h) => {
             return !headersToShowInTable.find((hst) => hst.value == h.value);
           })
-          .map((h) => {
-            return {
-              id: h.value,
-              name: h.label,
-              icon: h.icon,
-            };
-          })
-      : []),
-    headersToShow: {
-      id: string;
-      name: string;
-      icon?: string;
-    }[] = $state(headersToShowInTable.map((h) => {
-      return {
-        id: h.value,
-        name: h.label,
-        icon: h.icon,
-      };
-    }))
+      : [])
 </script>
 
 <PaginatedTable 
@@ -95,7 +73,7 @@
   {lang}
   {onsaveHeadersToShow}
   {availableHeaders}
-  {headersToShow}
+  bind:headersToShow={headersToShowInTable}
   contentSnippet={headerDrawerContentSnippet}
   drawerProps={headerDrawerProps}
   headersToAddSnippet={headerDrawerHeadersToAddSnippet}
