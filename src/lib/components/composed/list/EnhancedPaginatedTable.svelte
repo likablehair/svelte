@@ -24,6 +24,14 @@
     lang = 'en',
     headers,
     appendSnippet: internalAppendSnippet,
+    sortedBy = $bindable(undefined),
+    sortDirection = $bindable("asc"),
+    page = $bindable(1),
+    rowsPerPage = $bindable(20),
+    filters = $bindable([]),
+    quickFilters = $bindable(),
+    selectedItems = $bindable([]),
+    selectedAll = $bindable(),
     ...rest
   }: Props = $props()
 
@@ -58,7 +66,19 @@
     }))
 </script>
 
-<PaginatedTable {...rest} {lang} {headers}>
+<PaginatedTable 
+  {...rest} 
+  {lang} 
+  {headers}
+  bind:sortedBy
+  bind:sortDirection
+  bind:page
+  bind:rowsPerPage
+  bind:filters
+  bind:quickFilters
+  bind:selectedItems
+  bind:selectedAll
+>
   {#snippet appendSnippet({ index, item, })}
     {#if index == -1}
       <Icon
