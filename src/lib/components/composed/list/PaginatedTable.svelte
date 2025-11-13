@@ -79,7 +79,7 @@
     { label: rowsPerPage.toString(), value: rowsPerPage }
   ]
 
-  $: if(totalElements !== undefined) maxPage = Math.max(Math.round(totalElements/rowsPerPage), 1)
+  $: if(totalElements !== undefined) maxPage = Math.max(Math.ceil(totalElements/rowsPerPage), 1)
 
   function handleRowsPerPageChange(e: CustomEvent<{ selection: ComponentProps<Dropdown>['items']}>) {
     rowsPerPage = Number(e.detail.selection?.[0].value)
