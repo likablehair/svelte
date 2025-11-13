@@ -181,7 +181,7 @@
 
   $effect(() => {
     if (totalElements !== undefined)
-      maxPage = Math.max(Math.round(totalElements / rowsPerPage), 1);
+      maxPage = Math.max(Math.ceil(totalElements / rowsPerPage), 1);
   });
 
   function handleRowsPerPageChange(

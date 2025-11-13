@@ -343,7 +343,7 @@
 
   let {
     headers = [],
-    headersToShowInTable = headers,
+    headersToShowInTable = $bindable(headers),
     subHeaders = [],
     customizeHeaders = false,
     rows = [],
@@ -470,38 +470,14 @@
   let renderedRows = $derived(rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber))
 
   let openHeaderDrawer: boolean = $state(false),
-    availableHeaders: {
-      id: string;
-      name: string;
-      icon?: string;
-    }[] = $state(!!headers
-      ? headers
-          .filter((h) => {
-            return !headersToShowInTable.find((hst) => hst.value == h.value);
-          })
-          .map((h) => {
-            return {
-              id: h.value,
-              name: h.label,
-              icon: h.icon
-            };
-          })
-      : []),
-    headersToShow: {
-      id: string;
-      name: string;
-      icon?: string;
-    }[] = $state(headersToShowInTable.map((h) => {
-      return {
-        id: h.value,
-        name: h.label,
-        icon: h.icon
-      };
-    })),
+    availableHeaders = !!headers
+      ? headers.filter((h) => {
+          return !headersToShowInTable.find((hst) => hst.value == h.value);
+        })
+      : [],
     infoActivators = $state(Array(headersToShowInTable.length))
 
-  let totalBatchLength: number = $state(0),
-    expandedRows: Row[] = $state([]);    
+  let expandedRows: Row[] = $state([]);    
 
   function handleHeaderClick(header: Header) {
     if (header.sortable && !loading && !resizing) {
@@ -718,15 +694,6 @@
   }
 
   $effect(() => {
-    if (!showExpand) {
-      totalBatchLength = rows.length;
-    } else {
-      totalBatchLength = rows.reduce(
-        (acc, row) => acc + row.subItems.length,
-        rows.length
-      );
-    }
-
     if (
       !!cellEditorInfoActive &&
       cellEditorInfoActive.type.key == "number" &&
@@ -1353,7 +1320,6 @@
       !!tableContainer &&
       headersToShowInTable.length > 0 &&
       resizedColumnSizeWithPadding &&
-      headersToShow.length > 0 &&
       mainHeader
     ) {
       tick().then(updateRemainingWidth);
@@ -2328,7 +2294,7 @@
   {lang}
   {onsaveHeadersToShow}
   {availableHeaders}
-  {headersToShow}
+  bind:headersToShow={headersToShowInTable}
   contentSnippet={headerDrawerContentSnippet}
   drawerProps={headerDrawerProps}
   headersToAddSnippet={headerDrawerHeadersToAddSnippet}
