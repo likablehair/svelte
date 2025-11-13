@@ -51,7 +51,14 @@
     },
   });
 
+  let internalHeadersToShow = $state(headersToShow)
+  $effect(() => {
+    internalHeadersToShow = headersToShow
+  })
+
   function saveHeadersToShow() {
+    headersToShow = internalHeadersToShow
+    
     onsaveHeadersToShow?.({
       detail: {
         headersToShow,
@@ -79,9 +86,9 @@
           <div class="drawer-content">
             <span class="headers-show">{lang == 'en' ? 'Headers shown in table' : 'Intestazioni visualizzate in tabella'}</span>
   
-            {#if headersToShow}
+            {#if internalHeadersToShow}
               <VerticalDraggableList
-                items={headersToShow.map((e) => {
+                items={internalHeadersToShow.map((e) => {
                   return {
                     ...e,
                     id: e.value,
@@ -89,14 +96,14 @@
                   }
                 })}
                 onchangeOrder={(e) => {
-                  let newHeaders: typeof headersToShow = []
+                  let newHeaders: typeof internalHeadersToShow = []
                   for(let i = 0; i < e.detail.items.length; i += 1) {
-                    let item = headersToShow.find(hts => hts.value === e.detail.items[i].id)
+                    let item = internalHeadersToShow.find(hts => hts.value === e.detail.items[i].id)
                     if(!!item) {
                       newHeaders.push(item)
                     }
                   }
-                  headersToShow = newHeaders;
+                  internalHeadersToShow = newHeaders;
                 }}
               >
                 {#snippet itemSnippet({ item })}
@@ -121,10 +128,10 @@
                       >
                         <Switch
                           --switch-label-width="90%"
-                          value={headersToShow.find((h) => h.value == item.id) != undefined}
+                          value={internalHeadersToShow.find((h) => h.value == item.id) != undefined}
                           onchange={(e) => {
                             if (e.detail.value == false) {
-                              headersToShow = headersToShow.filter((h) => h.value != item.id);
+                              internalHeadersToShow = internalHeadersToShow.filter((h) => h.value != item.id);
                               availableHeaders = [...availableHeaders, item];
                             }
                           }}
@@ -177,7 +184,7 @@
                                 availableHeaders = availableHeaders.filter(
                                   (h) => h.value != header.value
                                 );
-                                headersToShow = [...headersToShow, header];
+                                internalHeadersToShow = [...internalHeadersToShow, header];
                               }
                             }}
                           />

@@ -47,7 +47,7 @@
 <PaginatedTable 
   {...rest} 
   {lang} 
-  {headers}
+  headers={headersToShowInTable}
   bind:sortedBy
   bind:sortDirection
   bind:page
