@@ -343,7 +343,7 @@
 
   let {
     headers = [],
-    headersToShowInTable = headers,
+    headersToShowInTable = $bindable(headers),
     subHeaders = [],
     customizeHeaders = false,
     rows = [],
@@ -470,15 +470,14 @@
   let renderedRows = $derived(rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber))
 
   let openHeaderDrawer: boolean = $state(false),
-    availableHeaders = $state(!!headers
+    availableHeaders = !!headers
       ? headers.filter((h) => {
           return !headersToShowInTable.find((hst) => hst.value == h.value);
         })
-      : []),
+      : [],
     infoActivators = $state(Array(headersToShowInTable.length))
 
-  let totalBatchLength: number = $state(0),
-    expandedRows: Row[] = $state([]);    
+  let expandedRows: Row[] = $state([]);    
 
   function handleHeaderClick(header: Header) {
     if (header.sortable && !loading && !resizing) {
@@ -695,15 +694,6 @@
   }
 
   $effect(() => {
-    if (!showExpand) {
-      totalBatchLength = rows.length;
-    } else {
-      totalBatchLength = rows.reduce(
-        (acc, row) => acc + row.subItems.length,
-        rows.length
-      );
-    }
-
     if (
       !!cellEditorInfoActive &&
       cellEditorInfoActive.type.key == "number" &&
@@ -2304,7 +2294,7 @@
   {lang}
   {onsaveHeadersToShow}
   {availableHeaders}
-  headersToShow={headersToShowInTable}
+  bind:headersToShow={headersToShowInTable}
   contentSnippet={headerDrawerContentSnippet}
   drawerProps={headerDrawerProps}
   headersToAddSnippet={headerDrawerHeadersToAddSnippet}

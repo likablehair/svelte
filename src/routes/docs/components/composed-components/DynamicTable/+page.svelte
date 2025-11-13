@@ -485,7 +485,7 @@
       name: "headerDrawerHeadersToAddSnippet", 
       description: "Headers drawer custom items", 
       properties: [
-        { name: "item", type: "{ id: string; name: string; }", description: "The item being rendered." }
+        { name: "item", type: "Header", description: "The item being rendered." }
       ],
       default: `
 <div
@@ -591,7 +591,7 @@
     {
       name: "onsaveHeadersToShow",
       description: "Triggered when the user saves which headers to show",
-      properties: [{ name: "headersToShow", type: "{ id: string; name: string }[]", description: "Selected headers to show" }]
+      properties: [{ name: "headersToShow", type: "Header[]", description: "Selected headers to show" }]
     },
     {
       name: "onfiltersChange",
