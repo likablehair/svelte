@@ -470,34 +470,11 @@
   let renderedRows = $derived(rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber))
 
   let openHeaderDrawer: boolean = $state(false),
-    availableHeaders: {
-      id: string;
-      name: string;
-      icon?: string;
-    }[] = $state(!!headers
-      ? headers
-          .filter((h) => {
-            return !headersToShowInTable.find((hst) => hst.value == h.value);
-          })
-          .map((h) => {
-            return {
-              id: h.value,
-              name: h.label,
-              icon: h.icon
-            };
-          })
+    availableHeaders = $state(!!headers
+      ? headers.filter((h) => {
+          return !headersToShowInTable.find((hst) => hst.value == h.value);
+        })
       : []),
-    headersToShow: {
-      id: string;
-      name: string;
-      icon?: string;
-    }[] = $state(headersToShowInTable.map((h) => {
-      return {
-        id: h.value,
-        name: h.label,
-        icon: h.icon
-      };
-    })),
     infoActivators = $state(Array(headersToShowInTable.length))
 
   let totalBatchLength: number = $state(0),
@@ -1353,7 +1330,6 @@
       !!tableContainer &&
       headersToShowInTable.length > 0 &&
       resizedColumnSizeWithPadding &&
-      headersToShow.length > 0 &&
       mainHeader
     ) {
       tick().then(updateRemainingWidth);
@@ -2328,7 +2304,7 @@
   {lang}
   {onsaveHeadersToShow}
   {availableHeaders}
-  {headersToShow}
+  headersToShow={headersToShowInTable}
   contentSnippet={headerDrawerContentSnippet}
   drawerProps={headerDrawerProps}
   headersToAddSnippet={headerDrawerHeadersToAddSnippet}
