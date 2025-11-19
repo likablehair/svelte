@@ -62,7 +62,7 @@
   style:--simple-time-line-body-width={singleSided
     ? `calc(100% - var(--simple-time-line-divider-width))`
     : `calc(50% - var(--simple-time-line-divider-width) / 2)`}
-  class="container"
+  class="simple-timeline-container"
 >
   {#each items as item, index}
     <div
@@ -91,9 +91,9 @@
                 {@render timesSnippet({ item, dateToString })}
               {:else}
                 <div
-                  class:vertical-centered-container={circleAlignment ==
+                  class:vertical-centered-simple-timeline-container={circleAlignment ==
                     "center"}
-                  class:vertical-bottom-container={circleAlignment == "bottom"}
+                  class:vertical-bottom-simple-timeline-container={circleAlignment == "bottom"}
                 >
                   {#if !!item.from}
                     <div
@@ -153,7 +153,7 @@
 </div>
 
 <style>
-  .container {
+  .simple-timeline-container {
     position: relative;
     height: var(
       --simple-time-line-height,
@@ -165,7 +165,7 @@
     gap: var(--simple-time-line-gap, var(--simple-time-line-default-gap));
   }
 
-  .container::before {
+  .simple-timeline-container::before {
     position: absolute;
     left: var(--simple-time-line-central-line-left);
     right: auto;
@@ -232,14 +232,14 @@
     justify-content: center;
   }
 
-  .vertical-centered-container {
+  .vertical-centered-simple-timeline-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     height: 100%;
   }
 
-  .vertical-bottom-container {
+  .vertical-bottom-simple-timeline-container {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
