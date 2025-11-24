@@ -10,12 +10,14 @@
 <ComponentSubtitle>Just a calendar.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
-  <Calendar></Calendar>
+  <Calendar type='dateRange'></Calendar>
 </div>
 <h2>Props</h2>
 <PropsViewer
   props={[
+    { name: "type", type: "'singleDate' | 'dateRange'", description: "Choose either a single date or a date range.", default: "singleDate" },
     { name: "selectedDate", type: "Date", description: "Currently selected date.", default: "undefined" },
+    { name: "selectedDateTo", type: "Date", description: "The second currently selected date for date ranges.", default: "undefined" },
     { name: "visibleMonth", type: "number", description: "Currently visible month (0-11).", default: "new Date().getMonth()" },
     { name: "visibleYear", type: "number", description: "Currently visible year.", default: "new Date().getFullYear()" },
     { name: "locale", type: "Locale", description: "Locale used for day names.", default: '"it"' },
@@ -26,14 +28,25 @@
     { name: "class", type: "{ container?: string, weekHeader?: string, day?: string }", description: "CSS classes for various calendar elements.", default: "{}" }
   ]}
   styleProps={[
-    { name: "--calendar-height", type: "size", description: "The height of the calendar.", default: "var(--calendar-default-height)" },
-    { name: "--calendar-width", type: "size", description: "The width of the calendar.", default: "var(--calendar-default-width)" },
-    { name: "--calendar-day-width", type: "size", description: "The width of each day in the calendar.", default: "var(--calendar-default-day-width)" },
-    { name: "--calendar-day-height", type: "size", description: "The height of each day in the calendar.", default: "var(--calendar-default-day-height)" },
+    { name: "--calendar-height", type: "size", description: "The height of the calendar.", default: "100%" },
+    { name: "--calendar-width", type: "size", description: "The width of the calendar.", default: "100%" },
+    { name: "--calendar-day-width", type: "size", description: "The width of each day in the calendar.", default: "100%" },
+    { name: "--calendar-day-height", type: "size", description: "The height of each day in the calendar.", default: "100%" },
+    { name: "--calendar-day-border-radius", type: "size", description: "The border radius of each day in the calendar.", default: "0px" },
     { name: "--calendar-day-hover-background-color", type: "color", description: "The background color of a day when hovered.", default: "rgb(var(--global-color-primary-600), .3)" },
     { name: "--calendar-selected-day-background-color", type: "color", description: "The background color of a selected day.", default: "rgb(var(--global-color-primary-600))" },
     { name: "--calendar-selected-day-color", type: "color", description: "The text color of a selected day.", default: "rgb(var(--global-color-grey-50))" },
-    { name: "--calendar-grid-gap", type: "size", description: "The gap between calendar grid cells.", default: "var(--calendar-default-grid-gap)" }
+    { name: "--calendar-selected-day-border-radius", type: "size", description: "The border radius of a selected day.", default: "4px" },
+    { name: "--calendar-grid-gap", type: "size", description: "The gap between calendar grid cells.", default: "0px" },
+    { name: "--calendar-today-background-color", type: "color", description: "The background color of the current day.", default: "rgb(var(--global-color-error-200), .7)" },
+    { name: "--calendar-today-color", type: "color", description: "The text color of the current day.", default: "rgb(var(--global-color-contrast-800))" },
+    { name: "--calendar-today-border-radius", type: "color", description: "The bored radius of the current day.", default: "9999px" },
+    { name: "--calendar-today-height", type: "color", description: "The height of the current day.", default: "30px" },
+    { name: "--calendar-today-width", type: "color", description: "The width of the current day.", default: "30px" },
+    { name: "--calendar-between-range-background-color", type: "color", description: "The background color of the days between the selected range.", default: "rgb(var(--global-color-primary-400), .4)" },
+    { name: "--calendar-between-range-color", type: "color", description: "The text color of the days between the selected range.", default: "rgb(var(--global-color-contrast-800))" },
+    { name: "--calendar-range-start-border-radius", type: "size", description: "The border radius of the first day of the range.", default: "4px 0px 0px 0px" },
+    { name: "--calendar-range-end-border-radius", type: "size", description: "The border radius of the last day of the range.", default: "0px 0px 4px 0px" },
   ]}
 ></PropsViewer>
 <h2>Slots</h2>

@@ -13,13 +13,14 @@
       name: "handlingType",
       label: "Tipo movimento",
       type: "select",
-      view: 'toggle',
+      view: 'autocomplete',
       column: 'handlingType',
       mode: 'equal',
       items: [
         {
           label: 'Carico',
-          value: 'load'
+          value: 'load',
+          icon: 'mdi-upload'
         },
         {
           label: 'Scarico',
@@ -35,6 +36,36 @@
         }
       ],
       advanced: false,
+      tabName: 'name1'
+    },
+    {
+      name: "handlingType1",
+      label: "Tipo movimento",
+      type: "select",
+      view: 'toggle',
+      column: 'handlingType',
+      mode: 'equal',
+      items: [
+        {
+          label: 'Carico',
+          value: 'load',
+          icon: 'mdi-upload'
+        },
+        {
+          label: 'Scarico',
+          value: 'unload'
+        },
+        {
+          label: 'Acquisto',
+          value: 'purhcase'
+        },
+        {
+          label: 'Vendita',
+          value: 'sale'
+        }
+      ],
+      advanced: false,
+      tabName: 'name1'
     },
     {
       name: "customerSupplier",
@@ -42,7 +73,10 @@
       type: "string",
       column: 'customer',
       mode: 'ilike',
-      advanced: false
+      advanced: false,
+      tabName: 'name1',
+      icon: 'mdi-factory',
+      iconColor: 'green'
     },
     {
       name: "handlingDate",
@@ -50,7 +84,8 @@
       type: "date",
       column: "handlingDate",
       mode: "between",
-      advanced: false,
+      advanced: true,
+      tabName: 'name1'
     },
     {
       name: "documentDate",
@@ -59,6 +94,8 @@
       column: "docDate",
       mode: "equal",
       advanced: true,
+      tabName: 'name1',
+      betweenModeSingleTextField: true
     },
     {
       name: 'testCustom',
@@ -66,7 +103,8 @@
       type: 'custom',
       modify: function({builder, value }) {
         return builder.where('test', value)
-      }
+      },
+      tabName: 'name2'
     },
     {
       name: "productsNumber",
@@ -74,7 +112,8 @@
       type: "number",
       column: "productsNumber",
       mode: "between",
-      advanced: false,
+      advanced: true,
+      tabName: 'name2',
     },
     {
       name: "tags",
@@ -93,6 +132,7 @@
           value: 'tag2'
         }
       ],
+      tabName: 'name2'
     },
     {
       name: "ddt",
@@ -101,6 +141,7 @@
       column: "ddt",
       mode: "equal",
       description: "DDT creato",
+      tabName: 'name2'
     },
     {
       name: "underStock",
@@ -117,14 +158,16 @@
         } else {
           return builder
         }
-      }
+      },
+      tabName: 'name2'
     },
     {
       name: "overflowTest",
       label: "Test datepicker overflow",
       type: "date",
       column: "test",
-      mode: "equal"
+      mode: "equal",
+      tabName: 'name2'
     }
   ];
 
@@ -172,7 +215,18 @@
   </Filters>
 </div>
 <div class="example" style:margin-top="500px" style:margin-bottom="500px">
-  <Filters lang="it" bind:filters onapplyFilter={handleFilterEdit} onremoveAllFilters={handleFilterEdit} onremoveFilter={handleFilterEdit} showActiveFilters={false} editFilterMode="multi-edit">
+  <Filters 
+    multiEditTabs={[
+      { label: 'Label1', name: 'name1', icon: 'mdi-file'},
+      { label: 'Label2', name: 'name2'}
+    ]}  
+    lang="it"
+    bind:filters
+    onapplyFilter={handleFilterEdit}
+    onremoveAllFilters={handleFilterEdit}
+    onremoveFilter={handleFilterEdit} 
+    editFilterMode="multi-edit"
+  >
     {#snippet customSnippet({ filter, mAndDown, updateFunction, })}
       {#if filter}
         <SimpleTextField
@@ -197,6 +251,11 @@
       type: "'it' | 'en'",
       description: "Language of the component.",
       default: "'en'"
+    },
+    {
+      name: "multiEditTabs",
+      type: "Tab[]",
+      description: "Optional tabs for multi-edit mode.",
     },
     {
       name: "addFilterLabel",
@@ -276,13 +335,13 @@
       name: "--filters-button-cancel-background-color",
       type: "color",
       description: "Background color of the cancel button.",
-      default: "transparent"
+      default: "rgb(var(--global-color-background-300, .5))"
     },
     {
       name: "--filters-button-cancel-color",
       type: "color",
       description: "Text color of the cancel button.",
-      default: "rgb(var(--global-color-primary-400))"
+      default: "rgb(var(--global-color-contrast-900))"
     },
     {
       name: "--filters-wrapper-width",
@@ -295,7 +354,79 @@
       type: "size",
       description: "Height of the filter button.",
       default: "28px"
-    }
+    },
+    {
+      name: "--filters-button-border-radius",
+      type: "size",
+      description: "Border radius of the filter button.",
+      default: "4px"
+    },
+    {
+      name: "--filters-card-background-color",
+      type: "color",
+      description: "Height of the filter button.",
+      default: "rgb(var(--global-color-background-100))"
+    },
+    {
+      name: "--filters-card-border",
+      type: "border",
+      description: "Height of the filter button.",
+      default: "1px solid rgb(var(--global-color-background-300))"
+    },
+    {
+      name: "--filters-card-border-radius",
+      type: "size",
+      description: "Height of the filter button.",
+      default: "8px"
+    },
+    {
+      name: "--filters-card-padding",
+      type: "size",
+      description: "Height of the filter button.",
+      default: "12px"
+    },
+    {
+      name: "--filters-card-box-shadow",
+      type: "box shadow",
+      description: "Height of the filter button.",
+      default: "0 0 8px rgba(0, 0, 0, 0.06)"
+    },
+    {
+      name: "--filters-card-hover-box-shadow",
+      type: "box shadow",
+      description: "Height of the filter button.",
+      default: "0 0 10px rgba(0, 0, 0, 0.10)"
+    },
+    {
+      name: "--filters-card-hover-transition",
+      type: "transition",
+      description: "Height of the filter button.",
+      default: "box-shadow 0.2s ease"
+    },
+    {
+      name: "--filters-card-title-font-weight",
+      type: "weight",
+      description: "Height of the filter button.",
+      default: "600"
+    },
+    {
+      name: "--filters-card-title-font-size",
+      type: "size",
+      description: "Height of the filter button.",
+      default: "15px"
+    },
+    {
+      name: "--filters-card-title-color",
+      type: "color",
+      description: "Height of the filter button.",
+      default: "rgb(var(--global-color-contrast-800))"
+    },
+    {
+      name: "--filters-card-title-margin-bottom",
+      type: "size",
+      description: "Height of the filter button.",
+      default: "8px"
+    },
   ]}
 />
 <h2>Slots</h2>
