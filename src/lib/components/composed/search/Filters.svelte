@@ -105,6 +105,11 @@
   let open: boolean = $state(false),
     mobileOpen: boolean = $state(false),
     activator: HTMLElement | undefined = $state(),
+    localMultiEditTabs = $derived.by(() => {
+      return filters.some(f => !multiEditTabs?.find(tab => tab.name == f.tabName)) 
+        ? undefined 
+        : multiEditTabs
+    }),
     selectedTab: ComponentProps<typeof TabSwitcher>['selected'] = $state(),
     selectedTabFilters: Filter[] = $derived.by(() => {
       return selectedTab
@@ -845,14 +850,14 @@
             style:width={mAndDown ? '100%' : '800px'} 
             style:box-sizing="border-box"
           >
-            <div class="header" class:no-border={multiEditTabs?.length}>
+            <div class="header" class:no-border={localMultiEditTabs?.length}>
               <div>{addFilterLabel}</div>
             </div>
             <TabSwitcher
-              tabs={multiEditTabs}
+              tabs={localMultiEditTabs}
               bind:selected={selectedTab}
             ></TabSwitcher>
-            <div class="dialog-body" class:shortened-body={multiEditTabs?.length}>
+            <div class="dialog-body" class:shortened-body={localMultiEditTabs?.length}>
               {#if contentSnippet}
                 {@render contentSnippet({ mAndDown, updateMultiFilterValues, filters, handleRemoveAllFilters })}
               {:else}

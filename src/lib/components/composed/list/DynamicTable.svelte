@@ -193,6 +193,7 @@
     loading?: boolean;
     disabled?: boolean;
     filters?: ComponentProps<typeof Filters>["filters"];
+    multiEditTabs?: ComponentProps<typeof Filters>['multiEditTabs']
     searchBarColumns?: string[];
     searchBarVisible?: boolean;
     searchBarPlaceholder?: string;
@@ -367,6 +368,7 @@
     searchBarVisible = false,
     searchBarPlaceholder = lang == 'en' ? "Type to search..." : "Scrivi per cercare...",
     filtersVisible = false,
+    multiEditTabs,
     quickFiltersVisible = false,
     editFilterMode = "one-edit",
     showActiveFilters = true,
@@ -1431,6 +1433,7 @@
                     {dateLocale}
                     {editFilterMode}
                     {showActiveFilters}
+                    {multiEditTabs}
                     drawerSpace='40rem'
                     appendSnippet={filterAppendSnippet}
                     customChipSnippet={customFilterChipSnippet}
@@ -1464,6 +1467,7 @@
                     {dateLocale}
                     {editFilterMode}
                     {showActiveFilters}
+                    {multiEditTabs}
                     appendSnippet={filterAppendSnippet}
                     customChipSnippet={customFilterChipSnippet}
                     customSnippet={customFilterSnippet}

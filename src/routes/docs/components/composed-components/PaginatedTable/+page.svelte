@@ -441,6 +441,11 @@
       default: "true",
     },
     {
+      name: "multiEditTabs",
+      type: "Tab[]",
+      description: "Tabs for multi-edit filter mode.",
+    },
+    {
       name: "resizableColumns",
       type: "boolean",
       description: "Enable or disable column resizing.",

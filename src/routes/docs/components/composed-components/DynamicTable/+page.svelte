@@ -262,6 +262,7 @@
     { name: "loading", type: "boolean", description: "Show loading state", default: "false" },
     { name: "disabled", type: "boolean", description: "Disable the table", default: "false" },
     { name: "filters", type: "Filter[]", description: "Filters applied to the table", default: "[]" },
+    { name: "multiEditTabs", type: "Tab[]", description: "Tabs for multi-edit filter mode." },
     { name: "searchBarColumns", type: "string[]", description: "Columns to apply search bar filtering", default: "undefined" },
     { name: "searchBarVisible", type: "boolean", description: "Toggle search bar visibility", default: "false" },
     { name: "searchBarPlaceholder", type: "string", description: "Search bar placeholder text", default: "'Type to search...'" },

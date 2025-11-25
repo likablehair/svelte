@@ -31,6 +31,7 @@
     editFilterMode?: "one-edit" | "multi-edit";
     showActiveFilters?: boolean;
     dateLocale?: 'it' | 'en'
+    multiEditTabs?: ComponentProps<typeof Filters>['multiEditTabs']
     searchTimeoutDelay?: number
     showSelection?: boolean
     selectionMode?: 'single' | 'multiple'
@@ -118,6 +119,7 @@
     quickFiltersVisible = false,
     lang = "en",
     dateLocale,
+    multiEditTabs,
     searchBarPlaceholder = lang == 'en' ? "Type to search..." : "Scrivi per cercare...",
     editFilterMode = "one-edit",
     showActiveFilters = true,
@@ -394,6 +396,7 @@
             {dateLocale}
             {editFilterMode}
             {showActiveFilters}
+            {multiEditTabs}
             appendSnippet={filterAppendSnippet}
             customChipSnippet={customFilterChipSnippet}
             customSnippet={customFilterSnippet}
