@@ -5,6 +5,7 @@
   import Keyboarder, { type CallbackFunction } from '$lib/utils/keyboarder';
 
   export let open = false,
+    persistent: boolean = false,
     transition: 'fly-down' | 'fly-up' | 'fly-horizontal' | 'scale' | 'fade' = 'fly-up'
 
   export let _overlayOpacity: string = "30%",
@@ -16,6 +17,7 @@
 
   let zIndex = 50,
     localOpen: boolean = open,
+    localPersistent: boolean = persistent,
     dialogElement: HTMLElement,
     teleportedUid: string | undefined = undefined,
     hasBeenOpened: boolean = false;
@@ -93,6 +95,7 @@
   }
 
   function handleOverlayClick() {
+    if (localPersistent) return;
     closeDialog();
   }
 </script>
