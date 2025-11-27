@@ -6,6 +6,7 @@
 
   interface Props {
     open?: boolean;
+    persistent?: boolean;
     transition?: 'fly-down' | 'fly-up' | 'fly-horizontal' | 'scale' | 'fade';
     _overlayOpacity?: string;
     _overlayColor?: string;
@@ -20,6 +21,7 @@
 
   let {
     open = $bindable(),
+    persistent = false,
     transition = 'fly-up',
     _overlayOpacity = "30%",
     _overlayColor = "#282828",
@@ -112,6 +114,7 @@
   }
 
   function handleOverlayClick() {
+    if(persistent) return;
     closeDialog();
   }
 </script>
