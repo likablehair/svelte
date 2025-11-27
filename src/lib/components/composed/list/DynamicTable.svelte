@@ -1540,6 +1540,26 @@
   </div>
   {/if}
 
+  {#each headersToShowInTable as header, index}
+    {#if !!header.info}
+      <ToolTip
+        appearTimeout={700}
+        activator={infoActivators[index]}
+        menuProps={{
+          anchor: 'right'
+        }}
+      >
+        <div
+          style:background-color='rgb(var(--global-color-background-300), .95)'
+          style:border-radius="5px"
+          style:padding="10px"
+        >
+          {header.info}
+        </div>
+      </ToolTip>
+    {/if}
+  {/each}
+
   <div class="outer-container {clazz.container}">
     <div class="inner-container" class:hide-scrollbar={hideScrollbar} bind:this={tableContainer} {onscroll}>
     <InfiniteScroll
@@ -1626,23 +1646,6 @@
                 {/if}
               {/if}
             </th>
-            {#if !!header.info}
-              <ToolTip
-                appearTimeout={700}
-                activator={infoActivators[index]}
-                menuProps={{
-                  anchor: 'right'
-                }}
-              >
-                <div
-                  style:background-color='rgb(var(--global-color-background-300), .95)'
-                  style:border-radius="5px"
-                  style:padding="10px"
-                >
-                  {header.info}
-                </div>
-              </ToolTip>
-            {/if}
           {/each}
           {#if remainingWidth}
             <th
