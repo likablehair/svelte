@@ -27,6 +27,7 @@
   import ToolTip from '../common/ToolTip.svelte';
   import { DateTime } from 'luxon';
   import type { KeyboardEventHandler, MouseEventHandler } from 'svelte/elements';
+  import { TabSwitcher } from '$lib';
 
   interface Props {
     filters?: Filter[];
@@ -43,6 +44,7 @@
     editFilterMode?: 'one-edit' | 'multi-edit';
     labelsMapper?: LabelMapper;
     drawerSpace?: string
+    multiEditTabs?: ComponentProps<typeof TabSwitcher>['tabs']
     onaddFilterClick?: () => void
     onapplyFilter?: () => void
     onremoveAllFilters?: () => void
@@ -87,6 +89,7 @@
       ? ENGLISH_LABELS_MAPPER
       : ITALIAN_LABELS_MAPPER,
     drawerSpace = '60vh',
+    multiEditTabs,
     onaddFilterClick,
     onapplyFilter,
     onremoveAllFilters,
@@ -101,7 +104,18 @@
 
   let open: boolean = $state(false),
     mobileOpen: boolean = $state(false),
-    activator: HTMLElement | undefined = $state()
+    activator: HTMLElement | undefined = $state(),
+    localMultiEditTabs = $derived.by(() => {
+      return filters.some(f => !multiEditTabs?.find(tab => tab.name == f.tabName)) 
+        ? undefined 
+        : multiEditTabs
+    }),
+    selectedTab: ComponentProps<typeof TabSwitcher>['selected'] = $state(),
+    selectedTabFilters: Filter[] = $derived.by(() => {
+      return selectedTab
+        ? filters.filter(f => f.tabName == selectedTab)
+        : filters
+    })
 
   function handleAddFilterClick() {
     if(onaddFilterClick) {
@@ -158,6 +172,7 @@
       selected = e.detail.element.name
       filterOpened = 'new'
     }
+    selectedTmpFilter = undefined
 
     let filter = filters.find(f => f.name === e.detail.element.name)
     if(!!filter) {
@@ -419,73 +434,75 @@
               bind:this={activeFiltersActivators[filter.name]}
             >
               <Chip
-                label
                 close
                 --chip-border-radius="4px"
+                --chip-default-gap="0px"
                 onclose={() => handleRemoveFilter(filter)}
                 onclick={() => handleActiveFilterClick(filter)}
               >
                 {#if filter.type === 'custom'}
                   {@render customChipSnippet?.({ filter })}
                 {:else}
-                  <span class="truncate-text inline-truncated" style:max-width="160px">
-                    <b>{filter.label}</b>
-                  </span>
-                  {#if filter.type === "string" && filter.value != undefined}
-                    {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                    <span class="truncate-text inline-truncated">
-                      <b>{filter.value}</b>
+                  <div class="chip-content">
+                    <span class="truncate-text inline-truncated" style:max-width="160px">
+                      <b>{filter.label}</b>
                     </span>
-                  {:else if filter.type === "date"}
-                    {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
+                    {#if filter.type === "string" && filter.value != undefined}
                       {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                      <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
-                      {betweenSeparator}
-                      <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
-                    {:else if filter.mode == 'between' && filter.from != undefined}
-                      {labelsMapper['greater'].extended || labelsMapper['greater'].short}
-                      <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
-                    {:else if filter.mode == 'between' && filter.to != undefined}
-                      {labelsMapper['lower'].extended || labelsMapper['lower'].short}
-                      <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
-                    {:else if filter.mode != 'between' && filter.value != undefined}
+                      <span class="truncate-text inline-truncated">
+                        <b>{filter.value}</b>
+                      </span>
+                    {:else if filter.type === "date"}
+                      {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
+                        {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
+                        <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
+                        {betweenSeparator}
+                        <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
+                      {:else if filter.mode == 'between' && filter.from != undefined}
+                        {labelsMapper['greater'].extended || labelsMapper['greater'].short}
+                        <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
+                      {:else if filter.mode == 'between' && filter.to != undefined}
+                        {labelsMapper['lower'].extended || labelsMapper['lower'].short}
+                        <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
+                      {:else if filter.mode != 'between' && filter.value != undefined}
+                        {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
+                        <span class="truncate-text inline-truncated"><b>{filter.value?.toLocaleDateString(dateLocale)}</b></span>
+                      {/if}
+                    {:else if filter.type == "number"}
+                      {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
+                        {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
+                        <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
+                        {betweenSeparator}
+                        <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
+                      {:else if filter.mode == 'between' && filter.from != undefined}
+                        {labelsMapper['greater'].extended || labelsMapper['greater'].short}
+                        <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
+                      {:else if filter.mode == 'between' && filter.to != undefined}
+                        {labelsMapper['lower'].extended || labelsMapper['lower'].short}
+                        <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
+                      {:else if filter.mode != 'between' && filter.value != undefined}
+                        {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
+                        <span class="truncate-text inline-truncated"><b>{filter.value}</b></span>
+                      {/if}
+                    {:else if filter.type == 'select' && !!filter.values && filter.values.length > 0}
                       {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                      <span class="truncate-text inline-truncated"><b>{filter.value?.toLocaleDateString(dateLocale)}</b></span>
+                      <span class="truncate-text inline-truncated"><b>{filter.values[0].label}</b></span>
+                      {#if filter.values.length >= 2}
+                        <span class="more-items" bind:this={moreItemsActivator}>+{filter.values.length - 1}</span>
+                        <ToolTip activator={moreItemsActivator}>
+                          <div class="more-tooltip-content">
+                            <ul style:margin="0px">
+                              {#each filter.values as value}
+                                <li><div class="truncate-text">{value.label}</div></li>
+                              {/each}
+                            </ul>
+                          </div>
+                        </ToolTip>
+                      {/if}
+                    {:else if filter.type == 'bool' && filter.value !== undefined}
+                        <b>{filter.value ? trueString : falseString}</b>
                     {/if}
-                  {:else if filter.type == "number"}
-                    {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
-                      {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                      <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
-                      {betweenSeparator}
-                      <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
-                    {:else if filter.mode == 'between' && filter.from != undefined}
-                      {labelsMapper['greater'].extended || labelsMapper['greater'].short}
-                      <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
-                    {:else if filter.mode == 'between' && filter.to != undefined}
-                      {labelsMapper['lower'].extended || labelsMapper['lower'].short}
-                      <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
-                    {:else if filter.mode != 'between' && filter.value != undefined}
-                      {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                      <span class="truncate-text inline-truncated"><b>{filter.value}</b></span>
-                    {/if}
-                  {:else if filter.type == 'select' && !!filter.values && filter.values.length > 0}
-                    {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                    <span class="truncate-text inline-truncated"><b>{filter.values[0].label}</b></span>
-                    {#if filter.values.length >= 2}
-                      <span class="more-items" bind:this={moreItemsActivator}>+{filter.values.length - 1}</span>
-                      <ToolTip activator={moreItemsActivator}>
-                        <div class="more-tooltip-content">
-                          <ul style:margin="0px">
-                            {#each filter.values as value}
-                              <li><div class="truncate-text">{value.label}</div></li>
-                            {/each}
-                          </ul>
-                        </div>
-                      </ToolTip>
-                    {/if}
-                  {:else if filter.type == 'bool' && filter.value !== undefined}
-                      <b>{filter.value ? trueString : falseString}</b>
-                  {/if}
+                  </div>
                 {/if}
               </Chip>
             </div>
@@ -498,7 +515,7 @@
           >
             <Button
               --button-color="var(--chip-color, var(--chip-default-color))"
-              --button-border-radius="4px"
+              --button-border-radius='var(--filters-button-border-radius, var(--filters-default-button-border-radius))'
               --button-height="var(--filters-button-height, var(--filters-default-button-height))"
               onclick={handleAddFilterClick}
             >
@@ -526,7 +543,7 @@
           <Button
             --button-color="var(--chip-color, var(--chip-default-color))"
             --button-hover-color="var(--chip-color, var(--chip-default-color))"
-            --button-border-radius="4px"
+            --button-border-radius="var(--filters-button-border-radius, var(--filters-default-button-border-radius))"
             --button-height="var(--filters-button-height, var(--filters-default-button-height))"
             onclick={handleAddFilterClick}
           >
@@ -594,11 +611,18 @@
                     </div>
                     <div class="btn">
                       <Button
-                        --button-width="100%"
-                        --button-box-shadow="none"
-                        --button-padding="10px 0px 10px 0px"
-                        --button-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
                         --button-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
+                        --button-background-color="transparent"
+                        --button-focus-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
+                        --button-active-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
+                        --button-hover-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
+                        --button-focus-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
+                        --button-active-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
+                        --button-hover-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
+                        --button-hover-box-shadow="none"
+                        --button-box-shadow="none"
+                        --button-width="100%"
+                        --button-padding="10px 0px 10px 0px"      
                         --button-border-radius="0px 0px 0px 0px"
                         onclick={() => {mobileOpen = false; closeFilterMenu(200)}}
                       >{cancelFilterLabel}</Button>
@@ -785,11 +809,17 @@
                 {#snippet filterActionsSnippet({ applyFilterDisabled, filter })}
                   <div class="sub-filter-button">
                     <Button
-                      --button-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
                       --button-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
-                      --button-hover-background-color="rgb(var(--global-color-primary-500))"
-                      --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
+                      --button-background-color="transparent"
+                      --button-focus-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
+                      --button-active-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
+                      --button-hover-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
+                      --button-focus-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
+                      --button-active-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
+                      --button-hover-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
+                      --button-hover-box-shadow="none"
                       --button-box-shadow="none"
+                      --button-padding="12px 16px"
                       onclick={handleCancelFilterClick}
                     >
                       {cancelFilterLabel}
@@ -820,19 +850,29 @@
             style:width={mAndDown ? '100%' : '800px'} 
             style:box-sizing="border-box"
           >
-            <div class="header">
+            <div class="header" class:no-border={localMultiEditTabs?.length}>
               <div>{addFilterLabel}</div>
             </div>
-            <div class="dialog-body">
+            <TabSwitcher
+              tabs={localMultiEditTabs}
+              bind:selected={selectedTab}
+            ></TabSwitcher>
+            <div class="dialog-body" class:shortened-body={localMultiEditTabs?.length}>
               {#if contentSnippet}
                 {@render contentSnippet({ mAndDown, updateMultiFilterValues, filters, handleRemoveAllFilters })}
               {:else}
                 <div class="multi-filters-container" style:grid-template-columns={mAndDown ? '1fr' : '1fr 1fr'}>
-                  {#each filters as filter, i}
-                    <div class="filter" class:wide={filter.type === 'select' || filter.type === 'custom'}>
+                  {#each selectedTabFilters as filter}
+                    {@const i = filters.findIndex(f => f.name === filter.name)}
+                    <div class="filter card" class:wide={filter.type === 'select' || filter.type === 'custom'}>
                       <div class="input">
-                        {#if !filter.advanced && filter.type !== 'custom'}
-                          <div class="label">
+                        {#if filter.type !== 'custom'}
+                          <div class="card-title">
+                            {#if filter.icon}
+                            <span style:margin-right=2px>
+                              <Icon name={filter.icon} --icon-color={filter.iconColor} --icon-size=15.5px />
+                            </span>
+                            {/if}
                             {filter.label}
                           </div>
                         {/if}
@@ -1006,13 +1046,16 @@
 
   .more-items {
     position: relative;
-    padding: 0px 6px;
+    padding: 0px 4px;
     border-radius: 8px;
     margin-left: 2px;
     background-color: rgb(var(--global-color-grey-50));
     color: rgb(var(--global-color-primary-500));
     font-weight: 800;
-    font-size: 10px;
+    font-size: 11px;
+    height: 20px;
+    display: flex;
+    align-items: center;
   }
 
   .more-tooltip-content {
@@ -1020,10 +1063,10 @@
     text-overflow: ellipsis;
     width: fit-content;
     border-radius: 6px;
-    padding: 16px;
-    text-align: left;
+    padding: 12px;
+    text-align: middle;
     background-color: rgb(var(--global-color-background-200));
-    color: rgb(var(--global-color-background-950));
+    color: rgb(var(--global-color-contrast-950), .7);
   }
 
   .more-tooltip-content ul {
@@ -1062,6 +1105,26 @@
     align-items: center;
   }
 
+  .card {
+    background-color: var(--filters-card-background-color, var(--filters-default-card-background-color));
+    border-radius: var(--filters-card-border-radius, var(--filters-default-card-border-radius));
+    padding: var(--filters-card-padding, var(--filters-default-card-padding));
+    box-shadow: var(--filters-card-box-shadow, var(--filters-default-card-box-shadow));
+    border: var(--filters-card-border, var(--filters-default-card-border));
+    display: flex;
+    align-items: start;
+  }
+
+  .card:hover {
+    box-shadow: var(--filters-card-hover-box-shadow, var(--filters-default-card-hover-box-shadow));
+    transition: var(--filters-card-hover-transition, var(--filters-default-card-hover-transition));
+  }
+  .card-title {
+    font-weight: var(--filters-card-title-font-weight, var(--filters-default-card-title-font-weight));
+    font-size: var(--filters-card-title-font-size, var(--filters-default-card-title-font-size));
+    color: var(--filters-card-title-color, var(--filters-default-card-title-color));
+    margin-bottom: var(--filters-card-title-margin-bottom, var(--filters-default-card-title-margin-bottom));
+  }
   .input {
     width: 100%;
   }
@@ -1103,6 +1166,10 @@
     border-bottom: 1px solid rgb(var(--global-color-background-200));
   }
 
+  .no-border {
+    border: none;
+  }
+
   .drawer-body {
     padding: 16px;
   }
@@ -1114,6 +1181,11 @@
     overflow-y: auto;
   }
 
+  .shortened-body {
+    height: calc(90vh - 170px);
+    max-height: calc(90vh - 170px);
+  }
+
   .dialog-footer {
     height: 64px;
     padding: 16px;
@@ -1123,4 +1195,9 @@
     border-top: 1px solid rgb(var(--global-color-background-200));
   }
 
+  .chip-content {
+    display: flex;
+    align-items: center;
+    gap: 4px
+  }
 </style>

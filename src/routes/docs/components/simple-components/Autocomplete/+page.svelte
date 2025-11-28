@@ -94,7 +94,7 @@
   styleProps={[
     { name: "--autocomplete-background-color", type: "color", description: "The background color of the selection container.", default: "rgb(var(--global-color-background-300), .5)" },
     { name: "--autocomplete-border", type: "border", description: "The border of the selection container.", default: "" },
-    { name: "--autocomplete-border-radius", type: "radius", description: "The border radius of the selection container.", default: "1.5rem" },
+    { name: "--autocomplete-border-radius", type: "radius", description: "The border radius of the selection container.", default: "4px" },
     { name: "--autocomplete-focus-border", type: "border", description: "The border when the selection container is focused.", default: "var(--autocomplete-border)" },
     { name: "--autocomplete-focus-box-shadow", type: "box-shadow", description: "The box-shadow when the selection container is focused.", default: "" },
     { name: "--autocomplete-selected-item-background-color", type: "color", description: "The background color of the selected item.", default: "rgb(var(--global-color-primary-500))" },

@@ -157,8 +157,9 @@
     }
   })
   
-  function handleChangeValue() {  
-    calendarOpened = false   
+  function handleChangeValue(isCalendarOpened = false) {  
+    calendarOpened = isCalendarOpened
+    calendarOpened2 = isCalendarOpened
     if(onchange) {
       onchange({
         detail: {
@@ -181,178 +182,226 @@
 
 
 {#if !!filter && !!tmpFilter}
-  <div class="filter-editor" style:margin={editFilterMode === 'one-edit' ? '5%' : '0'}>
-    {#if filter.advanced}
-      <div class="advanced-mode">
-        <div class="label">
-          {filter.label[0].toUpperCase() + filter.label.slice(1)}
-        </div>
-        <div class="advaced-mode-selector" {onclick} {onkeypress} role="presentation" tabindex="-1">
-          <Dropdown
-            items={advancedModeOptions}
-            bind:values={advancedModeSelectedOptions}
-            onchange={handleAdvancedModeSelection}
-            bind:menuOpened={dropdownOpened}
-            openingId="advanced-filter"
-            mobileDrawer={mobile}
-            {lang}
-          ></Dropdown>
-        </div>
-      </div>
-    {/if}
-
-    <div class="fields" style:width="100%" {onclick} {onkeypress} role="presentation" tabindex="-1">
-      {#if !tmpFilter.advanced || (advancedModeSelectedOptions.length > 0)}
-        {#if tmpFilter.type === "string" }
-          <SimpleTextField
-            bind:value={tmpFilter.value}
-            type="text"
-            placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
-            --simple-textfield-width="100%"
-            oninput={handleChangeValue}
-          ></SimpleTextField>
-        {:else if tmpFilter.type === "date" && tmpFilter.mode !== 'between'}
-          <div>
-            <DatePickerTextField
-              bind:selectedDate={tmpFilter.value}
+  <div class="filter-container" style:margin={editFilterMode === 'one-edit' ? '5%' : '0'}>
+    <div class="filter-editor" class:row={
+      (tmpFilter.type == 'number' || (tmpFilter.type == 'date' && ((advancedModeSelectedOptions.length && advancedModeSelectedOptions[0].value != 'between') || tmpFilter.betweenModeSingleTextField)))
+    }>
+      {#if filter.advanced}
+        <div class="advanced-mode">
+          <div class="advaced-mode-selector" {onclick} {onkeypress} role="presentation" tabindex="-1">
+            <Dropdown
+              items={advancedModeOptions}
+              bind:values={advancedModeSelectedOptions}
+              onchange={handleAdvancedModeSelection}
+              bind:menuOpened={dropdownOpened}
               openingId="advanced-filter"
-              bind:menuOpened={calendarOpened}
-              --simple-textfield-width="100%"
-              flipOnOverflow
-              oninput={handleChangeValue}
-              ondayClick={handleChangeValue}
-            >
-              {#snippet appendInnerSnippet()}
-                <Icon
-                  name="mdi-close-circle"
-                  onclick={() => {
-                    if(!!tmpFilter && tmpFilter.type === 'date' && tmpFilter.mode !== 'between') {
-                      tmpFilter.value = undefined
-                    }
-                  }}
-                ></Icon>
-              {/snippet}
-            </DatePickerTextField>
-          </div>
-        {:else if tmpFilter.type === "number" && tmpFilter.mode !== 'between'}
-          <div>
-            <SimpleTextField
-              bind:value={tmpFilter.value}
-              type="number"
-              placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
-              --simple-textfield-width="100%"
-              onchange={handleChangeValue}
-            ></SimpleTextField>
-          </div>
-        {:else if tmpFilter.type === "select" && (tmpFilter.view === undefined || tmpFilter.view === 'autocomplete')}
-          <div
-            style:width="100%"
-          >
-            <Autocomplete
-              bind:values={tmpFilter.values}
-              items={tmpFilter.items}
-              multiple
-              maxVisibleChips={2}
-              --simple-textfield-width="0px"
-              --simple-text-field-margin-left="0px"
-              --autocomplete-default-border-radius='4px'
-              --autocomplete-min-height="0px"
-              --chip-min-height="12px"
               mobileDrawer={mobile}
-              onchange={handleChangeValue}
-              placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
-              minWidth={''}
-              ></Autocomplete>
+              {lang}
+              minWidth={'100px'}
+              height={'100%'}
+              --button-padding="10px 12px"
+              --button-border='var(--dropdown-button-border, none)'
+              --button-background-color='var(--dropdown-button-background-color, rgb(var(--global-color-background-300), .6))'
+              --button-hover-background-color='var(--dropdown-button-hover-color, rgb(var(--global-color-background-300), .6))'
+              --button-focus-background-color='var(--dropdown-button-focus-color, rgb(var(--global-color-background-300), .6))'
+              --button-active-background-color='var(--dropdown-button-active-color, rgb(var(--global-color-background-300), .6))'
+              --button-hover-color='rgb(var(--global-color-contrast-800))'
+              --button-border-radius='var(--dropdown-button-border-radius, 4px)'
+              --button-default-height='var(--dropdown-button-height, 20px)'
+              --autocomplete-default-selected-item-background-color='rgb(var(--global-color-background-500), .5)'
+              --autocomplete-default-selected-item-color='rgb(var(--global-color-contrast-800))'
+              --autocomplete-default-hover-item-background-color='rgb(var(--global-color-background-300), .5)'
+              --button-active-box-shadow='var(--dropdown-button-active-box-shadow)'
+              --button-focus-box-shadow='var(--dropdown-button-focus-box-shadow)'
+              ></Dropdown>
           </div>
-        {:else if tmpFilter.type === "select" && (tmpFilter.view === 'toggle')}
-          <div
-            style:width="100%"
-          >
-            <ToggleList
-              bind:values={tmpFilter.values}
-              items={tmpFilter.items}
-              multiple
-              onchange={handleChangeValue}
-            ></ToggleList>
-          </div>
-        {:else if tmpFilter.type === "date" && tmpFilter.mode === 'between'}
-          <div>
-            <DatePickerTextField
-              bind:selectedDate={tmpFilter.from}
-              openingId="advanced-filter"
-              placeholder={betweenFromLabel}
-              bind:menuOpened={calendarOpened}
-              --simple-textfield-width="100%"
-              oninput={handleChangeValue}
-              ondayClick={handleChangeValue}
-            >
-              {#snippet appendInnerSnippet()}
-                <Icon
-                  name="mdi-close-circle"
-                  onclick={() => {
-                    if(!!tmpFilter && tmpFilter.type === 'date' && tmpFilter.mode === 'between') {
-                      tmpFilter.from = undefined
-                    }
-                  }}
-                ></Icon>
-              {/snippet}
-            </DatePickerTextField>
-          </div>
-          <div>
-            <DatePickerTextField
-              bind:selectedDate={tmpFilter.to}
-              openingId="advanced-filter"
-              placeholder={betweenToLabel}
-              bind:menuOpened={calendarOpened2}
-              --simple-textfield-width="100%"
-              flipOnOverflow
-              oninput={handleChangeValue}
-              ondayClick={handleChangeValue}
-            >
-              {#snippet appendInnerSnippet()}
-                <Icon
-                  name="mdi-close-circle"
-                  onclick={() => {
-                    if(!!tmpFilter && tmpFilter.type === 'date' && tmpFilter.mode === 'between') {
-                      tmpFilter.to = undefined
-                    }
-                  }}
-                ></Icon>
-              {/snippet}
-            </DatePickerTextField>
-          </div>
-        {:else if tmpFilter.type === "number" && tmpFilter.mode === 'between'}
-          <div>
+        </div>
+      {/if}
+  
+      {#if !tmpFilter.advanced || (advancedModeSelectedOptions.length > 0)}
+        <div class="fields" style:width="100%" {onclick} {onkeypress} role="presentation" tabindex="-1">
+          {#if tmpFilter.type === "string" }
             <SimpleTextField
-              bind:value={tmpFilter.from}
-              type="number"
-              placeholder={betweenFromLabel}
-              --simple-textfield-width="100%"
-              onchange={handleChangeValue}
-            ></SimpleTextField>
-          </div>
-          <div>
-            <SimpleTextField
-              bind:value={tmpFilter.to}
-              type="number"
-              placeholder={betweenToLabel}
-              --simple-textfield-width="100%"
-              onchange={handleChangeValue}
-            ></SimpleTextField>
-          </div>
-        {:else if tmpFilter.type == 'bool'}
-          <div class="bool-filter">
-            <Checkbox
               bind:value={tmpFilter.value}
-              onchange={handleChangeValue}
-            ></Checkbox>
-            <span style:margin-left="10px">
-              {tmpFilter.description}
-            </span>
-          </div>
-        {:else if tmpFilter.type == 'custom'}
-          {@render customSnippet?.({ filter: tmpFilter })}
-        {/if}
+              type="text"
+              placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
+              --simple-textfield-width="100%"
+              oninput={() => handleChangeValue()}
+            ></SimpleTextField>
+          {:else if tmpFilter.type === "date" && tmpFilter.mode !== 'between'}
+            <div>
+              <DatePickerTextField
+                bind:selectedDate={tmpFilter.value}
+                openingId="advanced-filter"
+                bind:menuOpened={calendarOpened}
+                --simple-textfield-width="100%"
+                --simple-textfield-padding='0.50rem 0.6rem'
+                flipOnOverflow
+                oninput={() => handleChangeValue()}
+                ondayClick={() => handleChangeValue()}
+              >
+                {#snippet appendInnerSnippet()}
+                  <Icon
+                    name="mdi-close-circle"
+                    onclick={() => {
+                      if(!!tmpFilter && tmpFilter.type === 'date' && tmpFilter.mode !== 'between') {
+                        tmpFilter.value = undefined
+                      }
+                    }}
+                  ></Icon>
+                {/snippet}
+              </DatePickerTextField>
+            </div>
+          {:else if tmpFilter.type === "number" && tmpFilter.mode !== 'between'}
+            <div>
+              <SimpleTextField
+                bind:value={tmpFilter.value}
+                type="number"
+                placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
+                --simple-textfield-width="100%"
+                onchange={() => handleChangeValue()}
+              ></SimpleTextField>
+            </div>
+          {:else if tmpFilter.type === "select" && (tmpFilter.view === undefined || tmpFilter.view === 'autocomplete')}
+            <div
+              style:width="100%"
+            >
+              <Autocomplete
+                bind:values={tmpFilter.values}
+                items={tmpFilter.items}
+                multiple
+                maxVisibleChips={2}
+                --autocomplete-min-height="0px"
+                --chip-min-height="12px"
+                mobileDrawer={mobile}
+                onchange={() => handleChangeValue()}
+                placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
+                minWidth={''}
+                ></Autocomplete>
+            </div>
+          {:else if tmpFilter.type === "select" && (tmpFilter.view === 'toggle')}
+            <div
+              style:width="100%"
+            >
+              <ToggleList
+                bind:values={tmpFilter.values}
+                items={tmpFilter.items}
+                multiple
+                onchange={() => handleChangeValue()}
+              ></ToggleList>
+            </div>
+          {:else if tmpFilter.type === "date" && tmpFilter.mode === 'between'}
+            {#if tmpFilter.betweenModeSingleTextField}
+              <DatePickerTextField
+                type='dateRange'
+                bind:selectedDate={tmpFilter.from}
+                bind:selectedDateTo={tmpFilter.to}
+                openingId="advanced-filter"
+                placeholder={betweenFromLabel}
+                placeholderTo={betweenToLabel}
+                bind:menuOpened={calendarOpened}
+                --simple-textfield-width="100%"
+                --simple-textfield-padding='0.50rem 0.6rem'
+                oninput={() => handleChangeValue(tmpFilter?.type == 'date' && tmpFilter.mode == 'between' && (!tmpFilter.from || !tmpFilter.to))}
+                ondayClick={() => handleChangeValue(tmpFilter?.type == 'date' && tmpFilter.mode == 'between' && (!tmpFilter.from || !tmpFilter.to))}
+              >
+                {#snippet appendInnerSnippet()}
+                  <Icon
+                    name="mdi-close-circle"
+                    onclick={() => {
+                      if(!!tmpFilter && tmpFilter.type === 'date' && tmpFilter.mode === 'between') {
+                        tmpFilter.from = undefined
+                        tmpFilter.to = undefined
+                      }
+                    }}
+                  ></Icon>
+                {/snippet}
+              </DatePickerTextField>
+            {:else}
+              <div class="between-container">
+                <div style="width: 50%;">
+                  <DatePickerTextField
+                    bind:selectedDate={tmpFilter.from}
+                    openingId="advanced-filter"
+                    placeholder={betweenFromLabel}
+                    bind:menuOpened={calendarOpened}
+                    --simple-textfield-width="100%"
+                    oninput={() => handleChangeValue()}
+                    ondayClick={() => handleChangeValue()}
+                  >
+                    {#snippet appendInnerSnippet()}
+                      <Icon
+                        name="mdi-close-circle"
+                        onclick={() => {
+                          if(!!tmpFilter && tmpFilter.type === 'date' && tmpFilter.mode === 'between') {
+                            tmpFilter.from = undefined
+                          }
+                        }}
+                      ></Icon>
+                    {/snippet}
+                  </DatePickerTextField>
+                </div>
+
+                <div style="width: 50%;">
+                  <DatePickerTextField
+                    bind:selectedDate={tmpFilter.to}
+                    openingId="advanced-filter"
+                    placeholder={betweenToLabel}
+                    bind:menuOpened={calendarOpened2}
+                    --simple-textfield-width="100%"
+                    flipOnOverflow
+                    oninput={() => handleChangeValue()}
+                    ondayClick={() => handleChangeValue()}
+                  >
+                    {#snippet appendInnerSnippet()}
+                      <Icon
+                        name="mdi-close-circle"
+                        onclick={() => {
+                          if(!!tmpFilter && tmpFilter.type === 'date' && tmpFilter.mode === 'between') {
+                            tmpFilter.to = undefined
+                          }
+                        }}
+                      ></Icon>
+                    {/snippet}
+                  </DatePickerTextField>
+                </div>
+              </div>
+            {/if}
+          {:else if tmpFilter.type === "number" && tmpFilter.mode === 'between'}
+            <div class="between-container">
+              <div style="width: 50%;">
+                <SimpleTextField
+                  bind:value={tmpFilter.from}
+                  type="number"
+                  placeholder={betweenFromLabel}
+                  --simple-textfield-width="100%"
+                  onchange={() => handleChangeValue()}
+                ></SimpleTextField>
+              </div>
+              <div style="width: 50%;">
+                <SimpleTextField
+                  bind:value={tmpFilter.to}
+                  type="number"
+                  placeholder={betweenToLabel}
+                  --simple-textfield-width="100%"
+                  onchange={() => handleChangeValue()}
+                ></SimpleTextField>
+              </div>
+            </div>
+          {:else if tmpFilter.type == 'bool'}
+            <div class="bool-filter">
+              <Checkbox
+                bind:value={tmpFilter.value}
+                onchange={() => handleChangeValue()}
+              ></Checkbox>
+              <span style:margin-left="10px">
+                {tmpFilter.description}
+              </span>
+            </div>
+          {:else if tmpFilter.type == 'custom'}
+            {@render customSnippet?.({ filter: tmpFilter })}
+          {/if}
+        </div>
       {/if}
     </div>
     {@render filterActionsSnippet?.({ applyFilterDisabled, filter: tmpFilter })}
@@ -360,11 +409,20 @@
 {/if}
 
 <style>
+  .filter-container {
+    display: flex;
+    flex-direction: column;
+    gap:10px;
+  }
   .filter-editor {
     display: flex;
     flex-direction: column;
     align-items: left;
     gap:10px;
+  }
+
+  .row {
+    flex-direction: row;
   }
 
   .advanced-mode {
@@ -373,11 +431,14 @@
     align-items: center;
   }
 
-  .label {
-    max-width: 200px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
+  .advaced-mode-selector {
+    height: 100%;
+  }
+
+  .between-container {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
   }
 
 </style>

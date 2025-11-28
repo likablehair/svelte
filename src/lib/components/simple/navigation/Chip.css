@@ -1,19 +1,19 @@
 :root {
-  --chip-default-border-radius: 9999px;
-  --chip-default-label-border-radius: 5px;
-  --chip-default-min-height: 2rem;
-  --chip-default-padding: 2px 10px;
-  --chip-default-background-color: rgb(var(--global-color-primary-500));
-  --chip-default-outlined-background-color: transparent;
-  --chip-default-color: rgb(var(--global-color-grey-50));
-  --chip-default-outlined-color: rgb(var(--global-color-primary-500));
-  --chip-default-font-size: inherit;
-  --chip-default-line-height: inherit;
+  --chip-default-min-height: 1.8rem;
+  --chip-default-padding: 0px 7px;
   --chip-default-cursor: pointer;
+  --chip-default-text-max-width: 200px;
+  --chip-default-background-color: rgb(var(--global-color-primary-500));
+  --chip-default-color: rgb(var(--global-color-grey-50));
   --chip-default-hover-background-color: rgb(var(--global-color-primary-600));
   --chip-default-focus-background-color: rgb(var(--global-color-primary-600));
-  --chip-default-outlined-focus-color: rgb(var(--global-color-primary-400));
-  --chip-default-text-max-width: 200px;
-  --chip-default-outlined-focus-box-shadow: 0px 0px 4px 2px rgba(var(--global-color-primary-400),0.1);
+  --chip-default-inactive-focus-color: rgb(var(--global-color-primary-400));
+  --chip-default-inactive-focus-box-shadow: 0px 0px 4px 2px rgba(var(--global-color-primary-400),0.1);
+  --chip-default-border-radius: 6px;
   --chip-default-gap: 5px;
+  --chip-default-font-size: inherit;
+  --chip-default-font-weight: 500;
+  --chip-default-line-height: inherit;
+  --chip-default-inactive-background-color: rgb(var(--global-color-background-300));
+  --chip-default-inactive-color: rgb(var(--global-color-contrast-900), .8);
 }

@@ -253,6 +253,10 @@
       --button-active-background-color,
       var(--button-default-active-background-color)
     );
+    box-shadow: var(
+      --button-active-box-shadow,
+      var(--button-default-active-box-shadow)
+    );
   }
 
   .button-default:focus:not(.disabled) {
@@ -263,6 +267,10 @@
     color: var(
       --button-focus-color,
       var(--button-default-focus-color)
+    );
+    box-shadow: var(
+      --button-focus-box-shadow,
+      var(--button-default-focus-box-shadow)
     );
   }
 

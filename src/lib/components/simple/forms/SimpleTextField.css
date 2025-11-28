@@ -13,5 +13,6 @@
   --simple-textfield-default-hint-color: rgb(var(--global-color-contrast-500), .5);
   --simple-textfield-default-hint-margin-left: 20px;
   --simple-textfield-default-margin-bottom: 5px;
-  --simple-textfield-default-color: rgb(var(--global-color-contrast-900))
+  --simple-textfield-default-color: rgb(var(--global-color-contrast-900));
+  --simple-textfield-default-range-text-align: right;
 }

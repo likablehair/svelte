@@ -27,19 +27,26 @@
 <PropsViewer
   props={[
     { name: "value", type: "string | number", description: "Bound value of the text field.", default: "undefined" },
+    { name: "valueTo", type: "string | number", description: "Bound value of the second text field for range textfields.", default: "undefined" },
     { name: "type", type: "'text' | 'password' | 'number' | 'time' | 'date'", description: "Type of input field.", default: "'text'" },
+    { name: "range", type: "boolean", description: "Adds a second input field to make a range", default: "false" },
     { name: "placeholder", type: "string", description: "Placeholder text.", default: "undefined" },
+    { name: "placeholderTo", type: "string", description: "Placeholder text.", default: "undefined" },
     { name: "disabled", type: "boolean", description: "Whether the input is disabled.", default: "false" },
     { name: "readonly", type: "boolean", description: "Whether the input is read-only.", default: "false" },
     { name: "id", type: "string", description: "ID of the input field.", default: "undefined" },
+    { name: "idTo", type: "string", description: "ID of the second input field.", default: "undefined" },
     { name: "appendIcon", type: "string", description: "Icon to display at the end.", default: "undefined" },
     { name: "appendInnerIcon", type: "string", description: "Icon inside the field at the end.", default: "undefined" },
     { name: "prependIcon", type: "string", description: "Icon to display at the start.", default: "undefined" },
     { name: "prependInnerIcon", type: "string", description: "Icon inside the field at the start.", default: "undefined" },
     { name: "iconSize", type: "string", description: "Size of the icons.", default: "'12pt'" },
     { name: "name", type: "string", description: "Name attribute of the input field.", default: "undefined" },
+    { name: "nameTo", type: "string", description: "Name attribute of the second input field.", default: "undefined" },
     { name: "hint", type: "string", description: "Hint text below the input field.", default: "undefined" },
     { name: "input", type: "HTMLElement", description: "Reference to the input element.", default: "undefined" },
+    { name: "inputTo", type: "HTMLElement", description: "Reference to the second input element.", default: "undefined" },
+    { name: "BetweenLabel", type: "string", description: "Label between the two input for range textfields.", default: "-" },
     { name: "class", type: "{ container?: string, row?: string, field?: string, hint?: string, input?: string }", description: "Additional CSS class for the button.", default: "undefined" }
   ]}
   styleProps={[
@@ -57,7 +64,8 @@
     { name: "--simple-textfield-hint-color", type: "color", description: "Color of the hint text", default: "rgb(var(--global-color-contrast-500), .5)" },
     { name: "--simple-textfield-hint-margin-left", type: "spacing", description: "Margin left for the hint text", default: "20px" },
     { name: "--simple-textfield-margin-bottom", type: "spacing", description: "Bottom margin of the text field", default: "5px" },
-    { name: "--simple-textfield-color", type: "color", description: "Text color of the input field", default: "rgb(var(--global-color-contrast-900))" }
+    { name: "--simple-textfield-color", type: "color", description: "Text color of the input field", default: "rgb(var(--global-color-contrast-900))" },
+    { name: "--simple-textfield-range-text-align", type: "position", description: "Text align of the first input field for ranges", default: "right" },
   ]}
 ></PropsViewer>
 <h2>Slots</h2>

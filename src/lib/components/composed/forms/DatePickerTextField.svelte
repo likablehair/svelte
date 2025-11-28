@@ -19,7 +19,10 @@
     visibleMonth?: number;
     visibleYear?: number;
     selectedDate?: Date;
+    selectedDateTo?: Date;
+    type?: ComponentProps<typeof DatePicker>['type']
     placeholder?: string;
+    placeholderTo?: string;
     mobileDialog?: boolean;
     maxYearInRange?: number;
     minYearInRange?: number;
@@ -60,9 +63,12 @@
     selectedYear = $bindable(new Date().getFullYear()),
     selectedMonth = $bindable(new Date().getMonth()),
     selectedDate = $bindable(),
+    selectedDateTo = $bindable(),
+    type,
     visibleMonth = $bindable(selectedMonth),
     visibleYear = $bindable(selectedYear),
     placeholder,
+    placeholderTo,
     mobileDialog = true,
     maxYearInRange = 2100,
     minYearInRange = 1970,
@@ -83,7 +89,11 @@
     refreshPosition = $state(false),
     menuElement: HTMLElement | undefined = $state(),
     inputElement: HTMLElement | undefined = $state(),
+    inputElementTo: HTMLElement | undefined = $state(),
     mask: InputMask<typeof maskFactoryArgs> | { value: string | undefined } = $state({
+      value: undefined
+    }),
+    maskTo: InputMask<typeof maskFactoryArgs> | { value: string | undefined } = $state({
       value: undefined
     }),
     maskFactoryArgs = {
@@ -137,8 +147,18 @@
       )
     }
 
+    if(inputElementTo){
+      maskTo = IMask(
+        inputElementTo, maskFactoryArgs
+      )
+    }
+
     if(!!selectedDate) {
       mask.value = DateTime.fromJSDate(selectedDate).toFormat(pattern)
+    }
+
+    if(!!selectedDateTo) {
+      maskTo.value = DateTime.fromJSDate(selectedDateTo).toFormat(pattern)
     }
   })
 
@@ -148,7 +168,15 @@
     }
   })
 
-  function handleInputChange(e: Event) {
+  $effect(() => {
+    if(!selectedDateTo) {
+      maskTo.value = ""
+    }
+  })
+
+  function handleInputChange(e: Parameters<NonNullable<ComponentProps<typeof SimpleTextField>['onkeydown']>>[0]) {
+    // @ts-ignore
+    const id = e.target?.id as string
     setTimeout(() => {
       // @ts-ignore
       const typedValue = e.target?.value as string
@@ -175,19 +203,31 @@
         }
 
         if(typedValue.length == pattern.length) {
-          selectedDate = DateTime.fromObject({
-            day: Number(dayOfMonth),
-            month: Number(oneBasedMonth),
-            year: Number(year)
-          }).toJSDate()
+          if(id == 'from') {
+            selectedDate = DateTime.fromObject({
+              day: Number(dayOfMonth),
+              month: Number(oneBasedMonth),
+              year: Number(year)
+            }).toJSDate()
+          } else if (id == 'to') {
+            selectedDateTo = DateTime.fromObject({
+              day: Number(dayOfMonth),
+              month: Number(oneBasedMonth),
+              year: Number(year)
+            }).toJSDate()
+          }
         } else {
-          selectedDate = undefined
+          if(id == 'from') {
+            if(selectedDate) selectedDate = undefined
+          } else if (id == 'to') {
+            if(selectedDateTo) selectedDateTo = undefined
+          }
         }
 
         if(oninput) {
           oninput({
             detail: {
-              datetime: selectedDate
+              datetime: id == "to" ? selectedDateTo : selectedDate
             }
           })
         }
@@ -198,6 +238,10 @@
   function handleDateSelect(event: Parameters<NonNullable<ComponentProps<typeof DatePicker>['ondayClick']>>[0]) {
     if(!!selectedDate) {
       mask.value = DateTime.fromJSDate(selectedDate).toFormat(pattern)
+    }
+
+    if(!!selectedDateTo) {
+      maskTo.value = DateTime.fromJSDate(selectedDateTo).toFormat(pattern)
     }
 
     if(ondayClick) {
@@ -211,10 +255,12 @@
 
   function handleYearSelect() {
     mask.value = ''
+    maskTo.value = ''
   }
 
   function handleMonthSelect() {
     mask.value = ''
+    maskTo.value = ''
   }
 
   $effect(() => {
@@ -226,7 +272,18 @@
         await tick()
       }, 30);
     }
-  }) 
+  })
+
+  $effect(() => {
+    if(!!selectedDateTo) {
+      setTimeout(async () => {
+        if(!!selectedDateTo) {
+          maskTo.value = DateTime.fromJSDate(selectedDateTo).toFormat(pattern)
+        }
+        await tick()
+      }, 30);
+    }
+  })
 </script>
 
 <MediaQuery>
@@ -241,15 +298,23 @@
       {:else}
         <SimpleTextField
           value={mask.value}
+          valueTo={maskTo.value}
           onfocus={() => handleTextFieldFocus(mAndDown)}
           onkeydown={handleInputChange}
           bind:input={inputElement}
+          bind:inputTo={inputElementTo}
+          id='from'
+          idTo='to'
           {placeholder}
+          {placeholderTo}
+          range={type == 'dateRange'}
           class={clazz.textfield}
           {disabled}
           {appendInnerSnippet}
           {prependSnippet}
           {appendSnippet}
+          --simple-textfield-default-padding='0.65rem 0.8rem'
+          --simple-textfield-default-inner-gap='4px'
         >
           {#snippet prependInnerSnippet({ iconSize, prependInnerIcon })}
             {#if prependInnerInternalSnippet}
@@ -277,6 +342,7 @@
         >
           <DatePicker
             bind:selectedDate={selectedDate}
+            bind:selectedDateTo={selectedDateTo}
             bind:selectedMonth={selectedMonth}
             bind:selectedYear={selectedYear}
             bind:visibleMonth
@@ -286,6 +352,7 @@
             onmonthClick={handleMonthSelect}
             skipTabs
             {disabled}
+            {type}
           ></DatePicker>
         </div>
       </Dialog>
@@ -308,6 +375,7 @@
         >
           <DatePicker
             bind:selectedDate={selectedDate}
+            bind:selectedDateTo={selectedDateTo}
             bind:selectedMonth={selectedMonth}
             bind:selectedYear={selectedYear}
             bind:visibleMonth
@@ -317,6 +385,7 @@
             onmonthClick={handleMonthSelect}
             skipTabs
             {disabled}
+            {type}
           ></DatePicker>
         </div>
       </Menu>

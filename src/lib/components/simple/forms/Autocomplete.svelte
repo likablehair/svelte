@@ -2,6 +2,7 @@
   export type Item<Data = any> = {
     value: string | number;
     label?: string | number;
+    icon?: string
     data?: Data;
   };
 </script>
@@ -365,6 +366,7 @@
   import SimpleTextField from "./SimpleTextField.svelte";
   import MenuOrDrawer from "$lib/components/composed/common/MenuOrDrawer.svelte";
   import Drawer from "../navigation/Drawer.svelte";
+  import Icon from "../media/Icon.svelte";
 </script>
 
 <svelte:window />
@@ -401,6 +403,7 @@
           <div tabindex="-1">
             <Chip
               close={true}
+              prependIcon={selection.icon}
               onclose={() => unselect(selection)}
               --chip-default-border-radius="var(--autocomplete-border-radius, var(--autocomplete-default-border-radius))"
               buttonTabIndex={-1}
@@ -493,6 +496,9 @@
                 {#if itemLabelSnippet}
                   {@render itemLabelSnippet({ item })}
                 {:else}
+                  {#if item.icon}
+                    <Icon name={item.icon}/>
+                  {/if}
                   {item.label}
                 {/if}
               </div>

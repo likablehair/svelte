@@ -66,7 +66,8 @@
       },
       icon: 'mdi-check'
     },
-  ];
+  ],
+  headersToShowInTable = $state(headers.filter((h, i) => i % 2 == 0))
 
   let items: Row[] = [
     {
@@ -258,7 +259,7 @@
     resizableColumns={true}
     {filters}
     {headers}
-    headersToShowInTable={headers}
+    {headersToShowInTable}
     {items}
     searchBarColumns={["businessName", "productName"]}
     totalElements={40}
@@ -274,6 +275,12 @@
     showActiveFilters={true}
     {calculateRowStyles}
     {calculateRowClasses}
+    resizedColumnSizeWithPadding={{
+      businessName: 200,
+      productName: 200,
+      rating: 200,
+      progress: 200
+    }}
     --filters-one-edit-menu-max-height="50vh"
   >
     {#snippet customFilterSnippet({ filter, mAndDown, updateFunction })}
@@ -309,25 +316,6 @@
       {/if}
     {/snippet}
   </EnhancedPaginatedTable>
-  <EnhancedPaginatedTable
-    resizableColumns={true}
-    {filters}
-    {headers}
-    headersToShowInTable={headers}
-    {items}
-    searchBarColumns={["businessName", "productName"]}
-    totalElements={40}
-    onfiltersChange={handleFiltersChange}
-    onremoveFilter={(e) => {
-      if (e.detail.filter.name == "productCategory") {
-        value = undefined;
-      }
-    }}
-    showActiveFilters={true}
-    {calculateRowStyles}
-    {calculateRowClasses}
-    --filters-one-edit-menu-max-height="50vh"
-  ></EnhancedPaginatedTable>
 </div>
 <h2>Props</h2>
 <PropsViewer
@@ -348,7 +336,7 @@
       name: "headerDrawerHeadersToAddSnippet", 
       description: "Headers drawer custom items", 
       properties: [
-        { name: "item", type: "{ id: string; name: string; }", description: "The item being rendered." }
+        { name: "item", type: "Header", description: "The item being rendered." }
       ],
       default: `
 <div
@@ -431,7 +419,7 @@
     {
       name: "onsaveHeadersToShow",
       description: "Triggered when the user saves which headers to show",
-      properties: [{ name: "headersToShow", type: "{ id: string; name: string }[]", description: "Selected headers to show" }]
+      properties: [{ name: "headersToShow", type: "Header[]", description: "Selected headers to show" }]
     },
   ]}
 ></EventsViewer>

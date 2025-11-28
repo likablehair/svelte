@@ -84,6 +84,7 @@ type StringFilter = {
 type DateFilter = {
   type: 'date',
   column: string,
+  betweenModeSingleTextField?: boolean
 } & (
   {
     mode: 'between',
@@ -138,7 +139,7 @@ type SelectFilter = {
   }) => Builder,
   column: string,
   mode: SelectMode,
-  items: { value: string | number, label: string }[]
+  items: { value: string | number, label: string, icon?: string }[]
   values?: { value: string | number, label?: string | number }[]
 }
 
@@ -171,6 +172,9 @@ export type Filter = {
   hidden?: boolean,
   label: string,
   advanced?: boolean,
+  tabName?: string
+  icon?: string
+  iconColor?: string
 } & (StringFilter | MultiStringFilter | ChoiceFilter | DateFilter | NumberFilter | SelectFilter | BoolFilter | CustomFilter )
 
 

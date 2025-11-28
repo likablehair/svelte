@@ -36,12 +36,12 @@
   }: Props = $props()
 
   let openHeaderDrawer: boolean = $state(false),
-    availableHeaders = $state(!!headers
+    availableHeaders = !!headers
       ? headers
           .filter((h) => {
             return !headersToShowInTable.find((hst) => hst.value == h.value);
           })
-      : [])
+      : []
 </script>
 
 <PaginatedTable 

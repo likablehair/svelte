@@ -2,6 +2,7 @@
   export type Item<Data = any> = {
     value: string | number;
     label?: string | number;
+    icon?: string;
     data?: Data;
   };
 </script>
@@ -88,10 +89,11 @@
       {#each (items || []) as item}
         <div class="chip">
           <Chip
-            outlined={!values || values?.findIndex(i => i.value === item.value) === -1}
+            inactive={!values || values?.findIndex(i => i.value === item.value) === -1}
             onclick={() => toggle(item)}
             buttonTabIndex={0}
             truncateText
+            prependIcon={item.icon}
             --button-focus-color="red"
           >
             {item.label}
@@ -121,10 +123,5 @@
   .toggle-container.disabled {
     opacity: 50%;
   }
-
-  .chip {
-    --chip-default-outlined-color: var(--toggle-list-unselected-color, var(--chip-default-background-color));
-  }
-
 
 </style>

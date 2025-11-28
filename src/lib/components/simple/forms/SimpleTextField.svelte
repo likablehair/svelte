@@ -7,19 +7,26 @@
 
   interface Props extends HTMLInputAttributes{
     value?: string | number;
+    valueTo?: string | number;
     type?: "text" | "password" | "number" | "time" | "date";
+    range?: boolean
     placeholder?: string;
+    placeholderTo?: string;
     disabled?: boolean;
     readonly?: boolean;
     id?: string;
+    idTo?: string;
     appendIcon?: string;
     appendInnerIcon?: string;
     prependIcon?: string;
     prependInnerIcon?: string;
     iconSize?: string;
     name?: string;
+    nameTo?: string;
     hint?: string;
     input?: HTMLElement;
+    inputTo?: HTMLElement;
+    betweenLabel?: string
     class?: {
       container?: string,
       row?: string,
@@ -50,19 +57,26 @@
 
   let {
     value = $bindable(),
+    valueTo = $bindable(),
     type = "text",
+    range = false,
     placeholder = undefined,
+    placeholderTo = undefined,
     disabled = false,
     readonly = false,
     id = undefined,
+    idTo = undefined,
     appendIcon = undefined,
     appendInnerIcon = undefined,
     prependIcon = undefined,
     prependInnerIcon = undefined,
     iconSize = "12pt",
     name = undefined,
+    nameTo = undefined,
     hint = undefined,
     input = $bindable(undefined),
+    inputTo = $bindable(undefined),
+    betweenLabel = '-',
     class: clazz = {},
     prependSnippet,
     prependInnerSnippet,
@@ -99,12 +113,32 @@
           <Icon name={prependInnerIcon} --icon-size={iconSize}></Icon>
         {/if}
       {/if}
-      {#if type == "text"}
+      <input
+        bind:value={value}
+        placeholder={placeholder}
+        type={type}
+        id={id}
+        disabled={disabled}
+        readonly={readonly}
+        {onchange}
+        {oninput}
+        {onfocus}
+        {onblur}
+        {onkeydown}
+        {onkeyup}
+        {onkeypress}
+        name={name}
+        class={clazz?.input || '' + (range ? ' align-right' : '')}
+        bind:this={input}
+        {...rest}
+      />
+      {#if range}
+        {betweenLabel}
         <input
-          bind:value={value}
-          placeholder={placeholder}
-          type="text"
-          id={id}
+          bind:value={valueTo}
+          placeholder={placeholderTo}
+          type={type}
+          id={idTo}
           disabled={disabled}
           readonly={readonly}
           {onchange}
@@ -114,89 +148,9 @@
           {onkeydown}
           {onkeyup}
           {onkeypress}
-          name={name}
+          name={nameTo}
           class={clazz?.input || ''}
-          bind:this={input}
-          {...rest}
-        />
-      {:else if type == "password"}
-        <input
-          bind:value={value}
-          placeholder={placeholder}
-          type="password"
-          id={id}
-          disabled={disabled}
-          readonly={readonly}
-          {onchange}          
-          {oninput}
-          {onfocus}
-          {onblur}
-          {onkeydown}
-          {onkeyup}
-          {onkeypress}
-          name={name}
-          class={clazz?.input || ''}
-          bind:this={input}
-          {...rest}
-        />
-      {:else if type == "number"}
-        <input
-          bind:value={value}
-          placeholder={placeholder}
-          type="number"
-          id={id}
-          disabled={disabled}
-          readonly={readonly}
-          {onchange}
-          {oninput}
-          {onfocus}
-          {onblur}
-          {onkeydown}
-          {onkeyup}
-          {onkeypress}
-          name={name}
-          class={clazz?.input || ''}
-          bind:this={input}
-          {...rest}
-        />
-      {:else if type == "time"}
-        <input
-          bind:value={value}
-          placeholder={placeholder}
-          type="time"
-          id={id}
-          disabled={disabled}
-          readonly={readonly}
-          {onchange}          
-          {oninput}
-          {onfocus}
-          {onblur}
-          {onkeydown}
-          {onkeyup}
-          {onkeypress}
-          name={name}
-          class={clazz?.input || ''}
-          bind:this={input}
-          {...rest}
-        />
-      {:else if type == "date"}
-        <input
-          bind:value={value}
-          placeholder={placeholder}
-          type="date"
-          id={id}
-          disabled={disabled}
-          readonly={readonly}
-          {onchange}
-          {oninput}
-          {onfocus}
-          {onblur}
-          {onkeydown}
-          {onkeyup}
-          {onkeypress}
-          name={name}
-          class={clazz?.input || ''}
-          bind:this={input}
+          bind:this={inputTo}
           {...rest}
         />
       {/if}
@@ -351,6 +305,13 @@
 
   ::-webkit-calendar-picker-indicator {
     opacity: 0;
+  }
+
+  .align-right {
+    text-align: var(
+      --simple-textfield-range-text-align,
+      var(--simple-textfield-default-range-text-align)
+    );
   }
 
 </style>

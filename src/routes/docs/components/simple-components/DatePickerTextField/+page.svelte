@@ -29,8 +29,14 @@
       {date}
     </div>
     <div class="h-flex">
-      <DatePickerTextField bind:selectedDate={date} />
-      <DatePickerTextField bind:selectedDate={date} disabled />
+      <DatePickerTextField type='dateRange'  />
+      <DatePickerTextField 
+        bind:selectedDate={date} 
+        --calendar-day-width=30px
+        --calendar-day-height=30px
+        --calendar-day-border-radius=50%
+        --calendar-grid-gap=1px
+      />
     </div>
   </div>
 </div>
@@ -44,8 +50,11 @@
     { name: "selectedYear", type: "number", description: "The selected year.", default: "new Date().getFullYear()" },
     { name: "visibleMonth", type: "number", description: "The month currently visible in the picker.", default: "$bindable(selectedMonth)" },
     { name: "visibleYear", type: "number", description: "The year currently visible in the picker.", default: "$bindable(selectedYear)" },
+    { name: "type", type: "'singleDate' | 'dateRange'", description: "Choose either a single date or a date range.", default: "singleDate" },
     { name: "selectedDate", type: "Date | undefined", description: "The currently selected date.", default: "$bindable(undefined)" },
+    { name: "selectedDateTo", type: "Date | undefined", description: "The second currently selected date for date ranges.", default: "$bindable(undefined)" },
     { name: "placeholder", type: "string", description: "Placeholder text for the input field.", default: "undefined" },
+    { name: "placeholderTo", type: "string", description: "Placeholder text for the second input field.", default: "undefined" },
     { name: "mobileDialog", type: "boolean", description: "Determines if the date picker uses a dialog on mobile.", default: "true" },
     { name: "maxYearInRange", type: "number", description: "Maximum year allowed in the date picker range.", default: "2100" },
     { name: "minYearInRange", type: "number", description: "Minimum year allowed in the date picker range.", default: "1970" },

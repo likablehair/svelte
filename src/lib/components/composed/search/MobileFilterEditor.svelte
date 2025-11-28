@@ -123,7 +123,7 @@
         if(tmpFilter.values === undefined) {
           tmpFilter.values = []
         }
-      } else if(tmpFilter.type == 'date' && tmpFilter.mode == 'between') {
+      } else if(tmpFilter.type == 'date' && tmpFilter.mode == 'between' && !tmpFilter.betweenModeSingleTextField) {
         if(!tmpFilter.from) tmpFilter.from = new Date()
         if(!tmpFilter.to) tmpFilter.to = new Date()
       }
@@ -249,26 +249,42 @@
                 ></SimpleTextField>
               {:else if tmpFilter.type === "date" && tmpFilter.mode === 'between'}
                 <div style:width="100%">
-                  <div class="date" style:margin-bottom="10px">
-                    <DatePickerTextField
-                      bind:selectedDate={tmpFilter.from}
-                      openingId="advanced-filter"
-                      placeholder={betweenToLabel}
-                      bind:menuOpened={calendarOpened}
-                      ondayClick={() => {calendarOpened = false}}
-                      --simple-textfield-width="100%"
-                    ></DatePickerTextField>
-                  </div>
-                  <div class="date">
-                    <DatePickerTextField
-                      bind:selectedDate={tmpFilter.to}
-                      openingId="advanced-filter"
-                      placeholder="Alla data"
-                      bind:menuOpened={calendarOpened2}
-                      ondayClick={() => {calendarOpened2 = false}}
-                      --simple-textfield-width="100%"
-                    ></DatePickerTextField>
-                  </div>
+                  {#if tmpFilter.betweenModeSingleTextField}
+                    <div class="date" style:margin-bottom="10px">
+                      <DatePickerTextField
+                        type=dateRange
+                        bind:selectedDate={tmpFilter.from}
+                        openingId="advanced-filter"
+                        placeholder={betweenFromLabel}
+                        bind:menuOpened={calendarOpened}
+                        ondayClick={() => {calendarOpened = tmpFilter?.type == 'date' && tmpFilter.mode == 'between' && (!tmpFilter.from || !tmpFilter.to)}}
+                        --simple-textfield-width="100%"
+                        bind:selectedDateTo={tmpFilter.to}
+                        placeholderTo={betweenToLabel}
+                      ></DatePickerTextField>
+                    </div>
+                  {:else}
+                    <div class="date" style:margin-bottom="10px">
+                      <DatePickerTextField
+                        bind:selectedDate={tmpFilter.from}
+                        openingId="advanced-filter"
+                        placeholder={betweenFromLabel}
+                        bind:menuOpened={calendarOpened}
+                        ondayClick={() => {calendarOpened = false}}
+                        --simple-textfield-width="100%"
+                      ></DatePickerTextField>
+                    </div>
+                    <div class="date">
+                      <DatePickerTextField
+                        bind:selectedDate={tmpFilter.to}
+                        openingId="advanced-filter"
+                        placeholder={betweenToLabel}
+                        bind:menuOpened={calendarOpened2}
+                        ondayClick={() => {calendarOpened2 = false}}
+                        --simple-textfield-width="100%"
+                      ></DatePickerTextField>
+                    </div>
+                  {/if}
                 </div>
               {:else if tmpFilter.type === "number" && tmpFilter.mode === "between"}
                 <div style:width="100%">

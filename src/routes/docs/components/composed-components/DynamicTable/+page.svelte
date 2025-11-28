@@ -262,6 +262,7 @@
     { name: "loading", type: "boolean", description: "Show loading state", default: "false" },
     { name: "disabled", type: "boolean", description: "Disable the table", default: "false" },
     { name: "filters", type: "Filter[]", description: "Filters applied to the table", default: "[]" },
+    { name: "multiEditTabs", type: "Tab[]", description: "Tabs for multi-edit filter mode." },
     { name: "searchBarColumns", type: "string[]", description: "Columns to apply search bar filtering", default: "undefined" },
     { name: "searchBarVisible", type: "boolean", description: "Toggle search bar visibility", default: "false" },
     { name: "searchBarPlaceholder", type: "string", description: "Search bar placeholder text", default: "'Type to search...'" },
@@ -485,7 +486,7 @@
       name: "headerDrawerHeadersToAddSnippet", 
       description: "Headers drawer custom items", 
       properties: [
-        { name: "item", type: "{ id: string; name: string; }", description: "The item being rendered." }
+        { name: "item", type: "Header", description: "The item being rendered." }
       ],
       default: `
 <div
@@ -591,7 +592,7 @@
     {
       name: "onsaveHeadersToShow",
       description: "Triggered when the user saves which headers to show",
-      properties: [{ name: "headersToShow", type: "{ id: string; name: string }[]", description: "Selected headers to show" }]
+      properties: [{ name: "headersToShow", type: "Header[]", description: "Selected headers to show" }]
     },
     {
       name: "onfiltersChange",
