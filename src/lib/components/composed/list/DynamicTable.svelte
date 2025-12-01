@@ -472,11 +472,13 @@
   let renderedRows = $derived(rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber))
 
   let openHeaderDrawer: boolean = $state(false),
-    availableHeaders = !!headers
-      ? headers.filter((h) => {
-          return !headersToShowInTable.find((hst) => hst.value == h.value);
-        })
-      : [],
+    availableHeaders = $derived.by(() => {
+      return !!headers
+        ? headers.filter((h) => {
+            return !headersToShowInTable.find((hst) => hst.value == h.value);
+          })
+        : []
+    }),
     infoActivators = $state(Array(headersToShowInTable.length))
 
   let expandedRows: Row[] = $state([]);    
