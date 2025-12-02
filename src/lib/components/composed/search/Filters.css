@@ -1,7 +1,19 @@
 :root {
-  --filters-button-cancel-default-background-color: transparent;
-  --filters-button-cancel-default-color: rgb(var(--global-color-primary-400));
+  --filters-button-cancel-default-background-color: rgb(var(--global-color-background-300, .5));
+  --filters-button-cancel-default-color: rgb(var(--global-color-contrast-900));
   --filters-default-one-edit-menu-max-height: 100%;
   --filters-default-wrapper-width: auto;
   --filters-default-button-height: 20px;
+  --filters-default-button-border-radius: 4px;
+  --filters-default-card-background-color: rgb(var(--global-color-background-100));
+  --filters-default-card-border: 1px solid rgb(var(--global-color-background-300));
+  --filters-default-card-border-radius: 8px;
+  --filters-default-card-padding: 12px;
+  --filters-default-card-box-shadow: 0 0 8px rgba(0, 0, 0, 0.06);
+  --filters-default-card-hover-box-shadow: 0 0 10px rgba(0, 0, 0, 0.10);
+  --filters-default-card-hover-transition: box-shadow 0.2s ease;
+  --filters-default-card-title-font-weight: 600;
+  --filters-default-card-title-font-size: 15px;
+  --filters-default-card-title-color: rgb(var(--global-color-contrast-800));
+  --filters-default-card-title-margin-bottom: 8px;
 }

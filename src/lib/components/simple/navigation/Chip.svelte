@@ -9,10 +9,8 @@
     close?: boolean;
     closeIcon?: string;
     disabled?: boolean;
-    filter?: boolean;
-    filterIcon?: string;
-    label?: boolean;
-    outlined?: boolean;
+    prependIcon?: string;
+    inactive?: boolean;
     buttonTabIndex?: number | null;
     truncateText?: boolean;
     onclick?: (event: {
@@ -32,10 +30,8 @@
     close = $bindable(false),
     closeIcon = "mdi-close-circle",
     disabled = false,
-    filter = false,
-    filterIcon = "mdi-check",
-    label = false,
-    outlined = false,
+    prependIcon,
+    inactive = false,
     buttonTabIndex = null,
     truncateText = false,
     onclick,
@@ -74,18 +70,15 @@
 
 <div
   class="chip"
-  class:label
-  class:outlined
+  class:inactive
   class:disabled
   role="button"
   tabindex={disabled ? -1 : buttonTabIndex}
   onclick={handleChipClick}
   onkeydown={handleChipClick}
 >
-  {#if filter}
-    <div class="icon-before">
-      <Icon name={filterIcon} />
-    </div>
+  {#if prependIcon}
+    <Icon name={prependIcon} />
   {/if}
   <div
     class="text"
@@ -131,6 +124,10 @@
       --chip-cursor,
       var(--chip-default-cursor)
     );
+    gap: var(
+      --chip-gap,
+      var(--chip-default-gap)
+    );
 
     outline: inherit;
     background-image: none;
@@ -148,7 +145,7 @@
   }
 
 
-  .chip:not(.outlined) {
+  .chip:not(.inactive) {
     background-color: var(
       --chip-background-color,
       var(--chip-default-background-color)
@@ -159,46 +156,39 @@
     );
   }
 
-  .chip:not(.outlined):hover {
+  .chip:not(.inactive):hover {
     background-color: var(
       --chip-hover-background-color,
       var(--chip-default-hover-background-color)
     );
   }
 
-  .chip:not(.outlined):focus {
+  .chip:not(.inactive):focus {
     background-color: var(
       --chip-focus-background-color,
       var(--chip-default-focus-background-color)
     );
   }
 
-  .chip.outlined:focus {
+  .chip.inactive:focus {
     color: var(
-      --chip-outlined-focus-color,
-      var(--chip-default-outlined-focus-color)
+      --chip-inactive-focus-color,
+      var(--chip-default-inactive-focus-color)
     );
     border-color: var(
-      --chip-outlined-focus-color,
-      var(--chip-default-outlined-focus-color)
+      --chip-inactive-focus-border-color,
+      var(--chip-default-inactive-border-focus-color)
     );
     box-shadow: var(
-      --chip-outlined-focus-box-shadow,
-      var(--chip-default-outlined-focus-box-shadow)
+      --chip-inactive-focus-box-shadow,
+      var(--chip-default-inactive-focus-box-shadow)
     );
   }
 
-  .chip:not(.label) {
+  .chip {
     border-radius: var(
       --chip-border-radius,
       var(--chip-default-border-radius)
-    );
-  }
-
-  .label {
-    border-radius: var(
-      --chip-border-radius,
-      var(--chip-default-label-border-radius)
     );
   }
 
@@ -206,14 +196,7 @@
     float: right;
     margin-left: 10px;
   }
-  .icon-before {
-    float: left;
-    margin-left: 10px;
-  }
   .text {
-    display: flex;
-    align-items: center;
-    gap: var(--chip-gap, var(--chip-default-gap));
     vertical-align: middle;
     user-select: none;
     font-size: var(
@@ -224,15 +207,27 @@
       --chip-line-height,
       var(--chip-default-line-height)
     );
+    font-weight: var(
+      --chip-font-weight,
+      var(--chip-default-font-weight)
+    );
   }
-  .outlined {
-    background: transparent !important;
-    border: solid 1px;
-    border-color: var(--chip-default-outlined-color);
-    color: var(--chip-default-outlined-color);
+  .inactive {
+    border: var(
+      --chip-inactive-border,
+      var(--chip-default-inactive-border)
+    );
+    border-color: var(
+      --chip-inactive-border-color,
+      var(--chip-default-inactive-border-color)
+    );
+    color: var(
+      --chip-inactive-color,
+      var(--chip-default-inactive-color)
+    );
     background-color: var(
-      --chip-background-color,
-      var(--chip-default-outlined-background-color)
+      --chip-inactive-background-color,
+      var(--chip-default-inactive-background-color)
     );
   }
   .disabled {

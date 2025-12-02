@@ -13,9 +13,11 @@
     selectedYear?: number;
     selectedMonth?: number;
     selectedDate?: Date;
+    selectedDateTo?: Date;
     visibleMonth?: number;
     visibleYear?: number;
     view?: "year" | "month" | "day";
+    type?: ComponentProps<typeof Calendar>['type']
     locale?: Locale;
     selectableYears?: number[];
     skipTabs?: boolean;
@@ -42,6 +44,7 @@
     selectedYear = $bindable(new Date().getFullYear()),
     selectedMonth = $bindable(new Date().getMonth()),
     selectedDate = $bindable(undefined),
+    selectedDateTo = $bindable(undefined),
     visibleMonth = $bindable(selectedMonth),
     visibleYear = $bindable(selectedYear),
     view = "day",
@@ -49,6 +52,7 @@
     selectableYears = [...Array(150).keys()].map((i) => i + (new Date().getFullYear() - 75)),
     skipTabs = false,
     disabled = false,
+    type,
     class: clazz = {},
     onmonthClick,
     onyearClick,
@@ -160,8 +164,10 @@
       class="unstyled day"
       tabindex={skipTabs ? -1 : undefined}
     >
-      {#if !!selectedDate}
+      {#if !!selectedDate && !selectedDateTo}
         {dateToString(selectedDate, "dayAndMonth", locale)}
+      {:else if !!selectedDate && !!selectedDateTo}
+        {dateToString(selectedDate, "dayAndMonth", locale)} - {dateToString(selectedDateTo, "dayAndMonth", locale)}
       {/if}
     </button>
   </div>
@@ -224,6 +230,8 @@
         bind:visibleMonth={visibleMonth}
         bind:visibleYear={visibleYear}
         bind:selectedDate
+        bind:selectedDateTo
+        {type}
         {locale}
         disabled={disabled}
         {ondayClick}

@@ -10,7 +10,7 @@
 <ComponentSubtitle>Day to change, day to stick to the habits.</ComponentSubtitle>
 <h2>Example</h2>
 <div class="example">
-  <DatePicker skipTabs></DatePicker>
+  <DatePicker type='dateRange'></DatePicker>
   <DatePicker skipTabs disabled></DatePicker>
 </div>
 <h2>Props</h2>
@@ -18,7 +18,9 @@
   props={[
     { name: "selectedYear", type: "number", description: "The currently selected year.", default: "new Date().getFullYear()" },
     { name: "selectedMonth", type: "number", description: "The currently selected month.", default: "new Date().getMonth()" },
+    { name: "type", type: "'singleDate' | 'dateRange'", description: "Choose either a single date or a date range.", default: "singleDate" },
     { name: "selectedDate", type: "Date", description: "The currently selected date.", default: "undefined" },
+    { name: "selectedDateTo", type: "Date", description: "The currently selected date to for date ranges.", default: "undefined" },
     { name: "visibleMonth", type: "number", description: "The currently visible month in the calendar.", default: "selectedMonth" },
     { name: "visibleYear", type: "number", description: "The currently visible year in the calendar.", default: "selectedYear" },
     { name: "view", type: "'year' | 'month' | 'day'", description: "The current view mode of the date picker.", default: "'day'" },

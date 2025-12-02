@@ -20,6 +20,7 @@
     menuOpened?: boolean;
     openingId?: string;
     width?: string;
+    height?: string;
     minWidth?: string;
     menuWidth?: string;
     mobileDrawer?: boolean;
@@ -57,6 +58,7 @@
     menuOpened = $bindable(false),
     openingId = $bindable("autocomplete-menu"),
     width,
+    height,
     minWidth,
     menuWidth = width,
     mobileDrawer = false,
@@ -103,6 +105,7 @@
   {width}
   {mobileDrawer}
   {minWidth}
+  {height}
   {menuWidth}
   {itemLabelSnippet}
 >

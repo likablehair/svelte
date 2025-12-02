@@ -190,6 +190,15 @@ export const getDateRowsStats: (
   return results;
 };
 
+export const dateToDateStat: (date: Date) => DateStat = (date) => {
+  return {
+    dayOfMonth: date.getDate(),
+    dayOfWeek: date.getDay(),
+    month: date.getMonth(),
+    year: date.getFullYear()
+  };
+}
+
 export type DateFormat =
   | "extended"
   | "extendedMonthAndYear"

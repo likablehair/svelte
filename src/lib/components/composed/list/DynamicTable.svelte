@@ -193,6 +193,7 @@
     loading?: boolean;
     disabled?: boolean;
     filters?: ComponentProps<typeof Filters>["filters"];
+    multiEditTabs?: ComponentProps<typeof Filters>['multiEditTabs']
     searchBarColumns?: string[];
     searchBarVisible?: boolean;
     searchBarPlaceholder?: string;
@@ -343,7 +344,7 @@
 
   let {
     headers = [],
-    headersToShowInTable = headers,
+    headersToShowInTable = $bindable(headers),
     subHeaders = [],
     customizeHeaders = false,
     rows = [],
@@ -367,6 +368,7 @@
     searchBarVisible = false,
     searchBarPlaceholder = lang == 'en' ? "Type to search..." : "Scrivi per cercare...",
     filtersVisible = false,
+    multiEditTabs,
     quickFiltersVisible = false,
     editFilterMode = "one-edit",
     showActiveFilters = true,
@@ -470,38 +472,16 @@
   let renderedRows = $derived(rows.slice(currentSectionNumber * sectionRowsNumber, currentSectionNumber * sectionRowsNumber + renderedRowsNumber))
 
   let openHeaderDrawer: boolean = $state(false),
-    availableHeaders: {
-      id: string;
-      name: string;
-      icon?: string;
-    }[] = $state(!!headers
-      ? headers
-          .filter((h) => {
+    availableHeaders = $derived.by(() => {
+      return !!headers
+        ? headers.filter((h) => {
             return !headersToShowInTable.find((hst) => hst.value == h.value);
           })
-          .map((h) => {
-            return {
-              id: h.value,
-              name: h.label,
-              icon: h.icon
-            };
-          })
-      : []),
-    headersToShow: {
-      id: string;
-      name: string;
-      icon?: string;
-    }[] = $state(headersToShowInTable.map((h) => {
-      return {
-        id: h.value,
-        name: h.label,
-        icon: h.icon
-      };
-    })),
+        : []
+    }),
     infoActivators = $state(Array(headersToShowInTable.length))
 
-  let totalBatchLength: number = $state(0),
-    expandedRows: Row[] = $state([]);    
+  let expandedRows: Row[] = $state([]);    
 
   function handleHeaderClick(header: Header) {
     if (header.sortable && !loading && !resizing) {
@@ -718,15 +698,6 @@
   }
 
   $effect(() => {
-    if (!showExpand) {
-      totalBatchLength = rows.length;
-    } else {
-      totalBatchLength = rows.reduce(
-        (acc, row) => acc + row.subItems.length,
-        rows.length
-      );
-    }
-
     if (
       !!cellEditorInfoActive &&
       cellEditorInfoActive.type.key == "number" &&
@@ -1353,7 +1324,6 @@
       !!tableContainer &&
       headersToShowInTable.length > 0 &&
       resizedColumnSizeWithPadding &&
-      headersToShow.length > 0 &&
       mainHeader
     ) {
       tick().then(updateRemainingWidth);
@@ -1465,6 +1435,7 @@
                     {dateLocale}
                     {editFilterMode}
                     {showActiveFilters}
+                    {multiEditTabs}
                     drawerSpace='40rem'
                     appendSnippet={filterAppendSnippet}
                     customChipSnippet={customFilterChipSnippet}
@@ -1498,6 +1469,7 @@
                     {dateLocale}
                     {editFilterMode}
                     {showActiveFilters}
+                    {multiEditTabs}
                     appendSnippet={filterAppendSnippet}
                     customChipSnippet={customFilterChipSnippet}
                     customSnippet={customFilterSnippet}
@@ -1569,6 +1541,26 @@
     {/if}
   </div>
   {/if}
+
+  {#each headersToShowInTable as header, index}
+    {#if !!header.info}
+      <ToolTip
+        appearTimeout={700}
+        activator={infoActivators[index]}
+        menuProps={{
+          anchor: 'right'
+        }}
+      >
+        <div
+          style:background-color='rgb(var(--global-color-background-300), .95)'
+          style:border-radius="5px"
+          style:padding="10px"
+        >
+          {header.info}
+        </div>
+      </ToolTip>
+    {/if}
+  {/each}
 
   <div class="outer-container {clazz.container}">
     <div class="inner-container" class:hide-scrollbar={hideScrollbar} bind:this={tableContainer} {onscroll}>
@@ -1656,23 +1648,6 @@
                 {/if}
               {/if}
             </th>
-            {#if !!header.info}
-              <ToolTip
-                appearTimeout={700}
-                activator={infoActivators[index]}
-                menuProps={{
-                  anchor: 'right'
-                }}
-              >
-                <div
-                  style:background-color='rgb(var(--global-color-background-300), .95)'
-                  style:border-radius="5px"
-                  style:padding="10px"
-                >
-                  {header.info}
-                </div>
-              </ToolTip>
-            {/if}
           {/each}
           {#if remainingWidth}
             <th
@@ -2328,7 +2303,7 @@
   {lang}
   {onsaveHeadersToShow}
   {availableHeaders}
-  {headersToShow}
+  bind:headersToShow={headersToShowInTable}
   contentSnippet={headerDrawerContentSnippet}
   drawerProps={headerDrawerProps}
   headersToAddSnippet={headerDrawerHeadersToAddSnippet}
