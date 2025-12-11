@@ -1018,7 +1018,7 @@
 
   .filters-container.mobile {
     flex-wrap: nowrap;
-    overflow: scroll;
+    overflow: auto;
   }
 
   .filters-wrapper {

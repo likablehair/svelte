@@ -3,7 +3,6 @@
     import PaginatedTable from "./PaginatedTable.svelte";
     import HeadersDrawer from "../common/HeadersDrawer.svelte";
     import { Icon } from "$lib";
-    import { derived } from "svelte/store";
 
 
   interface Props extends ComponentProps<typeof PaginatedTable<Item, Data>> {
