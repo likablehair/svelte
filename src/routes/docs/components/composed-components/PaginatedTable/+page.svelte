@@ -429,6 +429,12 @@
       default: "No data available",
     },
     {
+      name: "loading",
+      type: "boolean",
+      description: "Adds a loading bar",
+      default: "false",
+    },
+    {
       name: "editFilterMode",
       type: "'one-edit' | 'multi-edit'",
       description: "Mode for editing filters.",

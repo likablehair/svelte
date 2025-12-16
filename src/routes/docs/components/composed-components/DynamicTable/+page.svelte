@@ -187,6 +187,7 @@
     headersToShowInTable={headers}
     showExpand
     filtersVisible
+    loading
     cellEdit
     dynamicFilters={false}
     {rows}

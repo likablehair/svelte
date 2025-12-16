@@ -12,4 +12,7 @@
   --simple-table-default-header-font-weight: 700;
   --simple-table-default-overflow-x: auto;
   --simple-table-default-header-label-margin: 0 5px 0 0;
+  --simple-table-default-loader-height: 5px;
+  --simple-table-default-loader-background-color: rgb(var(--global-color-primary-500));
+  --simple-table-default-loader-border-radius: 20px;
 }

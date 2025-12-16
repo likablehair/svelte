@@ -215,6 +215,12 @@
       default: "No data available",
     },
     {
+      name: "loading",
+      type: "boolean",
+      description: "Adds a loading bar",
+      default: "false",
+    },
+    {
       name: "doubleClickActive",
       type: "boolean",
       description: "Enables the double click of the row.",
@@ -323,6 +329,24 @@
       type: "margin",
       description: "Table header label margin.",
       default: "0 5px 0 0",
+    },
+    {
+      name: "--simple-table-loader-height",
+      type: "size",
+      description: "Table loader height.",
+      default: "5px",
+    },
+    {
+      name: "--simple-table-loader-background-color",
+      type: "color",
+      description: "Table loader color.",
+      default: "rgb(var(--global-color-primary-500))",
+    },
+    {
+      name: "--simple-table-loader-border-radius",
+      type: "size",
+      description: "Table loader border radius.",
+      default: "20px",
     },
   ]}
 ></PropsViewer>
