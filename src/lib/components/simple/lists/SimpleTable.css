@@ -11,4 +11,7 @@
   --simple-table-default-header-padding: .2rem .5rem;
   --simple-table-default-header-font-weight: 700;
   --simple-table-default-overflow-x: auto;
+  --simple-table-default-loader-height: 5px;
+  --simple-table-default-loader-background-color: rgb(var(--global-color-primary-500));
+  --simple-table-default-loader-border-radius: 20px;
 }

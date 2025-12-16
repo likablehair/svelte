@@ -1496,7 +1496,13 @@
         {#if loading}
           <tr>
             <th
-              colspan={headersToShowInTable.length + 1}
+              colspan={
+                headersToShowInTable.length +
+                (!!showSelect && !showExpand && rows.length > 0 ? 1 : 0) +
+                (showExpand ? 1 : 0) +
+                (remainingWidth ? 1 : 0) +
+                (customizeHeaders || $$slots.rowActions || $$slots.append ? 1 : 0)
+              }
               class="loading"
               style="text-align: center;"
               style:border="none"

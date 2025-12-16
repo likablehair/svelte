@@ -74,6 +74,7 @@
     resizableColumns: boolean = false,
     resizedColumnSizeWithPadding: { [value: string]: number } = {},
     pointerOnRowHover: boolean = false,
+    loading: boolean = false,
     doubleClickActive: boolean = false,
     doubleClickDelay: number = 250;
 
@@ -345,6 +346,20 @@
             </th>
           {/if}
         </tr>
+        {#if loading}
+          <tr>
+            <th
+              colspan={
+                headers.length +
+                (resizableColumns && remainingWidth ? 1 : 0) +
+                ($$slots.rowActions || $$slots.append ? 1 : 0)
+              }
+              class="loading"
+            >
+              <div class="loader-line"></div>
+            </th>
+          </tr>
+        {/if}
       </thead>
       <tbody>
         {#each items as item, i}
@@ -615,5 +630,79 @@
 
   .pointer {
     cursor: pointer;
+  }
+
+  .loading {
+    padding: 0px !important;
+  }
+
+  .loader-line {
+    margin-top: -1px;
+    height: var(
+      --simple-table-loader-height,
+      var(--simple-table-default-loader-height)
+    );
+    position: relative;
+    overflow: hidden;
+    background-color: var(
+      --simple-table-header-background-color,
+      var(--simple-table-default-header-background-color)
+    );
+    -webkit-border-radius: var(
+      --simple-table-loader-border-radius,
+      var(--simple-table-default-loader-border-radius)
+    );
+    -moz-border-radius: var(
+      --simple-table-loader-border-radius,
+      var(--simple-table-default-loader-border-radius)
+    );
+    border-radius: var(
+      --simple-table-loader-border-radius,
+      var(--simple-table-default-loader-border-radius)
+    );
+  }
+
+  .loader-line:before {
+    content: "";
+    position: absolute;
+    left: -50%;
+    height: var(
+      --simple-table-loader-height,
+      var(--simple-table-default-loader-height)
+    );
+    width: 40%;
+    background-color: var(
+      --simple-table-loader-background-color,
+      var(--simple-table-default-loader-background-color)
+    );
+    -webkit-animation: lineAnim 1s linear infinite;
+    -moz-animation: lineAnim 1s linear infinite;
+    animation: lineAnim 1s linear infinite;
+    -webkit-border-radius: var(
+      --simple-table-loader-border-radius,
+      var(--simple-table-default-loader-border-radius)
+    );
+    -moz-border-radius: var(
+      --simple-table-loader-border-radius,
+      var(--simple-table-default-loader-border-radius)
+    );
+    border-radius: var(
+      --simple-table-loader-border-radius,
+      var(--simple-table-default-loader-border-radius)
+    );
+  }
+
+  @keyframes lineAnim {
+    0% {
+      left: -40%;
+    }
+    50% {
+      left: 20%;
+      width: 80%;
+    }
+    100% {
+      left: 100%;
+      width: 100%;
+    }
   }
 </style>

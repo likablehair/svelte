@@ -47,6 +47,7 @@
     editFilterMode: 'one-edit' | 'multi-edit' = 'one-edit',
     showActiveFilters: boolean = true,
     resizableColumns: boolean = false,
+    loading: boolean = false,
     resizedColumnSizeWithPadding: { [value: string]: number } = {},
     pointerOnRowHover: boolean | undefined = undefined,
     doubleClickActive: ComponentProps<SimpleTable>['doubleClickActive'] = false,
@@ -200,6 +201,7 @@
     bind:pointerOnRowHover
     {doubleClickActive}
     {doubleClickDelay}
+    {loading}
     on:sort={handleSort}
     on:sort
     on:rowClick
