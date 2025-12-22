@@ -1,113 +1,138 @@
 <script lang="ts">
+  import '../../../css/main.css'
+  import './Textarea.css'
   import { createId } from '@paralleldrive/cuid2';
+  import type { HTMLTextareaAttributes } from 'svelte/elements';
 
-  interface Props {
+  interface Props extends HTMLTextareaAttributes {
     label?: string;
-    placeholder?: string;
-    textAreaId?: string;
-    fontFamily?: string;
-    value?: string;
-    resizable?: boolean;
-    disabled?: boolean;
-    readOnly?: boolean;
-    maxLength?: number;
-    textColor?: string;
-    border?: string;
-    borderRadius?: string;
-    focusedBoxShadow?: string;
-    backgroundColor?: string;
-    padding?: string;
-    paddingLeft?: string;
-    paddingRight?: string;
-    paddingBottom?: string;
-    paddingTop?: string;
-    fontSize?: string;
-    labelFontSize?: string;
-    labelColor?: string;
-    width?: string;
-    height?: string;
-  }
+    class?: {
+      container?: string;
+      label?: string;
+      textarea?: string;
+    }
+  };
 
   let {
-    label = undefined,
-    placeholder = "placeholder",
-    textAreaId = createId(),
-    fontFamily = "inherit",
+    label,
+    id = createId(),
     value = $bindable(),
-    resizable = true,
-    disabled = false,
-    readOnly = false,
-    maxLength = undefined,
-    textColor = "black",
-    border = "none",
-    borderRadius = "5px",
-    focusedBoxShadow = undefined,
-    backgroundColor = undefined,
-    padding = undefined,
-    paddingLeft = undefined,
-    paddingRight = undefined,
-    paddingBottom = undefined,
-    paddingTop = undefined,
-    fontSize = undefined,
-    labelFontSize = undefined,
-    labelColor = undefined,
-    width = "100%",
-    height = "100%"
+    class: clazz,
+    ...rest
   }: Props = $props();
 </script>
 
-<div class="container">
+<div class={clazz?.container}>
   {#if label}
-    <label
-      for={textAreaId}
-      style:font-size={labelFontSize}
-      style:color={labelColor}
-    >
+    <label for={id} class={clazz?.label}>
       {label}
     </label>
   {/if}
   <textarea
-    style:width
-    style:height
-    style:font-family={fontFamily}
-    style:resize={resizable ? "both" : "none"}
-    style:font-size={fontSize}
-    style:border-radius={borderRadius}
-    style:background-color={backgroundColor}
-    style:color={textColor}
-    style:padding
-    style:padding-left={paddingLeft}
-    style:padding-right={paddingRight}
-    style:padding-bottom={paddingBottom}
-    style:padding-top={paddingTop}
-    style:border
-    style:--textarea-focus-box-shadow={focusedBoxShadow}
+    {...rest}
     bind:value
-    id={textAreaId}
-    {placeholder}
-    maxlength={maxLength}
-    {disabled}
-    readonly={readOnly}
+    {id}
+    class={clazz?.textarea}
   ></textarea>
 </div>
 
 <style>
   textarea {
-    display: block;
-    transition: all 0.3s;
+    box-sizing: border-box;
+    padding: var(
+      --textarea-padding,
+      var(--textarea-default-padding)
+    );
+    margin: var(
+      --textarea-margin,
+      var(--textarea-default-margin)
+    );
+    height: var(
+      --textarea-height,
+      var(--textarea-default-height)
+    );
+    width: var(
+      --textarea-width,
+      var(--textarea-default-width)
+    );
+    background-color: var(
+      --textarea-background-color,
+      var(--textarea-default-background-color)
+    );
+    border: var(
+      --textarea-border,
+      var(--textarea-default-border)
+    );
+    border-radius: var(
+      --textarea-border-radius,
+      var(--textarea-default-border-radius)
+    );
+    box-shadow: var(
+      --textarea-box-shadow,
+      var(--textarea-default-box-shadow)
+    );
+    transition: var(
+      --textarea-transition,
+      var(--textarea-default-transition)
+    );
+    font-family: var(
+      --textarea-font-family,
+      var(--textarea-default-font-family)
+    );
+    font-size: var(
+      --textarea-font-size,
+      var(--textarea-default-font-size)
+    );
+    font-weight: var(
+      --textarea-font-weight,
+      var(--textarea-default-font-weight)
+    );
+    color: var(
+      --textarea-color,
+      var(--textarea-default-color)
+    );
+    resize: var(
+      --textarea-resize,
+      var(--textarea-default-resize)
+    );
   }
 
   label {
-    display: block;
-    margin-bottom: 10px;
-    margin-left: 10px;
+    margin: var(
+      --textarea-label-margin,
+      var(--textarea-default-label-margin)
+    );
+    font-size: var(
+      --textarea-label-font-size,
+      var(--textarea-default-label-font-size)
+    );
+    font-weight: var(
+      --textarea-label-font-weight,
+      var(--textarea-default-label-font-weight)
+    );
+    color: var(
+      --textarea-label-color,
+      var(--textarea-default-label-color)
+    );
   }
 
   textarea:focus {
     outline: none;
-    -webkit-box-shadow: var(--textarea-focus-box-shadow);
-    -moz-box-shadow: var(--textarea-focus-box-shadow);
-    -o-box-shadow: var(--textarea-focus-box-shadow);
-    box-shadow: var(--textarea-focus-box-shadow);
+    -webkit-box-shadow: var(
+      --textarea-focus-box-shadow,
+      var(--textarea-default-focus-box-shadow)
+    );
+    -moz-box-shadow: var(
+      --textarea-focus-box-shadow,
+      var(--textarea-default-focus-box-shadow)
+    );
+    -o-box-shadow: var(
+      --textarea-focus-box-shadow,
+      var(--textarea-default-focus-box-shadow)
+    );
+    box-shadow: var(
+      --textarea-focus-box-shadow,
+      var(--textarea-default-focus-box-shadow)
+    );
   }
 </style>

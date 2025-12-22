@@ -1,0 +1,17 @@
+:root {
+  --textarea-default-padding: 0.65rem 1rem 0.65rem 1rem;
+  --textarea-default-margin: 0px 0px 5px;
+  --textarea-default-height: 100%;
+  --textarea-default-width: 100%;
+  --textarea-default-background-color: rgb(var(--global-color-background-300), .5);
+  --textarea-default-border-radius: 4px;
+  --textarea-default-box-shadow: none;
+  --textarea-default-transition: .2s;
+  --textarea-default-font-family: inherit;
+  --textarea-default-font-size: .9rem;
+  --textarea-default-font-weight: normal;
+  --textarea-default-color: rgb(var(--global-color-contrast-900));
+  --textarea-default-resize: none;
+  --textarea-default-label-margin: 0px 0px 10px 4px;
+  --textarea-default-label-font-weight: 500;
+}
