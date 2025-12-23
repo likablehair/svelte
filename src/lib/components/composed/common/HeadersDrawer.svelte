@@ -12,6 +12,7 @@
     lang: 'en' | 'it',
     availableHeaders: ComponentProps<typeof EnhancedPaginatedTable<Item, Data>>['headers'],
     headersToShow: ComponentProps<typeof EnhancedPaginatedTable<Item, Data>>['headers'],
+    firstColumn?: typeof headersToShow[number],
     onsaveHeadersToShow?: (event: {
       detail: {
         headersToShow: ComponentProps<typeof EnhancedPaginatedTable<Item, Data>>['headers'];
@@ -28,6 +29,7 @@
     lang,
     availableHeaders,
     headersToShow = $bindable(),
+    firstColumn,
     onsaveHeadersToShow,
     itemSnippet: internalItemSnippet,
     headersToAddSnippet,
@@ -54,6 +56,20 @@
   let internalHeadersToShow = $state(headersToShow)
   $effect(() => {
     internalHeadersToShow = headersToShow
+  })
+
+  let itemsVerticalList = $derived.by(() => {
+    let headers = [
+      ...(firstColumn ? [firstColumn] : []),
+      ...internalHeadersToShow.filter(h => h.value !== firstColumn?.value)
+    ]
+    return headers.map((e) => {
+      return {
+        ...e,
+        id: e.value,
+        name: e.label,
+      }
+    })
   })
 
   function saveHeadersToShow() {
@@ -88,13 +104,8 @@
   
             {#if internalHeadersToShow}
               <VerticalDraggableList
-                items={internalHeadersToShow.map((e) => {
-                  return {
-                    ...e,
-                    id: e.value,
-                    name: e.label,
-                  }
-                })}
+                items={itemsVerticalList}
+                disableFirstItem={!!firstColumn}
                 onchangeOrder={(e) => {
                   let newHeaders: typeof internalHeadersToShow = []
                   for(let i = 0; i < e.detail.items.length; i += 1) {
@@ -106,9 +117,9 @@
                   internalHeadersToShow = newHeaders;
                 }}
               >
-                {#snippet itemSnippet({ item })}
+                {#snippet itemSnippet({ item, index })}
                   {#if internalItemSnippet}
-                    {@render internalItemSnippet({ item })}
+                    {@render internalItemSnippet({ item, index })}
                   {:else}
                     <div
                       style:display=flex
@@ -129,6 +140,7 @@
                         <Switch
                           --switch-label-width="90%"
                           value={internalHeadersToShow.find((h) => h.value == item.id) != undefined}
+                          disabled={!!firstColumn && index == 0}
                           onchange={(e) => {
                             if (e.detail.value == false) {
                               internalHeadersToShow = internalHeadersToShow.filter((h) => h.value != item.id);
@@ -148,7 +160,13 @@
             <span class="headers-show">{lang == 'en' ? 'Available headers' : 'Intestazioni disponibili'}</span>
   
             {#if availableHeaders && availableHeaders.length > 0}
-              {#each availableHeaders as header (header.value)}
+              {#each availableHeaders
+                .filter(h => 
+                  firstColumn ?
+                  h.value != firstColumn?.value :
+                  true
+                ) as header (header.value)
+              }
                 <div
                   animate:flip
                   in:receive={{ key: header }}

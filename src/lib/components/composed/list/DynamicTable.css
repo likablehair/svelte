@@ -23,4 +23,8 @@
   --dynamic-table-default-cell-border: none;
   --dynamic-table-default-header-label-margin: 0px 4px 0px 0px;
   --dynamic-table-default-header-label-font-size: small;
+  --dynamic-table-default-resizer-color: rgb(var(--global-color-primary-500));
+  --dynamic-table-default-customize-headers-icon-size: 17px;
+  --dynamic-table-default-non-resizable-header-width: 37px;
+  --dynamic-table-default-sticked-background-color: rgb(var(--global-color-background-100));
 }
