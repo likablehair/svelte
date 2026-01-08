@@ -1,8 +1,9 @@
 <script lang="ts" generics="Item extends {[key: string]: any}, Data">
-    import type { ComponentProps } from "svelte";
-    import PaginatedTable from "./PaginatedTable.svelte";
-    import HeadersDrawer from "../common/HeadersDrawer.svelte";
-    import { Icon } from "$lib";
+  import type { ComponentProps } from "svelte";
+  import PaginatedTable from "./PaginatedTable.svelte";
+  import HeadersDrawer from "../common/HeadersDrawer.svelte";
+  import { Icon } from "$lib";
+  import './EnhancedPaginatedTable.css'
 
 
   interface Props extends ComponentProps<typeof PaginatedTable<Item, Data>> {
@@ -23,7 +24,7 @@
     headerDrawerHeadersToAddSnippet,
     lang = 'en',
     headers,
-    appendSnippet: internalAppendSnippet,
+    stickyAppendSnippet: internalStickyAppendSnippet,
     sortedBy = $bindable(undefined),
     sortDirection = $bindable("asc"),
     page = $bindable(1),
@@ -32,6 +33,8 @@
     quickFilters = $bindable(),
     selectedItems = $bindable([]),
     selectedAll = $bindable(),
+    stickFirstColumn,
+    resizedColumnSizeWithPadding = $bindable({}),
     ...rest
   }: Props = $props()
 
@@ -43,13 +46,30 @@
               return !headersToShowInTable.find((hst) => hst.value == h.value);
             })
         : []
+    }),
+    firstColumn = $derived.by(() => {
+      return stickFirstColumn
+        ? headers[0]
+        : undefined;
     })
+
+  $effect(() => {
+    if (firstColumn) {
+      if (headersToShowInTable[0].value === firstColumn.value) {
+        return; 
+      }
+
+      const otherHeaders = headersToShowInTable.filter(h => h.value !== firstColumn.value);
+      headersToShowInTable = [firstColumn, ...otherHeaders];
+    }
+  });
 </script>
 
 <PaginatedTable 
   {...rest} 
   {lang} 
   headers={headersToShowInTable}
+  {stickFirstColumn}
   bind:sortedBy
   bind:sortDirection
   bind:page
@@ -58,15 +78,18 @@
   bind:quickFilters
   bind:selectedItems
   bind:selectedAll
+  bind:resizedColumnSizeWithPadding
 >
-  {#snippet appendSnippet({ index, item, })}
-    {#if index == -1}
-      <Icon
-        name="mdi-plus-circle-outline"
-        onclick={() => (openHeaderDrawer = true)}
-      />
-    {/if}
-    {@render internalAppendSnippet?.({ index, item, })}
+  {#snippet stickyAppendSnippet()}
+    <Icon
+      name="mdi-plus-circle-outline"
+      onclick={() => (openHeaderDrawer = true)}
+      --icon-size="var(
+        --enhanced-paginated-table-customize-headers-icon-size,
+        var(--enhanced-paginated-table-default-customize-headers-icon-size)
+      )"
+    />
+    {@render internalStickyAppendSnippet?.()}
   {/snippet}
 </PaginatedTable>
 
@@ -80,4 +103,5 @@
   drawerProps={headerDrawerProps}
   headersToAddSnippet={headerDrawerHeadersToAddSnippet}
   itemSnippet={headerDrawerItemSnippet}
+  {firstColumn}
 />

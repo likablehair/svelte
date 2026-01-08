@@ -152,9 +152,6 @@
         Append
       {/if}
     {/snippet}
-    {#snippet rowActionsSnippet({ index, item })}
-      RowActions
-    {/snippet}
   </SimpleTable>
 </div>
 <h2>Props</h2>
@@ -233,6 +230,12 @@
       default: "250",
     },
     {
+      name: "stickFirstColumn",
+      type: "boolean",
+      description: "Sticks the first column above the others",
+      default: "false",
+    },
+    {
       name: "calculateRowStyles",
       type: "CalculateRowStyles<Item> | undefined",
       description: "Function to calculate row styles.",
@@ -268,7 +271,7 @@
       name: "--simple-table-header-background-color",
       type: "color",
       description: "Header background color.",
-      default: "rgb(var(--global-color-background-400), .8)",
+      default: "rgb(var(--global-color-background-400))",
     },
     {
       name: "--simple-table-separator-color",
@@ -304,7 +307,7 @@
       name: "--simple-table-row-hover-background-color",
       type: "color",
       description: "Row hover background color.",
-      default: "rgb(var(--global-color-background-400), .2)",
+      default: "rgb(var(--global-color-background-200))",
     },
     {
       name: "--simple-table-header-padding",
@@ -347,6 +350,24 @@
       type: "size",
       description: "Table loader border radius.",
       default: "20px",
+    },
+    { 
+      name: "--simple-table-customize-headers-icon-size", 
+      type: "size", 
+      description: "Size of the icon to open the headers drawer", 
+      default: "17px" 
+    },
+    { 
+      name: "--simple-table-non-resizable-header-width", 
+      type: "size", 
+      description: "Width of non-resizable headers", 
+      default: "37px" 
+    },
+    { 
+      name: "--simple-table-sticked-background-color", 
+      type: "color", 
+      description: "Background color for sticked header", 
+      default: "rgb(var(--global-color-background-100))" 
     },
   ]}
 ></PropsViewer>
@@ -415,14 +436,6 @@
       ],
     },
     {
-      name: "rowActionsSnippet",
-      description: "Custom actions for rows.",
-      properties: [
-        { name: "index", type: "number", description: "Row index." },
-        { name: "item", type: "Item", description: "Row item." },
-      ],
-    },
-    {
       name: "customSnippet",
       description: "Custom cell rendering.",
       properties: [
@@ -438,6 +451,10 @@
       default: `
 <NoData {lang} />
       `,
+    },
+    {
+      name: 'stickyAppendSnippet',
+      description: 'Appends a sticky header',
     },
   ]}
 ></SlotsViewer>

@@ -124,7 +124,7 @@
     editFilterMode = "one-edit",
     showActiveFilters = true,
     resizableColumns = false,
-    resizedColumnSizeWithPadding = {},
+    resizedColumnSizeWithPadding = $bindable({}),
     pointerOnRowHover = undefined,
     doubleClickActive = false,
     doubleClickDelay = 250,
@@ -153,7 +153,6 @@
     customSnippet,
     headerLabelSnippet,
     headerSnippet,
-    rowActionsSnippet,
     onsort,
     footerSnippet,
     rangeDescriptorSnippet,
@@ -436,7 +435,6 @@
     {resizableColumns}
     bind:resizedColumnSizeWithPadding
     {customSnippet}
-    {rowActionsSnippet}
     {appendSnippet}
     {headerSnippet}
     {headerLabelSnippet}

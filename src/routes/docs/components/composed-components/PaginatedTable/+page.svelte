@@ -302,9 +302,6 @@
         <Icon name="mdi-star" --icon-color="green"></Icon>
       {/if}
     {/snippet}
-    {#snippet rowActionsSnippet({ index, item })}
-      RowActions
-    {/snippet}
     {#snippet appendSnippet({ index, item })}
       RowActions
     {/snippet}
@@ -480,6 +477,12 @@
       type: "number",
       description: "Time window (in ms) to double click",
       default: "250",
+    },
+    {
+      name: "stickFirstColumn",
+      type: "boolean",
+      description: "Sticks the first column above the others",
+      default: "false",
     },
     {
       name: "searchTimeoutDelay",
@@ -738,14 +741,6 @@
       ],
     },
     {
-      name: "rowActionsSnippet",
-      description: "Custom actions for rows.",
-      properties: [
-        { name: "index", type: "number", description: "Row index." },
-        { name: "item", type: "Item", description: "Row item." },
-      ],
-    },
-    {
       name: "customSnippet",
       description: "Custom cell rendering.",
       properties: [
@@ -765,6 +760,10 @@
     {
       name: "totalsSnippet",
       description: "Slot to display number of results",
+    },
+    {
+      name: 'stickyAppendSnippet',
+      description: 'Appends a sticky header',
     },
   ]}
 ></SlotsViewer>

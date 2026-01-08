@@ -13,6 +13,7 @@
     type: HeaderType
     width?: string
     minWidth?: string
+    maxWidth?: string
     sortable?: boolean
     icon?: string
     sortModify?: (params: { builder: FilterBuilder, sortDirection: 'asc' | 'desc' }) => FilterBuilder
@@ -53,6 +54,7 @@
     loading?: boolean
     doubleClickActive?: boolean,
     doubleClickDelay?: number;
+    stickFirstColumn?: boolean;
     calculateRowStyles?: CalculateRowStyles<Item> | undefined
     calculateRowClasses?: CalculateRowClasses<Item> | undefined
     onsort?: (event: {
@@ -92,10 +94,7 @@
       index: number
       item?: Item
     }]>
-    rowActionsSnippet?: Snippet<[{
-      index: number
-      item: Item
-    }]>
+    stickyAppendSnippet?: Snippet<[]>
     customSnippet?: Snippet<[{
       index: number
       columnIndex: number
@@ -117,13 +116,14 @@
     sortedBy = $bindable(undefined),
     sortDirection = $bindable("asc"),
     resizableColumns = false,
-    resizedColumnSizeWithPadding = $bindable(),
+    resizedColumnSizeWithPadding = $bindable({}),
     pointerOnRowHover = false,
     lang = 'en',
     doubleClickActive = false,
     doubleClickDelay = 250,
     noItemsText,
     loading,
+    stickFirstColumn,
     calculateRowStyles = undefined,
     calculateRowClasses = undefined,
     oncolumnResize,
@@ -134,7 +134,7 @@
     headerLabelSnippet,
     appendSnippet,
     prependSnippet,
-    rowActionsSnippet,
+    stickyAppendSnippet,
     customSnippet,
     noDataSnippet,
     class: clazz = {},
@@ -149,46 +149,52 @@
     tableContainer: HTMLElement | undefined = $state(),
     mainHeader: HTMLElement | undefined = $state(),
     remainingWidth: number = $state(0),
-    resizeObserver: ResizeObserver
+    resizeObserver: ResizeObserver,
+    headersHTML: { [value: string]: HTMLElement } = $state({}),
+    tableHTML: HTMLElement | undefined = $state(),
+    resizing = false,
+    colspan = $derived.by(() => {
+      return headers.length +
+        (stickyAppendSnippet ? 1 : 0) +
+        (appendSnippet ? 1 : 0) +
+        (prependSnippet ? 1 : 0) +
+        (resizableColumns && remainingWidth ? 1 : 0);
+    })
+
+  const DEFAULT_MIN_WIDTH_PX = 100,
+    DEFAULT_MAX_WIDTH_PX = 400
 
   onMount(() => {
     if(resizableColumns) {
-      if(!resizedColumnSizeWithPadding) resizedColumnSizeWithPadding = {}
+      if (appendSnippet && headersHTML['row-append-header']) {
+        const actionCells = tableContainer?.querySelectorAll('.row-append-cell');
+        
+        if (actionCells && actionCells.length > 0) {
+          let maxActionWidth = 0;
 
-      for(const head of [...headers, { value: 'slot-append' }, { value: 'slot-prepend' }]) {
-        let th
-        if(head.value == 'slot-append' || head.value == 'slot-prepend') {
-          th = document.getElementsByClassName(head.value).item(0) as HTMLElement
-        } else {
-          th = document.getElementById(head.value) as HTMLElement
-        }
-        if(!!th) {
-          let widthWihtPadding;
-          if (!!resizedColumnSizeWithPadding[head.value]) {
-            widthWihtPadding = resizedColumnSizeWithPadding[head.value];
-          } else {
-            widthWihtPadding = th.getBoundingClientRect().width;
-            resizedColumnSizeWithPadding[head.value] = widthWihtPadding;
+          for (let i = 0; i < actionCells.length; i++) {
+            const cellContent = actionCells[i];
+            const width = cellContent.getBoundingClientRect().width;
+            if (width > maxActionWidth) {
+              maxActionWidth = width;
+            }
           }
-        }
+
+          const finalWidth = Math.ceil(maxActionWidth + 15);
+          
+          headersHTML['row-append-header'].style.width = `${finalWidth}px`;
+          headersHTML['row-append-header'].style.minWidth = `${finalWidth}px`;
+        } 
       }
 
-      for(const head of [...headers, { value: 'slot-append' }, { value: 'slot-prepend' }]) {
-        let th
-        if(head.value == 'slot-append' || head.value == 'slot-prepend') {
-          th = document.getElementsByClassName(head.value).item(0) as HTMLElement
-        } else {
-          th = document.getElementById(head.value) as HTMLElement
-        }
+      for(const head of headers) {
+        let th = headersHTML[head.value]
         if(!!th) {
-          let { paddingLeft, paddingRight } = getComputedStyle(th);
-          let width = resizedColumnSizeWithPadding[head.value] - parseFloat(paddingLeft) - parseFloat(paddingRight);
-          th.style.width = `${width}px`
+          resizeHeader(th, head)
         }
       }
 
-      let table = document.getElementsByClassName('table')[0] as HTMLElement
-      table.classList.add('resizable')
+      tableHTML?.classList.add('resizable')
 
       resizeObserver = new ResizeObserver(() => {
         updateRemainingWidth();
@@ -206,7 +212,7 @@
 
 
   function handleHeaderClick(header: TableHeader) {
-    if(header.sortable) {
+    if(header.sortable && !resizing) {
       if(!!sortedBy && header.value == sortedBy) {
         if(sortDirection == 'asc') sortDirection = 'desc'
         else if(sortDirection == 'desc') {
@@ -273,52 +279,65 @@
 
   function resize(node: HTMLElement) {
     let th: HTMLElement | null = node.parentElement
-    let thead: Element | null = document.getElementsByClassName('thead').item(0)
+    let resizingInner = false
 
-    if(!!th && !!thead && thead instanceof HTMLElement) {
-      let resizing = false
+    if(!!th) {
       let { width } = th.getBoundingClientRect()
 
       function mouseMoveHandler(e: MouseEvent) {
-        if(resizing && !!th) {
-          if(!resizedColumnSizeWithPadding) resizedColumnSizeWithPadding = {}
-          width += e.movementX
-          let { paddingLeft, paddingRight } = getComputedStyle(th)
+        if (resizingInner && !!th && !!tableContainer) {
+          width += e.movementX;
+          const { paddingLeft, paddingRight } = getComputedStyle(th);
 
-          let minWidth: string | undefined = headers.find(h => h.value === th.id)?.minWidth
-          let minWidthPx: number | undefined = undefined
-          if(!!minWidth && minWidth.endsWith('px')) {
-            minWidthPx = parseInt(minWidth, 10)
+          const minWidth: string | undefined = headers.find(h => h.value === th.id)?.minWidth;
+          let minWidthPx: number | undefined;
+          if (!!minWidth && minWidth.endsWith('px')) {
+            minWidthPx = parseInt(minWidth, 10);
           }
 
-          let actualMinWidth = (minWidthPx || 50) - parseFloat(paddingLeft) - parseFloat(paddingRight)
-          if(width > actualMinWidth) {
-            th.style.width = width + 'px'
-            resizedColumnSizeWithPadding[th.id] = th.getBoundingClientRect().width
-            if(oncolumnResize) {
-              oncolumnResize({
-                detail: {
-                  id: th.id,
-                  newWidthPx: width
-                }
-              })
+          const maxWidth: string | undefined = headers.find(h => h.value === th.id)?.maxWidth;
+          let maxWidthPx: number | undefined;
+          if (!!maxWidth && maxWidth.endsWith('px')) {
+            maxWidthPx = parseInt(maxWidth, 10);
+          }
+
+          const actualMinWidth = (minWidthPx || DEFAULT_MIN_WIDTH_PX) - parseFloat(paddingLeft) - parseFloat(paddingRight);
+          const actualMaxWidth = (maxWidthPx || DEFAULT_MAX_WIDTH_PX) - parseFloat(paddingLeft) - parseFloat(paddingRight);
+
+          if (width > actualMinWidth && width < actualMaxWidth) {
+            th.style.width = width + 'px';
+            resizedColumnSizeWithPadding[th.id] = th.getBoundingClientRect().width;
+            resizedColumnSizeWithPadding = {
+              ...resizedColumnSizeWithPadding,
             }
           }
         }
       }
+      
 
-      function mouseUpHandler(e: MouseEvent) {
+      function mouseUpHandler(e: MouseEvent, setResize: boolean = true) {
         if(!!th) {
-          resizing = false
+          resizingInner = false
           let { paddingLeft, paddingRight } = getComputedStyle(th)
           width = th.getBoundingClientRect().width - parseFloat(paddingLeft) - parseFloat(paddingRight)
+          if(setResize){
+            setTimeout(() => resizing = false, 20)
+          }
+          if(oncolumnResize){
+            oncolumnResize({
+              detail: {
+                id: th.id,
+                newWidthPx: width
+              }
+            })
+          }
         }
       }
 
       function mouseDownHandler(e: MouseEvent) {
         if(!!th) {
-          e.stopPropagation()
           resizing = true
+          resizingInner = true
           let { paddingLeft, paddingRight } = getComputedStyle(th)
           width = th.getBoundingClientRect().width - parseFloat(paddingLeft) - parseFloat(paddingRight)
         }
@@ -354,11 +373,11 @@
 
   async function updateRemainingWidth() {
     if(tableContainer != null && !!tableContainer && mainHeader) {
-      const containerWidth = tableContainer?.getBoundingClientRect().width - 30;
+      const containerWidth = tableContainer?.getBoundingClientRect().width - 10;
 
       if(containerWidth){
         const totalResizableWidth = headers.reduce((sum, head) => {
-          let th = document.getElementById(head.value)
+          let th = headersHTML[head.value]
           if(!!th) {
             resizeHeader(th, head)
           }
@@ -366,7 +385,7 @@
           return sum + width + 1;
         }, 0);
     
-        const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.slot-append, th.slot-prepend, th.customize-headers'))
+        const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.row-append-header, th.sticky-col'))
           .reduce((sum, th) => sum + th.getBoundingClientRect().width + 1, 0);
     
         remainingWidth = Math.max(0, containerWidth - totalResizableWidth - extraStaticWidth);
@@ -375,42 +394,67 @@
   }
 
   function resizeHeader(th: HTMLElement, header: { value: string, minWidth?: string, maxWidth?: string }){
-    if(resizedColumnSizeWithPadding){
-      if (!resizedColumnSizeWithPadding[header.value]) {
-        let widthWihtPadding = th.getBoundingClientRect().width
-        resizedColumnSizeWithPadding[header.value] = widthWihtPadding;
+    if (!resizedColumnSizeWithPadding[header.value]) {
+      let widthWithPadding = th.getBoundingClientRect().width
+
+      let minWidth = header.minWidth,
+        minWidthPx = DEFAULT_MIN_WIDTH_PX
+      if (!!minWidth && minWidth.endsWith('px')) {
+        minWidthPx = parseInt(minWidth, 10);
       }
-      let { paddingLeft, paddingRight } = getComputedStyle(th);
-      let width = resizedColumnSizeWithPadding[header.value] - parseFloat(paddingLeft) - parseFloat(paddingRight);
-      th.style.width = `${width}px`
+      if(widthWithPadding < minWidthPx) {
+        widthWithPadding = minWidthPx
+      }
+
+      let maxWidth = header.maxWidth,
+        maxWidthPx = DEFAULT_MAX_WIDTH_PX
+      if (!!maxWidth && maxWidth.endsWith('px')) {
+        maxWidthPx = parseInt(maxWidth, 10);
+      }
+      if(widthWithPadding > maxWidthPx) {
+        widthWithPadding = maxWidthPx
+      }
+
+      resizedColumnSizeWithPadding[header.value] = widthWithPadding;
     }
+    let { paddingLeft, paddingRight } = getComputedStyle(th);
+    let width = resizedColumnSizeWithPadding[header.value] - parseFloat(paddingLeft) - parseFloat(paddingRight);
+    th.style.width = `${width}px`
   }
 
 </script>
 
 {#if !!items && Array.isArray(items)}
   <div class="simple-table-container {clazz.container || ''}" class:resizable={resizableColumns} bind:this={tableContainer}>
-    <table class="table">
+    <table class="table" bind:this={tableHTML}>
       <thead class="thead {clazz.header || ''}" bind:this={mainHeader}>
         <tr>
           {#if prependSnippet}
-            <th class="slot-prepend">
+            <th 
+              class="non-resizable"
+              class:sticky-col-1={stickFirstColumn}
+            >
               {@render prependSnippet({ index: -1 })}
             </th>
           {/if}
-          {#each headers as head}
+          {#each headers as head, index}
             <th
-              tabindex="0"
               style={`${resizableColumns || !head.width ? '' : `width: ${head.width}`}`}
               style:min-width={head.minWidth}
+              style:max-width={head.maxWidth}
               class:sortable={head.sortable}
-              onmousedown={() => handleHeaderClick(head)}
-              onkeydown={(e) => {
+              class:sticky-col-2={stickFirstColumn && index == 0}
+              class:no-left={!prependSnippet}
+              onclick={() => handleHeaderClick(head)}
+              id={head.value}
+              bind:this={headersHTML[head.value]}
+              tabindex="0"
+              onkeyup={(e) => {
                 if(e.key == 'Enter') {
                   handleHeaderClick(head)
                 }
               }}
-              id={head.value}
+              bind:this={headersHTML[head.value]}
             >
               {#if resizableColumns}
                 <div class="resizer" use:resize></div>
@@ -445,6 +489,21 @@
               {/if}
             </th>
           {/each}
+          {#if appendSnippet}
+            <th
+              class="row-append-header"
+              bind:this={headersHTML['row-append-header']}
+            >
+              {@render appendSnippet({ index: -1, })}
+            </th>
+          {/if}
+          {#if stickyAppendSnippet}
+            <th
+              class="sticky-col"
+            >
+              {@render stickyAppendSnippet()}
+            </th>
+          {/if}
           {#if resizableColumns && remainingWidth}
             <th
               style:width={remainingWidth + 'px'}
@@ -452,23 +511,11 @@
               aria-hidden="true"
             ></th>
           {/if}
-          {#if rowActionsSnippet || appendSnippet}
-            <th class="slot-append">
-              {#if appendSnippet}
-                {@render appendSnippet({ index: -1 })}
-              {/if}
-            </th>
-          {/if}
         </tr>
         {#if loading}
           <tr>
             <th
-              colspan={
-                headers.length +
-                (prependSnippet ? 1 : 0) +
-                (resizableColumns && remainingWidth ? 1 : 0) +
-                (rowActionsSnippet || appendSnippet ? 1 : 0)
-              }
+              {colspan}
               class="loading"
             >
               <div class="loader-line"></div>
@@ -490,18 +537,25 @@
                 }
               }}
               tabindex="0"
-              style:background-color={styles.backgroundColor}
+              style:--row-bg={styles.backgroundColor}
               style:color={styles.color}
               style:font-weight={styles.fontWeight}
               class:pointer={pointerOnRowHover}
             >
               {#if prependSnippet}
-                <td class="{clazz.cell || ''} prepend" style:width="fit-content">
+                <td 
+                  class="{clazz.cell || ''} non-resizable"
+                  class:sticky-col-1={stickFirstColumn}
+                >
                   {@render prependSnippet({ index: i, item })}
                 </td>
               {/if}
               {#each headers as header, j}
-                <td class="{clazz.cell || ''}">
+                <td 
+                  class="{clazz.cell || ''}"
+                  class:sticky-col-2={stickFirstColumn && j == 0}
+                  class:no-left={!prependSnippet}
+                >
                   {#if header.type.key == "custom"}
                     {#if customSnippet}
                       {@render customSnippet({ index: i, columnIndex: j, header, item})}
@@ -531,25 +585,27 @@
                   {/if}
                 </td>
               {/each}
-              {#if resizableColumns && remainingWidth}
+              {#if appendSnippet}
+                <td 
+                  class="{clazz.cell || ''}"
+                >
+                  <div class="row-append-cell" style="display: inline-block; white-space: nowrap;">
+                    {@render appendSnippet({ index: i, item })}
+                  </div>
+                </td>
+              {/if}
+              {#if stickyAppendSnippet}
                 <td></td>
               {/if}
-              {#if rowActionsSnippet || appendSnippet}
-                <td class="{clazz.cell || ''} append" style:width="fit-content">
-                  {#if rowActionsSnippet}
-                    {@render rowActionsSnippet({ index: i, item })}
-                  {/if}
-                  {#if appendSnippet}
-                    {@render appendSnippet({ index: i, item })}
-                  {/if}
-                </td>
+              {#if resizableColumns && remainingWidth}
+                <td></td>
               {/if}
             </tr>
           {/each}
         {:else}
           <tr>
             <td
-              colspan={headers.length + 1}
+              {colspan}
               style="text-align: center;"
               style:border="none"
               style:cursor="default"
@@ -569,12 +625,12 @@
 
 <style>
 
-  th.slot-append, th.slot-prepend {
+  th.row-append-header {
     width: 1px;
     min-width: unset;
   }
 
-  .table.resizable .slot-append, .table.resizable .slot-prepend {
+  .table.resizable .row-append-header, .table.resizable {
     box-sizing: content-box;
   }
 
@@ -585,26 +641,6 @@
   .simple-table-container.resizable {
     overflow-x: auto;
   }
-
-  .resizer {
-    width: 2px;
-    display: none;
-    position: absolute;
-    right: 5%;
-    top: 10%;
-    bottom: 10%;
-    z-index: 1000;
-    background-color: rgb(var(--simple-table-column-resizer-color, var(--global-color-contrast-400)));
-    cursor: col-resize;
-    background-clip: content-box;
-    padding: 0px 5px 0px 5px;
-    box-sizing: content-box;
-  }
-
-  th:hover .resizer {
-    display: inline-block;
-  }
-
 
   .simple-table-container {
     width: var(--simple-table-width, var(--simple-table-default-width));
@@ -729,7 +765,7 @@
       --simple-table-row-height,
       var(--simple-table-default-row-height)
     );
-    transition: background-color 0.1s ease-in-out;
+    background-color: var(--row-bg);
   }
 
   .item-tr:hover {
@@ -844,5 +880,82 @@
       left: 100%;
       width: 100%;
     }
+  }
+
+  .resizer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 12px;
+    height: 100%;
+    cursor: col-resize;
+    z-index: 3;
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+  }
+  .resizer::after {
+    content: '';
+    width: 2.8px;
+    border-radius: 4px;
+    height: 75%;
+    background-color: transparent;
+    transition: background-color 0.2s;
+  }
+  th:hover .resizer::after {
+    background-color: var(
+      --simple-table-resizer-color,
+      var(--simple-table-default-resizer-color)
+    );
+  }
+  .non-resizable {
+    padding-left: 0px !important;
+    text-align: center;
+    width: var(
+      --simple-table-non-resizable-header-width,
+      var(--simple-table-default-non-resizable-header-width)
+    );
+  }
+  .thead th.sticky-col {
+    position: sticky;
+    right: 0;
+    z-index: 3;
+    width: 23px;
+    min-width: 23px;
+  }
+  .sticky-col-1 {
+    position: sticky;
+    left: 0;
+  }
+  .sticky-col-2 {
+    position: sticky;
+    left: var(
+      --simple-table-non-resizable-header-width,
+      var(--simple-table-default-non-resizable-header-width)
+    ); 
+  }
+  th.sticky-col-1, th.sticky-col-2 {
+    z-index: 3;
+    background-color: var(
+      --simple-table-header-background-color, 
+      var(--simple-table-default-header-background-color)
+    );
+  }
+
+  td.sticky-col-1, td.sticky-col-2 {
+    z-index: 2; 
+    background-color: var(
+      --row-bg, 
+      var(--simple-table-sticked-background-color, var(--simple-table-default-sticked-background-color))
+    );
+  }
+
+  .item-tr:hover td.sticky-col-1, .item-tr:hover td.sticky-col-2 {
+    background-color: var( 
+      --simple-table-row-hover-background-color, var(--simple-table-default-row-hover-background-color)
+    );
+  }
+  .no-left {
+    left: 0;
   }
 </style>

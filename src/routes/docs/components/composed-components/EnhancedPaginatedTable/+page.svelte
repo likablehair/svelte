@@ -327,6 +327,14 @@
     },
     { name: "headerDrawerProps", type: "object", description: "Props of the headers drawer", },
   ]}
+  styleProps={[
+    {
+      name: '--enhanced-paginated-table-default-customize-headers-icon-size',
+      type: 'size',
+      default: '17px;',
+      description: 'Icon size for the customize headers icon',
+    }
+  ]}
 ></PropsViewer>
 <h2>Slots</h2>
 <SlotsViewer

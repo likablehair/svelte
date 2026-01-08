@@ -190,7 +190,6 @@
   type Header = Headers[number] & {
     cellEditorInfo?: CellEditorInfo;
     info?: string;
-    maxWidth?: string;
   };
   type HeaderType = Header["type"];
 
@@ -508,7 +507,7 @@
       const otherHeaders = headersToShowInTable.filter(h => h.value !== firstColumn.value);
       headersToShowInTable = [firstColumn, ...otherHeaders];
     }
-});
+  });
 
   const DEFAULT_MIN_WIDTH_PX = 100,
     DEFAULT_MAX_WIDTH_PX = 400
@@ -1648,6 +1647,7 @@
               style:max-width={header.maxWidth}
               class:sortable={header.sortable}
               class:sticky-col-2={stickFirstColumn && index == 0}
+              class:no-left={!showExpand && !showSelect}
               onclick={() => handleHeaderClick(header)}
               id={header.value}
               bind:this={headersHTML[header.value]}
@@ -1823,6 +1823,7 @@
                   class:hover-cell={cellEdit && !loading && !!header.cellEditorInfo}
                   class:cell-edit-activator={cellEditorIndexHeader == indexHeader && cellEditorIndexRow == indexRow && !cellEditorSubItem}
                   class:sticky-col-2={stickFirstColumn && indexHeader == 0}
+                  class:no-left={!showExpand && !showSelect}
                   onclick={(e) => {
                     handleCellClick(
                       e,
@@ -2830,5 +2831,8 @@
       --row-bg, 
       var(--dynamic-table-row-background-color-hover, var(--dynamic-table-default-row-background-color-hover))
     ) !important;
+  }
+  .no-left {
+    left: 0;
   }
 </style>
