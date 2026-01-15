@@ -316,7 +316,7 @@
     { name: "--dynamic-table-resizer-color", type: "color", description: "Color fot the header resizer", default: "rgb(var(--global-color-primary-500))" },
     { name: "--dynamic-table-customize-headers-icon-size", type: "size", description: "Size of the icon to open the headers drawer", default: "17px" },
     { name: "--dynamic-table-non-resizable-header-width", type: "size", description: "Width of non-resizable headers", default: "37px" },
-    { name: "--dynamic-table-sticked-background-color", type: "color", description: "Background color for sticked header", default: "rgb(var(--global-color-background-100))" },
+    { name: "--dynamic-table-sticked-background-color", type: "color", description: "Background color for sticked header", default: "rgb(var(--global-color-background-50))" },
   ]}
 ></PropsViewer>
 <h2>Slots</h2>

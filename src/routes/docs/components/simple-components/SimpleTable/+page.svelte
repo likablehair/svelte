@@ -367,7 +367,7 @@
       name: "--simple-table-sticked-background-color", 
       type: "color", 
       description: "Background color for sticked header", 
-      default: "rgb(var(--global-color-background-100))" 
+      default: "rgb(var(--global-color-background-50))" 
     },
   ]}
 ></PropsViewer>

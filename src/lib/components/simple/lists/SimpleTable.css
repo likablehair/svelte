@@ -17,5 +17,5 @@
   --simple-table-default-loader-border-radius: 20px;
   --simple-table-default-resizer-color: rgb(var(--global-color-primary-500));
   --simple-table-default-non-resizable-header-width: 37px;
-  --simple-table-default-sticked-background-color: rgb(var(--global-color-background-100));
+  --simple-table-default-sticked-background-color: rgb(var(--global-color-background-50));
 }
