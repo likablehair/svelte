@@ -1,0 +1,11 @@
+:root {
+  --dashboard-shaper-default-widget-height: 200px;
+  --dashboard-shaper-default-gap: 4px;
+  --dashboard-shaper-default-cell-preview-background-color: rgb(var(--global-color-primary-500), 0.5);
+  --dashboard-shaper-default-widget-preview-border-radius: 8px;
+  --dashboard-shaper-default-display-mobile: flex;
+  --dashboard-shaper-default-flex-direction-mobile: column;
+  --dashboard-shaper-default-dialog-background-color: rgb(var(--global-color-background-300));
+  --dashboard-shaper-default-dialog-header-background-color: rgb(var(--global-color-background-400));
+  --dashboard-shaper-default-add-widget-button-background-color: rgb(var(--global-color-background-300));
+}

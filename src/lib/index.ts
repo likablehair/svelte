@@ -109,3 +109,5 @@ export { default as CollapsibleDivider } from './components/simple/common/Collap
 export { default as ConfirmOrCancelButtons } from './components/composed/forms/ConfirmOrCancelButtons.svelte'
 export { default as SearchBar } from './components/composed/search/SearchBar.svelte'
 export { default as SearchResults } from './components/composed/search/SearchBar.svelte'
+
+export { default as DashboardShaper } from './components/composed/dashboard/DashboardShaper.svelte'

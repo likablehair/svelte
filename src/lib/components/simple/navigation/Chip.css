@@ -16,4 +16,8 @@
   --chip-default-line-height: inherit;
   --chip-default-inactive-background-color: rgb(var(--global-color-background-300));
   --chip-default-inactive-color: rgb(var(--global-color-contrast-900), .8);
+  --chip-default-inactive-hover-background-color: rgb(var(--global-color-primary-500));
+  --chip-default-inactive-focus-background-color: rgb(var(--global-color-primary-500));
+  --chip-default-inactive-hover-color: rgb(var(--global-color-contrast-100));
+  --chip-default-inactive-focus-color: rgb(var(--global-color-contrast-100));
 }

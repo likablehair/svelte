@@ -440,6 +440,12 @@ const list: {
     type: 'simple',
     url: '/docs/components/simple-components/DashboardGridShaper'
   }, {
+    title: 'DashboardShaper',
+    description: 'Shape your dashboard into life.',
+    status: 'beta',
+    type: 'composed',
+    url: '/docs/components/composed-components/DashboardShaper'
+  }, {
     title: 'CountriesAutocomplete',
     description: 'Every nation includes the flag.',
     status: 'beta',

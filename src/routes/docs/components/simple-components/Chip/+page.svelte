@@ -47,7 +47,10 @@
     { name: "--chip-inactive-background-color", type: "color", description: "Background color for inactive chip", default: "rgb(var(--global-color-background-300))" },
     { name: "--chip-inactive-border", type: "border", description: "Border for inactive chip", },
     { name: "--chip-inactive-border-color", type: "color", description: "Border color for inactive chip" },
-    
+    { name: "--chip-default-inactive-hover-background-color", type: "color", description: "Background color for inactive hovered chip", default: 'rgb(var(--global-color-primary-500))', },
+    { name: "--chip-default-inactive-focus-background-color", type: "color", description: "Background color for inactive focused chip", default: 'rgb(var(--global-color-primary-500))', },
+    { name: "--chip-default-inactive-hover-color", type: "color", description: "Text color for inactive hovered chip", default: 'rgb(var(--global-color-contrast-100))', },
+    { name: "--chip-default-inactive-focus-color", type: "color", description: "Text color for inactive focused chip", default: 'rgb(var(--global-color-contrast-100))', },
   ]}
 ></PropsViewer>
 <h2>Slots</h2>

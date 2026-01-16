@@ -136,6 +136,24 @@
     border: none;
     font: inherit;
   }
+  .inactive {
+    border: var(
+      --chip-inactive-border,
+      var(--chip-default-inactive-border)
+    );
+    border-color: var(
+      --chip-inactive-border-color,
+      var(--chip-default-inactive-border-color)
+    );
+    color: var(
+      --chip-inactive-color,
+      var(--chip-default-inactive-color)
+    );
+    background-color: var(
+      --chip-inactive-background-color,
+      var(--chip-default-inactive-background-color)
+    );
+  }
 
   .truncate {
     max-width: var(--chip-text-max-width, var(--chip-default-text-max-width));
@@ -167,6 +185,28 @@
     background-color: var(
       --chip-focus-background-color,
       var(--chip-default-focus-background-color)
+    );
+  }
+
+  .chip.inactive:hover {
+    background-color: var(
+      --chip-inactive-hover-background-color,
+      var(--chip-default-inactive-hover-background-color)
+    );
+    color: var(
+      --chip-inactive-hover-color,
+      var(--chip-default-inactive-hover-color)
+    );
+  }
+
+  .chip.inactive:focus {
+    background-color: var(
+      --chip-inactive-focus-background-color,
+      var(--chip-default-inactive-focus-background-color)
+    );
+    color: var(
+      --chip-inactive-focus-color,
+      var(--chip-default-inactive-focus-color)
     );
   }
 
@@ -210,24 +250,6 @@
     font-weight: var(
       --chip-font-weight,
       var(--chip-default-font-weight)
-    );
-  }
-  .inactive {
-    border: var(
-      --chip-inactive-border,
-      var(--chip-default-inactive-border)
-    );
-    border-color: var(
-      --chip-inactive-border-color,
-      var(--chip-default-inactive-border-color)
-    );
-    color: var(
-      --chip-inactive-color,
-      var(--chip-default-inactive-color)
-    );
-    background-color: var(
-      --chip-inactive-background-color,
-      var(--chip-default-inactive-background-color)
     );
   }
   .disabled {
