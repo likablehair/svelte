@@ -122,6 +122,7 @@
                     >
                       <div
                         style:flex-grow=1
+                        style:opacity={item.pinned ? 0.8 : 1}
                       >
                         {#if !!item.icon}
                           <Icon name={item.icon} />
@@ -132,7 +133,7 @@
                         style:display=flex
                         style:min-width=50px
                         style:justify-content=end
-                        style:gap=3px
+                        style:gap=6px
                       >
                         <Switch
                           --switch-label-width="90%"
@@ -146,28 +147,29 @@
                           }}
                         />
                         {#if pinnableColumns || item.pinned}
-                          <Icon 
-                            name={item.pinned ? 'mdi-pin-off' : 'mdi-pin'}
-                            onclick={
-                              !locked ?
-                                () => {
-                                  let header = internalHeadersToShow.find((h) => h.value == item.id);
-                                  if (header) {
-                                    header.pinned = !header.pinned;
-                                    let pinnedHeaders = internalHeadersToShow.filter((h) => h.pinned);
-                                    let unpinnedHeaders = internalHeadersToShow.filter((h) => !h.pinned);
-                                    internalHeadersToShow = [
-                                      ...pinnedHeaders,
-                                      ...unpinnedHeaders
-                                    ];
-                                  }
-                                } :
-                                undefined
-                            }
-                            --icon-color={item.pinned ? 'rgb(var(--global-color-primary-500))' : ''}
-                            --icon-cursor={locked ? 'not-allowed' : ''}
-                            --icon-size=17px
-                          ></Icon>
+                          <div style:opacity={item.locked ? 0.8 : 1}>
+                            <Icon 
+                              name={item.pinned ? 'mdi-pin-off' : 'mdi-pin'}
+                              onclick={
+                                !locked ?
+                                  () => {
+                                    let header = internalHeadersToShow.find((h) => h.value == item.id);
+                                    if (header) {
+                                      header.pinned = !header.pinned;
+                                      let pinnedHeaders = internalHeadersToShow.filter((h) => h.pinned);
+                                      let unpinnedHeaders = internalHeadersToShow.filter((h) => !h.pinned);
+                                      internalHeadersToShow = [
+                                        ...pinnedHeaders,
+                                        ...unpinnedHeaders
+                                      ];
+                                    }
+                                  } :
+                                  undefined
+                              }
+                              --icon-cursor={locked ? 'not-allowed' : ''}
+                              --icon-size=17px
+                            ></Icon>
+                          </div>
                         {/if}
                       </div>
                     </div>

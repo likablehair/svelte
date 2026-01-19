@@ -55,7 +55,11 @@
 </script>
 
 {#each pinnedItems as item, index (item.id)}
-  <div class="item-container cursor-not-allowed {clazz}">
+  <div 
+    class="item-container pinned cursor-not-allowed {clazz}"
+    class:pinned-top={index === 0}
+    class:pinned-bottom={index === pinnedItems.length - 1}
+  >
     <div
       style:grid-cols=1
     >
@@ -120,5 +124,35 @@
 
   .cursor-not-allowed {
     cursor: not-allowed;
+  }
+
+  .pinned {
+    background-color: var(
+      --vertical-draggable-list-pinned-items-background-color,
+      var(--vertical-draggable-list-default-pinned-items-background-color)
+    );
+    border-radius: 0; 
+  }
+
+  .pinned-top {
+    border-top-left-radius: var(
+      --vertical-draggable-list-pinned-items-border-radius,
+      var(--vertical-draggable-list-default-pinned-items-border-radius)
+    );
+    border-top-right-radius: var(
+      --vertical-draggable-list-pinned-items-border-radius,
+      var(--vertical-draggable-list-default-pinned-items-border-radius)
+    );
+  }
+
+  .pinned-bottom {
+    border-bottom-left-radius: var(
+      --vertical-draggable-list-pinned-items-border-radius,
+      var(--vertical-draggable-list-default-pinned-items-border-radius)
+    );
+    border-bottom-right-radius: var(
+      --vertical-draggable-list-pinned-items-border-radius,
+      var(--vertical-draggable-list-default-pinned-items-border-radius)
+    );
   }
 </style>

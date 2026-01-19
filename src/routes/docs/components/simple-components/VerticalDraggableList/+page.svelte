@@ -43,6 +43,8 @@
   ]}
   styleProps={[
     { name: '--vertical-draggable-list-item-padding', type: 'size', description: 'Defines the row padding.', default: '8px' },
+    { name: '--vertical-draggable-list-default-pinned-items-background-color', type: 'color', description: 'Defines the background color for pinned items.', default: 'rgb(var(--global-color-background-400))' },
+    { name: '--vertical-draggable-list-default-pinned-items-border-radius', type: 'size', description: 'Defines the border radius for pinned items.', default: '4px' },
   ]}
 ></PropsViewer>
 <h2>Slots</h2>
