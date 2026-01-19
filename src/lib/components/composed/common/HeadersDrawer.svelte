@@ -5,6 +5,9 @@
   import { quintOut } from "svelte/easing";
   import { crossfade } from "svelte/transition";
   import EnhancedPaginatedTable from "../list/EnhancedPaginatedTable.svelte";
+  import lodash from "lodash";
+
+  const deepClone = lodash.cloneDeep;
   
   interface Props {
     drawerProps?: Omit<ComponentProps<typeof Drawer>, 'open'>
@@ -12,7 +15,7 @@
     lang: 'en' | 'it',
     availableHeaders: ComponentProps<typeof EnhancedPaginatedTable<Item, Data>>['headers'],
     headersToShow: ComponentProps<typeof EnhancedPaginatedTable<Item, Data>>['headers'],
-    firstColumn?: typeof headersToShow[number],
+    pinnableColumns?: boolean,
     onsaveHeadersToShow?: (event: {
       detail: {
         headersToShow: ComponentProps<typeof EnhancedPaginatedTable<Item, Data>>['headers'];
@@ -29,7 +32,7 @@
     lang,
     availableHeaders,
     headersToShow = $bindable(),
-    firstColumn,
+    pinnableColumns,
     onsaveHeadersToShow,
     itemSnippet: internalItemSnippet,
     headersToAddSnippet,
@@ -53,23 +56,9 @@
     },
   });
 
-  let internalHeadersToShow = $state(headersToShow)
+  let internalHeadersToShow = $state(deepClone(headersToShow))
   $effect(() => {
-    internalHeadersToShow = headersToShow
-  })
-
-  let itemsVerticalList = $derived.by(() => {
-    let headers = [
-      ...(firstColumn ? [firstColumn] : []),
-      ...internalHeadersToShow.filter(h => h.value !== firstColumn?.value)
-    ]
-    return headers.map((e) => {
-      return {
-        ...e,
-        id: e.value,
-        name: e.label,
-      }
-    })
+    internalHeadersToShow = deepClone(headersToShow)
   })
 
   function saveHeadersToShow() {
@@ -104,8 +93,14 @@
   
             {#if internalHeadersToShow}
               <VerticalDraggableList
-                items={itemsVerticalList}
-                disableFirstItem={!!firstColumn}
+                items={internalHeadersToShow.map((e) => {
+                  return {
+                    ...e,
+                    id: e.value,
+                    name: e.label,
+                    pinned: e.pinned,
+                  }
+                })}
                 onchangeOrder={(e) => {
                   let newHeaders: typeof internalHeadersToShow = []
                   for(let i = 0; i < e.detail.items.length; i += 1) {
@@ -121,6 +116,7 @@
                   {#if internalItemSnippet}
                     {@render internalItemSnippet({ item, index })}
                   {:else}
+                    {@const locked = internalHeadersToShow.find((h) => h.value == item.id)?.locked}
                     <div
                       style:display=flex
                     >
@@ -136,11 +132,12 @@
                         style:display=flex
                         style:min-width=50px
                         style:justify-content=end
+                        style:gap=3px
                       >
                         <Switch
                           --switch-label-width="90%"
                           value={internalHeadersToShow.find((h) => h.value == item.id) != undefined}
-                          disabled={!!firstColumn && index == 0}
+                          disabled={!!item.pinned}
                           onchange={(e) => {
                             if (e.detail.value == false) {
                               internalHeadersToShow = internalHeadersToShow.filter((h) => h.value != item.id);
@@ -148,6 +145,30 @@
                             }
                           }}
                         />
+                        {#if pinnableColumns || item.pinned}
+                          <Icon 
+                            name={item.pinned ? 'mdi-pin-off' : 'mdi-pin'}
+                            onclick={
+                              !locked ?
+                                () => {
+                                  let header = internalHeadersToShow.find((h) => h.value == item.id);
+                                  if (header) {
+                                    header.pinned = !header.pinned;
+                                    let pinnedHeaders = internalHeadersToShow.filter((h) => h.pinned);
+                                    let unpinnedHeaders = internalHeadersToShow.filter((h) => !h.pinned);
+                                    internalHeadersToShow = [
+                                      ...pinnedHeaders,
+                                      ...unpinnedHeaders
+                                    ];
+                                  }
+                                } :
+                                undefined
+                            }
+                            --icon-color={item.pinned ? 'rgb(var(--global-color-primary-500))' : ''}
+                            --icon-cursor={locked ? 'not-allowed' : ''}
+                            --icon-size=17px
+                          ></Icon>
+                        {/if}
                       </div>
                     </div>
                   {/if}
@@ -160,13 +181,7 @@
             <span class="headers-show">{lang == 'en' ? 'Available headers' : 'Intestazioni disponibili'}</span>
   
             {#if availableHeaders && availableHeaders.length > 0}
-              {#each availableHeaders
-                .filter(h => 
-                  firstColumn ?
-                  h.value != firstColumn?.value :
-                  true
-                ) as header (header.value)
-              }
+              {#each availableHeaders.filter(h => !h.pinned) as header (header.value)}
                 <div
                   animate:flip
                   in:receive={{ key: header }}

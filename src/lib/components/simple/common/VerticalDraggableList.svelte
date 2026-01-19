@@ -1,4 +1,4 @@
-<script lang="ts" generics="Item extends { id: string, name: string }">
+<script lang="ts" generics="Item extends { id: string, name: string, pinned?: boolean }">
   import '../../../css/main.css'
   import './VerticalDraggableList.css'
   import { flip } from "svelte/animate";
@@ -8,7 +8,6 @@
 
   interface Props {
     items?: Item[];
-    disableFirstItem?: boolean;
     class?: string;
     itemSnippet?: Snippet<[{
       item: typeof items[number],
@@ -24,26 +23,25 @@
   let { 
     items = [],
     class: clazz = '',
-    disableFirstItem,
     itemSnippet,
     onchangeOrder,
   }: Props = $props();
 
   const flipDurationMs = 300;
 
-  let firstItem = $derived.by(() => disableFirstItem ? items[0] : undefined),
-    internalItems = $derived.by(() => disableFirstItem ? items.slice(1) : items);
+  let pinnedItems = $derived.by(() => items.filter(item => item.pinned)),
+    internalItems = $derived.by(() => items.filter(item => !item.pinned));
 
   function handleDndConsider(e: CustomEvent<DndEvent<Item>>) {
     items = [
-      ...(firstItem ? [firstItem] : []),
+      ...pinnedItems,
       ...e.detail.items
     ]
   }
 
   function handleDndFinalize(e: CustomEvent<DndEvent<Item>>) {
 		items = [
-      ...(firstItem ? [firstItem] : []),
+      ...pinnedItems,
       ...e.detail.items
     ]
     if(onchangeOrder){
@@ -56,7 +54,7 @@
 	}
 </script>
 
-{#if firstItem}
+{#each pinnedItems as item, index (item.id)}
   <div class="item-container cursor-not-allowed {clazz}">
     <div
       style:grid-cols=1
@@ -69,13 +67,13 @@
       style:grid-cols=2
     >
       {#if itemSnippet}
-        {@render itemSnippet({ item: firstItem, index: 0 })}
+        {@render itemSnippet({ item, index })}
       {:else}
-        {firstItem.name}
+        {item.name}
       {/if}
     </div>
   </div>
-{/if}
+{/each}
 
 <section 
   use:dndzone={{items: internalItems, flipDurationMs, dropTargetStyle: {border: '0px dashed #000'}}}
@@ -98,7 +96,7 @@
           style:grid-cols=2
         >
           {#if itemSnippet}
-            {@render itemSnippet({ item, index: disableFirstItem ? index + 1 : index })}
+            {@render itemSnippet({ item, index: pinnedItems.length + index })}
           {:else}
             {item.name}
           {/if}

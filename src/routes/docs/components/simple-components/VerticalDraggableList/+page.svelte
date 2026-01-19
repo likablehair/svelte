@@ -39,7 +39,6 @@
 <PropsViewer
   props={[  
     { name: "items", type: "{ id: string; name: string; }[]", description: "An array of draggable items.", default: "[]" },  
-    { name: "disableFirstItem", type: "boolean", description: "Disables dragging for the first item.", default: "false" },  
     { name: "class", type: "string", description: "Additional CSS classes for item containers.", default: "''" }  
   ]}
   styleProps={[

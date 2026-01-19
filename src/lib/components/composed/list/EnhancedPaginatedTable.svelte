@@ -4,10 +4,13 @@
   import HeadersDrawer from "../common/HeadersDrawer.svelte";
   import { Icon } from "$lib";
   import './EnhancedPaginatedTable.css'
+  import lodash from "lodash";
 
+  const deepEqual = lodash.isEqual
 
   interface Props extends ComponentProps<typeof PaginatedTable<Item, Data>> {
     headersToShowInTable: ComponentProps<typeof PaginatedTable<Item, Data>>['headers']
+    pinnableColumns?: boolean,
     headerDrawerProps?: ComponentProps<typeof HeadersDrawer>['drawerProps']
     onsaveHeadersToShow?: ComponentProps<typeof HeadersDrawer>['onsaveHeadersToShow']
     headerDrawerContentSnippet?: ComponentProps<typeof HeadersDrawer>['contentSnippet']
@@ -17,6 +20,7 @@
 
   let {
     headersToShowInTable = $bindable(),
+    pinnableColumns,
     headerDrawerProps,
     onsaveHeadersToShow,
     headerDrawerContentSnippet,
@@ -38,6 +42,31 @@
     ...rest
   }: Props = $props()
 
+  const organizedHeaders = () => {
+    let pinnedFixedHeaders = headers.filter(h => h.pinned).map(h => ({
+      ...h,
+      locked: true,
+    }))
+    let pinnedByUserHeaders = headersToShowInTable.filter(h => 
+      h.pinned
+      && !pinnedFixedHeaders.find(fixed => fixed.value == h.value)
+    )
+    let otherHeaders = headersToShowInTable.filter(h =>
+      !pinnedFixedHeaders.find(fixed => fixed.value == h.value)
+      && !pinnedByUserHeaders.find(fixed => fixed.value == h.value)
+    )
+    return [
+      ...pinnedFixedHeaders,
+      ...pinnedByUserHeaders,
+      ...otherHeaders
+    ];
+  }
+  $effect(() => {
+    if(!deepEqual(organizedHeaders(), headersToShowInTable)) {
+      headersToShowInTable = organizedHeaders()
+    }
+  });
+
   let openHeaderDrawer: boolean = $state(false),
     availableHeaders = $derived.by(() => {
       return !!headers
@@ -46,23 +75,12 @@
               return !headersToShowInTable.find((hst) => hst.value == h.value);
             })
         : []
-    }),
-    firstColumn = $derived.by(() => {
-      return stickFirstColumn
-        ? headers[0]
-        : undefined;
     })
 
-  $effect(() => {
-    if (firstColumn) {
-      if (headersToShowInTable[0].value === firstColumn.value) {
-        return; 
-      }
-
-      const otherHeaders = headersToShowInTable.filter(h => h.value !== firstColumn.value);
-      headersToShowInTable = [firstColumn, ...otherHeaders];
-    }
-  });
+  function handleSaveHeadersToShow(event: Parameters<NonNullable<ComponentProps<typeof HeadersDrawer<Item, Data>>['onsaveHeadersToShow']>>[0]) {
+    headersToShowInTable = event.detail.headersToShow;
+    onsaveHeadersToShow?.(event)
+  }
 </script>
 
 <PaginatedTable 
@@ -96,12 +114,12 @@
 <HeadersDrawer
   bind:open={openHeaderDrawer}
   {lang}
-  {onsaveHeadersToShow}
+  onsaveHeadersToShow={handleSaveHeadersToShow}
   {availableHeaders}
   bind:headersToShow={headersToShowInTable}
   contentSnippet={headerDrawerContentSnippet}
   drawerProps={headerDrawerProps}
   headersToAddSnippet={headerDrawerHeadersToAddSnippet}
   itemSnippet={headerDrawerItemSnippet}
-  {firstColumn}
+  {pinnableColumns}
 />

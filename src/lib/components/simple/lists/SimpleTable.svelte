@@ -16,6 +16,8 @@
     maxWidth?: string
     sortable?: boolean
     icon?: string
+    pinned?: boolean
+    locked?: boolean
     sortModify?: (params: { builder: FilterBuilder, sortDirection: 'asc' | 'desc' }) => FilterBuilder
     data?: Data
   };
@@ -385,7 +387,7 @@
           return sum + width + 1;
         }, 0);
     
-        const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.row-append-header, th.sticky-col'))
+        const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.row-append-header, th.fixed-col'))
           .reduce((sum, th) => sum + th.getBoundingClientRect().width + 1, 0);
     
         remainingWidth = Math.max(0, containerWidth - totalResizableWidth - extraStaticWidth);
@@ -432,19 +434,28 @@
           {#if prependSnippet}
             <th 
               class="non-resizable"
-              class:sticky-col-1={stickFirstColumn}
+              class:sticky-col={headers.find(h => h.pinned)}
+              style:left={"0"}
             >
               {@render prependSnippet({ index: -1 })}
             </th>
           {/if}
           {#each headers as head, index}
+            {@const baseLeft = headers.slice(0, index).reduce((sum, h) => sum + (resizedColumnSizeWithPadding[h.value] || 0), 0)}
+            {@const extraLeft = 'var(--simple-table-non-resizable-header-width, var(--simple-table-default-non-resizable-header-width))'}
             <th
               style={`${resizableColumns || !head.width ? '' : `width: ${head.width}`}`}
               style:min-width={head.minWidth}
               style:max-width={head.maxWidth}
               class:sortable={head.sortable}
-              class:sticky-col-2={stickFirstColumn && index == 0}
-              class:no-left={!prependSnippet}
+              class:sticky-col={head.pinned}
+              style:left={
+                head.pinned 
+                  ? (prependSnippet)
+                    ? `calc(${baseLeft}px + ${extraLeft})`
+                    : `${baseLeft}px`
+                  : undefined
+              }
               onclick={() => handleHeaderClick(head)}
               id={head.value}
               bind:this={headersHTML[head.value]}
@@ -499,7 +510,7 @@
           {/if}
           {#if stickyAppendSnippet}
             <th
-              class="sticky-col"
+              class="fixed-col"
             >
               {@render stickyAppendSnippet()}
             </th>
@@ -545,16 +556,25 @@
               {#if prependSnippet}
                 <td 
                   class="{clazz.cell || ''} non-resizable"
-                  class:sticky-col-1={stickFirstColumn}
+                  class:sticky-col={headers.find(h => h.pinned)}
+                  style:left={"0"}
                 >
                   {@render prependSnippet({ index: i, item })}
                 </td>
               {/if}
               {#each headers as header, j}
+                {@const baseLeft = headers.slice(0, j).reduce((sum, h) => sum + (resizedColumnSizeWithPadding[h.value] || 0), 0)}
+                {@const extraLeft = 'var(--simple-table-non-resizable-header-width, var(--simple-table-default-non-resizable-header-width))'}
                 <td 
                   class="{clazz.cell || ''}"
-                  class:sticky-col-2={stickFirstColumn && j == 0}
-                  class:no-left={!prependSnippet}
+                  class:sticky-col={header.pinned}
+                  style:left={
+                    header.pinned 
+                      ? (prependSnippet)
+                        ? `calc(${baseLeft}px + ${extraLeft})`
+                        : `${baseLeft}px`
+                      : undefined
+                  }
                 >
                   {#if header.type.key == "custom"}
                     {#if customSnippet}
@@ -916,25 +936,17 @@
       var(--simple-table-default-non-resizable-header-width)
     );
   }
-  .thead th.sticky-col {
+  .thead th.fixed-col {
     position: sticky;
     right: 0;
     z-index: 3;
     width: 23px;
     min-width: 23px;
   }
-  .sticky-col-1 {
+  .sticky-col {
     position: sticky;
-    left: 0;
   }
-  .sticky-col-2 {
-    position: sticky;
-    left: var(
-      --simple-table-non-resizable-header-width,
-      var(--simple-table-default-non-resizable-header-width)
-    ); 
-  }
-  th.sticky-col-1, th.sticky-col-2 {
+  th.sticky-col {
     z-index: 3;
     background-color: var(
       --simple-table-header-background-color, 
@@ -942,7 +954,7 @@
     );
   }
 
-  td.sticky-col-1, td.sticky-col-2 {
+  td.sticky-col {
     z-index: 2; 
     background-color: var(
       --row-bg, 
@@ -950,12 +962,9 @@
     );
   }
 
-  .item-tr:hover td.sticky-col-1, .item-tr:hover td.sticky-col-2 {
+  .item-tr:hover td.sticky-col {
     background-color: var( 
       --simple-table-row-hover-background-color, var(--simple-table-default-row-hover-background-color)
     );
-  }
-  .no-left {
-    left: 0;
   }
 </style>

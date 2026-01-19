@@ -325,6 +325,12 @@
       type: "Header[]",
       description: "Defines the table columns to show in the table.",
     },
+    {
+      name: "pinnableColumns",
+      type: "boolean",
+      description: "Enables pin button in the headers drawer.",
+      default: "false",
+    },
     { name: "headerDrawerProps", type: "object", description: "Props of the headers drawer", },
   ]}
   styleProps={[

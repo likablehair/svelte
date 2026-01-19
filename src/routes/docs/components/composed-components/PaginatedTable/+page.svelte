@@ -479,9 +479,9 @@
       default: "250",
     },
     {
-      name: "stickFirstColumn",
+      name: "pinnableColumns",
       type: "boolean",
-      description: "Sticks the first column above the others",
+      description: "Enables pin button in the headers drawer.",
       default: "false",
     },
     {
