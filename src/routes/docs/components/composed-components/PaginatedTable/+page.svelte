@@ -302,9 +302,6 @@
         <Icon name="mdi-star" --icon-color="green"></Icon>
       {/if}
     {/snippet}
-    {#snippet rowActionsSnippet({ index, item })}
-      RowActions
-    {/snippet}
     {#snippet appendSnippet({ index, item })}
       RowActions
     {/snippet}
@@ -429,6 +426,12 @@
       default: "No data available",
     },
     {
+      name: "loading",
+      type: "boolean",
+      description: "Adds a loading bar",
+      default: "false",
+    },
+    {
       name: "editFilterMode",
       type: "'one-edit' | 'multi-edit'",
       description: "Mode for editing filters.",
@@ -474,6 +477,12 @@
       type: "number",
       description: "Time window (in ms) to double click",
       default: "250",
+    },
+    {
+      name: "pinnableColumns",
+      type: "boolean",
+      description: "Enables pin button in the headers drawer.",
+      default: "false",
     },
     {
       name: "searchTimeoutDelay",
@@ -732,14 +741,6 @@
       ],
     },
     {
-      name: "rowActionsSnippet",
-      description: "Custom actions for rows.",
-      properties: [
-        { name: "index", type: "number", description: "Row index." },
-        { name: "item", type: "Item", description: "Row item." },
-      ],
-    },
-    {
       name: "customSnippet",
       description: "Custom cell rendering.",
       properties: [
@@ -759,6 +760,10 @@
     {
       name: "totalsSnippet",
       description: "Slot to display number of results",
+    },
+    {
+      name: 'stickyAppendSnippet',
+      description: 'Appends a sticky header',
     },
   ]}
 ></SlotsViewer>

@@ -33,8 +33,32 @@
   import SearchBar from "../search/SearchBar.svelte";
   import MenuOrDrawer from "../common/MenuOrDrawer.svelte";
   import HeadersDrawer from "../common/HeadersDrawer.svelte";
+  import lodash from "lodash";
+
+  const deepEqual = lodash.isEqual
 
   onMount(() => {
+    if (rowAppendSnippet && headersHTML['row-append-header']) {
+      const actionCells = tableContainer?.querySelectorAll('.row-append-cell');
+      
+      if (actionCells && actionCells.length > 0) {
+        let maxActionWidth = 0;
+
+        for (let i = 0; i < actionCells.length; i++) {
+          const cellContent = actionCells[i];
+          const width = cellContent.getBoundingClientRect().width;
+          if (width > maxActionWidth) {
+            maxActionWidth = width;
+          }
+        }
+
+        const finalWidth = Math.ceil(maxActionWidth + 15);
+        
+        headersHTML['row-append-header'].style.width = `${finalWidth}px`;
+        headersHTML['row-append-header'].style.minWidth = `${finalWidth}px`;
+      } 
+    }
+
     updateHeaderHeight();
     window.addEventListener('resize', updateHeaderHeight);
     tableContainer?.addEventListener("scroll", setReachedBottomOrTop);
@@ -43,7 +67,7 @@
       hideScrollbar = tableContainer.scrollHeight > tableContainer.clientHeight
     }
 
-    for(const head of [...headers, { value: 'non-resizable', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }, { value: 'customize-headers', minWidth: DEFAULT_MIN_WIDTH_PX + 'px', maxWidth: DEFAULT_MAX_WIDTH_PX + 'px' }]) {
+    for(const head of headers) {
       let th = headersHTML[head.value]
       if(!!th) {
         resizeHeader(th, head)
@@ -70,7 +94,7 @@
 
   function updateHeaderHeight() {
     if (mainHeader) {
-      const headerHeight = mainHeader.getBoundingClientRect().height;
+      const headerHeight = mainHeader.getBoundingClientRect().height - 1;
       document.documentElement.style.setProperty('--main-header-height', headerHeight + 'px');
     }
   }
@@ -169,7 +193,6 @@
   type Header = Headers[number] & {
     cellEditorInfo?: CellEditorInfo;
     info?: string;
-    maxWidth?: string;
   };
   type HeaderType = Header["type"];
 
@@ -218,6 +241,7 @@
     endLineVisible?: boolean;
     resizableColumns?: boolean;
     resizedColumnSizeWithPadding?: { [value: string]: number };
+    pinnableColumns?: boolean;
     dynamicFilters?: boolean;
     useSelectedItemsOnly?: boolean;
     selectedAllDisabled?: boolean;
@@ -387,6 +411,7 @@
     endLineVisible = false,
     resizableColumns = false,
     resizedColumnSizeWithPadding = $bindable({}),
+    pinnableColumns,
     dynamicFilters = true,
     useSelectedItemsOnly = false,
     selectedAllDisabled = false,
@@ -461,7 +486,41 @@
     sortModify: Header['sortModify'],
     mainHeader: Element | undefined = $state(),
     resizeObserver: ResizeObserver,
-    ignoreSelectAll = rows.length == totalRows && useSelectedItemsOnly
+    ignoreSelectAll = rows.length == totalRows && useSelectedItemsOnly,
+    colspan = $derived.by(() => {
+      return headersToShowInTable.length +
+        (!!showSelect && !showExpand && rows.length > 0 ? 1 : 0) +
+        (showExpand ? 1 : 0) +
+        (remainingWidth ? 1 : 0) +
+        (rowAppendSnippet ? 1 : 0) +
+        (customizeHeaders ? 1 : 0);
+    })
+
+  const organizedHeaders = () => {
+    let pinnedFixedHeaders = headers.filter(h => h.pinned).map(h => ({
+      ...h,
+      locked: true,
+    }))
+    let pinnedByUserHeaders = headersToShowInTable.filter(h => 
+      h.pinned
+      && !pinnedFixedHeaders.find(fixed => fixed.value == h.value)
+    )
+    let otherHeaders = headersToShowInTable.filter(h =>
+      !pinnedFixedHeaders.find(fixed => fixed.value == h.value)
+      && !pinnedByUserHeaders.find(fixed => fixed.value == h.value)
+    )
+    return [
+      ...pinnedFixedHeaders,
+      ...pinnedByUserHeaders,
+      ...otherHeaders
+    ];
+  }
+
+  $effect(() => {
+    if(!deepEqual(organizedHeaders(), headersToShowInTable)) {
+      headersToShowInTable = organizedHeaders()
+    }
+  });
 
   const DEFAULT_MIN_WIDTH_PX = 100,
     DEFAULT_MAX_WIDTH_PX = 400
@@ -1332,7 +1391,7 @@
   
   async function updateRemainingWidth() {
     if(tableContainer != null && !!tableContainer && mainHeader) {
-      const containerWidth = tableContainer.getBoundingClientRect().width - 26;
+      const containerWidth = tableContainer.getBoundingClientRect().width - 10;
 
       if(containerWidth){
         const totalResizableWidth = headersToShowInTable.reduce((sum, head) => {
@@ -1344,25 +1403,25 @@
           return sum + width + 1;
         }, 0);
     
-        const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.customize-headers'))
+        const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.row-append-header, th.fixed-col'))
           .reduce((sum, th) => sum + th.getBoundingClientRect().width + 1, 0);
     
-        remainingWidth = Math.max(0, containerWidth - totalResizableWidth - extraStaticWidth);
+        remainingWidth = Math.max(0, containerWidth - totalResizableWidth - extraStaticWidth + 18);
       }
     }
   }
 
   function resizeHeader(th: HTMLElement, header: { value: string, minWidth?: string, maxWidth?: string }){
     if (!resizedColumnSizeWithPadding[header.value]) {
-      let widthWihtPadding = th.getBoundingClientRect().width
+      let widthWithPadding = th.getBoundingClientRect().width
 
       let minWidth = header.minWidth,
         minWidthPx = DEFAULT_MIN_WIDTH_PX
       if (!!minWidth && minWidth.endsWith('px')) {
         minWidthPx = parseInt(minWidth, 10);
       }
-      if(widthWihtPadding < minWidthPx) {
-        widthWihtPadding = minWidthPx
+      if(widthWithPadding < minWidthPx) {
+        widthWithPadding = minWidthPx
       }
 
       let maxWidth = header.maxWidth,
@@ -1370,15 +1429,20 @@
       if (!!maxWidth && maxWidth.endsWith('px')) {
         maxWidthPx = parseInt(maxWidth, 10);
       }
-      if(widthWihtPadding > maxWidthPx) {
-        widthWihtPadding = maxWidthPx
+      if(widthWithPadding > maxWidthPx) {
+        widthWithPadding = maxWidthPx
       }
 
-      resizedColumnSizeWithPadding[header.value] = widthWihtPadding;
+      resizedColumnSizeWithPadding[header.value] = widthWithPadding;
     }
     let { paddingLeft, paddingRight } = getComputedStyle(th);
     let width = resizedColumnSizeWithPadding[header.value] - parseFloat(paddingLeft) - parseFloat(paddingRight);
     th.style.width = `${width}px`
+  }
+
+  function handleSaveHeadersToShow(event: Parameters<NonNullable<ComponentProps<typeof HeadersDrawer>['onsaveHeadersToShow']>>[0]) {
+    headersToShowInTable = event.detail.headersToShow;
+    onsaveHeadersToShow?.(event)
   }
 </script>
 
@@ -1575,11 +1639,9 @@
         <tr>
           {#if !!showSelect && !showExpand && rows.length > 0}
             <th
-              style:width="30px"
-              style:min-width="30px"
-              style:text-align="center"
               class="non-resizable"
-              bind:this={headersHTML['non-resizable']}
+              class:sticky-col={headersToShowInTable.find(h => h.pinned)}
+              style:left={"0"}
             > 
               {#if selectMode === "multiple" && !selectedAllDisabled}
                 <Checkbox
@@ -1593,19 +1655,27 @@
           {/if}
           {#if showExpand}
             <th
-              style:min-width="60px"
-              style:max-width="60px"
-              style:text-align="center"
               class="non-resizable"
-              bind:this={headersHTML['non-resizable']}
+              class:sticky-col={headersToShowInTable.find(h => h.pinned)}
+              style:left={"0"}
             ></th>
           {/if}
           {#each headersToShowInTable as header, index}
+            {@const baseLeft = headersToShowInTable.slice(0, index).reduce((sum, h) => sum + (resizedColumnSizeWithPadding[h.value] || 0), 0)}
+            {@const extraLeft = 'var(--dynamic-table-non-resizable-header-width, var(--dynamic-table-default-non-resizable-header-width))'}
             <th
               style={`${resizableColumns || !header.width ? '' : `width: ${header.width}`}`}
               style:min-width={header.minWidth}
               style:max-width={header.maxWidth}
               class:sortable={header.sortable}
+              class:sticky-col={header.pinned}
+              style:left={
+                header.pinned 
+                  ? (showExpand || showSelect)
+                    ? `calc(${baseLeft}px + ${extraLeft})`
+                    : `${baseLeft}px`
+                  : undefined
+              }
               onclick={() => handleHeaderClick(header)}
               id={header.value}
               bind:this={headersHTML[header.value]}
@@ -1649,6 +1719,28 @@
               {/if}
             </th>
           {/each}
+          {#if rowAppendSnippet}
+            <th
+              class="row-append-header"
+              bind:this={headersHTML['row-append-header']}
+            >
+              {@render rowAppendSnippet({ index: -1, row: undefined })}
+            </th>
+          {/if}
+          {#if customizeHeaders}
+            <th
+              class="fixed-col"
+            >
+              <Icon
+                name="mdi-plus-circle-outline"
+                onclick={() => (openHeaderDrawer = true)}
+                --icon-size="var(
+                  --dynamic-table-customize-headers-icon-size,
+                  var(--dynamic-table-default-customize-headers-icon-size)
+                )"
+              />
+            </th>
+          {/if}
           {#if remainingWidth}
             <th
               style:width={remainingWidth + 'px'}
@@ -1656,29 +1748,11 @@
               aria-hidden="true"
             ></th>
           {/if}
-          {#if customizeHeaders || rowAppendSnippet}
-            <th
-              style:text-align="center"
-              class="customize-headers"
-              bind:this={headersHTML['customize-headers']}
-            >
-              {#if customizeHeaders}
-                <div style="display: flex; justify-content: start;">
-                  <Icon
-                    name="mdi-plus-circle-outline"
-                    onclick={() => (openHeaderDrawer = true)}
-                  />
-                </div>
-              {:else}
-                {@render rowAppendSnippet?.({ index: -1, row: undefined })}
-              {/if}
-            </th>
-          {/if}
         </tr>
         {#if loading}
           <tr>
             <th
-              colspan={headersToShowInTable.length + 1}
+              {colspan}
               class="loading"
               style="text-align: center;"
               style:border="none"
@@ -1696,7 +1770,7 @@
         {#if rows.length == 0}
           <tr>
             <td
-              colspan={headersToShowInTable.length + 1}
+              {colspan}
               style="text-align: center;"
               style:border="none"
               style:cursor="default"
@@ -1712,8 +1786,8 @@
               class="item-row {clazz.row}"
               class:pointer={!!onrowClick}
               data-key={row.item[uniqueKey]}
-              style:background-color={
-                !!row.item.disableEdit
+              style:--row-bg={
+                (!!row.item.disableEdit
                   ? !!row.item.rowDisableBackgroundColor
                     ? row.item.rowDisableBackgroundColor
                     : 'var(--dynamic-table-row-disabled-background-color, var(--dynamic-table-default-row-disabled-background-color))'
@@ -1726,12 +1800,17 @@
                       : selectedItems.find(i => i[uniqueKey] == row.item[uniqueKey])
                         ? 'var(--dynamic-table-selected-row-background-color, var(--dynamic-table-default-selected-row-background-color))'
                         : ''
-                }
+                ) || null
+              }
               class:row-activator={cellEditorIndexRow == indexRow && !cellEditorSubItem}
               onclick={() => handleRowClick(row.item)}
             >
               {#if !!showSelect && !showExpand}
-                <td style:padding-left="0px" style:text-align="center">
+                <td 
+                  class=non-resizable
+                  class:sticky-col={headersToShowInTable.find(h => h.pinned)}
+                  style:left={"0"}
+                >
                   <Checkbox
                     id={row.item[uniqueKey]}
                     value={
@@ -1750,7 +1829,11 @@
                 </td>
               {/if}
               {#if showExpand}
-                <td style:padding-left="0px" style:text-align="center">
+                <td
+                  class=non-resizable
+                  class:sticky-col={headersToShowInTable.find(h => h.pinned)}
+                  style:left={"0"}
+                >
                   <Icon
                     name={expandedRows.findIndex(
                       (r) => r.item[uniqueKey] == row.item[uniqueKey]
@@ -1766,9 +1849,19 @@
                 </td>
               {/if}
               {#each headersToShowInTable as header, indexHeader}
+                {@const baseLeft = headersToShowInTable.slice(0, indexHeader).reduce((sum, h) => sum + resizedColumnSizeWithPadding[h.value], 0)}
+                {@const extraLeft = 'var(--dynamic-table-non-resizable-header-width, var(--dynamic-table-default-non-resizable-header-width))'}
                 <td
                   class:hover-cell={cellEdit && !loading && !!header.cellEditorInfo}
                   class:cell-edit-activator={cellEditorIndexHeader == indexHeader && cellEditorIndexRow == indexRow && !cellEditorSubItem}
+                  class:sticky-col={header.pinned}
+                  style:left={
+                    header.pinned 
+                      ? (showExpand || showSelect)
+                        ? `calc(${baseLeft}px + ${extraLeft})`
+                        : `${baseLeft}px`
+                      : undefined
+                  }
                   onclick={(e) => {
                     handleCellClick(
                       e,
@@ -1809,20 +1902,25 @@
                   {/if}
                 </td>
               {/each}
-              {#if remainingWidth}
-                <td></td>
-              {/if}
               {#if rowAppendSnippet}
                 <td class={clazz.cell || ""}>
-                  {@render rowAppendSnippet?.({ index: indexRow, row })}
+                  <div class="row-append-cell" style="display: inline-block; white-space: nowrap;">
+                    {@render rowAppendSnippet?.({ index: indexRow, row })}
+                  </div>
                 </td>
+              {/if}
+              {#if customizeHeaders}
+                <td></td>
+              {/if}
+              {#if remainingWidth}
+                <td></td>
               {/if}
             </tr>
             {#if showExpand}
               {#if expandedRows.findIndex((r) => r.item[uniqueKey] == row.item[uniqueKey]) != -1}
                 <tr>
                   <td
-                    colspan={headersToShowInTable.length + 1}
+                    colspan={colspan - 1}
                     style:border="none"
                     class="expanded-row"
                   >
@@ -2301,13 +2399,14 @@
 <HeadersDrawer
   bind:open={openHeaderDrawer}
   {lang}
-  {onsaveHeadersToShow}
+  onsaveHeadersToShow={handleSaveHeadersToShow}
   {availableHeaders}
   bind:headersToShow={headersToShowInTable}
   contentSnippet={headerDrawerContentSnippet}
   drawerProps={headerDrawerProps}
   headersToAddSnippet={headerDrawerHeadersToAddSnippet}
   itemSnippet={headerDrawerItemSnippet}
+  {pinnableColumns}
 />
 
 <style>
@@ -2318,10 +2417,16 @@
   .inner-container {
     overflow-y: auto;
     max-height: var(--dynamic-table-max-height, var(--dynamic-table-default-max-height));
+    width: 100%;
   }
 
   .hide-scrollbar {
-    margin-right: -15px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 
   .dynamic-table {
@@ -2343,7 +2448,7 @@
   .table-header {
     position: sticky;
     top: 0;
-    z-index: 2;
+    z-index: 3;
     top: -1px;
     height: var(
       --dynamic-table-header-height,
@@ -2474,6 +2579,7 @@
   }
 
   .item-row > td {
+    background-color: var(--row-bg);
     height: var(
       --dynamic-table-row-min-height,
       var(--dynamic-table-default-row-min-height)
@@ -2482,8 +2588,8 @@
 
   .item-row:hover {
     background-color: var(
-      --dynamic-table-row-background-color-hover,
-      var(--dynamic-table-default-row-background-color-hover)
+      --row-bg, 
+      var(--dynamic-table-row-background-color-hover, var(--dynamic-table-default-row-background-color-hover))
     );
   }
 
@@ -2688,15 +2794,73 @@
     position: absolute;
     top: 0;
     right: 0;
-    width: 6px;
+    width: 12px;
     height: 100%;
     cursor: col-resize;
-    z-index: 100;
+    z-index: 3;
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+  }
+  .resizer::after {
+    content: '';
+    width: 2.8px;
+    border-radius: 4px;
+    height: 75%;
+    background-color: transparent;
+    transition: background-color 0.2s;
+  }
+  th:hover .resizer::after {
+    background-color: var(
+      --dynamic-table-resizer-color,
+      var(--dynamic-table-default-resizer-color)
+    );
+  }
+  .non-resizable {
+    padding-left: 0px !important;
+    text-align: center;
+    width: var(
+      --dynamic-table-non-resizable-header-width,
+      var(--dynamic-table-default-non-resizable-header-width)
+    );
   }
   .filler {
     padding: 0 !important;
   }
   .pointer {
     cursor: pointer;
+  }
+  .table-header th.fixed-col {
+    position: sticky;
+    right: 0;
+    z-index: 3;
+    width: 23px;
+    min-width: 23px;
+  }
+  .sticky-col {
+    position: sticky;
+  }
+
+  th.sticky-col {
+    z-index: 3;
+    background-color: var(
+      --dynamic-table-header-background-color, 
+      var(--dynamic-table-default-header-background-color)
+    );
+  }
+
+  td.sticky-col {
+    z-index: 2; 
+    background-color: var(
+      --row-bg, 
+      var(--dynamic-table-sticked-background-color, var(--dynamic-table-default-sticked-background-color))
+    );
+  }
+
+  .item-row:hover td.sticky-col {
+    background-color: var(
+      --row-bg, 
+      var(--dynamic-table-row-background-color-hover, var(--dynamic-table-default-row-background-color-hover))
+    ) !important;
   }
 </style>

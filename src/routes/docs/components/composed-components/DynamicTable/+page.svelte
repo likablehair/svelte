@@ -231,11 +231,6 @@
         <Icon name="mdi-star" --icon-color="green"></Icon>
       {/if}
     {/snippet}
-    {#snippet subHeaderSnippet({ subHeader })}
-      {#if subHeader.value == 'rating'}
-        <FlagIcon alpha2='it'></FlagIcon>
-      {/if}
-    {/snippet}
   </DynamicTable>
 </div>
 <h2>READ ME</h2>
@@ -317,7 +312,11 @@
     { name: "--dynamic-table-end-line-text-color", type: "color", description: "Text color in end line", default: "rgb(var(--global-color-contrast-500))" },
     { name: "--dynamic-table-border-collapse", type: "border", description: "Table borders collapsed or separated", default: "collapse" },
     { name: "--dynamic-table-header-label-margin", type: "margin", description: "Table header label margin", default: "0px 4px 0px 0px" },
-    { name: "--dynamic-table-header-label-font-size", type: "font-size", description: "Table header label font size", default: "small" }
+    { name: "--dynamic-table-header-label-font-size", type: "font-size", description: "Table header label font size", default: "small" },
+    { name: "--dynamic-table-resizer-color", type: "color", description: "Color fot the header resizer", default: "rgb(var(--global-color-primary-500))" },
+    { name: "--dynamic-table-customize-headers-icon-size", type: "size", description: "Size of the icon to open the headers drawer", default: "17px" },
+    { name: "--dynamic-table-non-resizable-header-width", type: "size", description: "Width of non-resizable headers", default: "37px" },
+    { name: "--dynamic-table-sticked-background-color", type: "color", description: "Background color for sticked header", default: "rgb(var(--global-color-background-50))" },
   ]}
 ></PropsViewer>
 <h2>Slots</h2>
@@ -486,7 +485,8 @@
       name: "headerDrawerHeadersToAddSnippet", 
       description: "Headers drawer custom items", 
       properties: [
-        { name: "item", type: "Header", description: "The item being rendered." }
+        { name: "item", type: "Header", description: "The item being rendered." },
+        { name: "index", type: "number", description: "The index of the item being rendered." }
       ],
       default: `
 <div

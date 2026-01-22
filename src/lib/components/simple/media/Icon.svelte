@@ -40,6 +40,7 @@
       --icon-color,
       var(--icon-default-color)
     );
+    cursor: var(--icon-cursor, default);
   }
   .icon.click {
     cursor: var(--icon-cursor, pointer);
@@ -54,7 +55,6 @@
     );
   }
   .icon.click:not(.click) {
-    cursor: var(--icon-cursor, default);
     pointer-events: var(--icon-pointer-events, none);
   }
   .click:hover, .click:focus {

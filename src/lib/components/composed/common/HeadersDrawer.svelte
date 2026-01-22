@@ -5,6 +5,9 @@
   import { quintOut } from "svelte/easing";
   import { crossfade } from "svelte/transition";
   import EnhancedPaginatedTable from "../list/EnhancedPaginatedTable.svelte";
+  import lodash from "lodash";
+
+  const deepClone = lodash.cloneDeep;
   
   interface Props {
     drawerProps?: Omit<ComponentProps<typeof Drawer>, 'open'>
@@ -12,6 +15,7 @@
     lang: 'en' | 'it',
     availableHeaders: ComponentProps<typeof EnhancedPaginatedTable<Item, Data>>['headers'],
     headersToShow: ComponentProps<typeof EnhancedPaginatedTable<Item, Data>>['headers'],
+    pinnableColumns?: boolean,
     onsaveHeadersToShow?: (event: {
       detail: {
         headersToShow: ComponentProps<typeof EnhancedPaginatedTable<Item, Data>>['headers'];
@@ -28,6 +32,7 @@
     lang,
     availableHeaders,
     headersToShow = $bindable(),
+    pinnableColumns,
     onsaveHeadersToShow,
     itemSnippet: internalItemSnippet,
     headersToAddSnippet,
@@ -51,9 +56,9 @@
     },
   });
 
-  let internalHeadersToShow = $state(headersToShow)
+  let internalHeadersToShow = $state(deepClone(headersToShow))
   $effect(() => {
-    internalHeadersToShow = headersToShow
+    internalHeadersToShow = deepClone(headersToShow)
   })
 
   function saveHeadersToShow() {
@@ -93,6 +98,7 @@
                     ...e,
                     id: e.value,
                     name: e.label,
+                    pinned: e.pinned,
                   }
                 })}
                 onchangeOrder={(e) => {
@@ -106,15 +112,17 @@
                   internalHeadersToShow = newHeaders;
                 }}
               >
-                {#snippet itemSnippet({ item })}
+                {#snippet itemSnippet({ item, index })}
                   {#if internalItemSnippet}
-                    {@render internalItemSnippet({ item })}
+                    {@render internalItemSnippet({ item, index })}
                   {:else}
+                    {@const locked = internalHeadersToShow.find((h) => h.value == item.id)?.locked}
                     <div
                       style:display=flex
                     >
                       <div
                         style:flex-grow=1
+                        style:opacity={item.pinned ? 0.8 : 1}
                       >
                         {#if !!item.icon}
                           <Icon name={item.icon} />
@@ -125,10 +133,12 @@
                         style:display=flex
                         style:min-width=50px
                         style:justify-content=end
+                        style:gap=6px
                       >
                         <Switch
                           --switch-label-width="90%"
                           value={internalHeadersToShow.find((h) => h.value == item.id) != undefined}
+                          disabled={!!item.pinned}
                           onchange={(e) => {
                             if (e.detail.value == false) {
                               internalHeadersToShow = internalHeadersToShow.filter((h) => h.value != item.id);
@@ -136,6 +146,31 @@
                             }
                           }}
                         />
+                        {#if pinnableColumns || item.pinned}
+                          <div style:opacity={item.locked ? 0.8 : 1}>
+                            <Icon 
+                              name={item.pinned ? 'mdi-pin-off' : 'mdi-pin'}
+                              onclick={
+                                !locked ?
+                                  () => {
+                                    let header = internalHeadersToShow.find((h) => h.value == item.id);
+                                    if (header) {
+                                      header.pinned = !header.pinned;
+                                      let pinnedHeaders = internalHeadersToShow.filter((h) => h.pinned);
+                                      let unpinnedHeaders = internalHeadersToShow.filter((h) => !h.pinned);
+                                      internalHeadersToShow = [
+                                        ...pinnedHeaders,
+                                        ...unpinnedHeaders
+                                      ];
+                                    }
+                                  } :
+                                  undefined
+                              }
+                              --icon-cursor={locked ? 'not-allowed' : ''}
+                              --icon-size=17px
+                            ></Icon>
+                          </div>
+                        {/if}
                       </div>
                     </div>
                   {/if}
@@ -148,7 +183,7 @@
             <span class="headers-show">{lang == 'en' ? 'Available headers' : 'Intestazioni disponibili'}</span>
   
             {#if availableHeaders && availableHeaders.length > 0}
-              {#each availableHeaders as header (header.value)}
+              {#each availableHeaders.filter(h => !h.pinned) as header (header.value)}
                 <div
                   animate:flip
                   in:receive={{ key: header }}

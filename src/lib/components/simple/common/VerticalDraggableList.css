@@ -1,3 +1,5 @@
 :root {
-  --vertical-draggable-list-default-item-padding: 8px
+  --vertical-draggable-list-default-item-padding: 8px;
+  --vertical-draggable-list-default-pinned-items-background-color: rgb(var(--global-color-background-400));
+  --vertical-draggable-list-default-pinned-items-border-radius: 4px;
 }
