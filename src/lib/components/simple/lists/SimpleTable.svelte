@@ -167,49 +167,52 @@
     DEFAULT_MAX_WIDTH_PX = 400
 
   onMount(() => {
-    if(resizableColumns) {
-      if (appendSnippet && headersHTML['row-append-header']) {
-        const actionCells = tableContainer?.querySelectorAll('.row-append-cell');
-        
-        if (actionCells && actionCells.length > 0) {
-          let maxActionWidth = 0;
-
-          for (let i = 0; i < actionCells.length; i++) {
-            const cellContent = actionCells[i];
-            const width = cellContent.getBoundingClientRect().width;
-            if (width > maxActionWidth) {
-              maxActionWidth = width;
-            }
-          }
-
-          const finalWidth = Math.ceil(maxActionWidth + 15);
+    (async () => {
+      await tick()
+      if(resizableColumns) {
+        if (appendSnippet && headersHTML['row-append-header']) {
+          const actionCells = tableContainer?.querySelectorAll('.row-append-cell');
           
-          headersHTML['row-append-header'].style.width = `${finalWidth}px`;
-          headersHTML['row-append-header'].style.minWidth = `${finalWidth}px`;
-        } 
-      }
+          if (actionCells && actionCells.length > 0) {
+            let maxActionWidth = 0;
 
-      for(const head of headers) {
-        let th = headersHTML[head.value]
-        if(!!th) {
-          resizeHeader(th, head)
+            for (let i = 0; i < actionCells.length; i++) {
+              const cellContent = actionCells[i];
+              const width = cellContent.getBoundingClientRect().width;
+              if (width > maxActionWidth) {
+                maxActionWidth = width;
+              }
+            }
+
+            const finalWidth = Math.ceil(maxActionWidth + 15);
+            
+            headersHTML['row-append-header'].style.width = `${finalWidth}px`;
+            headersHTML['row-append-header'].style.minWidth = `${finalWidth}px`;
+          } 
         }
+
+        for(const head of headers) {
+          let th = headersHTML[head.value]
+          if(!!th) {
+            resizeHeader(th, head)
+          }
+        }
+
+        tableHTML?.classList.add('resizable')
+
+        resizeObserver = new ResizeObserver(() => {
+          updateRemainingWidth();
+        });
+
+        if(tableContainer){
+          resizeObserver.observe(tableContainer);
+        }
+
+        return () => {
+          resizeObserver?.disconnect();
+        };
       }
-
-      tableHTML?.classList.add('resizable')
-
-      resizeObserver = new ResizeObserver(() => {
-        updateRemainingWidth();
-      });
-
-      if(tableContainer){
-        resizeObserver.observe(tableContainer);
-      }
-
-      return () => {
-        resizeObserver?.disconnect();
-      };
-    }
+    })()
   })
 
 

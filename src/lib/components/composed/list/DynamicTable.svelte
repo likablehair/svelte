@@ -38,52 +38,55 @@
   const deepEqual = lodash.isEqual
 
   onMount(() => {
-    if (rowAppendSnippet && headersHTML['row-append-header']) {
-      const actionCells = tableContainer?.querySelectorAll('.row-append-cell');
-      
-      if (actionCells && actionCells.length > 0) {
-        let maxActionWidth = 0;
-
-        for (let i = 0; i < actionCells.length; i++) {
-          const cellContent = actionCells[i];
-          const width = cellContent.getBoundingClientRect().width;
-          if (width > maxActionWidth) {
-            maxActionWidth = width;
-          }
-        }
-
-        const finalWidth = Math.ceil(maxActionWidth + 15);
+    (async () => {
+      await tick()
+      if (rowAppendSnippet && headersHTML['row-append-header']) {
+        const actionCells = tableContainer?.querySelectorAll('.row-append-cell');
         
-        headersHTML['row-append-header'].style.width = `${finalWidth}px`;
-        headersHTML['row-append-header'].style.minWidth = `${finalWidth}px`;
-      } 
-    }
+        if (actionCells && actionCells.length > 0) {
+          let maxActionWidth = 0;
 
-    updateHeaderHeight();
-    window.addEventListener('resize', updateHeaderHeight);
-    tableContainer?.addEventListener("scroll", setReachedBottomOrTop);
+          for (let i = 0; i < actionCells.length; i++) {
+            const cellContent = actionCells[i];
+            const width = cellContent.getBoundingClientRect().width;
+            if (width > maxActionWidth) {
+              maxActionWidth = width;
+            }
+          }
 
-    if(tableContainer?.scrollHeight && tableContainer.clientHeight){
-      hideScrollbar = tableContainer.scrollHeight > tableContainer.clientHeight
-    }
-
-    for(const head of headers) {
-      let th = headersHTML[head.value]
-      if(!!th) {
-        resizeHeader(th, head)
+          const finalWidth = Math.ceil(maxActionWidth + 15);
+          
+          headersHTML['row-append-header'].style.width = `${finalWidth}px`;
+          headersHTML['row-append-header'].style.minWidth = `${finalWidth}px`;
+        } 
       }
-    }
 
-    tableHTML?.classList.add('dynamic-resizable')
-
-    resizeObserver = new ResizeObserver(() => {
-      updateRemainingWidth();
       updateHeaderHeight();
-    });
+      window.addEventListener('resize', updateHeaderHeight);
+      tableContainer?.addEventListener("scroll", setReachedBottomOrTop);
 
-    if(tableContainer){
-      resizeObserver.observe(tableContainer);
-    }
+      if(tableContainer?.scrollHeight && tableContainer.clientHeight){
+        hideScrollbar = tableContainer.scrollHeight > tableContainer.clientHeight
+      }
+
+      for(const head of headers) {
+        let th = headersHTML[head.value]
+        if(!!th) {
+          resizeHeader(th, head)
+        }
+      }
+
+      tableHTML?.classList.add('dynamic-resizable')
+
+      resizeObserver = new ResizeObserver(() => {
+        updateRemainingWidth();
+        updateHeaderHeight();
+      });
+
+      if(tableContainer){
+        resizeObserver.observe(tableContainer);
+      }
+    })()
 
     return () => {
       window.removeEventListener('resize', updateHeaderHeight);
@@ -1406,6 +1409,7 @@
         const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.row-append-header, th.fixed-col'))
           .reduce((sum, th) => sum + th.getBoundingClientRect().width + 1, 0);
     
+        console.log({ containerWidth, totalResizableWidth, extraStaticWidth })
         remainingWidth = Math.max(0, containerWidth - totalResizableWidth - extraStaticWidth + 18);
       }
     }
