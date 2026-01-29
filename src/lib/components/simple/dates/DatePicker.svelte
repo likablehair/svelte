@@ -7,7 +7,7 @@
   import MonthSelector from "./MonthSelector.svelte";
   import Calendar from "./Calendar.svelte";
   import Button from "$lib/components/simple/buttons/Button.svelte";
-  import type { ComponentProps } from 'svelte';
+  import type { ComponentProps, Snippet } from 'svelte';
 
   interface Props {
     selectedYear?: number;
@@ -22,11 +22,16 @@
     selectableYears?: number[];
     skipTabs?: boolean;
     disabled?: boolean;
+    fillOpenRange?: boolean
     class?: {
       container?: string,
       header?: string,
       selectorRow?: string
     }
+    headerLabelSnippet?: Snippet<[{
+      dateString?: string
+      dateToString?: string
+    }]>
     onyearClick?: (event: {
       detail: {
         year: number
@@ -53,7 +58,9 @@
     skipTabs = false,
     disabled = false,
     type,
+    fillOpenRange,
     class: clazz = {},
+    headerLabelSnippet,
     onmonthClick,
     onyearClick,
     ondayClick,
@@ -164,10 +171,17 @@
       class="unstyled day"
       tabindex={skipTabs ? -1 : undefined}
     >
-      {#if !!selectedDate && !selectedDateTo}
-        {dateToString(selectedDate, "dayAndMonth", locale)}
-      {:else if !!selectedDate && !!selectedDateTo}
-        {dateToString(selectedDate, "dayAndMonth", locale)} - {dateToString(selectedDateTo, "dayAndMonth", locale)}
+      {#if headerLabelSnippet}
+        {@render headerLabelSnippet({
+          dateString: selectedDate ? dateToString(selectedDate, "dayAndMonth", locale) : undefined,
+          dateToString: selectedDateTo ? dateToString(selectedDateTo, "dayAndMonth", locale) : undefined,
+        })}
+      {:else}
+        {#if !!selectedDate && !selectedDateTo}
+          {dateToString(selectedDate, "dayAndMonth", locale)}
+        {:else if !!selectedDate && !!selectedDateTo}
+          {dateToString(selectedDate, "dayAndMonth", locale)} - {dateToString(selectedDateTo, "dayAndMonth", locale)}
+        {/if}
       {/if}
     </button>
   </div>
@@ -234,6 +248,7 @@
         {type}
         {locale}
         disabled={disabled}
+        {fillOpenRange}
         {ondayClick}
       />
     {/if}

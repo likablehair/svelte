@@ -71,6 +71,7 @@
     { name: '--button-text-hover-background-color', type: 'color', description: 'Background color for text button on hover.', default: 'rgb(var(--global-color-primary-500), 0.2)' },
     { name: '--button-text-active-background-color', type: 'color', description: 'Background color for text button when active.', default: 'rgb(var(--global-color-primary-500), 0.4)' },
     { name: '--button-icon-border-radius', type: 'border', description: 'Border radius for icon buttons.', default: '9999px' },
+    { name: '--button-box-sizing', type: 'box-sizing', description: 'Button box sizing.', default: 'content-box' },
   ]}
 />
 
