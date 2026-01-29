@@ -315,6 +315,7 @@
           {appendInnerSnippet}
           {prependSnippet}
           {appendSnippet}
+          autocomplete='off'
           --simple-textfield-default-padding='0.65rem 0.8rem'
           --simple-textfield-default-inner-gap='4px'
         >
