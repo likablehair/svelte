@@ -5,14 +5,14 @@
   --calendar-default-day-height: 100%;
   --calendar-default-day-border-radius: 0px;
   --calendar-default-day-hover-background-color: rgb(var(--global-color-primary-600), .3);
+  --calendar-default-day-hover-border-radius: 4px;
   --calendar-default-selected-day-background-color: rgb(var(--global-color-primary-600));
   --calendar-default-selected-day-color: rgb(var(--global-color-grey-50));
   --calendar-default-selected-day-border-radius: 4px;
   --calendar-default-today-background-color: rgb(var(--global-color-error-200), .7);
   --calendar-default-today-color: rgb(var(--global-color-contrast-800));
   --calendar-default-today-border-radius: 9999px;
-  --calendar-default-today-height: 30px;
-  --calendar-default-today-width: 30px;
+  --calendar-default-today-height: min(90%,30px);
   --calendar-default-between-range-background-color: rgb(var(--global-color-primary-400), .4);
   --calendar-default-between-range-color: rgb(var(--global-color-contrast-800));
   --calendar-default-grid-gap: 0px;

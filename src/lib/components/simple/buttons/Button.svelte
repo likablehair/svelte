@@ -136,7 +136,10 @@
 
   .button {
     overflow: hidden;
-    box-sizing: content-box;
+    box-sizing: var(
+      --button-box-sizing,
+      var(--button-default-box-sizing)
+    );
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     width: var(
       --button-width,

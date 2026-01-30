@@ -22,4 +22,5 @@
   --button-default-icon-focus-color: rgb(var(--global-color-primary-500));
   --button-default-box-shadow: none;
   --button-default-text-font-weight: 600;
+  --button-default-box-sizing: content-box;
 }

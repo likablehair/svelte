@@ -182,6 +182,7 @@
 								--dropdown-button-active-color='transparent'
 								--dropdown-button-active-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
 								--dropdown-button-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+								--dropdown-button-box-sizing=content-box
 							>
 								{#snippet customSnippet({ filter })}
 									{@render customSnippetInternal?.({ filter, mAndDown, updateCustomFilterValues })}

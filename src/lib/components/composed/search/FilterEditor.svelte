@@ -200,19 +200,20 @@
               minWidth={'100px'}
               height={'100%'}
               --button-padding="10px 12px"
-              --button-border='var(--dropdown-button-border, none)'
-              --button-background-color='var(--dropdown-button-background-color, rgb(var(--global-color-background-300), .6))'
-              --button-hover-background-color='var(--dropdown-button-hover-color, rgb(var(--global-color-background-300), .6))'
-              --button-focus-background-color='var(--dropdown-button-focus-color, rgb(var(--global-color-background-300), .6))'
-              --button-active-background-color='var(--dropdown-button-active-color, rgb(var(--global-color-background-300), .6))'
+              --button-border='var(--dropdown-button-border)'
+              --button-background-color='var(--dropdown-button-background-color)'
+              --button-hover-background-color='var(--dropdown-button-hover-color)'
+              --button-focus-background-color='var(--dropdown-button-focus-color)'
+              --button-active-background-color='var(--dropdown-button-active-color)'
+              --button-border-radius='var(--dropdown-button-border-radius)'
+              --button-default-height='var(--dropdown-button-height)'
+              --button-active-box-shadow='var(--dropdown-button-active-box-shadow)'
+              --button-focus-box-shadow='var(--dropdown-button-focus-box-shadow)'
+              --button-box-sizing='var(--dropdown-button-box-sizing)'
               --button-hover-color='rgb(var(--global-color-contrast-800))'
-              --button-border-radius='var(--dropdown-button-border-radius, 4px)'
-              --button-default-height='var(--dropdown-button-height, 20px)'
               --autocomplete-default-selected-item-background-color='rgb(var(--global-color-background-500), .5)'
               --autocomplete-default-selected-item-color='rgb(var(--global-color-contrast-800))'
               --autocomplete-default-hover-item-background-color='rgb(var(--global-color-background-300), .5)'
-              --button-active-box-shadow='var(--dropdown-button-active-box-shadow)'
-              --button-focus-box-shadow='var(--dropdown-button-focus-box-shadow)'
               ></Dropdown>
           </div>
         </div>

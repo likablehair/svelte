@@ -110,3 +110,6 @@ export { default as ConfirmOrCancelButtons } from './components/composed/forms/C
 export { default as SearchBar } from './components/composed/search/SearchBar.svelte'
 
 export { default as DashboardShaper } from './components/composed/dashboard/DashboardShaper.svelte'
+
+export { default as PeriodSelector } from './components/composed/forms/PeriodSelector.svelte'
+export { default as PeriodPicker } from './components/composed/forms/PeriodPicker.svelte'

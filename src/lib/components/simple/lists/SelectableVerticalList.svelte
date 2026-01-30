@@ -70,9 +70,9 @@
   let {
     activeKeyboard = false,
     loopSelection = true,
-    focused = $bindable(undefined),
-    selected = $bindable(undefined),
-    elements = $bindable([]),
+    focused = $bindable(),
+    selected = $bindable(),
+    elements = $bindable(),
     centered = false,
     bicolor = false,
     appendIconSize = "20pt",
@@ -85,10 +85,10 @@
     titleSnippet,
   }: Props = $props();
 
-  let focusedIndex = $derived(elements.findIndex((el) => el.name == focused))
+  let focusedIndex = $derived(elements?.findIndex((el) => el.name == focused))
 
   function handleKeypress(params: {key: string}) {
-    if(activeKeyboard && elements.length > 0) {
+    if(activeKeyboard && elements && elements.length > 0) {
       if(params.key == 'ArrowDown') {
         let newIndex
         if((focusedIndex === undefined || focusedIndex === -1) || (loopSelection && focusedIndex >= (elements.length - 1))) {
@@ -123,7 +123,7 @@
             }
           })
         }
-      } else if(params.key == 'Enter' && focusedIndex !== -1) {
+      } else if(params.key == 'Enter' && focusedIndex !== -1 && focusedIndex != undefined) {
         selected = elements[focusedIndex].name
         if(onselect) {
           onselect({
@@ -185,6 +185,7 @@
 <ul
   class="list"
   role="listbox"
+  onmouseleave={() => { focused = undefined }}
 >
   {#each elements as element, index (element.name)}
   <div

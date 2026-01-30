@@ -446,6 +446,18 @@ const list: {
     type: 'composed',
     url: '/docs/components/composed-components/DashboardShaper'
   }, {
+    title: 'PeriodPicker',
+    description: 'What period are you going through?',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/PeriodPicker'
+  }, {
+    title: 'PeriodSelector',
+    description: 'What period are you going through?',
+    status: 'stable',
+    type: 'composed',
+    url: '/docs/components/composed-components/PeriodSelector'
+  }, {
     title: 'CountriesAutocomplete',
     description: 'Every nation includes the flag.',
     status: 'beta',

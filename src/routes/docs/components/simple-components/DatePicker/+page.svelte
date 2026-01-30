@@ -28,6 +28,7 @@
     { name: "selectableYears", type: "number[]", description: "The years that can be selected in the year view.", default: "[...Array(150).keys()].map((i) => i + (new Date().getFullYear() - 75))" },
     { name: "skipTabs", type: "boolean", description: "Whether to skip tab navigation.", default: "false" },
     { name: "disabled", type: "boolean", description: "Whether the date picker is disabled.", default: "false" },
+    { name: "fillOpenRange", type: "boolean", description: "Treats the previous or next days for ranges as in-range.", default: "false" },
     { name: "class", type: "{ container?: string, header?: string, selectorRow?: string }", description: "Custom CSS class names for the date picker container, header, and selector row.", default: "undefined" },
   ]}
   styleProps={[
@@ -42,6 +43,29 @@
 <h2>Slots</h2>
 <SlotsViewer
   slots={[
+    {
+      description: 'Label inside the header of the calendar',
+      name: 'headerLabelSnippet',
+      default: `
+{#if !!selectedDate && !selectedDateTo}
+  {dateToString(selectedDate, "dayAndMonth", locale)}
+{:else if !!selectedDate && !!selectedDateTo}
+  {dateToString(selectedDate, "dayAndMonth", locale)} - {dateToString(selectedDateTo, "dayAndMonth", locale)}
+{/if}
+`,
+      properties: [
+        {
+          name: 'dateString',
+          type: 'string',
+          description: 'From date'
+        },
+        {
+          name: 'dateToString',
+          type: 'string',
+          description: 'To date'
+        },
+      ]
+    }
   ]}
 ></SlotsViewer>
 <h2>Events</h2>

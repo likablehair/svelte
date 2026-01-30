@@ -17,6 +17,7 @@
     animationDuration?: number;
     disabled?: boolean;
     type?: 'singleDate' | 'dateRange'
+    fillOpenRange?: boolean; 
     class?: {
       container?: string,
       weekHeader?: string,
@@ -51,6 +52,7 @@
     animationDuration = 200,
     disabled = false,
     type = 'singleDate',
+    fillOpenRange = false, 
     class: clazz = {},
     ondayClick,
     weekHeaderSnippet,
@@ -109,26 +111,49 @@
   }
 
   function isBetweenRange(dateStat: DateStat): boolean {
-  if (type == 'dateRange') {
-    let rangeDate: DateStat |undefined = !!selectedDateTo
-      ? dateToDateStat(selectedDateTo)
-      : hoveredDateStat
-    if (!!rangeDate && !!selectedDate) {
-      const date = new Date(dateStat.year, dateStat.month, dateStat.dayOfMonth);
-      const selected = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
-      const hovered = new Date(rangeDate.year, rangeDate.month, rangeDate.dayOfMonth);
-      
-      const minDate = selected < hovered ? selected : hovered;
-      const maxDate = selected < hovered ? hovered : selected;
-      
-      return date > minDate && date < maxDate;
-    } else {
-      return false;
+    if (type !== 'dateRange') return false;
+
+    const current = new Date(dateStat.year, dateStat.month, dateStat.dayOfMonth);
+    
+    const start = selectedDate 
+      ? new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate()) 
+      : undefined;
+    
+    const end = selectedDateTo 
+      ? new Date(selectedDateTo.getFullYear(), selectedDateTo.getMonth(), selectedDateTo.getDate()) 
+      : undefined;
+
+    let limitA: Date | undefined;
+    let limitB: Date | undefined;
+
+    if (start && end) {
+      limitA = start;
+      limitB = end;
+    } 
+    else if (start && hoveredDateStat) {
+      limitA = start;
+      limitB = new Date(hoveredDateStat.year, hoveredDateStat.month, hoveredDateStat.dayOfMonth);
+    } 
+    else if (end && hoveredDateStat) {
+      limitA = new Date(hoveredDateStat.year, hoveredDateStat.month, hoveredDateStat.dayOfMonth);
+      limitB = end;
     }
-  } else {
+
+    if (limitA && limitB) {
+      if (limitA.getTime() !== limitB.getTime()) {
+        const min = limitA < limitB ? limitA : limitB;
+        const max = limitA < limitB ? limitB : limitA;
+        return current > min && current < max;
+      }
+    }
+
+    if (fillOpenRange) {
+      if (start && !end) return current > start;
+      if (!start && end) return current < end;
+    }
+
     return false;
   }
-}
 </script>
 
 <div class="calendar-container {clazz.container || ''}">
@@ -159,22 +184,30 @@
           selectedDateTo.getMonth() == day.month &&
           selectedDateTo.getFullYear() == day.year}
         {@const extraMonth = day.month != visibleMonth}
+        {@const isBetween = isBetweenRange(day)}
         {@const isToday = 
           day.dayOfMonth == today.getDate() &&
           day.month == today.getMonth() &&
           day.year == today.getFullYear()}
+        {@const hovered =
+          !(type == 'dateRange') &&
+          !!hoveredDateStat &&
+          hoveredDateStat.dayOfMonth == day.dayOfMonth &&
+          hoveredDateStat.month == day.month &&
+          hoveredDateStat.year == day.year}
         <div 
           onmouseenter={() => hoverDateStat(day)}
           onmouseleave={() => hoverDateStat()}
           role='presentation'
           class="day-slot {clazz.day || ''}"
           class:extra-month={extraMonth}
-          class:today={isToday}
+          class:today={isToday && !(firstDaySelected || lastDaySelected) && !isBetween}
           class:selected={firstDaySelected || lastDaySelected}
-          class:between-range={isBetweenRange(day)}
+          class:between-range={isBetween}
           class:not-selected={!(firstDaySelected || lastDaySelected)}
           class:range-start={type == 'dateRange' && firstDaySelected}
           class:range-end={type == 'dateRange' && lastDaySelected}
+          class:hovered={hovered}
           onclick={() => handleDayClick(day, extraMonth)}
           onkeydown={() => handleDayClick(day, extraMonth)}
           >
@@ -205,7 +238,7 @@
 
   .grid-layout {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: repeat(7, 1fr);
     height: 100%;
     gap: var(
       --calendar-grid-gap,
@@ -214,6 +247,8 @@
   }
 
   .day-slot {
+    position: relative;
+    z-index: 1;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -247,26 +282,38 @@
   }
 
   .today {
-    background-color: var(
-      --calendar-today-background-color,
-      var(--calendar-default-today-background-color)
-    );
     color: var(
       --calendar-today-color,
       var(--calendar-default-today-color)
     );
+  }
+
+  .today::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
     height: var(
       --calendar-today-height,
       var(--calendar-default-today-height)
     );
+    width: auto;
+    aspect-ratio: 1 / 1;
     border-radius: var(
       --calendar-today-border-radius,
       var(--calendar-default-today-border-radius)
     );
-    width: var(
-      --calendar-today-width,
-      var(--calendar-default-today-width)
+    background-color: var(
+      --calendar-today-background-color,
+      var(--calendar-default-today-background-color)
     );
+  }
+  
+  .today:hover::before {
+    background-color: transparent;
   }
 
   .between-range {
@@ -290,6 +337,7 @@
       --calendar-day-width,
       var(--calendar-default-day-width)
     );
+    aspect-ratio: auto;
   }
 
   .selected {
@@ -326,6 +374,14 @@
       --calendar-day-hover-background-color,
       var(--calendar-default-day-hover-background-color)
     );
+    border-radius: var(
+      --calendar-day-hover-border-radius,
+      var(--calendar-default-day-hover-border-radius)
+    );
+  }
+
+  .day-slot.not-selected:hover:not(.hovered) {
+    border-radius: 0px;
   }
 
   .week-header-slot {
