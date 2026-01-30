@@ -429,35 +429,51 @@
       refreshPosition = false;
     }
   })
-  $effect(() => {
-    if (closeOnClickOutside && !!menuElement) {
-      window.addEventListener("mousedown", () => {
-        open = false;
-      });
-  
-      window.addEventListener("touchstart", () => {
-        open = false;
-      });
-  
-      if (activator) {
-        activator.addEventListener("mousedown", (event) => {
-          event.stopPropagation();
-        });
-  
-        activator.addEventListener("touchstart", (event) => {
-          event.stopPropagation();
-        });
+  function handleOutsideClick(node: HTMLElement, params: { enabled: boolean; activator?: HTMLElement }) {
+    const handleWindowClick = () => {
+      open = false;
+    };
+
+    const handleStopPropagation = (event: Event) => {
+      event.stopPropagation();
+    };
+
+    function updateListeners(currentParams: { enabled: boolean; activator?: HTMLElement }) {
+      window.removeEventListener("mousedown", handleWindowClick);
+      window.removeEventListener("touchstart", handleWindowClick);
+      node.removeEventListener("mousedown", handleStopPropagation);
+      node.removeEventListener("touchstart", handleStopPropagation);
+      
+      if (currentParams.activator) {
+        currentParams.activator.removeEventListener("mousedown", handleStopPropagation);
+        currentParams.activator.removeEventListener("touchstart", handleStopPropagation);
       }
-  
-      menuElement.addEventListener("mousedown", (event) => {
-        event.stopPropagation();
-      });
-  
-      menuElement.addEventListener("touchstart", (event) => {
-        event.stopPropagation();
-      });
+
+      if (currentParams.enabled) {
+        window.addEventListener("mousedown", handleWindowClick);
+        window.addEventListener("touchstart", handleWindowClick);
+        
+        node.addEventListener("mousedown", handleStopPropagation);
+        node.addEventListener("touchstart", handleStopPropagation);
+
+        if (currentParams.activator) {
+          currentParams.activator.addEventListener("mousedown", handleStopPropagation);
+          currentParams.activator.addEventListener("touchstart", handleStopPropagation);
+        }
+      }
     }
-  })
+
+    updateListeners(params);
+
+    return {
+      update(newParams: { enabled: boolean; activator?: HTMLElement }) {
+        updateListeners(newParams);
+      },
+      destroy() {
+        updateListeners({ enabled: false, activator: params.activator });
+      }
+    };
+  }
 
   function getPositionedAncestor(elem: HTMLElement | null, positions: string[] = ['fixed', 'absolute', 'sticky', 'relative']): HTMLElement | null {
     if (!elem) return null
@@ -555,6 +571,7 @@
   <div
     role="presentation"
     bind:this={menuElement}
+    use:handleOutsideClick={{ enabled: closeOnClickOutside, activator }}
     data-menu
     data-uid={currentUid}
     style:z-index={zIndex}

@@ -56,7 +56,7 @@
   menuProps={{
     activator: input,
     _activatorGap: 16,
-    closeOnClickOutside: false,
+    closeOnClickOutside: valid,
     _offsetLeft: -16,
     anchor: 'bottom',
     flipOnOverflow: true,
@@ -65,7 +65,7 @@
     _overflow: 'hidden',
   }}
   drawerProps={{
-    closeOnClickOutside: false,
+    closeOnClickOutside: valid,
     _space: 'min(50%,420px)',
     _borderRadius: '4px',
     _overflow: 'hidden',
