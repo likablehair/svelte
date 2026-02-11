@@ -112,7 +112,7 @@
     hideRowsPerPage = false,
     totalElements = undefined,
     rowsPerPage = $bindable(20),
-    filters = $bindable([]),
+    filters = $bindable(),
     quickFilters = $bindable(),
     searchBarColumns = undefined,
     searchBarVisible = true,
@@ -385,21 +385,23 @@
               ></SearchBar>
             {/if}
           {/if}
-          <Filters
-            bind:filters
-            onapplyFilter={handleFiltersChange}
-            onremoveFilter={handleRemoveFilter}
-            onremoveAllFilters={handleRemoveAllFilters}
-            --filters-default-wrapper-width={!!searchBarVisible ? undefined : "100%"}
-            {lang}
-            {dateLocale}
-            {editFilterMode}
-            {showActiveFilters}
-            {multiEditTabs}
-            appendSnippet={filterAppendSnippet}
-            customChipSnippet={customFilterChipSnippet}
-            customSnippet={customFilterSnippet}
-          ></Filters>
+          {#if filters?.length}
+            <Filters
+              bind:filters
+              onapplyFilter={handleFiltersChange}
+              onremoveFilter={handleRemoveFilter}
+              onremoveAllFilters={handleRemoveAllFilters}
+              --filters-default-wrapper-width={!!searchBarVisible ? undefined : "100%"}
+              {lang}
+              {dateLocale}
+              {editFilterMode}
+              {showActiveFilters}
+              {multiEditTabs}
+              appendSnippet={filterAppendSnippet}
+              customChipSnippet={customFilterChipSnippet}
+              customSnippet={customFilterSnippet}
+            ></Filters>
+          {/if}
         </div>
         {#if quickFiltersVisible}
           <div class="quick-filters-container">
