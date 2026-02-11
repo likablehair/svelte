@@ -161,7 +161,7 @@
       return headers.length +
         (appendSnippet ||  stickyAppendSnippet? 1 : 0) +
         (prependSnippet ? 1 : 0) +
-        (resizableColumns && remainingWidth ? 1 : 0);
+        (remainingWidth ? 1 : 0);
     })
 
   let stickyEnabled = $derived.by(() => {
@@ -171,7 +171,7 @@
     return true;
   });
 
-  const DEFAULT_MIN_WIDTH_PX = 100,
+  const DEFAULT_MIN_WIDTH_PX = 130,
     DEFAULT_MAX_WIDTH_PX = 400
 
   onMount(() => {
@@ -185,47 +185,42 @@
         }
         
         calculateStickyMetrics();
-
-        if (resizableColumns) {
-          updateRemainingWidth();
-        }
+        updateRemainingWidth();
       });
 
       if(tableContainer){
         resizeObserver.observe(tableContainer);
       }
 
-      if(resizableColumns) {
-        if (appendSnippet && headersHTML['row-append-header']) {
-          const actionCells = tableContainer?.querySelectorAll('.row-append-cell');
-          
-          if (actionCells && actionCells.length > 0) {
-            let maxActionWidth = 0;
+      if (appendSnippet && headersHTML['row-append-header']) {
+        const actionCells = tableContainer?.querySelectorAll('.row-append-cell');
+        
+        if (actionCells && actionCells.length > 0) {
+          let maxActionWidth = 0;
 
-            for (let i = 0; i < actionCells.length; i++) {
-              const cellContent = actionCells[i];
-              const width = cellContent.getBoundingClientRect().width;
-              if (width > maxActionWidth) {
-                maxActionWidth = width;
-              }
+          for (let i = 0; i < actionCells.length; i++) {
+            const cellContent = actionCells[i];
+            const width = cellContent.getBoundingClientRect().width;
+            if (width > maxActionWidth) {
+              maxActionWidth = width;
             }
-
-            const finalWidth = Math.max(Math.ceil(maxActionWidth), 40);
-            
-            headersHTML['row-append-header'].style.width = `${finalWidth}px`;
-            headersHTML['row-append-header'].style.minWidth = `${finalWidth}px`;
-          } 
-        }
-
-        for(const head of headers) {
-          let th = headersHTML[head.value]
-          if(!!th) {
-            resizeHeader(th, head)
           }
-        }
 
-        tableHTML?.classList.add('resizable')
+          const finalWidth = Math.max(Math.ceil(maxActionWidth), 40);
+          
+          headersHTML['row-append-header'].style.width = `${finalWidth}px`;
+          headersHTML['row-append-header'].style.minWidth = `${finalWidth}px`;
+        } 
       }
+
+      for(const head of headers) {
+        let th = headersHTML[head.value]
+        if(!!th) {
+          resizeHeader(th, head)
+        }
+      }
+
+      tableHTML?.classList.add('resizable')
 
       return () => {
         resizeObserver?.disconnect();
@@ -413,9 +408,7 @@
 
     tick().then(() => {
       calculateStickyMetrics();
-      if (resizableColumns) {
-        updateRemainingWidth();
-      }
+      updateRemainingWidth();
     });
   });
 
@@ -473,7 +466,7 @@
 </script>
 
 {#if !!items && Array.isArray(items)}
-  <div class="simple-table-container {clazz.container || ''}" class:resizable={resizableColumns} bind:this={tableContainer}>
+  <div class="simple-table-container {clazz.container || ''}" bind:this={tableContainer}>
     <table class="table" bind:this={tableHTML}>
       <thead class="thead {clazz.header || ''}" bind:this={mainHeader}>
         <tr>
@@ -561,7 +554,7 @@
               {/if}
             </th>
           {/if}
-          {#if resizableColumns && remainingWidth}
+          {#if remainingWidth}
             <th
               style:width={remainingWidth + 'px'}
               class="filler"
@@ -665,7 +658,7 @@
                   </div>
                 </td>
               {/if}
-              {#if resizableColumns && remainingWidth}
+              {#if remainingWidth}
                 <td></td>
               {/if}
             </tr>

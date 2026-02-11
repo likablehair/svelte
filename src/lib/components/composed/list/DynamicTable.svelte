@@ -568,7 +568,7 @@
     totalStickyWidth = width;
   }
 
-  const DEFAULT_MIN_WIDTH_PX = 100,
+  const DEFAULT_MIN_WIDTH_PX = 130,
     DEFAULT_MAX_WIDTH_PX = 400
   
   let totalSections = $derived((totalRows - renderedRowsNumber) / sectionRowsNumber)
@@ -1433,9 +1433,7 @@
     showExpand;
     tick().then(() => {
       calculateStickyMetrics();
-      if(resizableColumns || dynamicFilters) {
-         updateRemainingWidth();
-      }
+      updateRemainingWidth();
     })
   });
   
