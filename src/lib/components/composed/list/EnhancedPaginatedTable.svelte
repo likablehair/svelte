@@ -37,7 +37,6 @@
     quickFilters = $bindable(),
     selectedItems = $bindable([]),
     selectedAll = $bindable(),
-    stickFirstColumn,
     resizedColumnSizeWithPadding = $bindable({}),
     ...rest
   }: Props = $props()
@@ -87,7 +86,6 @@
   {...rest} 
   {lang} 
   headers={headersToShowInTable}
-  {stickFirstColumn}
   bind:sortedBy
   bind:sortDirection
   bind:page

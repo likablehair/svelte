@@ -15,7 +15,7 @@
   }
 
   let { 
-    open = $bindable(false),
+    open = $bindable(),
     elements = [],
     onselect,
     menuProps,

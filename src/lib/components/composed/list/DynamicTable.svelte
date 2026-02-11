@@ -54,7 +54,7 @@
             }
           }
 
-          const finalWidth = Math.ceil(maxActionWidth + 15);
+          const finalWidth = Math.max(Math.ceil(maxActionWidth), 40);
           
           headersHTML['row-append-header'].style.width = `${finalWidth}px`;
           headersHTML['row-append-header'].style.minWidth = `${finalWidth}px`;
@@ -79,6 +79,12 @@
       tableHTML?.classList.add('dynamic-resizable')
 
       resizeObserver = new ResizeObserver(() => {
+        if (tableContainer) {
+          const rect = tableContainer.getBoundingClientRect();
+          containerWidth = rect.width;
+        }
+
+        calculateStickyMetrics();
         updateRemainingWidth();
         updateHeaderHeight();
       });
@@ -248,6 +254,7 @@
     dynamicFilters?: boolean;
     useSelectedItemsOnly?: boolean;
     selectedAllDisabled?: boolean;
+    stickyMinContainerWidth?: number;
     headerDrawerProps?: ComponentProps<typeof HeadersDrawer>['drawerProps']
     class?: {
       container?: string;
@@ -418,6 +425,7 @@
     dynamicFilters = true,
     useSelectedItemsOnly = false,
     selectedAllDisabled = false,
+    stickyMinContainerWidth = 1024,
     headerDrawerProps,
     class: clazz = {},
     onapplyCustomQuickFilter,
@@ -490,14 +498,21 @@
     mainHeader: Element | undefined = $state(),
     resizeObserver: ResizeObserver,
     ignoreSelectAll = rows.length == totalRows && useSelectedItemsOnly,
+    containerWidth: number = $state(0),
+    totalStickyWidth: number = $state(0),
     colspan = $derived.by(() => {
       return headersToShowInTable.length +
         (!!showSelect && !showExpand && rows.length > 0 ? 1 : 0) +
         (showExpand ? 1 : 0) +
         (remainingWidth ? 1 : 0) +
-        (rowAppendSnippet ? 1 : 0) +
-        (customizeHeaders ? 1 : 0);
+        (customizeHeaders || rowAppendSnippet ? 1 : 0)
     })
+
+  let stickyEnabled = $derived.by(() => {
+    if (containerWidth <= stickyMinContainerWidth) return false;
+    if (totalStickyWidth >= containerWidth) return false;
+    return true;
+  });
 
   const organizedHeaders = () => {
     let pinnedFixedHeaders = headers.filter(h => h.pinned).map(h => ({
@@ -524,6 +539,34 @@
       headersToShowInTable = organizedHeaders()
     }
   });
+
+  function calculateStickyMetrics() {
+    let width = 0;
+    
+    const hasPinnedData = headersToShowInTable.find(h => h.pinned);
+
+    if (hasPinnedData) {
+      if (headersHTML['select']) width += headersHTML['select'].getBoundingClientRect().width;
+      if (headersHTML['expand']) width += headersHTML['expand'].getBoundingClientRect().width;
+    }
+
+    headersToShowInTable.forEach(head => {
+      if (head.pinned) {
+        const stored = resizedColumnSizeWithPadding[head.value];
+        if (stored) {
+          width += stored;
+        } else if (headersHTML[head.value]) {
+          width += headersHTML[head.value].getBoundingClientRect().width;
+        }
+      }
+    });
+
+    if (customizeHeaders && headersHTML['row-append-header']) {
+      width += headersHTML['row-append-header'].getBoundingClientRect().width;
+    }
+
+    totalStickyWidth = width;
+  }
 
   const DEFAULT_MIN_WIDTH_PX = 100,
     DEFAULT_MAX_WIDTH_PX = 400
@@ -1333,6 +1376,7 @@
             resizedColumnSizeWithPadding = {
               ...resizedColumnSizeWithPadding,
             }
+            calculateStickyMetrics();
           }
         }
       }
@@ -1354,6 +1398,7 @@
               }
             })
           }
+          calculateStickyMetrics();
         }
       }
 
@@ -1382,15 +1427,17 @@
   }
 
   $effect(() => {
-    if (
-      !!tableContainer &&
-      headersToShowInTable.length > 0 &&
-      resizedColumnSizeWithPadding &&
-      mainHeader
-    ) {
-      tick().then(updateRemainingWidth);
-    }
-  })
+    headersToShowInTable;
+    resizedColumnSizeWithPadding;
+    showSelect;
+    showExpand;
+    tick().then(() => {
+      calculateStickyMetrics();
+      if(resizableColumns || dynamicFilters) {
+         updateRemainingWidth();
+      }
+    })
+  });
   
   async function updateRemainingWidth() {
     if(tableContainer != null && !!tableContainer && mainHeader) {
@@ -1406,10 +1453,9 @@
           return sum + width + 1;
         }, 0);
     
-        const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.row-append-header, th.fixed-col'))
+        const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.row-append-header'))
           .reduce((sum, th) => sum + th.getBoundingClientRect().width + 1, 0);
     
-        console.log({ containerWidth, totalResizableWidth, extraStaticWidth })
         remainingWidth = Math.max(0, containerWidth - totalResizableWidth - extraStaticWidth + 18);
       }
     }
@@ -1643,9 +1689,10 @@
         <tr>
           {#if !!showSelect && !showExpand && rows.length > 0}
             <th
+              bind:this={headersHTML['select']}
               class="non-resizable"
-              class:sticky-col={headersToShowInTable.find(h => h.pinned)}
-              style:left={"0"}
+              class:sticky-col={headersToShowInTable.find(h => h.pinned) && stickyEnabled}
+              style:left={headersToShowInTable.find(h => h.pinned) && stickyEnabled ? 0 : undefined}
             > 
               {#if selectMode === "multiple" && !selectedAllDisabled}
                 <Checkbox
@@ -1659,9 +1706,10 @@
           {/if}
           {#if showExpand}
             <th
+              bind:this={headersHTML['expand']}
               class="non-resizable"
-              class:sticky-col={headersToShowInTable.find(h => h.pinned)}
-              style:left={"0"}
+              class:sticky-col={headersToShowInTable.find(h => h.pinned) && stickyEnabled}
+              style:left={headersToShowInTable.find(h => h.pinned) && stickyEnabled ? 0 : undefined}
             ></th>
           {/if}
           {#each headersToShowInTable as header, index}
@@ -1672,9 +1720,9 @@
               style:min-width={header.minWidth}
               style:max-width={header.maxWidth}
               class:sortable={header.sortable}
-              class:sticky-col={header.pinned}
+              class:sticky-col={header.pinned && stickyEnabled}
               style:left={
-                header.pinned 
+                (header.pinned && stickyEnabled)
                   ? (showExpand || showSelect)
                     ? `calc(${baseLeft}px + ${extraLeft})`
                     : `${baseLeft}px`
@@ -1723,26 +1771,25 @@
               {/if}
             </th>
           {/each}
-          {#if rowAppendSnippet}
+          {#if customizeHeaders || rowAppendSnippet}
             <th
+              class:sticky-col={(customizeHeaders || !!rowAppendSnippet) && stickyEnabled}
+              style:right={((customizeHeaders || !!rowAppendSnippet) && stickyEnabled) ? 0 : undefined}
               class="row-append-header"
               bind:this={headersHTML['row-append-header']}
             >
-              {@render rowAppendSnippet({ index: -1, row: undefined })}
-            </th>
-          {/if}
-          {#if customizeHeaders}
-            <th
-              class="fixed-col"
-            >
-              <Icon
-                name="mdi-plus-circle-outline"
-                onclick={() => (openHeaderDrawer = true)}
-                --icon-size="var(
-                  --dynamic-table-customize-headers-icon-size,
-                  var(--dynamic-table-default-customize-headers-icon-size)
-                )"
-              />
+              {#if customizeHeaders}
+                <Icon
+                  name="mdi-plus-circle-outline"
+                  onclick={() => (openHeaderDrawer = true)}
+                  --icon-size="var(
+                    --dynamic-table-customize-headers-icon-size,
+                    var(--dynamic-table-default-customize-headers-icon-size)
+                  )"
+                />
+              {:else if rowAppendSnippet}
+                {@render rowAppendSnippet({ index: -1, row: undefined })}
+              {/if}
             </th>
           {/if}
           {#if remainingWidth}
@@ -1812,8 +1859,8 @@
               {#if !!showSelect && !showExpand}
                 <td 
                   class=non-resizable
-                  class:sticky-col={headersToShowInTable.find(h => h.pinned)}
-                  style:left={"0"}
+                  class:sticky-col={headersToShowInTable.find(h => h.pinned) && stickyEnabled}
+                  style:left={headersToShowInTable.find(h => h.pinned) && stickyEnabled ? 0 : undefined}
                 >
                   <Checkbox
                     id={row.item[uniqueKey]}
@@ -1835,8 +1882,8 @@
               {#if showExpand}
                 <td
                   class=non-resizable
-                  class:sticky-col={headersToShowInTable.find(h => h.pinned)}
-                  style:left={"0"}
+                  class:sticky-col={headersToShowInTable.find(h => h.pinned) && stickyEnabled}
+                  style:left={headersToShowInTable.find(h => h.pinned) && stickyEnabled ? 0 : undefined}
                 >
                   <Icon
                     name={expandedRows.findIndex(
@@ -1858,9 +1905,9 @@
                 <td
                   class:hover-cell={cellEdit && !loading && !!header.cellEditorInfo}
                   class:cell-edit-activator={cellEditorIndexHeader == indexHeader && cellEditorIndexRow == indexRow && !cellEditorSubItem}
-                  class:sticky-col={header.pinned}
+                  class:sticky-col={header.pinned && stickyEnabled}
                   style:left={
-                    header.pinned 
+                    (header.pinned && stickyEnabled)
                       ? (showExpand || showSelect)
                         ? `calc(${baseLeft}px + ${extraLeft})`
                         : `${baseLeft}px`
@@ -1906,15 +1953,19 @@
                   {/if}
                 </td>
               {/each}
-              {#if rowAppendSnippet}
-                <td class={clazz.cell || ""}>
-                  <div class="row-append-cell" style="display: inline-block; white-space: nowrap;">
+              {#if customizeHeaders || rowAppendSnippet}
+                <td
+                  class={clazz.cell || ""}
+                  class:sticky-col={(customizeHeaders || !!rowAppendSnippet) && stickyEnabled}
+                  style:right={((customizeHeaders || !!rowAppendSnippet) && stickyEnabled) ? 0 : undefined}
+                >
+                  <div 
+                    class="row-append-cell"
+                    style="display: inline-block; white-space: nowrap;"
+                  >
                     {@render rowAppendSnippet?.({ index: indexRow, row })}
                   </div>
                 </td>
-              {/if}
-              {#if customizeHeaders}
-                <td></td>
               {/if}
               {#if remainingWidth}
                 <td></td>
@@ -2834,10 +2885,7 @@
   .pointer {
     cursor: pointer;
   }
-  .table-header th.fixed-col {
-    position: sticky;
-    right: 0;
-    z-index: 3;
+  .row-append-header {
     width: 23px;
     min-width: 23px;
   }

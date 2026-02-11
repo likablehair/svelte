@@ -230,12 +230,6 @@
       default: "250",
     },
     {
-      name: "stickFirstColumn",
-      type: "boolean",
-      description: "Sticks the first column above the others",
-      default: "false",
-    },
-    {
       name: "calculateRowStyles",
       type: "CalculateRowStyles<Item> | undefined",
       description: "Function to calculate row styles.",
