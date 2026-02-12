@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="ts" generics="Data extends string">
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
   import type { ComponentProps } from "svelte";
   import MenuOrDrawer from "../common/MenuOrDrawer.svelte";
@@ -8,7 +8,7 @@
   import Icon from "$lib/components/simple/media/Icon.svelte";
 
   interface Props extends 
-    Omit<ComponentProps<typeof PeriodSelector>, 'showTimeRangeLabel'> {
+    Omit<ComponentProps<typeof PeriodSelector<Data>>, 'showTimeRangeLabel'> {
   }
 
   let {
@@ -25,7 +25,7 @@
     input: HTMLElement | undefined = $state(),
     text: string | undefined = $derived(timeRangeLabel)
 
-  function handleChange(event: Parameters<NonNullable<ComponentProps<typeof PeriodSelector>['onchange']>>[0]) {
+  function handleChange(event: Parameters<NonNullable<ComponentProps<typeof PeriodSelector<Data>>['onchange']>>[0]) {
     if (timespanSettings?.method == 'quick') {
       open = false
     }
