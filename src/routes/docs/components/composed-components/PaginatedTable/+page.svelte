@@ -536,6 +536,11 @@
       description: "Actions for the selected items",
     },
     {
+      name: "filterLabels",
+      type: "object",
+      description: "Labels for filters",
+    },
+    {
       name: "calculateRowStyles",
       type: "CalculateRowStyles<Item> | undefined",
       description: "Function to calculate row styles.",

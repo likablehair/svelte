@@ -41,6 +41,16 @@
     uniqueKey?: keyof ComponentProps<typeof SimpleTable<Item, Data>>['items'][number]
     hideActions?: boolean
     actionsForSelectedItems?: Action[];
+    filterLabels?: Pick<ComponentProps<typeof Filters>,
+      'addFilterLabel' |
+      'applyFilterLabel' |
+      'filterTitleLabel' |
+      'cancelFilterLabel' |
+      'labelsMapper' |
+      'trueString' |
+      'falseString' |
+      'betweenSeparator'
+    >
     class?: {
       simpleTable?: ComponentProps<typeof SimpleTable<Item, Data>>["class"];
     };
@@ -137,6 +147,7 @@
     uniqueKey = 'id',
     hideActions,
     actionsForSelectedItems = [],
+    filterLabels,
     calculateRowStyles = undefined,
     calculateRowClasses = undefined,
     class: clazz = {},
@@ -400,6 +411,7 @@
               appendSnippet={filterAppendSnippet}
               customChipSnippet={customFilterChipSnippet}
               customSnippet={customFilterSnippet}
+              {...filterLabels}
             ></Filters>
           {/if}
         </div>

@@ -256,6 +256,16 @@
     selectedAllDisabled?: boolean;
     stickyMinContainerWidth?: number;
     headerDrawerProps?: ComponentProps<typeof HeadersDrawer>['drawerProps']
+    filterLabels?: Pick<ComponentProps<typeof Filters>,
+      'addFilterLabel' |
+      'applyFilterLabel' |
+      'filterTitleLabel' |
+      'cancelFilterLabel' |
+      'labelsMapper' |
+      'trueString' |
+      'falseString' |
+      'betweenSeparator'
+    >
     class?: {
       container?: string;
       header?: string;
@@ -427,6 +437,7 @@
     selectedAllDisabled = false,
     stickyMinContainerWidth = 1024,
     headerDrawerProps,
+    filterLabels,
     class: clazz = {},
     onapplyCustomQuickFilter,
     oncellClick,
@@ -1551,6 +1562,7 @@
                     drawerSpace='40rem'
                     appendSnippet={filterAppendSnippet}
                     customChipSnippet={customFilterChipSnippet}
+                    {...filterLabels}
                   >
                     {#snippet contentSnippet({ filters, mAndDown, updateMultiFilterValues, })}  
                       {#key filters}
@@ -1560,6 +1572,7 @@
                           {mAndDown}
                           onchange={e => updateFilterValues(e.detail.filter, updateMultiFilterValues)}    
                           {updateMultiFilterValues}
+                          labelsMapper={filterLabels?.labelsMapper}
                         >
                           {#snippet customSnippet({ filter, mAndDown, updateCustomFilterValues })}
                             {@render customFilterSnippet?.({ filter, mAndDown, updateCustomFilterValues })}
@@ -1585,6 +1598,7 @@
                     appendSnippet={filterAppendSnippet}
                     customChipSnippet={customFilterChipSnippet}
                     customSnippet={customFilterSnippet}
+                    {...filterLabels}
                   >
                   </Filters>
                 {/if}
