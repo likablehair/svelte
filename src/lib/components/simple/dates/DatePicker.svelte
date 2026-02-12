@@ -75,30 +75,40 @@
   let elementDisabled = $derived(view == "year" ? "year" : "date");
   let lastSelectedYear: number = selectedYear
 
+  let minSelectableYear = $derived(selectableYears[0]);
+  let maxSelectableYear = $derived(selectableYears[selectableYears.length - 1]);
+
   function next() {
     if (view == "day") {
       if (visibleMonth == 11) {
-        visibleMonth = 0;
-        visibleYear += 1;
+        if (visibleYear < maxSelectableYear) {
+          visibleMonth = 0;
+          visibleYear += 1;
+        }
       } else {
         visibleMonth += 1;
       }
     } else {
-      if (visibleYear != selectableYears[selectableYears.length - 1])
+      if (visibleYear < maxSelectableYear) {
         visibleYear++;
+      }
     }
   }
 
   function previous() {
     if (view == "day") {
       if (visibleMonth == 0) {
-        visibleMonth = 11;
-        visibleYear -= 1;
+        if (visibleYear > minSelectableYear) {
+          visibleMonth = 11;
+          visibleYear -= 1;
+        }
       } else {
         visibleMonth -= 1;
       }
     } else {
-      if (visibleYear != selectableYears[0]) visibleYear--;
+      if (visibleYear > minSelectableYear) {
+        visibleYear--;
+      }
     }
   }
 
@@ -196,6 +206,7 @@
             icon="mdi-chevron-left"
             onclick={previous}
             tabindex={skipTabs ? -1 : undefined}
+            disabled={view === 'day' ? (visibleYear <= minSelectableYear && visibleMonth === 0) : visibleYear <= minSelectableYear}
           />
         </div>
         <div class="row-elem selector">
@@ -218,6 +229,7 @@
             icon="mdi-chevron-right"
             onclick={next}
             tabindex={skipTabs ? -1 : undefined}
+            disabled={view === 'day' ? (visibleYear >= maxSelectableYear && visibleMonth === 11) : visibleYear >= maxSelectableYear}
           />
         </div>
       </div>

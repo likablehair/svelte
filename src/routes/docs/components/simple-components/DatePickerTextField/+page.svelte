@@ -29,7 +29,7 @@
       {date}
     </div>
     <div class="h-flex">
-      <DatePickerTextField type='dateRange'  />
+      <DatePickerTextField type='dateRange' minYearInRange={2020} maxYearInRange={2030}  />
       <DatePickerTextField 
         bind:selectedDate={date} 
         --calendar-day-width=30px

@@ -135,6 +135,11 @@
       }
     }
 
+  let selectableYears = $derived.by(() => {
+    const range = maxYearInRange - minYearInRange + 1;
+    return Array.from({ length: range }, (_, i) => minYearInRange + i);
+  });
+
   function handleTextFieldFocus(mobile: boolean) {
     if(!mobile || !mobileDialog) {
       menuOpened = true
@@ -354,6 +359,7 @@
             onyearClick={handleYearSelect}
             onmonthClick={handleMonthSelect}
             skipTabs
+            {selectableYears}
             {disabled}
             {type}
           ></DatePicker>
@@ -387,6 +393,7 @@
             onyearClick={handleYearSelect}
             onmonthClick={handleMonthSelect}
             skipTabs
+            {selectableYears}
             {disabled}
             {type}
           ></DatePicker>
