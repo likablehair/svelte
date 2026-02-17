@@ -41,6 +41,7 @@
     menuAnchor?: ComponentProps<typeof Menu>['anchor']
     menuStayInViewport?: ComponentProps<typeof Menu>['stayInViewport']
     menuFlipOnOverflow?: ComponentProps<typeof Menu>['flipOnOverflow']
+    menuMaxHeight?: string
     adaptInputWidth?: boolean
     class?: {
       activator?: string;
@@ -142,6 +143,7 @@
     class: clazz = {},
     menuStayInViewport,
     menuFlipOnOverflow = true,
+    menuMaxHeight = '300px',
     adaptInputWidth = true,
     selectionContainerSnippet,
     selectionSnippet,
@@ -454,7 +456,7 @@
       {activator}
       _width={localMenuWidth || ""}
       _height={menuHeight}
-      _maxHeight="300px"
+      _maxHeight={menuMaxHeight}
       _boxShadow={menuBoxShadow}
       _borderRadius={menuBorderRadius}
       bind:open={menuOpened}

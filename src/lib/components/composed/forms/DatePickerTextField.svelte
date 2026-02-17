@@ -39,7 +39,8 @@
     }) => void
     oninput?: (event: {
       detail: {
-        datetime: Date | undefined
+        datetime: Date | undefined,
+        type: 'from' | 'to'
       }
     }) => void
     activatorSnippet?: Snippet<[{
@@ -134,6 +135,11 @@
       }
     }
 
+  let selectableYears = $derived.by(() => {
+    const range = maxYearInRange - minYearInRange + 1;
+    return Array.from({ length: range }, (_, i) => minYearInRange + i);
+  });
+
   function handleTextFieldFocus(mobile: boolean) {
     if(!mobile || !mobileDialog) {
       menuOpened = true
@@ -224,10 +230,11 @@
           }
         }
 
-        if(oninput) {
+        if(oninput && (id == 'to' || id == 'from')) {
           oninput({
             detail: {
-              datetime: id == "to" ? selectedDateTo : selectedDate
+              datetime: id == "to" ? selectedDateTo : selectedDate,
+              type: id,
             }
           })
         }
@@ -313,6 +320,7 @@
           {appendInnerSnippet}
           {prependSnippet}
           {appendSnippet}
+          autocomplete='off'
           --simple-textfield-default-padding='0.65rem 0.8rem'
           --simple-textfield-default-inner-gap='4px'
         >
@@ -351,6 +359,7 @@
             onyearClick={handleYearSelect}
             onmonthClick={handleMonthSelect}
             skipTabs
+            {selectableYears}
             {disabled}
             {type}
           ></DatePicker>
@@ -384,6 +393,7 @@
             onyearClick={handleYearSelect}
             onmonthClick={handleMonthSelect}
             skipTabs
+            {selectableYears}
             {disabled}
             {type}
           ></DatePicker>

@@ -41,6 +41,16 @@
     uniqueKey?: keyof ComponentProps<typeof SimpleTable<Item, Data>>['items'][number]
     hideActions?: boolean
     actionsForSelectedItems?: Action[];
+    filterLabels?: Pick<ComponentProps<typeof Filters>,
+      'addFilterLabel' |
+      'applyFilterLabel' |
+      'filterTitleLabel' |
+      'cancelFilterLabel' |
+      'labelsMapper' |
+      'trueString' |
+      'falseString' |
+      'betweenSeparator'
+    >
     class?: {
       simpleTable?: ComponentProps<typeof SimpleTable<Item, Data>>["class"];
     };
@@ -112,7 +122,7 @@
     hideRowsPerPage = false,
     totalElements = undefined,
     rowsPerPage = $bindable(20),
-    filters = $bindable([]),
+    filters = $bindable(),
     quickFilters = $bindable(),
     searchBarColumns = undefined,
     searchBarVisible = true,
@@ -137,6 +147,7 @@
     uniqueKey = 'id',
     hideActions,
     actionsForSelectedItems = [],
+    filterLabels,
     calculateRowStyles = undefined,
     calculateRowClasses = undefined,
     class: clazz = {},
@@ -385,21 +396,24 @@
               ></SearchBar>
             {/if}
           {/if}
-          <Filters
-            bind:filters
-            onapplyFilter={handleFiltersChange}
-            onremoveFilter={handleRemoveFilter}
-            onremoveAllFilters={handleRemoveAllFilters}
-            --filters-default-wrapper-width={!!searchBarVisible ? undefined : "100%"}
-            {lang}
-            {dateLocale}
-            {editFilterMode}
-            {showActiveFilters}
-            {multiEditTabs}
-            appendSnippet={filterAppendSnippet}
-            customChipSnippet={customFilterChipSnippet}
-            customSnippet={customFilterSnippet}
-          ></Filters>
+          {#if filters?.length}
+            <Filters
+              bind:filters
+              onapplyFilter={handleFiltersChange}
+              onremoveFilter={handleRemoveFilter}
+              onremoveAllFilters={handleRemoveAllFilters}
+              --filters-default-wrapper-width={!!searchBarVisible ? undefined : "100%"}
+              {lang}
+              {dateLocale}
+              {editFilterMode}
+              {showActiveFilters}
+              {multiEditTabs}
+              appendSnippet={filterAppendSnippet}
+              customChipSnippet={customFilterChipSnippet}
+              customSnippet={customFilterSnippet}
+              {...filterLabels}
+            ></Filters>
+          {/if}
         </div>
         {#if quickFiltersVisible}
           <div class="quick-filters-container">

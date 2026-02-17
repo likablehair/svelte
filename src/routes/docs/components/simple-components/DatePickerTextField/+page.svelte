@@ -29,7 +29,7 @@
       {date}
     </div>
     <div class="h-flex">
-      <DatePickerTextField type='dateRange'  />
+      <DatePickerTextField type='dateRange' minYearInRange={2020} maxYearInRange={2030}  />
       <DatePickerTextField 
         bind:selectedDate={date} 
         --calendar-day-width=30px
@@ -132,7 +132,7 @@
 <EventsViewer
   events={[
     { name: "ondayClick", description: "Triggered when a day is clicked in the date picker.", properties: [{ name: "dateStat", type: "DateStat", description: "The date statistics for the clicked day." }] },
-    { name: "oninput", description: "Triggered when the input value changes.", properties: [{ name: "datetime", type: "Date | undefined", description: "The selected date or undefined if no date is selected." }] },
+    { name: "oninput", description: "Triggered when the input value changes.", properties: [{ name: "datetime", type: "Date | undefined", description: "The selected date or undefined if no date is selected." }, { name: "id", type: '"from" | "to"', description: "The selected date for range date pickers." }] },
   ]}
 ></EventsViewer>
 

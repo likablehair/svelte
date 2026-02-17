@@ -59,7 +59,7 @@
     openingId = $bindable("autocomplete-menu"),
     width,
     height,
-    minWidth,
+    minWidth = 'none',
     menuWidth = width,
     mobileDrawer = false,
     disabled = false,
@@ -111,11 +111,6 @@
 >
   {#snippet selectionContainerSnippet({ openMenu, handleKeyDown })}
     <Button
-      --button-default-background-color="transparent"
-      --button-default-focus-background-color="rgb(var(--global-color-primary-400), .3)"
-      --button-default-focus-color="rgb(var(--global-color-contrast-900))"
-      --button-default-border="2px solid rgb(var(--global-color-primary-400))"
-      --button-default-color="rgb(var(--global-color-contrast-800))"
       onclick={openMenu}
       onkeydown={(event) => {
         handleKeyDown(event.detail.nativeEvent)
@@ -124,6 +119,20 @@
           event.detail.nativeEvent.preventDefault()
         }
       }}
+      --button-padding="var(--dropdown-button-padding, 10px 12px)"
+      --button-border='var(--dropdown-button-border, none)'
+      --button-background-color='var(--dropdown-button-background-color, rgb(var(--global-color-background-300), .6))'
+      --button-hover-background-color='var(--dropdown-button-hover-color, rgb(var(--global-color-background-300), .6))'
+      --button-focus-background-color='var(--dropdown-button-focus-color, rgb(var(--global-color-background-300), .6))'
+      --button-active-background-color='var(--dropdown-button-active-color, rgb(var(--global-color-background-300), .6))'
+      --button-hover-color='var(--dropdown-button-hover-color, rgb(var(--global-color-contrast-800)))'
+      --button-color='var(--dropdown-button-color, rgb(var(--global-color-contrast-800)))'
+      --button-focus-color='var(--dropdown-button-focus-color, rgb(var(--global-color-contrast-800)))'
+      --button-border-radius='var(--dropdown-button-border-radius, 4px)'
+      --button-height='var(--dropdown-button-height, 38.78px)'
+      --button-active-box-shadow='var(--dropdown-button-active-box-shadow)'
+      --button-focus-box-shadow='var(--dropdown-button-focus-box-shadow)'
+      --button-box-sizing='var(--dropdown-button-box-sizing, border-box)'
     >
       {#if labelSnippet}
         {@render labelSnippet({ 

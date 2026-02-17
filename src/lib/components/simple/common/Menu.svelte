@@ -15,6 +15,8 @@
   interface Props {
     _top?: number;
     _left?: number;
+    _offsetTop?: number;
+    _offsetLeft?: number;
     _width?: string;
     _height?: string;
     _maxHeight?: string;
@@ -74,6 +76,8 @@
     _maxHeight = undefined,
     _minWidth = undefined,
     _top = undefined,
+    _offsetTop = 0,
+    _offsetLeft = 0,
     activator = $bindable(),
     menuElement = $bindable(),
     openingId = $bindable(),
@@ -85,26 +89,37 @@
     currentUid: string = createId(),
     closeController: HTMLElement;
 
+  let calculatedTop = $state<number | undefined>(undefined);
+  let calculatedLeft = $state<number | undefined>(undefined);
+  
+  let finalTop = $derived(_top !== undefined ? _top : (calculatedTop !== undefined ? calculatedTop + _offsetTop : undefined));
+  let finalLeft = $derived(_left !== undefined ? _left : (calculatedLeft !== undefined ? calculatedLeft + _offsetLeft : undefined));
+
   function calculateMenuPosition(params: {
     activator: HTMLElement;
     menuElement: HTMLElement;
   }) {
+    if (_top !== undefined && _left !== undefined) return;
+    
+    let tempTop: number = 0;
+    let tempLeft: number = 0;
+    
     if (params.menuElement) {
       if (params.activator) {
         if (anchor == "bottom") {
           let { left: activatorLeft, top: activatorTop } =
             params.activator.getBoundingClientRect();
           let activatorHeight = params.activator.offsetHeight;
-          _top = activatorTop + activatorHeight + _activatorGap;
-          _left = activatorLeft;
+          tempTop = activatorTop + activatorHeight + _activatorGap;
+          tempLeft = activatorLeft;
 
           let { top: fixedParentTop, left: fixedParentLeft, fixedParent, validStickyParent } = getParentInstanceFromViewport(activator?.parentElement);
           if(!!fixedParent) {
-            _top = _top - fixedParentTop
-            _left = _left - fixedParentLeft
+            tempTop = tempTop - fixedParentTop
+            tempLeft = tempLeft - fixedParentLeft
           } else if(!validStickyParent && !fixedParent) {
-            _top = _top + window.scrollY
-            _left = _left + window.scrollX
+            tempTop = tempTop + window.scrollY
+            tempLeft = tempLeft + window.scrollX
           }
 
         } else if (anchor == "bottom-center") {
@@ -113,118 +128,109 @@
           let activatorHeight = params.activator.offsetHeight;
           let activatorWidth = params.activator.offsetWidth;
           let menuWidth = params.menuElement.offsetWidth;
-          _top = activatorTop + activatorHeight + _activatorGap;
-          _left = activatorLeft;
+          tempTop = activatorTop + activatorHeight + _activatorGap;
+          tempLeft = activatorLeft;
 
           let { top: fixedParentTop, left: fixedParentLeft, fixedParent, validStickyParent } = getParentInstanceFromViewport(activator?.parentElement);
           if(!!fixedParent) {
-            _top = _top - fixedParentTop
-            _left = _left - fixedParentLeft
+            tempTop = tempTop - fixedParentTop
+            tempLeft = tempLeft - fixedParentLeft
           } else if(!validStickyParent && !fixedParent) {
-            _top = _top + window.scrollY
-            _left = _left + window.scrollX
+            tempTop = tempTop + window.scrollY
+            tempLeft = tempLeft + window.scrollX
           }
 
           if (menuWidth > activatorWidth) {
-            _left = _left - (menuWidth - activatorWidth) / 2;
+            tempLeft = tempLeft - (menuWidth - activatorWidth) / 2;
           } else {
-            _left = _left + (activatorWidth - menuWidth) / 2;
+            tempLeft = tempLeft + (activatorWidth - menuWidth) / 2;
           }
         } else if (anchor == 'right-center') {
-          let { left: activatorLeft, top: activatorTop } =
-            params.activator.getBoundingClientRect();
+          let { left: activatorLeft, top: activatorTop } = params.activator.getBoundingClientRect();
           let activatorHeight = params.activator.offsetHeight;
           let activatorWidth = params.activator.offsetWidth;
           let menuHeight = params.menuElement.offsetHeight;
           let { top: fixedParentTop, left: fixedParentLeft } = getParentInstanceFromViewport(activator?.parentElement);
 
-          _top = activatorTop + window.scrollY + (activatorHeight / 2) - (menuHeight / 2) - fixedParentTop;
-          _left = activatorLeft + window.scrollX + activatorWidth + _activatorGap - fixedParentLeft;
+          tempTop = activatorTop + window.scrollY + (activatorHeight / 2) - (menuHeight / 2) - fixedParentTop;
+          tempLeft = activatorLeft + window.scrollX + activatorWidth + _activatorGap - fixedParentLeft;
         } else if (anchor == 'left-center') {
-          let { left: activatorLeft, top: activatorTop } =
-            params.activator.getBoundingClientRect();
+          let { left: activatorLeft, top: activatorTop } = params.activator.getBoundingClientRect();
           let activatorHeight = params.activator.offsetHeight;
           let menuHeight = params.menuElement.offsetHeight;
           let menuWidth = params.menuElement.offsetWidth;
           let { top: fixedParentTop, left: fixedParentLeft, fixedParent, validStickyParent } = getParentInstanceFromViewport(activator?.parentElement);
 
-          _top = activatorTop + (activatorHeight / 2) - (menuHeight / 2);
-          _left = activatorLeft - menuWidth - _activatorGap;
+          tempTop = activatorTop + (activatorHeight / 2) - (menuHeight / 2);
+          tempLeft = activatorLeft - menuWidth - _activatorGap;
 
           if(!!fixedParent) {
-            _top = _top - fixedParentTop
-            _left = _left - fixedParentLeft
+            tempTop = tempTop - fixedParentTop
+            tempLeft = tempLeft - fixedParentLeft
           } else if(!validStickyParent && !fixedParent) {
-            _top = _top + window.scrollY
-            _left = _left + window.scrollX
-          }
-        } else if (anchor == 'up') {
-          let { left: activatorLeft, top: activatorTop } =
-            params.activator.getBoundingClientRect();
-          let menuHeight = params.menuElement.offsetHeight;
-          _top = activatorTop - menuHeight - _activatorGap;
-          _left = activatorLeft;
-
-          let { top: fixedParentTop, left: fixedParentLeft, fixedParent, validStickyParent } = getParentInstanceFromViewport(activator?.parentElement);
-          if(!!fixedParent) {
-            _top = _top - fixedParentTop
-            _left = _left - fixedParentLeft
-          } else if(!validStickyParent && !fixedParent) {
-            _top = _top + window.scrollY
-            _left = _left + window.scrollX
+            tempTop = tempTop + window.scrollY
+            tempLeft = tempLeft + window.scrollX
           }
         } else if (anchor == 'left') {
-          let { left: activatorLeft, top: activatorTop } =
-            params.activator.getBoundingClientRect();
+          let { left: activatorLeft, top: activatorTop } = params.activator.getBoundingClientRect();
           let menuWidth = params.menuElement.offsetWidth;
-          _top = activatorTop;
-          _left = activatorLeft - menuWidth - _activatorGap;
-
+          tempTop = activatorTop;
+          tempLeft = activatorLeft - menuWidth - _activatorGap;
           let { top: fixedParentTop, left: fixedParentLeft, fixedParent, validStickyParent } = getParentInstanceFromViewport(activator?.parentElement);
           if(!!fixedParent) {
-            _top = _top - fixedParentTop
-            _left = _left - fixedParentLeft
+            tempTop = tempTop - fixedParentTop
+            tempLeft = tempLeft - fixedParentLeft
           } else if(!validStickyParent && !fixedParent) {
-            _top = _top + window.scrollY
-            _left = _left + window.scrollX
+            tempTop = tempTop + window.scrollY
+            tempLeft = tempLeft + window.scrollX
           }
         } else if (anchor == 'right') {
-          let { left: activatorLeft, top: activatorTop } =
-            params.activator.getBoundingClientRect();
+          let { left: activatorLeft, top: activatorTop } = params.activator.getBoundingClientRect();
           let activatorWidth = params.activator.offsetWidth;
-          _top = activatorTop;
-          _left = activatorLeft + activatorWidth + _activatorGap;
+          tempTop = activatorTop;
+          tempLeft = activatorLeft + activatorWidth + _activatorGap;
 
           let { top: fixedParentTop, left: fixedParentLeft, fixedParent, validStickyParent } = getParentInstanceFromViewport(activator?.parentElement);
           if(!!fixedParent) {
-            _top = _top - fixedParentTop
-            _left = _left - fixedParentLeft
+            tempTop = tempTop - fixedParentTop
+            tempLeft = tempLeft - fixedParentLeft
           } else if(!validStickyParent && !fixedParent) {
-            _top = _top + window.scrollY
-            _left = _left + window.scrollX
+            tempTop = tempTop + window.scrollY
+            tempLeft = tempLeft + window.scrollX
+          }
+        } else if (anchor == 'up') {
+          let { left: activatorLeft, top: activatorTop } = params.activator.getBoundingClientRect();
+          let menuHeight = params.menuElement.offsetHeight;
+          tempTop = activatorTop - menuHeight - _activatorGap;
+          tempLeft = activatorLeft;
+
+          let { top: fixedParentTop, left: fixedParentLeft, fixedParent, validStickyParent } = getParentInstanceFromViewport(activator?.parentElement);
+          if(!!fixedParent) {
+            tempTop = tempTop - fixedParentTop
+            tempLeft = tempLeft - fixedParentLeft
+          } else if(!validStickyParent && !fixedParent) {
+            tempTop = tempTop + window.scrollY
+            tempLeft = tempLeft + window.scrollX
           }
         } else if (anchor == 'up-center') {
-          let { left: activatorLeft, top: activatorTop } =
-            params.activator.getBoundingClientRect();
+          let { left: activatorLeft, top: activatorTop } = params.activator.getBoundingClientRect();
           let activatorWidth = params.activator.offsetWidth;
           let menuHeight = params.menuElement.offsetHeight;
           let menuWidth = params.menuElement.offsetWidth;
-          _top = activatorTop - menuHeight - _activatorGap;
-          _left = activatorLeft;
-
+          tempTop = activatorTop - menuHeight - _activatorGap;
+          tempLeft = activatorLeft;
           let { top: fixedParentTop, left: fixedParentLeft, fixedParent, validStickyParent } = getParentInstanceFromViewport(activator?.parentElement);
           if(!!fixedParent) {
-            _top = _top - fixedParentTop
-            _left = _left - fixedParentLeft
+            tempTop = tempTop - fixedParentTop
+            tempLeft = tempLeft - fixedParentLeft
           } else if(!validStickyParent && !fixedParent) {
-            _top = _top + window.scrollY
-            _left = _left + window.scrollX
+            tempTop = tempTop + window.scrollY
+            tempLeft = tempLeft + window.scrollX
           }
-
           if (menuWidth > activatorWidth) {
-            _left = _left - (menuWidth - activatorWidth) / 2;
+            tempLeft = tempLeft - (menuWidth - activatorWidth) / 2;
           } else {
-            _left = _left + (activatorWidth - menuWidth) / 2;
+            tempLeft = tempLeft + (activatorWidth - menuWidth) / 2;
           }
         }
       }
@@ -232,98 +238,96 @@
       if(flipOnOverflow && !!params.activator) {
         let { top: activatorTopDistance } = params.activator.getBoundingClientRect()
         if (window.innerHeight < activatorTopDistance + (menuElement?.offsetHeight || 0) + ((menuElement?.offsetHeight || 0) * 0.1)) {
-          _top = getTopDistance(params.activator) - _activatorGap - (menuElement?.offsetHeight || 0)
+          tempTop = getTopDistance(params.activator) - _activatorGap - (menuElement?.offsetHeight || 0)
         }
-
         if (
           anchor == 'right-center' &&
           window.innerWidth + window.scrollX <
-          (_left || 0) + (menuElement?.offsetWidth || 0)
+          tempLeft + (menuElement?.offsetWidth || 0)
         ) {
           let { left: activatorLeft } = params.activator.getBoundingClientRect();
-          _left = activatorLeft + window.scrollX - _activatorGap - (menuElement?.offsetWidth || 0)
+           tempLeft = activatorLeft + window.scrollX - _activatorGap - (menuElement?.offsetWidth || 0)
         }
 
         if (
           anchor == 'left-center' &&
-          (_left || 0) < 0
+          tempLeft < 0
         ) {
           let { left: activatorLeft } = params.activator.getBoundingClientRect();
           let activatorWidth = params.activator.offsetWidth;
-          _left = activatorLeft + window.scrollX + activatorWidth + _activatorGap
+          tempLeft = activatorLeft + window.scrollX + activatorWidth + _activatorGap
         }
 
         if (
           anchor == 'left' &&
-          (_left || 0) < 0
+          tempLeft < 0
         ) {
           let { left: activatorLeft } = params.activator.getBoundingClientRect();
           let activatorWidth = params.activator.offsetWidth;
-          _left = activatorLeft + window.scrollX + activatorWidth + _activatorGap
+          tempLeft = activatorLeft + window.scrollX + activatorWidth + _activatorGap
         }
 
         if (
           anchor == 'right' &&
           window.innerWidth + window.scrollX <
-          (_left || 0) + (menuElement?.offsetWidth || 0)
+          tempLeft + (menuElement?.offsetWidth || 0)
         ) {
           let { left: activatorLeft } = params.activator.getBoundingClientRect();
           let menuWidth = params.menuElement.offsetWidth;
-          _left = activatorLeft + window.scrollX - menuWidth - _activatorGap
+          tempLeft = activatorLeft + window.scrollX - menuWidth - _activatorGap
         }
 
         if (
           anchor == 'up' &&
-          (_top || 0) < window.scrollY
+          tempTop < window.scrollY
         ) {
           let { top: activatorTop } = params.activator.getBoundingClientRect();
           let activatorHeight = params.activator.offsetHeight;
-          _top = activatorTop + window.scrollY + activatorHeight + _activatorGap
+          tempTop = activatorTop + window.scrollY + activatorHeight + _activatorGap
         }
 
         if (
           anchor == 'up-center' &&
-          (_top || 0) < window.scrollY
+          tempTop < window.scrollY
         ) {
           let { top: activatorTop } = params.activator.getBoundingClientRect();
           let activatorHeight = params.activator.offsetHeight;
-          _top = activatorTop + window.scrollY + activatorHeight + _activatorGap
+          tempTop = activatorTop + window.scrollY + activatorHeight + _activatorGap
         }
       }
 
       if(stayInViewport) {
         if (
           window.innerWidth + window.scrollX <
-          (_left || 0) + (menuElement?.offsetWidth || 0)
+          tempLeft + (menuElement?.offsetWidth || 0)
         ) {
-          _left = Math.max(
+          tempLeft = Math.max(
             window.innerWidth + window.scrollX - (menuElement?.offsetWidth || 0),
             0
           );
         }
-
-        if ((_left || 0) < window.scrollX) {
-          _left = window.scrollX;
+        if (tempLeft < window.scrollX) {
+          tempLeft = window.scrollX;
         }
       }
 
       if(!!positionedAncestor) {
         let { left: positionedAncestorLeft, top: positionedAncestorTop } = positionedAncestor.getBoundingClientRect();
 
-        if(!_left) _left = 0
-        if(!_top) _top = 0
-
-        _left = _left - (positionedAncestorLeft + window.scrollX - positionedAncestor.scrollLeft)
-        _top = _top - (positionedAncestorTop + window.scrollY - positionedAncestor.scrollTop)
+        tempLeft = tempLeft - (positionedAncestorLeft + window.scrollX - positionedAncestor.scrollLeft)
+        tempTop = tempTop - (positionedAncestorTop + window.scrollY - positionedAncestor.scrollTop)
 
         if(!!activator) {
           let { validStickyParent, fixedParent } = getParentInstanceFromViewport(activator?.parentElement)
           if(!!validStickyParent || !!fixedParent) {
-            _left = _left + window.scrollX
-            _top = _top + window.scrollY
+            tempLeft = tempLeft + window.scrollX
+            tempTop = tempTop + window.scrollY
           }
         }
       }
+      
+      calculatedTop = tempTop;
+      calculatedLeft = tempLeft;
     }
   }
 
@@ -425,35 +429,51 @@
       refreshPosition = false;
     }
   })
-  $effect(() => {
-    if (closeOnClickOutside && !!menuElement) {
-      window.addEventListener("mousedown", () => {
-        open = false;
-      });
-  
-      window.addEventListener("touchstart", () => {
-        open = false;
-      });
-  
-      if (activator) {
-        activator.addEventListener("mousedown", (event) => {
-          event.stopPropagation();
-        });
-  
-        activator.addEventListener("touchstart", (event) => {
-          event.stopPropagation();
-        });
+  function handleOutsideClick(node: HTMLElement, params: { enabled: boolean; activator?: HTMLElement }) {
+    const handleWindowClick = () => {
+      open = false;
+    };
+
+    const handleStopPropagation = (event: Event) => {
+      event.stopPropagation();
+    };
+
+    function updateListeners(currentParams: { enabled: boolean; activator?: HTMLElement }) {
+      window.removeEventListener("mousedown", handleWindowClick);
+      window.removeEventListener("touchstart", handleWindowClick);
+      node.removeEventListener("mousedown", handleStopPropagation);
+      node.removeEventListener("touchstart", handleStopPropagation);
+      
+      if (currentParams.activator) {
+        currentParams.activator.removeEventListener("mousedown", handleStopPropagation);
+        currentParams.activator.removeEventListener("touchstart", handleStopPropagation);
       }
-  
-      menuElement.addEventListener("mousedown", (event) => {
-        event.stopPropagation();
-      });
-  
-      menuElement.addEventListener("touchstart", (event) => {
-        event.stopPropagation();
-      });
+
+      if (currentParams.enabled) {
+        window.addEventListener("mousedown", handleWindowClick);
+        window.addEventListener("touchstart", handleWindowClick);
+        
+        node.addEventListener("mousedown", handleStopPropagation);
+        node.addEventListener("touchstart", handleStopPropagation);
+
+        if (currentParams.activator) {
+          currentParams.activator.addEventListener("mousedown", handleStopPropagation);
+          currentParams.activator.addEventListener("touchstart", handleStopPropagation);
+        }
+      }
     }
-  })
+
+    updateListeners(params);
+
+    return {
+      update(newParams: { enabled: boolean; activator?: HTMLElement }) {
+        updateListeners(newParams);
+      },
+      destroy() {
+        updateListeners({ enabled: false, activator: params.activator });
+      }
+    };
+  }
 
   function getPositionedAncestor(elem: HTMLElement | null, positions: string[] = ['fixed', 'absolute', 'sticky', 'relative']): HTMLElement | null {
     if (!elem) return null
@@ -551,14 +571,15 @@
   <div
     role="presentation"
     bind:this={menuElement}
+    use:handleOutsideClick={{ enabled: closeOnClickOutside, activator }}
     data-menu
     data-uid={currentUid}
     style:z-index={zIndex}
     style:position="absolute"
-    style:top={_top + "px"}
+    style:top={finalTop + "px"}
     style:box-shadow={_boxShadow}
     style:border-radius={_borderRadius}
-    style:left={_left + "px"}
+    style:left={finalLeft + "px"}
     style:height={_height}
     style:max-height={_maxHeight}
     style:width={_width}

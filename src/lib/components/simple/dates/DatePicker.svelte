@@ -7,7 +7,7 @@
   import MonthSelector from "./MonthSelector.svelte";
   import Calendar from "./Calendar.svelte";
   import Button from "$lib/components/simple/buttons/Button.svelte";
-  import type { ComponentProps } from 'svelte';
+  import type { ComponentProps, Snippet } from 'svelte';
 
   interface Props {
     selectedYear?: number;
@@ -22,11 +22,16 @@
     selectableYears?: number[];
     skipTabs?: boolean;
     disabled?: boolean;
+    fillOpenRange?: boolean
     class?: {
       container?: string,
       header?: string,
       selectorRow?: string
     }
+    headerLabelSnippet?: Snippet<[{
+      dateString?: string
+      dateToString?: string
+    }]>
     onyearClick?: (event: {
       detail: {
         year: number
@@ -53,7 +58,9 @@
     skipTabs = false,
     disabled = false,
     type,
+    fillOpenRange,
     class: clazz = {},
+    headerLabelSnippet,
     onmonthClick,
     onyearClick,
     ondayClick,
@@ -68,30 +75,40 @@
   let elementDisabled = $derived(view == "year" ? "year" : "date");
   let lastSelectedYear: number = selectedYear
 
+  let minSelectableYear = $derived(selectableYears[0]);
+  let maxSelectableYear = $derived(selectableYears[selectableYears.length - 1]);
+
   function next() {
     if (view == "day") {
       if (visibleMonth == 11) {
-        visibleMonth = 0;
-        visibleYear += 1;
+        if (visibleYear < maxSelectableYear) {
+          visibleMonth = 0;
+          visibleYear += 1;
+        }
       } else {
         visibleMonth += 1;
       }
     } else {
-      if (visibleYear != selectableYears[selectableYears.length - 1])
+      if (visibleYear < maxSelectableYear) {
         visibleYear++;
+      }
     }
   }
 
   function previous() {
     if (view == "day") {
       if (visibleMonth == 0) {
-        visibleMonth = 11;
-        visibleYear -= 1;
+        if (visibleYear > minSelectableYear) {
+          visibleMonth = 11;
+          visibleYear -= 1;
+        }
       } else {
         visibleMonth -= 1;
       }
     } else {
-      if (visibleYear != selectableYears[0]) visibleYear--;
+      if (visibleYear > minSelectableYear) {
+        visibleYear--;
+      }
     }
   }
 
@@ -164,10 +181,17 @@
       class="unstyled day"
       tabindex={skipTabs ? -1 : undefined}
     >
-      {#if !!selectedDate && !selectedDateTo}
-        {dateToString(selectedDate, "dayAndMonth", locale)}
-      {:else if !!selectedDate && !!selectedDateTo}
-        {dateToString(selectedDate, "dayAndMonth", locale)} - {dateToString(selectedDateTo, "dayAndMonth", locale)}
+      {#if headerLabelSnippet}
+        {@render headerLabelSnippet({
+          dateString: selectedDate ? dateToString(selectedDate, "dayAndMonth", locale) : undefined,
+          dateToString: selectedDateTo ? dateToString(selectedDateTo, "dayAndMonth", locale) : undefined,
+        })}
+      {:else}
+        {#if !!selectedDate && !selectedDateTo}
+          {dateToString(selectedDate, "dayAndMonth", locale)}
+        {:else if !!selectedDate && !!selectedDateTo}
+          {dateToString(selectedDate, "dayAndMonth", locale)} - {dateToString(selectedDateTo, "dayAndMonth", locale)}
+        {/if}
       {/if}
     </button>
   </div>
@@ -182,6 +206,7 @@
             icon="mdi-chevron-left"
             onclick={previous}
             tabindex={skipTabs ? -1 : undefined}
+            disabled={view === 'day' ? (visibleYear <= minSelectableYear && visibleMonth === 0) : visibleYear <= minSelectableYear}
           />
         </div>
         <div class="row-elem selector">
@@ -204,6 +229,7 @@
             icon="mdi-chevron-right"
             onclick={next}
             tabindex={skipTabs ? -1 : undefined}
+            disabled={view === 'day' ? (visibleYear >= maxSelectableYear && visibleMonth === 11) : visibleYear >= maxSelectableYear}
           />
         </div>
       </div>
@@ -234,6 +260,7 @@
         {type}
         {locale}
         disabled={disabled}
+        {fillOpenRange}
         {ondayClick}
       />
     {/if}

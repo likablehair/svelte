@@ -8,6 +8,7 @@
     filters?: Filter[];
     lang?: "it" | "en";
     mAndDown?: boolean;
+		labelsMapper?: LabelMapper,
 		onchange?: (event: {
 			detail: {
 				filter: Filter
@@ -25,6 +26,25 @@
     filters = [],
     lang = "en",
     mAndDown = false,
+		labelsMapper = lang == 'en' ? {
+			equal: { extended: "equal to", short: "equal" },
+			like: { short: "includes" },
+			ilike: { short: "includes" },
+			contains: { short: "contains" },
+			greater: { short: "greater", extended: "greater than" },
+			lower: { short: "lower", extended: "lower than" },
+			between: { short: "between", extended: "is between" },
+			different: { short: "different", extended: "different from" },
+		} : {
+			equal: { extended: "uguale a", short: "uguale" },
+			like: { short: "include" },
+			ilike: { short: "include" },
+			contains: { short: "contiene" },
+			greater: { short: "maggiore", extended: "maggiore di" },
+			lower: { short: "minore", extended: "minore di" },
+			between: { short: "compreso", extended: "è compreso tra" },
+			different: { short: "diverso", extended: "diverso da" },
+		},
 		onchange,
 		updateMultiFilterValues,
 		customSnippet: customSnippetInternal,
@@ -40,26 +60,6 @@
 
 	type LabelMapper = {
 		[label: string]: { extended?: string; short: string };
-	};
-	
-	let labelsMapper: LabelMapper = lang == 'en' ? {
-		equal: { extended: "equal to", short: "equal" },
-		like: { short: "includes" },
-		ilike: { short: "includes" },
-		contains: { short: "contains" },
-		greater: { short: "greater", extended: "greater than" },
-		lower: { short: "lower", extended: "lower than" },
-		between: { short: "between", extended: "is between" },
-		different: { short: "different", extended: "different from" },
-	} : {
-		equal: { extended: "uguale a", short: "uguale" },
-		like: { short: "include" },
-		ilike: { short: "include" },
-		contains: { short: "contiene" },
-		greater: { short: "maggiore", extended: "maggiore di" },
-		lower: { short: "minore", extended: "minore di" },
-		between: { short: "compreso", extended: "è compreso tra" },
-		different: { short: "diverso", extended: "diverso da" },
 	};
 
 	function selectFilter(filter: Filter) {
@@ -182,6 +182,7 @@
 								--dropdown-button-active-color='transparent'
 								--dropdown-button-active-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
 								--dropdown-button-focus-box-shadow='inset 0 0 0 2px rgb(var(--global-color-primary-500))'
+								--dropdown-button-box-sizing=content-box
 							>
 								{#snippet customSnippet({ filter })}
 									{@render customSnippetInternal?.({ filter, mAndDown, updateCustomFilterValues })}

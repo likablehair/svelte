@@ -19,7 +19,7 @@
   }
 
   let { 
-    open = $bindable(false),
+    open = $bindable(),
     drawerProps,
     menuProps,
     children,

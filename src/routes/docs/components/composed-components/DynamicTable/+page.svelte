@@ -286,6 +286,7 @@
     { name: "useSelectedItemsOnly", type: "boolean", description: "Uses only selectedItems if all rows are fetched initially", default: "false" },
     { name: "selectedAllDisabled", type: "boolean", description: "Disabled the selected all", default: "false" },
     { name: "headerDrawerProps", type: "object", description: "Props of the headers drawer", },
+    { name: "filterLabels", type: "object", description: "Labels for filters", },
     { name: "class", type: "{ container?: string; header?: string; row?: string; cell?: string }", description: "Custom classes for table elements", default: "{}" }
   ]}
   styleProps={[

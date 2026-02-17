@@ -25,6 +25,7 @@
     { name: "showHeader", type: "boolean", description: "Controls visibility of the week header.", default: "true" },
     { name: "animationDuration", type: "number", description: "Duration of the calendar transition animation in milliseconds.", default: "200" },
     { name: "disabled", type: "boolean", description: "Disables interaction with the calendar.", default: "false" },
+    { name: "fillOpenRange", type: "boolean", description: "Treats the previous or next days for ranges as in-range.", default: "false" },
     { name: "class", type: "{ container?: string, weekHeader?: string, day?: string }", description: "CSS classes for various calendar elements.", default: "{}" }
   ]}
   styleProps={[
@@ -34,6 +35,7 @@
     { name: "--calendar-day-height", type: "size", description: "The height of each day in the calendar.", default: "100%" },
     { name: "--calendar-day-border-radius", type: "size", description: "The border radius of each day in the calendar.", default: "0px" },
     { name: "--calendar-day-hover-background-color", type: "color", description: "The background color of a day when hovered.", default: "rgb(var(--global-color-primary-600), .3)" },
+    { name: "--calendar-day-hover-border-radius", type: "size", description: "The border radius of a hovered day.", default: "4px" },
     { name: "--calendar-selected-day-background-color", type: "color", description: "The background color of a selected day.", default: "rgb(var(--global-color-primary-600))" },
     { name: "--calendar-selected-day-color", type: "color", description: "The text color of a selected day.", default: "rgb(var(--global-color-grey-50))" },
     { name: "--calendar-selected-day-border-radius", type: "size", description: "The border radius of a selected day.", default: "4px" },
@@ -41,8 +43,7 @@
     { name: "--calendar-today-background-color", type: "color", description: "The background color of the current day.", default: "rgb(var(--global-color-error-200), .7)" },
     { name: "--calendar-today-color", type: "color", description: "The text color of the current day.", default: "rgb(var(--global-color-contrast-800))" },
     { name: "--calendar-today-border-radius", type: "color", description: "The bored radius of the current day.", default: "9999px" },
-    { name: "--calendar-today-height", type: "color", description: "The height of the current day.", default: "30px" },
-    { name: "--calendar-today-width", type: "color", description: "The width of the current day.", default: "30px" },
+    { name: "--calendar-today-height", type: "color", description: "The height of the current day.", default: "min(90%,30px)" },
     { name: "--calendar-between-range-background-color", type: "color", description: "The background color of the days between the selected range.", default: "rgb(var(--global-color-primary-400), .4)" },
     { name: "--calendar-between-range-color", type: "color", description: "The text color of the days between the selected range.", default: "rgb(var(--global-color-contrast-800))" },
     { name: "--calendar-range-start-border-radius", type: "size", description: "The border radius of the first day of the range.", default: "4px 0px 0px 0px" },

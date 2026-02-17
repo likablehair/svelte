@@ -146,7 +146,7 @@
     { name: "openingId", type: "string", description: "The unique identifier for the autocomplete menu.", default: "$bindable('autocomplete-menu')" },
     { name: "width", type: "string", description: "Width of the autocomplete input field.", default: "undefined" },
     { name: "height", type: "string", description: "Height of the autocomplete input field.", default: "undefined" },
-    { name: "minWidth", type: "string", description: "Minimum width of the autocomplete input field.", default: "undefined" },
+    { name: "minWidth", type: "string", description: "Minimum width of the autocomplete input field.", default: "none" },
     { name: "menuWidth", type: "string", description: "Width of the autocomplete menu.", default: "width" },
     { name: "mobileDrawer", type: "boolean", description: "If true, the menu is displayed as a mobile drawer.", default: "false" },
     { name: "disabled", type: "boolean", description: "If true, the autocomplete is disabled.", default: "false" },

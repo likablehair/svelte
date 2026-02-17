@@ -89,6 +89,7 @@
     { name: 'adaptInputWidth', type: 'boolean', description: 'If true the width of the search input adapt based on the content inside.', default: 'true' },
     { name: 'menuWidth', type: 'string | null', description: 'The width of the menu.', default: 'null' },
     { name: 'menuAnchor', type: '"bottom" | "bottom-center" | "right-center"', description: 'The anchor of the menu.', default: '"bottom-center"' },
+    { name: 'menuMaxHeight', type: 'string', description: 'The max height of the menu.', default: '300px' },
     { name: 'class', type: 'object', description: 'CSS classes to apply to different parts of the component.', default: 'undefined' },
   ]}
   styleProps={[
