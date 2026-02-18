@@ -465,6 +465,7 @@
           <div
             style:display=flex
             style:align-items=middle
+            style:justify-content=center
             style:padding="8px 0px"
           >
             <Checkbox
