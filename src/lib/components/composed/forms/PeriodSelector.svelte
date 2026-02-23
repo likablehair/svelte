@@ -19,12 +19,77 @@
     picker: PickerSelectValues
   }
 
-  type TimespanSettings<T extends string = string> = {
+  export type TimespanSettings<T extends string = string> = {
     [K in keyof TimespanMap<T>]: {
       method?: K
       values?: TimespanMap<T>[K]
     }
   }[keyof TimespanMap<T>]
+
+  export const defaultQuickOptions = {
+    'it': [
+      { value: 'today', label: 'Oggi' },
+      { value: 'this-week', label: 'Questa settimana' },
+      { value: 'this-month', label: 'Questo mese' },
+      { value: 'last-3month', label: 'Ultimi 3 mesi' },
+      { value: 'last-6month', label: 'Ultimi 6 mesi' },
+      { value: 'this-year', label: "Quest'anno" },
+      { value: 'total', label: 'Sempre' },
+    ],
+    'en': [
+      { value: 'today', label: 'Today' },
+      { value: 'this-week', label: 'This week' },
+      { value: 'this-month', label: 'This month' },
+      { value: 'last-3month', label: 'Last 3 months' },
+      { value: 'last-6month', label: 'Last 6 months' },
+      { value: 'this-year', label: 'This year' },
+      { value: 'total', label: 'All time' },
+    ],
+  }
+
+  export function getPeriodLabel<T extends string>(
+    settings: TimespanSettings<T> | undefined,
+    lang: 'en' | 'it' = 'en',
+    quickOptions: { value: string | T; label: string }[] = defaultQuickOptions[lang]
+  ): string {
+    if (!settings?.method) return lang == 'en' ? 'Select range mode' : 'Seleziona una modalità';
+
+    if (settings.method === 'picker') {
+      let fromStr = settings.values?.from ? new Date(settings.values.from).toLocaleDateString(lang) : '';
+      let toStr = settings.values?.to ? new Date(settings.values.to).toLocaleDateString(lang) : '';
+
+      if (fromStr && toStr) return `${lang == 'en' ? 'From' : 'Dal'} ${fromStr} ${lang == 'en' ? 'to' : 'al'} ${toStr}`;
+      if (fromStr) return `${lang == 'en' ? 'From' : 'Dal'} ${fromStr}`;
+      if (toStr) return `${lang == 'en' ? 'Until' : 'Fino al'} ${toStr}`;
+      return lang == 'en' ? 'Select dates' : 'Seleziona date';
+    }
+
+    if (settings.method === 'quick') {
+      return quickOptions.find(o => o.value === settings.values)?.label || (lang == 'en' ? 'Select a period' : 'Seleziona un periodo');
+    }
+
+    if (settings.method === 'rolling') {
+      const num = settings.values?.numberOfUnits;
+      const unit = settings.values?.measurementUnit;
+      const dir = settings.values?.direction ?? 'last';
+
+      if (!unit || !num) return lang == 'en' ? 'Configure rolling window' : 'Configura periodo';
+
+      let unitLabel = '';
+      if (unit === 'days') unitLabel = lang == 'en' ? 'Days' : 'Giorni';
+      if (unit === 'weeks') unitLabel = lang == 'en' ? 'Weeks' : 'Settimane';
+      if (unit === 'months') unitLabel = lang == 'en' ? 'Months' : 'Mesi';
+      if (unit === 'years') unitLabel = lang == 'en' ? 'Years' : 'Anni';
+
+      const dirLabel = dir === 'next' 
+        ? (lang == 'en' ? 'Next' : unit == 'weeks' ? 'Prossime' : 'Prossimi')
+        : (lang == 'en' ? 'Last' : unit == 'weeks' ? 'Ultime' : 'Ultimi');
+
+      return `${dirLabel} ${num} ${unitLabel}`;
+    }
+
+    return lang == 'en' ? 'Select range mode' : 'Seleziona una modalità';
+  }
 </script>
 
 <script lang="ts" generics="T extends string = string">
@@ -38,27 +103,6 @@
   import Chip from "$lib/components/simple/navigation/Chip.svelte";
   import { tick } from "svelte";
 
-  const defaultQuickOptions = {
-    'it': [
-      { value: 'today', label: 'Oggi' },
-      { value: 'this-week', label: 'Questa settimana' },
-      { value: 'this-month', label: 'Questo mese' },
-      { value: 'last-3month', label: 'Ultimi 3 mesi' },
-      { value: 'last-6month', label: 'Ultimi 6 mesi' },
-      { value: 'this-year', label: "Quest'anno" },
-      { value: 'total', label: 'Sempre' },
-    ] as NonNullable<Props['quickSelectOptions']>,
-    'en': [
-      { value: 'today', label: 'Today' },
-      { value: 'this-week', label: 'This week' },
-      { value: 'this-month', label: 'This month' },
-      { value: 'last-3month', label: 'Last 3 months' },
-      { value: 'last-6month', label: 'Last 6 months' },
-      { value: 'this-year', label: 'This year' },
-      { value: 'total', label: 'All time' },
-    ] as NonNullable<Props['quickSelectOptions']>,
-  }
-
   interface Props {
     timespanSettings?: TimespanSettings<T>
     quickSelectOptions?: {
@@ -70,26 +114,28 @@
     lang?: 'it' | 'en'
     locale?: 'it' | 'en'
     showTimeRangeLabel?: boolean
-    timeRangeLabel?: string
     isSelectionMode?: boolean
     onchange?: (event: {
       timespanSettings?: TimespanSettings<T>
     }) => void
     quickRangeConvertor?: typeof getDatesFromQuick
+    setTimespanLabel?: (params: {
+      timespanSettings: typeof timespanSettings
+    }) => string
   }
 
   let { 
     timespanSettings = $bindable(),
     lang = 'en',
-    quickSelectOptions = defaultQuickOptions[lang],
+    quickSelectOptions = defaultQuickOptions[lang] as { value: T; label: string }[],
     valid = $bindable(),
     mode = 'default',
     locale = lang,
     showTimeRangeLabel = false,
     isSelectionMode = $bindable(),
-    timeRangeLabel = $bindable(),
     onchange,
     quickRangeConvertor,
+    setTimespanLabel,
   }: Props = $props()
 
   if (!timespanSettings) {
@@ -104,36 +150,7 @@
     if(localValid != valid) valid = localValid
   })
 
-  $effect(() => { 
-    if(!timespanSettings?.method) {
-      timeRangeLabel = lang == 'en' ? 'Select range mode' : 'Seleziona una modalità'
-      return
-    }
-
-    if(timespanSettings.method == 'picker') {
-      timeRangeLabel = formatDateLabel(timespanSettings.values?.from, timespanSettings.values?.to)
-      return
-    }
-    else if (timespanSettings.method == 'quick') {
-      timeRangeLabel = quickSelectOptions.find(o => o.value == timespanSettings?.values)?.label || (lang == 'en' ? 'Select a period' : 'Seleziona un periodo')
-      return
-    }
-    else if (timespanSettings.method == 'rolling') {
-      const num = rollingNumberOfUnits ?? undefined
-      const unitLabel = rollingMeasurementOfUnit?.label
-      const dirLabel = rollingDirection === 'next' 
-        ? lang == 'en' ? 'Next' : rollingMeasurementOfUnit?.value == 'weeks' ? 'Prossime' : 'Prossimi'
-        : lang == 'en' ? 'Last' : rollingMeasurementOfUnit?.value == 'weeks' ? 'Ultime' : 'Ultimi'
-
-      if (!unitLabel || !num) {
-        timeRangeLabel = lang == 'en' ? 'Configure rolling window' : 'Configura periodo'
-        return
-      }
-      
-      timeRangeLabel = `${dirLabel} ${num} ${unitLabel}`
-      return
-    }
-  })
+  let timeRangeLabel = $derived(setTimespanLabel ? setTimespanLabel({ timespanSettings }) : getPeriodLabel(timespanSettings, lang, quickSelectOptions));
 
   let rollingAutocompleteValues: {
       value: RollingMeasurementUnit,

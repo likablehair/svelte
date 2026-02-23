@@ -2,7 +2,7 @@
   import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
   import type { ComponentProps } from "svelte";
   import MenuOrDrawer from "../common/MenuOrDrawer.svelte";
-  import PeriodSelector from "./PeriodSelector.svelte";
+  import PeriodSelector, { getPeriodLabel } from "./PeriodSelector.svelte"; // Import helper
   import Button from "$lib/components/simple/buttons/Button.svelte";
   import { fly } from "svelte/transition";
   import Icon from "$lib/components/simple/media/Icon.svelte";
@@ -17,13 +17,13 @@
     valid = $bindable(),
     isSelectionMode = $bindable(),
     lang = 'en',
-    timeRangeLabel = lang == 'en' ? 'Select range mode' : 'Seleziona una modalità',
+    quickSelectOptions,
     ...rest
   }: Props = $props()
 
   let open = $state(false),
     input: HTMLElement | undefined = $state(),
-    text: string | undefined = $derived(timeRangeLabel)
+    text = $derived(getPeriodLabel(timespanSettings, lang, quickSelectOptions))
 
   function handleChange(event: Parameters<NonNullable<ComponentProps<typeof PeriodSelector<Data>>['onchange']>>[0]) {
     if (timespanSettings?.method == 'quick') {
@@ -33,21 +33,24 @@
     onchange?.(event)
   }
 
+  function openMenu() {
+    if (!open) open = true
+    else if (valid) open = false
+  }
+
 </script>
 
 <SimpleTextField
   onfocus={() => open = true}
-  oninput={() => text = timeRangeLabel}
-  bind:value={text}
+  value={text}
   bind:input
+  disabled
 >
   {#snippet appendInnerSnippet()}
     <Icon
       name='mdi-chevron-down'
-      onclick={() => {
-        if (!open) open = true
-        else if (valid) open = false
-      }}
+      onclick={openMenu}
+      --icon-size="20px"
     ></Icon>
   {/snippet}
 </SimpleTextField>
@@ -80,8 +83,8 @@
         onchange={handleChange}
         bind:timespanSettings
         bind:valid
-        bind:timeRangeLabel
         bind:isSelectionMode
+        {quickSelectOptions}
         {lang}
         {...rest}
       ></PeriodSelector>

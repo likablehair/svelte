@@ -8,120 +8,120 @@
 
   let availableWidgetCells: ComponentProps<typeof DashboardShaper>['availableWidgetCells'] = [
 			{
-				widgetComponentName: 'Clock',
-				label: 'Clock',
+				name: 'Clock',
+				title: 'Clock',
 				description: 'A simple clock',
 				icon: 'mdi-clock',
 				availableSizes: [[1, 1]],
 			},
 			{
-				widgetComponentName: 'Calendar',
-				label: 'Calendar',
+				name: 'Calendar',
+				title: 'Calendar',
 				description: 'A simple calendar',
 				icon: 'mdi-calendar',
 				availableSizes: [[1, 1], [1, 2], [2, 1]],
 			},
 			{
-				widgetComponentName: 'ADMDeclarationsByType',
-				label: 'ADM Declarations By Type',
+				name: 'ADMDeclarationsByType',
+				title: 'ADM Declarations By Type',
 				description: 'A list of ADM declarations grouped by type',
 				icon: 'mdi-file-cabinet',
 				availableSizes: [[1, 3], [2, 2], [2, 3], [3, 2]],
 			},
 			{
-				widgetComponentName: 'PlafondVatRatio',
-				label: 'Plafond VAT Ratio',
+				name: 'PlafondVatRatio',
+				title: 'Plafond VAT Ratio',
 				description: 'The ratio between declared and used plafond VAT',
 				icon: 'mdi-percent',
 				availableSizes: [[2, 2], [2, 3], [2, 4]],
 			},
 			{
-				widgetComponentName: 'PlafondVatUsedValueByTime',
-				label: 'Plafond VAT Used Value By Time',
+				name: 'PlafondVatUsedValueByTime',
+				title: 'Plafond VAT Used Value By Time',
 				description: 'The used value of the plafond VAT grouped by time',
 				icon: 'mdi-chart-timeline-variant',
 				availableSizes: [[2, 2], [2, 3], [2, 4]],
 			},
 			{
-				widgetComponentName: 'DeclarationGoodsByNcCode',
-				label: 'Imported Goods By NC Code',
+				name: 'DeclarationGoodsByNcCode',
+				title: 'Imported Goods By NC Code',
 				description: 'A list of imported goods grouped by NC code',
 				icon: 'mdi-barcode-scan',
 				availableSizes: [[1, 2], [2, 2], [3, 3]],
 			},
 			{
-				widgetComponentName: 'ExportDeclarationGoodsByNcCode',
-				label: 'Exported Goods By NC Code',
+				name: 'ExportDeclarationGoodsByNcCode',
+				title: 'Exported Goods By NC Code',
 				description: 'A list of exported goods grouped by NC code',
 				icon: 'mdi-barcode-scan',
 				availableSizes: [[1, 2], [2, 2], [3, 3]],
 			},
 			{
-				widgetComponentName: 'CbamGoodsByCategory',
-				label: 'CBAM Goods By Category',
+				name: 'CbamGoodsByCategory',
+				title: 'CBAM Goods By Category',
 				description: 'A list of CBAM goods grouped by category',
 				icon: 'mdi-package-variant-closed',
 				availableSizes: [[1, 1], [2, 2], [3, 3]],
 			},
 			{
-				widgetComponentName: 'TotalTaxesAndDuties',
-				label: 'Total Taxes and Duties',
+				name: 'TotalTaxesAndDuties',
+				title: 'Total Taxes and Duties',
 				description: 'The total of taxes, duties and vat in import declarations',
 				icon: 'mdi-cash-register',
 				availableSizes: [[1, 1], [1, 2], [2, 2]],
 			},
 			{
-				widgetComponentName: 'TotalTaxesAndDutiesByTime',
-				label: 'Total Taxes and Duties By Time',
+				name: 'TotalTaxesAndDutiesByTime',
+				title: 'Total Taxes and Duties By Time',
 				description: 'The total of taxes, duties and vat in import declarations, grouped by time',
 				icon: 'mdi-chart-line',
 				availableSizes: [[2, 2], [2, 3]],
 			},
 			{
-				widgetComponentName: 'CbamGoodsRatio',
-				label: 'CBAM Goods Ratio',
+				name: 'CbamGoodsRatio',
+				title: 'CBAM Goods Ratio',
 				description: 'The ratio between the CBAM and non CBAM goods',
 				icon: 'mdi-chart-donut-variant',
 				availableSizes: [[1, 1], [2, 2], [3, 3]],
 			},
 			{
-				widgetComponentName: 'ADMDeclarationsByIncoterm',
-				label: 'ADM Declarations by Incoterm',
+				name: 'ADMDeclarationsByIncoterm',
+				title: 'ADM Declarations by Incoterm',
 				description: 'A list of import declarations grouped by the Incoterm',
 				icon: 'mdi-chart-timeline-variant-shimmer',
 				availableSizes: [[1, 1], [1, 2], [2, 2], [2, 3]],
 			},
 			{
-				widgetComponentName: 'ImportedDeclarationsByRegion',
-				label: 'Customs Import Declaration by Region',
+				name: 'ImportedDeclarationsByRegion',
+				title: 'Customs Import Declaration by Region',
 				description: 'A list of imported declarations grouped by Country Region',
 				icon: 'mdi-earth',
 				availableSizes: [[2, 2], [2, 3], [3, 3]],
 			},
 			{
-				widgetComponentName: 'ExportedDeclarationsByRegion',
-				label: 'Customs Export Declarations by Region',
+				name: 'ExportedDeclarationsByRegion',
+				title: 'Customs Export Declarations by Region',
 				description: 'A list of exported declarations grouped by Country Region',
 				icon: 'mdi-earth-arrow-right',
 				availableSizes: [[2, 2], [2, 3], [3, 3]],
 			},
 			{
-				widgetComponentName: 'ImportedCbamGoodsByCountry',
-				label: 'Imported CBAM Goods By Country',
+				name: 'ImportedCbamGoodsByCountry',
+				title: 'Imported CBAM Goods By Country',
 				description: 'A list of imported CBAM goods grouped by country',
 				icon: 'mdi-leaf',
 				availableSizes: [[2, 2], [2, 3], [3, 3]],
 			},
 			{
-				widgetComponentName: 'ImportedCbamGoodsByRegion',
-				label: 'Imported CBAM Goods By Region',
+				name: 'ImportedCbamGoodsByRegion',
+				title: 'Imported CBAM Goods By Region',
 				description: 'A list of imported CBAM goods grouped by country region',
 				icon: 'mdi-leaf',
 				availableSizes: [[2, 2], [2, 3], [3, 3]],
 			},
 			{
-				widgetComponentName: 'DutiesByType',
-				label: 'Oil Duties By Type',
+				name: 'DutiesByType',
+				title: 'Oil Duties By Type',
 				description: 'A list of duties grouped by type',
 				icon: 'mdi-cash-register',
 				availableSizes: [[2, 2], [2, 3], [3, 3]],
@@ -131,7 +131,7 @@
   let widgets: ComponentProps<typeof DashboardShaper>['widgets'] = [
     {
       id: 1,
-      componentName: "TotalTaxesAndDuties",
+      name: "TotalTaxesAndDuties",
       height: 2,
       width: 2,
       top: 1,
@@ -139,7 +139,7 @@
     },
     {
       id: 2,
-      componentName: "ADMDeclarationsByType",
+      name: "ADMDeclarationsByType",
       height: 2,
       width: 3,
       top: 1,
@@ -147,7 +147,7 @@
     },
     {
       id: 3,
-      componentName: "Clock",
+      name: "Clock",
       height: 1,
       width: 1,
       top: 1,
@@ -155,7 +155,7 @@
     },
     {
       id: 4,
-      componentName: "Calendar",
+      name: "Calendar",
       height: 1,
       width: 1,
       top: 2,
@@ -163,7 +163,7 @@
     },
     {
       id: 5,
-      componentName: "CbamGoodsRatio",
+      name: "CbamGoodsRatio",
       height: 2,
       width: 2,
       top: 3,
@@ -171,7 +171,7 @@
     },
     {
       id: 6,
-      componentName: "TotalTaxesAndDutiesByTime",
+      name: "TotalTaxesAndDutiesByTime",
       height: 2,
       width: 2,
       top: 3,
@@ -179,7 +179,7 @@
     },
     {
       id: 7,
-      componentName: "ExportedDeclarationsByRegion",
+      name: "ExportedDeclarationsByRegion",
       height: 2,
       width: 2,
       top: 3,
@@ -198,7 +198,7 @@
       class="widget"
       style:background-color={randomColor}
     >
-      {parameters.widgetCell.widget?.componentName}
+      {parameters.widgetCell.widget?.name}
     </div>
   {/snippet}
   <DashboardShaper
@@ -339,7 +339,7 @@
 				},
 			],
 			default: `
-{widgetCell.widget.componentName}
+{widgetCell.widget.name}
 `
 		},
 		{

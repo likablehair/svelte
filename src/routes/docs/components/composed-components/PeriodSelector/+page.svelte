@@ -94,13 +94,13 @@
       default: 'false',
     },
     {
-      description: 'Label for the time range',
-      name: 'timeRangeLabel',
-      type: 'string',
-    },
-    {
       description: 'Converts the quick range value into dates',
       name: 'quickRangeConvertor',
+      type: 'function',
+    },
+    {
+      description: 'Custom label setter',
+      name: 'setTimespanLabel',
       type: 'function',
     },
   ]}

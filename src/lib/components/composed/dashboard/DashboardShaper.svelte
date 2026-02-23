@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="ts" generics="Data, WidgetName extends string">
   import './DashboardShaper.css'
   import type { Snippet } from "svelte"
 	import lodash from 'lodash'
@@ -10,15 +10,16 @@
 
   type Widget = {
     id: number | string
-    componentName: string
+    name: WidgetName
     height: number
     width: number
     left: number
     top: number,
+    data?: Data
   }
   type AvailableWidget = {
-    widgetComponentName: string,
-    label: string
+    name: WidgetName,
+    title: string
     description?: string
     icon: string
     availableSizes: [number, number][], // [height, width][]
@@ -40,7 +41,7 @@
       widgetCell: (typeof widgetCells)[number]
 		}) => void
 		widgetCellSnippet?: Snippet<[{
-			widgetCell: (typeof filledWidgetGrid)[number]
+			widgetCell: (typeof filledWidgetGrid)[number] & { title?: string }
 			removeWidgetCell: typeof removeWidgetCell
 		}]>
     widgetSelectionDialogHeaderSnippet?: Snippet<[]>
@@ -104,11 +105,12 @@
 			return {
         widget: {
           id: w.id,
-          componentName: w.componentName,
+          name: w.name,
           height: w.height,
           width: w.width,
           left: w.left,
           top: w.top,
+          data: w.data,
         },
 				columnSpanFrom: w.left,
 				columnSpanTo: w.left + w.width,
@@ -273,7 +275,7 @@
 		widgets = widgetCells?.map((lWidget) => {
 			return {
 				id: lWidget.widget.id,
-				componentName: lWidget.widget.componentName,
+				name: lWidget.widget.name,
 				height: lWidget.widget.height,
 				width: lWidget.widget.width,
 				left: lWidget.widget.left,
@@ -312,9 +314,15 @@
           <div class="widget-cell-preview"></div>
         {:else}
 					{#if widgetCellSnippet}
-						{@render widgetCellSnippet({ widgetCell, removeWidgetCell })}
+						{@render widgetCellSnippet({ 
+              widgetCell: {
+                ...widgetCell,
+                title: availableWidgetCells.find((awc) => awc.name === widgetCell.widget?.name)?.title
+              },
+              removeWidgetCell
+            })}
 					{:else}
-						{widgetCell.widget.componentName}
+						{widgetCell.widget.name}
 					{/if}
         {/if}
       </div>
@@ -377,9 +385,9 @@
               availableSizes: ws.availableSizes 
             }).length > 0)
             .sort((a, b) => {
-              if (a.label == 'Placeholder') return -1
-              if (a.label < b.label) return -1
-              if (a.label > b.label) return 1
+              if (a.title == 'Placeholder') return -1
+              if (a.title < b.title) return -1
+              if (a.title > b.title) return 1
               return 0
             }) as widgetSpec
           }
@@ -388,7 +396,7 @@
                 {#if widgetSpec.icon}
                   <Icon name={widgetSpec.icon} --icon-size="30px" />
                 {/if}
-                <div class="widget-title">{widgetSpec.label}</div>
+                <div class="widget-title">{widgetSpec.title}</div>
                 <div class="widget-desc">{widgetSpec.description}</div>
               </div>
 
@@ -405,7 +413,7 @@
                       addWidgetCell({
                         widget: {
                           id: createId(),
-                          componentName: widgetSpec.widgetComponentName,
+                          name: widgetSpec.name,
                           height: sizes[0],
                           width: sizes[1],
                           top: addWidgetInfo!.fromRow,
@@ -469,15 +477,15 @@
 
 	.header {
 		display: flex;
-		padding: 30px 24px 16px;
+		padding: 20px;
 		gap: 12px;
 		background-color: var(--dashboard-shaper-dialog-header-background-color, var(--dashboard-shaper-default-dialog-header-background-color));
 		border-block-end: 1px solid rgb(var(--global-color-contrast-100));
-		height: 35px;
+		height: min-content;
 	}
   
   .title {
-		font-size: x-large;
+		font-size: 1.35rem;
 		font-weight: bold;
 		text-align: center;
 	}
