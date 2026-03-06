@@ -652,7 +652,6 @@
                 >
                   <div
                     class="row-append-cell"
-                    style="display: inline-block; white-space: nowrap;"
                   >
                     {@render appendSnippet?.({ index: i, item })}
                   </div>
