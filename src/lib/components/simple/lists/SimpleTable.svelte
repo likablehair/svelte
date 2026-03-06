@@ -652,6 +652,7 @@
                 >
                   <div
                     class="row-append-cell"
+                    style="display: inline-block; white-space: nowrap;"
                   >
                     {@render appendSnippet?.({ index: i, item })}
                   </div>
@@ -847,8 +848,6 @@
 
   .table.resizable td, th {
     text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
   }
 
   th {
