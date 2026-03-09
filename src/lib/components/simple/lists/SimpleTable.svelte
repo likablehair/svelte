@@ -59,7 +59,6 @@
     calculateRowStyles?: CalculateRowStyles<Item> | undefined
     calculateRowClasses?: CalculateRowClasses<Item> | undefined
     stickyMinContainerWidth?: number;
-    temporaryTableLayoutFixed?: boolean
     onsort?: (event: {
       detail: {
         sortedBy: string | undefined,
@@ -114,7 +113,6 @@
   }
 
   let {
-    temporaryTableLayoutFixed,
     headers = [],
     items = [],
     sortedBy = $bindable(undefined),
@@ -222,9 +220,7 @@
         }
       }
 
-      if (temporaryTableLayoutFixed) {
-        tableHTML?.classList.add('resizable')
-      }
+      tableHTML?.classList.add('resizable')
 
       return () => {
         resizeObserver?.disconnect();

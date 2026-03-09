@@ -21,7 +21,6 @@
   let {
     headersToShowInTable = $bindable(),
     pinnableColumns,
-    temporaryTableLayoutFixed = pinnableColumns,
     headerDrawerProps,
     onsaveHeadersToShow,
     headerDrawerContentSnippet,
@@ -85,7 +84,6 @@
 
 <PaginatedTable 
   {...rest} 
-  {temporaryTableLayoutFixed}
   {lang} 
   headers={headersToShowInTable}
   bind:sortedBy
