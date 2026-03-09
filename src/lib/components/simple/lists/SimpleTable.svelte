@@ -171,7 +171,7 @@
     return true;
   });
 
-  const DEFAULT_MIN_WIDTH_PX = 130,
+  const DEFAULT_MIN_WIDTH_PX = 60,
     DEFAULT_MAX_WIDTH_PX = 400
 
   onMount(() => {
@@ -220,7 +220,6 @@
         }
       }
 
-      tableHTML?.classList.add('resizable')
 
       return () => {
         resizeObserver?.disconnect();
@@ -436,7 +435,15 @@
 
   function resizeHeader(th: HTMLElement, header: { value: string, minWidth?: string, maxWidth?: string }){
     if (!resizedColumnSizeWithPadding[header.value]) {
-      let widthWithPadding = th.getBoundingClientRect().width
+      if (tableHTML) {
+        tableHTML.style.tableLayout = 'auto'
+      }
+
+      let widthWithPadding = th.scrollWidth
+
+      if (tableHTML) {
+        tableHTML.style.tableLayout = 'fixed'
+      }
 
       let minWidth = header.minWidth,
         minWidthPx = DEFAULT_MIN_WIDTH_PX
@@ -467,7 +474,7 @@
 
 {#if !!items && Array.isArray(items)}
   <div class="simple-table-container {clazz.container || ''}" bind:this={tableContainer}>
-    <table class="table" bind:this={tableHTML}>
+    <table class="table resizable" bind:this={tableHTML}>
       <thead class="thead {clazz.header || ''}" bind:this={mainHeader}>
         <tr>
           {#if prependSnippet}
@@ -652,7 +659,7 @@
                 >
                   <div
                     class="row-append-cell"
-                    style="display: inline-block; white-space: nowrap;"
+                    style="display: inline-block;"
                   >
                     {@render appendSnippet?.({ index: i, item })}
                   </div>
@@ -849,7 +856,6 @@
   .table.resizable td, th {
     text-overflow: ellipsis;
     overflow: hidden;
-    white-space: nowrap;
   }
 
   th {
