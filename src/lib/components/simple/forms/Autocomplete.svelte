@@ -357,7 +357,7 @@
         input.style.width =
           Math.max(searchText?.length || placeholder?.length, 1) + "ch";
       } else {
-        input.style.width = "auto";
+        input.style.width = "";
       }
     }
   });
