@@ -88,7 +88,7 @@
     labelsMapper = lang === 'en'
       ? ENGLISH_LABELS_MAPPER
       : ITALIAN_LABELS_MAPPER,
-    drawerSpace = '60vh',
+    drawerSpace = '85vh',
     multiEditTabs,
     onaddFilterClick,
     onapplyFilter,
@@ -572,7 +572,7 @@
         _borderRadius="20px 20px 0px 0px"
         _space={drawerSpace}
       >
-        <div class="drawer-content">
+        <div class="drawer-content" class:shortened-drawer-content={editFilterMode === 'one-edit' && !(!!selectedFilter && singleFilterMenuOpened)}>
           {#if editFilterMode === 'one-edit'}
             {#if !!selectedFilter && singleFilterMenuOpened}
               <div
@@ -660,25 +660,34 @@
               style:height="100%"
             >
               <div class="form-container" style:background-color={mAndDown ? 'transparent' : 'rgb(var(--global-color-background-100))'} style:width={mAndDown ? '100%' : '50vw'} style:box-sizing="border-box">
-                <div class="header">
+                <div class="header" class:no-border={localMultiEditTabs?.length}>
                   <div>{addFilterLabel}</div>
                 </div>
-                <div class="drawer-body">
+                <TabSwitcher
+                  tabs={localMultiEditTabs}
+                  bind:selected={selectedTab}
+                ></TabSwitcher>
+                <div class="drawer-body" class:shortened-body-mobile={localMultiEditTabs?.length}>
                   {#if contentSnippet}
                     {@render contentSnippet({ mAndDown, updateMultiFilterValues, filters, handleRemoveAllFilters })}
                   {:else}
                     <div class="multi-filters-container" style:grid-template-columns={mAndDown ? '1fr' : '1fr 1fr'}>
-                      {#each filters as filter, i}
+                      {#each selectedTabFilters as filter, i}
                         <div class="filter">
                           <div class="input">
-                            {#if !filter.advanced && filter.type !== 'custom'}
-                              <div class="label">
+                            {#if filter.type !== 'custom'}
+                              <div class="card-title">
+                                {#if filter.icon}
+                                <span style:margin-right=2px>
+                                  <Icon name={filter.icon} --icon-color={filter.iconColor} --icon-size=15.5px />
+                                </span>
+                                {/if}
                                 {filter.label}
                               </div>
                             {/if}
                             <div class="field">
                               <FilterEditor
-                                filter={filters[i]}
+                                filter={selectedTabFilters[i]}
                                 {lang}
                                 {labelsMapper}
                                 editFilterMode="multi-edit"
@@ -686,7 +695,7 @@
                                 mobile={mAndDown}
                                 onchange={(e) => {
                                   if(!!e.detail.filter)
-                                    filters[i] = e.detail.filter
+                                    selectedTabFilters[i] = e.detail.filter
                                 }}
                               >
                                 {#snippet customSnippet({ filter })}
@@ -701,29 +710,42 @@
                   {/if}
                 </div>
                 <div class="footer">
-                  <div class="actions" style:padding-bottom={mAndDown ? '20px' : undefined}>
+                  <div class="actions">
                     <Button
-                      --button-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
-                      --button-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
-                      --button-hover-background-color="rgb(var(--global-color-primary-500))"
-                      --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
+                      --button-color="rgb(var(--global-color-contrast-900))"
+                      --button-background-color="transparent"
+                      --button-focus-background-color="rgb(var(--global-color-background-300, .5))"
+                      --button-active-background-color="rgb(var(--global-color-background-300, .5))"
+                      --button-hover-background-color="rgb(var(--global-color-background-300, .5))"
+                      --button-focus-color="rgb(var(--global-color-contrast-900))"
+                      --button-active-color="rgb(var(--global-color-contrast-900))"
+                      --button-hover-color="rgb(var(--global-color-contrast-900))"
+                      --button-hover-box-shadow="none"
                       --button-box-shadow="none"
+                      --button-padding="12px 16px"
                       onclick={handleCancelFilterClick}
                     >
                       {cancelFilterLabel}
                     </Button>
                     <Button
-                      --button-color="rgb(var(--global-color-primary-400))"
+                      --button-color="rgb(var(--global-color-contrast-900))"
                       --button-background-color="transparent"
-                      --button-hover-background-color="rgb(var(--global-color-primary-500))"
-                      --button-hover-box-shadow="0 0 0.5rem rgba(0, 0, 0, 0.3)"
+                      --button-focus-background-color="rgb(var(--global-color-background-300, .5))"
+                      --button-active-background-color="rgb(var(--global-color-background-300, .5))"
+                      --button-hover-background-color="rgb(var(--global-color-background-300, .5))"
+                      --button-focus-color="rgb(var(--global-color-contrast-900))"
+                      --button-active-color="rgb(var(--global-color-contrast-900))"
+                      --button-hover-color="rgb(var(--global-color-contrast-900))"
+                      --button-hover-box-shadow="none"
                       --button-box-shadow="none"
+                      --button-padding="12px 16px"
                       onclick={handleMultiEditRemoveClick}
                     >
                       {lang == 'en' ? "Remove filters" : "Rimuovi filtri"}
                     </Button>
                     <Button
-                      --button-min-width="100px"
+                      --button-min-width="fit-content"
+                      --button-padding="12px 16px"
                       onclick={handleApplyMultiFilterClick}
                     >
                       {applyFilterLabel}
@@ -1044,6 +1066,10 @@
     height: 100%;
   }
 
+  .shortened-drawer-content{
+    height: calc(100% - 20px);
+  }
+
   .more-items {
     position: relative;
     padding: 0px 4px;
@@ -1129,12 +1155,8 @@
     width: 100%;
   }
 
-  .input .label {
-    margin-bottom: 5px;
-  }
-
   .footer {
-    margin-top: 40px;
+    margin-top: 20px;
   }
 
   .footer .actions {
@@ -1172,6 +1194,9 @@
 
   .drawer-body {
     padding: 16px;
+    overflow-y: scroll;
+    height: calc(89vh - 170px);
+    max-height: calc(89vh - 170px);
   }
 
   .dialog-body {
@@ -1182,13 +1207,18 @@
   }
 
   .shortened-body {
-    height: calc(90vh - 170px);
-    max-height: calc(90vh - 170px);
+    height: calc(90vh - 186px);
+    max-height: calc(90vh - 186px);
+  }
+
+  .shortened-body-mobile {
+    height: calc(83vh - 170px);
+    max-height: calc(83vh - 170px);
   }
 
   .dialog-footer {
-    height: 64px;
-    padding: 16px;
+    height: 68px;
+    padding: 12px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
