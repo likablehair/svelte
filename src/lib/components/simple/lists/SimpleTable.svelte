@@ -441,6 +441,10 @@
 
       let widthWithPadding = th.scrollWidth
 
+      if (widthWithPadding == 0) {
+        return
+      }
+
       if (tableHTML) {
         tableHTML.style.tableLayout = 'fixed'
       }
