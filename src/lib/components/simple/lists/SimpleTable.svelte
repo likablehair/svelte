@@ -980,7 +980,7 @@
     );
   }
   .non-resizable {
-    padding-left: 0px !important;
+    padding: 0px !important;
     text-align: center;
     width: var(
       --simple-table-non-resizable-header-width,
