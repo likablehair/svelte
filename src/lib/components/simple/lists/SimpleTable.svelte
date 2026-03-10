@@ -192,22 +192,7 @@
         resizeObserver.observe(tableContainer);
       }
 
-      if ((appendSnippet ||  stickyAppendSnippet) && headersHTML['row-append-header']) {
-        const actionCells = tableContainer?.querySelectorAll('.row-append-cell');
-        let finalWidth = 30
-
-        if (actionCells && actionCells.length > 0) {
-          for (let i = 0; i < actionCells.length; i++) {
-            const cellContent = actionCells[i];
-            const width = cellContent.getBoundingClientRect().width;
-            
-            finalWidth = Math.max(Math.ceil(width), finalWidth);
-          }
-        } 
-        
-        headersHTML['row-append-header'].style.width = `${finalWidth}px`;
-        headersHTML['row-append-header'].style.minWidth = `${finalWidth}px`;
-      }
+      resizeRowAppendHeader()
 
       for(const head of headers) {
         let th = headersHTML[head.value]
@@ -410,6 +395,7 @@
   async function updateRemainingWidth() {
     if(tableContainer != null && !!tableContainer && mainHeader) {
       const containerWidth = tableContainer?.getBoundingClientRect().width;
+      const scrollbarWidth = tableContainer.offsetWidth - tableContainer.clientWidth
 
       if(containerWidth){
         const totalResizableWidth = headers.reduce((sum, head) => {
@@ -420,12 +406,35 @@
           const width = th?.getBoundingClientRect().width || 0
           return sum + width;
         }, 0);
+
+        resizeRowAppendHeader()
     
         const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.row-append-header'))
           .reduce((sum, th) => sum + th.getBoundingClientRect().width, 0);
     
-        remainingWidth = Math.max(0, containerWidth - totalResizableWidth - extraStaticWidth);
+        remainingWidth = Math.max(0, containerWidth - scrollbarWidth - totalResizableWidth - extraStaticWidth);
       }
+    }
+  }
+
+  function resizeRowAppendHeader() {
+    if ((appendSnippet || stickyAppendSnippet) && headersHTML['row-append-header']) {
+      if(!!headersHTML['row-append-header'].style.width && headersHTML['row-append-header'].style.width != "0px") {
+        return
+      }
+
+      if (tableHTML) {
+        tableHTML.style.tableLayout = 'auto'
+      }
+
+      let widthWithPadding = headersHTML['row-append-header'].scrollWidth
+
+      if (tableHTML) {
+        tableHTML.style.tableLayout = 'fixed'
+      }
+      
+      headersHTML['row-append-header'].style.width = `${widthWithPadding}px`;
+      headersHTML['row-append-header'].style.minWidth = `${widthWithPadding}px`;
     }
   }
 

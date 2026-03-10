@@ -41,22 +41,7 @@
     (async () => {
       await tick()
 
-      if ((customizeHeaders || rowAppendSnippet) && headersHTML['row-append-header']) {
-        const actionCells = tableContainer?.querySelectorAll('.row-append-cell');
-        let finalWidth = 30
-
-        if (actionCells && actionCells.length > 0) {
-          for (let i = 0; i < actionCells.length; i++) {
-            const cellContent = actionCells[i];
-            const width = cellContent.getBoundingClientRect().width;
-            
-            finalWidth = Math.max(Math.ceil(width), finalWidth);
-          }
-        } 
-        
-        headersHTML['row-append-header'].style.width = `${finalWidth}px`;
-        headersHTML['row-append-header'].style.minWidth = `${finalWidth}px`;
-      }
+      resizeRowAppendHeader()
 
       updateHeaderHeight();
       window.addEventListener('resize', updateHeaderHeight);
@@ -1456,12 +1441,35 @@
           const width = th?.getBoundingClientRect().width || 0
           return sum + width;
         }, 0);
+
+        resizeRowAppendHeader()
     
         const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.row-append-header'))
           .reduce((sum, th) => sum + th.getBoundingClientRect().width, 0);
     
-        remainingWidth = Math.max(0, containerWidth - totalResizableWidth - extraStaticWidth + 18);
+        remainingWidth = Math.max(0, containerWidth - totalResizableWidth - extraStaticWidth);
       }
+    }
+  }
+
+  function resizeRowAppendHeader() {
+    if ((customizeHeaders || rowAppendSnippet) && headersHTML['row-append-header']) {
+      if(!!headersHTML['row-append-header'].style.width && headersHTML['row-append-header'].style.width != "0px") {
+        return
+      }
+
+      if (tableHTML) {
+        tableHTML.style.tableLayout = 'auto'
+      }
+
+      let widthWithPadding = headersHTML['row-append-header'].scrollWidth
+
+      if (tableHTML) {
+        tableHTML.style.tableLayout = 'fixed'
+      }
+      
+      headersHTML['row-append-header'].style.width = `${widthWithPadding}px`;
+      headersHTML['row-append-header'].style.minWidth = `${widthWithPadding}px`;
     }
   }
 
@@ -2496,13 +2504,8 @@
     width: 100%;
   }
 
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
   .hide-scrollbar::-webkit-scrollbar {
-    display: none;
+    width: 0px;
   }
 
   .dynamic-table {
