@@ -63,15 +63,6 @@
 
   function initTmpFilter() {
     tmpFilter = filter === undefined ? undefined : {...filter}
-    if(!!tmpFilter && ['string', 'number', 'date', 'select'].includes(tmpFilter.type) && Object.keys(tmpFilter).includes('mode')) {
-      //@ts-ignore
-      if((tmpFilter.mode == 'between' && tmpFilter.from !== undefined && tmpFilter.to !== undefined) || tmpFilter.value !== undefined || (tmpFilter.type == 'select' && tmpFilter.values !== undefined && tmpFilter.values.length > 0)) {
-        advancedModeSelectedOptions = [{
-          //@ts-ignore
-          value: tmpFilter.mode, label: labelsMapper[tmpFilter.mode].short || tmpFilter.mode
-        }]
-      }
-    }
   }
 
 
@@ -85,6 +76,16 @@
         initTmpFilter();
         closeDropDown();
       });
+    }
+    
+    if(!!tmpFilter && ['string', 'number', 'date', 'select'].includes(tmpFilter.type) && Object.keys(tmpFilter).includes('mode')) {
+      //@ts-ignore
+      if((tmpFilter.mode == 'between' && tmpFilter.from !== undefined && tmpFilter.to !== undefined) || tmpFilter.value !== undefined || (tmpFilter.type == 'select' && tmpFilter.values !== undefined && tmpFilter.values.length > 0)) {
+        advancedModeSelectedOptions = [{
+          //@ts-ignore
+          value: tmpFilter.mode, label: labelsMapper[tmpFilter.mode].short || tmpFilter.mode
+        }]
+      }
     }
   }) 
 
