@@ -100,15 +100,15 @@
     { name: "lang", type: "'it' | 'en'", description: "Language of the labels.", default: "'en'" }
   ]}
   styleProps={[
-    { name: "--quick-actions-background-color", type: "color", description: "Background color of the quick actions container.", default: "rgb(var(--global-color-background-200))" },
+    { name: "--quick-actions-background-color", type: "color", description: "Background color of the quick actions container.", default: "rgb(var(--global-color-background-300))" },
     { name: "--quick-actions-selected-items-button-background-color", type: "color", description: "Background color of the selected items button.", default: "rgb(var(--global-color-background-500))" },
-    { name: "--quick-actions-selected-items-button-background-color-hover", type: "color", description: "Hover background color of the selected items button.", default: "rgb(var(--global-color-background-300))" },
-    { name: "--quick-actions-selected-items-button-background-color-disabled", type: "color", description: "Disabled background color of the selected items button.", default: "rgb(var(--global-color-background-300), .5)" },
+    { name: "--quick-actions-selected-items-button-background-color-hover", type: "color", description: "Hover background color of the selected items button.", default: "rgb(var(--global-color-background-400))" },
+    { name: "--quick-actions-selected-items-button-background-color-disabled", type: "color", description: "Disabled background color of the selected items button.", default: "rgb(var(--global-color-background-400), .5)" },
     { name: "--quick-actions-selected-items-button-color-disabled", type: "color", description: "Text color of the selected items button.", default: "rgb(var(--global-color-contrast-900), .5)" },
     { name: "--quick-actions-z-index", type: "number", description: "Z-index of the quick actions container.", default: "48" },
-    { name: "--quick-actions-buttons-background-color", type: "color", description: "Background color of quick action buttons.", default: "rgb(var(--global-color-background-200))" },
-    { name: "--quick-actions-buttons-background-color-disabled", type: "color", description: "Disabled background color of quick action buttons.", default: "rgba(var(--global-color-background-300), .5)" },
-    { name: "--quick-actions-buttons-background-color-hover", type: "color", description: "Hover background color of quick action buttons.", default: "rgb(var(--global-color-background-300))" },
+    { name: "--quick-actions-buttons-background-color", type: "color", description: "Background color of quick action buttons.", default: "rgb(var(--global-color-background-300))" },
+    { name: "--quick-actions-buttons-background-color-disabled", type: "color", description: "Disabled background color of quick action buttons.", default: "rgba(var(--global-color-background-400), .5)" },
+    { name: "--quick-actions-buttons-background-color-hover", type: "color", description: "Hover background color of quick action buttons.", default: "rgb(var(--global-color-background-400))" },
     { name: "--quick-actions-buttons-color", type: "color", description: "Text color of quick action buttons.", default: "rgb(var(--global-color-contrast-900))" },
     { name: "--quick-actions-buttons-color-disabled", type: "color", description: "Disabled text color of quick action buttons.", default: "rgba(var(--global-color-contrast-900), .5)" }
   ]}
