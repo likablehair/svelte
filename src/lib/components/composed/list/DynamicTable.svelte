@@ -41,7 +41,7 @@
     (async () => {
       await tick()
 
-      if (rowAppendSnippet && headersHTML['row-append-header']) {
+      if ((customizeHeaders || rowAppendSnippet) && headersHTML['row-append-header']) {
         const actionCells = tableContainer?.querySelectorAll('.row-append-cell');
         let finalWidth = 30
 

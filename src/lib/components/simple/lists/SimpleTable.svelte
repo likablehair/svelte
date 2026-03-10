@@ -159,7 +159,7 @@
     resizing = false,
     colspan = $derived.by(() => {
       return headers.length +
-        (appendSnippet ||  stickyAppendSnippet? 1 : 0) +
+        (appendSnippet ||  stickyAppendSnippet ? 1 : 0) +
         (prependSnippet ? 1 : 0) +
         (remainingWidth ? 1 : 0);
     })
@@ -192,7 +192,7 @@
         resizeObserver.observe(tableContainer);
       }
 
-      if (appendSnippet && headersHTML['row-append-header']) {
+      if ((appendSnippet ||  stickyAppendSnippet) && headersHTML['row-append-header']) {
         const actionCells = tableContainer?.querySelectorAll('.row-append-cell');
         let finalWidth = 30
 
