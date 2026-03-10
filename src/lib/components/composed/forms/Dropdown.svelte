@@ -119,7 +119,7 @@
           event.detail.nativeEvent.preventDefault()
         }
       }}
-      --button-padding="var(--dropdown-button-padding, 10px 12px)"
+      --button-padding="var(--dropdown-button-padding, 6px 8px)"
       --button-border='var(--dropdown-button-border, none)'
       --button-background-color='var(--dropdown-button-background-color, rgb(var(--global-color-background-300), .6))'
       --button-hover-background-color='var(--dropdown-button-hover-color, rgb(var(--global-color-background-300), .6))'

@@ -223,6 +223,7 @@
               type="text"
               placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
               --simple-textfield-width="100%"
+              --simple-textfield-padding='0.45rem 0.6rem'
               oninput={() => handleChangeValue()}
             ></SimpleTextField>
           {:else if tmpFilter.type === "date" && tmpFilter.mode !== 'between'}
@@ -256,6 +257,7 @@
                 type="number"
                 placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
                 --simple-textfield-width="100%"
+                --simple-textfield-padding='0.45rem 0.6rem'
                 onchange={() => handleChangeValue()}
               ></SimpleTextField>
             </div>
@@ -374,6 +376,7 @@
                   type="number"
                   placeholder={betweenFromLabel}
                   --simple-textfield-width="100%"
+                  --simple-textfield-padding='0.45rem 0.6rem'
                   onchange={() => handleChangeValue()}
                 ></SimpleTextField>
               </div>
@@ -383,6 +386,7 @@
                   type="number"
                   placeholder={betweenToLabel}
                   --simple-textfield-width="100%"
+                  --simple-textfield-padding='0.45rem 0.6rem'
                   onchange={() => handleChangeValue()}
                 ></SimpleTextField>
               </div>
