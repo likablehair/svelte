@@ -134,7 +134,11 @@
               --circular-loader-height="17px"
               disabled={action.disabled || action.loading || disabled}
               loading={action.loading}
-              onclick={action.onClick}
+              onclick={e => {
+                action.loading = true
+                action.onClick(e)
+                action.loading = false
+              }}
             >
               <div class="action" bind:this={disabledInfoActivators[action.label]}>
                 {#if action.icon}
@@ -225,7 +229,11 @@
               --circular-loader-height="25px"
               disabled={action.disabled || action.loading || disabled}
               loading={action.loading}
-              onclick={action.onClick}
+              onclick={e => {
+                action.loading = true
+                action.onClick(e)
+                action.loading = false
+              }}
             >
               <div class="action" bind:this={disabledInfoActivators[action.label]}>
                 {#if action.icon}
