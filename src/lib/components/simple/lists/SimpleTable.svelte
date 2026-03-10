@@ -194,23 +194,19 @@
 
       if (appendSnippet && headersHTML['row-append-header']) {
         const actionCells = tableContainer?.querySelectorAll('.row-append-cell');
-        
-        if (actionCells && actionCells.length > 0) {
-          let maxActionWidth = 0;
+        let finalWidth = 30
 
+        if (actionCells && actionCells.length > 0) {
           for (let i = 0; i < actionCells.length; i++) {
             const cellContent = actionCells[i];
             const width = cellContent.getBoundingClientRect().width;
-            if (width > maxActionWidth) {
-              maxActionWidth = width;
-            }
+            
+            finalWidth = Math.max(Math.ceil(width), finalWidth);
           }
-
-          const finalWidth = Math.max(Math.ceil(maxActionWidth), 40);
-          
-          headersHTML['row-append-header'].style.width = `${finalWidth}px`;
-          headersHTML['row-append-header'].style.minWidth = `${finalWidth}px`;
         } 
+        
+        headersHTML['row-append-header'].style.width = `${finalWidth}px`;
+        headersHTML['row-append-header'].style.minWidth = `${finalWidth}px`;
       }
 
       for(const head of headers) {
