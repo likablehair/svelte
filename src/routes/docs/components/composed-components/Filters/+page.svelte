@@ -327,7 +327,7 @@
       name: "drawerSpace",
       type: "string",
       description: "Drawer space on mobile screen size",
-      default: "20rem"
+      default: "85vh"
     }
   ]}
   styleProps={[
