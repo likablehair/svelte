@@ -208,13 +208,6 @@
       --chip-inactive-focus-color,
       var(--chip-default-inactive-focus-color)
     );
-  }
-
-  .chip.inactive:focus {
-    color: var(
-      --chip-inactive-focus-color,
-      var(--chip-default-inactive-focus-color)
-    );
     border-color: var(
       --chip-inactive-focus-border-color,
       var(--chip-default-inactive-border-focus-color)

@@ -61,11 +61,6 @@
   let advancedModeOptions: Item[] | undefined = $state(),
     advancedModeSelectedOptions: Item[] = $state([])
 
-  function initTmpFilter() {
-    tmpFilter = filter === undefined ? undefined : {...filter}
-  }
-
-
   function closeDropDown() {
     dropdownOpened = false
   }
@@ -73,7 +68,7 @@
   $effect(() => {
     if(!!filter && !tmpFilter) {
       tick().then(() => {
-        initTmpFilter();
+        tmpFilter = filter === undefined ? undefined : {...filter}
         closeDropDown();
       });
     }

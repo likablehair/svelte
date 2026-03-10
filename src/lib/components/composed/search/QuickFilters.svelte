@@ -41,9 +41,22 @@
   let activators: Record<string, HTMLElement> = $state({}),
     openMenus: Record<string, boolean> = $state({});
 
+  function handleClick(params: { index: number }) {
+    if (filters) {
+      let filter = filters[params.index]
+
+      if (filter.type == 'bool') {
+        filter.value = !filter.value
+        handleApplyFilter(params)
+      } else {
+        openMenus[filter.name] = true
+      }
+    }
+  }
+
   function handleApplyFilter(params: { index: number }) {
     if (!!filters) {
-      filters[params.index].active = true;
+      filters[params.index].active = isActiveFilter(params);
       openMenus[filters[params.index].name] = false;
       onapply?.({ filter: filters[params.index], filters: filters || [] });
     }
@@ -51,9 +64,73 @@
 
   function handleClearFilter(params: { index: number }) {
     if (!!filters) {
-      filters[params.index].active = false;
-      onapply?.({ filter: filters[params.index], filters: filters || [] });
+      let filter = filters[params.index]
+      
+      if (
+        filter.type == 'string' ||
+        filter.type == 'bool' ||
+        filter.type == 'choice' || 
+        filter.type == 'custom' ||
+        filter.type == 'multiString'
+      ) {
+        filter.value = undefined
+      }
+      else if (filter.type == 'select') {
+        filter.values = undefined
+      }
+      else if (
+        filter.type == 'number' ||
+        filter.type == 'date'
+      ) {
+        if (filter.mode == 'between') {
+          filter.from = undefined
+          filter.to = undefined
+        } else if (
+          filter.mode == 'equal' ||
+          filter.mode == 'greater' ||
+          filter.mode == 'lower'
+        ) {
+          filter.value = undefined
+        }
+      }
+
+      handleApplyFilter(params)
     }
+  }
+
+  function isActiveFilter(params: { index: number }): boolean {
+    if (filters) {
+      let filter = filters[params.index]
+  
+      if (
+        filter.type == 'string' ||
+        filter.type == 'bool' ||
+        filter.type == 'choice' || 
+        filter.type == 'custom' ||
+        filter.type == 'multiString'
+      ) {
+        return !!filter.value && filter.value != undefined
+      }
+      else if (filter.type == 'select') {
+        return !!filter.values?.length
+      }
+      else if (
+        filter.type == 'number' ||
+        filter.type == 'date'
+      ) {
+        if (filter.mode == 'between') {
+          return filter.from != undefined || filter.to != undefined
+        } else if (
+          filter.mode == 'equal' ||
+          filter.mode == 'greater' ||
+          filter.mode == 'lower'
+        ) {
+          return filter.value != undefined
+        }
+      }
+    }
+
+    return false
   }
 </script>
 
@@ -62,9 +139,9 @@
     {#each filters as filter, index}
       <button
         class="quick-filters-button"
-        class:active={filter.active}
+        class:active={isActiveFilter({ index })}
         bind:this={activators[filter.name]}
-        onclick={() => (openMenus[filter.name] = true)}
+        onclick={() => handleClick({ index })}
       >
         {#if buttonLabelSnippet}
           {@render buttonLabelSnippet({ filter })}
@@ -75,7 +152,7 @@
             </span>
           {/if}
           {filter.label}
-          {#if filter.active}
+          {#if isActiveFilter({ index })}
             <div
               class="clear-button"
               onclick={(e) => {
