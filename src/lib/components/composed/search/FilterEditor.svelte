@@ -184,7 +184,7 @@
 {#if !!filter && !!tmpFilter}
   <div class="filter-container" style:margin={editFilterMode === 'one-edit' ? '5%' : '0'}>
     <div class="filter-editor" class:row={
-      (tmpFilter.type == 'number' || (tmpFilter.type == 'date' && ((advancedModeSelectedOptions.length && advancedModeSelectedOptions[0].value != 'between') || tmpFilter.betweenModeSingleTextField)))
+      (tmpFilter.type == 'number' || tmpFilter.type == 'string' || (tmpFilter.type == 'date' && ((advancedModeSelectedOptions.length && advancedModeSelectedOptions[0].value != 'between') || tmpFilter.betweenModeSingleTextField)))
     }>
       {#if filter.advanced}
         <div class="advanced-mode">
@@ -236,7 +236,7 @@
                 openingId="advanced-filter"
                 bind:menuOpened={calendarOpened}
                 --simple-textfield-width="100%"
-                --simple-textfield-padding='0.50rem 0.6rem'
+                --simple-textfield-padding='0.45rem 0.6rem'
                 flipOnOverflow
                 oninput={() => handleChangeValue()}
                 ondayClick={() => handleChangeValue()}
@@ -302,7 +302,7 @@
                 placeholderTo={betweenToLabel}
                 bind:menuOpened={calendarOpened}
                 --simple-textfield-width="100%"
-                --simple-textfield-padding='0.50rem 0.6rem'
+                --simple-textfield-padding='0.45rem 0.6rem'
                 oninput={() => handleChangeValue(tmpFilter?.type == 'date' && tmpFilter.mode == 'between' && (!tmpFilter.from || !tmpFilter.to))}
                 ondayClick={() => handleChangeValue(tmpFilter?.type == 'date' && tmpFilter.mode == 'between' && (!tmpFilter.from || !tmpFilter.to))}
               >
@@ -327,6 +327,7 @@
                     placeholder={betweenFromLabel}
                     bind:menuOpened={calendarOpened}
                     --simple-textfield-width="100%"
+                    --simple-textfield-padding='0.45rem 0.6rem'
                     oninput={() => handleChangeValue()}
                     ondayClick={() => handleChangeValue()}
                   >
@@ -350,6 +351,7 @@
                     placeholder={betweenToLabel}
                     bind:menuOpened={calendarOpened2}
                     --simple-textfield-width="100%"
+                    --simple-textfield-padding='0.45rem 0.6rem'
                     flipOnOverflow
                     oninput={() => handleChangeValue()}
                     ondayClick={() => handleChangeValue()}
