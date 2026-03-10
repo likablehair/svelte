@@ -236,17 +236,22 @@
       }
 
       if(flipOnOverflow && !!params.activator) {
-        let { top: activatorTopDistance } = params.activator.getBoundingClientRect()
-        if (window.innerHeight < activatorTopDistance + (menuElement?.offsetHeight || 0) + ((menuElement?.offsetHeight || 0) * 0.1)) {
-          tempTop = getTopDistance(params.activator) - _activatorGap - (menuElement?.offsetHeight || 0)
+        if (
+          (anchor == 'bottom' || anchor == 'bottom-center') &&
+          tempTop + (menuElement?.offsetHeight || 0) > window.scrollY + window.innerHeight
+        ) {
+          let { top: activatorTop } = params.activator.getBoundingClientRect();
+          let menuHeight = params.menuElement.offsetHeight;
+          tempTop = activatorTop + window.scrollY - menuHeight - _activatorGap;
         }
+
         if (
           anchor == 'right-center' &&
           window.innerWidth + window.scrollX <
           tempLeft + (menuElement?.offsetWidth || 0)
         ) {
           let { left: activatorLeft } = params.activator.getBoundingClientRect();
-           tempLeft = activatorLeft + window.scrollX - _activatorGap - (menuElement?.offsetWidth || 0)
+          tempLeft = activatorLeft + window.scrollX - _activatorGap - (menuElement?.offsetWidth || 0)
         }
 
         if (
@@ -329,26 +334,6 @@
       calculatedTop = tempTop;
       calculatedLeft = tempLeft;
     }
-  }
-
-  function getTopDistance(elem: HTMLElement): number {
-    let positionedAncestor = !!menuElement?.parentElement ? getPositionedAncestor(menuElement?.parentElement) : undefined
-    if(!!positionedAncestor) {
-      let top: number = parseInt(getComputedStyle(positionedAncestor).top)
-      return (isNaN(top) ? 0 : top) + elem.offsetTop - calcScrollY(elem)
-    } else return window.scrollY + elem.getBoundingClientRect().top
-  }
-
-  function calcScrollY(elem: HTMLElement): number {
-    let parent = elem.parentElement
-    let scroll = 0
-    while(!!parent) {
-      scroll += parent.scrollTop
-      let parentPosition = getComputedStyle(parent).position
-      if(parentPosition === 'absolute' || parentPosition === 'fixed' || parentPosition === 'relative') break
-      parent = parent.parentElement
-    }
-    return scroll
   }
 
   let positionedAncestor: HTMLElement | undefined = undefined
