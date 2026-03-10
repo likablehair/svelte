@@ -90,6 +90,7 @@
     { name: 'menuWidth', type: 'string | null', description: 'The width of the menu.', default: 'null' },
     { name: 'menuAnchor', type: '"bottom" | "bottom-center" | "right-center"', description: 'The anchor of the menu.', default: '"bottom-center"' },
     { name: 'menuMaxHeight', type: 'string', description: 'The max height of the menu.', default: '300px' },
+    { name: 'hint', type: 'string', description: 'Hint below the input' },
     { name: 'class', type: 'object', description: 'CSS classes to apply to different parts of the component.', default: 'undefined' },
   ]}
   styleProps={[
@@ -108,7 +109,10 @@
     { name: "--autocomplete-min-height", type: "size", description: "The minimum height of the selection container.", default: "2rem" },
     { name: "--autocomplete-options-max-width", type: "size", description: "The maximum width of the selection options.", default: "100%" },
     { name: "--autocomplete-input-margin-left", type: "spacing", description: "The margin-left for the autocomplete input.", default: "4px" },
-    { name: "--autocomplete-input-width", type: "spacing", description: "The width for the autocomplete search input.", default: "" }
+    { name: "--autocomplete-input-width", type: "spacing", description: "The width for the autocomplete search input.", default: "" },
+    { name: "--autocomplete-hint-font-size", type: "font-size", description: "The font size for the hint.", default: ".75rem" },
+    { name: "--autocomplete-hint-color", type: "color", description: "The colo for the hint.", default: "rgb(var(--global-color-contrast-500), .5)" },
+    { name: "--autocomplete-hint-margin-left", type: "margin-left", description: "The margin left for the input.", default: "2px" },
   ]}
 ></PropsViewer>
 <h2>Slots</h2>
@@ -362,6 +366,23 @@
         { name: 'index', type: 'number', description: 'The index of the item in the list.' },
         { name: 'selected', type: 'boolean', description: 'Indicates if the item is selected.' }
       ]
+    }, {
+      name: 'hintSnippet',
+      properties: [
+        {
+          name: 'hint',
+          description: "The hint",
+          type: 'string'
+        }
+      ],
+      description: 'Snippet for the hint',
+      default: `
+<div class="{clazz?.hint || ''}">
+  {#if !!hint}
+    <span class="hint">{hint}</span>
+  {/if}
+</div>
+`
     }
   ]}
 ></SlotsViewer>

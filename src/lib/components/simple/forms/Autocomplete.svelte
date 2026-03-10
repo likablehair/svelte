@@ -43,10 +43,12 @@
     menuFlipOnOverflow?: ComponentProps<typeof Menu>['flipOnOverflow']
     menuMaxHeight?: string
     adaptInputWidth?: boolean
+    hint?: string
     class?: {
       activator?: string;
       menu?: string;
       simpleTextfield?: ComponentProps<typeof SimpleTextField>["class"];
+      hint?: string
     };
     selectionContainerSnippet?: Snippet<
       [
@@ -104,6 +106,9 @@
         },
       ]
     >;
+    hintSnippet?: Snippet<[{
+      hint?: string
+    }]>
     onchange?: (event: {
       detail: {
         unselect: ItemData | undefined;
@@ -145,6 +150,7 @@
     menuFlipOnOverflow = true,
     menuMaxHeight = '300px',
     adaptInputWidth = true,
+    hint,
     selectionContainerSnippet,
     selectionSnippet,
     chipLabelSnippet,
@@ -152,6 +158,7 @@
     menuSnippet,
     itemLabelSnippet,
     itemSnippet,
+    hintSnippet,
     onchange,
     onfocus,
     onblur,
@@ -445,6 +452,16 @@
         bind:this={input}
       />
     </div>
+
+    {#if hintSnippet}
+      {@render hintSnippet({ hint })}
+    {:else}
+      <div class="{clazz?.hint || ''}">
+        {#if !!hint}
+          <span class="hint">{hint}</span>
+        {/if}
+      </div>
+    {/if}
   {/if}
 </div>
 
@@ -670,5 +687,20 @@
     outline: none;
     border: none;
     color: inherit;
+  }
+
+  .hint {
+    margin-left: var(
+      --autocomplete-hint-margin-left, 
+      var(--autocomplete-default-hint-margin-left)
+    );
+    font-size: var(
+      --autocomplete-hint-font-size, 
+      var(--autocomplete-default-hint-font-size)
+    );
+    color: var(
+      --autocomplete-hint-color,
+      var(--autocomplete-default-hint-color)
+    );
   }
 </style>

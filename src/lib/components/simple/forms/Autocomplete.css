@@ -11,4 +11,7 @@
   --autocomplete-default-border-radius: 4px;
   --autocomplete-default-options-max-width: 100%;
   --autocomplete-default-input-margin-left: 4px;
+  --autocomplete-default-hint-font-size: .75rem;
+  --autocomplete-default-hint-color: rgb(var(--global-color-contrast-500), .5);
+  --autocomplete-default-hint-margin-left: 2px;
 }
