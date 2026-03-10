@@ -1445,7 +1445,7 @@
   
   async function updateRemainingWidth() {
     if(tableContainer != null && !!tableContainer && mainHeader) {
-      const containerWidth = tableContainer.getBoundingClientRect().width - 10;
+      const containerWidth = tableContainer.getBoundingClientRect().width;
 
       if(containerWidth){
         const totalResizableWidth = headersToShowInTable.reduce((sum, head) => {
@@ -1454,11 +1454,11 @@
             resizeHeader(th, head)
           }
           const width = th?.getBoundingClientRect().width || 0
-          return sum + width + 1;
+          return sum + width;
         }, 0);
     
         const extraStaticWidth = Array.from(mainHeader.querySelectorAll('th.non-resizable, th.row-append-header'))
-          .reduce((sum, th) => sum + th.getBoundingClientRect().width + 1, 0);
+          .reduce((sum, th) => sum + th.getBoundingClientRect().width, 0);
     
         remainingWidth = Math.max(0, containerWidth - totalResizableWidth - extraStaticWidth + 18);
       }
@@ -1816,6 +1816,7 @@
             <th
               style:width={remainingWidth + 'px'}
               class="filler"
+              style:padding=0
               aria-hidden="true"
             ></th>
           {/if}
