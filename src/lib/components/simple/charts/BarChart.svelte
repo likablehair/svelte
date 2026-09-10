@@ -121,38 +121,54 @@
     chart: Chart;
 
   $effect(() => {
-    import("chartjs-plugin-zoom").then(({ default: zoomPlugin}) => {
-      Chart.register(zoomPlugin)
-      setTimeout(() => {
-        if(!!chart.resetZoom)
-          chart.resetZoom()
-      }, 40);
-    })
-
-    chart = new Chart(canvasElem, {
+    let cancelled = false
+    const localChart = new Chart(canvasElem, {
       type: 'bar',
       data,
       options,
     })
+    chart = localChart
+
+    const originalUpdate = localChart.update.bind(localChart)
+    localChart.update = (...args: Parameters<typeof originalUpdate>) => {
+      if (!localChart.canvas) return
+      originalUpdate(...args)
+    }
+    const originalResize = localChart.resize.bind(localChart)
+    localChart.resize = (...args: Parameters<typeof originalResize>) => {
+      if (!localChart.canvas) return
+      originalResize(...args)
+    }
+
+    import("chartjs-plugin-zoom").then(({ default: zoomPlugin}) => {
+      if (cancelled) return
+      Chart.register(zoomPlugin)
+      setTimeout(() => {
+        if (!cancelled && !!localChart.resetZoom)
+          localChart.resetZoom()
+      }, 40);
+    })
 
     return () => {
-      chart.destroy();
+      cancelled = true
+      localChart.destroy();
     };
   });
 
   $effect(() => {
-    if (chart) {
+    if (chart && chart.canvas) {
       chart.data = data;
       chart.update();
     }
   });
 
   $effect(() => {
-    if(!!chart && !!resetZoom && !!chart.resetZoom) {
+    if(!!chart && !!chart.canvas && !!resetZoom && !!chart.resetZoom) {
+      const target = chart
       setTimeout(() => {
-        if(!!chart.resetZoom)
+        if (chart === target && !!chart.canvas && !!chart.resetZoom)
           chart.resetZoom()
-          resetZoom = false
+        resetZoom = false
       }, 40);
     }
   });
