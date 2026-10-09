@@ -10,9 +10,12 @@ export { default as SimpleTextField } from './components/simple/forms/SimpleText
 export { default as Menu } from './components/simple/common/Menu.svelte';
 export { default as Tooltip } from './components/simple/common/Tooltip.svelte';
 export { default as NoData } from './components/simple/common/NoData.svelte';
+export { default as Divider } from './components/simple/common/Divider.svelte';
 export { default as Dialog } from './components/simple/dialogs/Dialog.svelte';
 export { default as Drawer } from './components/simple/navigation/Drawer.svelte';
 export { default as Chip } from './components/simple/navigation/Chip.svelte';
+export { default as TabSwitcher } from './components/simple/navigation/TabSwitcher.svelte';
+export type { Tab } from './components/simple/navigation/TabSwitcher.svelte';
 export { default as Checkbox } from './components/simple/forms/Checkbox.svelte';
 export { default as Switch } from './components/simple/forms/Switch.svelte';
 export { default as RadioButton } from './components/simple/forms/RadioButton.svelte';

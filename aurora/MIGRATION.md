@@ -8,7 +8,7 @@ Contents:
 
 - [Checklist](#checklist)
 - [Global changes](#global-changes)
-- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Button](#button), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [Dialog](#dialog), [Drawer](#drawer), [Dropdown](#dropdown), [FlagIcon](#flagicon), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [Menu](#menu), [NoData](#nodata), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [Select](#select), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [Textarea](#textarea), [Toaster](#toaster), [Tooltip](#tooltip)
+- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Button](#button), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FlagIcon](#flagicon), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [Menu](#menu), [NoData](#nodata), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [Select](#select), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Textarea](#textarea), [Toaster](#toaster), [Tooltip](#tooltip)
 - [Not available yet](#not-available-yet)
 
 ## Checklist
@@ -414,6 +414,21 @@ New, optional: `locale`, `dialCode`, `class.dialCode`, `dialCode(code)`, `Countr
 
 New, optional: `title`, `titleSnippet`, `closable`, `closeLabel`, `closeSnippet`, `actionsSnippet`, `onclose(event)`, `bind:dialogElement`, `class` object, `<form method="dialog">` support, about 37 `--dialog-*` variables.
 
+### Divider
+
+- It is a native `<hr>` with class `aurora-divider` (v4: an empty `<div>`); screen readers announce it as a separator. App CSS that targeted the v4 `div` must target `.aurora-divider` or use `class`.
+- **Margins**: 10px above and below as in v4, but **no 5px on the sides**: the line spans the whole container. Set `--divider-margin-left` / `--divider-margin-right` where the inset mattered.
+- Look: 1px `--global-color-border-strong` (v4: `background-500`), round ends (`--global-radius-full`, v4: 0.5px).
+- Most apps use their own copy, `$lib/components/common/Divider.svelte` (props `color`, `weight`, `marginTop`, ...): it is app code and keeps working. To switch to the library, turn the props into the variables below.
+
+| v4 | v5 |
+|---|---|
+| `--divider-color`, `-weight`, `-radius`, `-margin-top`, `-margin-bottom`, `-margin-left`, `-margin-right` | same names (`--divider-color` takes a gradient too) |
+| `--divider-default-margin-top`, `-margin-bottom` | `--divider-default-spacing` |
+| `--divider-default-margin-left`, `-margin-right` | removed (no side margin) |
+
+New, optional: `variant` (solid \| gradient), `orientation` (horizontal \| vertical), `label` and `children` (text in the middle of the line), `bind:dividerElement`, `class` and native attributes, `data-variant`, `data-orientation`, `--divider-spacing`, `--divider-vertical-min-height`, `--divider-gap`, `--divider-label-*`.
+
 ### Drawer
 
 - `closeOnClickOutside` (default `true`) → `persistent` (default `false`), inverted: `closeOnClickOutside={false}` → `persistent`. It now also blocks Escape.
@@ -697,6 +712,29 @@ Unchanged: `--switch-width`, `--switch-height` (now the track). Defaults follow 
 
 New, optional: `size`, `label`, `labelSnippet`, `bind:input`, `class` object, native attributes.
 
+### TabSwitcher
+
+- `ontabClick({ detail: { tab, nativeEvent } })` → `ontabClick({ tab, nativeEvent })`: drop `.detail`. Enter and Space on a focused tab call it too. `ontabKeypress` removed (v4 never called it).
+- **Tabs that switch page**: give each tab an `href` instead of calling `goto()` in `ontabClick`. With `href` the switcher is a `<nav>` of links with `aria-current="page"` (middle click, new tab, SvelteKit preloading). Keep `selected` derived from the route; do not keep the `goto` as well.
+- Without `href` it is an ARIA tab list: arrows, Home and End move the focus, Enter and Space select, only one tab is in the Tab order. Pass `aria-label`; give tabs a `panelId` when their content is in the same page (`role="tabpanel"` on it).
+- `Tab.icon` is an SVG path. The `Tab` type is exported: import it instead of declaring it.
+- `mandatory` selects the first enabled tab in the first render (v4: after mount, so server-rendered pages showed no selection), and again when the tabs arrive later.
+- `class`: `tabs` → `tab`, `bookmark` → `indicator` (v4 ignored it), `guide` removed; `container` and `selected` unchanged.
+- Look: muted 14px tabs without side padding, the selected one in body text color with a gradient underline that slides between tabs (v4: inherited font size, selected tab in primary, 8px padding). `--tab-switcher-selected-color="var(--global-color-primary)"` restores the v4 color. `variant="segmented"` is the pill look.
+- Only the tabs scroll; `appendSnippet` stays at the end of the row. Tabs show a focus ring (v4: `outline: none`).
+- Markup: `.tabs-container`, `.tab-label`, `.selected-tab`, `.horizontal-guide` → `.aurora-tab-switcher`, `.aurora-tab-switcher-tab`, `[data-selected]`, `.aurora-tab-switcher-indicator`; the line is a box shadow of the root.
+
+| v4 | v5 |
+|---|---|
+| `--tab-switcher-bookmark-color` | `--tab-switcher-indicator-background` (gradients allowed) |
+| `--tab-switcher-selected-color` | same name; default body text (v4: primary-400) |
+| `--tab-switcher-gap` | same name; underline tabs lost 8px of side padding, add 16px to keep the v4 spacing |
+| `--tab-switcher-guide-color` | same name, drawn at full opacity (v4: 20%) |
+| `--tab-switcher-width` | same name |
+| `--tab-switcher-default-bookmark-color`, `-default-selected-color`, `-default-gap` | `--tab-switcher-default-underline-indicator-background`, `-underline-selected-color`, `-underline-gap` (and the `-segmented-` ones) |
+
+New, optional: `variant`, Tab `badge` / `href` / `disabled` / `panelId`, `tabSnippet`, `aria-label` / `aria-labelledby` on the tab list, `bind:tabSwitcherElement`, native attributes, `data-variant`, `data-selected`, every other `--tab-switcher-*` variable.
+
 ### Textarea
 
 - The `id` is generated with `$props.id()` (stable across server and client) instead of a random cuid.
@@ -785,6 +823,6 @@ New, optional: `text`, `title`, `titleSnippet`, `variant`, `offset`, `bind:toolt
 
 These v4 exports have no v5 version yet. Keep v4 for screens that need them, or wait for the port.
 
-- **Components**: MediaQuery (use `svelte/reactivity`), MenuOrDrawer, MenuOrDrawerOptions, QuickActions, VerticalDraggableList, InfiniteScroll, Divider, CollapsibleDivider, Calendar, DatePicker, MonthSelector, YearSelector, DatePickerTextField, YearPickerTextField, PeriodSelector, PeriodPicker, FileInput, FileInputList, VerticalSwitch, VerticalTextSwitch, IconsDropdown, AvatarDropdown, ToggleList, BoxList, ColorInvertedSelector, SelectableMenuList, SelectableVerticalList, SidebarMenuList, HierarchyMenu, SimpleTable, Paginator, PaginatedTable, EnhancedPaginatedTable, DynamicTable, Filters, DynamicFilters, FilterEditor, GlobalSearchTextField, SearchBar, Avatar, DescriptiveAvatar, Breadcrumb, HeaderMenu, Navigator, TabSwitcher, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper, CollapsibleSideBarLayout, StableDividedSideBarLayout, UnstableDividedSideBarLayout.
+- **Components**: MediaQuery (use `svelte/reactivity`), MenuOrDrawer, MenuOrDrawerOptions, QuickActions, VerticalDraggableList, InfiniteScroll, CollapsibleDivider, Calendar, DatePicker, MonthSelector, YearSelector, DatePickerTextField, YearPickerTextField, PeriodSelector, PeriodPicker, FileInput, FileInputList, VerticalSwitch, VerticalTextSwitch, IconsDropdown, AvatarDropdown, ToggleList, BoxList, ColorInvertedSelector, SelectableMenuList, SelectableVerticalList, SidebarMenuList, HierarchyMenu, SimpleTable, Paginator, PaginatedTable, EnhancedPaginatedTable, DynamicTable, Filters, DynamicFilters, FilterEditor, GlobalSearchTextField, SearchBar, Avatar, DescriptiveAvatar, Breadcrumb, HeaderMenu, Navigator, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper, CollapsibleSideBarLayout, StableDividedSideBarLayout, UnstableDividedSideBarLayout.
 - **Utilities**: `scrollAtCenter`, `FilterBuilder`, `FilterConverter` / `Converter`, `FilterValidator`.
 - **Stores**: `mediaQuery`, `theme`, `toggleTheme` (see [Dark mode](#dark-mode-and-themes)), `debounce`.

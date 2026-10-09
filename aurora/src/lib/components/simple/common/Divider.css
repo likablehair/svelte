@@ -1,0 +1,19 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--divider-default-color: var(--global-color-border-strong);
+		--divider-default-gradient-background: var(--global-gradient);
+		--divider-default-weight: 1px;
+		--divider-default-radius: var(--global-radius-full);
+		--divider-default-spacing: 10px;
+		--divider-default-vertical-min-height: 1em;
+		--divider-default-gap: 14px;
+		--divider-default-label-color: var(--global-color-text-3);
+		--divider-default-label-font-family: inherit;
+		--divider-default-label-font-size: 11.5px;
+		--divider-default-label-font-weight: 500;
+		--divider-default-label-letter-spacing: 0.14em;
+		--divider-default-label-text-transform: uppercase;
+	}
+}

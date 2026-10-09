@@ -1,0 +1,61 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--tab-switcher-default-width: 100%;
+		--tab-switcher-default-font-family: inherit;
+		--tab-switcher-default-font-weight: 500;
+		--tab-switcher-default-icon-size: 16px;
+		--tab-switcher-default-icon-gap: 6px;
+		--tab-switcher-default-append-gap: 8px;
+		--tab-switcher-default-disabled-opacity: 0.4;
+		--tab-switcher-default-focus-ring-width: var(--global-focus-ring-width);
+		--tab-switcher-default-focus-ring-color: var(--global-focus-ring-color);
+		--tab-switcher-default-focus-ring-offset: var(--global-focus-ring-offset);
+		--tab-switcher-default-duration: var(--global-duration-slow);
+
+		--tab-switcher-default-badge-background: var(--global-color-primary-soft);
+		--tab-switcher-default-badge-color: var(--global-color-primary);
+		--tab-switcher-default-badge-font-family: var(--global-font-family-mono);
+		--tab-switcher-default-badge-font-size: 10.5px;
+		--tab-switcher-default-badge-padding: 1px 6px;
+		--tab-switcher-default-badge-border-radius: var(--global-radius-full);
+
+		--tab-switcher-default-underline-gap: 22px;
+		--tab-switcher-default-underline-padding: 8px 0 10px;
+		--tab-switcher-default-underline-font-size: 14px;
+		--tab-switcher-default-underline-color: var(--global-color-text-3);
+		--tab-switcher-default-underline-hover-color: var(--global-color-text);
+		--tab-switcher-default-underline-selected-color: var(--global-color-text);
+		--tab-switcher-default-underline-border-radius: var(--global-radius-xs);
+		--tab-switcher-default-guide-color: var(--global-color-border);
+		--tab-switcher-default-guide-width: var(--global-border-width);
+		--tab-switcher-default-underline-indicator-background: var(--global-gradient);
+		--tab-switcher-default-underline-indicator-height: 2px;
+		--tab-switcher-default-underline-indicator-border-radius: 2px;
+		--tab-switcher-default-underline-indicator-border-width: 0px;
+		--tab-switcher-default-underline-indicator-border-color: transparent;
+		--tab-switcher-default-underline-indicator-box-shadow: 0 0 12px
+			var(--global-color-primary-glow);
+		--tab-switcher-default-underline-easing: var(--global-ease);
+
+		--tab-switcher-default-segmented-gap: 0px;
+		--tab-switcher-default-segmented-padding: 5px 12px;
+		--tab-switcher-default-segmented-font-size: 13px;
+		--tab-switcher-default-segmented-color: var(--global-color-text-2);
+		--tab-switcher-default-segmented-hover-color: var(--global-color-text);
+		--tab-switcher-default-segmented-selected-color: var(--global-color-text);
+		--tab-switcher-default-segmented-border-radius: var(--global-radius-sm);
+		--tab-switcher-default-list-background: var(--global-color-surface-2);
+		--tab-switcher-default-list-border-color: var(--global-color-border);
+		--tab-switcher-default-list-border-width: var(--global-border-width);
+		--tab-switcher-default-list-border-radius: var(--global-radius-md);
+		--tab-switcher-default-list-padding: 3px;
+		--tab-switcher-default-segmented-indicator-background: var(--global-color-surface-pop);
+		--tab-switcher-default-segmented-indicator-border-width: var(--global-border-width);
+		--tab-switcher-default-segmented-indicator-border-color: var(--global-color-border-strong);
+		--tab-switcher-default-segmented-indicator-border-radius: var(--global-radius-sm);
+		--tab-switcher-default-segmented-indicator-box-shadow: var(--global-shadow-sm);
+		--tab-switcher-default-segmented-easing: var(--global-ease-spring);
+	}
+}
