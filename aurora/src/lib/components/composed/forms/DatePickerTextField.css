@@ -1,0 +1,45 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--date-picker-text-field-default-width: 100%;
+		--date-picker-text-field-default-max-width: none;
+		--date-picker-text-field-default-gap: 6px;
+		--date-picker-text-field-default-outer-gap: 8px;
+		--date-picker-text-field-default-inner-gap: var(--global-input-gap);
+		--date-picker-text-field-default-height: var(--global-input-height);
+		--date-picker-text-field-default-padding: 0 var(--global-input-padding-x);
+		--date-picker-text-field-default-font-family: var(--global-font-family-mono);
+		--date-picker-text-field-default-font-size: var(--global-input-font-size);
+		--date-picker-text-field-default-font-weight: 400;
+		--date-picker-text-field-default-color: var(--global-input-color);
+		--date-picker-text-field-default-placeholder-color: var(--global-input-placeholder-color);
+		--date-picker-text-field-default-icon-color: var(--global-input-icon-color);
+		--date-picker-text-field-default-icon-size: 18px;
+		--date-picker-text-field-default-background: var(--global-input-background);
+		--date-picker-text-field-default-border-width: var(--global-input-border-width);
+		--date-picker-text-field-default-border-color: var(--global-input-border-color);
+		--date-picker-text-field-default-border-radius: var(--global-input-radius);
+		--date-picker-text-field-default-box-shadow: var(--global-input-shadow);
+		--date-picker-text-field-default-hover-border-color: var(--global-input-hover-border-color);
+		--date-picker-text-field-default-focus-border-color: var(--global-input-focus-border-color);
+		--date-picker-text-field-default-focus-ring-color: var(--global-input-focus-ring-color);
+		--date-picker-text-field-default-focus-ring-width: var(--global-focus-ring-width);
+		--date-picker-text-field-default-error-color: var(--global-input-error-color);
+		--date-picker-text-field-default-success-color: var(--global-input-success-color);
+		--date-picker-text-field-default-disabled-background: var(--global-input-disabled-background);
+		--date-picker-text-field-default-disabled-opacity: var(--global-input-disabled-opacity);
+		--date-picker-text-field-default-label-color: var(--global-input-label-color);
+		--date-picker-text-field-default-label-font-size: var(--global-input-label-font-size);
+		--date-picker-text-field-default-label-font-weight: var(--global-input-label-font-weight);
+		--date-picker-text-field-default-hint-color: var(--global-input-hint-color);
+		--date-picker-text-field-default-hint-font-size: var(--global-input-hint-font-size);
+		--date-picker-text-field-default-separator-color: var(--global-color-text-3);
+		--date-picker-text-field-default-format-color: var(--global-color-text-3);
+		--date-picker-text-field-default-format-background: var(--global-color-surface-2);
+		--date-picker-text-field-default-format-border-color: var(--global-color-border);
+		--date-picker-text-field-default-format-border-radius: var(--global-radius-xs);
+		--date-picker-text-field-default-format-font-size: 11px;
+		--date-picker-text-field-default-format-padding: 2px 6px;
+	}
+}

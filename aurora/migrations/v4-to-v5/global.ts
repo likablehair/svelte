@@ -191,12 +191,6 @@ export default {
 			'VerticalDraggableList',
 			'InfiniteScroll',
 			'CollapsibleDivider',
-			'Calendar',
-			'DatePicker',
-			'MonthSelector',
-			'YearSelector',
-			'DatePickerTextField',
-			'YearPickerTextField',
 			'PeriodSelector',
 			'PeriodPicker',
 			'FileInput',
@@ -336,6 +330,14 @@ export default {
 				'v5 has toasts (`<Toaster />`, `addToast`, `addErrorToast`, `addSuccessToast`, `addWarningToast`, `addInfoToast`, `updateToast`, `removeToast`); most apps have their own `Toaster.svelte` copied from the melt-ui demo with the same function names but `{ data: { title, description, closeDelay, showLoading, action } }` arguments.',
 			action:
 				'Turn the app `Toaster.svelte` into the adapter shown in MIGRATION.md ("Toaster"), so call sites keep working: map `data.closeDelay` → `duration` (`0` now really keeps it open; default 5000), `data.showLoading` → `loading`, `data.action.handler` → `action.onclick`. Then check: `add*(...).id` → `add*(...)` (they return the id); CSS color strings (`color: "info"`, `"green"`) → the function or `variant`; remove-then-add loading flows → `updateToast(id, { variant: "success", title, loading: false })`; action handlers that must keep the toast open call `event.preventDefault()`. Remove the app melt-ui dependency once nothing else uses it.',
+			scope: 'app'
+		},
+		{
+			id: 'global-dates',
+			summary:
+				'Date components work with `Date` values at local midnight; `toISOString()` converts them to UTC and gives the previous day in Italy, and `new Date("yyyy-mm-dd")` reads the string as UTC midnight. v4 brought `luxon`, which apps used to convert these dates.',
+			action:
+				"Where a value bound to a date component is turned into a string, replace `date.toISOString()` (and `.toISOString().split('T')[0]`, `.slice(0, 10)`) with `toISODate(date)`, and where a `yyyy-mm-dd` string becomes the value, `new Date(text)` with `parseISODate(text)` (both from `@likable-hair/svelte`). luxon conversions (`DateTime.fromJSDate(d).toISODate()`, `DateTime.fromISO(s).toJSDate()`) are correct, but the app must declare `luxon` in its `package.json`.",
 			scope: 'app'
 		},
 		{

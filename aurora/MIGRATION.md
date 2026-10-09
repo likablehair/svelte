@@ -8,7 +8,7 @@ Contents:
 
 - [Checklist](#checklist)
 - [Global changes](#global-changes)
-- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Button](#button), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FlagIcon](#flagicon), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [Menu](#menu), [NoData](#nodata), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [Select](#select), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Textarea](#textarea), [Toaster](#toaster), [Tooltip](#tooltip)
+- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FlagIcon](#flagicon), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [Menu](#menu), [MonthSelector](#monthselector), [NoData](#nodata), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [Select](#select), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Textarea](#textarea), [Toaster](#toaster), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
 - [Not available yet](#not-available-yet)
 
 ## Checklist
@@ -20,7 +20,8 @@ Contents:
 5. Replace MDI class names (`"mdi-plus"`) with SVG paths from `@mdi/js` (`mdiPlus`) in every icon prop ([Icons](#icons)).
 6. Remove `.detail` from callbacks ([Callbacks](#callbacks)).
 7. Install the packages the app imports directly but used to get through v4 (`luxon`, `lodash`, `date-fns`, ...).
-8. Go through the [component sections](#components) for each component the app uses.
+8. Add `locale="it"` to the date components and replace `toISOString()` on their values with `toISODate()` ([Dates](#dates)).
+9. Go through the [component sections](#components) for each component the app uses.
 
 ## Global changes
 
@@ -137,6 +138,15 @@ The library does not load fonts, as in v4, but the tokens now name them: `--glob
 ### Responsive
 
 The `mediaQuery` store and the `MediaQuery` component are not in v5: use `MediaQuery` from `svelte/reactivity`. Components switch to their mobile variant at 1024px as before, but the **server now renders the desktop variant** (v4 rendered the mobile one).
+
+### Dates
+
+The date components work with `Date` values at **local midnight**. `date.toISOString()` converts to UTC and returns the previous day in Italy (local midnight is 22:00 or 23:00 UTC of the day before), and `new Date('2026-10-09')` reads the string as UTC midnight. Use the exported helpers instead:
+
+- `toISODate(date)` → `'2026-10-09'` (local), in place of `toISOString()`, `.toISOString().split('T')[0]` or `.slice(0, 10)`;
+- `parseISODate('2026-10-09')` → local midnight (or `undefined`), in place of `new Date(text)`.
+
+luxon conversions (`DateTime.fromJSDate(d).toISODate()`, `DateTime.fromISO(s).toJSDate()`) are correct, but the app now has to declare `luxon` (and `imask`, if it uses it) in its own `package.json`.
 
 ## Components
 
@@ -300,6 +310,39 @@ Defaults are now per variant and size: `--button-default-background-color` → `
 
 New, optional: `variant`, `size`, `appendIcon`, `iconSnippet`, `loadingSnippet`, `href` (renders an `<a>`; with `target`, `rel`, `download`), `data-variant` / `data-size` / `data-shape` / `data-loading`.
 
+### Calendar
+
+- `type="dateRange"` → `range`; `type="singleDate"` → drop it.
+- **`locale` defaults to `'en'`** (v4: `'it'`): add `locale="it"` where it was omitted. It takes any BCP 47 tag (`Intl`), and the first day of the week follows it (`weekStart` overrides it).
+- `showExtraMonthDays` → `showOutsideDays` (hidden days are empty cells; in v4 they stayed clickable), `showHeader` → `showWeekdays`, `animationDuration={300}` → `--calendar-duration="300ms"`.
+- `visibleMonth` / `visibleYear` default to the month of `selectedDate` and follow it when it moves to another month (v4: the current month).
+- **Days of the nearby months can be chosen**: a click selects the day and shows its month (v4 ignored it). With `range`, the same day clicked twice is a one-day range, and hovering a day previews the band.
+- `ondayClick({ detail: { dateStat, selected, extraMonth } })` → `ondayClick({ date, outside, nativeEvent })`, with `date` a `Date` at local midnight: `dateStat.dayOfMonth` / `.month` / `.year` → `date.getDate()` / `.getMonth()` / `.getFullYear()`, `extraMonth` → `outside`. v4 `dayOfWeek` was the column index, not the weekday; `selected` was always `!extraMonth`. It fires only for days that can be chosen, after the selection changed. For the value, `onchange({ selectedDate, selectedDateTo })` is new.
+- `weekHeaderSnippet({ header, index })` → `weekdaySnippet({ label, name, day })` (`day` is the weekday, 0 = Sunday, not the column). `daySnippet({ dayStat, extraMonth, selected })` → `daySnippet(day)` with `CalendarDay` `{ date, outside, selected, inRange, today, disabled }`; it replaces only the number.
+- `class.weekHeader` → `class.weekday`.
+- It is an ARIA grid: one Tab stop, arrows by day and week, Home/End, Page Up/Down by month (with Shift, by year), Enter and Space choose; screen readers read the full date. v4 cells were not focusable.
+- Look: always 6 rows of 32px days (v4: only the rows needed, stretched to the parent height), short weekday names (`weekdayFormat="narrow"` for the v4 single letter), today marked by a dot (v4: a pale red circle), outside days at 50% opacity (v4: 30%), a continuous range band; the new month slides in.
+- Markup: `.calendar-container`, `.week-header-slot`, `.day-slot`, `.extra-month`, `.today`, `.selected`, `.between-range`, `.range-start`, `.range-end` → `.aurora-calendar`, `.aurora-calendar-weekday`, `.aurora-calendar-day` with `[data-outside]`, `[data-today]`, `[data-selected]`, `[data-range]`.
+
+| v4 | v5 |
+|---|---|
+| `--calendar-height` | removed: the height follows the rows; size them with `--calendar-day-height` |
+| `--calendar-day-height` | same name, `100%` → `32px` (a length now) |
+| `--calendar-grid-gap` | `--calendar-row-gap` (rows only, default 2px) |
+| `--calendar-day-background-color`, `--calendar-day-hover-background-color` | `--calendar-day-background`, `--calendar-day-hover-background` |
+| `--calendar-day-border-radius` | same name, now the radius of every day state (v4 `0px`, v5 `--global-radius-sm`) |
+| `--calendar-day-hover-border-radius`, `--calendar-selected-day-border-radius`, `--calendar-range-start-border-radius`, `--calendar-range-end-border-radius` | removed: `--calendar-day-border-radius` |
+| `--calendar-selected-day-background-color` | `--calendar-selected-day-background` |
+| `--calendar-selected-day-color` | same name; the default is the text color on primary, so `rgb(var(--global-color-primary-foreground))` can be dropped |
+| `--calendar-today-background-color` | `--calendar-today-background` (fills the day; the dot is `--calendar-today-dot-color`, `-dot-size`) |
+| `--calendar-today-color` | same name, default `inherit` |
+| `--calendar-today-border-radius`, `--calendar-today-height` | removed: today is a dot |
+| `--calendar-between-range-background-color`, `--calendar-between-range-color` | `--calendar-range-background` (also behind the ends), `--calendar-range-color` |
+
+Unchanged: `--calendar-width`, `--calendar-day-width`. The `-default-*` names follow the same renames.
+
+New, optional: `min`, `max`, `isDateDisabled`, `weekStart`, `weekdayFormat`, `variant="grid"` (agenda cells), `dayAppendSnippet`, `onchange`, `focus()`, `bind:calendarElement`, native attributes, `data-*` on the grid and the days, `--calendar-*` for colors, font, weekdays, today dot, range preview, opacity, focus ring, duration and easing.
+
 ### Checkbox
 
 - `value` → `checked` (`bind:value` → `bind:checked`). `value` is now the native form value: `value={true}` compiles but leaves the box unchecked.
@@ -399,6 +442,69 @@ Everything in [Autocomplete](#autocomplete) applies.
   | `getCountryInfoByAlpha2(code)` | `countryName(code, locale)`: any case; an unknown code returns the code itself instead of `undefined` |
 
 New, optional: `locale`, `dialCode`, `class.dialCode`, `dialCode(code)`, `CountryData`, `--countries-autocomplete-dial-code-*`.
+
+### DatePicker
+
+What [Calendar](#calendar) says about `range`, `locale`, the days of the nearby months, `ondayClick`, the keyboard and the `--calendar-*` variables applies to its grid; `--calendar-*` set on a DatePicker still reach it.
+
+- **The colored header** with the year and the chosen date is gone: the panel is a title ("October 2026") between two arrows above the grid, on a popup surface 280px wide (border, radius, padding, shadow) whose height follows the content (v4: 100% wide, 400px high). `headerLabelSnippet` removed; `titleSnippet({ title, month, year, view })` replaces the title text.
+- Clicking the title goes days → months → years → days; choosing a year shows its months and choosing a month its days, without changing the date. `view` is bindable and follows the navigation (v4: read once).
+- `selectedYear` / `selectedMonth` removed (in v4 they were not linked to the date): use `bind:visibleYear` / `bind:visibleMonth`. `onyearClick` / `onmonthClick` removed: bind `visibleYear`, `visibleMonth` and `view` instead.
+- `selectableYears` → `min` / `max` (`Date`s): the year view is a scrolling 4-column grid of every year between them (default 1900–2100; v4: the 75 years before and after today), and they also disable days, months and arrows.
+- `skipTabs` removed: each view is one Tab stop. The arrows have English accessible names (`previousMonthLabel`, `nextMonthLabel`, `previousYearLabel`, `nextYearLabel`); every button is `type="button"` (v4 header buttons submitted forms).
+- `disabled` disables the title, the arrows and the grids (v4: only the days).
+- `class`: `{ container, header, selectorRow }` → `{ container, header, title, calendar }` (`selectorRow` → `header`; the v4 `header` band is gone).
+- `locale` defaults to `'en'` (v4: `'it'`).
+- Markup: `.date-picker-container`, `.header`, `.selector-row`, `.selector-text` → `.aurora-date-picker` (`data-view`, `data-disabled`), `.aurora-date-picker-header`, `.aurora-date-picker-title`.
+
+| v4 | v5 |
+|---|---|
+| `--date-picker-height` | removed: the height follows the content |
+| `--date-picker-width` | same name, `100%` → `280px` |
+| `--date-picker-box-shadow` | same name, default `--global-shadow-lg` with a border |
+| `--date-picker-overflow` | removed |
+| `--date-picker-header-background-color`, `--date-picker-header-color` | removed with the header; do not move the color to `--date-picker-title-color` (the title sits on the surface) |
+| `--date-picker-default-primary-color` | removed (never read) |
+
+The `-default-*` names follow.
+
+New, optional: `min`, `max`, `isDateDisabled`, `weekStart`, `weekdayFormat`, `showOutsideDays`, `showWeekdays`, `titleSnippet`, `daySnippet`, `dayAppendSnippet`, `weekdaySnippet`, `onchange`, the arrow labels, `focus()`, `bind:datePickerElement`, native attributes, `--date-picker-*` for padding, gap, background, border and title.
+
+### DatePickerTextField
+
+- **`locale`**: v4 had none and was always Italian (dd/MM/yyyy, weeks from Monday). v5 defaults to `'en'`: **MM/dd/yyyy** and weeks from Sunday, so "05/03/2026" becomes May 3. Add `locale="it"` to every usage and app wrapper that omits it.
+- `menuOpened` → `open`; `type="dateRange"` → `range`; `pattern` → `format` (tokens `dd`, `MM`, `yyyy` only, any separator; the default comes from `locale`); `mobileDialog` → `mobileDrawer`.
+- `minYearInRange` / `maxYearInRange` → `min` / `max` as `Date`s (`min={new Date(1900, 0, 1)}`), which now limit typing and the calendar. Usually drop them: the year view spans 1900–2100 and any year can be typed.
+- Removed: `openingId` (opening a menu closes the others), `flipOnOverflow` (always on), `selectedYear`, `selectedMonth`, `visibleMonth`, `visibleYear` (the calendar opens on the month of the date).
+- **It closes after a choice** (`closeOnSelect`, default `true`; with `range`, after the end). `ondayClick` is removed: delete handlers that only closed the menu (`ondayClick={() => (open = false)}`) together with `bind:menuOpened` when nothing else reads it; move other code to `onchange`.
+- `oninput({ detail: { datetime, type } })` → `onchange({ selectedDate, selectedDateTo })`: it fires when the value changes (a whole valid date typed or made invalid, the calendar, the clear button), not at every key. `oninput` is now the native input event.
+- Typing: digits only with the separators added, paste (also `yyyy-MM-dd`) and autofill work, the value updates on `input` (v4: keydown + 30ms). A date that does not exist, is outside `min` / `max`, or is unfinished when the field loses focus shows the error state with `invalidText` (English "Enter a valid date") and makes the form invalid. Clicking a month or a year in the calendar no longer empties the text.
+- Range: a start and an end input with an arrow between them, named by `startLabel` / `endLabel` (English defaults) after the `label`; a typed end before the start is not accepted.
+- Keyboard: focus or click opens the calendar (desktop), Arrow Down moves into it, Escape closes it and returns to the field, Tab closes it, Enter with the calendar open closes it without submitting the form.
+- Mobile (up to 1024px): the calendar button opens a bottom Drawer titled `drawerTitle ?? label` (v4: a centered Dialog); the field stays typable with the numeric keyboard.
+- Ids are generated (v4: fixed `from` and `to`, duplicated with two fields on a page): use `id` (the end input is `<id>-to`) or `bind:input` / `bind:inputTo`.
+- Snippets: `activatorSnippet` removed (it could not connect the mask); `prependInnerSnippet` → `iconSnippet` (it replaces the calendar icon, the button stays); `prependSnippet`, `appendSnippet` and `appendInnerSnippet` take no parameters.
+- `class`: `{ activator, textfield: { container, row, field, input, hint } }` → `{ container, label, row, field, input, hint, picker }` (`activator` → `container`, `textfield.*` flattened).
+- Look: 36px bordered field in the mono font, the calendar button at the start, a chip with the format at the end (`showFormat={false}` hides it), 100% of the container (v4: a 280px filled grey field in a `fit-content` wrapper); the calendar opens aligned to the start of the field (`placement`, v4 centered).
+- `--date-picker-*` and `--calendar-*` passed to the field still reach the calendar, now also in the drawer, with the renames of [DatePicker](#datepicker) and [Calendar](#calendar). Drop `--date-picker-header-color` and the `--calendar-selected-day-color` that went with it; the popup surface is the Menu's (`--menu-*`).
+- App wrappers (`StandardDatePickerTextfield`): type the props as `ComponentProps<typeof DatePickerTextField>`, spread the rest on the field, and set `locale="it"` and the Italian texts inside the wrapper.
+
+The v4 field was styled with SimpleTextField variables passed to DatePickerTextField. On this component they become `--date-picker-text-field-*`:
+
+| v4 (on DatePickerTextField) | v5 |
+|---|---|
+| `--simple-textfield-width` | `--date-picker-text-field-width` (default `100%`; v4 280px) |
+| `--simple-textfield-height`, `--simple-textfield-padding` | `--date-picker-text-field-height` (36px, border-box), `-padding` (keep the horizontal part) |
+| `--simple-textfield-border` | `--date-picker-text-field-border-width` + `-border-color` |
+| `--simple-textfield-background-color` | `--date-picker-text-field-background` |
+| `--simple-textfield-focus-box-shadow` | `--date-picker-text-field-focus-ring-width` + `-ring-color`, `-focus-border-color` |
+| `--simple-textfield-margin-bottom` | `--date-picker-text-field-gap` |
+| `--simple-textfield-focus-background-color`, `-margin-left`, `-hint-margin-left`, `-transition`, `-range-text-align` | removed |
+| `--simple-text-field-width`, `--textfield-width` (no effect in v4) | `--date-picker-text-field-width` |
+
+The others only change prefix (`max-width`, `outer-gap`, `inner-gap`, `border-radius`, `box-shadow`, `font-size`, `font-weight`, `color`, `hint-font-size`, `hint-color`). `--simple-textfield-default-*` map to `--date-picker-text-field-default-*` the same way (`--simple-textfield-default-radius`, which did not exist, to `-default-border-radius`; `--simple-textfield-default-margin` is dropped).
+
+New, optional: `label`, `hint`, `state`, `invalidText`, `min`, `max`, `isDateDisabled`, `weekStart`, `weekdayFormat`, `showOutsideDays`, `name` / `nameTo` (hidden inputs with `yyyy-MM-dd`), `required`, `readonly`, `id`, `clearable`, `showFormat`, `formatLabel`, `drawerTitle`, texts (`openLabel`, `closeLabel`, `clearLabel`, `startLabel`, `endLabel`), snippets `labelSnippet`, `hintSnippet`, `stateIconSnippet`, `clearSnippet`, `formatSnippet`, `daySnippet`, `dayAppendSnippet`, `bind:input` / `bind:inputTo`, native input attributes, `data-*` state attributes.
 
 ### Dialog
 
@@ -573,6 +679,16 @@ New, optional: `rel`, `bind:linkElement`, `--link-button-hover-color`, `--link-b
 
 New, optional: `-start`/`-end` placements, `matchActivatorWidth`, virtual activator, `class` and native attributes, `data-side`.
 
+### MonthSelector
+
+- `onclick({ detail: { monthIndex } })` → `onchange({ month })`.
+- `labelSnippet({ month, monthName })` → `itemSnippet({ month, label, name, selected, current, disabled })` (`monthName` → `name`). `selectorSnippet` removed (it could not choose a month): the cell keeps click and keyboard; style it with `--month-selector-*` or `class.month`.
+- Names are short by default ("Gen"; v4 "Gennaio"): `monthFormat="long"` for full names. `locale` defaults to `'en'` (v4: `'it'`) and takes any BCP 47 tag.
+- `class.buttons` → `class.month`. The months are `role="option"` cells of a listbox (one Tab stop, arrows, Home/End, Enter/Space), not Buttons; the current month has a border, the selected one a primary fill.
+- `--month-selector-height` defaults to `auto` (v4: `100%`); `--month-selector-width` unchanged. Markup: `.selector-container` → `.aurora-month-selector`, `.aurora-month-selector-month` with `[data-selected]`, `[data-current]`, `[data-disabled]`.
+
+New, optional: `year`, `min`, `max`, `disabled`, `monthFormat`, `focus()`, `bind:monthSelectorElement`, native attributes, `data-*`, `--month-selector-*` for columns, gap, padding, colors and states.
+
 ### NoData
 
 - Look: the default (`size="md"`) is a framed icon with dashed rings, a title in the display font and an optional description and actions. `size="sm"` is close to the v4 look (icon and text only), for tables, lists and cards.
@@ -650,7 +766,7 @@ New, optional: `label`, `hint`, `state`, `bind:select`, snippets `labelSnippet`,
 
 ### SimpleTextField
 
-- **Range mode removed**: `range`, `valueTo`, `placeholderTo`, `idTo`, `nameTo`, `inputTo`, `betweenLabel`. Use two fields with their own labels; date ranges will be handled by DatePickerTextField.
+- **Range mode removed**: `range`, `valueTo`, `placeholderTo`, `idTo`, `nameTo`, `inputTo`, `betweenLabel`. Use two fields with their own labels; for a date range use [DatePickerTextField](#datepickertextfield) with `range`.
 - `iconSize` removed: `--simple-text-field-icon-size` (`--icon-size` no longer reaches the icons).
 - Icon props are SVG paths; the icon snippets lose the `iconSize` parameter.
 - Default width 280px → 100% of the container. The input always gets an `id`. `input` is an `HTMLInputElement`.
@@ -819,10 +935,42 @@ Differences from the melt-ui copies:
 
 New, optional: `text`, `title`, `titleSnippet`, `variant`, `offset`, `bind:tooltipElement`, `class` and native attributes, `data-side`, `data-variant`, every `--tooltip-*` variable.
 
+### YearPickerTextField
+
+It works like [DatePickerTextField](#datepickertextfield) for one year.
+
+- `menuOpened` → `open` (no default), `mobileDialog` → `mobileDrawer`, `minYearInRange` / `maxYearInRange` → `min` / `max` (same numbers and defaults, 1900–2100; v4 ignored them on mobile). `openingId` removed.
+- `onyearClick({ detail: { year } })` and `oninput({ detail: { year } })` → `onchange({ year })` (merge them if both were set): it fires on every change of the year (grid, typing, clear button), not at every key; `oninput` is the native input event.
+- It closes after a choice (`closeOnSelect`) and opens aligned to the start of the field (`placement`, v4 centered).
+- Typing: four digits; a year outside `min` / `max`, or unfinished when the field loses focus, shows the error state with `invalidText` (English "Enter a valid year") and makes the form invalid. Setting `selectedYear` to `undefined` now empties the text.
+- Snippets and `class` as in DatePickerTextField: `activatorSnippet` removed, `prependInnerSnippet` → `iconSnippet`, the other position snippets take no parameters; `{ activator, textfield }` → `{ container, label, row, field, input, hint, picker }`.
+- `--simple-textfield-*` passed to the field become `--year-picker-text-field-*`, as in the DatePickerTextField table. `--button-max-width`, listed in the v4 docs, was never read.
+- Look: the DatePickerTextField field with a chevron at the end; the years are a 4-column YearSelector in a Menu, or a bottom Drawer on mobile. Markup: `.year-picker-activator` → `.aurora-year-picker-text-field`.
+
+New, optional: `label`, `hint`, `state`, `invalidText`, `name`, `required`, `readonly`, `id`, `clearable`, `drawerTitle`, texts (`openLabel`, `closeLabel`, `clearLabel`), snippets `labelSnippet`, `hintSnippet`, `stateIconSnippet`, `clearSnippet`, `chevronSnippet`, `bind:input`, native input attributes, `data-*`, `--year-picker-text-field-*` (including `-menu-width` and `-menu-padding`).
+
+### YearSelector
+
+- `onclick({ detail: { year } })` and `onchange({ detail: { year } })` → `onchange({ year })` (merge them if both were set). Clicking the selected year keeps it (v4 set `selectedYear` to `undefined`): `year` is always a number.
+- `selectableYears` → `min` / `max` (numbers, default 1900–2100; v4: the 75 years before and after today). A list with holes has no equivalent.
+- `labelSnippet({ year })` → `itemSnippet({ year, selected, current })`; `selectorSnippet({ year, handleYearClick })` removed: the cell keeps click and keyboard.
+- `class`: string → `{ container, year }`.
+- A scrolling 4-column grid in the mono font, scrolled to the chosen year, instead of a vertical list of Buttons; it is a listbox with one Tab stop (arrows, Page Up/Down, Home/End, Enter/Space). `--year-selector-columns="1"` gives a single column. Markup: `.selector-container` → `.aurora-year-selector`, `.aurora-year-selector-year` with `[data-selected]`, `[data-current]`.
+
+| v4 | v5 |
+|---|---|
+| `--year-selector-height` | same name, `100%` → `auto` |
+| `--year-selector-max-height` | same name, `500px` → `240px` |
+| `--year-selector-width` | same name, now only the grid (v4: also each year button) |
+
+The `-default-*` names follow.
+
+New, optional: `min`, `max`, `focus()`, `bind:yearSelectorElement`, native attributes, `data-*`, `--year-selector-*` for columns, gap, padding, font, colors and states.
+
 ## Not available yet
 
 These v4 exports have no v5 version yet. Keep v4 for screens that need them, or wait for the port.
 
-- **Components**: MediaQuery (use `svelte/reactivity`), MenuOrDrawer, MenuOrDrawerOptions, QuickActions, VerticalDraggableList, InfiniteScroll, CollapsibleDivider, Calendar, DatePicker, MonthSelector, YearSelector, DatePickerTextField, YearPickerTextField, PeriodSelector, PeriodPicker, FileInput, FileInputList, VerticalSwitch, VerticalTextSwitch, IconsDropdown, AvatarDropdown, ToggleList, BoxList, ColorInvertedSelector, SelectableMenuList, SelectableVerticalList, SidebarMenuList, HierarchyMenu, SimpleTable, Paginator, PaginatedTable, EnhancedPaginatedTable, DynamicTable, Filters, DynamicFilters, FilterEditor, GlobalSearchTextField, SearchBar, Avatar, DescriptiveAvatar, Breadcrumb, HeaderMenu, Navigator, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper, CollapsibleSideBarLayout, StableDividedSideBarLayout, UnstableDividedSideBarLayout.
+- **Components**: MediaQuery (use `svelte/reactivity`), MenuOrDrawer, MenuOrDrawerOptions, QuickActions, VerticalDraggableList, InfiniteScroll, CollapsibleDivider, PeriodSelector, PeriodPicker, FileInput, FileInputList, VerticalSwitch, VerticalTextSwitch, IconsDropdown, AvatarDropdown, ToggleList, BoxList, ColorInvertedSelector, SelectableMenuList, SelectableVerticalList, SidebarMenuList, HierarchyMenu, SimpleTable, Paginator, PaginatedTable, EnhancedPaginatedTable, DynamicTable, Filters, DynamicFilters, FilterEditor, GlobalSearchTextField, SearchBar, Avatar, DescriptiveAvatar, Breadcrumb, HeaderMenu, Navigator, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper, CollapsibleSideBarLayout, StableDividedSideBarLayout, UnstableDividedSideBarLayout.
 - **Utilities**: `scrollAtCenter`, `FilterBuilder`, `FilterConverter` / `Converter`, `FilterValidator`.
 - **Stores**: `mediaQuery`, `theme`, `toggleTheme` (see [Dark mode](#dark-mode-and-themes)), `debounce`.

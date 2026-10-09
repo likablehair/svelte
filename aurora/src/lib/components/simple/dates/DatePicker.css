@@ -1,0 +1,23 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--date-picker-default-width: 280px;
+		--date-picker-default-padding: 12px;
+		--date-picker-default-gap: 12px;
+		--date-picker-default-background: var(--global-color-surface-pop);
+		--date-picker-default-color: var(--global-color-text);
+		--date-picker-default-border-width: var(--global-border-width);
+		--date-picker-default-border-color: var(--global-color-border-strong);
+		--date-picker-default-border-radius: var(--global-radius-lg);
+		--date-picker-default-box-shadow: var(--global-shadow-lg);
+		--date-picker-default-title-color: var(--global-color-text);
+		--date-picker-default-title-font-family: var(--global-font-family-display);
+		--date-picker-default-title-font-size: 16px;
+		--date-picker-default-title-font-weight: 600;
+		--date-picker-default-title-letter-spacing: -0.02em;
+		--date-picker-default-title-hover-background: var(--global-color-surface-2);
+		--date-picker-default-title-border-radius: var(--global-radius-sm);
+		--date-picker-default-focus-ring-color: var(--global-focus-ring-color);
+	}
+}

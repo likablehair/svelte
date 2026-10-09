@@ -18,6 +18,7 @@ for (const { slug, id } of examples) {
 	for (const { theme, mode } of appearances) {
 		test(`${slug}/${id} ${theme} ${mode}`, async ({ page }) => {
 			await page.route(/fonts\.(googleapis|gstatic)\.com/, (route) => route.abort());
+			await page.clock.setFixedTime(new Date(2026, 8, 24, 10));
 			await page.addInitScript(
 				([theme, mode]) => {
 					if (theme !== 'aurora') localStorage.setItem('aurora-docs-theme', theme);

@@ -1,0 +1,26 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--year-selector-default-width: 100%;
+		--year-selector-default-height: auto;
+		--year-selector-default-max-height: 240px;
+		--year-selector-default-columns: 4;
+		--year-selector-default-gap: 6px;
+		--year-selector-default-padding: 8px 0;
+		--year-selector-default-border-radius: var(--global-radius-sm);
+		--year-selector-default-color: var(--global-color-text-2);
+		--year-selector-default-font-family: var(--global-font-family-mono);
+		--year-selector-default-font-size: 14px;
+		--year-selector-default-font-weight: 500;
+		--year-selector-default-background: transparent;
+		--year-selector-default-hover-background: var(--global-color-surface-2);
+		--year-selector-default-hover-color: var(--global-color-text);
+		--year-selector-default-selected-background: var(--global-fill-primary);
+		--year-selector-default-selected-color: var(--global-color-on-primary);
+		--year-selector-default-selected-box-shadow: var(--global-shadow-fill);
+		--year-selector-default-current-border-color: var(--global-color-border-strong);
+		--year-selector-default-disabled-opacity: 0.35;
+		--year-selector-default-focus-ring-color: var(--global-focus-ring-color);
+	}
+}

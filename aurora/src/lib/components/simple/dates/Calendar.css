@@ -1,0 +1,51 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--calendar-default-width: 100%;
+		--calendar-default-row-gap: 2px;
+		--calendar-default-color: var(--global-color-text);
+		--calendar-default-font-size: 13px;
+		--calendar-default-weekday-color: var(--global-color-text-3);
+		--calendar-default-weekday-font-size: 10.5px;
+		--calendar-default-weekday-font-weight: 600;
+		--calendar-default-weekday-letter-spacing: 0.08em;
+		--calendar-default-weekday-text-transform: uppercase;
+		--calendar-default-weekday-padding: 6px 0;
+		--calendar-default-day-height: 32px;
+		--calendar-default-day-width: 100%;
+		--calendar-default-day-border-radius: var(--global-radius-sm);
+		--calendar-default-day-background: transparent;
+		--calendar-default-day-hover-background: var(--global-color-surface-3);
+		--calendar-default-selected-day-background: var(--global-fill-primary);
+		--calendar-default-selected-day-color: var(--global-color-on-primary);
+		--calendar-default-selected-day-box-shadow: var(--global-shadow-fill);
+		--calendar-default-selected-day-font-weight: 600;
+		--calendar-default-range-background: var(--global-color-primary-soft);
+		--calendar-default-range-color: var(--global-color-text);
+		--calendar-default-range-preview-background: color-mix(
+			in srgb,
+			var(--global-color-primary) 8%,
+			transparent
+		);
+		--calendar-default-today-color: inherit;
+		--calendar-default-today-background: transparent;
+		--calendar-default-today-dot-color: var(--global-color-accent);
+		--calendar-default-today-dot-size: 4px;
+		--calendar-default-outside-day-opacity: 0.5;
+		--calendar-default-disabled-day-opacity: 0.35;
+		--calendar-default-focus-ring-color: var(--global-focus-ring-color);
+		--calendar-default-duration: var(--global-duration);
+		--calendar-default-easing: var(--global-ease);
+		--calendar-default-grid-background: var(--global-color-surface-solid);
+		--calendar-default-grid-border-color: var(--global-color-border);
+		--calendar-default-grid-border-radius: var(--global-radius-lg);
+		--calendar-default-grid-cell-min-height: 64px;
+		--calendar-default-grid-cell-padding: 6px;
+		--calendar-default-grid-day-size: 24px;
+		--calendar-default-grid-day-font-size: 12px;
+		--calendar-default-grid-weekday-padding: 10px;
+		--calendar-default-grid-today-background: var(--global-fill-primary);
+		--calendar-default-grid-today-color: var(--global-color-on-primary);
+	}
+}

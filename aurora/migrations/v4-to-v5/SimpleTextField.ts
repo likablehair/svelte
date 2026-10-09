@@ -161,7 +161,7 @@ export default {
 			summary:
 				'Range mode (`range` with `valueTo`, `placeholderTo`, `idTo`, `nameTo`, `inputTo`, `betweenLabel`) is removed.',
 			action:
-				'Replace the field with two SimpleTextFields in a flex row, each with its own `label` (or `aria-label`), `bind:value` (the v4 `value` and `valueTo`), `placeholder`, `name`, `id` and `bind:input`; put the `betweenLabel` text between them if still wanted. Callbacks fired by both v4 inputs must be passed to both fields. Date ranges: keep the v4 DatePickerTextField until it is ported.',
+				'Replace the field with two SimpleTextFields in a flex row, each with its own `label` (or `aria-label`), `bind:value` (the v4 `value` and `valueTo`), `placeholder`, `name`, `id` and `bind:input`; put the `betweenLabel` text between them if still wanted. Callbacks fired by both v4 inputs must be passed to both fields. Date ranges: use DatePickerTextField with `range` (start and end inputs, `selectedDate` / `selectedDateTo`).',
 			when: {
 				props: ['range', 'valueTo', 'placeholderTo', 'idTo', 'nameTo', 'inputTo', 'betweenLabel']
 			}

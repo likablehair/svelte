@@ -1,0 +1,24 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--month-selector-default-width: 100%;
+		--month-selector-default-height: auto;
+		--month-selector-default-columns: 3;
+		--month-selector-default-gap: 6px;
+		--month-selector-default-padding: 8px 0;
+		--month-selector-default-border-radius: var(--global-radius-sm);
+		--month-selector-default-color: var(--global-color-text-2);
+		--month-selector-default-font-size: 14px;
+		--month-selector-default-font-weight: 500;
+		--month-selector-default-background: transparent;
+		--month-selector-default-hover-background: var(--global-color-surface-2);
+		--month-selector-default-hover-color: var(--global-color-text);
+		--month-selector-default-selected-background: var(--global-fill-primary);
+		--month-selector-default-selected-color: var(--global-color-on-primary);
+		--month-selector-default-selected-box-shadow: var(--global-shadow-fill);
+		--month-selector-default-current-border-color: var(--global-color-border-strong);
+		--month-selector-default-disabled-opacity: 0.35;
+		--month-selector-default-focus-ring-color: var(--global-focus-ring-color);
+	}
+}

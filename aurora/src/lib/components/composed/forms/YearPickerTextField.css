@@ -1,0 +1,40 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--year-picker-text-field-default-width: 100%;
+		--year-picker-text-field-default-max-width: none;
+		--year-picker-text-field-default-gap: 6px;
+		--year-picker-text-field-default-outer-gap: 8px;
+		--year-picker-text-field-default-inner-gap: var(--global-input-gap);
+		--year-picker-text-field-default-height: var(--global-input-height);
+		--year-picker-text-field-default-padding: 0 var(--global-input-padding-x);
+		--year-picker-text-field-default-font-family: var(--global-font-family-mono);
+		--year-picker-text-field-default-font-size: var(--global-input-font-size);
+		--year-picker-text-field-default-font-weight: 400;
+		--year-picker-text-field-default-color: var(--global-input-color);
+		--year-picker-text-field-default-placeholder-color: var(--global-input-placeholder-color);
+		--year-picker-text-field-default-icon-color: var(--global-input-icon-color);
+		--year-picker-text-field-default-icon-size: 18px;
+		--year-picker-text-field-default-background: var(--global-input-background);
+		--year-picker-text-field-default-border-width: var(--global-input-border-width);
+		--year-picker-text-field-default-border-color: var(--global-input-border-color);
+		--year-picker-text-field-default-border-radius: var(--global-input-radius);
+		--year-picker-text-field-default-box-shadow: var(--global-input-shadow);
+		--year-picker-text-field-default-hover-border-color: var(--global-input-hover-border-color);
+		--year-picker-text-field-default-focus-border-color: var(--global-input-focus-border-color);
+		--year-picker-text-field-default-focus-ring-color: var(--global-input-focus-ring-color);
+		--year-picker-text-field-default-focus-ring-width: var(--global-focus-ring-width);
+		--year-picker-text-field-default-error-color: var(--global-input-error-color);
+		--year-picker-text-field-default-success-color: var(--global-input-success-color);
+		--year-picker-text-field-default-disabled-background: var(--global-input-disabled-background);
+		--year-picker-text-field-default-disabled-opacity: var(--global-input-disabled-opacity);
+		--year-picker-text-field-default-label-color: var(--global-input-label-color);
+		--year-picker-text-field-default-label-font-size: var(--global-input-label-font-size);
+		--year-picker-text-field-default-label-font-weight: var(--global-input-label-font-weight);
+		--year-picker-text-field-default-hint-color: var(--global-input-hint-color);
+		--year-picker-text-field-default-hint-font-size: var(--global-input-hint-font-size);
+		--year-picker-text-field-default-menu-width: 300px;
+		--year-picker-text-field-default-menu-padding: 8px;
+	}
+}
