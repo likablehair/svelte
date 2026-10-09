@@ -1,0 +1,19 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.theme {
+	:root[data-theme='salon'] {
+		--global-color-bg: light-dark(#faf8f3, #0d0c0a);
+		--global-color-bg-2: light-dark(#f2eee4, #15130f);
+		--global-color-surface-solid: light-dark(#fffefb, #1a1813);
+		--global-color-surface-pop: var(--global-color-surface-solid);
+		--global-color-text: light-dark(#1a1814, #f3efe6);
+		--global-color-text-2: light-dark(#5c564a, #b8b0a0);
+		--global-color-primary: light-dark(#a67c1f, #d4af37);
+		--global-color-accent: light-dark(#7a5c3e, #c9a27a);
+		--global-color-on-primary: #1a1408;
+		--global-color-primary-glow: transparent;
+		--global-radius-scale: 0.5;
+		--global-font-family-display: 'Didot', 'Bodoni MT', ui-serif, Georgia, serif;
+		--global-font-family: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+	}
+}

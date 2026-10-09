@@ -1,0 +1,21 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--dropdown-default-width: fit-content;
+		--dropdown-default-min-width: 0;
+		--dropdown-default-max-width: 100%;
+		--dropdown-default-label-color: color-mix(in oklab, currentColor 70%, transparent);
+		--dropdown-default-label-font-weight: 400;
+		--dropdown-default-placeholder-color: color-mix(in oklab, currentColor 70%, transparent);
+		--dropdown-default-chevron-color: color-mix(in oklab, currentColor 70%, transparent);
+		--dropdown-default-chevron-size: 18px;
+		--dropdown-default-menu-min-width: 220px;
+		--dropdown-default-clear-size: 22px;
+		--dropdown-default-clear-icon-size: 16px;
+		--dropdown-default-clear-border-radius: var(--global-radius-sm);
+		--dropdown-default-clear-color: color-mix(in oklab, currentColor 70%, transparent);
+		--dropdown-default-clear-hover-background: color-mix(in oklab, currentColor 12%, transparent);
+		--dropdown-default-clear-hover-color: currentColor;
+	}
+}

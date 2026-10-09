@@ -1,0 +1,46 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--alert-banner-default-width: 100%;
+		--alert-banner-default-padding: 12px 14px;
+		--alert-banner-default-gap: 12px;
+		--alert-banner-default-border-width: var(--global-border-width);
+		--alert-banner-default-border-radius: var(--global-radius-lg);
+		--alert-banner-default-box-shadow: 0 0 #0000;
+		--alert-banner-default-icon-box-size: 28px;
+		--alert-banner-default-icon-size: 16px;
+		--alert-banner-default-icon-border-radius: var(--global-radius-sm);
+		--alert-banner-default-title-color: var(--global-color-text);
+		--alert-banner-default-title-font-size: 14px;
+		--alert-banner-default-title-font-weight: 600;
+		--alert-banner-default-description-color: var(--global-color-text-2);
+		--alert-banner-default-description-font-size: 13px;
+		--alert-banner-default-line-height: 1.45;
+		--alert-banner-default-close-size: 28px;
+		--alert-banner-default-close-icon-size: 18px;
+		--alert-banner-default-close-border-radius: var(--global-radius-sm);
+		--alert-banner-default-close-color: var(--global-color-text-3);
+		--alert-banner-default-close-hover-color: var(--global-color-text);
+		--alert-banner-default-close-hover-background: color-mix(in oklab, var(--global-color-text) 8%, transparent);
+		--alert-banner-default-focus-ring-width: var(--global-focus-ring-width);
+		--alert-banner-default-focus-ring-color: var(--global-focus-ring-color);
+		--alert-banner-default-focus-ring-offset: var(--global-focus-ring-offset);
+		--alert-banner-default-info-background: var(--global-color-primary-soft);
+		--alert-banner-default-info-border-color: color-mix(in oklab, var(--global-color-primary) 30%, transparent);
+		--alert-banner-default-info-icon-background: var(--global-color-primary);
+		--alert-banner-default-info-icon-color: var(--global-color-on-primary);
+		--alert-banner-default-success-background: var(--global-color-success-soft);
+		--alert-banner-default-success-border-color: color-mix(in oklab, var(--global-color-success) 30%, transparent);
+		--alert-banner-default-success-icon-background: var(--global-color-success);
+		--alert-banner-default-success-icon-color: var(--global-color-on-success);
+		--alert-banner-default-warning-background: var(--global-color-warning-soft);
+		--alert-banner-default-warning-border-color: color-mix(in oklab, var(--global-color-warning) 30%, transparent);
+		--alert-banner-default-warning-icon-background: var(--global-color-warning);
+		--alert-banner-default-warning-icon-color: var(--global-color-on-warning);
+		--alert-banner-default-error-background: var(--global-color-error-soft);
+		--alert-banner-default-error-border-color: color-mix(in oklab, var(--global-color-error) 30%, transparent);
+		--alert-banner-default-error-icon-background: var(--global-color-error);
+		--alert-banner-default-error-icon-color: var(--global-color-on-error);
+	}
+}

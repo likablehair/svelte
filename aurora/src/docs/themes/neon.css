@@ -1,0 +1,15 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.theme {
+	:root[data-theme='neon'] {
+		--global-color-bg: light-dark(#fbf7ff, #07020f);
+		--global-color-bg-2: light-dark(#f3ebff, #0d0519);
+		--global-color-surface-solid: light-dark(#ffffff, #140a24);
+		--global-color-surface-pop: light-dark(#ffffff, #1b0f30);
+		--global-color-primary: light-dark(#c2189b, #ff2bd6);
+		--global-color-accent: light-dark(#0097a7, #00e5ff);
+		--global-color-primary-glow: color-mix(in oklab, var(--global-color-primary) 85%, transparent);
+		--global-shadow-md: 0 0 0 1px color-mix(in oklab, var(--global-color-accent) 25%, transparent), 0 12px 40px -12px var(--global-color-primary-glow);
+		--global-font-family-display: ui-monospace, monospace;
+	}
+}

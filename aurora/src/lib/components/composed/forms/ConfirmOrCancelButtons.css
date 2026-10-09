@@ -1,0 +1,11 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--confirm-or-cancel-buttons-default-gap: 12px;
+		--confirm-or-cancel-buttons-default-actions-gap: 8px;
+		--confirm-or-cancel-buttons-default-content-gap: 6px;
+		--confirm-or-cancel-buttons-default-content-color: var(--global-color-text-3);
+		--confirm-or-cancel-buttons-default-content-font-size: 13px;
+	}
+}

@@ -43,6 +43,6 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ['*.cjs', '.svelte-kit/**', 'dist/**', 'build/**'],
+    ignores: ['*.cjs', '.svelte-kit/**', 'dist/**', 'build/**', 'aurora/**'],
   },
 );

@@ -1,0 +1,20 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		accent-color: var(--global-color-primary);
+	}
+
+	body {
+		margin: 0;
+		background: var(--global-color-bg);
+		color: var(--global-color-text);
+		font-family: var(--global-font-family);
+		-webkit-font-smoothing: antialiased;
+	}
+
+	::selection {
+		background: var(--global-color-primary);
+		color: var(--global-color-on-primary);
+	}
+}

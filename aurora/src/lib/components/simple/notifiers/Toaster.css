@@ -1,0 +1,15 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--toast-default-width: 360px;
+		--toast-default-offset: 16px;
+		--toast-default-gap: 8px;
+		--toast-default-padding: 12px 14px;
+		--toast-default-background: var(--global-color-surface-pop);
+		--toast-default-border-color: var(--global-color-border-strong);
+		--toast-default-border-radius: var(--global-radius-lg);
+		--toast-default-box-shadow: var(--global-shadow-lg);
+		--toast-default-duration: var(--global-duration-slow);
+	}
+}

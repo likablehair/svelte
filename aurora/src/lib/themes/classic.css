@@ -1,0 +1,40 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.theme {
+	:root[data-theme='classic'] {
+		--global-color-bg: light-dark(rgb(247 247 248), rgb(34 37 43));
+		--global-color-bg-2: light-dark(rgb(241 242 244), rgb(43 47 54));
+		--global-color-surface: light-dark(rgb(255 255 255), rgb(43 47 54));
+		--global-color-surface-2: light-dark(rgb(232 234 237), rgb(63 69 80));
+		--global-color-surface-3: light-dark(rgb(224 226 230), rgb(81 88 103));
+		--global-color-surface-solid: light-dark(rgb(255 255 255), rgb(43 47 54));
+		--global-color-surface-pop: light-dark(rgb(255 255 255), rgb(63 69 80));
+		--global-color-border: light-dark(rgb(224 226 230), rgb(63 69 80));
+		--global-color-border-strong: light-dark(rgb(204 208 214), rgb(81 88 103));
+
+		--global-color-text: light-dark(rgb(29 32 37), rgb(241 242 244));
+		--global-color-text-2: light-dark(rgb(67 75 86), rgb(204 208 214));
+		--global-color-text-3: light-dark(rgb(105 117 134), rgb(156 163 175));
+
+		--global-color-primary: rgb(69 93 201);
+		--global-color-primary-glow: transparent;
+		--global-color-error-glow: transparent;
+		--global-color-accent: rgb(17 151 140);
+		--global-color-success: rgb(12 156 66);
+		--global-color-warning: rgb(169 112 20);
+		--global-color-error: rgb(238 37 37);
+
+		--global-gradient: linear-gradient(var(--global-color-primary), var(--global-color-primary));
+		--global-fill-gradient: var(--global-gradient);
+		--global-fill-primary: linear-gradient(var(--global-color-primary), var(--global-color-primary));
+		--global-fill-error: linear-gradient(var(--global-color-error), var(--global-color-error));
+
+		--global-shadow-sm: 0 0 #0000;
+		--global-shadow-md: 0 2px 8px rgb(0 0 0 / 0.12);
+		--global-shadow-lg: 0 8px 24px rgb(0 0 0 / 0.2);
+		--global-shadow-fill: 0 0 #0000;
+
+		--global-font-family: system-ui, sans-serif;
+		--global-font-family-display: var(--global-font-family);
+	}
+}

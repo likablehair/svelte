@@ -1,0 +1,35 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--no-data-default-height: auto;
+		--no-data-default-min-height: 200px;
+		--no-data-default-max-width: 320px;
+		--no-data-default-padding: 10px;
+		--no-data-default-gap: 18px;
+		--no-data-default-icon-box-size: 96px;
+		--no-data-default-icon-size: 40px;
+		--no-data-default-icon-color: var(--global-color-primary);
+		--no-data-default-icon-background: var(--global-gradient-soft);
+		--no-data-default-icon-border-color: var(--global-color-border-strong);
+		--no-data-default-icon-border-radius: var(--global-radius-xl);
+		--no-data-default-ring-color: var(--global-color-border-strong);
+		--no-data-default-title-color: var(--global-color-text);
+		--no-data-default-title-font-family: var(--global-font-family-display);
+		--no-data-default-title-font-size: 19px;
+		--no-data-default-title-font-weight: 600;
+		--no-data-default-description-color: var(--global-color-text-3);
+		--no-data-default-description-font-size: 13px;
+		--no-data-default-actions-gap: 18px;
+		--no-data-default-sm-min-height: 120px;
+		--no-data-default-sm-gap: 8px;
+		--no-data-default-sm-icon-size: 32px;
+		--no-data-default-sm-icon-color: var(--global-color-text-3);
+		--no-data-default-sm-title-color: var(--global-color-text-2);
+		--no-data-default-sm-title-font-family: var(--global-font-family);
+		--no-data-default-sm-title-font-size: 13px;
+		--no-data-default-sm-title-font-weight: 500;
+		--no-data-default-sm-description-font-size: 12px;
+		--no-data-default-sm-actions-gap: 12px;
+	}
+}

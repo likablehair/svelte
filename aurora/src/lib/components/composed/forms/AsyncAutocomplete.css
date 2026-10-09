@@ -1,0 +1,15 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--async-autocomplete-default-skeleton-gap: 12px;
+		--async-autocomplete-default-skeleton-row-gap: 10px;
+		--async-autocomplete-default-skeleton-avatar-size: 24px;
+		--async-autocomplete-default-skeleton-avatar-border-radius: var(--global-radius-full);
+		--async-autocomplete-default-skeleton-line-height: 10px;
+		--async-autocomplete-default-skeleton-line-border-radius: var(--global-radius-xs);
+		--async-autocomplete-default-skeleton-color: var(--global-color-surface-2);
+		--async-autocomplete-default-skeleton-highlight-color: var(--global-color-surface-3);
+		--async-autocomplete-default-skeleton-duration: 1.6s;
+	}
+}

@@ -1,0 +1,42 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--dialog-default-inset: 16px;
+		--dialog-default-backdrop-background: var(--global-color-overlay);
+		--dialog-default-backdrop-filter: blur(var(--global-overlay-blur));
+		--dialog-default-width: 100%;
+		--dialog-default-max-width: 440px;
+		--dialog-default-height: auto;
+		--dialog-default-max-height: 100%;
+		--dialog-default-padding: 20px;
+		--dialog-default-background: var(--global-color-surface-pop);
+		--dialog-default-color: var(--global-color-text);
+		--dialog-default-border-width: var(--global-border-width);
+		--dialog-default-border-color: var(--global-color-border-strong);
+		--dialog-default-border-radius: var(--global-radius-xl);
+		--dialog-default-box-shadow:
+			var(--global-shadow-lg), 0 0 80px -30px var(--global-color-primary-glow);
+		--dialog-default-header-gap: 12px;
+		--dialog-default-header-padding: 0;
+		--dialog-default-header-margin-bottom: 6px;
+		--dialog-default-title-color: var(--global-color-text);
+		--dialog-default-title-font-family: var(--global-font-family-display);
+		--dialog-default-title-font-size: 21px;
+		--dialog-default-title-font-weight: 700;
+		--dialog-default-title-line-height: 1.25;
+		--dialog-default-title-letter-spacing: -0.02em;
+		--dialog-default-body-color: var(--global-color-text-2);
+		--dialog-default-body-font-size: 14px;
+		--dialog-default-body-line-height: 1.5;
+		--dialog-default-actions-gap: 10px;
+		--dialog-default-actions-justify-content: flex-end;
+		--dialog-default-actions-padding: 0;
+		--dialog-default-actions-margin-top: 22px;
+		--dialog-default-duration: var(--global-duration-slow);
+		--dialog-default-easing: var(--global-ease-spring);
+		--dialog-default-transition-x: 0px;
+		--dialog-default-transition-y: 16px;
+		--dialog-default-transition-scale: 0.96;
+	}
+}

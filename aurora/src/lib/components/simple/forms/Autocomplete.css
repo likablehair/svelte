@@ -1,0 +1,74 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--autocomplete-default-width: 100%;
+		--autocomplete-default-max-width: none;
+		--autocomplete-default-gap: 6px;
+		--autocomplete-default-inner-gap: var(--global-input-gap);
+		--autocomplete-default-chip-gap: 6px;
+		--autocomplete-default-min-height: var(--global-input-height);
+		--autocomplete-default-padding: 4px 6px;
+		--autocomplete-default-start-padding: 6px;
+		--autocomplete-default-end-padding: 6px;
+		--autocomplete-default-font-size: var(--global-input-font-size);
+		--autocomplete-default-color: var(--global-input-color);
+		--autocomplete-default-placeholder-color: var(--global-input-placeholder-color);
+		--autocomplete-default-icon-color: var(--global-input-icon-color);
+		--autocomplete-default-icon-size: 18px;
+		--autocomplete-default-background: var(--global-input-background);
+		--autocomplete-default-border-width: var(--global-input-border-width);
+		--autocomplete-default-border-color: var(--global-input-border-color);
+		--autocomplete-default-border-radius: var(--global-input-radius);
+		--autocomplete-default-box-shadow: var(--global-input-shadow);
+		--autocomplete-default-hover-border-color: var(--global-input-hover-border-color);
+		--autocomplete-default-focus-border-color: var(--global-input-focus-border-color);
+		--autocomplete-default-focus-ring-color: var(--global-input-focus-ring-color);
+		--autocomplete-default-focus-ring-width: var(--global-focus-ring-width);
+		--autocomplete-default-error-color: var(--global-input-error-color);
+		--autocomplete-default-success-color: var(--global-input-success-color);
+		--autocomplete-default-disabled-background: var(--global-input-disabled-background);
+		--autocomplete-default-disabled-opacity: var(--global-input-disabled-opacity);
+		--autocomplete-default-label-color: var(--global-input-label-color);
+		--autocomplete-default-label-font-size: var(--global-input-label-font-size);
+		--autocomplete-default-label-font-weight: var(--global-input-label-font-weight);
+		--autocomplete-default-hint-color: var(--global-input-hint-color);
+		--autocomplete-default-hint-font-size: var(--global-input-hint-font-size);
+		--autocomplete-default-input-min-width: 60px;
+		--autocomplete-default-input-padding: 0 6px;
+		--autocomplete-default-counter-color: var(--global-color-text-3);
+		--autocomplete-default-counter-font-size: 12px;
+		--autocomplete-default-counter-font-weight: 500;
+		--autocomplete-default-spinner-size: 16px;
+		--autocomplete-default-spinner-border-width: 2px;
+		--autocomplete-default-spinner-color: var(--global-color-primary);
+
+		--autocomplete-default-menu-max-height: 300px;
+		--autocomplete-default-drawer-size: 85dvh;
+		--autocomplete-default-drawer-gap: 10px;
+		--autocomplete-default-option-spacing: 1px;
+		--autocomplete-default-option-gap: 8px;
+		--autocomplete-default-option-padding: 7px 10px;
+		--autocomplete-default-drawer-option-padding: 11px 12px;
+		--autocomplete-default-option-border-radius: var(--global-radius-sm);
+		--autocomplete-default-option-color: var(--global-color-text-2);
+		--autocomplete-default-option-font-size: 13px;
+		--autocomplete-default-drawer-option-font-size: 15px;
+		--autocomplete-default-option-icon-size: 17px;
+		--autocomplete-default-option-highlighted-background: var(--global-color-surface-2);
+		--autocomplete-default-option-highlighted-color: var(--global-color-text);
+		--autocomplete-default-option-selected-background: var(--global-color-primary-soft);
+		--autocomplete-default-option-selected-color: var(--global-color-text);
+		--autocomplete-default-option-selected-highlighted-background: color-mix(
+			in oklab,
+			var(--global-color-primary) 20%,
+			transparent
+		);
+		--autocomplete-default-check-color: var(--global-color-primary);
+		--autocomplete-default-match-color: var(--global-color-primary);
+		--autocomplete-default-match-font-weight: 700;
+		--autocomplete-default-status-padding: 9px 10px;
+		--autocomplete-default-status-color: var(--global-color-text-3);
+		--autocomplete-default-status-font-size: 13px;
+	}
+}

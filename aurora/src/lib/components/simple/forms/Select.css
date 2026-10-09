@@ -1,0 +1,66 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--select-default-width: 100%;
+		--select-default-max-width: none;
+		--select-default-gap: 6px;
+		--select-default-inner-gap: var(--global-input-gap);
+		--select-default-height: var(--global-input-height);
+		--select-default-padding-x: var(--global-input-padding-x);
+		--select-default-font-size: var(--global-input-font-size);
+		--select-default-font-weight: 400;
+		--select-default-color: var(--global-input-color);
+		--select-default-placeholder-color: var(--global-input-placeholder-color);
+		--select-default-icon-color: var(--global-input-icon-color);
+		--select-default-icon-size: 18px;
+		--select-default-background: var(--global-input-background);
+		--select-default-border-width: var(--global-input-border-width);
+		--select-default-border-color: var(--global-input-border-color);
+		--select-default-border-radius: var(--global-input-radius);
+		--select-default-box-shadow: var(--global-input-shadow);
+		--select-default-hover-border-color: var(--global-input-hover-border-color);
+		--select-default-focus-border-color: var(--global-input-focus-border-color);
+		--select-default-focus-ring-color: var(--global-input-focus-ring-color);
+		--select-default-focus-ring-width: var(--global-focus-ring-width);
+		--select-default-error-color: var(--global-input-error-color);
+		--select-default-success-color: var(--global-input-success-color);
+		--select-default-disabled-background: var(--global-input-disabled-background);
+		--select-default-disabled-opacity: var(--global-input-disabled-opacity);
+		--select-default-label-color: var(--global-input-label-color);
+		--select-default-label-font-size: var(--global-input-label-font-size);
+		--select-default-label-font-weight: var(--global-input-label-font-weight);
+		--select-default-hint-color: var(--global-input-hint-color);
+		--select-default-hint-font-size: var(--global-input-hint-font-size);
+
+		--select-default-picker-offset: 6px;
+		--select-default-picker-max-height: 300px;
+		--select-default-picker-padding: 4px;
+		--select-default-picker-background: var(--global-color-surface-pop);
+		--select-default-picker-color: var(--global-color-text);
+		--select-default-picker-border-width: var(--global-border-width);
+		--select-default-picker-border-color: var(--global-color-border-strong);
+		--select-default-picker-border-radius: var(--global-radius-lg);
+		--select-default-picker-box-shadow: var(--global-shadow-lg);
+		--select-default-picker-backdrop-filter: blur(24px);
+		--select-default-picker-duration: var(--global-duration);
+		--select-default-picker-transition-distance: 6px;
+		--select-default-option-spacing: 1px;
+		--select-default-option-gap: 8px;
+		--select-default-option-padding: 7px 10px;
+		--select-default-option-border-radius: var(--global-radius-sm);
+		--select-default-option-color: var(--global-color-text-2);
+		--select-default-option-font-size: 13px;
+		--select-default-option-icon-size: 17px;
+		--select-default-option-highlighted-background: var(--global-color-surface-2);
+		--select-default-option-highlighted-color: var(--global-color-text);
+		--select-default-option-selected-background: var(--global-color-primary-soft);
+		--select-default-option-selected-color: var(--global-color-text);
+		--select-default-option-selected-highlighted-background: color-mix(
+			in oklab,
+			var(--global-color-primary) 20%,
+			transparent
+		);
+		--select-default-check-color: var(--global-color-primary);
+	}
+}

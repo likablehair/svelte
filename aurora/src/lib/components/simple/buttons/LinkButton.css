@@ -1,0 +1,28 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--link-button-default-color: var(--global-color-text);
+		--link-button-default-hover-color: var(--link-button-default-color);
+		--link-button-default-background: transparent;
+		--link-button-default-hover-background: transparent;
+		--link-button-default-padding: 0;
+		--link-button-default-border-radius: var(--global-radius-xs);
+		--link-button-default-gap: 6px;
+		--link-button-default-font-size: inherit;
+		--link-button-default-font-weight: 500;
+		--link-button-default-line-height: inherit;
+		--link-button-default-icon-size: 1.15em;
+		--link-button-default-icon-shift: 3px;
+		--link-button-default-underline-background: var(--global-gradient);
+		--link-button-default-underline-height: 2px;
+		--link-button-default-underline-offset: 3px;
+		--link-button-default-underline-scale: 0.2;
+		--link-button-default-underline-opacity: 0.6;
+		--link-button-default-duration: var(--global-duration-slow);
+		--link-button-default-focus-ring-width: var(--global-focus-ring-width);
+		--link-button-default-focus-ring-color: var(--global-focus-ring-color);
+		--link-button-default-focus-ring-offset: var(--global-focus-ring-offset);
+		--link-button-default-disabled-opacity: 0.4;
+	}
+}

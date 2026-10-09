@@ -1,0 +1,17 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.theme {
+	:root[data-theme='coffee'] {
+		--global-color-bg: light-dark(#f5efe6, #17110d);
+		--global-color-bg-2: light-dark(#ece3d5, #1f1712);
+		--global-color-surface-solid: light-dark(#fbf7f1, #241b15);
+		--global-color-surface-pop: light-dark(#fffdf9, #2c211a);
+		--global-color-text: light-dark(#2b1d14, #f1e7dc);
+		--global-color-text-2: light-dark(#5e4a3c, #c4b2a2);
+		--global-color-primary: light-dark(#7b4a2a, #d39b6a);
+		--global-color-on-primary: light-dark(#fffaf3, #1d130c);
+		--global-color-accent: light-dark(#4d7c5a, #9cc9a6);
+		--global-radius-scale: 1.2;
+		--global-font-family-display: 'Playfair Display', ui-serif, Georgia, serif;
+	}
+}

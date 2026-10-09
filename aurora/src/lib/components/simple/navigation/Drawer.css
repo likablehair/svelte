@@ -1,0 +1,40 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--drawer-default-size: 20rem;
+		--drawer-default-max-size: 100%;
+		--drawer-default-margin: 0;
+		--drawer-default-padding: 18px 12px;
+		--drawer-default-background: var(--global-color-surface-pop);
+		--drawer-default-color: var(--global-color-text);
+		--drawer-default-border-width: var(--global-border-width);
+		--drawer-default-border-color: var(--global-color-border-strong);
+		--drawer-default-left-border-radius: 0;
+		--drawer-default-right-border-radius: 0;
+		--drawer-default-top-border-radius: 0 0 var(--global-radius-xl) var(--global-radius-xl);
+		--drawer-default-bottom-border-radius: var(--global-radius-xl) var(--global-radius-xl) 0 0;
+		--drawer-default-box-shadow: var(--global-shadow-lg);
+		--drawer-default-overflow: auto;
+		--drawer-default-backdrop-background: var(--global-color-overlay);
+		--drawer-default-backdrop-filter: blur(var(--global-overlay-blur));
+		--drawer-default-header-gap: 12px;
+		--drawer-default-header-padding: 0 6px;
+		--drawer-default-header-margin-bottom: 14px;
+		--drawer-default-title-color: var(--global-color-text);
+		--drawer-default-title-font-family: var(--global-font-family-display);
+		--drawer-default-title-font-size: 16px;
+		--drawer-default-title-font-weight: 600;
+		--drawer-default-title-line-height: 1.3;
+		--drawer-default-title-letter-spacing: -0.01em;
+		--drawer-default-body-color: var(--global-color-text);
+		--drawer-default-body-font-size: 14px;
+		--drawer-default-body-line-height: 1.5;
+		--drawer-default-actions-gap: 10px;
+		--drawer-default-actions-justify-content: flex-end;
+		--drawer-default-actions-padding: 0 6px;
+		--drawer-default-actions-margin-top: 14px;
+		--drawer-default-duration: var(--global-duration-slow);
+		--drawer-default-easing: var(--global-ease);
+	}
+}

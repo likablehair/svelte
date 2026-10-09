@@ -1,0 +1,38 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.theme {
+	:root[data-theme='high-contrast'] {
+		--global-color-bg: light-dark(#ffffff, #000000);
+		--global-color-bg-2: var(--global-color-bg);
+		--global-color-surface: var(--global-color-bg);
+		--global-color-surface-2: light-dark(#e6e6e6, #262626);
+		--global-color-surface-3: light-dark(#cccccc, #404040);
+		--global-color-surface-solid: var(--global-color-bg);
+		--global-color-surface-pop: var(--global-color-bg);
+		--global-color-text: light-dark(#000000, #ffffff);
+		--global-color-text-2: var(--global-color-text);
+		--global-color-text-3: light-dark(#333333, #cccccc);
+		--global-color-border: var(--global-color-text);
+		--global-color-border-strong: var(--global-color-text);
+		--global-color-primary: light-dark(#0030b3, #8ab4ff);
+		--global-color-on-primary: light-dark(#ffffff, #000000);
+		--global-color-error: light-dark(#b00020, #ff8a80);
+		--global-color-on-error: var(--global-color-on-primary);
+		--global-gradient: linear-gradient(var(--global-color-primary), var(--global-color-primary));
+		--global-fill-gradient: var(--global-gradient);
+		--global-fill-primary: var(--global-gradient);
+		--global-fill-error: linear-gradient(var(--global-color-error), var(--global-color-error));
+		--global-color-primary-glow: transparent;
+		--global-color-error-glow: transparent;
+		--global-shadow-sm: 0 0 #0000;
+		--global-shadow-md: 0 0 #0000;
+		--global-shadow-lg: 0 0 #0000;
+		--global-shadow-fill: 0 0 #0000;
+		--global-border-width: 2px;
+		--global-focus-ring-color: var(--global-color-text);
+		--global-focus-ring-offset: 2px;
+		--global-duration-fast: 0s;
+		--global-duration: 0s;
+		--global-duration-slow: 0s;
+	}
+}

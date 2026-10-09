@@ -1,0 +1,23 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--menu-default-width: auto;
+		--menu-default-min-width: 0;
+		--menu-default-max-width: calc(100vw - 16px);
+		--menu-default-height: auto;
+		--menu-default-max-height: calc(100dvh - 16px);
+		--menu-default-overflow: auto;
+		--menu-default-padding: 4px;
+		--menu-default-background: var(--global-color-surface-pop);
+		--menu-default-color: var(--global-color-text);
+		--menu-default-border-width: var(--global-border-width);
+		--menu-default-border-color: var(--global-color-border-strong);
+		--menu-default-border-radius: var(--global-radius-lg);
+		--menu-default-box-shadow: var(--global-shadow-lg);
+		--menu-default-backdrop-filter: blur(24px);
+		--menu-default-duration: var(--global-duration);
+		--menu-default-transition-distance: 6px;
+		--menu-default-transition-scale: 0.98;
+	}
+}

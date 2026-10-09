@@ -1,0 +1,10 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+@import 'flag-icons/css/flag-icons.min.css' layer(global.components);
+
+@layer global.base {
+	:root {
+		--flag-icon-default-size: 1.2em;
+		--flag-icon-default-border-radius: calc(var(--global-radius-xs) * 0.75);
+		--flag-icon-default-box-shadow: 0 0 0 1px var(--global-color-border);
+	}
+}

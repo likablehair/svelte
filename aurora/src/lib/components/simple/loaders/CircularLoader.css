@@ -1,0 +1,16 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--circular-loader-default-size: 32px;
+		--circular-loader-default-thickness: 10cqi;
+		--circular-loader-default-color: var(--global-gradient);
+		--circular-loader-default-track-color: var(--global-color-surface-3);
+		--circular-loader-default-duration: 0.9s;
+		--circular-loader-default-value-duration: var(--global-duration-slow);
+		--circular-loader-default-content-color: var(--global-color-text);
+		--circular-loader-default-content-font-family: var(--global-font-family-mono);
+		--circular-loader-default-content-font-size: 20cqi;
+		--circular-loader-default-content-font-weight: 500;
+	}
+}

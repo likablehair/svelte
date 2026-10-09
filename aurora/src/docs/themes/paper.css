@@ -1,0 +1,25 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.theme {
+	:root[data-theme='paper'] {
+		--global-color-bg: light-dark(#f7f5f0, #161513);
+		--global-color-bg-2: light-dark(#efece4, #1d1c19);
+		--global-color-surface-solid: light-dark(#fbfaf7, #1f1e1b);
+		--global-color-surface-pop: light-dark(#ffffff, #262522);
+		--global-color-text: light-dark(#1b1a17, #ecebe6);
+		--global-color-primary: var(--global-color-text);
+		--global-color-on-primary: light-dark(#f7f5f0, #161513);
+		--global-color-accent: light-dark(#b3261e, #ff7a70);
+		--global-gradient: linear-gradient(var(--global-color-primary), var(--global-color-primary));
+		--global-fill-gradient: var(--global-gradient);
+		--global-fill-primary: var(--global-gradient);
+		--global-color-primary-glow: transparent;
+		--global-shadow-sm: 0 0 #0000;
+		--global-shadow-md: 0 0 0 1px var(--global-color-border);
+		--global-shadow-lg: 0 0 0 1px var(--global-color-border-strong);
+		--global-shadow-fill: 0 0 #0000;
+		--global-radius-scale: 0.4;
+		--global-font-family: ui-serif, Georgia, serif;
+		--global-font-family-display: var(--global-font-family);
+	}
+}

@@ -1,0 +1,191 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		color-scheme: light dark;
+
+		--global-color-bg: light-dark(#eef2f7, #060a13);
+		--global-color-bg-2: light-dark(#e3e9f2, #0a1020);
+		--global-color-surface: light-dark(rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.035));
+		--global-color-surface-2: light-dark(rgb(12 28 64 / 0.06), rgb(255 255 255 / 0.06));
+		--global-color-surface-3: light-dark(rgb(12 28 64 / 0.11), rgb(255 255 255 / 0.09));
+		--global-color-surface-solid: light-dark(#f9fbfd, #0e1628);
+		--global-color-surface-pop: light-dark(#ffffff, #131c31);
+		--global-color-border: light-dark(rgb(12 28 64 / 0.13), rgb(255 255 255 / 0.075));
+		--global-color-border-strong: light-dark(rgb(12 28 64 / 0.24), rgb(255 255 255 / 0.14));
+
+		--global-color-text: light-dark(#0b1424, #edf2fb);
+		--global-color-text-2: light-dark(#4b5872, #a3afc6);
+		--global-color-text-3: light-dark(#5f6b84, #66728c);
+
+		--global-color-primary: light-dark(#1f5af0, #4d8dff);
+		--global-color-primary-strong: light-dark(
+			color-mix(in oklab, var(--global-color-primary), black 12%),
+			color-mix(in oklab, var(--global-color-primary), black 15%)
+		);
+		--global-color-primary-soft: light-dark(
+			color-mix(in oklab, var(--global-color-primary) 10%, transparent),
+			color-mix(in oklab, var(--global-color-primary) 14%, transparent)
+		);
+		--global-color-primary-glow: light-dark(
+			color-mix(in oklab, var(--global-color-primary) 35%, transparent),
+			color-mix(in oklab, var(--global-color-primary) 50%, transparent)
+		);
+		--global-color-on-primary: #f7faff;
+		--global-color-accent: light-dark(#0077a8, #5fd4ff);
+		--global-color-accent-soft: color-mix(in oklab, var(--global-color-accent) 12%, transparent);
+
+		--global-color-success: light-dark(#0e7a4f, #4ade9a);
+		--global-color-success-soft: light-dark(
+			color-mix(in oklab, var(--global-color-success) 10%, transparent),
+			color-mix(in oklab, var(--global-color-success) 12%, transparent)
+		);
+		--global-color-warning: light-dark(#9a5b00, #f5c451);
+		--global-color-warning-soft: light-dark(
+			color-mix(in oklab, var(--global-color-warning) 10%, transparent),
+			color-mix(in oklab, var(--global-color-warning) 12%, transparent)
+		);
+		--global-color-error: light-dark(#cf2f36, #ff5a5f);
+		--global-color-error-soft: light-dark(
+			color-mix(in oklab, var(--global-color-error) 8%, transparent),
+			color-mix(in oklab, var(--global-color-error) 12%, transparent)
+		);
+		--global-color-error-glow: color-mix(in oklab, var(--global-color-error) 60%, transparent);
+		--global-color-on-success: light-dark(#f7faff, #0b1424);
+		--global-color-on-warning: light-dark(#f7faff, #0b1424);
+		--global-color-on-error: light-dark(#f7faff, #0b1424);
+
+		--global-color-data-1: var(--global-color-primary);
+		--global-color-data-2: var(--global-color-accent);
+		--global-color-data-3: light-dark(#5b63e6, #8b93ff);
+		--global-color-data-4: light-dark(#13916a, #4ade9a);
+		--global-color-data-5: light-dark(#c77700, #f5c451);
+		--global-color-data-6: light-dark(#c2266d, #ff7eb6);
+
+		--global-gradient: linear-gradient(
+			135deg,
+			var(--global-color-primary-strong) 0%,
+			var(--global-color-primary) 50%,
+			var(--global-color-accent) 100%
+		);
+		--global-gradient-soft: linear-gradient(
+			135deg,
+			light-dark(
+				color-mix(in oklab, var(--global-color-primary) 10%, transparent),
+				color-mix(in oklab, var(--global-color-primary) 18%, transparent)
+			),
+			light-dark(
+				color-mix(in oklab, var(--global-color-accent) 8%, transparent),
+				color-mix(in oklab, var(--global-color-accent) 10%, transparent)
+			)
+		);
+		--global-fill-primary: linear-gradient(
+			180deg,
+			light-dark(var(--global-color-primary), color-mix(in oklab, var(--global-color-primary), black 15%)),
+			light-dark(var(--global-color-primary-strong), color-mix(in oklab, var(--global-color-primary), black 28%))
+		);
+		--global-fill-error: linear-gradient(
+			180deg,
+			light-dark(var(--global-color-error), color-mix(in oklab, var(--global-color-error) 86%, white)),
+			light-dark(color-mix(in oklab, var(--global-color-error), black 12%), var(--global-color-error))
+		);
+		--global-fill-gradient: linear-gradient(
+			135deg,
+			light-dark(var(--global-color-primary-strong), color-mix(in oklab, var(--global-color-primary), black 28%)) 0%,
+			light-dark(var(--global-color-primary), color-mix(in oklab, var(--global-color-primary), black 15%)) 50%,
+			light-dark(var(--global-color-accent), color-mix(in oklab, var(--global-color-accent), black 33%)) 100%
+		);
+
+		--global-radius-scale: 1;
+		--global-radius-xs: calc(4px * var(--global-radius-scale));
+		--global-radius-sm: calc(6px * var(--global-radius-scale));
+		--global-radius-md: calc(8px * var(--global-radius-scale));
+		--global-radius-lg: calc(10px * var(--global-radius-scale));
+		--global-radius-xl: calc(12px * var(--global-radius-scale));
+		--global-radius-full: 9999px;
+		--global-border-width: 1px;
+
+		--global-shadow-sm:
+			0 1px 0 light-dark(transparent, rgb(255 255 255 / 0.04)) inset,
+			0 1px 2px light-dark(rgb(12 28 64 / 0.06), rgb(0 0 0 / 0.4));
+		--global-shadow-md:
+			0 1px 0 light-dark(transparent, rgb(255 255 255 / 0.05)) inset,
+			0 12px 32px -12px light-dark(rgb(12 28 64 / 0.18), rgb(0 0 0 / 0.7)),
+			0 1px 2px light-dark(rgb(12 28 64 / 0.05), transparent);
+		--global-shadow-lg:
+			0 1px 0 light-dark(transparent, rgb(255 255 255 / 0.06)) inset,
+			0 30px 80px -20px light-dark(rgb(12 28 64 / 0.28), rgb(0 0 0 / 0.85));
+		--global-shadow-fill:
+			0 1px 0 light-dark(rgb(255 255 255 / 0.25), rgb(255 255 255 / 0.22)) inset,
+			0 1px 2px light-dark(rgb(12 28 64 / 0.18), rgb(0 0 0 / 0.3));
+		--global-focus-ring-width: 3px;
+		--global-focus-ring-offset: 0px;
+		--global-focus-ring-color: light-dark(
+			color-mix(in oklab, var(--global-color-primary) 16%, transparent),
+			color-mix(in oklab, var(--global-color-primary) 22%, transparent)
+		);
+		--global-color-overlay: light-dark(rgb(12 28 64 / 0.4), rgb(3 4 10 / 0.6));
+		--global-overlay-blur: 8px;
+
+		--global-input-height: 36px;
+		--global-input-padding-x: 12px;
+		--global-input-gap: 8px;
+		--global-input-font-size: 14px;
+		--global-input-radius: var(--global-radius-md);
+		--global-input-border-width: var(--global-border-width);
+		--global-input-background: var(--global-color-surface-solid);
+		--global-input-color: var(--global-color-text);
+		--global-input-placeholder-color: var(--global-color-text-3);
+		--global-input-icon-color: var(--global-color-text-3);
+		--global-input-border-color: var(--global-color-border-strong);
+		--global-input-hover-border-color: color-mix(
+			in oklab,
+			var(--global-color-primary) 40%,
+			var(--global-color-border-strong)
+		);
+		--global-input-focus-border-color: var(--global-color-primary);
+		--global-input-focus-ring-color: var(--global-color-primary-soft);
+		--global-input-shadow: var(--global-shadow-sm);
+		--global-input-disabled-background: var(--global-color-surface-2);
+		--global-input-disabled-opacity: 0.6;
+		--global-input-error-color: var(--global-color-error);
+		--global-input-success-color: var(--global-color-success);
+		--global-input-label-color: var(--global-color-text-2);
+		--global-input-label-font-size: 12.5px;
+		--global-input-label-font-weight: 500;
+		--global-input-hint-color: var(--global-color-text-3);
+		--global-input-hint-font-size: 12px;
+
+		--global-font-family: 'Geist', system-ui, sans-serif;
+		--global-font-family-display: 'Bricolage Grotesque', var(--global-font-family);
+		--global-font-family-mono: 'Geist Mono', ui-monospace, monospace;
+
+		--global-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+		--global-ease-spring: cubic-bezier(0.2, 0.8, 0.2, 1);
+		--global-duration-fast: 0.18s;
+		--global-duration: 0.25s;
+		--global-duration-slow: 0.4s;
+	}
+
+	:root[data-mode='light'] {
+		color-scheme: light;
+	}
+
+	:root[data-mode='dark'] {
+		color-scheme: dark;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		:root {
+			--global-duration-fast: 0s;
+			--global-duration: 0s;
+			--global-duration-slow: 0s;
+		}
+	}
+
+	:root[data-switching],
+	:root[data-switching] *,
+	:root[data-switching] *::after {
+		transition: none !important;
+	}
+}

@@ -1,0 +1,13 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--dots-loader-default-size: 9px;
+		--dots-loader-default-gap: 6px;
+		--dots-loader-default-color-1: var(--global-color-data-1);
+		--dots-loader-default-color-2: var(--global-color-data-3);
+		--dots-loader-default-color-3: var(--global-color-data-2);
+		--dots-loader-default-duration: 1.2s;
+		--dots-loader-default-dim-opacity: 0.25;
+	}
+}

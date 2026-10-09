@@ -1,0 +1,7 @@
+{
+	"extends": "$app/tsconfig",
+	"compilerOptions": {
+		"strict": true
+	},
+	"include": ["src", "tests", "migrations", "vite.config.ts", "playwright.config.ts"]
+}

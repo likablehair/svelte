@@ -1,0 +1,78 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--button-default-height: 34px;
+		--button-default-sm-height: 28px;
+		--button-default-lg-height: 40px;
+		--button-default-padding: 0 14px;
+		--button-default-sm-padding: 0 10px;
+		--button-default-lg-padding: 0 18px;
+		--button-default-font-size: 13.5px;
+		--button-default-sm-font-size: 12.5px;
+		--button-default-lg-font-size: 14.5px;
+		--button-default-border-radius: var(--global-radius-md);
+		--button-default-sm-border-radius: var(--global-radius-sm);
+		--button-default-lg-border-radius: var(--global-radius-md);
+		--button-default-icon-size: 16px;
+		--button-default-gap: 7px;
+		--button-default-spinner-border-width: 2px;
+
+		--button-default-width: auto;
+		--button-default-font-family: inherit;
+		--button-default-font-weight: 500;
+		--button-default-letter-spacing: -0.005em;
+		--button-default-border-width: var(--global-border-width);
+		--button-default-active-transform: scale(0.97);
+		--button-default-focus-ring-width: var(--global-focus-ring-width);
+		--button-default-focus-ring-color: var(--global-focus-ring-color);
+		--button-default-focus-ring-offset: var(--global-focus-ring-offset);
+		--button-default-disabled-opacity: 0.4;
+		--button-default-disabled-filter: saturate(0.3);
+
+		--button-default-primary-background: var(--global-fill-primary);
+		--button-default-primary-color: var(--global-color-on-primary);
+		--button-default-primary-border-color: transparent;
+		--button-default-primary-box-shadow:
+			var(--global-shadow-fill), 0 6px 16px -8px var(--global-color-primary-glow);
+		--button-default-primary-hover-background: var(--global-fill-primary);
+		--button-default-primary-hover-box-shadow:
+			var(--global-shadow-fill), 0 8px 22px -8px var(--global-color-primary-glow);
+		--button-default-primary-hover-filter: brightness(1.06);
+		--button-default-primary-text-color: var(--global-color-primary);
+		--button-default-primary-text-hover-background: var(--global-color-primary-soft);
+
+		--button-default-secondary-background: var(--global-color-surface-2);
+		--button-default-secondary-color: var(--global-color-text);
+		--button-default-secondary-border-color: var(--global-color-border-strong);
+		--button-default-secondary-box-shadow: var(--global-shadow-sm);
+		--button-default-secondary-hover-background: var(--global-color-surface-3);
+		--button-default-secondary-hover-box-shadow: var(--global-shadow-sm);
+		--button-default-secondary-hover-filter: none;
+		--button-default-secondary-text-color: var(--global-color-text);
+		--button-default-secondary-text-hover-background: var(--global-color-surface-2);
+
+		--button-default-danger-background: var(--global-fill-error);
+		--button-default-danger-color: var(--global-color-on-error);
+		--button-default-danger-border-color: transparent;
+		--button-default-danger-box-shadow:
+			var(--global-shadow-fill),
+			0 6px 16px -8px var(--global-color-error-glow);
+		--button-default-danger-hover-background: var(--button-default-danger-background);
+		--button-default-danger-hover-box-shadow: var(--button-default-danger-box-shadow);
+		--button-default-danger-hover-filter: brightness(1.06);
+		--button-default-danger-text-color: var(--global-color-error);
+		--button-default-danger-text-hover-background: var(--global-color-error-soft);
+
+		--button-default-gradient-background: var(--global-fill-gradient);
+		--button-default-gradient-color: var(--global-color-on-primary);
+		--button-default-gradient-border-color: transparent;
+		--button-default-gradient-box-shadow: 0 10px 30px -10px var(--global-color-primary-glow);
+		--button-default-gradient-hover-background: var(--global-fill-gradient);
+		--button-default-gradient-hover-box-shadow: 0 12px 34px -10px var(--global-color-primary-glow);
+		--button-default-gradient-hover-filter: none;
+		--button-default-gradient-text-color: var(--global-color-primary);
+		--button-default-gradient-text-hover-background: var(--global-color-primary-soft);
+		--button-default-gradient-animation-duration: 6s;
+	}
+}

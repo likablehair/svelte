@@ -1,0 +1,21 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.theme {
+	:root[data-theme='nordic'] {
+		--global-color-bg: light-dark(#eceff4, #2e3440);
+		--global-color-bg-2: light-dark(#e5e9f0, #3b4252);
+		--global-color-surface: light-dark(rgb(255 255 255 / 0.8), rgb(255 255 255 / 0.04));
+		--global-color-surface-solid: light-dark(#f5f7fa, #3b4252);
+		--global-color-surface-pop: light-dark(#ffffff, #434c5e);
+		--global-color-text: light-dark(#2e3440, #eceff4);
+		--global-color-text-2: light-dark(#4c566a, #d8dee9);
+		--global-color-primary: light-dark(#4f6f9a, #88c0d0);
+		--global-color-on-primary: light-dark(#ffffff, #2e3440);
+		--global-color-accent: #b48ead;
+		--global-color-success: light-dark(#4f7a3a, #a3be8c);
+		--global-color-warning: light-dark(#8a6100, #ebcb8b);
+		--global-color-error: #bf616a;
+		--global-color-primary-glow: transparent;
+		--global-radius-scale: 0.75;
+	}
+}

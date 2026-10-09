@@ -1,0 +1,38 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--switch-default-width: 36px;
+		--switch-default-height: 20px;
+		--switch-default-thumb-size: 16px;
+		--switch-default-lg-width: 46px;
+		--switch-default-lg-height: 26px;
+		--switch-default-lg-thumb-size: 22px;
+		--switch-default-gap: 12px;
+		--switch-default-border-width: var(--global-border-width);
+		--switch-default-border-radius: var(--global-radius-full);
+		--switch-default-border-color: var(--global-color-border-strong);
+		--switch-default-background: var(--global-color-surface-3);
+		--switch-default-box-shadow: 0 0 #0000;
+		--switch-default-hover-border-color: var(--global-color-primary);
+		--switch-default-checked-background: var(--global-fill-primary);
+		--switch-default-checked-border-color: transparent;
+		--switch-default-checked-box-shadow: var(--global-shadow-fill);
+		--switch-default-thumb-color: var(--global-color-on-primary);
+		--switch-default-checked-thumb-color: var(--global-color-on-primary);
+		--switch-default-thumb-border-radius: var(--global-radius-full);
+		--switch-default-thumb-box-shadow:
+			var(--global-shadow-sm),
+			0 2px 5px color-mix(in oklab, var(--global-color-overlay) 70%, transparent);
+		--switch-default-duration: var(--global-duration-slow);
+		--switch-default-easing: var(--global-ease-spring);
+		--switch-default-focus-ring-width: var(--global-focus-ring-width);
+		--switch-default-focus-ring-color: var(--global-focus-ring-color);
+		--switch-default-focus-ring-offset: var(--global-focus-ring-offset);
+		--switch-default-disabled-opacity: 0.4;
+		--switch-default-label-color: var(--global-color-text);
+		--switch-default-label-font-size: 14px;
+		--switch-default-label-font-weight: 400;
+		--switch-default-label-line-height: 1.5;
+	}
+}

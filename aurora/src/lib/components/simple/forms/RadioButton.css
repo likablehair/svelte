@@ -1,0 +1,39 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--radio-button-default-size: 18px;
+		--radio-button-default-gap: 10px;
+		--radio-button-default-border-width: 1.5px;
+		--radio-button-default-border-color: var(--global-color-border-strong);
+		--radio-button-default-background: var(--global-input-background);
+		--radio-button-default-box-shadow: 0 0 #0000;
+		--radio-button-default-hover-border-color: var(--global-color-primary);
+		--radio-button-default-checked-background: var(--global-fill-primary);
+		--radio-button-default-checked-border-color: transparent;
+		--radio-button-default-checked-box-shadow: var(--global-shadow-fill);
+		--radio-button-default-dot-size: 8px;
+		--radio-button-default-dot-color: var(--global-color-on-primary);
+		--radio-button-default-duration: var(--global-duration);
+		--radio-button-default-easing: var(--global-ease-spring);
+		--radio-button-default-focus-ring-width: var(--global-focus-ring-width);
+		--radio-button-default-focus-ring-color: var(--global-focus-ring-color);
+		--radio-button-default-focus-ring-offset: var(--global-focus-ring-offset);
+		--radio-button-default-disabled-opacity: 0.4;
+		--radio-button-default-label-color: var(--global-color-text);
+		--radio-button-default-label-font-size: 14px;
+		--radio-button-default-label-font-weight: 400;
+		--radio-button-default-label-line-height: 1.5;
+		--radio-button-default-description-color: var(--global-color-text-3);
+		--radio-button-default-description-font-size: 12px;
+		--radio-button-default-card-padding: 12px 14px;
+		--radio-button-default-card-border-width: var(--global-border-width);
+		--radio-button-default-card-border-color: var(--global-color-border);
+		--radio-button-default-card-border-radius: var(--global-radius-lg);
+		--radio-button-default-card-background: var(--global-color-surface-solid);
+		--radio-button-default-card-box-shadow: 0 0 #0000;
+		--radio-button-default-card-hover-border-color: var(--global-color-border-strong);
+		--radio-button-default-card-checked-border-color: var(--global-color-primary);
+		--radio-button-default-card-checked-background: var(--global-color-primary-soft);
+	}
+}

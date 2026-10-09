@@ -1,0 +1,110 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--chip-default-height: 26px;
+		--chip-default-sm-height: 22px;
+		--chip-default-padding: 0 10px;
+		--chip-default-sm-padding: 0 8px;
+		--chip-default-font-size: 12.5px;
+		--chip-default-sm-font-size: 12px;
+		--chip-default-icon-size: 15px;
+		--chip-default-sm-icon-size: 14px;
+		--chip-default-gap: 6px;
+		--chip-default-max-width: 100%;
+		--chip-default-font-family: inherit;
+		--chip-default-font-weight: 500;
+		--chip-default-border-width: var(--global-border-width);
+		--chip-default-border-radius: var(--global-radius-sm);
+		--chip-default-hover-transform: translateY(-1px);
+		--chip-default-focus-ring-width: var(--global-focus-ring-width);
+		--chip-default-focus-ring-color: var(--global-focus-ring-color);
+		--chip-default-focus-ring-offset: var(--global-focus-ring-offset);
+		--chip-default-disabled-opacity: 0.4;
+
+		--chip-default-close-size: 18px;
+		--chip-default-close-margin-end: 4px;
+		--chip-default-close-border-radius: var(--global-radius-full);
+		--chip-default-close-focus-ring-offset: 0px;
+		--chip-default-close-icon-size: 14px;
+		--chip-default-close-color: color-mix(in oklab, currentColor 70%, transparent);
+		--chip-default-close-hover-color: currentColor;
+		--chip-default-close-hover-background: color-mix(in oklab, currentColor 14%, transparent);
+
+		--chip-default-neutral-background: var(--global-color-surface-2);
+		--chip-default-neutral-color: var(--global-color-text);
+		--chip-default-neutral-border-color: var(--global-color-border);
+		--chip-default-neutral-hover-border-color: var(--global-color-border-strong);
+		--chip-default-neutral-box-shadow: 0 0 #0000;
+
+		--chip-default-primary-background: var(--global-color-primary-soft);
+		--chip-default-primary-color: var(--global-color-primary);
+		--chip-default-primary-border-color: color-mix(
+			in oklab,
+			var(--global-color-primary) 30%,
+			transparent
+		);
+		--chip-default-primary-hover-border-color: color-mix(
+			in oklab,
+			var(--global-color-primary) 55%,
+			transparent
+		);
+		--chip-default-primary-box-shadow: 0 0 #0000;
+
+		--chip-default-accent-background: var(--global-color-accent-soft);
+		--chip-default-accent-color: var(--global-color-accent);
+		--chip-default-accent-border-color: color-mix(
+			in oklab,
+			var(--global-color-accent) 30%,
+			transparent
+		);
+		--chip-default-accent-hover-border-color: color-mix(
+			in oklab,
+			var(--global-color-accent) 55%,
+			transparent
+		);
+		--chip-default-accent-box-shadow: 0 0 #0000;
+
+		--chip-default-success-background: var(--global-color-success-soft);
+		--chip-default-success-color: var(--global-color-success);
+		--chip-default-success-border-color: transparent;
+		--chip-default-success-hover-border-color: color-mix(
+			in oklab,
+			var(--global-color-success) 40%,
+			transparent
+		);
+		--chip-default-success-box-shadow: 0 0 #0000;
+
+		--chip-default-warning-background: var(--global-color-warning-soft);
+		--chip-default-warning-color: var(--global-color-warning);
+		--chip-default-warning-border-color: transparent;
+		--chip-default-warning-hover-border-color: color-mix(
+			in oklab,
+			var(--global-color-warning) 40%,
+			transparent
+		);
+		--chip-default-warning-box-shadow: 0 0 #0000;
+
+		--chip-default-error-background: var(--global-color-error-soft);
+		--chip-default-error-color: var(--global-color-error);
+		--chip-default-error-border-color: transparent;
+		--chip-default-error-hover-border-color: color-mix(
+			in oklab,
+			var(--global-color-error) 40%,
+			transparent
+		);
+		--chip-default-error-box-shadow: 0 0 #0000;
+
+		--chip-default-filled-background: var(--global-fill-gradient);
+		--chip-default-filled-color: var(--global-color-on-primary);
+		--chip-default-filled-border-color: transparent;
+		--chip-default-filled-hover-border-color: transparent;
+		--chip-default-filled-box-shadow: 0 6px 16px -6px var(--global-color-primary-glow);
+
+		--chip-default-selected-background: var(--chip-default-filled-background);
+		--chip-default-selected-color: var(--chip-default-filled-color);
+		--chip-default-selected-border-color: var(--chip-default-filled-border-color);
+		--chip-default-selected-hover-border-color: var(--chip-default-filled-hover-border-color);
+		--chip-default-selected-box-shadow: var(--chip-default-filled-box-shadow);
+	}
+}

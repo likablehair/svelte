@@ -1,0 +1,43 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--textarea-default-width: 100%;
+		--textarea-default-max-width: none;
+		--textarea-default-gap: 6px;
+		--textarea-default-inner-gap: var(--global-input-gap);
+		--textarea-default-padding: 9px var(--global-input-padding-x);
+		--textarea-default-height: auto;
+		--textarea-default-min-height: 1lh;
+		--textarea-default-max-height: none;
+		--textarea-default-resize: vertical;
+		--textarea-default-font-family: inherit;
+		--textarea-default-font-size: var(--global-input-font-size);
+		--textarea-default-font-weight: 400;
+		--textarea-default-line-height: 1.55;
+		--textarea-default-color: var(--global-input-color);
+		--textarea-default-placeholder-color: var(--global-input-placeholder-color);
+		--textarea-default-icon-size: 18px;
+		--textarea-default-background: var(--global-input-background);
+		--textarea-default-border-width: var(--global-input-border-width);
+		--textarea-default-border-color: var(--global-input-border-color);
+		--textarea-default-border-radius: var(--global-input-radius);
+		--textarea-default-box-shadow: var(--global-input-shadow);
+		--textarea-default-hover-border-color: var(--global-input-hover-border-color);
+		--textarea-default-focus-border-color: var(--global-input-focus-border-color);
+		--textarea-default-focus-ring-color: var(--global-input-focus-ring-color);
+		--textarea-default-focus-ring-width: var(--global-focus-ring-width);
+		--textarea-default-error-color: var(--global-input-error-color);
+		--textarea-default-success-color: var(--global-input-success-color);
+		--textarea-default-disabled-background: var(--global-input-disabled-background);
+		--textarea-default-disabled-opacity: var(--global-input-disabled-opacity);
+		--textarea-default-label-color: var(--global-input-label-color);
+		--textarea-default-label-font-size: var(--global-input-label-font-size);
+		--textarea-default-label-font-weight: var(--global-input-label-font-weight);
+		--textarea-default-hint-color: var(--global-input-hint-color);
+		--textarea-default-hint-font-size: var(--global-input-hint-font-size);
+		--textarea-default-counter-color: var(--global-input-hint-color);
+		--textarea-default-counter-font-size: 11px;
+		--textarea-default-counter-font-family: var(--global-font-family-mono);
+	}
+}

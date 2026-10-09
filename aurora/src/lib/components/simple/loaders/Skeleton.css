@@ -1,0 +1,17 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--skeleton-default-width: 100%;
+		--skeleton-default-height: 100%;
+		--skeleton-default-min-height: 1em;
+		--skeleton-default-size: 40px;
+		--skeleton-default-border-radius: var(--global-radius-xs);
+		--skeleton-default-background: var(--global-color-surface-2);
+		--skeleton-default-highlight-color: var(--global-color-surface-3);
+		--skeleton-default-duration: 1.6s;
+		--skeleton-default-line-height: 0.75em;
+		--skeleton-default-line-gap: 0.65em;
+		--skeleton-default-last-line-width: 60%;
+	}
+}

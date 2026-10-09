@@ -1,0 +1,29 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--checkbox-default-size: 18px;
+		--checkbox-default-gap: 10px;
+		--checkbox-default-border-width: 1.5px;
+		--checkbox-default-border-radius: var(--global-radius-xs);
+		--checkbox-default-border-color: var(--global-color-border-strong);
+		--checkbox-default-background: var(--global-input-background);
+		--checkbox-default-box-shadow: 0 0 #0000;
+		--checkbox-default-hover-border-color: var(--global-color-primary);
+		--checkbox-default-checked-background: var(--global-fill-primary);
+		--checkbox-default-checked-border-color: transparent;
+		--checkbox-default-checked-box-shadow: var(--global-shadow-fill);
+		--checkbox-default-mark-color: var(--global-color-on-primary);
+		--checkbox-default-mark-thickness: 2px;
+		--checkbox-default-duration: var(--global-duration);
+		--checkbox-default-easing: var(--global-ease-spring);
+		--checkbox-default-focus-ring-width: var(--global-focus-ring-width);
+		--checkbox-default-focus-ring-color: var(--global-focus-ring-color);
+		--checkbox-default-focus-ring-offset: var(--global-focus-ring-offset);
+		--checkbox-default-disabled-opacity: 0.4;
+		--checkbox-default-label-color: var(--global-color-text);
+		--checkbox-default-label-font-size: 14px;
+		--checkbox-default-label-font-weight: 400;
+		--checkbox-default-label-line-height: 1.5;
+	}
+}

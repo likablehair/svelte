@@ -1,0 +1,21 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.theme {
+	:root[data-theme='corporate'] {
+		--global-color-primary: light-dark(#0f62fe, #4589ff);
+		--global-color-accent: light-dark(#0072c3, #33b1ff);
+		--global-color-bg: light-dark(#f4f4f4, #161616);
+		--global-color-bg-2: light-dark(#ffffff, #262626);
+		--global-gradient: linear-gradient(var(--global-color-primary), var(--global-color-primary));
+		--global-fill-gradient: var(--global-gradient);
+		--global-fill-primary: var(--global-gradient);
+		--global-fill-error: linear-gradient(var(--global-color-error), var(--global-color-error));
+		--global-color-primary-glow: transparent;
+		--global-color-error-glow: transparent;
+		--global-radius-scale: 0.25;
+		--global-shadow-fill: 0 0 #0000;
+		--global-font-family: 'IBM Plex Sans', system-ui, sans-serif;
+		--global-font-family-display: var(--global-font-family);
+		--global-duration: 0.12s;
+	}
+}
