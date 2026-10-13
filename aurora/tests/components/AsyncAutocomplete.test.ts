@@ -4,6 +4,7 @@ import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import AsyncAutocomplete from '#lib/components/composed/forms/AsyncAutocomplete.svelte';
 import type { Item } from '#lib/components/simple/forms/item.js';
+import { renderWithDefaultLocale } from '../helpers.js';
 
 const CLIENTS = ['Giulia Marini', 'Marco Rossi', 'Martina Galli', 'Sara Bianchi', 'Marta Romano'];
 
@@ -376,5 +377,43 @@ describe('AsyncAutocomplete', () => {
 		await screen.unmount();
 		await new Promise((resolve) => setTimeout(resolve));
 		expect(onerror).not.toHaveBeenCalled();
+	});
+});
+
+describe('AsyncAutocomplete texts', () => {
+	test('follow locale, also in the Autocomplete inside, and a text prop wins', async () => {
+		const italian = await render(AsyncAutocomplete, { label: 'Cliente', searcher: instant(), locale: 'it' });
+		await italian.getByRole('combobox').click();
+		await expect.element(italian.getByRole('status')).toHaveTextContent('Scrivi almeno 2 caratteri');
+		await italian.unmount();
+		const one = await render(AsyncAutocomplete, {
+			label: 'Cliente',
+			searcher: instant(),
+			searchThreshold: 1,
+			locale: 'it',
+			multiple: true,
+			values: [{ value: 'Marco Rossi', label: 'Marco Rossi' }]
+		});
+		await expect.element(one.getByRole('button', { name: 'Rimuovi Marco Rossi' })).toBeInTheDocument();
+		await one.getByRole('combobox').click();
+		await expect.element(one.getByRole('status')).toHaveTextContent('Scrivi almeno 1 carattere');
+		await one.unmount();
+		const own = await render(AsyncAutocomplete, { label: 'Cliente', searcher: instant(), locale: 'it', thresholdText: 'Continua' });
+		await own.getByRole('combobox').click();
+		await expect.element(own.getByRole('status')).toHaveTextContent('Continua');
+	});
+
+	test('follow setDefaultLocale, and the locale prop wins over it', async () => {
+		const inherited = await renderWithDefaultLocale('it', AsyncAutocomplete, {
+			label: 'Cliente',
+			searcher: () => Promise.reject(new Error('offline')),
+			searchThreshold: 0
+		});
+		await inherited.getByRole('combobox').click();
+		await expect.element(inherited.getByRole('status')).toHaveTextContent('Impossibile caricare i risultati');
+		await inherited.unmount();
+		const own = await renderWithDefaultLocale('it', AsyncAutocomplete, { label: 'Client', searcher: instant(), locale: 'en' });
+		await own.getByRole('combobox').click();
+		await expect.element(own.getByRole('status')).toHaveTextContent('Type at least 2 characters');
 	});
 });

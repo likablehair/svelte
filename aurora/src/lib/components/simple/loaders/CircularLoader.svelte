@@ -6,21 +6,37 @@ Circular loader. Without `value` it is a spinning ring that says something is lo
 	import './CircularLoader.css';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import { libraryTexts } from '../../../utils/texts.js';
 
 	interface Props extends Omit<HTMLAttributes<HTMLSpanElement>, 'class' | 'children'> {
 		/** Progress, from 0 to `total`. Without it the loader spins (indeterminate). */
 		value?: number;
 		/** Value that fills the ring. With `0` the ring is full. */
 		total?: number;
-		/** Accessible name. An empty string makes the loader decorative (hidden from screen readers). */
+		/** Accessible name. An empty string makes the loader decorative (hidden from screen readers). Defaults to "Loading", in the language of `locale`. */
 		label?: string;
+		/** BCP 47 locale of the texts: `it` and `en` are built in, other languages fall back to English. Defaults to the one set with `setDefaultLocale`, else `en`. */
+		locale?: string;
 		/** Extra classes on the root element. */
 		class?: string;
 		/** Content in the middle of the ring, for example the percentage. Receives the value, the total and the percentage (0–100). */
 		children?: Snippet<[{ value: number | undefined; total: number; percent: number }]>;
 	}
 
-	let { value, total = 100, label = 'Loading', class: clazz = '', children, ...rest }: Props = $props();
+	let {
+		value,
+		total = 100,
+		label: labelProp,
+		locale: localeProp,
+		class: clazz = '',
+		children,
+		...rest
+	}: Props = $props();
+
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
+	let label = $derived(labelProp ?? libraryTexts(locale).circularLoader.label);
 
 	let indeterminate = $derived(value === undefined);
 	let percent = $derived(

@@ -101,9 +101,9 @@ export default {
 		{
 			id: 'countries-autocomplete-names',
 			summary:
-				'Country names come from the browser (`Intl.DisplayNames`) in `locale` (default `en`) and the list is sorted by name in that language; v4 had fixed English ISO names sorted by code. In English 48 of the 249 names differ (for example "Czech Republic" → "Czechia").',
+				'Country names come from the browser (`Intl.DisplayNames`) in `locale` (default: the one of `setDefaultLocale`, else `en`) and the list is sorted by name in that language; v4 had fixed English ISO names sorted by code. In English 48 of the 249 names differ (for example "Czech Republic" → "Czechia").',
 			action:
-				'Pass `locale` (for example `"it"`) where the app shows Italian. Store and compare the ISO code (`value`), never the label: code that matched hard-coded v4 names breaks.'
+				'Italian apps call `setDefaultLocale("it")` in the root layout (step `global-default-locale`) or pass `locale="it"`; the texts of the field (chip remove buttons, empty list) follow the same locale. Store and compare the ISO code (`value`), never the label: code that matched hard-coded v4 names breaks.'
 		},
 		{
 			id: 'countries-autocomplete-value-labels',

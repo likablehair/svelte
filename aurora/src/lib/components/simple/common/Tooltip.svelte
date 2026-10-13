@@ -118,7 +118,7 @@ Short description of an element, shown on hover after `appearTimeout` and right 
 		};
 		const onFocusOut = () => {
 			clearTimers();
-			open = false;
+			if (open) queueMicrotask(() => (open = false));
 		};
 
 		element.addEventListener('pointerenter', onPointerEnter);

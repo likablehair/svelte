@@ -10,6 +10,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"test": "vitest run",
 		"test:watch": "vitest",
+		"test:related": "vitest related --run",
 		"test:visual": "playwright test",
 		"test:visual:update": "playwright test --update-snapshots"
 	},

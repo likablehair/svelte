@@ -7,6 +7,8 @@ Compact label for tags, statuses, filters and selections, with seven color varia
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import Icon from '../media/Icon.svelte';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import { libraryTexts } from '../../../utils/texts.js';
 
 	const CLOSE_ICON =
 		'M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z';
@@ -26,8 +28,10 @@ Compact label for tags, statuses, filters and selections, with seven color varia
 		closable?: boolean;
 		/** SVG path of the close button icon. Defaults to the MDI `close` icon. */
 		closeIcon?: string;
-		/** Accessible name of the close button. */
+		/** Accessible name of the close button. Defaults to "Remove", in the language of `locale`. */
 		closeLabel?: string;
+		/** BCP 47 locale of the texts: `it` and `en` are built in, other languages fall back to English. Defaults to the one set with `setDefaultLocale`, else `en`. */
+		locale?: string;
 		/** Native `tabindex` of the chip button and of the close button: `-1` keeps both out of the tab order. */
 		tabindex?: number;
 		/** Called on click. With it the chip content becomes a native `<button>`. */
@@ -52,7 +56,8 @@ Compact label for tags, statuses, filters and selections, with seven color varia
 		prependIcon,
 		closable = false,
 		closeIcon = CLOSE_ICON,
-		closeLabel = 'Remove',
+		closeLabel,
+		locale: localeProp,
 		tabindex,
 		onclick,
 		onclose,
@@ -63,6 +68,10 @@ Compact label for tags, statuses, filters and selections, with seven color varia
 		closeSnippet,
 		...rest
 	}: Props = $props();
+
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
+	let texts = $derived(libraryTexts(locale).chip);
 
 	function close(event: MouseEvent) {
 		onclose?.(event);
@@ -97,12 +106,12 @@ Compact label for tags, statuses, filters and selections, with seven color varia
 	{#if closeSnippet || closable}
 		<span class="aurora-chip-end">
 			{#if closeSnippet}
-				{@render closeSnippet({ close, closeLabel })}
+				{@render closeSnippet({ close, closeLabel: closeLabel ?? texts.remove })}
 			{:else}
 				<button
 					type="button"
 					class="aurora-chip-close"
-					aria-label={closeLabel}
+					aria-label={closeLabel ?? texts.remove}
 					{disabled}
 					{tabindex}
 					onclick={close}

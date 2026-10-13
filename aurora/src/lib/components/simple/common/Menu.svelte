@@ -1,5 +1,5 @@
 <!-- @component
-Floating surface anchored to an `activator`, for dropdowns, autocompletes, pickers, action and context menus. It opens on the browser's top layer (`popover`), so it is never clipped by `overflow` containers and needs no z-index. It flips and shifts to stay in the viewport and follows the activator wherever it moves. It closes on outside click (the activator excluded) and on Escape, which returns focus to the activator. Opening a menu closes the other open menus, except nested ones and those with `closeOnClickOutside={false}`. The content decides the role (`role="menu"`, `role="listbox"`, ...). The current side is exposed as `data-side` on the menu element.
+Floating surface anchored to an `activator`, for dropdowns, autocompletes, pickers, action and context menus. It opens on the browser's top layer (`popover`), so it is never clipped by `overflow` containers and needs no z-index. It flips and shifts to stay in the viewport and follows the activator wherever it moves. It closes on outside click (the activator excluded) and on Escape, which returns focus to the activator; with menus open inside it, a click outside closes only the innermost one, one level per click, as Escape does. Opening a menu closes the other open menus, except nested ones and those with `closeOnClickOutside={false}`. The content decides the role (`role="menu"`, `role="listbox"`, ...). The current side is exposed as `data-side` on the menu element.
 -->
 <script lang="ts">
 	import '../../../css/tokens.css';
@@ -98,11 +98,12 @@ Floating surface anchored to an `activator`, for dropdowns, autocompletes, picke
 			if (!dismissOnOutside) return;
 			const target = event.target as Node;
 			if (menu.contains(target) || anchorElement?.contains(target)) return;
+			if (menu.querySelector('.aurora-menu:popover-open:not([data-closing])')) return;
 			open = false;
 		};
 		const onKeyDown = (event: KeyboardEvent) => {
 			if (event.key !== 'Escape' || event.defaultPrevented) return;
-			if (menu.querySelector(':popover-open')) return;
+			if (menu.querySelector(':popover-open:not([data-closing])')) return;
 			event.preventDefault();
 			if (menu.contains(document.activeElement) && anchorElement instanceof HTMLElement)
 				anchorElement.focus();
@@ -120,7 +121,10 @@ Floating surface anchored to an `activator`, for dropdowns, autocompletes, picke
 		document.addEventListener('keydown', onKeyDown);
 		document.addEventListener('aurora:menu-open', onOtherMenuOpen);
 
+		delete menu.dataset.closing;
+
 		return () => {
+			menu.dataset.closing = '';
 			stopFollowing();
 			document.removeEventListener('pointerdown', onPointerDown, true);
 			document.removeEventListener('keydown', onKeyDown);

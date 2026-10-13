@@ -4,6 +4,7 @@ import { render } from 'vitest-browser-svelte';
 import CountriesAutocomplete from '#lib/components/composed/forms/CountriesAutocomplete.svelte';
 import { countryItems } from '#lib/utils/countries.js';
 import BoundValues from '../fixtures/countries-autocomplete/BoundValues.svelte';
+import { renderWithDefaultLocale, tooltipText } from '../helpers.js';
 
 const france = { value: 'FR', label: 'Francia', data: { dialCode: '+33' } };
 const italy = { value: 'IT', label: 'Italia', data: { dialCode: '+39' } };
@@ -86,7 +87,7 @@ describe('CountriesAutocomplete', () => {
 		expect(chip.element().closest('.aurora-chip')?.querySelector('.fi.fi-it')).not.toBeNull();
 		await screen.rerender({ locale: 'it' });
 		await expect
-			.element(screen.getByRole('button', { name: 'Remove Italia' }))
+			.element(screen.getByRole('button', { name: 'Rimuovi Italia' }))
 			.toBeInTheDocument();
 	});
 
@@ -213,7 +214,7 @@ describe('CountriesAutocomplete', () => {
 		container.append(document.createElement('button'));
 		const input = screen.getByRole('combobox');
 		await expect.element(input).toHaveAttribute('placeholder', 'Search a country');
-		await expect.element(screen.getByText('+1')).toHaveAttribute('title', 'France');
+		await expect.poll(() => tooltipText(screen.getByText('+1').element())).toBe('France');
 		await input.click();
 		expect(onfocus.mock.calls[0][0]).toBeInstanceOf(FocusEvent);
 		await userEvent.keyboard('spa{Enter}');
@@ -225,5 +226,25 @@ describe('CountriesAutocomplete', () => {
 		expect(onblur).toHaveBeenCalledOnce();
 		expect(onblur.mock.calls[0][0]).toBeInstanceOf(FocusEvent);
 		container.remove();
+	});
+});
+
+describe('CountriesAutocomplete texts', () => {
+	test('setDefaultLocale gives the names and the texts; the locale prop wins over it', async () => {
+		const props = { label: 'Paesi', multiple: true, values: [{ value: 'DE' }] };
+		const inherited = await renderWithDefaultLocale('it', CountriesAutocomplete, props);
+		await expect.element(inherited.getByRole('button', { name: 'Rimuovi Germania' })).toBeInTheDocument();
+		await inherited.unmount();
+		const own = await renderWithDefaultLocale('it', CountriesAutocomplete, { ...props, locale: 'en' });
+		await expect.element(own.getByRole('button', { name: 'Remove Germany' })).toBeInTheDocument();
+	});
+
+	test('locale gives Italian texts, and a text prop wins', async () => {
+		const props = { label: 'Paesi', multiple: true, values: [{ value: 'DE' }], locale: 'it' };
+		const italian = await render(CountriesAutocomplete, props);
+		await expect.element(italian.getByRole('button', { name: 'Rimuovi Germania' })).toBeInTheDocument();
+		await italian.unmount();
+		const own = await render(CountriesAutocomplete, { ...props, removeLabel: 'Togli' });
+		await expect.element(own.getByRole('button', { name: 'Togli Germania' })).toBeInTheDocument();
 	});
 });

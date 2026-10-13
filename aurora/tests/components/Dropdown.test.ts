@@ -4,6 +4,7 @@ import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import Dropdown from '#lib/components/composed/forms/Dropdown.svelte';
 import type { Item } from '#lib/components/simple/forms/item.js';
+import { renderWithDefaultLocale } from '../helpers.js';
 
 const orders: Item[] = [
 	{ value: 'recent', label: 'Newest' },
@@ -384,5 +385,29 @@ describe('Dropdown', () => {
 		} finally {
 			await page.viewport(1280, 800);
 		}
+	});
+});
+
+describe('Dropdown texts', () => {
+	test('follow locale, and a text prop wins', async () => {
+		const italian = await render(Dropdown, { items: statuses, multiple: true, locale: 'it' });
+		expect(valueText(italian.container)).toBe('Seleziona');
+		await italian.unmount();
+		const selected = await render(Dropdown, { items: statuses, multiple: true, values: [statuses[0], statuses[1]], locale: 'it' });
+		expect(valueText(selected.container)).toBe('2 selezionati');
+		await expect.element(selected.getByRole('button', { name: 'Cancella la selezione' })).toBeVisible();
+		await selected.unmount();
+		const own = await render(Dropdown, { items: statuses, locale: 'it', placeholder: 'Stato' });
+		expect(valueText(own.container)).toBe('Stato');
+	});
+
+	test('follow setDefaultLocale, and the locale prop wins over it', async () => {
+		const props = { items: statuses, multiple: true, values: [statuses[0], statuses[1]] };
+		const inherited = await renderWithDefaultLocale('it', Dropdown, props);
+		expect(valueText(inherited.container)).toBe('2 selezionati');
+		await inherited.unmount();
+		const own = await renderWithDefaultLocale('it', Dropdown, { ...props, locale: 'en' });
+		expect(valueText(own.container)).toBe('2 selected');
+		await expect.element(own.getByRole('button', { name: 'Clear selection' })).toBeVisible();
 	});
 });

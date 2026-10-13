@@ -218,8 +218,9 @@ main {
 .stage {
 	display: flex;
 	flex-wrap: wrap;
+	align-content: flex-start;
 	align-items: center;
-	justify-content: center;
+	justify-content: flex-start;
 	gap: 12px;
 	padding: 24px;
 	min-height: 150px;

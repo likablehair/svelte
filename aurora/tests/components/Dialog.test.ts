@@ -7,7 +7,7 @@ import NestedExample from '../../src/docs/examples/dialog/03-persistent.svelte';
 import LightboxExample from '../../src/docs/examples/dialog/04-lightbox.svelte';
 import DialogWithMenu from '../fixtures/dialog/DialogWithMenu.svelte';
 import ModalHarness from '../fixtures/dialog/ModalHarness.svelte';
-import { snippet, text } from '../helpers.js';
+import { renderWithDefaultLocale, snippet, text } from '../helpers.js';
 
 const pause = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -290,5 +290,25 @@ describe('Dialog', () => {
 		expect(body?.textContent).toBe('Gone for good');
 		const footer = element.querySelector('footer.aurora-dialog-actions.app-actions');
 		expect(footer?.querySelector('button')?.textContent).toBe('Confirm');
+	});
+});
+
+describe('Dialog texts', () => {
+	test('follow locale, and closeLabel wins', async () => {
+		const props = { open: true, title: 'Cliente', closable: true, locale: 'it' };
+		const italian = await render(Dialog, props);
+		await expect.element(italian.getByRole('button', { name: 'Chiudi' })).toBeVisible();
+		await italian.unmount();
+		const own = await render(Dialog, { ...props, closeLabel: 'Esci' });
+		await expect.element(own.getByRole('button', { name: 'Esci' })).toBeVisible();
+	});
+
+	test('follow setDefaultLocale, and the locale prop wins over it', async () => {
+		const props = { open: true, title: 'Cliente', closable: true };
+		const inherited = await renderWithDefaultLocale('it', Dialog, props);
+		await expect.element(inherited.getByRole('button', { name: 'Chiudi' })).toBeVisible();
+		await inherited.unmount();
+		const own = await renderWithDefaultLocale('it', Dialog, { ...props, locale: 'en' });
+		await expect.element(own.getByRole('button', { name: 'Close' })).toBeVisible();
 	});
 });

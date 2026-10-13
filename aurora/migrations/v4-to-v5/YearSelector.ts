@@ -117,6 +117,7 @@ export default {
 	],
 	added: [
 		'`min`, `max`.',
+		'`locale` (BCP 47): language of the default texts, Italian with `it`, English otherwise; without it the one of `setDefaultLocale` (step `global-default-locale`), else `en`. Text props win over it.',
 		'`focus()` method, `bind:yearSelectorElement`, native attributes on the grid.',
 		'`data-disabled` on the grid; `data-selected`, `data-current` on the years.',
 		'`--year-selector-*` variables for columns, gap, padding, font, colors, selected, current, hover, disabled and focus ring.'

@@ -161,15 +161,38 @@ export function formatDate(date: Date, format: string): string {
 
 const isDigit = (char: string) => char >= '0' && char <= '9';
 
+export type MaskPart = { length: number; limit?: number } | { literal: string };
+
+const DATE_LIMITS: Record<'day' | 'month' | 'year', number | undefined> = {
+	day: 3,
+	month: 1,
+	year: undefined
+};
+
+export function dateMaskParts(format: string): MaskPart[] {
+	return parseFormat(format).map((part) =>
+		part.type === 'literal'
+			? { literal: part.value }
+			: { length: part.length, limit: DATE_LIMITS[part.type] }
+	);
+}
+
 export function maskInput(
 	raw: string,
 	format: string,
 	caret = raw.length
 ): { text: string; caret: number } {
-	const parts = parseFormat(format);
-	const fields = parts.filter((part) => part.type !== 'literal');
+	return maskParts(raw, dateMaskParts(format), caret);
+}
+
+export function maskParts(
+	raw: string,
+	parts: MaskPart[],
+	caret = raw.length
+): { text: string; caret: number } {
+	const fields = parts.filter((part) => !('literal' in part));
 	const literals = parts.flatMap((part, index) =>
-		part.type === 'literal' && index > 0 ? [part.value] : []
+		'literal' in part && index > 0 ? [part.literal] : []
 	);
 	const groups: { digits: string; start: number; closed: boolean }[] = [];
 	for (const token of raw.matchAll(/\d+|\D+/g)) {
@@ -191,14 +214,14 @@ export function maskInput(
 	let index = 0;
 	let carry: { digits: string; start: number; closed: boolean } | undefined;
 	for (let field = 0; field < fields.length; field++) {
-		const part = fields[field] as Exclude<DatePart, { type: 'literal' }>;
+		const part = fields[field] as { length: number; limit?: number };
 		const group = carry ?? groups[index];
 		if (!group) break;
 		const last = !carry && index === groups.length - 1;
-		const limit = part.type === 'day' ? 3 : 1;
+		const limit = part.limit;
 		let digits = group.digits;
 		let rest = '';
-		const take = part.type !== 'year' && Number(digits[0]) > limit ? 1 : part.length;
+		const take = limit !== undefined && Number(digits[0]) > limit ? 1 : part.length;
 		if (digits.length > take) {
 			if ((carry || last) && !group.closed) rest = digits.slice(take);
 			digits = digits.slice(0, take);
@@ -208,7 +231,7 @@ export function maskInput(
 			? caret >= group.start && caret < end
 			: caret >= group.start && caret <= group.start + group.digits.length;
 		let pad = 0;
-		if (digits.length < part.length && part.type !== 'year' && digits !== '' && digits !== '0') {
+		if (digits.length < part.length && limit !== undefined && digits !== '' && digits !== '0') {
 			const ended = !hasCaret && (group.closed || !last);
 			if (ended || (digits.length === 1 && Number(digits) > limit)) pad = part.length - digits.length;
 		}

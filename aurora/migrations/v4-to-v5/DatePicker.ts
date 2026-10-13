@@ -119,9 +119,9 @@ export default {
 			{
 				name: 'locale',
 				v4: "'it'",
-				v5: "'en'",
+				v5: "'en', or the one of setDefaultLocale",
 				keepV4: 'locale="it"',
-				note: 'Without it the title, the month and day names are English and the week starts on Sunday. Add `locale="it"` to every usage that omits it, unless the app wants English.'
+				note: 'Without `locale` and without `setDefaultLocale` the title, the month and day names and the arrow labels are English and the week starts on Sunday. Call `setDefaultLocale("it")` once in the root layout (step `global-default-locale`); add `locale="it"` only to usages rendered outside it, unless the app wants English.'
 			},
 			{
 				name: 'weekdayFormat',
@@ -203,9 +203,9 @@ export default {
 		{
 			id: 'date-picker-labels',
 			summary:
-				'The arrows have English accessible names (`previousMonthLabel`, `nextMonthLabel`, `previousYearLabel`, `nextYearLabel`) and all the buttons are `type="button"` (v4 header buttons submitted the forms they were in).',
+				'The arrows have accessible names in the language of `locale` ("Previous month", "Mese precedente" in Italian; `previousMonthLabel`, `nextMonthLabel`, `previousYearLabel`, `nextYearLabel` change them) and all the buttons are `type="button"` (v4 header buttons submitted the forms they were in).',
 			action:
-				'Pass the labels in the app language, e.g. `previousMonthLabel="Mese precedente"` and `nextMonthLabel="Mese successivo"`, where the app is Italian.'
+				'Italian apps get the Italian names from `setDefaultLocale("it")` or `locale="it"`; pass the `*Label` props only for other names. Remove app code that prevented the header buttons from submitting a form.'
 		},
 		{
 			id: 'date-picker-calendar-variables',

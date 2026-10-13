@@ -3,7 +3,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import YearPickerTextField from '#lib/components/composed/forms/YearPickerTextField.svelte';
-import { snippet } from '../helpers.js';
+import { renderWithDefaultLocale, snippet } from '../helpers.js';
 
 const CHEVRON_ICON = 'M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z';
 
@@ -706,5 +706,26 @@ describe('YearPickerTextField', () => {
 		const menu = target.querySelector('.aurora-year-picker-text-field-menu')!;
 		expect(getComputedStyle(menu).width).toBe('250px');
 		target.remove();
+	});
+});
+
+describe('YearPickerTextField texts', () => {
+	test('follow locale, and a text prop wins', async () => {
+		const italian = await render(YearPickerTextField, { label: 'Anno', locale: 'it' });
+		await expect.element(italian.getByRole('button', { name: "Scegli l'anno" })).toBeInTheDocument();
+		const input = italian.getByRole('combobox', { name: 'Anno' });
+		await userEvent.fill(input, '1899');
+		await expect.element(input).toHaveAccessibleDescription('Inserisci un anno valido');
+		await italian.unmount();
+		const own = await render(YearPickerTextField, { label: 'Anno', locale: 'it', openLabel: 'Anni' });
+		await expect.element(own.getByRole('button', { name: 'Anni' })).toBeInTheDocument();
+	});
+
+	test('follow setDefaultLocale, and the locale prop wins over it', async () => {
+		const inherited = await renderWithDefaultLocale('it', YearPickerTextField, { label: 'Anno' });
+		await expect.element(inherited.getByRole('button', { name: "Scegli l'anno" })).toBeInTheDocument();
+		await inherited.unmount();
+		const own = await renderWithDefaultLocale('it', YearPickerTextField, { label: 'Year', locale: 'en' });
+		await expect.element(own.getByRole('button', { name: 'Choose year' })).toBeInTheDocument();
 	});
 });

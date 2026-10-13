@@ -1,5 +1,5 @@
 <!-- @component
-Scrolling grid of years, from `min` to `max`, to choose one. When it appears it scrolls to the chosen year (or the current one, which has a border). Choosing the chosen year again keeps it. It is an ARIA listbox: one Tab stop, the arrows move in the grid, Page Up and Page Down jump three rows, Home and End go to the first and last year, Enter or Space choose. Its state is exposed as `data-disabled` on the grid and as `data-selected` and `data-current` on the years, for app CSS.
+Scrolling grid of years, from `min` to `max`, to choose one. Without `aria-label` or `aria-labelledby` it is named "Year", in the language of `locale`. When it appears it scrolls to the chosen year (or the current one, which has a border). Choosing the chosen year again keeps it. It is an ARIA listbox: one Tab stop, the arrows move in the grid, Page Up and Page Down jump three rows, Home and End go to the first and last year, Enter or Space choose. Its state is exposed as `data-disabled` on the grid and as `data-selected` and `data-current` on the years, for app CSS.
 -->
 <script lang="ts">
 	import '../../../css/tokens.css';
@@ -7,6 +7,8 @@ Scrolling grid of years, from `min` to `max`, to choose one. When it appears it 
 	import { tick, type Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { gridTarget } from './grid.js';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import { libraryTexts } from '../../../utils/texts.js';
 
 	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'children' | 'onchange'> {
 		/** Chosen year. */
@@ -17,6 +19,8 @@ Scrolling grid of years, from `min` to `max`, to choose one. When it appears it 
 		max?: number;
 		/** Shows the years without letting anyone choose them. */
 		disabled?: boolean;
+		/** BCP 47 locale of the default accessible name: `it` and `en` are built in, other languages fall back to English. Defaults to the one set with `setDefaultLocale`, else `en`. */
+		locale?: string;
 		/** Extra classes for each part. */
 		class?: { container?: string; year?: string };
 		/** The grid element, which scrolls. */
@@ -32,6 +36,7 @@ Scrolling grid of years, from `min` to `max`, to choose one. When it appears it 
 		min = 1900,
 		max = 2100,
 		disabled = false,
+		locale: localeProp,
 		class: clazz = {},
 		yearSelectorElement = $bindable(),
 		itemSnippet,
@@ -39,6 +44,9 @@ Scrolling grid of years, from `min` to `max`, to choose one. When it appears it 
 		onkeydown,
 		...rest
 	}: Props = $props();
+
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
 
 	let listNode = $state<HTMLDivElement>();
 	let focused = $state<number>();
@@ -101,7 +109,7 @@ Scrolling grid of years, from `min` to `max`, to choose one. When it appears it 
 	{...rest}
 	bind:this={() => listNode, (node) => (listNode = yearSelectorElement = node)}
 	role="listbox"
-	aria-label={rest['aria-labelledby'] ? rest['aria-label'] : (rest['aria-label'] ?? 'Year')}
+	aria-label={rest['aria-labelledby'] ? rest['aria-label'] : (rest['aria-label'] ?? libraryTexts(locale).yearSelector.label)}
 	aria-disabled={disabled || undefined}
 	class={['aurora-year-selector', clazz.container]}
 	data-disabled={disabled || undefined}

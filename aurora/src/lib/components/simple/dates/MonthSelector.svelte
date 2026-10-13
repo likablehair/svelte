@@ -1,5 +1,5 @@
 <!-- @component
-Grid of the twelve months, to choose one. Names come from `locale` through `Intl`. `year` tells which month is the current one (it has a border) and, with `min` and `max`, which months cannot be chosen. It is an ARIA listbox: one Tab stop, the arrows move in the grid, Home and End go to the first and last month, Enter or Space choose. Its state is exposed as `data-disabled` on the grid and as `data-selected`, `data-current` and `data-disabled` on the months, for app CSS.
+Grid of the twelve months, to choose one. Names come from `locale` through `Intl`. Without `aria-label` or `aria-labelledby` it is named "Month", in the language of `locale`. `year` tells which month is the current one (it has a border) and, with `min` and `max`, which months cannot be chosen. It is an ARIA listbox: one Tab stop, the arrows move in the grid, Home and End go to the first and last month, Enter or Space choose. Its state is exposed as `data-disabled` on the grid and as `data-selected`, `data-current` and `data-disabled` on the months, for app CSS.
 -->
 <script lang="ts">
 	import '../../../css/tokens.css';
@@ -7,6 +7,8 @@ Grid of the twelve months, to choose one. Names come from `locale` through `Intl
 	import { tick, type Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { dayKey, makeDate, monthNames } from '../../../utils/dates.js';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import { libraryTexts } from '../../../utils/texts.js';
 	import { gridTarget } from './grid.js';
 
 	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'children' | 'onchange'> {
@@ -14,7 +16,7 @@ Grid of the twelve months, to choose one. Names come from `locale` through `Intl
 		selectedMonth?: number;
 		/** Year of the months: it decides the current month and, with `min` and `max`, which months are disabled. Defaults to the current year. */
 		year?: number;
-		/** BCP 47 locale of the month names. */
+		/** BCP 47 locale of the month names and of the default accessible name. Defaults to the one set with `setDefaultLocale`, else `en`. */
 		locale?: string;
 		/** Length of the month names. Screen readers always read the full name. */
 		monthFormat?: 'short' | 'long';
@@ -48,7 +50,7 @@ Grid of the twelve months, to choose one. Names come from `locale` through `Intl
 	let {
 		selectedMonth = $bindable(),
 		year,
-		locale = 'en',
+		locale: localeProp,
 		monthFormat = 'short',
 		min,
 		max,
@@ -60,6 +62,9 @@ Grid of the twelve months, to choose one. Names come from `locale` through `Intl
 		onkeydown,
 		...rest
 	}: Props = $props();
+
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
 
 	let listNode = $state<HTMLDivElement>();
 	let focused = $state<number>();
@@ -129,7 +134,7 @@ Grid of the twelve months, to choose one. Names come from `locale` through `Intl
 	{...rest}
 	bind:this={() => listNode, (node) => (listNode = monthSelectorElement = node)}
 	role="listbox"
-	aria-label={rest['aria-labelledby'] ? rest['aria-label'] : (rest['aria-label'] ?? 'Month')}
+	aria-label={rest['aria-labelledby'] ? rest['aria-label'] : (rest['aria-label'] ?? libraryTexts(locale).monthSelector.label)}
 	aria-disabled={disabled || undefined}
 	class={['aurora-month-selector', clazz.container]}
 	data-disabled={disabled || undefined}

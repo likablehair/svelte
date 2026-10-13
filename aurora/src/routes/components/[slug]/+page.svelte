@@ -28,7 +28,7 @@
 </svelte:head>
 
 <header class="hero">
-	<h1>{doc.name}</h1>
+	<h1>{#each doc.name.split(/(?=[A-Z])/) as part, index (index)}{#if index}<wbr />{/if}{part}{/each}</h1>
 	{#if doc.description}<p class="lead">{@html inline(doc.description)}</p>{/if}
 	<pre class="import"><code>import {'{'} {doc.name} {'}'} from '{PACKAGE}';</code></pre>
 	<p class="meta">
@@ -63,6 +63,7 @@
 		font-size: clamp(48px, 7vw, 96px);
 		line-height: 0.9;
 		letter-spacing: -0.05em;
+		overflow-wrap: anywhere;
 		margin: 0 0 18px;
 	}
 

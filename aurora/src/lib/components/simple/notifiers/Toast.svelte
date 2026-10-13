@@ -8,9 +8,11 @@
 	interface Props {
 		toast: Toast;
 		closeLabel: string;
+		loadingLabel: string;
+		progressLabel: string;
 	}
 
-	let { toast, closeLabel }: Props = $props();
+	let { toast, closeLabel, loadingLabel, progressLabel }: Props = $props();
 
 	let extra = $derived(!!toast.description || !!toast.loading || toast.progress !== undefined);
 
@@ -28,13 +30,13 @@
 			class="aurora-toast-progress"
 			><ProgressBar
 				indeterminate
-				aria-label={toast.title ?? 'Loading'}
+				aria-label={toast.title ?? loadingLabel}
 				--progress-bar-height="3px"
 			/></span
 		>{:else if toast.progress !== undefined}<span class="aurora-toast-progress"
 			><ProgressBar
 				value={toast.progress}
-				aria-label={toast.title ?? 'Progress'}
+				aria-label={toast.title ?? progressLabel}
 				--progress-bar-height="4px"
 			/></span
 		>{/if}{/snippet}

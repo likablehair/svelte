@@ -129,7 +129,7 @@ export default {
 			{
 				from: 'pattern',
 				to: 'format',
-				note: 'Only the tokens `dd`, `MM` and `yyyy`, with any separator (v4 accepted luxon tokens; hours were lost anyway). Without it the format now comes from `locale` (`it` dd/MM/yyyy, `en` MM/dd/yyyy): `pattern="dd/MM/yyyy"` can be dropped when `locale="it"` is set.'
+				note: 'Only the tokens `dd`, `MM` and `yyyy`, with any separator (v4 accepted luxon tokens; hours were lost anyway). Without it the format now comes from `locale` (`it` dd/MM/yyyy, `en` MM/dd/yyyy): `pattern="dd/MM/yyyy"` can be dropped when the locale is `it` (`setDefaultLocale("it")` in the root layout or `locale="it"`).'
 			},
 			{
 				from: 'mobileDialog',
@@ -197,9 +197,9 @@ export default {
 			{
 				name: 'locale',
 				v4: "'it'",
-				v5: "'en'",
+				v5: "'en', or the one of setDefaultLocale",
 				keepV4: 'locale="it"',
-				note: 'IMPORTANT. v4 had no `locale`: it was always Italian, dd/MM/yyyy, weeks from Monday. v5 defaults to English, MM/dd/yyyy, weeks from Sunday: without `locale="it"` a typed "05/03/2026" is read as May 3. Add `locale="it"` to every usage (and every app wrapper) that omits it.'
+				note: 'IMPORTANT. v4 had no `locale`: it was always Italian, dd/MM/yyyy, weeks from Monday. v5 takes the locale of the `locale` prop, else the one of `setDefaultLocale`, else English (MM/dd/yyyy, weeks from Sunday, English texts): with neither, a typed "05/03/2026" is read as May 3. Call `setDefaultLocale("it")` once in the root layout (step `global-default-locale`): then usages need no `locale="it"`, and the format, the calendar and the texts ("Inserisci una data valida", chip `gg/mm/aaaa`) are Italian. Add `locale="it"` only where the field renders outside that layout (an app wrapper used by other roots or by tests, a component mounted with `mount()`).'
 			},
 			{
 				name: 'closeOnSelect',
@@ -277,16 +277,16 @@ export default {
 		{
 			id: 'date-picker-text-field-typing',
 			summary:
-				'Typing accepts digits only and adds the separators of `format`; paste (also `yyyy-MM-dd`) and autofill work, and the value updates on `input` (v4: on keydown after 30ms). A whole date that does not exist, is outside `min` / `max` or disabled, or an unfinished one when the field loses focus, shows the error state with `invalidText` (English "Enter a valid date") and makes the form invalid (`setCustomValidity`). Clicking a month or a year in the calendar no longer empties the text.',
+				'Typing accepts digits only and adds the separators of `format`; paste (also `yyyy-MM-dd`) and autofill work, and the value updates on `input` (v4: on keydown after 30ms). A whole date that does not exist, is outside `min` / `max` or disabled, or an unfinished one when the field loses focus, shows the error state with `invalidText` ("Enter a valid date", in Italian "Inserisci una data valida") and makes the form invalid (`setCustomValidity`). Clicking a month or a year in the calendar no longer empties the text.',
 			action:
-				'Pass `invalidText` in the app language (`invalidText="Data non valida"`). Forms sent with `novalidate` or by script should still check `selectedDate`. Remove app code that validated or reformatted the typed text.'
+				'With the Italian locale the message is already Italian; pass `invalidText` only for another message (`invalidText="Data non valida"`). Forms sent with `novalidate` or by script should still check `selectedDate`. Remove app code that validated or reformatted the typed text.'
 		},
 		{
 			id: 'date-picker-text-field-range',
 			summary:
-				'With `range` the field has a start and an end input separated by an arrow, named by `startLabel` / `endLabel` (English defaults) after the `label`; a typed end before the start, or start after the end, is not accepted.',
+				'With `range` the field has a start and an end input separated by an arrow, named by `startLabel` / `endLabel` ("Start date" / "End date", in Italian "Data di inizio" / "Data di fine") after the `label`; a typed end before the start, or start after the end, is not accepted.',
 			action:
-				'Pass `startLabel` and `endLabel` in the app language (`startLabel="Data di inizio"`, `endLabel="Data di fine"`). `placeholder` and `placeholderTo` keep their meaning.',
+				'Pass `startLabel` and `endLabel` only for other names than those of the locale. `placeholder` and `placeholderTo` keep their meaning.',
 			when: { props: ['type'] }
 		},
 		{
@@ -294,7 +294,7 @@ export default {
 			summary:
 				'Up to 1024px the calendar button opens the calendar in a bottom Drawer titled `drawerTitle ?? label` (v4: a centered Dialog); focusing the field does not open it and the field stays typable with the numeric keyboard. The server renders the desktop variant.',
 			action:
-				'Pass `label` or `drawerTitle` so the drawer has a title, and `closeLabel` / `openLabel` in the app language. `mobileDrawer={false}` keeps the menu on every screen.'
+				'Pass `label` or `drawerTitle` so the drawer has a title (`closeLabel` and `openLabel` follow the locale). `mobileDrawer={false}` keeps the menu on every screen.'
 		},
 		{
 			id: 'date-picker-text-field-keyboard',
@@ -331,7 +331,7 @@ export default {
 			summary:
 				'Several apps wrap the field (`StandardDatePickerTextfield` in addibox, contattorapido, new-vigipass, stramoniumai); some wrappers forward only a few props (new-vigipass drops `menuOpened`, `ondayClick` and the rest).',
 			action:
-				'Migrate the wrapper first: type its props as `ComponentProps<typeof DatePickerTextField>` and spread `{...rest}` on the field, set `locale="it"` (and Italian `invalidText`, `startLabel`, `endLabel`, `openLabel`, `closeLabel`) inside the wrapper, and rename what it forwards (`menuOpened` → `open`, `type` → `range`, `oninput` → `onchange`). Then migrate its call sites with the same rules, since they pass the v4 names.',
+				'Migrate the wrapper first: type its props as `ComponentProps<typeof DatePickerTextField>` and spread `{...rest}` on the field, set `locale="it"` inside the wrapper when the app has no `setDefaultLocale("it")` (the Italian texts come with it: drop the Italian `invalidText`, `startLabel`, `endLabel`, `openLabel`, `closeLabel` the wrapper passed only to translate), and rename what it forwards (`menuOpened` → `open`, `type` → `range`, `oninput` → `onchange`). Then migrate its call sites with the same rules, since they pass the v4 names.',
 			scope: 'app'
 		},
 		{
@@ -349,6 +349,7 @@ export default {
 		'`name` / `nameTo`: hidden inputs that submit `yyyy-MM-dd`; `required`, `readonly`, `id`.',
 		'`clearable`, `clearLabel`, `clearSnippet`; `showFormat`, `formatLabel`, `formatSnippet`.',
 		'`drawerTitle`, `closeLabel`, `openLabel`, `startLabel`, `endLabel`.',
+		'`locale` (BCP 47): language of the format, the calendar and the default texts, Italian with `it`, English otherwise; without it the one of `setDefaultLocale` (step `global-default-locale`), else `en`. Text props win over it.',
 		'`daySnippet`, `dayAppendSnippet`, `weekdayFormat`, `showOutsideDays` (forwarded to the calendar).',
 		'`bind:input`, `bind:inputTo`; native attributes and events of the (start) input.',
 		'`--date-picker-text-field-*` variables for the label, field, icons, format chip, separator, states and hint.'

@@ -4,6 +4,7 @@ import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import Autocomplete from '#lib/components/simple/forms/Autocomplete.svelte';
 import type { Item } from '#lib/components/simple/forms/item.js';
+import { renderWithDefaultLocale, tooltipText } from '../helpers.js';
 
 const services: Item[] = [
 	{ value: 'cut', label: 'Haircut' },
@@ -264,7 +265,10 @@ describe('Autocomplete', () => {
 		});
 		expect(screen.getByRole('button', { name: /^Remove/ }).elements()).toHaveLength(2);
 		const counter = screen.getByText('+3');
-		await expect.element(counter).toHaveAttribute('title', 'Color, Balayage, Pédicure');
+		expect(counter.element()).not.toHaveAttribute('title');
+		await expect.poll(() => tooltipText(counter.element())).toBe('Color, Balayage, Pédicure');
+		await userEvent.hover(counter);
+		await expect.element(screen.getByRole('tooltip')).toHaveTextContent('Color, Balayage, Pédicure');
 	});
 
 	test('mandatory keeps the last value', async () => {
@@ -647,5 +651,28 @@ describe('Autocomplete', () => {
 		const field = target.querySelector('.aurora-autocomplete-field')!;
 		expect(getComputedStyle(field).borderTopColor).toBe('rgb(1, 2, 3)');
 		target.remove();
+	});
+});
+
+describe('Autocomplete texts', () => {
+	test('follow locale, and a text prop wins', async () => {
+		const props = { label: 'Servizi', items: services, multiple: true, values: [services[2]], locale: 'it' };
+		const italian = await render(Autocomplete, props);
+		await expect.element(italian.getByRole('button', { name: 'Rimuovi Color' })).toBeInTheDocument();
+		await italian.getByRole('combobox').click();
+		await userEvent.keyboard('zzz');
+		await expect.element(italian.getByRole('status')).toHaveTextContent('Nessun risultato');
+		await italian.unmount();
+		const own = await render(Autocomplete, { ...props, removeLabel: 'Togli' });
+		await expect.element(own.getByRole('button', { name: 'Togli Color' })).toBeInTheDocument();
+	});
+
+	test('follow setDefaultLocale, and the locale prop wins over it', async () => {
+		const props = { label: 'Servizi', items: services, multiple: true, values: [services[2]] };
+		const inherited = await renderWithDefaultLocale('it', Autocomplete, props);
+		await expect.element(inherited.getByRole('button', { name: 'Rimuovi Color' })).toBeInTheDocument();
+		await inherited.unmount();
+		const own = await renderWithDefaultLocale('it', Autocomplete, { ...props, locale: 'en' });
+		await expect.element(own.getByRole('button', { name: 'Remove Color' })).toBeInTheDocument();
 	});
 });

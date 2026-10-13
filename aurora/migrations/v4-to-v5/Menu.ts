@@ -138,7 +138,7 @@ export default {
 			summary:
 				'The menu closes itself on outside clicks (new default), on Escape and when another menu opens; v4 closed only when the app set `open` to false.',
 			action:
-				'Use `bind:open` wherever `open` is passed one-way, otherwise the app keeps `true` after the menu closed and the next toggle does nothing. Menus that must stay open together: render the inner one inside the outer menu `children`, or give it `closeOnClickOutside={false}`. Remove app code that closed menus on Escape or on outside clicks by hand.'
+				'Use `bind:open` wherever `open` is passed one-way, otherwise the app keeps `true` after the menu closed and the next toggle does nothing. Menus that must stay open together: render the inner one inside the outer menu `children`, or give it `closeOnClickOutside={false}`; then a click outside (like Escape) closes only the innermost open menu, one level per click. Remove app code that closed menus on Escape or on outside clicks by hand.'
 		},
 		{
 			id: 'menu-surface',

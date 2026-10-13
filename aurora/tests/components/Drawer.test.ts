@@ -4,7 +4,7 @@ import { render } from 'vitest-browser-svelte';
 import Drawer from '#lib/components/simple/navigation/Drawer.svelte';
 import BottomSheetExample from '../../src/docs/examples/drawer/03-bottom-sheet.svelte';
 import ModalHarness from '../fixtures/dialog/ModalHarness.svelte';
-import { snippet, text } from '../helpers.js';
+import { renderWithDefaultLocale, snippet, text } from '../helpers.js';
 
 const instant = '--drawer-duration: 0s';
 const pause = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -257,5 +257,25 @@ describe('Drawer', () => {
 		expect(element.querySelector('.aurora-drawer-body.app-body')?.textContent).toBe('Links');
 		const footer = element.querySelector('footer.aurora-drawer-actions.app-actions');
 		expect(footer?.querySelector('button')?.textContent).toBe('Log out');
+	});
+});
+
+describe('Drawer texts', () => {
+	test('follow locale, and closeLabel wins', async () => {
+		const props = { open: true, title: 'Cliente', closable: true, locale: 'it' };
+		const italian = await render(Drawer, props);
+		await expect.element(italian.getByRole('button', { name: 'Chiudi' })).toBeVisible();
+		await italian.unmount();
+		const own = await render(Drawer, { ...props, closeLabel: 'Esci' });
+		await expect.element(own.getByRole('button', { name: 'Esci' })).toBeVisible();
+	});
+
+	test('follow setDefaultLocale, and the locale prop wins over it', async () => {
+		const props = { open: true, title: 'Cliente', closable: true };
+		const inherited = await renderWithDefaultLocale('it', Drawer, props);
+		await expect.element(inherited.getByRole('button', { name: 'Chiudi' })).toBeVisible();
+		await inherited.unmount();
+		const own = await renderWithDefaultLocale('it', Drawer, { ...props, locale: 'en' });
+		await expect.element(own.getByRole('button', { name: 'Close' })).toBeVisible();
 	});
 });

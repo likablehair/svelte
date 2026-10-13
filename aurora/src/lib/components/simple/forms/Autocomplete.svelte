@@ -8,11 +8,14 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 	import type { HTMLAttributes, HTMLInputAttributes } from 'svelte/elements';
 	import { MediaQuery } from 'svelte/reactivity';
 	import Menu from '../common/Menu.svelte';
+	import Tooltip from '../common/Tooltip.svelte';
 	import Icon from '../media/Icon.svelte';
 	import Chip from '../navigation/Chip.svelte';
 	import Drawer from '../navigation/Drawer.svelte';
 	import SimpleTextField from './SimpleTextField.svelte';
 	import type { Item } from './item.js';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import { libraryTexts } from '../../../utils/texts.js';
 
 	const ALERT_ICON =
 		'M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z';
@@ -68,7 +71,7 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 		id?: string;
 		/** Form field name: each selected `value` is submitted under this name. */
 		name?: string;
-		/** Shows at most this many chips, followed by a "+N" counter. */
+		/** Shows at most this many chips, followed by a "+N" counter whose Tooltip lists the hidden values. */
 		maxVisibleChips?: number;
 		/** Replaces the default search, which matches the label ignoring case and accents. Called for each item while `searchText` is not empty. Return `true` for every item when the filtering happens elsewhere, for example on a server. */
 		searchFunction?: (item: Item<Data>, searchText: string) => boolean;
@@ -96,14 +99,16 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 		drawerSearch?: boolean;
 		/** Title of the mobile drawer. Defaults to `label`. */
 		drawerTitle?: string;
-		/** Text of the loading row. */
+		/** Text of the loading row. Defaults to "Loading…", in the language of `locale`. */
 		loadingText?: string;
-		/** Text shown when no option matches. */
+		/** Text shown when no option matches. Defaults to "No results", in the language of `locale`. */
 		noResultsText?: string;
-		/** Accessible name of the chip remove buttons, followed by the option label. */
+		/** Accessible name of the chip remove buttons, followed by the option label. Defaults to "Remove", in the language of `locale`. */
 		removeLabel?: string;
-		/** Accessible name of the close button of the mobile drawer. */
+		/** Accessible name of the close button of the mobile drawer. Defaults to "Close", in the language of `locale`. */
 		closeLabel?: string;
+		/** BCP 47 locale of the texts: `it` and `en` are built in, other languages fall back to English. Defaults to the one set with `setDefaultLocale`, else `en`. */
+		locale?: string;
 		/** The native `<input>` element. */
 		input?: HTMLInputElement;
 		/** Extra classes for each part. */
@@ -206,10 +211,11 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 		mobileDrawer = false,
 		drawerSearch = true,
 		drawerTitle,
-		loadingText = 'Loading…',
-		noResultsText = 'No results',
-		removeLabel = 'Remove',
-		closeLabel = 'Close',
+		loadingText,
+		noResultsText,
+		removeLabel,
+		closeLabel,
+		locale: localeProp,
 		input = $bindable(),
 		class: clazz = {},
 		onchange,
@@ -235,6 +241,10 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 		emptySnippet,
 		...rest
 	}: Props = $props();
+
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
+	let texts = $derived(libraryTexts(locale).autocomplete);
 
 	let inputNode = $state<HTMLInputElement>();
 
@@ -272,6 +282,7 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 		maxVisibleChips === undefined ? selection : selection.slice(0, maxVisibleChips)
 	);
 	let hiddenCount = $derived(selection.length - visible.length);
+	let counterNode = $state<HTMLSpanElement>();
 	let removable = $derived(!disabled && !(mandatory && selection.length <= 1));
 	let hasLabel = $derived(!!label || !!labelSnippet);
 	let describedBy = $derived(hint || hintSnippet ? hintId : undefined);
@@ -485,7 +496,7 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 			{#if loadingSnippet}
 				{@render loadingSnippet()}
 			{:else}
-				<span class="aurora-autocomplete-spinner" aria-hidden="true"></span>{loadingText}
+				<span class="aurora-autocomplete-spinner" aria-hidden="true"></span>{loadingText ?? texts.loading}
 			{/if}
 		</div>
 	{:else if options.length === 0}
@@ -498,7 +509,7 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 			{#if emptySnippet}
 				{@render emptySnippet({ searchText })}
 			{:else}
-				{noResultsText}
+				{noResultsText ?? texts.noResults}
 			{/if}
 		</div>
 	{:else}
@@ -622,7 +633,7 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 								prependIcon={item.icon}
 								prependSnippet={chipIconSnippet ? chipIcon : undefined}
 								closable={removable}
-								closeLabel="{removeLabel} {text(item)}"
+								closeLabel="{removeLabel ?? texts.remove} {text(item)}"
 								tabindex={-1}
 								onclose={() => unselect(item)}
 								class={clazz.chip}
@@ -645,10 +656,8 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 								disabled
 							})}
 						{:else}
-							<span
-								class="aurora-autocomplete-counter"
-								title={selection.slice(maxVisibleChips).map(text).join(', ')}>+{hiddenCount}</span
-							>
+							<span class="aurora-autocomplete-counter" bind:this={counterNode}>+{hiddenCount}</span>
+							<Tooltip activator={counterNode} text={selection.slice(maxVisibleChips).map(text).join(', ')} />
 						{/if}
 					{/if}
 					<input
@@ -722,7 +731,7 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 		title={drawerTitle ?? label}
 		aria-label={(drawerTitle ?? label) ? undefined : placeholder}
 		closable
-		{closeLabel}
+		closeLabel={closeLabel ?? texts.close}
 		class={{
 			drawer: drawerSearch
 				? 'aurora-autocomplete-drawer'

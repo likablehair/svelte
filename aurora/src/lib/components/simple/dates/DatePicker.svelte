@@ -11,6 +11,8 @@ Calendar panel to choose a day or, with `range`, a range of days: the title of t
 	import MonthSelector from './MonthSelector.svelte';
 	import YearSelector from './YearSelector.svelte';
 	import { makeDate, monthTitle } from '../../../utils/dates.js';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import { libraryTexts } from '../../../utils/texts.js';
 
 	const CHEVRON_LEFT = 'M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z';
 	const CHEVRON_RIGHT = 'M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z';
@@ -28,13 +30,15 @@ Calendar panel to choose a day or, with `range`, a range of days: the title of t
 		titleSnippet?: Snippet<
 			[{ title: string; month: number; year: number; view: 'day' | 'month' | 'year' }]
 		>;
-		/** Accessible name of the left arrow in the day view. */
+		/** BCP 47 locale of the title, of the names of months and days, of the first day of the week and of the texts of the arrows (`it` and `en` are built in, other languages fall back to English). Defaults to the one set with `setDefaultLocale`, else `en`. */
+		locale?: string;
+		/** Accessible name of the left arrow in the day view. Defaults to "Previous month", in the language of `locale`. */
 		previousMonthLabel?: string;
-		/** Accessible name of the right arrow in the day view. */
+		/** Accessible name of the right arrow in the day view. Defaults to "Next month", in the language of `locale`. */
 		nextMonthLabel?: string;
-		/** Accessible name of the left arrow in the month view. */
+		/** Accessible name of the left arrow in the month view. Defaults to "Previous year", in the language of `locale`. */
 		previousYearLabel?: string;
-		/** Accessible name of the right arrow in the month view. */
+		/** Accessible name of the right arrow in the month view. Defaults to "Next year", in the language of `locale`. */
 		nextYearLabel?: string;
 	}
 
@@ -45,7 +49,7 @@ Calendar panel to choose a day or, with `range`, a range of days: the title of t
 		visibleMonth = $bindable(),
 		visibleYear = $bindable(),
 		view = $bindable(),
-		locale = 'en',
+		locale: localeProp,
 		weekStart,
 		min,
 		max,
@@ -63,12 +67,16 @@ Calendar panel to choose a day or, with `range`, a range of days: the title of t
 		weekdaySnippet,
 		ondayClick,
 		onchange,
-		previousMonthLabel = 'Previous month',
-		nextMonthLabel = 'Next month',
-		previousYearLabel = 'Previous year',
-		nextYearLabel = 'Next year',
+		previousMonthLabel,
+		nextMonthLabel,
+		previousYearLabel,
+		nextYearLabel,
 		...rest
 	}: Props = $props();
+
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
+	let texts = $derived(libraryTexts(locale).datePicker);
 
 	const uid = $props.id();
 	const titleId = `${uid}-title`;
@@ -163,7 +171,9 @@ Calendar panel to choose a day or, with `range`, a range of days: the title of t
 				variant="secondary"
 				size="sm"
 				icon={CHEVRON_LEFT}
-				aria-label={shown === 'month' ? previousYearLabel : previousMonthLabel}
+				aria-label={shown === 'month'
+					? (previousYearLabel ?? texts.previousYear)
+					: (previousMonthLabel ?? texts.previousMonth)}
 				disabled={disabled || !canGoBack}
 				onclick={() => step(-1)}
 			/>
@@ -189,7 +199,9 @@ Calendar panel to choose a day or, with `range`, a range of days: the title of t
 				variant="secondary"
 				size="sm"
 				icon={CHEVRON_RIGHT}
-				aria-label={shown === 'month' ? nextYearLabel : nextMonthLabel}
+				aria-label={shown === 'month'
+					? (nextYearLabel ?? texts.nextYear)
+					: (nextMonthLabel ?? texts.nextMonth)}
 				disabled={disabled || !canGoOn}
 				onclick={() => step(1)}
 			/>
@@ -245,6 +257,7 @@ Calendar panel to choose a day or, with `range`, a range of days: the title of t
 				selectedYear={year}
 				min={min?.getFullYear() ?? 1900}
 				max={max?.getFullYear() ?? 2100}
+				{locale}
 				{disabled}
 				aria-labelledby={titleId}
 				onchange={pickYear}

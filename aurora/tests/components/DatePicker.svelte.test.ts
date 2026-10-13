@@ -4,6 +4,7 @@ import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import DatePicker from '#lib/components/simple/dates/DatePicker.svelte';
 import { parseISODate, toISODate } from '#lib/utils/dates.js';
+import { renderWithDefaultLocale } from '../helpers.js';
 
 const fullDate = new Intl.DateTimeFormat('en', { dateStyle: 'full' });
 
@@ -483,5 +484,30 @@ describe('DatePicker', () => {
 		expect(picker().getBoundingClientRect().width).toBe(400);
 		expect(getComputedStyle(picker()).backgroundColor).toBe('rgb(1, 2, 3)');
 		expect(getComputedStyle(button('October 2026').element()).color).toBe('rgb(4, 5, 6)');
+	});
+});
+
+describe('DatePicker texts', () => {
+	test('follow locale, and a text prop wins', async () => {
+		const italian = await render(DatePicker, { visibleMonth: 9, visibleYear: 2026, locale: 'it' });
+		await expect.element(button('Mese precedente')).toBeVisible();
+		await expect.element(button('Mese successivo')).toBeVisible();
+		await button('Ottobre 2026').click();
+		await expect.element(button('Anno precedente')).toBeVisible();
+		await expect.element(italian.getByRole('listbox', { name: '2026' })).toBeVisible();
+		await italian.unmount();
+		await render(DatePicker, { visibleMonth: 9, visibleYear: 2026, locale: 'it', previousMonthLabel: 'Indietro' });
+		await expect.element(button('Indietro')).toBeVisible();
+	});
+
+	test('follow setDefaultLocale, and the locale prop wins over it', async () => {
+		const props = { visibleMonth: 9, visibleYear: 2026 };
+		const inherited = await renderWithDefaultLocale('it', DatePicker, props);
+		await expect.element(button('Mese precedente')).toBeVisible();
+		await expect.element(button('Ottobre 2026')).toBeVisible();
+		await inherited.unmount();
+		await renderWithDefaultLocale('it', DatePicker, { ...props, locale: 'en' });
+		await expect.element(button('Previous month')).toBeVisible();
+		await expect.element(button('October 2026')).toBeVisible();
 	});
 });

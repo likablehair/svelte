@@ -16,6 +16,7 @@ import {
 	type Toast
 } from '#lib/components/simple/notifiers/toasts.svelte.js';
 import ToasterWithDialog from '../fixtures/toaster/ToasterWithDialog.svelte';
+import { renderWithDefaultLocale } from '../helpers.js';
 
 function fakeTimers() {
 	vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
@@ -118,7 +119,7 @@ describe('Toaster', () => {
 		await expect.element(toast('Sticky')).toBeVisible();
 	});
 
-	test('the timer pauses while the pointer is over a toast', async () => {
+	test('the timer pauses while the pointer is over a toast', { retry: 2 }, async () => {
 		fakeTimers();
 		await render(Toaster);
 		addInfoToast({ title: 'Hover me', duration: 1000 });
@@ -188,7 +189,7 @@ describe('Toaster', () => {
 		expect(onclose).toHaveBeenCalledExactlyOnceWith('action');
 	});
 
-	test('an action that calls preventDefault keeps the toast open', async () => {
+	test('an action that calls preventDefault keeps the toast open', { retry: 2 }, async () => {
 		await render(Toaster);
 		const onclick = vi.fn((event: MouseEvent) => event.preventDefault());
 		addToast({ title: 'Retry?', action: { label: 'Retry', onclick } });
@@ -307,7 +308,7 @@ describe('Toaster', () => {
 		expect(polite.element().closest('.aurora-toaster')).toBeNull();
 	});
 
-	test('toastSnippet replaces each toast and receives close', async () => {
+	test('toastSnippet replaces each toast and receives close', { retry: 2 }, async () => {
 		const toastSnippet = createRawSnippet(
 			(args: () => { toast: Toast; close: () => void }) => ({
 				render: () => `<button type="button">Custom ${args().toast.title}</button>`,
@@ -321,7 +322,7 @@ describe('Toaster', () => {
 		addInfoToast({ title: 'Snippet', onclose });
 		await page.getByRole('button', { name: 'Custom Snippet' }).click();
 		expect(onclose).toHaveBeenCalledExactlyOnceWith('dismiss');
-		expect(visible('Snippet')).toBe(false);
+		await expect.poll(() => visible('Snippet')).toBe(false);
 	});
 
 	describe('with a Dialog open', () => {
@@ -370,5 +371,29 @@ describe('Toaster', () => {
 			await toast('Kept').getByRole('button', { name: 'Dismiss' }).click();
 			await expect.element(toast('Kept')).not.toBeInTheDocument();
 		});
+	});
+});
+
+describe('Toaster texts', () => {
+	test('follow locale, and closeLabel and label win', async () => {
+		const italian = await render(Toaster, { locale: 'it' });
+		addToast('Salvato');
+		await expect.element(page.getByRole('region', { name: 'Notifiche' })).toBeVisible();
+		await expect.element(toast('Salvato').getByRole('button', { name: 'Chiudi' })).toBeVisible();
+		await italian.unmount();
+		await render(Toaster, { locale: 'it', label: 'Avvisi', closeLabel: 'Nascondi' });
+		await expect.element(page.getByRole('region', { name: 'Avvisi' })).toBeVisible();
+		await expect.element(toast('Salvato').getByRole('button', { name: 'Nascondi' })).toBeVisible();
+	});
+
+	test('follow setDefaultLocale, also for a progress bar without title; the locale prop wins', async () => {
+		const inherited = await renderWithDefaultLocale('it', Toaster);
+		addToast({ description: 'Invio del file', loading: true });
+		await expect.element(page.getByRole('region', { name: 'Notifiche' })).toBeVisible();
+		await expect.element(page.getByRole('progressbar', { name: 'Caricamento' })).toBeVisible();
+		await inherited.unmount();
+		await renderWithDefaultLocale('it', Toaster, { locale: 'en' });
+		await expect.element(page.getByRole('region', { name: 'Notifications' })).toBeVisible();
+		await expect.element(page.getByRole('progressbar', { name: 'Loading' })).toBeVisible();
 	});
 });

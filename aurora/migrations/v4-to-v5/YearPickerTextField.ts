@@ -125,15 +125,16 @@ export default {
 		{
 			id: 'year-picker-text-field-typing',
 			summary:
-				'Typing accepts four digits; a year outside `min` / `max`, or an unfinished one when the field loses focus, shows the error state with `invalidText` (English "Enter a valid year") and makes the form invalid. The value updates on `input` (v4: on keydown after 30ms).',
-			action: 'Pass `invalidText` in the app language (`invalidText="Anno non valido"`).'
+				'Typing accepts four digits; a year outside `min` / `max`, or an unfinished one when the field loses focus, shows the error state with `invalidText` ("Enter a valid year", in Italian "Inserisci un anno valido") and makes the form invalid. The value updates on `input` (v4: on keydown after 30ms).',
+			action:
+				'Italian apps get the Italian message from `setDefaultLocale("it")` or `locale="it"`; pass `invalidText` only for another message (`invalidText="Anno non valido"`).'
 		},
 		{
 			id: 'year-picker-text-field-look',
 			summary:
 				'The field is 36px high with a border, the calendar button at the start and a chevron at the end, and fills its container (v4: a 280px filled grey SimpleTextField). The years are a 4-column YearSelector in a Menu (desktop) or a bottom Drawer titled `drawerTitle ?? label` (mobile).',
 			action:
-				'Set `--year-picker-text-field-width` where the v4 width mattered; pass `label` or `drawerTitle`, and `openLabel` / `closeLabel` in the app language. The menu size is `--year-picker-text-field-menu-width` and `-menu-padding`.'
+				'Set `--year-picker-text-field-width` where the v4 width mattered; pass `label` or `drawerTitle` (`openLabel` and `closeLabel` follow the locale). The menu size is `--year-picker-text-field-menu-width` and `-menu-padding`.'
 		},
 		{
 			id: 'year-picker-text-field-markup',
@@ -149,6 +150,7 @@ export default {
 		'`name` (hidden input with the year), `required`, `readonly`, `id`.',
 		'`clearable`, `clearLabel`, `clearSnippet`, `chevronSnippet`.',
 		'`drawerTitle`, `closeLabel`, `openLabel`.',
+		'`locale` (BCP 47): language of the default texts, Italian with `it`, English otherwise; without it the one of `setDefaultLocale` (step `global-default-locale`), else `en`. Text props win over it.',
 		'`bind:input`; native attributes and events of the input; Arrow Down moves the focus into the years.',
 		'`--year-picker-text-field-*` variables for the label, field, icons, states, hint and menu.'
 	]

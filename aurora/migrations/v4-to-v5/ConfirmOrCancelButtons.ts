@@ -11,8 +11,20 @@ export default {
 			}
 		],
 		defaults: [
-			{ name: 'cancelText', v4: "'Annulla'", v5: "'Cancel'", keepV4: 'cancelText="Annulla"' },
-			{ name: 'confirmText', v4: "'Salva'", v5: "'Save'", keepV4: 'confirmText="Salva"' }
+			{
+				name: 'cancelText',
+				v4: "'Annulla'",
+				v5: "'Cancel', 'Annulla' with the it locale",
+				keepV4: 'locale="it"',
+				note: 'The texts follow `locale`, else `setDefaultLocale`, else English. Italian apps call `setDefaultLocale("it")` in the root layout (step `global-default-locale`); `cancelText="Annulla"` also works.'
+			},
+			{
+				name: 'confirmText',
+				v4: "'Salva'",
+				v5: "'Save', 'Salva' with the it locale",
+				keepV4: 'locale="it"',
+				note: 'See `cancelText`.'
+			}
 		]
 	},
 	events: {
@@ -88,6 +100,7 @@ export default {
 	added: [
 		'`confirmIcon`, `cancelIcon` (SVG paths), `confirmVariant` (Button `variant`, e.g. `danger`).',
 		'`confirmType="submit"` submits the surrounding form, with its validation.',
+		'`locale` (BCP 47): language of the default texts, Italian with `it`, English otherwise; without it the one of `setDefaultLocale` (step `global-default-locale`), else `en`. Text props win over it.',
 		'`children`: content at the start of the row (e.g. "Unsaved changes").',
 		'`class` object: `container`, `content`, `actions`, `cancel`, `confirm`; native attributes on the root.',
 		'`data-loading` attribute.',

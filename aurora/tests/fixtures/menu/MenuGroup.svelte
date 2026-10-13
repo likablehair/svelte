@@ -1,6 +1,8 @@
 <script lang="ts">
 	import Menu from '#lib/components/simple/common/Menu.svelte';
 
+	let { nestedStyle }: { nestedStyle?: string } = $props();
+
 	let first = $state(false);
 	let second = $state(false);
 	let nested = $state(false);
@@ -14,8 +16,10 @@
 <button type="button" bind:this={firstButton} onclick={() => (first = !first)}>First</button>
 <button type="button" bind:this={secondButton} onclick={() => (second = !second)}>Second</button>
 <button type="button" bind:this={pinnedButton} onclick={() => (pinned = !pinned)}>Pinned</button>
+<button type="button">Outside</button>
 
 <Menu bind:open={first} activator={firstButton} role="menu" aria-label="First menu">
+	<button type="button" role="menuitem">Rename</button>
 	<button
 		type="button"
 		role="menuitem"
@@ -30,6 +34,7 @@
 		placement="right-start"
 		role="menu"
 		aria-label="Nested menu"
+		style={nestedStyle}
 	>
 		<button type="button" role="menuitem">Deep</button>
 	</Menu>

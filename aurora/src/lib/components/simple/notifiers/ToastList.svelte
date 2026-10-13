@@ -138,7 +138,12 @@
 				{#if config.toastSnippet}
 					{@render config.toastSnippet({ toast, close: () => closeToast(toast.id, 'dismiss') })}
 				{:else}
-					<Toast {toast} closeLabel={config.closeLabel} />
+					<Toast
+						{toast}
+						closeLabel={config.closeLabel}
+						loadingLabel={config.loadingLabel}
+						progressLabel={config.progressLabel}
+					/>
 				{/if}
 			</div>
 		{/each}

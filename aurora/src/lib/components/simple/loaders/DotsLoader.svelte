@@ -5,15 +5,23 @@ Three dots that light up in turn, a lighter alternative to `CircularLoader` for 
 	import '../../../css/tokens.css';
 	import './DotsLoader.css';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import { libraryTexts } from '../../../utils/texts.js';
 
 	interface Props extends Omit<HTMLAttributes<HTMLSpanElement>, 'class' | 'children'> {
-		/** Accessible name. An empty string makes the loader decorative (hidden from screen readers). */
+		/** Accessible name. An empty string makes the loader decorative (hidden from screen readers). Defaults to "Loading", in the language of `locale`. */
 		label?: string;
+		/** BCP 47 locale of the texts: `it` and `en` are built in, other languages fall back to English. Defaults to the one set with `setDefaultLocale`, else `en`. */
+		locale?: string;
 		/** Extra classes on the root element. */
 		class?: string;
 	}
 
-	let { label = 'Loading', class: clazz = '', ...rest }: Props = $props();
+	let { label: labelProp, locale: localeProp, class: clazz = '', ...rest }: Props = $props();
+
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
+	let label = $derived(labelProp ?? libraryTexts(locale).dotsLoader.label);
 </script>
 
 <span

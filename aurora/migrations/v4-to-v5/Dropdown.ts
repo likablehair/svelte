@@ -14,6 +14,11 @@ export default {
 				from: 'menuAnchor',
 				to: 'placement',
 				note: 'The values change too: see `props.values`.'
+			},
+			{
+				from: 'lang',
+				to: 'locale',
+				note: 'The texts follow `locale` (BCP 47; `it` and `en` built in): `placeholder` ("Select" / "Seleziona"), the selection text ("N selected" / "N selezionati"), `clearLabel`, `closeLabel`, `noResultsText`. `lang="it"` → `locale="it"`, or nothing when the root layout calls `setDefaultLocale("it")` (step `global-default-locale`). A v4 Dropdown without `lang` was English: with `setDefaultLocale("it")` it becomes Italian, so pass `locale="en"` only where English is wanted. Text props win over the locale.'
 			}
 		],
 		removed: [
@@ -37,13 +42,6 @@ export default {
 			{
 				name: 'height',
 				note: 'The trigger is a Button: use `size` (sm 28px, md 34px, lg 40px) or `--button-height` on the Dropdown.'
-			}
-		],
-		changed: [
-			{
-				name: 'lang',
-				native: true,
-				note: 'No longer a prop: it still type-checks but becomes the native `lang` attribute of the button, which would mark the English texts as Italian. Delete it. Texts are props, in English by default: `placeholder` ("Select"), `selectionText(values)` ("N selected"), `clearLabel`, `closeLabel`, `noResultsText`; for `lang="it"` pass `placeholder="Seleziona"` and the other texts in Italian.'
 			}
 		],
 		toCssVar: [
@@ -190,9 +188,9 @@ export default {
 		{
 			id: 'dropdown-selection-text',
 			summary:
-				'With more than one value the button reads "N selected" (v4: always the Italian "N Selezionati", also with `lang="en"`).',
+				'With more than one value the button reads "N selected", or "N selezionati" with the `it` locale (v4: always the Italian "N Selezionati", with a capital S, also with `lang="en"`).',
 			action:
-				'For Italian pass `selectionText={(values) => values.length === 1 ? String(values[0].label) : `${values.length} selezionati`}`.',
+				'Italian apps get it from `setDefaultLocale("it")` or `locale="it"`. For another text pass `selectionText={(values) => ...}`.',
 			when: { props: ['multiple'] }
 		},
 		{

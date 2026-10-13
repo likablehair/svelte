@@ -192,6 +192,64 @@ describe('Menu', () => {
 		await expect.element(first).not.toBeInTheDocument();
 	});
 
+	test('a click outside closes only the innermost open menu, one level per click', async () => {
+		const screen = await render(MenuGroup);
+		const first = screen.getByRole('menu', { name: 'First menu' });
+		const nested = screen.getByRole('menu', { name: 'Nested menu' });
+		const outside = screen.getByRole('button', { name: 'Outside' });
+		await screen.getByRole('button', { name: 'First' }).click();
+		await screen.getByRole('menuitem', { name: 'More' }).click();
+		await expect.element(nested).toBeVisible();
+
+		await outside.click();
+		await expect.element(nested).not.toBeInTheDocument();
+		await expect.element(first).toBeVisible();
+		await outside.click();
+		await expect.element(first).not.toBeInTheDocument();
+	});
+
+	test('a click inside the outer menu closes the inner one only; Escape then closes the outer one', async () => {
+		const screen = await render(MenuGroup);
+		const first = screen.getByRole('menu', { name: 'First menu' });
+		const nested = screen.getByRole('menu', { name: 'Nested menu' });
+		await screen.getByRole('button', { name: 'First' }).click();
+		await screen.getByRole('menuitem', { name: 'More' }).click();
+		await expect.element(nested).toBeVisible();
+
+		await screen.getByRole('menuitem', { name: 'Rename' }).click();
+		await expect.element(nested).not.toBeInTheDocument();
+		await expect.element(first).toBeVisible();
+		await userEvent.keyboard('{Escape}');
+		await expect.element(first).not.toBeInTheDocument();
+	});
+
+	test('a nested menu that is closing no longer holds its parent: the next click or Escape closes it', async () => {
+		const screen = await render(MenuGroup, { nestedStyle: '--menu-duration: 3s' });
+		const first = screen.getByRole('menu', { name: 'First menu' });
+		const outside = screen.getByRole('button', { name: 'Outside' });
+		const nested = () => document.querySelector('.aurora-menu[aria-label="Nested menu"]');
+		const openBoth = async () => {
+			await screen.getByRole('button', { name: 'First' }).click();
+			await screen.getByRole('menuitem', { name: 'More' }).click();
+			await expect.element(screen.getByRole('menu', { name: 'Nested menu' })).toBeVisible();
+			expect(nested()).not.toHaveAttribute('data-closing');
+		};
+
+		await openBoth();
+		await outside.click();
+		await expect.poll(() => nested()?.hasAttribute('data-closing')).toBe(true);
+		expect(nested()?.matches(':popover-open')).toBe(true);
+		await outside.click();
+		await expect.element(first).not.toBeInTheDocument();
+		await expect.poll(nested).toBeNull();
+
+		await openBoth();
+		await outside.click();
+		await expect.poll(() => nested()?.hasAttribute('data-closing')).toBe(true);
+		await userEvent.keyboard('{Escape}');
+		await expect.element(first).not.toBeInTheDocument();
+	});
+
 	test('matchActivatorWidth makes the menu as wide as the activator', async () => {
 		const { menu, activator } = await openHarness({
 			matchActivatorWidth: true,

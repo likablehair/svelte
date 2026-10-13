@@ -114,6 +114,7 @@ export default {
 		'`variant` (info | success | warning | error) and `data-variant`.',
 		'`icon` (SVG path, default per variant, `""` removes it) and `iconSnippet({ variant })`.',
 		'`closable`, `closeLabel` (default "Dismiss"), `closeSnippet({ close, closeLabel })`, `onclose(event)`: the app removes the banner.',
+		'`locale` (BCP 47): language of the default texts, Italian with `it`, English otherwise; without it the one of `setDefaultLocale` (step `global-default-locale`), else `en`. Text props win over it.',
 		'Native attributes on the root `<div>`; `role` overrides the default.',
 		'`--alert-banner-padding`, `-gap`, `-background`, `-border-color`, `-line-height`, `--alert-banner-icon-*`, `-title-*`, `-description-*`, `-close-*`, `-focus-ring-*`.'
 	]

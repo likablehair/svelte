@@ -39,6 +39,7 @@ Grid of the days of one month, to choose a day or, with `range`, a range of days
 		weekdayNames,
 		weekStartOf
 	} from '../../../utils/dates.js';
+	import { inheritedLocale } from '../../../utils/locale.js';
 
 	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'children' | 'onchange'> {
 		/** The chosen day; with `range`, the first day of the range. Days are local midnights. */
@@ -51,7 +52,7 @@ Grid of the days of one month, to choose a day or, with `range`, a range of days
 		visibleMonth?: number;
 		/** Visible year. */
 		visibleYear?: number;
-		/** BCP 47 locale of the names of months and days and of the first day of the week. */
+		/** BCP 47 locale of the names of months and days and of the first day of the week. Defaults to the one set with `setDefaultLocale`, else `en`. */
 		locale?: string;
 		/** First day of the week, from 0 (Sunday) to 6 (Saturday). Defaults to the one of `locale`. */
 		weekStart?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -99,7 +100,7 @@ Grid of the days of one month, to choose a day or, with `range`, a range of days
 		range = false,
 		visibleMonth = $bindable(),
 		visibleYear = $bindable(),
-		locale = 'en',
+		locale: localeProp,
 		weekStart,
 		min,
 		max,
@@ -123,6 +124,9 @@ Grid of the days of one month, to choose a day or, with `range`, a range of days
 		onmouseleave,
 		...rest
 	}: Props = $props();
+
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
 
 	const initial = untrack(() => selectedDate ?? selectedDateTo ?? new Date());
 	let ownMonth = $state(initial.getMonth());

@@ -246,6 +246,7 @@ export default {
 	added: [
 		'`variant` (neutral | primary | accent | success | warning | error | filled) and `size` (sm | md).',
 		'`closeLabel`: accessible name of the close button (default "Remove").',
+		'`locale` (BCP 47): language of the default texts, Italian with `it`, English otherwise; without it the one of `setDefaultLocale` (step `global-default-locale`), else `en`. Text props win over it.',
 		'`prependSnippet`, and `closeSnippet` with `{ close, closeLabel }`.',
 		'`bind:chipElement`, `class` and native attributes on the root `<span>`.',
 		'`data-variant`, `data-size`, `data-selected`, `data-disabled` attributes.',

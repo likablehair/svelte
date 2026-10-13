@@ -9,6 +9,8 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 	import Button from '../buttons/Button.svelte';
 	import { CLOSE_ICON, leave, modal } from '../dialogs/modal.js';
 	import ToastList from '../notifiers/ToastList.svelte';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import { libraryTexts } from '../../../utils/texts.js';
 
 	type Close = (event: Event) => void;
 
@@ -24,8 +26,10 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 		title?: string;
 		/** Shows a close button in the header. */
 		closable?: boolean;
-		/** Accessible label of the close button. */
+		/** Accessible name of the close button. Defaults to "Close", in the language of `locale`. */
 		closeLabel?: string;
+		/** BCP 47 locale of the texts: `it` and `en` are built in, other languages fall back to English. Defaults to the one set with `setDefaultLocale`, else `en`. */
+		locale?: string;
 		/** Called when the drawer closes itself (Escape, backdrop, close button, `close` from a snippet, `<form method="dialog">`), with the event that caused it. Not called when `open` is set to `false` from outside. */
 		onclose?: (event: Event) => void;
 		/** The `<dialog>` element. */
@@ -56,7 +60,8 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 		persistent = false,
 		title,
 		closable = false,
-		closeLabel = 'Close',
+		closeLabel,
+		locale: localeProp,
 		onclose,
 		drawerElement = $bindable(),
 		class: clazz = {},
@@ -66,6 +71,10 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 		actionsSnippet,
 		...rest
 	}: Props = $props();
+
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
+	let texts = $derived(libraryTexts(locale).drawer);
 
 	let drawerNode = $state<HTMLDialogElement>();
 
@@ -110,7 +119,7 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 						</h2>
 					{/if}
 					{#if closeSnippet}
-						{@render closeSnippet({ close, closeLabel })}
+						{@render closeSnippet({ close, closeLabel: closeLabel ?? texts.close })}
 					{:else if closable}
 						<Button
 							class="aurora-drawer-close"
@@ -118,7 +127,7 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 							variant="secondary"
 							size="sm"
 							icon={CLOSE_ICON}
-							aria-label={closeLabel}
+							aria-label={closeLabel ?? texts.close}
 							onclick={close}
 						/>
 					{/if}

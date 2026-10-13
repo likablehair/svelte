@@ -12,9 +12,11 @@ Empty state: an icon, a title, an optional description and optional actions (`ch
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import Icon from '../media/Icon.svelte';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import { libraryTexts } from '../../../utils/texts.js';
 
 	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'children' | 'title'> {
-		/** Main text. */
+		/** Main text. Defaults to "No data available", in the language of `locale`. */
 		title?: string;
 		/** Secondary text under the title. */
 		description?: string;
@@ -22,6 +24,8 @@ Empty state: an icon, a title, an optional description and optional actions (`ch
 		icon?: string;
 		/** `md` the full illustration, `sm` only the icon and the text. */
 		size?: 'sm' | 'md';
+		/** BCP 47 locale of the texts: `it` and `en` are built in, other languages fall back to English. Defaults to the one set with `setDefaultLocale`, else `en`. */
+		locale?: string;
 		/** Extra classes on the root element. */
 		class?: string;
 		/** Actions under the text, for example a button that creates the first item. */
@@ -35,10 +39,11 @@ Empty state: an icon, a title, an optional description and optional actions (`ch
 	}
 
 	let {
-		title = 'No data available',
+		title: titleProp,
 		description,
 		icon = DATABASE_OFF_ICON,
 		size = 'md',
+		locale: localeProp,
 		class: clazz = '',
 		children,
 		titleSnippet,
@@ -46,6 +51,10 @@ Empty state: an icon, a title, an optional description and optional actions (`ch
 		iconSnippet,
 		...rest
 	}: Props = $props();
+
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
+	let title = $derived(titleProp ?? libraryTexts(locale).noData.title);
 </script>
 
 <div {...rest} class={['aurora-no-data', clazz]} data-size={size}>

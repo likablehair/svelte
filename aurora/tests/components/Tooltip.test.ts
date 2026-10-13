@@ -2,6 +2,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import Tooltip from '#lib/components/simple/common/Tooltip.svelte';
+import RemovableActivator from '../fixtures/tooltip/RemovableActivator.svelte';
 import SpreadAttributes from '../fixtures/tooltip/SpreadAttributes.svelte';
 import TooltipHarness from '../fixtures/tooltip/TooltipHarness.svelte';
 import TooltipInMenu from '../fixtures/tooltip/TooltipInMenu.svelte';
@@ -75,7 +76,8 @@ describe('Tooltip', () => {
 	});
 
 	test('closes on Escape, keeping the focus on the activator', async () => {
-		const { activator, isOpen } = await setup({ appearTimeout: 5000 });
+		const { screen, activator, isOpen } = await setup({ appearTimeout: 5000 });
+		await screen.getByRole('button', { name: 'Show Save tip' }).hover();
 		await userEvent.keyboard('{Tab}');
 		await expect.poll(isOpen).toBe(true);
 		await userEvent.keyboard('{Escape}');
@@ -232,5 +234,17 @@ describe('Tooltip', () => {
 		expect(style.backgroundColor).toBe('rgb(1, 2, 3)');
 		expect(style.maxWidth).toBe('120px');
 		button.remove();
+	});
+	test('an activator removed while it has the focus closes the tooltip without errors', async () => {
+		const screen = await render(RemovableActivator);
+		await userEvent.keyboard('{Tab}');
+		const first = screen.getByRole('button', { name: 'Remove First' });
+		await expect.element(first).toHaveFocus();
+		await expect.element(page.getByRole('tooltip', { name: 'Remove First' })).toBeVisible();
+		await userEvent.keyboard('{Enter}');
+		await expect.element(first).not.toBeInTheDocument();
+		await expect.element(page.getByRole('tooltip', { name: 'Remove First' })).not.toBeInTheDocument();
+		await screen.getByRole('button', { name: 'Remove Second' }).click();
+		await expect.element(screen.getByRole('button', { name: 'Remove Second' })).not.toBeInTheDocument();
 	});
 });

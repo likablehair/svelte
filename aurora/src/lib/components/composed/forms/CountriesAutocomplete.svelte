@@ -1,5 +1,5 @@
 <!-- @component
-Autocomplete of countries, with their flags. The names come from the browser in the language of `locale` (English by default), so every language works, and the list is sorted by name in that language. The search ignores case and accents and also matches the ISO code (`us` finds the United States): names that start with the text come first, then the country with that code, then names with a word that starts with it, then the rest. `values` holds `Item`s whose `value` is the uppercase ISO 3166-1 alpha-2 code (`IT`); they can be set with the code alone, `[{ value: 'IT' }]`: the component fills in the name in `locale` and the dialing code. With `dialCode` every option also shows its dialing code (`+39`), which is in `item.data.dialCode` anyway. For a subset of the countries, or other labels, pass `items`, for example `countryItems('it', ['IT', 'SM', 'VA'])`. Everything else works as in `Autocomplete`, including its props, snippets, events and `--autocomplete-*` variables; the flags take the `--flag-icon-*` ones.
+Autocomplete of countries, with their flags. The names come from the browser in the language of `locale` (the one set with `setDefaultLocale`, else English), so every language works, and the list is sorted by name in that language. The search ignores case and accents and also matches the ISO code (`us` finds the United States): names that start with the text come first, then the country with that code, then names with a word that starts with it, then the rest. `values` holds `Item`s whose `value` is the uppercase ISO 3166-1 alpha-2 code (`IT`); they can be set with the code alone, `[{ value: 'IT' }]`: the component fills in the name in `locale` and the dialing code. With `dialCode` every option also shows its dialing code (`+39`), which is in `item.data.dialCode` anyway. For a subset of the countries, or other labels, pass `items`, for example `countryItems('it', ['IT', 'SM', 'VA'])`. Everything else works as in `Autocomplete`, including its props, snippets, events and `--autocomplete-*` variables; the flags take the `--flag-icon-*` ones.
 -->
 <script lang="ts">
 	import '../../../css/tokens.css';
@@ -9,11 +9,12 @@ Autocomplete of countries, with their flags. The names come from the browser in 
 	import type { Item } from '../../simple/forms/item.js';
 	import FlagIcon from '../../simple/media/FlagIcon.svelte';
 	import { countryItems, countryName, type CountryData } from '../../../utils/countries.js';
+	import { inheritedLocale } from '../../../utils/locale.js';
 
 	type AutocompleteProps = ComponentProps<typeof Autocomplete<CountryData>>;
 
 	interface Props extends Omit<AutocompleteProps, 'items' | 'searchFunction' | 'class'> {
-		/** Language of the country names, as a BCP 47 tag such as `en`, `it` or `fr-CH`. */
+		/** Language of the country names and of the texts, as a BCP 47 tag such as `en`, `it` or `fr-CH` (the texts are English for languages other than `it` and `en`). Defaults to the one set with `setDefaultLocale`, else `en`. */
 		locale?: string;
 		/** Countries to choose from. Defaults to all of them, named in `locale`, that is `countryItems(locale)`. */
 		items?: Item<CountryData>[];
@@ -24,7 +25,7 @@ Autocomplete of countries, with their flags. The names come from the browser in 
 	}
 
 	let {
-		locale = 'en',
+		locale: localeProp,
 		items,
 		dialCode = false,
 		values = $bindable(),
@@ -37,6 +38,9 @@ Autocomplete of countries, with their flags. The names come from the browser in 
 		itemAppendSnippet,
 		...rest
 	}: Props = $props();
+
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
 
 	const DIACRITICS = /\p{Diacritic}/gu;
 	const fold = (value: string) => value.normalize('NFD').replace(DIACRITICS, '').toLowerCase();
@@ -98,6 +102,7 @@ Autocomplete of countries, with their flags. The names come from the browser in 
 
 <Autocomplete
 	{...rest}
+	{locale}
 	bind:values={() => selection, (selected) => (values = selected)}
 	bind:searchText
 	bind:open

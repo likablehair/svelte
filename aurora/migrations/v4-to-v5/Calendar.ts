@@ -239,9 +239,9 @@ export default {
 			{
 				name: 'locale',
 				v4: "'it'",
-				v5: "'en'",
+				v5: "'en', or the one of setDefaultLocale",
 				keepV4: 'locale="it"',
-				note: 'Without it the month and day names are English and the week starts on Sunday. Add `locale="it"` to every usage that omits it, unless the app wants English.'
+				note: 'Without `locale` and without `setDefaultLocale` the month and day names are English and the week starts on Sunday. Call `setDefaultLocale("it")` once in the root layout (step `global-default-locale`); add `locale="it"` only to usages rendered outside it, unless the app wants English.'
 			},
 			{
 				name: 'weekdayFormat',

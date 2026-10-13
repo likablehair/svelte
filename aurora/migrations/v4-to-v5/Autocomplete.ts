@@ -399,6 +399,7 @@ const rule = {
 		'`icon` and `iconSnippet` at the start of the field.',
 		'`loading` with `loadingText` / `loadingSnippet`; `noResultsText` / `emptySnippet({ searchText })` when nothing matches.',
 		'`removeLabel` (chip remove buttons), `drawerSearch`, `drawerTitle`, `closeLabel` (mobile drawer).',
+		'`locale` (BCP 47): language of the default texts, Italian with `it`, English otherwise; without it the one of `setDefaultLocale` (step `global-default-locale`), else `en`. Text props win over it.',
 		'`chipIconSnippet`, `itemIconSnippet`, `itemAppendSnippet`.',
 		'`bind:input` and the native attributes and events of the `<input>`.',
 		'`data-state`, `data-disabled`, `data-open`, `data-loading` on the root element.',

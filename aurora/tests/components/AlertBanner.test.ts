@@ -11,7 +11,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import AlertBanner from '#lib/components/simple/notifiers/AlertBanner.svelte';
-import { snippet, text } from '../helpers.js';
+import { renderWithDefaultLocale, snippet, text } from '../helpers.js';
 
 type Variant = 'info' | 'success' | 'warning' | 'error';
 
@@ -236,5 +236,24 @@ describe('AlertBanner', () => {
 		const icon = getComputedStyle(banner.querySelector('.aurora-alert-banner-icon')!);
 		expect(icon.backgroundColor).toBe('rgb(7, 8, 9)');
 		expect(icon.color).toBe('rgb(10, 11, 12)');
+	});
+});
+
+describe('AlertBanner texts', () => {
+	test('follow locale, and closeLabel wins', async () => {
+		const italian = await render(AlertBanner, { title: 'Salvato', closable: true, locale: 'it' });
+		await expect.element(italian.getByRole('button', { name: 'Chiudi' })).toBeVisible();
+		await italian.unmount();
+		const own = await render(AlertBanner, { title: 'Salvato', closable: true, locale: 'it', closeLabel: 'Nascondi' });
+		await expect.element(own.getByRole('button', { name: 'Nascondi' })).toBeVisible();
+	});
+
+	test('follow setDefaultLocale, and the locale prop wins over it', async () => {
+		const props = { title: 'Salvato', closable: true };
+		const inherited = await renderWithDefaultLocale('it', AlertBanner, props);
+		await expect.element(inherited.getByRole('button', { name: 'Chiudi' })).toBeVisible();
+		await inherited.unmount();
+		const own = await renderWithDefaultLocale('it', AlertBanner, { ...props, locale: 'en' });
+		await expect.element(own.getByRole('button', { name: 'Dismiss' })).toBeVisible();
 	});
 });

@@ -160,7 +160,15 @@ export function getComponentDoc(slug: string): ComponentDoc | undefined {
 	const cssFile = lib[`/src/lib/${entry.file.replace(/\.svelte$/, '.css')}`];
 	const allDefaults = cssFile ? parseCssDefaults(cssFile) : [];
 	const componentDefaults = allDefaults.filter((d) => d.name.startsWith(`${prefix}default-`));
-	const instance = instanceVars(ast.css?.content.styles ?? '', prefix);
+	const partsDir = `/src/lib/${entry.file.replace(/[^/]+$/, entry.slug)}/`;
+	const styles = [
+		ast.css?.content.styles ?? '',
+		...Object.keys(lib)
+			.filter((path) => path.startsWith(partsDir) && path.endsWith('.svelte'))
+			.sort()
+			.map((path) => parse(lib[path], { modern: true }).css?.content.styles ?? '')
+	].join('\n');
+	const instance = instanceVars(styles, prefix);
 	const cssVars: CssVarDoc[] = instance.map(({ name, fallback }) => {
 		const inherits = fallback.match(new RegExp(`^var\\((${prefix}[\\w-]+)`))?.[1];
 		return {

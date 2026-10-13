@@ -7,14 +7,18 @@ Pair of buttons that closes a form or a dialog: a text "Cancel" button and a fil
 	import type { ComponentProps, Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import Button from '../../simple/buttons/Button.svelte';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import { libraryTexts } from '../../../utils/texts.js';
 
 	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
 		/** Shows a spinner on the confirm button and disables it. */
 		loading?: boolean;
-		/** Text of the confirm button. */
+		/** Text of the confirm button. Defaults to "Save", in the language of `locale`. */
 		confirmText?: string;
-		/** Text of the cancel button. */
+		/** Text of the cancel button. Defaults to "Cancel", in the language of `locale`. */
 		cancelText?: string;
+		/** BCP 47 locale of the texts: `it` and `en` are built in, other languages fall back to English. Defaults to the one set with `setDefaultLocale`, else `en`. */
+		locale?: string;
 		/** Disables the confirm button. */
 		confirmDisable?: boolean;
 		/** Disables the cancel button. */
@@ -67,8 +71,9 @@ Pair of buttons that closes a form or a dialog: a text "Cancel" button and a fil
 
 	let {
 		loading = false,
-		confirmText = 'Save',
-		cancelText = 'Cancel',
+		confirmText: confirmTextProp,
+		cancelText: cancelTextProp,
+		locale: localeProp,
 		confirmDisable = false,
 		cancelDisable = false,
 		confirmIcon,
@@ -83,6 +88,12 @@ Pair of buttons that closes a form or a dialog: a text "Cancel" button and a fil
 		confirmButtonSnippet,
 		...rest
 	}: Props = $props();
+
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
+	let texts = $derived(libraryTexts(locale).confirmOrCancelButtons);
+	let confirmText = $derived(confirmTextProp ?? texts.confirm);
+	let cancelText = $derived(cancelTextProp ?? texts.cancel);
 
 	function handleConfirm(event: MouseEvent) {
 		if (!confirmDisable && !loading) onconfirmClick?.(event);

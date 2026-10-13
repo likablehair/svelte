@@ -10,13 +10,11 @@ export default {
 				from: 'iconName',
 				to: 'icon',
 				note: 'The value changes too: an MDI class name becomes an SVG path (`iconName="mdi-magnify"` → `icon={mdiMagnify}`).'
-			}
-		],
-		changed: [
+			},
 			{
-				name: 'lang',
-				native: true,
-				note: 'No longer a prop: it still type-checks but becomes the native `lang` attribute of the root, which would mark the English default title ("No data available") as Italian. Delete it; where `lang="it"` relied on the Italian default, pass `title="Nessun dato disponibile"`.'
+				from: 'lang',
+				to: 'locale',
+				note: 'The default title follows `locale` ("No data available", "Nessun dato disponibile" with `it`). `lang="it"` → `locale="it"`, or nothing when the root layout calls `setDefaultLocale("it")` (step `global-default-locale`). A v4 NoData without `lang` was English: with `setDefaultLocale("it")` it becomes Italian, so pass `locale="en"` only where English is wanted.'
 			}
 		],
 		defaults: [

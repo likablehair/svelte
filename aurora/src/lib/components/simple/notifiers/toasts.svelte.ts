@@ -1,4 +1,5 @@
 import type { Snippet } from 'svelte';
+import { TEXTS_EN } from '../../../utils/texts.js';
 
 export type ToastVariant = 'info' | 'success' | 'warning' | 'error';
 
@@ -35,6 +36,8 @@ export type ToasterConfig = {
 	limit: number;
 	closeLabel: string;
 	label: string;
+	loadingLabel: string;
+	progressLabel: string;
 	className?: string;
 	toastSnippet?: Snippet<[{ toast: Toast; close: () => void }]>;
 };
@@ -47,8 +50,10 @@ export const toaster = $state({
 	config: {
 		position: 'bottom-end',
 		limit: 5,
-		closeLabel: 'Dismiss',
-		label: 'Notifications'
+		closeLabel: TEXTS_EN.toaster.close,
+		label: TEXTS_EN.toaster.label,
+		loadingLabel: TEXTS_EN.toaster.loading,
+		progressLabel: TEXTS_EN.toaster.progress
 	} as ToasterConfig
 });
 

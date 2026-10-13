@@ -107,6 +107,7 @@ export default {
 	],
 	added: [
 		'`title` / `titleSnippet` (also the accessible name), `closable` with `closeLabel` / `closeSnippet`, `actionsSnippet` as footer.',
+		'`locale` (BCP 47): language of the default texts, Italian with `it`, English otherwise; without it the one of `setDefaultLocale` (step `global-default-locale`), else `en`. Text props win over it.',
 		'`onclose(event)` when the dialog closes itself (Escape, backdrop, close button, `close`, `<form method="dialog">`).',
 		'Every snippet receives `{ close }`.',
 		'A `<form method="dialog">` inside closes it after a valid submit.',

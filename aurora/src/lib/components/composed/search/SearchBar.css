@@ -1,0 +1,24 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--search-bar-default-width: 100%;
+		--search-bar-default-max-width: none;
+		--search-bar-default-height: 40px;
+		--search-bar-default-padding: 0 6px 0 12px;
+		--search-bar-default-gap: 8px;
+		--search-bar-default-background-color: var(--global-input-background);
+		--search-bar-default-ring-color: var(--global-input-border-color);
+		--search-bar-default-ring-width: var(--global-input-border-width);
+		--search-bar-default-hover-ring-color: var(--global-input-hover-border-color);
+		--search-bar-default-focus-ring-color: var(--global-input-focus-border-color);
+		--search-bar-default-focus-glow-color: var(--global-input-focus-ring-color);
+		--search-bar-default-border-radius: var(--global-input-radius);
+		--search-bar-default-font-size: var(--global-input-font-size);
+		--search-bar-default-line-height: 1.5;
+		--search-bar-default-color: var(--global-input-color);
+		--search-bar-default-placeholder-color: var(--global-input-placeholder-color);
+		--search-bar-default-icon-color: var(--global-input-icon-color);
+		--search-bar-default-icon-size: 18px;
+	}
+}

@@ -9,6 +9,8 @@ Modal dialog on the browser's top layer (`<dialog>` with `showModal()`): it need
 	import Button from '../buttons/Button.svelte';
 	import { CLOSE_ICON, leave, modal } from './modal.js';
 	import ToastList from '../notifiers/ToastList.svelte';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import { libraryTexts } from '../../../utils/texts.js';
 
 	type Close = (event: Event) => void;
 
@@ -22,8 +24,10 @@ Modal dialog on the browser's top layer (`<dialog>` with `showModal()`): it need
 		title?: string;
 		/** Shows a close button in the header. */
 		closable?: boolean;
-		/** Accessible label of the close button. */
+		/** Accessible name of the close button. Defaults to "Close", in the language of `locale`. */
 		closeLabel?: string;
+		/** BCP 47 locale of the texts: `it` and `en` are built in, other languages fall back to English. Defaults to the one set with `setDefaultLocale`, else `en`. */
+		locale?: string;
 		/** Called when the dialog closes itself (Escape, backdrop, close button, `close` from a snippet, `<form method="dialog">`), with the event that caused it. Not called when `open` is set to `false` from outside. */
 		onclose?: (event: Event) => void;
 		/** The `<dialog>` element. */
@@ -59,7 +63,8 @@ Modal dialog on the browser's top layer (`<dialog>` with `showModal()`): it need
 		persistent = false,
 		title,
 		closable = false,
-		closeLabel = 'Close',
+		closeLabel,
+		locale: localeProp,
 		onclose,
 		dialogElement = $bindable(),
 		class: clazz = {},
@@ -72,6 +77,10 @@ Modal dialog on the browser's top layer (`<dialog>` with `showModal()`): it need
 		centerRightSnippet,
 		...rest
 	}: Props = $props();
+
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
+	let texts = $derived(libraryTexts(locale).dialog);
 
 	let dialogNode = $state<HTMLDialogElement>();
 
@@ -119,7 +128,7 @@ Modal dialog on the browser's top layer (`<dialog>` with `showModal()`): it need
 						</h2>
 					{/if}
 					{#if closeSnippet}
-						{@render closeSnippet({ close, closeLabel })}
+						{@render closeSnippet({ close, closeLabel: closeLabel ?? texts.close })}
 					{:else if closable}
 						<Button
 							class="aurora-dialog-close"
@@ -127,7 +136,7 @@ Modal dialog on the browser's top layer (`<dialog>` with `showModal()`): it need
 							variant="secondary"
 							size="sm"
 							icon={CLOSE_ICON}
-							aria-label={closeLabel}
+							aria-label={closeLabel ?? texts.close}
 							onclick={close}
 						/>
 					{/if}

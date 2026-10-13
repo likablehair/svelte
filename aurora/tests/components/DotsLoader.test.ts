@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import DotsLoader from '#lib/components/simple/loaders/DotsLoader.svelte';
+import { renderWithDefaultLocale } from '../helpers.js';
 
 function resolve(property: string, value: string) {
 	const probe = document.createElement('div');
@@ -84,5 +85,23 @@ describe('DotsLoader', () => {
 		expect(styles.map((dot) => dot.animationName.includes('blink'))).toEqual([true, true, true]);
 		expect(styles.map((dot) => parseFloat(dot.animationDelay))).toEqual([0, 0.1, 0.2]);
 		expect(styles.map((dot) => dot.animationDuration)).toEqual(['0.8s', '0.8s', '0.8s']);
+	});
+});
+
+describe('DotsLoader texts', () => {
+	test('follow locale, and label wins', async () => {
+		const italian = await render(DotsLoader, { locale: 'it' });
+		await expect.element(italian.getByRole('progressbar', { name: 'Caricamento' })).toBeInTheDocument();
+		await italian.unmount();
+		const own = await render(DotsLoader, { locale: 'it', label: 'Invio in corso' });
+		await expect.element(own.getByRole('progressbar', { name: 'Invio in corso' })).toBeInTheDocument();
+	});
+
+	test('follow setDefaultLocale, and the locale prop wins over it', async () => {
+		const inherited = await renderWithDefaultLocale('it', DotsLoader);
+		await expect.element(inherited.getByRole('progressbar', { name: 'Caricamento' })).toBeInTheDocument();
+		await inherited.unmount();
+		const own = await renderWithDefaultLocale('it', DotsLoader, { locale: 'en' });
+		await expect.element(own.getByRole('progressbar', { name: 'Loading' })).toBeInTheDocument();
 	});
 });

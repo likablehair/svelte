@@ -11,6 +11,8 @@ Year field: type the year or choose it in a scrolling grid of years. The value i
 	import YearSelector from '../../simple/dates/YearSelector.svelte';
 	import Icon from '../../simple/media/Icon.svelte';
 	import Drawer from '../../simple/navigation/Drawer.svelte';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import { libraryTexts } from '../../../utils/texts.js';
 
 	const CALENDAR_ICON =
 		'M9,10H7V12H9V10M13,10H11V12H13V10M17,10H15V12H17V10M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19Z';
@@ -47,13 +49,15 @@ Year field: type the year or choose it in a scrolling grid of years. The value i
 		min?: number;
 		/** Last year that can be chosen or typed. */
 		max?: number;
+		/** BCP 47 locale of the texts: `it` and `en` are built in, other languages fall back to English. Defaults to the one set with `setDefaultLocale`, else `en`. */
+		locale?: string;
 		/** Visible label above the field, linked to the input. In the mobile drawer it is the title. */
 		label?: string;
 		/** Text below the field. With `state` it becomes the error or success message. */
 		hint?: string;
 		/** Validation state: colors the border and the hint and shows an icon. `error` also sets `aria-invalid`. Without it the field still shows the error state for an invalid year. */
 		state?: 'error' | 'success';
-		/** Message shown below the field, and given to the form, when the typed year is not valid. */
+		/** Message shown below the field, and given to the form, when the typed year is not valid. Defaults to "Enter a valid year", in the language of `locale`. */
 		invalidText?: string;
 		/** Native `placeholder`. */
 		placeholder?: string;
@@ -69,7 +73,7 @@ Year field: type the year or choose it in a scrolling grid of years. The value i
 		name?: string;
 		/** Shows a button that empties the field. */
 		clearable?: boolean;
-		/** Accessible name of the clear button. */
+		/** Accessible name of the clear button. Defaults to "Clear", in the language of `locale`. */
 		clearLabel?: string;
 		/** Closes the menu when a year is chosen. */
 		closeOnSelect?: boolean;
@@ -91,9 +95,9 @@ Year field: type the year or choose it in a scrolling grid of years. The value i
 		mobileDrawer?: boolean;
 		/** Title of the mobile drawer. Defaults to `label`. */
 		drawerTitle?: string;
-		/** Accessible name of the close button of the mobile drawer. */
+		/** Accessible name of the close button of the mobile drawer. Defaults to "Close", in the language of `locale`. */
 		closeLabel?: string;
-		/** Accessible name of the calendar button. */
+		/** Accessible name of the calendar button. Defaults to "Choose year", in the language of `locale`. */
 		openLabel?: string;
 		/** The input element. */
 		input?: HTMLInputElement;
@@ -134,10 +138,11 @@ Year field: type the year or choose it in a scrolling grid of years. The value i
 		open = $bindable(),
 		min = 1900,
 		max = 2100,
+		locale: localeProp,
 		label,
 		hint,
 		state: validationState,
-		invalidText = 'Enter a valid year',
+		invalidText: invalidTextProp,
 		placeholder,
 		disabled = false,
 		readonly = false,
@@ -145,13 +150,13 @@ Year field: type the year or choose it in a scrolling grid of years. The value i
 		id,
 		name,
 		clearable = false,
-		clearLabel = 'Clear',
+		clearLabel,
 		closeOnSelect = true,
 		placement = 'bottom-start',
 		mobileDrawer = true,
 		drawerTitle,
-		closeLabel = 'Close',
-		openLabel = 'Choose year',
+		closeLabel,
+		openLabel: openLabelProp,
 		input = $bindable(),
 		class: clazz = {},
 		labelSnippet,
@@ -171,6 +176,12 @@ Year field: type the year or choose it in a scrolling grid of years. The value i
 		onkeydown,
 		...rest
 	}: Props = $props();
+
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
+	let texts = $derived(libraryTexts(locale).yearPickerTextField);
+	let invalidText = $derived(invalidTextProp ?? texts.invalid);
+	let openLabel = $derived(openLabelProp ?? texts.open);
 
 	const uid = $props.id();
 	const labelId = `${uid}-label`;
@@ -283,6 +294,7 @@ Year field: type the year or choose it in a scrolling grid of years. The value i
 		{selectedYear}
 		{min}
 		{max}
+		{locale}
 		id={pickerId}
 		aria-label={label ?? openLabel}
 		class={{ container: clazz.picker }}
@@ -410,7 +422,7 @@ Year field: type the year or choose it in a scrolling grid of years. The value i
 					<button
 						type="button"
 						class="aurora-year-picker-text-field-clear"
-						aria-label={clearLabel}
+						aria-label={clearLabel ?? texts.clear}
 						onmousedown={(event) => event.preventDefault()}
 						onclick={clear}
 					>
@@ -457,7 +469,7 @@ Year field: type the year or choose it in a scrolling grid of years. The value i
 		title={drawerTitle ?? label}
 		aria-label={(drawerTitle ?? label) ? undefined : openLabel}
 		closable
-		{closeLabel}
+		closeLabel={closeLabel ?? texts.close}
 		class={{
 			drawer: 'aurora-year-picker-text-field-drawer',
 			body: 'aurora-year-picker-text-field-drawer-body'

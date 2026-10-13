@@ -4,6 +4,7 @@ import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import Calendar, { type CalendarDay } from '#lib/components/simple/dates/Calendar.svelte';
 import { parseISODate, toISODate } from '#lib/utils/dates.js';
+import { renderWithDefaultLocale } from '../helpers.js';
 
 const fullDate = new Intl.DateTimeFormat('en', { dateStyle: 'full' });
 
@@ -762,5 +763,23 @@ describe('Calendar', () => {
 		const selected = cell('2026-10-09').querySelector('.aurora-calendar-day-content')!;
 		expect(getComputedStyle(selected).backgroundColor).toBe('rgb(1, 2, 3)');
 		expect(getComputedStyle(selected).color).toBe('rgb(4, 5, 6)');
+	});
+});
+
+describe('Calendar locale', () => {
+	test('setDefaultLocale gives the names and the first day of the week; the locale prop wins', async () => {
+		const props = { visibleMonth: 9, visibleYear: 2026 };
+		const inherited = await renderWithDefaultLocale('it', Calendar, props);
+		await expect.element(inherited.getByRole('grid', { name: 'Ottobre 2026' })).toBeVisible();
+		expect(inherited.getByRole('columnheader').elements()[0]).toHaveAttribute('aria-label', 'Lunedì');
+		await inherited.unmount();
+		const own = await renderWithDefaultLocale('it', Calendar, { ...props, locale: 'en' });
+		await expect.element(own.getByRole('grid', { name: 'October 2026' })).toBeVisible();
+		expect(own.getByRole('columnheader').elements()[0]).toHaveAttribute('aria-label', 'Sunday');
+	});
+
+	test('without setDefaultLocale, or with an empty one, it is English', async () => {
+		const screen = await renderWithDefaultLocale(undefined, Calendar, { visibleMonth: 9, visibleYear: 2026 });
+		await expect.element(screen.getByRole('grid', { name: 'October 2026' })).toBeVisible();
 	});
 });

@@ -3,6 +3,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import YearSelector from '#lib/components/simple/dates/YearSelector.svelte';
+import { renderWithDefaultLocale } from '../helpers.js';
 
 function year(value: number) {
 	return page.getByRole('option', { name: String(value), exact: true });
@@ -294,5 +295,23 @@ describe('YearSelector', () => {
 		expect(list.getBoundingClientRect().height).toBe(80);
 		expect(getComputedStyle(year(2022).element()).backgroundColor).toBe('rgb(1, 2, 3)');
 		expect(getComputedStyle(list).gridTemplateColumns.split(' ')).toHaveLength(2);
+	});
+});
+
+describe('YearSelector texts', () => {
+	test('follow locale, and aria-label wins', async () => {
+		const italian = await render(YearSelector, { locale: 'it' });
+		await expect.element(italian.getByRole('listbox', { name: 'Anno' })).toBeVisible();
+		await italian.unmount();
+		const own = await render(YearSelector, { locale: 'it', 'aria-label': 'Anno di nascita' });
+		await expect.element(own.getByRole('listbox', { name: 'Anno di nascita' })).toBeVisible();
+	});
+
+	test('follow setDefaultLocale, and the locale prop wins over it', async () => {
+		const inherited = await renderWithDefaultLocale('it', YearSelector);
+		await expect.element(inherited.getByRole('listbox', { name: 'Anno' })).toBeVisible();
+		await inherited.unmount();
+		const own = await renderWithDefaultLocale('it', YearSelector, { locale: 'en' });
+		await expect.element(own.getByRole('listbox', { name: 'Year' })).toBeVisible();
 	});
 });

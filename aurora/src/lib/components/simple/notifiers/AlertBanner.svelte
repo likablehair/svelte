@@ -19,6 +19,8 @@ Message banner inside the page, with a colored icon, a title, a description, an 
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import Icon from '../media/Icon.svelte';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import { libraryTexts } from '../../../utils/texts.js';
 
 	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'children' | 'title' | 'onclose'> {
 		/** Color and default icon. */
@@ -31,8 +33,10 @@ Message banner inside the page, with a colored icon, a title, a description, an 
 		icon?: string;
 		/** Shows a close button that calls `onclose`. */
 		closable?: boolean;
-		/** Accessible name of the close button. */
+		/** Accessible name of the close button. Defaults to "Dismiss", in the language of `locale`. */
 		closeLabel?: string;
+		/** BCP 47 locale of the texts: `it` and `en` are built in, other languages fall back to English. Defaults to the one set with `setDefaultLocale`, else `en`. */
+		locale?: string;
 		/** Called on a click on the close button. Remove the banner here. */
 		onclose?: (event: MouseEvent) => void;
 		/** Extra classes for each part: the root, the icon box, the text block, the title and the description. */
@@ -63,7 +67,8 @@ Message banner inside the page, with a colored icon, a title, a description, an 
 		description,
 		icon,
 		closable = false,
-		closeLabel = 'Dismiss',
+		closeLabel,
+		locale: localeProp,
 		onclose,
 		class: clazz = {},
 		children,
@@ -74,6 +79,10 @@ Message banner inside the page, with a colored icon, a title, a description, an 
 		closeSnippet,
 		...rest
 	}: Props = $props();
+
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
+	let texts = $derived(libraryTexts(locale).alertBanner);
 
 	let iconPath = $derived(icon ?? ICONS[variant]);
 
@@ -115,9 +124,9 @@ Message banner inside the page, with a colored icon, a title, a description, an 
 		<div class="aurora-alert-banner-append">{@render appendSnippet()}</div>
 	{/if}
 	{#if closeSnippet}
-		{@render closeSnippet({ close, closeLabel })}
+		{@render closeSnippet({ close, closeLabel: closeLabel ?? texts.close })}
 	{:else if closable}
-		<button type="button" class="aurora-alert-banner-close" aria-label={closeLabel} onclick={close}>
+		<button type="button" class="aurora-alert-banner-close" aria-label={closeLabel ?? texts.close} onclick={close}>
 			<Icon path={CLOSE_ICON} />
 		</button>
 	{/if}

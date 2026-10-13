@@ -7,6 +7,8 @@ Autocomplete whose options come from a server: while the user types, it calls `s
 	import { untrack, type ComponentProps, type Snippet } from 'svelte';
 	import Autocomplete from '../../simple/forms/Autocomplete.svelte';
 	import type { Item } from '../../simple/forms/item.js';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import { libraryTexts } from '../../../utils/texts.js';
 
 	const SEARCH_ICON =
 		'M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z';
@@ -29,9 +31,9 @@ Autocomplete whose options come from a server: while the user types, it calls `s
 		searching?: boolean;
 		/** SVG path of the icon at the start of the field. An empty string removes it. */
 		icon?: string;
-		/** Text of the row shown below `searchThreshold` when no `items` match. Defaults to "Type at least N characters". */
+		/** Text of the row shown below `searchThreshold` when no `items` match. Defaults to "Type at least N characters", in the language of `locale`. */
 		thresholdText?: string;
-		/** Text of the row shown when a search fails. */
+		/** Text of the row shown when a search fails. Defaults to "Couldn't load results", in the language of `locale`. */
 		errorText?: string;
 		/** Called when `searcher` throws or rejects, except for searches aborted by a newer one. */
 		onerror?: (error: unknown) => void;
@@ -47,9 +49,10 @@ Autocomplete whose options come from a server: while the user types, it calls `s
 		searching = $bindable(),
 		icon = SEARCH_ICON,
 		thresholdText,
-		errorText = "Couldn't load results",
-		noResultsText = 'No results',
-		loadingText = 'Loading…',
+		errorText,
+		noResultsText,
+		loadingText,
+		locale: localeProp,
 		values = $bindable(),
 		searchText = $bindable(),
 		open = $bindable(),
@@ -60,6 +63,10 @@ Autocomplete whose options come from a server: while the user types, it calls `s
 		loadingSnippet,
 		...rest
 	}: Props = $props();
+
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
+	let texts = $derived(libraryTexts(locale));
 
 	let text = $derived((searchText ?? '').trim());
 	let results: Item<Data>[] = $state.raw([]);
@@ -139,7 +146,7 @@ Autocomplete whose options come from a server: while the user types, it calls `s
 		{@render loadingSnippet()}
 	{:else}
 		<span class="aurora-async-autocomplete-skeleton">
-			<span class="aurora-async-autocomplete-loading-text">{loadingText}</span>
+			<span class="aurora-async-autocomplete-loading-text">{loadingText ?? texts.autocomplete.loading}</span>
 			{#each SKELETON_ROWS as width (width)}
 				<span class="aurora-async-autocomplete-skeleton-row" aria-hidden="true">
 					<span class="aurora-async-autocomplete-skeleton-avatar"></span>
@@ -155,20 +162,23 @@ Autocomplete whose options come from a server: while the user types, it calls `s
 		{#if errorSnippet}
 			{@render errorSnippet({ error, search })}
 		{:else}
-			{errorText}
+			{errorText ?? texts.asyncAutocomplete.searchError}
 		{/if}
 	{:else if !showResults}
 		{thresholdText ??
-			`Type at least ${searchThreshold} ${searchThreshold === 1 ? 'character' : 'characters'}`}
+			(searchThreshold === 1
+				? texts.asyncAutocomplete.typeMoreOne
+				: texts.asyncAutocomplete.typeMore.replace('{count}', String(searchThreshold)))}
 	{:else if emptySnippet}
 		{@render emptySnippet(params)}
 	{:else}
-		{noResultsText}
+		{noResultsText ?? texts.autocomplete.noResults}
 	{/if}
 {/snippet}
 
 <Autocomplete
 	{...rest}
+	{locale}
 	bind:values
 	bind:searchText
 	bind:open

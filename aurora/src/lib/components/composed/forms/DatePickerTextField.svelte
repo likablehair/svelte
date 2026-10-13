@@ -1,5 +1,5 @@
 <!-- @component
-Date field: type the date or choose it in a calendar. The value is `selectedDate`, a `Date` at local midnight; with `range` the field has a start and an end input and `selectedDateTo` holds the end. The format comes from `locale` (`en` is MM/dd/yyyy, `it` dd/MM/yyyy) or from `format`, and it is shown as a chip at the end of the field. Typing accepts digits only and adds the separators; a whole date that does not exist, is outside `min` and `max` or is disabled by `isDateDisabled` (and an unfinished one when the field loses focus) turns the field to the error state with `invalidText`, and the form refuses to submit it. On desktop, focusing or clicking the field opens a `DatePicker` in a menu; Arrow Down moves the focus into it, Escape closes it and Tab leaves it. On screens up to 1024px wide the calendar button opens it in a bottom drawer instead, and the field stays typable with the numeric keyboard (`mobileDrawer`). Choosing a day closes the calendar (`closeOnSelect`). With `name` (and `nameTo`) the value is submitted as `yyyy-MM-dd`. Its state is exposed as `data-state`, `data-disabled`, `data-readonly`, `data-open` and `data-range` for app CSS.
+Date field: type the date or choose it in a calendar. The value is `selectedDate`, a `Date` at local midnight; with `range` the field has a start and an end input and `selectedDateTo` holds the end. The format comes from `locale` (`en` is MM/dd/yyyy, `it` dd/MM/yyyy) or from `format`, and it is shown as a chip after the text, which hides itself when the field is too narrow for both. Typing accepts digits only and adds the separators; a whole date that does not exist, is outside `min` and `max` or is disabled by `isDateDisabled` (and an unfinished one when the field loses focus) turns the field to the error state with `invalidText`, and the form refuses to submit it. On desktop, focusing or clicking the field opens a `DatePicker` in a menu; Arrow Down moves the focus into it, Escape closes it and Tab leaves it. On screens up to 1024px wide the calendar button opens it in a bottom drawer instead, and the field stays typable with the numeric keyboard (`mobileDrawer`). Choosing a day closes the calendar (`closeOnSelect`). With `name` (and `nameTo`) the value is submitted as `yyyy-MM-dd`. Its state is exposed as `data-state`, `data-disabled`, `data-readonly`, `data-open` and `data-range` for app CSS.
 -->
 <script lang="ts">
 	import '../../../css/tokens.css';
@@ -23,6 +23,8 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		sameDay,
 		toISODate
 	} from '../../../utils/dates.js';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import { formatLetters, libraryTexts } from '../../../utils/texts.js';
 
 	const CALENDAR_ICON =
 		'M19 3H18V1H16V3H8V1H6V3H5C3.89 3 3 3.9 3 5V19C3 20.11 3.9 21 5 21H19C20.11 21 21 20.11 21 19V5C21 3.9 20.11 3 19 3M19 19H5V9H19V19M19 7H5V5H19V7Z';
@@ -59,7 +61,7 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		range?: boolean;
 		/** Whether the calendar is open. `undefined` counts as closed. */
 		open?: boolean;
-		/** BCP 47 locale of the format, of the names in the calendar and of the first day of the week. */
+		/** BCP 47 locale of the format, of the names in the calendar, of the first day of the week and of the texts (`it` and `en` are built in, other languages fall back to English). Defaults to the one set with `setDefaultLocale`, else `en`. */
 		locale?: string;
 		/** Format of the typed date, with the tokens `dd`, `MM` and `yyyy` and any separator (`dd/MM/yyyy`, `yyyy-MM-dd`, `dd.MM.yyyy`). Defaults to the one of `locale`. */
 		format?: string;
@@ -81,7 +83,7 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		hint?: string;
 		/** Validation state: colors the border and the hint and shows an icon. `error` also sets `aria-invalid`. Without it the field still shows the error state for an invalid date. */
 		state?: 'error' | 'success';
-		/** Message shown below the field, and given to the form, when the typed date is not valid. */
+		/** Message shown below the field, and given to the form, when the typed date is not valid. Defaults to "Enter a valid date", in the language of `locale`. */
 		invalidText?: string;
 		/** Placeholder of the (start) input. Without it the format chip tells what to type. */
 		placeholder?: string;
@@ -101,7 +103,7 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		nameTo?: string;
 		/** Shows a button that empties the field. */
 		clearable?: boolean;
-		/** Accessible name of the clear button. */
+		/** Accessible name of the clear button. Defaults to "Clear", in the language of `locale`. */
 		clearLabel?: string;
 		/** Closes the calendar when a day is chosen (with `range`, when the end is chosen). */
 		closeOnSelect?: boolean;
@@ -123,18 +125,26 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		mobileDrawer?: boolean;
 		/** Title of the mobile drawer. Defaults to `label`. */
 		drawerTitle?: string;
-		/** Accessible name of the close button of the mobile drawer. */
+		/** Accessible name of the close button of the mobile drawer. Defaults to "Close", in the language of `locale`. */
 		closeLabel?: string;
-		/** Accessible name of the calendar button, and of the calendar when there is no `label`. */
+		/** Accessible name of the calendar button, and of the calendar when there is no `label`. Defaults to "Choose date", in the language of `locale`. */
 		openLabel?: string;
-		/** With `range`, accessible name of the start input, after the label. */
+		/** With `range`, accessible name of the start input, after the label. Defaults to "Start date", in the language of `locale`. */
 		startLabel?: string;
-		/** With `range`, accessible name of the end input, after the label. */
+		/** With `range`, accessible name of the end input, after the label. Defaults to "End date", in the language of `locale`. */
 		endLabel?: string;
-		/** Shows the format as a chip at the end of the field, also read by screen readers. */
+		/** Shows the format as a chip after the text, also read by screen readers. The chip hides itself while the field is too narrow for the whole text and the chip. */
 		showFormat?: boolean;
-		/** Text of the format chip. Defaults to the format in lowercase (`dd/mm/yyyy`). */
+		/** Text of the format chip. Defaults to the format in lowercase, with the letters of the language of `locale` (`dd/mm/yyyy`, in Italian `gg/mm/aaaa`). */
 		formatLabel?: string;
+		/** Accessible name of the calendar's left arrow in the day view (`DatePicker`). Defaults to "Previous month", in the language of `locale`. */
+		previousMonthLabel?: string;
+		/** Accessible name of the calendar's right arrow in the day view. Defaults to "Next month", in the language of `locale`. */
+		nextMonthLabel?: string;
+		/** Accessible name of the calendar's left arrow in the month view. Defaults to "Previous year", in the language of `locale`. */
+		previousYearLabel?: string;
+		/** Accessible name of the calendar's right arrow in the month view. Defaults to "Next year", in the language of `locale`. */
+		nextYearLabel?: string;
 		/** The (start) input element. */
 		input?: HTMLInputElement;
 		/** With `range`, the end input element. */
@@ -159,7 +169,7 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		iconSnippet?: Snippet;
 		/** Content outside the field, on the left. */
 		prependSnippet?: Snippet;
-		/** Content inside the field, before the clear button and the format chip. */
+		/** Content inside the field, after the format chip and before the clear button. */
 		appendInnerSnippet?: Snippet;
 		/** Content outside the field, on the right. */
 		appendSnippet?: Snippet;
@@ -180,7 +190,7 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		selectedDateTo = $bindable(),
 		range = false,
 		open = $bindable(),
-		locale = 'en',
+		locale: localeProp,
 		format,
 		weekStart,
 		weekdayFormat = 'short',
@@ -191,7 +201,7 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		label,
 		hint,
 		state: validationState,
-		invalidText = 'Enter a valid date',
+		invalidText: invalidTextProp,
 		placeholder,
 		placeholderTo,
 		disabled = false,
@@ -201,17 +211,21 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		name,
 		nameTo,
 		clearable = false,
-		clearLabel = 'Clear',
+		clearLabel,
 		closeOnSelect = true,
 		placement = 'bottom-start',
 		mobileDrawer = true,
 		drawerTitle,
-		closeLabel = 'Close',
-		openLabel = 'Choose date',
-		startLabel = 'Start date',
-		endLabel = 'End date',
+		closeLabel,
+		openLabel: openLabelProp,
+		startLabel,
+		endLabel,
 		showFormat = true,
 		formatLabel,
+		previousMonthLabel,
+		nextMonthLabel,
+		previousYearLabel,
+		nextYearLabel,
 		input = $bindable(),
 		inputTo = $bindable(),
 		class: clazz = {},
@@ -235,6 +249,12 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		...rest
 	}: Props = $props();
 
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
+	let texts = $derived(libraryTexts(locale));
+	let invalidText = $derived(invalidTextProp ?? texts.datePickerTextField.invalid);
+	let openLabel = $derived(openLabelProp ?? texts.datePickerTextField.open);
+
 	const uid = $props.id();
 	const labelId = `${uid}-label`;
 	const hintId = `${uid}-hint`;
@@ -248,7 +268,7 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 	let drawerMode = $derived(mobileDrawer && mobile.current);
 	let pattern = $derived(format ?? formatOf(locale));
 	let length = $derived(formatDate(new Date(2000, 0, 1), pattern).length);
-	let chip = $derived(formatLabel ?? pattern.toLowerCase());
+	let chip = $derived(formatLabel ?? formatLetters(pattern, texts.dateLetters));
 
 	let anchor = $state<HTMLDivElement>();
 	let inputNode = $state<HTMLInputElement>();
@@ -485,6 +505,10 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		{isDateDisabled}
 		{daySnippet}
 		{dayAppendSnippet}
+		{previousMonthLabel}
+		{nextMonthLabel}
+		{previousYearLabel}
+		{nextYearLabel}
 		id={pickerId}
 		role={drawerMode ? undefined : 'dialog'}
 		aria-label={drawerMode ? undefined : (label ?? openLabel)}
@@ -528,7 +552,7 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		<div
 			class={['aurora-date-picker-text-field-control', clazz.field]}
 			bind:this={anchor}
-			style:--aurora-date-chars={Math.max(length, placeholder?.length ?? 0, placeholderTo?.length ?? 0)}
+			style:--_chars={Math.max(length, placeholder?.length ?? 0, placeholderTo?.length ?? 0)}
 			onmousedown={(event) => {
 				if ((event.target as Element).closest('input, button')) return;
 				event.preventDefault();
@@ -567,27 +591,11 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 			{#if range}
 				<Icon path={ARROW_ICON} class="aurora-date-picker-text-field-separator" />
 				{@render field('to')}
-				<span hidden id={startId}>{startLabel}</span>
-				<span hidden id={endId}>{endLabel}</span>
+				<span hidden id={startId}>{startLabel ?? texts.datePickerTextField.start}</span>
+				<span hidden id={endId}>{endLabel ?? texts.datePickerTextField.end}</span>
 			{/if}
-			<span class="aurora-date-picker-text-field-end">
-				{@render appendInnerSnippet?.()}
-				{#if clearable && filled && !disabled && !readonly}
-					<button
-						type="button"
-						class="aurora-date-picker-text-field-clear"
-						aria-label={clearLabel}
-						onmousedown={(event) => event.preventDefault()}
-						onclick={clear}
-					>
-						{#if clearSnippet}
-							{@render clearSnippet()}
-						{:else}
-							<Icon path={CLEAR_ICON} />
-						{/if}
-					</button>
-				{/if}
-				{#if showFormat}
+			{#if showFormat}
+				<span class="aurora-date-picker-text-field-format-slot">
 					<kbd class="aurora-date-picker-text-field-format" aria-hidden="true">
 						{#if formatSnippet}
 							{@render formatSnippet({ format: pattern })}
@@ -596,16 +604,36 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 						{/if}
 					</kbd>
 					<span hidden id={formatId}>{chip}</span>
-				{/if}
-				{#if validation && stateIconSnippet}
-					{@render stateIconSnippet({ state: validation })}
-				{:else if validation}
-					<Icon
-						path={validation === 'error' ? ALERT_ICON : SUCCESS_ICON}
-						class="aurora-date-picker-text-field-state-icon"
-					/>
-				{/if}
-			</span>
+				</span>
+			{/if}
+			{#if appendInnerSnippet || (clearable && filled && !disabled && !readonly) || validation}
+				<span class="aurora-date-picker-text-field-end">
+					{@render appendInnerSnippet?.()}
+					{#if clearable && filled && !disabled && !readonly}
+						<button
+							type="button"
+							class="aurora-date-picker-text-field-clear"
+							aria-label={clearLabel ?? texts.datePickerTextField.clear}
+							onmousedown={(event) => event.preventDefault()}
+							onclick={clear}
+						>
+							{#if clearSnippet}
+								{@render clearSnippet()}
+							{:else}
+								<Icon path={CLEAR_ICON} />
+							{/if}
+						</button>
+					{/if}
+					{#if validation && stateIconSnippet}
+						{@render stateIconSnippet({ state: validation })}
+					{:else if validation}
+						<Icon
+							path={validation === 'error' ? ALERT_ICON : SUCCESS_ICON}
+							class="aurora-date-picker-text-field-state-icon"
+						/>
+					{/if}
+				</span>
+			{/if}
 		</div>
 		{@render appendSnippet?.()}
 	</div>
@@ -631,7 +659,7 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		title={drawerTitle ?? label}
 		aria-label={(drawerTitle ?? label) ? undefined : openLabel}
 		closable
-		{closeLabel}
+		closeLabel={closeLabel ?? texts.datePickerTextField.close}
 		class={{
 			drawer: 'aurora-date-picker-text-field-drawer',
 			body: 'aurora-date-picker-text-field-drawer-body'
@@ -832,7 +860,8 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		}
 
 		input {
-			flex: 1;
+			flex: 0 1 auto;
+			width: calc(var(--_chars) * 1ch + 2px);
 			min-width: 0;
 			height: 100%;
 			margin: 0;
@@ -856,11 +885,6 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 			font-variant-numeric: tabular-nums;
 		}
 
-		.aurora-date-picker-text-field[data-range] input {
-			flex: 0 1 auto;
-			width: calc(var(--aurora-date-chars) * 1ch + 2px);
-		}
-
 		input::placeholder {
 			color: var(
 				--date-picker-text-field-placeholder-color,
@@ -882,6 +906,23 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 			scale: -1 1;
 		}
 
+		.aurora-date-picker-text-field-format-slot {
+			display: flex;
+			flex: 1 1 0;
+			flex-wrap: wrap;
+			align-self: stretch;
+			align-items: center;
+			align-content: flex-start;
+			justify-content: flex-end;
+			min-width: 0;
+			overflow: clip;
+		}
+
+		.aurora-date-picker-text-field-format-slot::before {
+			content: '';
+			height: 100%;
+		}
+
 		.aurora-date-picker-text-field-end {
 			display: flex;
 			flex: none;
@@ -891,10 +932,6 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 				var(--date-picker-text-field-default-inner-gap)
 			);
 			margin-inline-start: auto;
-		}
-
-		.aurora-date-picker-text-field-end:empty {
-			display: none;
 		}
 
 		.aurora-date-picker-text-field-format {

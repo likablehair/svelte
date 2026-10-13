@@ -171,6 +171,7 @@ export default {
 	],
 	added: [
 		'`title` / `titleSnippet` (also the accessible name), `closable` with `closeLabel` / `closeSnippet`, `actionsSnippet` as a footer pinned at the bottom.',
+		'`locale` (BCP 47): language of the default texts, Italian with `it`, English otherwise; without it the one of `setDefaultLocale` (step `global-default-locale`), else `en`. Text props win over it.',
 		'`children` and every snippet receive `{ close }`; a `<form method="dialog">` inside closes it.',
 		'`bind:drawerElement`, `class` object (`drawer`, `backdrop`, `panel`, `header`, `title`, `body`, `actions`), native attributes on the `<dialog>`, `data-position` and `data-closing`.',
 		'New `--drawer-*` variables: `--drawer-max-size`, `--drawer-padding`, `--drawer-border-width`, `--drawer-border-color`, `--drawer-box-shadow`, `--drawer-backdrop-filter`, `--drawer-easing`, header, title, body and actions.'

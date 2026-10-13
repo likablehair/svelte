@@ -3,7 +3,7 @@ import { createRawSnippet } from 'svelte';
 import { describe, expect, test } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import NoData from '#lib/components/simple/common/NoData.svelte';
-import { snippet } from '../helpers.js';
+import { renderWithDefaultLocale, snippet } from '../helpers.js';
 
 function withArgs<T>(markup: (args: T) => string) {
 	return createRawSnippet<[T]>((args) => ({ render: () => markup(args()) }));
@@ -141,5 +141,23 @@ describe('NoData', () => {
 		expect(getComputedStyle(element.querySelector('.aurora-no-data-icon')!).color).toBe(
 			'rgb(4, 5, 6)'
 		);
+	});
+});
+
+describe('NoData texts', () => {
+	test('follow locale, and title wins', async () => {
+		const italian = await render(NoData, { locale: 'it' });
+		await expect.element(italian.getByText('Nessun dato disponibile')).toBeVisible();
+		await italian.unmount();
+		const own = await render(NoData, { locale: 'it', title: 'Nessun cliente' });
+		await expect.element(own.getByText('Nessun cliente')).toBeVisible();
+	});
+
+	test('follow setDefaultLocale, and the locale prop wins over it', async () => {
+		const inherited = await renderWithDefaultLocale('it', NoData);
+		await expect.element(inherited.getByText('Nessun dato disponibile')).toBeVisible();
+		await inherited.unmount();
+		const own = await renderWithDefaultLocale('it', NoData, { locale: 'en' });
+		await expect.element(own.getByText('No data available')).toBeVisible();
 	});
 });

@@ -4,7 +4,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import ConfirmOrCancelButtons from '#lib/components/composed/forms/ConfirmOrCancelButtons.svelte';
-import { text } from '../helpers.js';
+import { renderWithDefaultLocale, text } from '../helpers.js';
 
 type CancelArgs = {
 	loading: boolean;
@@ -267,5 +267,26 @@ describe('ConfirmOrCancelButtons', () => {
 		await userEvent.keyboard('{Enter}');
 		expect(oncancelClick).toHaveBeenCalledOnce();
 		expect(onconfirmClick).toHaveBeenCalledOnce();
+	});
+});
+
+describe('ConfirmOrCancelButtons texts', () => {
+	test('follow locale, and confirmText and cancelText win', async () => {
+		const italian = await render(ConfirmOrCancelButtons, { locale: 'it' });
+		await expect.element(italian.getByRole('button', { name: 'Salva' })).toBeVisible();
+		await expect.element(italian.getByRole('button', { name: 'Annulla' })).toBeVisible();
+		await italian.unmount();
+		const own = await render(ConfirmOrCancelButtons, { locale: 'it', confirmText: 'Conferma', cancelText: 'Indietro' });
+		await expect.element(own.getByRole('button', { name: 'Conferma' })).toBeVisible();
+		await expect.element(own.getByRole('button', { name: 'Indietro' })).toBeVisible();
+	});
+
+	test('follow setDefaultLocale, and the locale prop wins over it', async () => {
+		const inherited = await renderWithDefaultLocale('it', ConfirmOrCancelButtons);
+		await expect.element(inherited.getByRole('button', { name: 'Salva' })).toBeVisible();
+		await inherited.unmount();
+		const own = await renderWithDefaultLocale('it', ConfirmOrCancelButtons, { locale: 'en' });
+		await expect.element(own.getByRole('button', { name: 'Save' })).toBeVisible();
+		await expect.element(own.getByRole('button', { name: 'Cancel' })).toBeVisible();
 	});
 });

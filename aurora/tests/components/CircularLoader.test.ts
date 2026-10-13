@@ -2,6 +2,7 @@ import { createRawSnippet } from 'svelte';
 import { describe, expect, test } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import CircularLoader from '#lib/components/simple/loaders/CircularLoader.svelte';
+import { renderWithDefaultLocale } from '../helpers.js';
 
 type Content = { value: number | undefined; total: number; percent: number };
 
@@ -148,5 +149,23 @@ describe('CircularLoader', () => {
 		const loader = screen.getByRole('progressbar', { name: 'Loading' });
 		await expect.element(loader).toBeInTheDocument();
 		expect(loader.element().querySelector('svg')).toBeNull();
+	});
+});
+
+describe('CircularLoader texts', () => {
+	test('follow locale, and label wins', async () => {
+		const italian = await render(CircularLoader, { locale: 'it' });
+		await expect.element(italian.getByRole('progressbar', { name: 'Caricamento' })).toBeInTheDocument();
+		await italian.unmount();
+		const own = await render(CircularLoader, { locale: 'it', label: 'Invio in corso' });
+		await expect.element(own.getByRole('progressbar', { name: 'Invio in corso' })).toBeInTheDocument();
+	});
+
+	test('follow setDefaultLocale, and the locale prop wins over it', async () => {
+		const inherited = await renderWithDefaultLocale('it', CircularLoader);
+		await expect.element(inherited.getByRole('progressbar', { name: 'Caricamento' })).toBeInTheDocument();
+		await inherited.unmount();
+		const own = await renderWithDefaultLocale('it', CircularLoader, { locale: 'en' });
+		await expect.element(own.getByRole('progressbar', { name: 'Loading' })).toBeInTheDocument();
 	});
 });

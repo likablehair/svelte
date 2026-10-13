@@ -5,7 +5,7 @@ import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import Chip from '#lib/components/simple/navigation/Chip.svelte';
 import ToggleExample from '../../src/docs/examples/chip/02-toggle.svelte';
-import { snippet, text } from '../helpers.js';
+import { renderWithDefaultLocale, snippet, text } from '../helpers.js';
 
 const CLOSE_PATH =
 	'M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z';
@@ -310,5 +310,24 @@ describe('Chip', () => {
 		const style = getComputedStyle(root(screen.container));
 		expect(style.backgroundColor).toBe('rgb(7, 8, 9)');
 		expect(style.color).toBe('rgb(10, 11, 12)');
+	});
+});
+
+describe('Chip texts', () => {
+	test('follow locale, and closeLabel wins', async () => {
+		const italian = await render(Chip, { closable: true, locale: 'it', children: text('Roma') });
+		await expect.element(italian.getByRole('button', { name: 'Rimuovi' })).toBeVisible();
+		await italian.unmount();
+		const own = await render(Chip, { closable: true, locale: 'it', closeLabel: 'Togli Roma', children: text('Roma') });
+		await expect.element(own.getByRole('button', { name: 'Togli Roma' })).toBeVisible();
+	});
+
+	test('follow setDefaultLocale, and the locale prop wins over it', async () => {
+		const props = { closable: true, children: text('Roma') };
+		const inherited = await renderWithDefaultLocale('it', Chip, props);
+		await expect.element(inherited.getByRole('button', { name: 'Rimuovi' })).toBeVisible();
+		await inherited.unmount();
+		const own = await renderWithDefaultLocale('it', Chip, { ...props, locale: 'en' });
+		await expect.element(own.getByRole('button', { name: 'Remove' })).toBeVisible();
 	});
 });

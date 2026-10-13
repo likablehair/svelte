@@ -10,6 +10,8 @@ Button that opens a list of options (`items`) and picks one or, with `multiple`,
 	import Autocomplete from '../../simple/forms/Autocomplete.svelte';
 	import type { Item } from '../../simple/forms/item.js';
 	import Icon from '../../simple/media/Icon.svelte';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import { libraryTexts } from '../../../utils/texts.js';
 
 	const CHEVRON_ICON = 'M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z';
 	const CLOSE_ICON =
@@ -28,7 +30,7 @@ Button that opens a list of options (`items`) and picks one or, with `multiple`,
 		multiple?: boolean;
 		/** Text before the selection inside the button, and the accessible name of the control. */
 		label?: string;
-		/** Text shown in place of the selection while nothing is selected. */
+		/** Text shown in place of the selection while nothing is selected. Defaults to "Select", in the language of `locale`. */
 		placeholder?: string;
 		/** SVG path of an icon at the start of the button. */
 		icon?: string;
@@ -64,14 +66,16 @@ Button that opens a list of options (`items`) and picks one or, with `multiple`,
 		variant?: 'primary' | 'secondary' | 'danger' | 'gradient';
 		/** Height, padding and text size of the button. */
 		size?: 'sm' | 'md' | 'lg';
-		/** Text of the button while something is selected. */
+		/** Text of the button while something is selected. Defaults to the label of the option, or "N selected" in the language of `locale` with more than one. */
 		selectionText?: (values: Item<Data>[]) => string;
-		/** Accessible name of the clear button. */
+		/** Accessible name of the clear button. Defaults to "Clear selection", in the language of `locale`. */
 		clearLabel?: string;
-		/** Accessible name of the close button of the mobile drawer. */
+		/** Accessible name of the close button of the mobile drawer. Defaults to "Close", in the language of `locale`. */
 		closeLabel?: string;
-		/** Text shown when there are no options. */
+		/** Text shown when there are no options. Defaults to "No options", in the language of `locale`. */
 		noResultsText?: string;
+		/** BCP 47 locale of the texts: `it` and `en` are built in, other languages fall back to English. Defaults to the one set with `setDefaultLocale`, else `en`. */
+		locale?: string;
 		/** The native `<button>` element of the trigger. */
 		buttonElement?: HTMLButtonElement;
 		/** Extra classes for each part. */
@@ -117,7 +121,7 @@ Button that opens a list of options (`items`) and picks one or, with `multiple`,
 		values = $bindable(),
 		multiple = false,
 		label,
-		placeholder = 'Select',
+		placeholder: placeholderProp,
 		icon,
 		clearable = true,
 		mandatory = true,
@@ -129,13 +133,11 @@ Button that opens a list of options (`items`) and picks one or, with `multiple`,
 		mobileDrawer = false,
 		variant = 'secondary',
 		size = 'md',
-		selectionText = (values) =>
-			values.length === 1
-				? String(values[0].label ?? values[0].value)
-				: `${values.length} selected`,
-		clearLabel = 'Clear selection',
-		closeLabel = 'Close',
-		noResultsText = 'No options',
+		selectionText,
+		clearLabel,
+		closeLabel,
+		noResultsText,
+		locale: localeProp,
 		buttonElement = $bindable(),
 		class: clazz = {},
 		onchange,
@@ -156,8 +158,12 @@ Button that opens a list of options (`items`) and picks one or, with `multiple`,
 	const uid = $props.id();
 	const labelId = `${uid}-label`;
 
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
+	let texts = $derived(libraryTexts(locale).dropdown);
+	let placeholder = $derived(placeholderProp ?? texts.placeholder);
 	let selection = $derived(values ?? []);
-	let text = $derived(selection.length ? selectionText(selection) : placeholder);
+	let text = $derived(selection.length ? (selectionText ?? selectedText)(selection) : placeholder);
 	let showClear = $derived(clearable && !disabled && selection.length > 0);
 	let clearInset = $state<number>();
 
@@ -167,6 +173,12 @@ Button that opens a list of options (`items`) and picks one or, with `multiple`,
 		const style = getComputedStyle(buttonElement);
 		clearInset = parseFloat(style.paddingInlineEnd) + parseFloat(style.borderInlineEndWidth);
 	});
+
+	function selectedText(selected: Item<Data>[]) {
+		return selected.length === 1
+			? String(selected[0].label ?? selected[0].value)
+			: texts.selected.replace('{count}', String(selected.length));
+	}
 
 	function clear() {
 		const removed = selection;
@@ -190,8 +202,9 @@ Button that opens a list of options (`items`) and picks one or, with `multiple`,
 	drawerSearch={false}
 	drawerTitle={label}
 	placeholder={label ?? placeholder}
-	{noResultsText}
-	{closeLabel}
+	{locale}
+	noResultsText={noResultsText ?? texts.noResults}
+	closeLabel={closeLabel ?? texts.close}
 	class={{
 		container: ['aurora-dropdown', clazz.container].filter(Boolean).join(' '),
 		menu: ['aurora-dropdown-menu', clazz.menu].filter(Boolean).join(' '),
@@ -260,7 +273,7 @@ Button that opens a list of options (`items`) and picks one or, with `multiple`,
 				<button
 					type="button"
 					class={['aurora-dropdown-clear', clazz.clear]}
-					aria-label={clearLabel}
+					aria-label={clearLabel ?? texts.clear}
 					style:inset-inline-end={clearInset === undefined ? undefined : `${clearInset}px`}
 					onclick={clear}
 				>

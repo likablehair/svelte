@@ -1,0 +1,19 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--filter-editor-default-width: 320px;
+		--filter-editor-default-gap: 12px;
+		--filter-editor-default-padding: 12px;
+		--filter-editor-default-color: var(--global-color-text);
+		--filter-editor-default-title-font-size: 14px;
+		--filter-editor-default-title-font-weight: 600;
+		--filter-editor-default-icon-color: var(--global-color-primary);
+		--filter-editor-default-operators-background: var(--global-color-surface-2);
+		--filter-editor-default-operators-border-radius: var(--global-radius-md);
+		--filter-editor-default-operator-color: var(--global-color-text-2);
+		--filter-editor-default-operator-selected-background: var(--global-color-surface-pop);
+		--filter-editor-default-operator-selected-color: var(--global-color-primary);
+		--filter-editor-default-operator-selected-border-color: var(--global-color-border-strong);
+	}
+}

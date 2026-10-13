@@ -48,7 +48,7 @@ export default {
 		{
 			id: 'circular-loader-label',
 			summary:
-				'The loader is a `role="progressbar"` named "Loading" (English) for screen readers; v4 rendered a bare `<svg>`.',
+				'The loader is a `role="progressbar"` named "Loading" for screen readers ("Caricamento" with the `it` locale, from `locale` or `setDefaultLocale`); v4 rendered a bare `<svg>`.',
 			action:
 				'When a visible text next to it already says what is loading ("Loading…", "Saving"), pass `label=""` to hide the loader from screen readers. Otherwise pass `label` with a text in the app language that says what is loading.'
 		},
@@ -64,6 +64,7 @@ export default {
 		'`value` and `total`: a progress ring that fills up to `value / total`, with `aria-valuenow` (both clamped to `0…total`; `children` gets the raw `value`).',
 		'`children({ value, total, percent })` in the middle of the ring, for example the percentage.',
 		'`label` (accessible name, `""` = decorative), native attributes, `data-indeterminate`.',
+		'`locale` (BCP 47): language of the default texts, Italian with `it`, English otherwise; without it the one of `setDefaultLocale` (step `global-default-locale`), else `en`. Text props win over it.',
 		'`--circular-loader-thickness`, `--circular-loader-track-color`, `--circular-loader-duration`, `--circular-loader-value-duration`, `--circular-loader-content-*`.',
 		'`DotsLoader`, a new component: three dots that light up in turn.'
 	]

@@ -4,7 +4,7 @@ import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import type { CalendarDay } from '#lib/components/simple/dates/Calendar.svelte';
 import DatePickerTextField from '#lib/components/composed/forms/DatePickerTextField.svelte';
-import { snippet } from '../helpers.js';
+import { renderWithDefaultLocale, snippet, sweepFormatChip } from '../helpers.js';
 
 type Change = { selectedDate: Date | undefined; selectedDateTo: Date | undefined };
 
@@ -71,13 +71,33 @@ describe('DatePickerTextField', () => {
 		expect(screen.getByLabelText('Booking').element()).toBe(input.element());
 	});
 
+	test('the format chip hides itself before the text gets cut', async () => {
+		const screen = await render(DatePickerTextField, { selectedDate: new Date(2026, 8, 24), clearable: true });
+		const root = screen.container.querySelector<HTMLElement>('.aurora-date-picker-text-field')!;
+		const steps = sweepFormatChip(root, '--date-picker-text-field-width');
+		expect(steps[0]).toEqual({ width: 400, chip: true, fits: true });
+		expect(steps.filter((step) => step.chip && !step.fits)).toEqual([]);
+		expect(steps.some((step) => !step.chip && step.fits)).toBe(true);
+		expect(steps.at(-1)!.chip).toBe(false);
+	});
+
+	test('the format chip hides itself before the text gets cut, also with a range', async () => {
+		const screen = await render(DatePickerTextField, { range: true, selectedDate: new Date(2026, 8, 11), selectedDateTo: new Date(2026, 8, 24) });
+		const root = screen.container.querySelector<HTMLElement>('.aurora-date-picker-text-field')!;
+		const steps = sweepFormatChip(root, '--date-picker-text-field-width');
+		expect(steps[0]).toEqual({ width: 400, chip: true, fits: true });
+		expect(steps.filter((step) => step.chip && !step.fits)).toEqual([]);
+		expect(steps.some((step) => !step.chip && step.fits)).toBe(true);
+		expect(steps.at(-1)!.chip).toBe(false);
+	});
+
 	test('locale decides the format of the text and of the chip; format overrides it', async () => {
 		const date = new Date(2026, 9, 9);
 		const cases = [
 			[{ locale: 'en' }, '10/09/2026', 'mm/dd/yyyy'],
-			[{ locale: 'it' }, '09/10/2026', 'dd/mm/yyyy'],
+			[{ locale: 'it' }, '09/10/2026', 'gg/mm/aaaa'],
 			[{ locale: 'en-GB' }, '09/10/2026', 'dd/mm/yyyy'],
-			[{ locale: 'it', format: 'yyyy-MM-dd' }, '2026-10-09', 'yyyy-mm-dd'],
+			[{ locale: 'it', format: 'yyyy-MM-dd' }, '2026-10-09', 'aaaa-mm-gg'],
 			[{ format: 'dd.MM.yyyy', formatLabel: 'tt.mm.jjjj' }, '09.10.2026', 'tt.mm.jjjj']
 		] as const;
 		for (const [props, value, chip] of cases) {
@@ -355,7 +375,7 @@ describe('DatePickerTextField', () => {
 		await expect.element(input).toHaveValue('10/09/2026');
 		locale.value = 'it';
 		await expect.element(input).toHaveValue('09/10/2026');
-		await expect.element(input).toHaveAccessibleDescription('dd/mm/yyyy');
+		await expect.element(input).toHaveAccessibleDescription('gg/mm/aaaa');
 	});
 
 	test('selectedDate set from outside updates the text, and undefined empties it', async () => {
@@ -756,6 +776,25 @@ describe('DatePickerTextField', () => {
 			await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
 		});
 
+		test('the arrows of the calendar take their names from the field', async () => {
+			const screen = await render(DatePickerTextField, {
+				label: 'Data',
+				locale: 'it',
+				selectedDate: new Date(2026, 9, 9),
+				openLabel: 'Scegli la data',
+				previousMonthLabel: 'Mese precedente',
+				nextMonthLabel: 'Mese successivo',
+				previousYearLabel: 'Anno precedente',
+				nextYearLabel: 'Anno successivo'
+			});
+			await screen.getByRole('button', { name: 'Scegli la data' }).click();
+			await expect.element(screen.getByRole('button', { name: 'Mese precedente' })).toBeVisible();
+			await expect.element(screen.getByRole('button', { name: 'Mese successivo' })).toBeVisible();
+			await screen.getByRole('button', { name: /^ottobre 2026$/i }).click();
+			await expect.element(screen.getByRole('button', { name: 'Anno precedente' })).toBeVisible();
+			await expect.element(screen.getByRole('button', { name: 'Anno successivo' })).toBeVisible();
+		});
+
 		test('v4 bug: the calendar buttons inside a form do not submit it', async () => {
 			const { form, onsubmit } = makeForm();
 			const screen = await render(DatePickerTextField, {
@@ -1142,5 +1181,40 @@ describe('DatePickerTextField', () => {
 		const chip = target.querySelector('.aurora-date-picker-text-field-format')!;
 		expect(getComputedStyle(chip).color).toBe('rgb(4, 5, 6)');
 		target.remove();
+	});
+});
+
+describe('DatePickerTextField texts', () => {
+	test('follow locale, with the format letters of the language, and a text prop wins', async () => {
+		const italian = await render(DatePickerTextField, {
+			label: 'Data',
+			locale: 'it',
+			clearable: true,
+			selectedDate: new Date(2026, 9, 9)
+		});
+		const input = italian.getByRole('combobox', { name: 'Data' });
+		await expect.element(input).toHaveAccessibleDescription('gg/mm/aaaa');
+		await expect.element(italian.getByRole('button', { name: 'Scegli la data' })).toBeInTheDocument();
+		await expect.element(italian.getByRole('button', { name: 'Cancella' })).toBeInTheDocument();
+		await italian.unmount();
+		const own = await render(DatePickerTextField, { label: 'Data', locale: 'it', openLabel: 'Calendario', formatLabel: 'gg-mm-aaaa' });
+		await expect.element(own.getByRole('button', { name: 'Calendario' })).toBeInTheDocument();
+		await expect.element(own.getByRole('combobox', { name: 'Data' })).toHaveAccessibleDescription('gg-mm-aaaa');
+	});
+
+	test('setDefaultLocale sets the texts and the format; the locale prop wins over it', async () => {
+		const date = new Date(2026, 9, 9);
+		const inherited = await renderWithDefaultLocale('it', DatePickerTextField, { label: 'Data', selectedDate: date });
+		const input = inherited.getByRole('combobox', { name: 'Data' });
+		await expect.element(input).toHaveValue('09/10/2026');
+		await expect.element(input).toHaveAccessibleDescription('gg/mm/aaaa');
+		await input.click();
+		await expect.element(page.getByRole('button', { name: 'Mese precedente' })).toBeVisible();
+		await inherited.unmount();
+		const own = await renderWithDefaultLocale('it', DatePickerTextField, { label: 'Date', selectedDate: date, locale: 'en' });
+		const field = own.getByRole('combobox', { name: 'Date' });
+		await expect.element(field).toHaveValue('10/09/2026');
+		await expect.element(field).toHaveAccessibleDescription('mm/dd/yyyy');
+		await expect.element(own.getByRole('button', { name: 'Choose date' })).toBeInTheDocument();
 	});
 });

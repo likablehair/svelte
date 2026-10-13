@@ -3,6 +3,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import MonthSelector from '#lib/components/simple/dates/MonthSelector.svelte';
+import { renderWithDefaultLocale } from '../helpers.js';
 
 function month(name: string) {
 	return page.getByRole('option', { name, exact: true });
@@ -351,5 +352,24 @@ describe('MonthSelector', () => {
 		expect(getComputedStyle(month('March').element()).backgroundColor).toBe('rgb(1, 2, 3)');
 		expect(getComputedStyle(month('April').element()).color).toBe('rgb(4, 5, 6)');
 		expect(getComputedStyle(page.getByRole('listbox').element()).rowGap).toBe('20px');
+	});
+});
+
+describe('MonthSelector texts', () => {
+	test('follow locale, and aria-label wins', async () => {
+		const italian = await render(MonthSelector, { locale: 'it' });
+		await expect.element(italian.getByRole('listbox', { name: 'Mese' })).toBeVisible();
+		await italian.unmount();
+		const own = await render(MonthSelector, { locale: 'it', 'aria-label': 'Mese di fatturazione' });
+		await expect.element(own.getByRole('listbox', { name: 'Mese di fatturazione' })).toBeVisible();
+	});
+
+	test('follow setDefaultLocale, and the locale prop wins over it', async () => {
+		const inherited = await renderWithDefaultLocale('it', MonthSelector);
+		await expect.element(inherited.getByRole('listbox', { name: 'Mese' })).toBeVisible();
+		await expect.element(inherited.getByRole('option', { name: 'Gennaio' })).toBeVisible();
+		await inherited.unmount();
+		const own = await renderWithDefaultLocale('it', MonthSelector, { locale: 'en' });
+		await expect.element(own.getByRole('listbox', { name: 'Month' })).toBeVisible();
 	});
 });
