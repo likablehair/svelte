@@ -1316,6 +1316,34 @@ New, optional: `size`, `label`, `labelSnippet`, `bind:input`, `class` object, na
 
 New, optional: `variant`, Tab `badge` / `href` / `disabled` / `panelId`, `tabSnippet`, `aria-label` / `aria-labelledby` on the tab list, `bind:tabSwitcherElement`, native attributes, `data-variant`, `data-selected`, every other `--tab-switcher-*` variable.
 
+### Table
+
+- **Renamed**: `SimpleTable` → `Table` (`import { Table, type TableColumn } from '@likable-hair/svelte'`). PaginatedTable, EnhancedPaginatedTable and DynamicTable will become `DataTable` (not available yet).
+- `items` → `rows`, `headers` → `columns`, `resizableColumns` → `resizable`, `calculateRowClasses` → `rowClass`, `noItemsText` → `noDataTitle`, `lang` → `locale` (also formats numbers and dates).
+- **Columns**: `value` → `key`, `type: { key, params }` → a flat `type` and options. `string` → `text` (or nothing), `number` (now formatted with `Intl` and right-aligned), `date` with a luxon `format` → `date` or `datetime` with `dateFormat` (Intl options; luxon values still work), `custom` stays and is drawn by `cellSnippet`; `icon` and `checkbox` are gone (they ignored the value). `nullText` → `empty`, `sortModify({ builder, sortDirection })` → `sort({ builder, direction })`, `width` / `minWidth` / `maxWidth` take any CSS length (`width` is preferred, `minWidth` keeps the column from shrinking), `locked` and `data` are gone. New: `value(row)`, `format`, `numberFormat`, `align`, `hidden`, `info`, `footer`, `cell` and `header` snippets.
+- **Sorting**: `sortedBy` + `sortDirection` → `bind:sort` = `{ key, direction }` or `undefined`; `onsort({ detail: { sortedBy, sortDirection, sortModify } })` → `onsortchange({ sort })`. **The table now sorts the rows itself** (v4 only showed the arrow): delete the app code that sorted the items in `onsort`, or pass `sorting="manual"` when the server sorts.
+- **Rows**: `onrowClick({ detail: { item } })` → `onrowclick(row, event)`; rows with it are focusable (Enter, Space) and clicks on buttons, links and fields inside no longer reach it. When the click only opens a page, use `rowHref={(row) => url}`: a real link, Ctrl-click opens a new tab. `onrowDoubleClick`, `doubleClickActive`, `doubleClickDelay`, `pointerOnRowHover` removed. `calculateRowStyles` removed: return a class from `rowClass` and set `--table-row-background`, `color`, `font-weight` in it.
+- **Snippets**: `customSnippet({ index, columnIndex, header, item })` → `cellSnippet({ row, value, column })` (`header.value` → `column.key`, `item` → `row`); better, give each column its own `cell` snippet. `appendSnippet({ index, item })` → `actionsSnippet({ row })`: a column of row buttons, always visible as in v4 and now pinned on the right (`actionsVisibility="hover"` shows it only on hover and focus); drop its `index === -1` header branch. `headerSnippet` and `headerLabelSnippet` → the `header` snippet of a column; `prependSnippet` → `selectable` for checkboxes, a first column with `cell` otherwise; `stickyAppendSnippet` removed (the actions column is always pinned).
+- **Columns state**: `resizedColumnSizeWithPadding` and `oncolumnResize` → `bind:columnState` (`[{ key, visible, width?, pinned? }]`, widths in pixels) and `oncolumnstatechange`, called once at the end of a resize (v4 called `oncolumnResize` for every column on any mouseup in the page). `columnsKey` saves it in the browser. Resizing also works with the arrow keys.
+- **Pinned columns** are moved before the others and stay pinned at every width (v4: only when they were the first ones and the table was wider than `stickyMinContainerWidth`, removed).
+- **Look** of the prototype: bordered rounded box, small uppercase grey headers, 9 × 12px cells (v4: 60px rows, use `--table-cell-padding` for that density), monospaced numbers and dates, "—" in empty cells (`empty=""` for blank cells), tinted hover and selected rows. `loading` also dims the rows and shows placeholder rows when there are none. App CSS on `.simple-table`, `.item-tr` or `.thead` must target `.aurora-table`, `.aurora-table-row`, `.aurora-table-header` or use the `class` parts (`header` is now on every header cell).
+- **Cards**: below 640px of table width every row becomes a card (title, checkbox and actions on top, label and value of the first 4 other columns or of `cardColumns`, the rest behind "Show more fields", sorting in a select). `cardBreakpoint={false}` keeps the sideways scrolling of v4.
+
+| v4 | v5 |
+|---|---|
+| `--simple-table-background-color`, `-header-background-color`, `-row-hover-background-color` | `--table-background`, `--table-header-background`, `--table-row-hover-background` |
+| `--simple-table-header-hover-color`, `-header-font-weight`, `-header-font-size`, `-header-padding` | `--table-header-hover-color`, `--table-header-font-weight`, `--table-header-font-size`, `--table-header-padding` |
+| `--simple-table-separator-color`, `-width`, `-max-height`, `-resizer-color` | `--table-separator-color`, `--table-width`, `--table-max-height`, `--table-resizer-color` |
+| `--simple-table-loader-height`, `-loader-background-color` | `--table-progress-height`, `--table-progress-color` |
+| `--simple-table-non-resizable-header-width`, `-sticked-background-color` | `--table-control-size`, `--table-pinned-background` |
+| `--simple-table-header-height`, `-row-height` | removed: `--table-header-padding`, `--table-cell-padding` |
+| `--simple-table-header-border-radius` | removed: `--table-border-radius` on the whole table |
+| `--simple-table-header-label-margin`, `-overflow-x`, `-loader-border-radius`, `-min-width`, `-max-width`, `-height`, `-min-height` | removed |
+
+Defaults: the same renames on `--simple-table-default-*` → `--table-default-*` (`--simple-table-default-hover-color` → `--table-default-header-hover-color`).
+
+New, optional: `selectable` (`single` / `multiple`, shift-click ranges) with `bind:selected`, `selectedAll`, `excluded`, `onselectionchange`; `expandedSnippet`, `bind:expanded`, `expandable`, `onexpandedchange`; `rowKey`, `rowHref`; `actionsVisibility`; `columnsKey`; `cardBreakpoint`, `cardTitle`, `cardColumns`; `loadingRows`, `caption`, `labels`, `bind:tableElement`, native attributes on the root, `data-cards`, `data-loading`, `data-selected`, `data-expanded`; `--table-color`, `-row-background`, `-border`, `-border-radius`, `-header-sorted-color`, `-cell-padding`, `-row-selected-*`, `-number-*`, `-date-*`, `-empty-color`, `-boolean-*`, `-pinned-shadow`, `-actions-*`, `-detail-*`, `-footer-*`, `-loading-opacity`, `-card-*`, `-focus-ring-*`, `-duration`, `-easing`.
+
 ### Textarea
 
 - The `id` is generated with `$props.id()` (stable across server and client) instead of a random cuid.
@@ -1458,6 +1486,6 @@ New, optional: `min`, `max`, `locale` (language of the default name "Year"), `fo
 
 These v4 exports have no v5 version yet. Keep v4 for screens that need them, or wait for the port.
 
-- **Components**: MediaQuery (use `svelte/reactivity`), MenuOrDrawer, MenuOrDrawerOptions, QuickActions, VerticalDraggableList, InfiniteScroll, CollapsibleDivider, PeriodSelector, PeriodPicker, FileInput, FileInputList, VerticalSwitch, VerticalTextSwitch, IconsDropdown, AvatarDropdown, ToggleList, BoxList, ColorInvertedSelector, SelectableMenuList, SelectableVerticalList, SidebarMenuList, HierarchyMenu, SimpleTable, PaginatedTable, EnhancedPaginatedTable, DynamicTable, GlobalSearchTextField, Avatar, DescriptiveAvatar, Breadcrumb, HeaderMenu, Navigator, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper, CollapsibleSideBarLayout, StableDividedSideBarLayout, UnstableDividedSideBarLayout.
+- **Components**: MediaQuery (use `svelte/reactivity`), MenuOrDrawer, MenuOrDrawerOptions, QuickActions, VerticalDraggableList, InfiniteScroll, CollapsibleDivider, PeriodSelector, PeriodPicker, FileInput, FileInputList, VerticalSwitch, VerticalTextSwitch, IconsDropdown, AvatarDropdown, ToggleList, BoxList, ColorInvertedSelector, SelectableMenuList, SelectableVerticalList, SidebarMenuList, HierarchyMenu, PaginatedTable, EnhancedPaginatedTable, DynamicTable, GlobalSearchTextField, Avatar, DescriptiveAvatar, Breadcrumb, HeaderMenu, Navigator, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper, CollapsibleSideBarLayout, StableDividedSideBarLayout, UnstableDividedSideBarLayout.
 - **Utilities**: `scrollAtCenter`.
 - **Stores**: `mediaQuery`, `theme`, `toggleTheme` (see [Dark mode](#dark-mode-and-themes)), `debounce`.

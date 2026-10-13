@@ -128,6 +128,29 @@ export function componentMarkdown(doc: ComponentDoc, examples: ExampleDoc[]) {
 		);
 	}
 
+	if (doc.types.length) {
+		out.push(
+			'## Types',
+			'',
+			`Exported by the package: \`import type { ${doc.types.map((t) => t.name).join(', ')} } from '${PACKAGE}';\``,
+			''
+		);
+		for (const t of doc.types) {
+			out.push(`### ${t.name}`, '');
+			if (t.description) out.push(t.description, '');
+			out.push(code(t.declaration), '');
+			if (t.members.length) {
+				out.push(
+					table(
+						['Name', 'Type', 'Description'],
+						t.members.map((m) => [`\`${m.name}\`${m.optional ? '' : ' (required)'}`, code(m.type), cell(m.description)])
+					),
+					''
+				);
+			}
+		}
+	}
+
 	if (doc.cssVars.length || doc.cssDefaultsOnly.length || base) {
 		out.push('## CSS variables', '');
 		if (doc.cssVars.length || doc.cssDefaultsOnly.length)

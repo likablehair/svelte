@@ -40,6 +40,20 @@ export interface CssVarDoc {
 	inherits?: string;
 }
 
+export interface TypeMemberDoc {
+	name: string;
+	type: string;
+	optional: boolean;
+	description?: string;
+}
+
+export interface TypeDoc {
+	name: string;
+	declaration: string;
+	description?: string;
+	members: TypeMemberDoc[];
+}
+
 export interface ComponentEntry {
 	name: string;
 	slug: string;
@@ -57,6 +71,7 @@ export interface ComponentDoc extends ComponentEntry {
 	methods: MethodDoc[];
 	cssVars: CssVarDoc[];
 	cssDefaultsOnly: CssDefault[];
+	types: TypeDoc[];
 }
 
 export interface ExampleDoc {

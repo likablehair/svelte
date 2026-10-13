@@ -230,7 +230,6 @@ export default {
 			'SelectableVerticalList',
 			'SidebarMenuList',
 			'HierarchyMenu',
-			'SimpleTable',
 			'PaginatedTable',
 			'EnhancedPaginatedTable',
 			'DynamicTable',

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { inline } from './inline.js';
-	import { styleExample } from './markdown.js';
+	import { PACKAGE, styleExample } from './markdown.js';
 	import type { ComponentDoc, PropDoc, SnippetDoc } from './types.js';
 
 	let { doc }: { doc: ComponentDoc } = $props();
@@ -153,6 +153,41 @@
 				</tbody>
 			</table>
 		</div>
+	</section>
+{/if}
+
+{#if doc.types.length}
+	<section class="api" aria-labelledby="api-types">
+		<h2 id="api-types">Types</h2>
+		<p class="hint">
+			Exported by the package: <code
+				>import type {'{'} {doc.types.map((t) => t.name).join(', ')} {'}'} from '{PACKAGE}';</code
+			>
+		</p>
+		{#each doc.types as t (t.name)}
+			<h3 id="type-{t.name}"><code>{t.name}</code></h3>
+			{#if t.description}<p>{@html inline(t.description)}</p>{/if}
+			<p><code>{t.declaration}</code></p>
+			{#if t.members.length}
+				<div class="table-wrap">
+					<table>
+						<thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead>
+						<tbody>
+							{#each t.members as m (m.name)}
+								<tr>
+									<td>
+										<code>{m.name}</code>
+										{#if !m.optional}<span class="badge">required</span>{/if}
+									</td>
+									<td><code>{m.type}</code></td>
+									<td>{@html inline(m.description)}</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			{/if}
+		{/each}
 	</section>
 {/if}
 

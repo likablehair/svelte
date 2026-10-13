@@ -9,11 +9,13 @@ import type {
 	MethodDoc,
 	PropDoc,
 	SnippetDoc,
-	TokenGroup
+	TokenGroup,
+	TypeDoc,
+	TypeMemberDoc
 } from './types.js';
 
 const lib = import.meta.glob<string>(
-	['/src/lib/index.ts', '/src/lib/**/*.svelte', '/src/lib/**/*.css'],
+	['/src/lib/**/*.ts', '/src/lib/**/*.svelte', '/src/lib/**/*.css'],
 	{ query: '?raw', import: 'default', eager: true }
 );
 const examples = import.meta.glob<string>('/src/docs/examples/*/*.svelte', {
@@ -194,6 +196,12 @@ export function getComponentDoc(slug: string): ComponentDoc | undefined {
 		else cssDefaultsOnly.push(d);
 	}
 
+	const types = referencedTypes([
+		...props.map((p) => p.type),
+		...snippets.map((s) => s.params ?? ''),
+		...events.map((e) => e.type)
+	]);
+
 	return {
 		...entry,
 		description,
@@ -204,8 +212,97 @@ export function getComponentDoc(slug: string): ComponentDoc | undefined {
 		events,
 		methods,
 		cssVars,
-		cssDefaultsOnly
+		cssDefaultsOnly,
+		types
 	};
+}
+
+function exportedTypeFiles() {
+	const files = new Map<string, string>();
+	for (const m of lib['/src/lib/index.ts'].matchAll(/export\s+type\s*\{([^}]*)\}\s*from\s*'\.\/([^']+)'/g)) {
+		const path = `/src/lib/${m[2].replace(/\.js$/, '.ts')}`;
+		for (const name of m[1].split(',').map((n) => n.trim()).filter(Boolean)) files.set(name, path);
+	}
+	return files;
+}
+
+function scriptBody(path: string): { body: Node[]; source: string } {
+	const raw = lib[path] ?? '';
+	if (path.endsWith('.svelte')) {
+		const ast = parse(raw, { modern: true });
+		return { body: (ast.module?.content.body ?? []) as unknown as Node[], source: raw };
+	}
+	const source = `<script lang="ts">${raw}</script>`;
+	const ast = parse(source, { modern: true });
+	return { body: (ast.instance?.content.body ?? []) as unknown as Node[], source };
+}
+
+function typeDoc(name: string, path: string, exported = exportedTypeFiles()): TypeDoc | undefined {
+	const { body, source } = scriptBody(path);
+	const text = (node: Node) => source.slice(node.start, node.end).replace(/\s+/g, ' ');
+	const localMembers = (base: string): Node[] => {
+		if (exported.has(base)) return [];
+		const local = body
+			.map((n) => (n.type === 'ExportNamedDeclaration' ? n.declaration : n))
+			.find((n: Node | null) => n?.type === 'TSInterfaceDeclaration' && n.id.name === base);
+		return local ? local.body.body : [];
+	};
+	for (const statement of body) {
+		const decl: Node | null = statement.type === 'ExportNamedDeclaration' ? statement.declaration : statement;
+		if (!decl || decl.id?.name !== name) continue;
+		if (decl.type !== 'TSInterfaceDeclaration' && decl.type !== 'TSTypeAliasDeclaration') continue;
+		const params = decl.typeParameters ? text(decl.typeParameters) : '';
+		let declaration: string;
+		let members: Node[] = [];
+		if (decl.type === 'TSInterfaceDeclaration') {
+			const ext = decl.extends?.length ? ` extends ${(decl.extends as Node[]).map(text).join(', ')}` : '';
+			declaration = `interface ${name}${params}${ext}`;
+			const inherited = ((decl.extends ?? []) as Node[]).flatMap((e) => localMembers(text(e.expression)));
+			members = [...inherited, ...decl.body.body];
+		} else {
+			const annotation: Node = decl.typeAnnotation;
+			const parts: Node[] = annotation.type === 'TSIntersectionType' ? annotation.types : [annotation];
+			const literals = parts.filter((part) => part.type === 'TSTypeLiteral');
+			members = literals.flatMap((part) => part.members);
+			declaration = literals.length
+				? `type ${name}${params} = ${[...parts.filter((part) => part.type !== 'TSTypeLiteral').map(text), '{ … }'].join(' & ')}`
+				: `type ${name}${params} = ${text(annotation).replace(/^\| /, '')}`;
+		}
+		const docs: TypeMemberDoc[] = members
+			.filter((member) => member.type === 'TSPropertySignature')
+			.map((member) => ({
+				name: member.key.name ?? member.key.value,
+				type: member.typeAnnotation ? text(member.typeAnnotation.typeAnnotation).replace(/^\| /, '') : 'unknown',
+				optional: !!member.optional,
+				description: jsdoc(member.leadingComments)
+			}));
+		return {
+			name,
+			declaration,
+			description: jsdoc(statement.leadingComments ?? decl.leadingComments),
+			members: docs
+		};
+	}
+	return undefined;
+}
+
+function referencedTypes(texts: string[]): TypeDoc[] {
+	const files = exportedTypeFiles();
+	const found: TypeDoc[] = [];
+	const seen = new Set<string>();
+	const queue = [...texts];
+	while (queue.length) {
+		const current = queue.shift()!;
+		for (const [name, path] of files) {
+			if (seen.has(name) || !new RegExp(`\\b${name}\\b`).test(current)) continue;
+			seen.add(name);
+			const doc = typeDoc(name, path, files);
+			if (!doc) continue;
+			found.push(doc);
+			queue.push(doc.declaration, ...doc.members.map((member) => member.type));
+		}
+	}
+	return found;
 }
 
 export function getExamples(slug: string): ExampleDoc[] {

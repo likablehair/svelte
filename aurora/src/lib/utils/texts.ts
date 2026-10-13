@@ -44,6 +44,27 @@ export interface LibraryTexts {
 		status: string;
 	};
 	searchBar: { clear: string };
+	table: {
+		selectAll: string;
+		selectAllShort: string;
+		selectRow: string;
+		row: string;
+		expand: string;
+		collapse: string;
+		actions: string;
+		resize: string;
+		info: string;
+		open: string;
+		loading: string;
+		yes: string;
+		no: string;
+		sortBy: string;
+		unsorted: string;
+		moreFields: string;
+		fewerFields: string;
+		ascending: string;
+		descending: string;
+	};
 	timePicker: { hours: string; minutes: string; period: string };
 	timePickerTextField: { invalid: string; clear: string; close: string; open: string };
 	toaster: { close: string; label: string; loading: string; progress: string };
@@ -105,6 +126,27 @@ export const TEXTS_EN: LibraryTexts = {
 		status: 'Page {page} of {count}'
 	},
 	searchBar: { clear: 'Clear search' },
+	table: {
+		selectAll: 'Select all rows',
+		selectAllShort: 'Select all',
+		selectRow: 'Select {row}',
+		row: 'row {index}',
+		expand: 'Show details',
+		collapse: 'Hide details',
+		actions: 'Actions',
+		resize: 'Resize {column}',
+		info: 'About {column}',
+		open: 'Open',
+		loading: 'Loading',
+		yes: 'Yes',
+		no: 'No',
+		sortBy: 'Sort by',
+		unsorted: 'Not sorted',
+		moreFields: 'Show {count} more fields',
+		fewerFields: 'Show fewer fields',
+		ascending: '{column}, ascending',
+		descending: '{column}, descending'
+	},
 	timePicker: { hours: 'Hours', minutes: 'Minutes', period: 'AM/PM' },
 	timePickerTextField: { invalid: 'Enter a valid time', clear: 'Clear', close: 'Close', open: 'Choose time' },
 	toaster: { close: 'Dismiss', label: 'Notifications', loading: 'Loading', progress: 'Progress' },
@@ -166,6 +208,27 @@ export const TEXTS_IT: LibraryTexts = {
 		status: 'Pagina {page} di {count}'
 	},
 	searchBar: { clear: 'Cancella la ricerca' },
+	table: {
+		selectAll: 'Seleziona tutte le righe',
+		selectAllShort: 'Seleziona tutto',
+		selectRow: 'Seleziona {row}',
+		row: 'riga {index}',
+		expand: 'Mostra dettagli',
+		collapse: 'Nascondi dettagli',
+		actions: 'Azioni',
+		resize: 'Ridimensiona {column}',
+		info: 'Informazioni su {column}',
+		open: 'Apri',
+		loading: 'Caricamento',
+		yes: 'Sì',
+		no: 'No',
+		sortBy: 'Ordina per',
+		unsorted: 'Nessun ordinamento',
+		moreFields: 'Mostra altri {count} campi',
+		fewerFields: 'Mostra meno campi',
+		ascending: '{column}, crescente',
+		descending: '{column}, decrescente'
+	},
 	timePicker: { hours: 'Ore', minutes: 'Minuti', period: 'AM/PM' },
 	timePickerTextField: {
 		invalid: "Inserisci un'ora valida",

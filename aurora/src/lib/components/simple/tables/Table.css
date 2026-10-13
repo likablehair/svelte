@@ -1,0 +1,71 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--table-default-width: 100%;
+		--table-default-background: var(--global-color-surface-solid);
+		--table-default-color: var(--global-color-text);
+		--table-default-border: var(--global-border-width) solid var(--global-color-border);
+		--table-default-border-radius: var(--global-radius-lg);
+		--table-default-font-size: 13.5px;
+		--table-default-max-height: none;
+		--table-default-separator-color: var(--global-color-border);
+		--table-default-header-background: var(--global-color-surface-2);
+		--table-default-header-color: var(--global-color-text-3);
+		--table-default-header-font-size: 11px;
+		--table-default-header-font-weight: 500;
+		--table-default-header-letter-spacing: 0.06em;
+		--table-default-header-text-transform: uppercase;
+		--table-default-header-padding: 8px 12px;
+		--table-default-header-hover-color: var(--global-color-text);
+		--table-default-header-sorted-color: var(--global-color-primary);
+		--table-default-sort-icon-size: 14px;
+		--table-default-info-icon-size: 14px;
+		--table-default-cell-padding: 9px 12px;
+		--table-default-row-background: transparent;
+		--table-default-row-hover-background: var(--global-color-surface-2);
+		--table-default-row-selected-background: var(--global-color-primary-soft);
+		--table-default-row-selected-hover-background: color-mix(
+			in oklab,
+			var(--global-color-primary-soft),
+			var(--global-color-primary) 6%
+		);
+		--table-default-number-font-family: var(--global-font-family-mono);
+		--table-default-number-font-size: 13px;
+		--table-default-date-font-family: var(--global-font-family-mono);
+		--table-default-date-font-size: 13px;
+		--table-default-date-color: var(--global-color-text-2);
+		--table-default-empty-color: var(--global-color-text-3);
+		--table-default-boolean-color: var(--global-color-success);
+		--table-default-boolean-icon-size: 18px;
+		--table-default-pinned-background: var(--global-color-surface-solid);
+		--table-default-pinned-shadow: 1px 0 0 var(--global-color-border);
+		--table-default-actions-shadow: -1px 0 0 var(--global-color-border);
+		--table-default-actions-gap: 4px;
+		--table-default-control-size: 40px;
+		--table-default-expand-icon-size: 20px;
+		--table-default-detail-background: var(--global-color-bg-2);
+		--table-default-detail-color: var(--global-color-text-2);
+		--table-default-detail-padding: 16px 16px 16px 52px;
+		--table-default-footer-background: var(--global-color-surface-2);
+		--table-default-footer-color: var(--global-color-text);
+		--table-default-footer-font-weight: 600;
+		--table-default-progress-height: 2px;
+		--table-default-progress-color: var(--global-color-primary);
+		--table-default-loading-opacity: 0.55;
+		--table-default-resizer-width: 2px;
+		--table-default-resizer-color: var(--global-color-primary);
+		--table-default-card-gap: 8px;
+		--table-default-card-padding: 12px 14px;
+		--table-default-card-background: var(--global-color-surface-solid);
+		--table-default-card-border: var(--global-border-width) solid var(--global-color-border);
+		--table-default-card-border-radius: var(--global-radius-md);
+		--table-default-card-title-font-weight: 600;
+		--table-default-card-label-color: var(--global-color-text-3);
+		--table-default-card-label-font-size: 12px;
+		--table-default-focus-ring-width: var(--global-focus-ring-width);
+		--table-default-focus-ring-color: var(--global-focus-ring-color);
+		--table-default-duration: var(--global-duration-fast);
+		--table-default-easing: var(--global-ease);
+	}
+}
