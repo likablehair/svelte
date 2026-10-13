@@ -10,11 +10,11 @@ export function fullColumnState<Row>(
 	for (const entry of state ?? []) {
 		if (!byKey.has(entry.key) || seen.has(entry.key)) continue;
 		seen.add(entry.key);
-		result.push({ ...entry });
+		result.push(byKey.get(entry.key)!.required ? { ...entry, visible: true } : { ...entry });
 	}
 	for (const column of columns) {
 		if (seen.has(column.key)) continue;
-		const entry: TableColumnState = { key: column.key, visible: !column.hidden };
+		const entry: TableColumnState = { key: column.key, visible: !!column.required || !column.hidden };
 		if (column.pinned) entry.pinned = true;
 		result.push(entry);
 	}

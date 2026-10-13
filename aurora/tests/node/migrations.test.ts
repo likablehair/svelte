@@ -3,7 +3,15 @@ import { describe, expect, test } from 'vitest';
 import { getComponentDoc, listComponents } from '../../src/docs/api.server.js';
 import type { ComponentMigration, GlobalMigration } from '../../migrations/types.js';
 
-const NEW_IN_V5 = ['DotsLoader', 'RadioGroup', 'Toaster', 'TimePicker', 'TimePickerTextField', 'DateTimePickerTextField'];
+const NEW_IN_V5 = [
+	'DotsLoader',
+	'RadioGroup',
+	'Toaster',
+	'TimePicker',
+	'TimePickerTextField',
+	'DateTimePickerTextField',
+	'ColumnManager'
+];
 
 const files = import.meta.glob<ComponentMigration | GlobalMigration>('/migrations/v4-to-v5/*.ts', {
 	import: 'default',

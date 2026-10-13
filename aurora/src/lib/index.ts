@@ -19,6 +19,7 @@ export { default as TabSwitcher } from './components/simple/navigation/TabSwitch
 export type { Tab } from './components/simple/navigation/TabSwitcher.svelte';
 export { default as Paginator } from './components/simple/navigation/Paginator.svelte';
 export { default as Table } from './components/simple/tables/Table.svelte';
+export { default as ColumnManager } from './components/composed/tables/ColumnManager.svelte';
 export type { TableColumn, TableSort, TableColumnState } from './utils/table/types.js';
 export { default as Checkbox } from './components/simple/forms/Checkbox.svelte';
 export { default as Switch } from './components/simple/forms/Switch.svelte';

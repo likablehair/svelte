@@ -11,6 +11,42 @@ export interface LibraryTexts {
 	autocomplete: { loading: string; noResults: string; remove: string; close: string };
 	chip: { remove: string };
 	circularLoader: { label: string };
+	columnManager: {
+		title: string;
+		count: string;
+		search: string;
+		visible: string;
+		reorderHint: string;
+		available: string;
+		availableCount: string;
+		availableCountOne: string;
+		results: string;
+		resultsOne: string;
+		noMatch: string;
+		allVisible: string;
+		reset: string;
+		save: string;
+		close: string;
+		move: string;
+		moveHint: string;
+		moved: string;
+		pin: string;
+		pinTip: string;
+		unpinTip: string;
+		pinned: string;
+		hide: string;
+		hideTip: string;
+		required: string;
+		lastVisible: string;
+		add: string;
+		typeText: string;
+		typeNumber: string;
+		typeCurrency: string;
+		typePercent: string;
+		typeDate: string;
+		typeDatetime: string;
+		typeBoolean: string;
+	};
 	confirmOrCancelButtons: { confirm: string; cancel: string };
 	datePicker: { previousMonth: string; nextMonth: string; previousYear: string; nextYear: string };
 	datePickerTextField: {
@@ -83,6 +119,42 @@ export const TEXTS_EN: LibraryTexts = {
 	autocomplete: { loading: 'Loading…', noResults: 'No results', remove: 'Remove', close: 'Close' },
 	chip: { remove: 'Remove' },
 	circularLoader: { label: 'Loading' },
+	columnManager: {
+		title: 'Table columns',
+		count: '{visible} of {total} columns visible',
+		search: 'Search by name, type or description…',
+		visible: 'Visible',
+		reorderHint: 'drag to reorder',
+		available: 'Available',
+		availableCount: '{count} available',
+		availableCountOne: '1 available',
+		results: '{count} results',
+		resultsOne: '1 result',
+		noMatch: 'No column matches “{query}”',
+		allVisible: 'Every column is visible',
+		reset: 'Reset',
+		save: 'Save view',
+		close: 'Close',
+		move: 'Move {column}',
+		moveHint: 'Up and down arrows to move it',
+		moved: '{column}, position {position} of {count}',
+		pin: 'Pin {column}',
+		pinTip: 'Pin to the left',
+		unpinTip: 'Unpin',
+		pinned: 'Pinned',
+		hide: 'Hide {column}',
+		hideTip: 'Hide',
+		required: 'Always visible',
+		lastVisible: 'At least one column stays visible',
+		add: 'Add {column}',
+		typeText: 'Text',
+		typeNumber: 'Number',
+		typeCurrency: 'Currency',
+		typePercent: 'Percentage',
+		typeDate: 'Date',
+		typeDatetime: 'Date and time',
+		typeBoolean: 'Yes/No'
+	},
 	confirmOrCancelButtons: { confirm: 'Save', cancel: 'Cancel' },
 	datePicker: {
 		previousMonth: 'Previous month',
@@ -165,6 +237,42 @@ export const TEXTS_IT: LibraryTexts = {
 	autocomplete: { loading: 'Caricamento…', noResults: 'Nessun risultato', remove: 'Rimuovi', close: 'Chiudi' },
 	chip: { remove: 'Rimuovi' },
 	circularLoader: { label: 'Caricamento' },
+	columnManager: {
+		title: 'Colonne della tabella',
+		count: '{visible} di {total} colonne visibili',
+		search: 'Cerca per nome, tipo o descrizione…',
+		visible: 'Visibili',
+		reorderHint: 'trascina per riordinare',
+		available: 'Da aggiungere',
+		availableCount: '{count} disponibili',
+		availableCountOne: '1 disponibile',
+		results: '{count} risultati',
+		resultsOne: '1 risultato',
+		noMatch: 'Nessuna colonna corrisponde a “{query}”',
+		allVisible: 'Tutte le colonne sono visibili',
+		reset: 'Ripristina',
+		save: 'Salva vista',
+		close: 'Chiudi',
+		move: 'Sposta {column}',
+		moveHint: 'Frecce su e giù per spostarla',
+		moved: '{column}, posizione {position} di {count}',
+		pin: 'Fissa {column}',
+		pinTip: 'Fissa a sinistra',
+		unpinTip: 'Non fissare',
+		pinned: 'Fissata',
+		hide: 'Nascondi {column}',
+		hideTip: 'Nascondi',
+		required: 'Sempre visibile',
+		lastVisible: 'Resta visibile almeno una colonna',
+		add: 'Aggiungi {column}',
+		typeText: 'Testo',
+		typeNumber: 'Numero',
+		typeCurrency: 'Valuta',
+		typePercent: 'Percentuale',
+		typeDate: 'Data',
+		typeDatetime: 'Data e ora',
+		typeBoolean: 'Sì/No'
+	},
 	confirmOrCancelButtons: { confirm: 'Salva', cancel: 'Annulla' },
 	datePicker: {
 		previousMonth: 'Mese precedente',

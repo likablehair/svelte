@@ -35,8 +35,14 @@ export interface TableColumn<Row = any> {
 	sort?: (params: { builder: FilterBuilder; direction: 'asc' | 'desc' }) => FilterBuilder;
 	/** Keeps the column visible on the left while the table scrolls sideways. Pinned columns are moved before the others; they scroll like the others while, together with the checkboxes and the actions, they would take more than half of the table. */
 	pinned?: boolean;
-	/** Hides the column until it is shown through `columnState` (for example with a column manager). */
+	/** Hides the column until it is shown through `columnState` (for example with a `ColumnManager`). */
 	hidden?: boolean;
+	/** The column is always shown: `columnState` cannot hide it and the `ColumnManager` has no button to hide it. */
+	required?: boolean;
+	/** SVG path of the icon of the column in the `ColumnManager`. Defaults to an icon of its `type`. */
+	icon?: string;
+	/** Description of the column in the `ColumnManager`, also matched by its search. Defaults to `info`. */
+	description?: string;
 	/** With `resizable` on the table, `false` keeps this column at its size. */
 	resizable?: boolean;
 	/** Explanation of the column, shown in a tooltip next to the header. */

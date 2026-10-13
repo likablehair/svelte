@@ -8,7 +8,7 @@ Contents:
 
 - [Checklist](#checklist)
 - [Global changes](#global-changes)
-- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [Menu](#menu), [MonthSelector](#monthselector), [NoData](#nodata), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Toaster](#toaster), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
+- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [Menu](#menu), [MonthSelector](#monthselector), [NoData](#nodata), [Paginator](#paginator), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Toaster](#toaster), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
 - [Not available yet](#not-available-yet)
 
 ## Checklist
@@ -481,6 +481,15 @@ New, optional: `variant`, `size`, `selected`, `closeLabel`, `locale` (language o
 | `--circular-loader-color` | same name, now works (any color or gradient) |
 
 New, optional: `value` and `total` (progress ring), `children` in the middle, `label` (default "Loading", "Caricamento" in Italian), `locale` (language of the texts), native attributes, `data-indeterminate`, `--circular-loader-thickness`, `--circular-loader-track-color`, `--circular-loader-duration`, `--circular-loader-value-duration`, `--circular-loader-content-*`. New component: `DotsLoader` (three dots that light up in turn).
+
+### ColumnManager
+
+New in v5: the panel where the user picks the columns of a table (shown, order, pinned), on the same `columnState` bound to `Table`. It replaces the internal `HeadersDrawer` of v4 (opened by the "+" icon of `EnhancedPaginatedTable` and of `DynamicTable` with `customizeHeaders`; those props move with the tables) and the column drawers that apps built by hand next to `PaginatedTable`.
+
+- **Saved columns**: v4 apps kept `[{ name, order }]` in the user's settings (`populateHeaders`, `UserSettingsService.set({ key: 'xxxTableHeaders', ... })`). In v5 save `columnState` from `onsave({ columnState })`: plain data `[{ key, visible, width?, pinned? }]` in display order, hidden columns included, and pass it back as `columnState`. An old setting converts once: `headers.map((header) => ({ key: header.name, visible: true }))` in its `order`; columns missing from it stay as `columns` declares them.
+- Changes apply live (the table behind follows) and are kept only with "Save view"; closing in any other way puts back the state it opened with (in v4 the unsaved changes stayed until the next save).
+- `pinnableColumns` (default off in v4) becomes `pinnable`, **on by default**; `locked` columns of v4 are `required` columns of `Table` (always visible).
+- Each column can have an `icon` and a `description` for the panel (`info`, the tooltip of the header, is used when there is no `description`).
 
 ### ConfirmOrCancelButtons
 
