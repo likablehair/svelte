@@ -173,7 +173,7 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 			border: 0;
 			background: none;
 			color: inherit;
-			overflow: hidden;
+			overflow: clip;
 		}
 
 		.aurora-drawer::backdrop {

@@ -18,7 +18,7 @@ import {
 	type SavedFilter,
 	type SelectFilterField
 } from '#lib';
-import { renderWithDefaultLocale, snippet, text, tooltipText } from '../helpers.js';
+import { instantDrawers, renderWithDefaultLocale, snippet, text, tooltipText } from '../helpers.js';
 import { ICONS, SERVICES, fieldOf, fields, few } from '../fixtures/filters/fields.js';
 
 type Change = { value: FilterGroup; builder: FilterBuilder };
@@ -1176,6 +1176,8 @@ describe('Filters', () => {
 	});
 
 	describe('mobile', () => {
+		instantDrawers();
+
 		async function onMobile(run: () => Promise<void>) {
 			await page.viewport(800, 700);
 			try {

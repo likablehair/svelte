@@ -3,7 +3,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import YearPickerTextField from '#lib/components/composed/forms/YearPickerTextField.svelte';
-import { renderWithDefaultLocale, snippet } from '../helpers.js';
+import { instantDrawers, renderWithDefaultLocale, snippet } from '../helpers.js';
 
 const CHEVRON_ICON = 'M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z';
 
@@ -412,6 +412,8 @@ describe('YearPickerTextField', () => {
 	});
 
 	describe('mobile', () => {
+		instantDrawers();
+
 		test('the calendar button opens a modal bottom drawer; choosing a year closes it', async () => {
 			await page.viewport(800, 700);
 			try {

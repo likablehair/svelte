@@ -38,6 +38,13 @@ describe('Dialog', () => {
 		expect(getComputedStyle(element).zIndex).toBe('auto');
 	});
 
+	test('its container never scrolls, so the focus moved inside on opening cannot shift it', async () => {
+		const { dialog } = await openHarness();
+		const element = dialog.element() as HTMLElement;
+		expect(getComputedStyle(element).overflow).toBe('clip');
+		expect(element.scrollTop).toBe(0);
+	});
+
 	test('v4 bug: closed content is not in the DOM and its state resets at every opening', async () => {
 		const screen = await render(ModalHarness);
 		expect(screen.container.querySelector('dialog')).toBeNull();

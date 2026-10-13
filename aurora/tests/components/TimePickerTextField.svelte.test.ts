@@ -3,7 +3,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import TimePickerTextField from '#lib/components/composed/forms/TimePickerTextField.svelte';
-import { renderWithDefaultLocale, snippet, sweepFormatChip } from '../helpers.js';
+import { instantDrawers, renderWithDefaultLocale, snippet, sweepFormatChip } from '../helpers.js';
 
 const CLOCK_ICON =
 	'M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z';
@@ -584,6 +584,8 @@ describe('TimePickerTextField', () => {
 	});
 
 	describe('mobile', () => {
+		instantDrawers();
+
 		test('the clock button opens a modal bottom drawer; choosing the minutes closes it', async () => {
 			await page.viewport(800, 700);
 			try {

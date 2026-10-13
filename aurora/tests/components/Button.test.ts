@@ -13,6 +13,19 @@ describe('Button', () => {
 		await expect.element(button).toHaveClass('aurora-button');
 	});
 
+	test.runIf(CSS.supports('-webkit-tap-highlight-color', 'red'))(
+		'turns off the tap highlight of mobile browsers, only on library elements',
+		async () => {
+			const screen = await render(Button, { children: text('Save') });
+			const own = document.createElement('button');
+			document.body.append(own);
+			const highlight = (element: Element) => getComputedStyle(element).getPropertyValue('-webkit-tap-highlight-color');
+			expect(highlight(screen.getByRole('button', { name: 'Save' }).element())).toBe('rgba(0, 0, 0, 0)');
+			expect(highlight(own)).not.toBe('rgba(0, 0, 0, 0)');
+			own.remove();
+		}
+	);
+
 	test('forwards native attributes and class to the button', async () => {
 		const screen = await render(Button, {
 			children: text('Save'),

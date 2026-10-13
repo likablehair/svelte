@@ -188,4 +188,25 @@
 	:root[data-switching] *::after {
 		transition: none !important;
 	}
+
+	:where(
+			button,
+			a,
+			label,
+			summary,
+			input,
+			select,
+			textarea,
+			[role='button'],
+			[role='checkbox'],
+			[role='link'],
+			[role='menuitem'],
+			[role='option'],
+			[role='separator'],
+			[role='switch'],
+			[role='tab'],
+			[tabindex]
+		)[class*='aurora-'] {
+		-webkit-tap-highlight-color: transparent;
+	}
 }

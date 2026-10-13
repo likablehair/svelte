@@ -1,5 +1,5 @@
 <!-- @component
-Table of rows and columns. `columns` declares what each column shows (`key`, `label`, a `type` that formats numbers, dates and yes/no with `Intl` in the language of `locale`, `format`, or a `cell` snippet) and `rows` are plain objects, identified by `rowKey`. Sortable columns sort the rows on their own (ascending, descending, unsorted), or only report the new `sort` with `sorting="manual"` when the server sorts. `selectable` adds a checkbox per row (shift-click selects a range), `expandedSnippet` a detail row under each row, `actionsSnippet` a column of buttons that stays on the right while scrolling (with `actionsVisibility="hover"` it shows only on hover and focus). `rowHref` turns every row into a link (Ctrl-click and middle click open it in a new tab), `onrowclick` makes rows clickable and focusable. `pinned` columns stay on the left, `resizable` columns can be dragged or resized with the arrow keys, and `columnState` keeps order, visibility, widths and pins as plain data to save. Empty cells show "—". When the table is narrower than `cardBreakpoint` (640px by default) every row becomes a card, with the `cardColumns` (the first 4 by default) and the other columns behind "Show more fields". While `loading` the table shows a progress bar, or placeholder rows when it has none; with no rows it shows `NoData`. State is exposed as `data-cards`, `data-loading`, `data-resizing` and `data-actions-visibility` on the root, and `data-selected`, `data-expanded` on rows for app CSS.
+Table of rows and columns. `columns` declares what each column shows (`key`, `label`, a `type` that formats numbers, dates and yes/no with `Intl` in the language of `locale`, `format`, or a `cell` snippet) and `rows` are plain objects, identified by `rowKey`. Sortable columns sort the rows on their own (ascending, descending, unsorted), or only report the new `sort` with `sorting="manual"` when the server sorts. `selectable` adds a checkbox per row (shift-click selects a range), `expandedSnippet` a detail row under each row, `actionsSnippet` a column of buttons that stays on the right while scrolling (with `actionsVisibility="hover"` it shows only on hover and focus). `rowHref` turns every row into a link (Ctrl-click and middle click open it in a new tab), `onrowclick` makes rows clickable and focusable. `pinned` columns stay on the left (unless together with the checkboxes and the actions they would take more than half of the table), `resizable` columns can be dragged or resized with the arrow keys, and `columnState` keeps order, visibility, widths and pins as plain data to save. Empty cells show "—". When the table is narrower than `cardBreakpoint` (640px by default) every row becomes a card, with the `cardColumns` (the first 4 by default) and the other columns behind "Show more fields". While `loading` the table shows a progress bar, or placeholder rows when it has none; with no rows it shows `NoData`. State is exposed as `data-cards`, `data-loading`, `data-resizing`, `data-actions-visibility` and `data-pins-off` on the root, and `data-selected`, `data-expanded` on rows for app CSS.
 -->
 <script lang="ts" generics="Row extends Record<string, any>">
 	import '../../../css/tokens.css';
@@ -248,6 +248,8 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 	let resizing = $state<string>();
 	let actionsWidth = $state<number>();
 	let overflowStart = $state(false);
+	let viewWidth = $state<number>();
+	let scrolling = $state(false);
 	let overflowEnd = $state(false);
 	let infoButtons = $state<Record<string, HTMLButtonElement>>({});
 	const headerCells: Record<string, HTMLTableCellElement> = {};
@@ -258,8 +260,19 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 
 	let fixedLayout = $derived(!cards && resolved.some((entry) => widthOf(entry) !== undefined));
 	let anyPinned = $derived(resolved.some((entry) => entry.pinned));
+	let pinnedWidth = $derived(
+		[
+			...(selectable ? [SELECT_KEY] : []),
+			...(expandedSnippet ? [EXPAND_KEY] : []),
+			...resolved.filter((entry) => entry.pinned).map((entry) => entry.column.key)
+		].reduce((sum, key) => sum + (measured[key] ?? 0), actionsSnippet ? (actionsWidth ?? 0) : 0)
+	);
+	let pinsOff = $derived(
+		anyPinned && scrolling && viewWidth !== undefined && pinnedWidth > viewWidth / 2
+	);
+	let pinsOn = $derived(anyPinned && !pinsOff);
 	let stickyKeys = $derived(
-		anyPinned
+		pinsOn
 			? [
 					...(selectable ? [SELECT_KEY] : []),
 					...(expandedSnippet ? [EXPAND_KEY] : []),
@@ -336,6 +349,9 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 			const start = Math.abs(node.scrollLeft);
 			const nextStart = start > 1;
 			const nextEnd = start + node.clientWidth < node.scrollWidth - 1;
+			const nextScrolling = node.scrollWidth > node.clientWidth + 1;
+			if (viewWidth !== node.clientWidth) viewWidth = node.clientWidth;
+			if (scrolling !== nextScrolling) scrolling = nextScrolling;
 			if (overflowStart !== nextStart) overflowStart = nextStart;
 			if (overflowEnd !== nextEnd) overflowEnd = nextEnd;
 		};
@@ -650,6 +666,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 	data-loading={loading || undefined}
 	data-resizing={resizing ? '' : undefined}
 	data-actions-visibility={actionsSnippet ? actionsVisibility : undefined}
+	data-pins-off={!cards && pinsOff ? '' : undefined}
 	data-overflow-start={!cards && overflowStart ? '' : undefined}
 	data-overflow-end={!cards && overflowEnd ? '' : undefined}
 >
@@ -794,7 +811,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 							<th
 								{@attach measure(SELECT_KEY)}
 								class={['aurora-table-control', clazz.header]}
-								data-pinned={anyPinned || undefined}
+								data-pinned={pinsOn || undefined}
 								data-pinned-last={lastSticky === SELECT_KEY || undefined}
 								style:inset-inline-start={stickyStart(SELECT_KEY)}
 							>
@@ -813,7 +830,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 							<th
 								{@attach measure(EXPAND_KEY)}
 								class={['aurora-table-control', clazz.header]}
-								data-pinned={anyPinned || undefined}
+								data-pinned={pinsOn || undefined}
 								data-pinned-last={lastSticky === EXPAND_KEY || undefined}
 								style:inset-inline-start={stickyStart(EXPAND_KEY)}
 							>
@@ -831,7 +848,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 								data-align={columnAlign(column)}
 								data-sortable={column.sortable || undefined}
 								data-sorted={sorted}
-								data-pinned={entry.pinned || undefined}
+								data-pinned={(pinsOn && entry.pinned) || undefined}
 								data-pinned-last={lastSticky === column.key || undefined}
 								style:inset-inline-start={stickyStart(column.key)}
 								style:min-width={column.minWidth}
@@ -932,7 +949,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 							{#if selectable}
 								<td
 									class="aurora-table-control"
-									data-pinned={anyPinned || undefined}
+									data-pinned={pinsOn || undefined}
 									data-pinned-last={lastSticky === SELECT_KEY || undefined}
 									style:inset-inline-start={stickyStart(SELECT_KEY)}
 								>
@@ -942,7 +959,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 							{#if expandedSnippet}
 								<td
 									class="aurora-table-control"
-									data-pinned={anyPinned || undefined}
+									data-pinned={pinsOn || undefined}
 									data-pinned-last={lastSticky === EXPAND_KEY || undefined}
 									style:inset-inline-start={stickyStart(EXPAND_KEY)}
 								>
@@ -955,7 +972,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 									class={['aurora-table-cell', clazz.cell]}
 									data-type={column.type ?? 'text'}
 									data-align={columnAlign(column)}
-									data-pinned={entry.pinned || undefined}
+									data-pinned={(pinsOn && entry.pinned) || undefined}
 									data-pinned-last={lastSticky === column.key || undefined}
 									style:inset-inline-start={stickyStart(column.key)}
 									style:min-width={column.minWidth}
@@ -993,14 +1010,14 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 							{#if selectable}
 								<td
 									class="aurora-table-control"
-									data-pinned={anyPinned || undefined}
+									data-pinned={pinsOn || undefined}
 									style:inset-inline-start={stickyStart(SELECT_KEY)}
 								></td>
 							{/if}
 							{#if expandedSnippet}
 								<td
 									class="aurora-table-control"
-									data-pinned={anyPinned || undefined}
+									data-pinned={pinsOn || undefined}
 									style:inset-inline-start={stickyStart(EXPAND_KEY)}
 								></td>
 							{/if}
@@ -1009,7 +1026,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 									class="aurora-table-cell"
 									data-type={entry.column.type ?? 'text'}
 									data-align={columnAlign(entry.column)}
-									data-pinned={entry.pinned || undefined}
+									data-pinned={(pinsOn && entry.pinned) || undefined}
 									data-pinned-last={lastSticky === entry.column.key || undefined}
 									style:inset-inline-start={stickyStart(entry.column.key)}
 								>
@@ -1256,16 +1273,22 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 		}
 
 		.aurora-table-table td {
+			--_cell-bg: transparent;
+			--_edge: 0 0 transparent;
+
 			box-sizing: border-box;
 			padding: var(--table-cell-padding, var(--table-default-cell-padding));
 			border-bottom: var(--_separator);
-			background: var(--_row-bg);
+			background-color: var(--_cell-bg);
+			box-shadow:
+				inset 0 0 0 100vmax var(--_row-bg, transparent),
+				var(--_edge);
 			overflow: hidden;
 			text-align: start;
 			text-overflow: ellipsis;
 			white-space: nowrap;
 			vertical-align: middle;
-			transition: background-color var(--_duration) var(--_easing);
+			transition: box-shadow var(--_duration) var(--_easing);
 		}
 
 		.aurora-table-table tbody tr {
@@ -1347,11 +1370,10 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 		}
 
 		.aurora-table-table [data-pinned] {
+			--_cell-bg: var(--table-pinned-background, var(--table-default-pinned-background));
+
 			position: sticky;
 			z-index: 1;
-			background:
-				linear-gradient(var(--_row-bg), var(--_row-bg)),
-				var(--table-pinned-background, var(--table-default-pinned-background));
 		}
 
 		.aurora-table-table thead [data-pinned] {
@@ -1360,8 +1382,12 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 				var(--table-pinned-background, var(--table-default-pinned-background));
 		}
 
-		.aurora-table[data-overflow-start] [data-pinned-last] {
+		.aurora-table[data-overflow-start] th[data-pinned-last] {
 			box-shadow: var(--table-pinned-shadow, var(--table-default-pinned-shadow));
+		}
+
+		.aurora-table[data-overflow-start] td[data-pinned-last] {
+			--_edge: var(--table-pinned-shadow, var(--table-default-pinned-shadow));
 		}
 
 		.aurora-table-control-col {
@@ -1378,11 +1404,10 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 			position: sticky;
 			inset-inline-end: 0;
 			z-index: 1;
+			--_cell-bg: var(--table-pinned-background, var(--table-default-pinned-background));
+
 			width: 1px;
 			padding-block: 0;
-			background:
-				linear-gradient(var(--_row-bg), var(--_row-bg)),
-				var(--table-pinned-background, var(--table-default-pinned-background));
 			text-align: end;
 		}
 
@@ -1392,8 +1417,12 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 				var(--table-pinned-background, var(--table-default-pinned-background));
 		}
 
-		.aurora-table[data-overflow-end] .aurora-table-actions {
+		.aurora-table[data-overflow-end] th.aurora-table-actions {
 			box-shadow: var(--table-actions-shadow, var(--table-default-actions-shadow));
+		}
+
+		.aurora-table[data-overflow-end] td.aurora-table-actions {
+			--_edge: var(--table-actions-shadow, var(--table-default-actions-shadow));
 		}
 
 		.aurora-table-actions-content {
@@ -1468,10 +1497,9 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 		}
 
 		.aurora-table-table .aurora-table-detail-row > td {
+			--_cell-bg: var(--table-detail-background, var(--table-default-detail-background));
+
 			padding: var(--table-detail-padding, var(--table-default-detail-padding));
-			background:
-				linear-gradient(var(--_row-bg), var(--_row-bg)),
-				var(--table-detail-background, var(--table-default-detail-background));
 			color: var(--table-detail-color, var(--table-default-detail-color));
 			white-space: normal;
 		}
@@ -1486,6 +1514,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 			padding: 0;
 			border: 0;
 			background: none;
+			box-shadow: none;
 			overflow: visible;
 		}
 

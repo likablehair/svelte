@@ -189,7 +189,7 @@ Modal dialog on the browser's top layer (`<dialog>` with `showModal()`): it need
 			align-items: center;
 			justify-content: center;
 			gap: var(--_inset);
-			overflow: hidden;
+			overflow: clip;
 		}
 
 		.aurora-dialog::backdrop {

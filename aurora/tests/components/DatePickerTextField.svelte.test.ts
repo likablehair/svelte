@@ -4,7 +4,7 @@ import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import type { CalendarDay } from '#lib/components/simple/dates/Calendar.svelte';
 import DatePickerTextField from '#lib/components/composed/forms/DatePickerTextField.svelte';
-import { renderWithDefaultLocale, snippet, sweepFormatChip } from '../helpers.js';
+import { instantDrawers, renderWithDefaultLocale, snippet, sweepFormatChip } from '../helpers.js';
 
 type Change = { selectedDate: Date | undefined; selectedDateTo: Date | undefined };
 
@@ -815,6 +815,8 @@ describe('DatePickerTextField', () => {
 	});
 
 	describe('mobile', () => {
+		instantDrawers();
+
 		test('the calendar button opens a modal bottom drawer; choosing a day closes it', async () => {
 			await page.viewport(800, 700);
 			try {

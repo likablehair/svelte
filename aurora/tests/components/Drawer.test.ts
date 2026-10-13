@@ -61,6 +61,15 @@ describe('Drawer', () => {
 		}
 	);
 
+	test('the focus moved inside on opening does not scroll the sheet while it slides in', async () => {
+		const { drawer } = await openHarness({ position: 'bottom', style: '--drawer-duration: 2s' });
+		const element = drawer.element() as HTMLElement;
+		expect(getComputedStyle(element).overflow).toBe('clip');
+		expect(element.scrollTop).toBe(0);
+		expect(element.contains(document.activeElement)).toBe(true);
+		expect(panelOf(drawer).getBoundingClientRect().top).toBeGreaterThan(element.getBoundingClientRect().bottom - 320);
+	});
+
 	test('--drawer-size sets the panel size, capped by --drawer-max-size', async () => {
 		const small = await openHarness({
 			position: 'right',

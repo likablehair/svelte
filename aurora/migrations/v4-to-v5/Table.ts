@@ -58,7 +58,7 @@ export default {
 			},
 			{
 				name: 'stickyMinContainerWidth',
-				note: 'Pinned columns stay pinned at every width; below `cardBreakpoint` (640px of the table) the rows become cards, which have nothing to pin.'
+				note: 'No fixed width any more: pinned columns scroll with the others only while, with the checkboxes and the actions, they would take more than half of a table that scrolls sideways (`data-pins-off` on the root); below `cardBreakpoint` (640px of the table) the rows become cards.'
 			}
 		],
 		changed: [

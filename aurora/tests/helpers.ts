@@ -1,4 +1,5 @@
 import { createRawSnippet, type Component } from 'svelte';
+import { afterEach, beforeEach } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import WithDefaultLocale from './fixtures/locale/WithDefaultLocale.svelte';
 
@@ -42,4 +43,9 @@ export function sweepFormatChip(root: HTMLElement, variable: string) {
 	}
 	root.style.removeProperty(variable);
 	return steps;
+}
+
+export function instantDrawers() {
+	beforeEach(() => document.documentElement.style.setProperty('--drawer-duration', '0s'));
+	afterEach(() => document.documentElement.style.removeProperty('--drawer-duration'));
 }

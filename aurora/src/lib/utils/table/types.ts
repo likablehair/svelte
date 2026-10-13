@@ -33,7 +33,7 @@ export interface TableColumn<Row = any> {
 	compare?: (a: Row, b: Row) => number;
 	/** Adds the sorting by this column to the query sent to the backend, instead of `orderBy(key, direction)`. Used when the table does not sort on its own (`sorting="manual"`, `DataTable`). */
 	sort?: (params: { builder: FilterBuilder; direction: 'asc' | 'desc' }) => FilterBuilder;
-	/** Keeps the column visible on the left while the table scrolls sideways. Pinned columns are moved before the others. */
+	/** Keeps the column visible on the left while the table scrolls sideways. Pinned columns are moved before the others; they scroll like the others while, together with the checkboxes and the actions, they would take more than half of the table. */
 	pinned?: boolean;
 	/** Hides the column until it is shown through `columnState` (for example with a column manager). */
 	hidden?: boolean;

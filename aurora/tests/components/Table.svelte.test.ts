@@ -478,6 +478,50 @@ describe('Table', () => {
 		await expect.poll(() => (headers[1] as HTMLElement).style.insetInlineStart).toBe(`${headers[0].getBoundingClientRect().width}px`);
 	});
 
+	test('pinned and regular cells take the row color together, with the same transition', async () => {
+		const screen = await render(Table, {
+			rows: products,
+			columns: [{ ...columns[0], pinned: true }, ...columns.slice(1)],
+			actionsSnippet: rowSnippet((row) => `<button type="button">Edit ${row.name}</button>`)
+		});
+		const row = bodyRows(screen.container)[1];
+		const [pinned, regular] = row.querySelectorAll('td');
+		const actions = row.querySelector('td.aurora-table-actions')!;
+		expect(pinned.hasAttribute('data-pinned')).toBe(true);
+		for (const cell of [pinned, regular, actions]) {
+			expect(getComputedStyle(cell).transitionProperty).toBe('box-shadow');
+			expect(getComputedStyle(cell).backgroundImage).toBe('none');
+		}
+		const rowColor = (cell: Element) => getComputedStyle(cell).boxShadow.split(' 0px')[0];
+		await userEvent.hover(row);
+		await expect.poll(() => rowColor(regular)).not.toBe('rgba(0, 0, 0, 0)');
+		expect(rowColor(pinned)).toBe(rowColor(regular));
+		expect(rowColor(actions)).toBe(rowColor(regular));
+		await userEvent.hover(screen.container.querySelector('thead th')!);
+	});
+
+	test('pinned columns scroll with the others while they would take more than half of the table', async () => {
+		const host = document.createElement('div');
+		host.style.width = '700px';
+		document.body.append(host);
+		await render(Table, {
+			target: host,
+			props: {
+				rows: products,
+				columns: [{ ...columns[0], pinned: true, minWidth: '400px' }, ...columns.slice(1).map((column) => ({ ...column, minWidth: '200px' }))],
+				selectable: 'multiple',
+				cardBreakpoint: false
+			}
+		});
+		const root = host.querySelector('.aurora-table')!;
+		await expect.poll(() => root.hasAttribute('data-pins-off')).toBe(true);
+		expect(root.querySelectorAll('[data-pinned]')).toHaveLength(0);
+		host.style.width = '1000px';
+		await expect.poll(() => root.hasAttribute('data-pins-off')).toBe(false);
+		expect(root.querySelectorAll('thead [data-pinned]')).toHaveLength(2);
+		host.remove();
+	});
+
 	test('columnState sets order, visibility and widths; hidden columns start hidden', async () => {
 		const screen = await render(Table, {
 			rows: products,
@@ -717,6 +761,6 @@ describe('Table', () => {
 		expect(getComputedStyle(header).color).toBe('rgb(4, 5, 6)');
 		const cell = root.querySelector('tbody td.aurora-table-cell')!;
 		expect(getComputedStyle(cell).padding).toBe('3px 7px');
-		expect(getComputedStyle(cell).backgroundColor).toBe('rgb(7, 8, 9)');
+		expect(getComputedStyle(cell).boxShadow).toContain('rgb(7, 8, 9)');
 	});
 });
