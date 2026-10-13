@@ -1122,6 +1122,27 @@ Unchanged: `--no-data-gap`.
 
 New, optional: `description`, `size`, `children` (actions), `titleSnippet`, `descriptionSnippet`, `iconSnippet`, native attributes, `data-size`, `--no-data-min-height`, `-padding`, `-max-width`, `-icon-*`, `-ring-color`, `-title-*`, `-description-*`, `-actions-gap`.
 
+### Paginator
+
+- `maxPage` → `pageCount` (same meaning). `bind:maxPage` → `pageCount={maxPage}`: the paginator never wrote it.
+- `onchange({ detail: { page } })` → `onchange({ page })`: `e.detail.page` → `e.page`. It is no longer called for the page that is already current.
+- **`page` is no longer clamped**: v4 moved it back to `maxPage` without calling `onchange` (the data did not reload). Now a page past `pageCount` stays, no number is marked and "previous" goes to the last page. Set `page = 1` when filters, search or page size change.
+- Look of the prototype: `« ‹ 1 … 6 7 8 … 24 › »` (v4: previous, current and next page only), mono digits, filled current page, always the same number of buttons. First and previous are disabled on the first page, next and last on the last one (`aria-disabled`, they keep the focus). Without `pageCount` it works as in v4: "next" always enabled, no "last".
+- It is a `<nav>` named "Pagination" with `aria-current="page"`; the texts follow `locale`. App CSS on `.paginator-container`, `.page-button` or `.selected` must target `.aurora-paginator`, `.aurora-paginator-button` and `[aria-current="page"]`.
+- Six apps have a copy, `$lib/components/common/StandardPaginator.svelte`: replace it with the library one.
+
+| v4 | v5 |
+|---|---|
+| `--paginator-page-button-background-color`, `-color`, `-padding`, `-border-radius` | `--paginator-button-background`, `-color`, `-padding`, `-border-radius` |
+| `--paginator-page-button-hover-background-color` | `--paginator-button-hover-background` |
+| `--paginator-page-button-selected-background-color`, `-selected-color` | `--paginator-current-background`, `--paginator-current-color` |
+| `--paginator-page-button-hover-border-radius`, `-selected-padding` | removed (same radius and padding as the other buttons) |
+| `--paginator-page-button-focus-color`, `-focus-background-color` | removed: focus ring, `--paginator-focus-ring-color` |
+
+Defaults: the same renames on `--paginator-default-page-button-*` → `--paginator-default-button-*` and `--paginator-default-current-*`.
+
+New, optional: `siblingCount`, `showFirstLast`, `compact` ("7 / 24"), `pageHref` (links, page in the URL), `pageSnippet`, `firstIcon` / `previousIcon` / `nextIcon` / `lastIcon`, `locale` and the `*Label` texts, `bind:paginatorElement`, `class` object (`container`, `button`, `current`), `data-compact`, `data-current`, `--paginator-gap`, `-font-*`, `-icon-size`, `-button-size`, `-button-hover-color`, `-current-box-shadow`, `-ellipsis-*`, `-status-*`, `-disabled-opacity`, `-focus-ring-*`, `-duration`, `-easing`.
+
 ### ProgressBar
 
 - Look: an 8px pill track with the theme gradient, a glow and a moving shimmer (v4: 5px, radius 2px, flat primary). Pass `--progress-bar-height="5px"` for the v4 height.
@@ -1437,6 +1458,6 @@ New, optional: `min`, `max`, `locale` (language of the default name "Year"), `fo
 
 These v4 exports have no v5 version yet. Keep v4 for screens that need them, or wait for the port.
 
-- **Components**: MediaQuery (use `svelte/reactivity`), MenuOrDrawer, MenuOrDrawerOptions, QuickActions, VerticalDraggableList, InfiniteScroll, CollapsibleDivider, PeriodSelector, PeriodPicker, FileInput, FileInputList, VerticalSwitch, VerticalTextSwitch, IconsDropdown, AvatarDropdown, ToggleList, BoxList, ColorInvertedSelector, SelectableMenuList, SelectableVerticalList, SidebarMenuList, HierarchyMenu, SimpleTable, Paginator, PaginatedTable, EnhancedPaginatedTable, DynamicTable, GlobalSearchTextField, Avatar, DescriptiveAvatar, Breadcrumb, HeaderMenu, Navigator, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper, CollapsibleSideBarLayout, StableDividedSideBarLayout, UnstableDividedSideBarLayout.
+- **Components**: MediaQuery (use `svelte/reactivity`), MenuOrDrawer, MenuOrDrawerOptions, QuickActions, VerticalDraggableList, InfiniteScroll, CollapsibleDivider, PeriodSelector, PeriodPicker, FileInput, FileInputList, VerticalSwitch, VerticalTextSwitch, IconsDropdown, AvatarDropdown, ToggleList, BoxList, ColorInvertedSelector, SelectableMenuList, SelectableVerticalList, SidebarMenuList, HierarchyMenu, SimpleTable, PaginatedTable, EnhancedPaginatedTable, DynamicTable, GlobalSearchTextField, Avatar, DescriptiveAvatar, Breadcrumb, HeaderMenu, Navigator, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper, CollapsibleSideBarLayout, StableDividedSideBarLayout, UnstableDividedSideBarLayout.
 - **Utilities**: `scrollAtCenter`.
 - **Stores**: `mediaQuery`, `theme`, `toggleTheme` (see [Dark mode](#dark-mode-and-themes)), `debounce`.

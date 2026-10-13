@@ -20,6 +20,7 @@ Questo file è corto di proposito (si carica a ogni lavoro su `aurora/`): regole
 | `reference/filters-backends.md` | lavoro sui filtri, sulle tabelle o su cosa accettano i backend delle app |
 | `reference/v4-discarded.md` | si porta un componente e bisogna sapere cosa della v4 è stato scartato |
 | `reference/performance.md` | si toccano transizioni, token o si misura il costo degli stili |
+| `reference/tables.md` | lavoro sulle tabelle: gerarchia v4, duplicati, bug, uso nelle app con i numeri |
 
 ## Regola di manutenzione (prima di tutto)
 
@@ -136,10 +137,12 @@ Una riga per argomento; la voce completa, con data e motivazioni, è in `referen
 - Chip: neutro, `selected` toggle, X fratello. TabSwitcher: tablist o `<nav>` con `href`, `variant` underline/segmented. Divider: `<hr>`, `label`, `variant`.
 - Feedback: CircularLoader, DotsLoader, Skeleton, ProgressBar, HorizontalStackedProgress, AlertBanner, NoData, Tooltip (rinominato da `ToolTip`), Toaster con funzioni `addToast`, `addSuccessToast`… (stessi nomi delle app).
 - **Filtri** (decisioni del 2026-10-09 → 2026-10-13): modello alla ClickUp, si aggiunge un filtro alla volta; `fields` (definizione) + `value` (albero JSON di gruppi e condizioni); operatori per tipo in livelli `basic`/`standard`/`all` (`operatorSet`, `typeOperators`, `field.operators`), coppie positivo/negativo vicine; AND/OR con `allowOr`, gruppi con `maxDepth` (filtro singolo come riga discreta con "+ Add nested filter", riquadro solo per i gruppi veri, un gruppo con un solo elemento si scioglie; gruppi annidati a toni alternati, `--filters-group-background` (`surface-3`) / `--filters-group-alt-background` (`surface-pop`, il pannello)); pill, `pinned`, `presets` (accesi solo se le condizioni coincidono), `confirm`, `applyDelay`, bottom sheet su mobile; filtri salvati (`savedKey` nel browser, `bind:saved` + `onsavedchange` per il backend); query `FilterBuilder` con il JSON della v4 (contratto con i backend) da `filtersToBuilder`; testi dal `locale` (`it`, `en`) con `labels` sopra; uguaglianze di testo senza maiuscole salvo `caseSensitive`; `words` parola per parola (anche `is`/`isNot`); `negativesIncludeEmpty` **acceso di default** (le app con backend E/E' passano `false`); campi con più valori dicono "has any/none/all of". Opzioni che sostituiscono custom e `modify`: `columns`, `joins`, `through`, `json`, `array`, `compareWith`, `whenTrue`/`whenFalse`, `whenAbsent`, `hidden` + `locked`, `scale`, `apply`, `suggest`. Il gruppo C (funzioni senza uso visto) è stato tenuto per intero. SearchBar separata, in AND con i filtri.
+- **Paginator** (2026-10-13): `pageCount` (ex `maxPage`), `onchange({ page })`, finestra `1 … 6 7 8 … 24` a elementi fissi (`siblingCount`, `showFirstLast`), estremi con `aria-disabled`, nessuna correzione automatica di `page`; `pageHref`, `compact`, `pageSnippet`.
+- **Tabelle** (P47–P55 confermate il 2026-10-13, analisi in `reference/tables.md`): `Table` (ex SimpleTable) + `DataTable` (ex PaginatedTable, EnhancedPaginatedTable e DynamicTable, paginazione `pages`/`infinite`/`none`) + `Paginator` + `ColumnManager` (ex HeadersDrawer); logica in moduli TS interni `utils/table/`. Una sola `onquerychange({ page, pageSize, sort, search, filters, builder })` con pagina a 1 su filtri/ricerca/ordinamento, `total`; `loader` opzionale accanto alla modalità controllata; `columns` con `cell` snippet per colonna, tipi `Intl` (number/valuta, date anche luxon, boolean), `format`, `empty`, `sort`, `footer`; `bind:columnState` serializzabile; `rowKey`, `rowHref`, `actionsSnippet` in hover, `rowClass`; selezione unica con "tutto" ed esclusioni + barra azioni; `expandedSnippet`. Tolti `cellEdit`, la finestra di 100 righe, doppio clic, quick filter delle tabelle, `editFilterMode`, `stickyAppendSnippet`. **Vista a card su mobile** (approvata dall'utente): sotto una larghezza del contenitore ogni riga diventa una card.
 
 ## Proposte (non ancora confermate)
 
-Le nuove proposte vanno in una tabella `| # | Proposta | Nota |`, numerate da P46 (P19 e P20 sono state usate per i layer e Tailwind).
+Le nuove proposte vanno in una tabella `| # | Proposta | Nota |`, numerate dal primo numero libero (ultimo usato: P55; P19 e P20 sono state usate per i layer e Tailwind).
 
 | # | Proposta | Nota |
 |---|---|---|
@@ -160,6 +163,10 @@ Le nuove proposte vanno in una tabella `| # | Proposta | Nota |`, numerate da P4
 - codemod, server MCP e prompt di migrazione (P42), che leggono le regole di ex P44;
 - pipeline di rilascio: bump, GitHub release, pnpm, changelog (da proporre: Changesets, che non richiede commit convenzionali; decidere se fare del repo un workspace pnpm con v4 e v5);
 - P38 (portare prima i componenti che bloccano la migrazione) e P40 (`v4-compat.css`).
+
+**Segnalati dall'utente il 2026-10-13** (prima o dopo le tabelle, non bloccano):
+- **Filtri su mobile**: aprendo il bottom sheet sale, fa uno scatto e torna giù (animazione d'ingresso che rimbalza); il bottone "aggiungi filtro" diventa tutto azzurro mentre lo si tocca (probabile `-webkit-tap-highlight-color` o stato `:active`). Riprodurre con viewport mobile e touch.
+- **`FilterModifierApplier` unico**: oggi è copiato nei backend di 20 app in 6 varianti diverse (`reference/filters-backends.md`); trovare il modo di averne uno solo (pacchetto condiviso per Adonis/Lucid, versionato insieme a `FilterBuilder`), così niente copia-incolla e si risolvono insieme varianti rotte (E/E'), `kind` mancanti e whitelist di sicurezza.
 
 Il Toast, chiesto il 2026-10-08, è fatto il 2026-10-09.
 
@@ -232,9 +239,11 @@ La suite intera (~2.400 test in due browser, 3–4 minuti) e il test visivo inte
 ## Stato (sintesi; dettagli in `reference/history.md`)
 
 - **Fondamenta**: token, temi (Aurora, classic, galleria), layer, Tailwind, docs generate, infrastruttura di test e di migrazione.
-- **Componenti fatti**: Button, Icon, LinkButton, ActivableButton, ConfirmOrCancelButtons, SimpleTextField, Textarea, Select, Checkbox, Switch, RadioButton, RadioGroup, Autocomplete, AsyncAutocomplete, CountriesAutocomplete, Dropdown, FlagIcon, Chip, Menu, Dialog, Drawer, TabSwitcher, Divider, Tooltip, CircularLoader, DotsLoader, Skeleton, ProgressBar, HorizontalStackedProgress, AlertBanner, NoData, Toaster, Calendar, DatePicker, MonthSelector, YearSelector, DatePickerTextField, YearPickerTextField, **TimePicker**, **TimePickerTextField**, **DateTimePickerTextField** (2026-10-13), più **Filters**, **FilterEditor** e **SearchBar**.
+- **Componenti fatti**: Button, Icon, LinkButton, ActivableButton, ConfirmOrCancelButtons, SimpleTextField, Textarea, Select, Checkbox, Switch, RadioButton, RadioGroup, Autocomplete, AsyncAutocomplete, CountriesAutocomplete, Dropdown, FlagIcon, Chip, Menu, Dialog, Drawer, TabSwitcher, Divider, Tooltip, CircularLoader, DotsLoader, Skeleton, ProgressBar, HorizontalStackedProgress, AlertBanner, NoData, Toaster, Calendar, DatePicker, MonthSelector, YearSelector, DatePickerTextField, YearPickerTextField, **TimePicker**, **TimePickerTextField**, **DateTimePickerTextField** (2026-10-13), **Paginator**, più **Filters**, **FilterEditor** e **SearchBar**.
 - **Filtri**: completi e divisi in file piccoli (`search/filters/`, `utils/filters/convert/`); dettagli e decisioni del 2026-10-12/13 in `reference/history.md` e `reference/decisions.md`.
 - **2026-10-13**: `DateTimePickerTextField` fatto e usato dai filtri (`datetime`, `datetimeRange`); suite 2542 verde, visivo 528.
 - **2026-10-13, dopo**: toni alternati dei gruppi annidati dei filtri, testi dal `locale` in tutta la libreria con `setDefaultLocale`, chip del formato che si nasconde da solo; suite 2653 verde, visivo 528, package ok.
 - **2026-10-13, commit e push** su `origin aurora-v5` di tutto il lavoro dal 2026-10-09 (due test instabili sotto carico corretti prima: Tooltip, SearchBar).
-- **Prossimo** (ordine proposto dall'utente il 2026-10-09: prima i filtri, poi le tabelle): SimpleTable e Paginator, PaginatedTable, EnhancedPaginatedTable con HeadersDrawer, DynamicTable; poi BarChart (38 usi). Dopo: PeriodSelector/PeriodPicker, GlobalSearchTextField, gruppo "Selection controls" (VerticalSwitch, VerticalTextSwitch, ToggleList), e il lavoro "Dopo" del capo (P42 codemod/MCP/prompt, pipeline di rilascio).
+- **2026-10-13, piano tabelle**: analisi della v4 e dell'uso nelle app (`reference/tables.md`), proposte P47–P55 confermate dall'utente, più la vista a card su mobile.
+- **2026-10-13, Paginator** fatto (decisione omonima): test, regola, 6 esempi, 24 baseline. Commit e push su `origin aurora-v5`.
+- **Prossimo** (ordine proposto dall'utente il 2026-10-09: prima i filtri, poi le tabelle): Table → ColumnManager → DataTable (decisioni ex P47–P55); poi BarChart (38 usi). Dopo: PeriodSelector/PeriodPicker, GlobalSearchTextField, gruppo "Selection controls" (VerticalSwitch, VerticalTextSwitch, ToggleList), e il lavoro "Dopo" del capo (P42 codemod/MCP/prompt, pipeline di rilascio).

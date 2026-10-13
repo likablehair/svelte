@@ -1,0 +1,32 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--paginator-default-gap: 4px;
+		--paginator-default-font-family: var(--global-font-family-mono);
+		--paginator-default-font-size: 13px;
+		--paginator-default-icon-size: 16px;
+		--paginator-default-button-size: 30px;
+		--paginator-default-button-padding: 0 8px;
+		--paginator-default-button-border-radius: var(--global-radius-sm);
+		--paginator-default-button-background: transparent;
+		--paginator-default-button-color: var(--global-color-text-2);
+		--paginator-default-button-font-weight: 400;
+		--paginator-default-button-hover-background: var(--global-color-surface-2);
+		--paginator-default-button-hover-color: var(--global-color-text);
+		--paginator-default-current-background: var(--global-fill-primary);
+		--paginator-default-current-color: var(--global-color-on-primary);
+		--paginator-default-current-box-shadow: var(--global-shadow-fill);
+		--paginator-default-current-font-weight: 600;
+		--paginator-default-ellipsis-color: var(--global-color-text-3);
+		--paginator-default-ellipsis-padding: 0 4px;
+		--paginator-default-status-color: var(--global-color-text-2);
+		--paginator-default-status-padding: 0 8px;
+		--paginator-default-disabled-opacity: 0.4;
+		--paginator-default-focus-ring-width: var(--global-focus-ring-width);
+		--paginator-default-focus-ring-color: var(--global-focus-ring-color);
+		--paginator-default-focus-ring-offset: var(--global-focus-ring-offset);
+		--paginator-default-duration: var(--global-duration);
+		--paginator-default-easing: var(--global-ease);
+	}
+}

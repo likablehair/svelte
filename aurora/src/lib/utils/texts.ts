@@ -34,6 +34,15 @@ export interface LibraryTexts {
 	};
 	monthSelector: { label: string };
 	noData: { title: string };
+	paginator: {
+		label: string;
+		first: string;
+		previous: string;
+		next: string;
+		last: string;
+		page: string;
+		status: string;
+	};
 	searchBar: { clear: string };
 	timePicker: { hours: string; minutes: string; period: string };
 	timePickerTextField: { invalid: string; clear: string; close: string; open: string };
@@ -86,6 +95,15 @@ export const TEXTS_EN: LibraryTexts = {
 	},
 	monthSelector: { label: 'Month' },
 	noData: { title: 'No data available' },
+	paginator: {
+		label: 'Pagination',
+		first: 'First page',
+		previous: 'Previous page',
+		next: 'Next page',
+		last: 'Last page',
+		page: 'Page {page}',
+		status: 'Page {page} of {count}'
+	},
 	searchBar: { clear: 'Clear search' },
 	timePicker: { hours: 'Hours', minutes: 'Minutes', period: 'AM/PM' },
 	timePickerTextField: { invalid: 'Enter a valid time', clear: 'Clear', close: 'Close', open: 'Choose time' },
@@ -138,6 +156,15 @@ export const TEXTS_IT: LibraryTexts = {
 	},
 	monthSelector: { label: 'Mese' },
 	noData: { title: 'Nessun dato disponibile' },
+	paginator: {
+		label: 'Paginazione',
+		first: 'Prima pagina',
+		previous: 'Pagina precedente',
+		next: 'Pagina successiva',
+		last: 'Ultima pagina',
+		page: 'Pagina {page}',
+		status: 'Pagina {page} di {count}'
+	},
 	searchBar: { clear: 'Cancella la ricerca' },
 	timePicker: { hours: 'Ore', minutes: 'Minuti', period: 'AM/PM' },
 	timePickerTextField: {

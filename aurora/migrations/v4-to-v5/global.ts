@@ -231,7 +231,6 @@ export default {
 			'SidebarMenuList',
 			'HierarchyMenu',
 			'SimpleTable',
-			'Paginator',
 			'PaginatedTable',
 			'EnhancedPaginatedTable',
 			'DynamicTable',

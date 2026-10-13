@@ -17,6 +17,7 @@ export { default as Drawer } from './components/simple/navigation/Drawer.svelte'
 export { default as Chip } from './components/simple/navigation/Chip.svelte';
 export { default as TabSwitcher } from './components/simple/navigation/TabSwitcher.svelte';
 export type { Tab } from './components/simple/navigation/TabSwitcher.svelte';
+export { default as Paginator } from './components/simple/navigation/Paginator.svelte';
 export { default as Checkbox } from './components/simple/forms/Checkbox.svelte';
 export { default as Switch } from './components/simple/forms/Switch.svelte';
 export { default as RadioButton } from './components/simple/forms/RadioButton.svelte';
