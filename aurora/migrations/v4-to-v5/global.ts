@@ -200,44 +200,105 @@ export default {
 			replacement: 'Filters',
 			note: 'The master-detail list of DynamicTable (passed as Filters `contentSnippet`) is replaced by the Filters panel ("Filters" button: every condition in rows, with AND / OR and groups when allowed). Drop it together with `contentSnippet` and its `updateMultiFilterValues` / `updateCustomFilterValues` plumbing; custom inputs go in the Filters `inputSnippet`. Quick filters of the v4 tables (internal QuickFilters) become Filters `pinned` fields (always in the bar; "missing value" = operator `empty`, a three-state bool = `isTrue` / `isFalse` / no condition) and `presets` (chips that add ready conditions).'
 		},
-		...pending('utility', ['scrollAtCenter']),
-		...pending('store', ['debounce']),
+		{
+			name: 'HeaderMenu',
+			kind: 'component',
+			note: 'Not ported: no app used it. For a page with a top bar and a menu use SidebarLayout; for a bar alone write a `<header>` in the app with the library Button and Drawer.'
+		},
+		{
+			name: 'QuickActions',
+			kind: 'component',
+			replacement: 'DataTable selectionActions',
+			note: 'Not ported: the floating bar of the selected rows is part of DataTable (`selectionActions`, `selectionActionsSnippet`).'
+		},
+		{
+			name: 'InfiniteScroll',
+			kind: 'component',
+			replacement: 'Table onendreached',
+			note: 'Not ported: Table calls `onendreached` when its last rows come into view, and DataTable has `pagination="infinite"`. Elsewhere use an `IntersectionObserver` on the last element.'
+		},
+		{
+			name: 'Navigator',
+			kind: 'component',
+			replacement: 'HierarchyMenu',
+			note: 'Not ported: it was the list of the v4 Drawer `items`. Put a HierarchyMenu (links with `currentPath`) or a TabSwitcher with `href` in the Drawer.'
+		},
+		{
+			name: 'Breadcrumb',
+			kind: 'component',
+			note: 'Not ported: no app used it. Write a `<nav aria-label="Breadcrumb">` with links in the app.'
+		},
+		{
+			name: 'VerticalSwitch',
+			kind: 'component',
+			replacement: 'Switch',
+			note: 'Not ported: no app used it. Use Switch for a yes/no value, or TabSwitcher `variant="segmented"` with two tabs for two labelled choices.'
+		},
+		{
+			name: 'VerticalTextSwitch',
+			kind: 'component',
+			replacement: 'TabSwitcher',
+			note: 'Not ported: no app used it. Use TabSwitcher `variant="segmented"` with two tabs.'
+		},
+		{
+			name: 'CollapsibleDivider',
+			kind: 'component',
+			replacement: 'Divider',
+			note: 'Not ported: no app used it. Use a `<details>` with a Divider `label` in its `<summary>`.'
+		},
+		{
+			name: 'ColorInvertedSelector',
+			kind: 'component',
+			replacement: 'HierarchyMenu',
+			note: 'Not ported (it was the menu inside UnstableDividedSideBarLayout, used directly by one app); available on request. A list of options to choose from is a HierarchyMenu, or a TabSwitcher.'
+		},
+		{
+			name: 'SidebarMenuList',
+			kind: 'component',
+			replacement: 'HierarchyMenu',
+			note: 'Not ported (one app); available on request. HierarchyMenu with `href` on the options and `currentPath={page.url.pathname}` does what `autoDetectUrl` did; `title` → `label`, `url` → `href`, `children` → `options`.'
+		},
+		{
+			name: 'AvatarDropdown',
+			kind: 'component',
+			note: 'Not ported (one app); available on request.'
+		},
+		{
+			name: 'VerticalDraggableList',
+			kind: 'component',
+			note: 'Not ported (it was the list inside HeadersDrawer; three files in the apps); available on request.'
+		},
+		{
+			name: 'scrollAtCenter',
+			kind: 'utility',
+			replacement: "element.scrollIntoView({ block: 'center', behavior: 'smooth' })",
+			note: 'Not ported (one app): the browser does it.'
+		},
+		{
+			name: 'debounce',
+			kind: 'store',
+			note: 'Not ported (one app); available on request. A debounce is a few lines in the app (`clearTimeout` + `setTimeout`).'
+		},
 		...pending('component', [
 			'MenuOrDrawer',
 			'MenuOrDrawerOptions',
-			'QuickActions',
-			'VerticalDraggableList',
-			'InfiniteScroll',
-			'CollapsibleDivider',
 			'PeriodSelector',
 			'PeriodPicker',
 			'FileInput',
 			'FileInputList',
-			'VerticalSwitch',
-			'VerticalTextSwitch',
 			'IconsDropdown',
-			'AvatarDropdown',
 			'ToggleList',
 			'BoxList',
-			'ColorInvertedSelector',
 			'SelectableMenuList',
 			'SelectableVerticalList',
-			'SidebarMenuList',
-			'HierarchyMenu',
 			'GlobalSearchTextField',
 			'Avatar',
 			'DescriptiveAvatar',
-			'Breadcrumb',
-			'HeaderMenu',
-			'Navigator',
 			'LineChart',
 			'BarChart',
 			'PieChart',
 			'SimpleTimeLine',
-			'DashboardShaper',
-			'CollapsibleSideBarLayout',
-			'StableDividedSideBarLayout',
-			'UnstableDividedSideBarLayout'
+			'DashboardShaper'
 		])
 	],
 	manual: [

@@ -8,7 +8,8 @@ Contents:
 
 - [Checklist](#checklist)
 - [Global changes](#global-changes)
-- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DataTable](#datatable), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [MediaQuery](#mediaquery), [Menu](#menu), [MonthSelector](#monthselector), [NoData](#nodata), [Paginator](#paginator), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Toaster](#toaster), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
+- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DataTable](#datatable), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [HierarchyMenu](#hierarchymenu), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [MediaQuery](#mediaquery), [Menu](#menu), [MonthSelector](#monthselector), [NoData](#nodata), [Paginator](#paginator), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SidebarLayout](#sidebarlayout), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Toaster](#toaster), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
+- [Not ported](#not-ported)
 - [Not available yet](#not-available-yet)
 
 ## Checklist
@@ -1058,6 +1059,32 @@ New, optional: field options (`columns`, `words`, `joins`, `through`, `json`, `a
 
 New, optional: `square`, `title`, `--flag-icon-box-shadow`.
 
+### HierarchyMenu
+
+- `onoptionClick({ detail: { option } })` → `onoptionClick({ option, nativeEvent })`: drop `.detail`. A parent without `href` only opens and closes its children: v4 also selected it and called the handler. Give `href` to parents that open a page.
+- **Options that open pages**: put the route in the option `href` (the option becomes a link: middle click, new tab, SvelteKit preloading) and pass `currentPath={page.url.pathname}`: the option whose `href` is the longest match of the path is selected, also on the pages below it. Delete the `goto` chain in `onoptionClick` and the code that derived `selected` from the URL. `selected` (a `name`) still works without links.
+- Options nest to any depth (v4: two levels); the parents of the selected option are highlighted and open by themselves; `expanded` is bindable. The arrow is always on the right and rotates (v4: the icon turned into an arrow on hover).
+- `iconsOnly`: labels become tooltips, a parent opens a menu with its children (v4: children unreachable, the parent got selected), a badge becomes a dot, an option without icon shows its first letter.
+- Keyboard: every option is a link or a button (v4: rows were `div`s reachable only through the expand buttons); arrows, Home and End move, Right and Left open and close. `aria-current` on the selected option.
+- `Option.icon` is an SVG path. Import the `HierarchyMenuOption` type instead of declaring it.
+- Snippets get `{ option, selected, depth }`; `appendSnippet` is now outside the link or button, so it can hold buttons.
+- Look of the prototype: muted options, the selected one with a soft primary gradient and a glowing bar on the left (v4: solid primary pill in bold), children under a dashed line. Style props of the icons (`--icon-size="20px"`, `--icon-cursor`) no longer reach them: use `--hierarchy-menu-icon-size`.
+
+| v4 | v5 |
+|---|---|
+| `--hierarchy-menu-element-padding`, `-border-radius` | `--hierarchy-menu-option-padding`, `-option-border-radius` |
+| `--hierarchy-menu-element-background-color`, `-color` | `--hierarchy-menu-option-background`, `-option-color` |
+| `--hierarchy-menu-element-hover-background-color`, `-hover-color` | `--hierarchy-menu-option-hover-background`, `-option-hover-color` |
+| `--hierarchy-menu-element-selected-background-color`, `-selected-color`, `-selected-font-weight` | `--hierarchy-menu-option-selected-background`, `-option-selected-color`, `-option-selected-font-weight` |
+| `--hierarchy-menu-sub-options-padding` | `--hierarchy-menu-children-indent` (and `-children-offset`) |
+| `--hierarchy-menu-icon-button-padding` | `--hierarchy-menu-option-gap`, `--hierarchy-menu-icon-size` |
+| `--hierarchy-menu-gap`, `-width` | same names (gap default 2px, v4: 4px) |
+| `--hierarchy-menu-height`, `-element-cursor`, `-element-active-background-color`, `-element-active-color` | removed |
+
+Defaults: the same renames on `--hierarchy-menu-default-*`.
+
+New, optional: `currentPath`, option `badge` and `disabled`, `bind:expanded`, `locale`, `aria-label`, `class` parts (`container`, `option`, `selected`, `children`), `bind:hierarchyMenuElement`, native attributes, `data-selected`, `data-ancestor`, `data-open`, `data-depth`, `data-icons-only`, every other `--hierarchy-menu-*` variable.
+
 ### HorizontalStackedProgress
 
 - Look: one 12px bar of separate segments with rounded corners and a 3px gap, a hover highlight, and the legend in a row below (v4: one 5px `ProgressBar` per segment with a 4px gap, labels under the segments, no legend).
@@ -1278,6 +1305,35 @@ New, optional: `label`, `debounce`, `searchOnType`, `onsearch`, `clearable`, `cl
 Unchanged: `--select-height`, `--select-width`, `--select-color`, `--select-border-radius`. Defaults follow the same renames.
 
 New, optional: `label`, `hint`, `state`, `bind:select`, snippets `labelSnippet`, `hintSnippet`, `stateIconSnippet`, `chevronSnippet`, `itemSnippet`, `checkSnippet`, `--select-picker-*`, `--select-option-*`.
+
+### SidebarLayout
+
+- **Renamed and merged**: `UnstableDividedSideBarLayout`, `CollapsibleSideBarLayout` and `StableDividedSideBarLayout` → `SidebarLayout` (`import { SidebarLayout } from '@likable-hair/svelte'`). `expandOn` picks the behaviour: `toggle` (default, the v4 Collapsible), `hover` or `click` (the v4 Unstable, whose default was `hover`: add `expandOn="hover"`), `none` with `sidebarExpanded` (the v4 Stable).
+- **The window scrolls**: the bar and the sidebar stay in place and the content is in a `<main>` next to the sidebar. Remove the box the app put around the content to scroll it (`calc(100dvw - 52px)` × `calc(100dvh - 50px)` with `overflow-auto`) and the `<main>` inside it; code that scrolled that box uses `window`. `--...-content-padding-left` and `-padding-top` are gone (the grid places the content).
+- **Bar**: it always keeps the library toggle, the menu button on mobile and the sidebar button on desktop (only with `toggle`), both with a name and `aria-expanded`. `innerMenuSnippet` → `headerSnippet`, the content after the toggle. The v4 `headerSnippet` replaced the whole bar, so the apps copied the hamburger and the dock icon by hand: delete them and keep the rest. `toggleSnippet({ toggle, ... })` replaces the toggle when needed. Stable's `menuSnippet` was the bar: it goes to `headerSnippet`.
+- **Menu**: `options` are drawn with [HierarchyMenu](#hierarchymenu) (v4 Unstable: ColorInvertedSelector), with nesting, links, badges and, while the sidebar is narrow, tooltips and a menu with the children of a parent. `selectedIndex` → `selected` (the `name`); better, give the options `href` and pass `currentPath={page.url.pathname}`, and delete the `goto` chain in `onmenuSelect`. Apps that drew HierarchyMenu in `menuSnippet` can pass the options to the layout. Unstable `prependSnippet` / `optionSnippet` removed: icons and `badge` come from the options, anything else is a HierarchyMenu in `menuSnippet`.
+- **Expanding**: with `hover` and `click` the sidebar widens over the content (v4 pushed the whole page) and keyboard focus widens it too; with `click`, choosing an option, a click outside or Escape narrows it (v4 reopened it after a choice). With `toggle` it pushes the content as in v4; on mobile `sidebarExpanded` is no longer forced to `false`.
+- **Mobile** (up to 1024px, as in v4): the sidebar is in the library Drawer, over the bar (v4: a panel below the bar), with Escape, focus kept inside and returned, page scroll blocked. It closes when an option is chosen (v4: only Unstable) and when `currentPath` changes: delete the app code that set `drawerOpened = false` after a click or a navigation.
+- Callbacks without `.detail`: `ondrawerChange({ opened })`, `onsidebarToggle({ expanded })`, `onmenuSelect({ option, nativeEvent })` (Collapsible declared it but never called it). `ondrawerChange` is no longer called on desktop. `onpinnedChange` removed (never called).
+- Snippets get `{ hamburgerVisible, sidebarExpanded, collapsed }`: `collapsed` replaces `!sidebarExpanded && !hamburgerVisible`. The placeholder texts ("logo", "Menu", "Content", "Sidebar") are gone.
+- `class`: `container` unchanged, `header` → `sidebar` (it was the sidebar element), `mainSection` → `content`, `overlay` removed; `header` is now the bar, `drawer` the drawer panel.
+- **Defaults**: rail 4rem and wide sidebar 18rem (Collapsible: 300px), bar 3.5rem (Collapsible: 48px), sticky bar with a translucent background and a bottom border, sidebar with background and border on desktop too (Unstable had none).
+- Style props of the v4 inner ColorInvertedSelector on the layout (`--color-inverted-selector-*`) have no effect: drop them, or set `--hierarchy-menu-option-selected-*` for a solid selected option. The Collapsible style props with the wrong prefix (`--collapsible-side-bar-layout-drawer-background-color`, `-header-menu-padding`) never worked: drop them, do not map them.
+
+| v4 (`--unstable-divided-side-bar-layout-*`, `--collapsible-divided-side-bar-layout-*`) | v5 |
+|---|---|
+| `side-bar-width`, `side-bar-hover-width` | `--sidebar-layout-sidebar-width`, `--sidebar-layout-sidebar-expanded-width` |
+| `side-bar-border`, `side-bar-padding`, `background-color` (Collapsible) | `--sidebar-layout-sidebar-border`, `-sidebar-padding` (top and bottom; sides: `-sidebar-inline-padding`), `-sidebar-background` |
+| `content-padding` | `--sidebar-layout-content-padding` |
+| `header-menu-height`, `-position`, `-border`, `-padding`, `-backdrop-filter` | `--sidebar-layout-header-height`, `-header-position` (default `sticky`, v4 `fixed`), `-header-border`, `-header-padding`, `-header-backdrop-filter` |
+| `inner-header-menu-background-color` | `--sidebar-layout-header-background` (a full color; v4 read an RGB triplet) |
+| `drawer-width` | `--sidebar-layout-drawer-width` |
+| `drawer-background-color` | removed: `--drawer-background` on the drawer panel (`class.drawer`) |
+| `content-padding-left`, `content-padding-top`, `expanded-background-color` | removed |
+
+`--stable-divided-side-bar-layout-*`: `side-bar-width` → `--sidebar-layout-sidebar-expanded-width`, `side-bar-background-color` → `-sidebar-background`, `side-bar-border-color` and `header-menu-border-color` → the `-sidebar-border` and `-header-border` shorthands, the others as above. Defaults: the same renames on the `-default-` names.
+
+New, optional: `expandOn`, `options` / `selected` / `currentPath` / `onmenuSelect` on every layout, `toggleSnippet`, `locale`, `menuLabel`, `sidebarLabel`, `skipLabel`, a "Skip to content" link, the `<main>` landmark, `bind:sidebarLayoutElement`, native attributes, `data-expand-on`, `data-expanded`, every other `--sidebar-layout-*` variable.
 
 ### SimpleTextField
 
@@ -1533,10 +1589,27 @@ The `-default-*` names follow.
 
 New, optional: `min`, `max`, `locale` (language of the default name "Year"), `focus()`, `bind:yearSelectorElement`, native attributes, `data-*`, `--year-selector-*` for columns, gap, padding, font, colors and states.
 
+## Not ported
+
+These v4 exports are not in v5. Use the replacement; the ones marked "on request" can be ported if an app needs them.
+
+| v4 | Use instead |
+|---|---|
+| HeaderMenu | [SidebarLayout](#sidebarlayout); for a bar alone, a `<header>` in the app with Button and Drawer |
+| QuickActions | DataTable `selectionActions` |
+| InfiniteScroll | Table `onendreached`, DataTable `pagination="infinite"`, or an `IntersectionObserver` |
+| Navigator | a [HierarchyMenu](#hierarchymenu) or a TabSwitcher with `href` inside the Drawer |
+| Breadcrumb | a `<nav aria-label="Breadcrumb">` with links |
+| VerticalSwitch | Switch, or TabSwitcher `variant="segmented"` with two tabs |
+| VerticalTextSwitch | TabSwitcher `variant="segmented"` with two tabs |
+| CollapsibleDivider | a `<details>` with a Divider `label` in its `<summary>` |
+| ColorInvertedSelector (on request) | HierarchyMenu or TabSwitcher |
+| SidebarMenuList (on request) | HierarchyMenu with `href` and `currentPath` (`title` → `label`, `url` → `href`, `children` → `options`) |
+| AvatarDropdown, VerticalDraggableList, `debounce` (on request) | — |
+| `scrollAtCenter` | `element.scrollIntoView({ block: 'center', behavior: 'smooth' })` |
+
 ## Not available yet
 
 These v4 exports have no v5 version yet. Keep v4 for screens that need them, or wait for the port.
 
-- **Components**: MenuOrDrawer, MenuOrDrawerOptions, QuickActions, VerticalDraggableList, InfiniteScroll, CollapsibleDivider, PeriodSelector, PeriodPicker, FileInput, FileInputList, VerticalSwitch, VerticalTextSwitch, IconsDropdown, AvatarDropdown, ToggleList, BoxList, ColorInvertedSelector, SelectableMenuList, SelectableVerticalList, SidebarMenuList, HierarchyMenu, GlobalSearchTextField, Avatar, DescriptiveAvatar, Breadcrumb, HeaderMenu, Navigator, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper, CollapsibleSideBarLayout, StableDividedSideBarLayout, UnstableDividedSideBarLayout.
-- **Utilities**: `scrollAtCenter`.
-- **Stores**: `mediaQuery`, `theme`, `toggleTheme` (see [Dark mode](#dark-mode-and-themes)), `debounce`.
+- **Components**: MenuOrDrawer, MenuOrDrawerOptions, PeriodSelector, PeriodPicker, FileInput, FileInputList, IconsDropdown, ToggleList, BoxList, SelectableMenuList, SelectableVerticalList, GlobalSearchTextField, Avatar, DescriptiveAvatar, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper.

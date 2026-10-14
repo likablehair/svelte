@@ -47,7 +47,11 @@
 {/if}
 
 {#each data.examples as example (example.id)}
-	<Example {example} component={example.component} />
+	<Example
+		{example}
+		component={example.component}
+		frame={doc.category === 'layouts' ? `/examples/${doc.slug}/${example.id}` : undefined}
+	/>
 {/each}
 
 <ApiTables {doc} />
@@ -77,6 +81,8 @@
 
 	.import {
 		display: inline-block;
+		max-width: 100%;
+		overflow-x: auto;
 		margin: 0 0 10px;
 		padding: 8px 14px;
 		border-radius: var(--global-radius-md);

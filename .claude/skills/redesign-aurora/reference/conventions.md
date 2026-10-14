@@ -29,6 +29,7 @@ La lista essenziale sta in `SKILL.md`. Questo file va letto prima di scrivere o 
   - esempi in `src/docs/examples/<slug>/NN-name.svelte` (nomi in inglese), con `<!-- @component Titolo\nDescrizione -->` in testa e import da `'#lib'` (nel codice mostrato diventa `'@likable-hair/svelte'`). Ogni esempio è codice copiabile: il layout dell'esempio sta nel suo `<style>`, non nelle classi delle docs.
   - Un componente che ne avvolge un altro dichiara `interface Props extends Omit<ComponentProps<typeof Base<Data>>, '…'>` e ridichiara solo le prop che cambiano: le docs mostrano le ereditate in "From Base". I metodi pubblici sono `export function` con JSDoc.
   - Un componente compare nelle docs quando è esportato da `src/lib/index.ts` con `export { default as X } from './components/...'`.
+  - **Esempi dei layout** (2026-10-14): i componenti in `components/layouts/` occupano tutta la pagina; nella pagina delle docs i loro esempi sono un iframe di `/examples/<slug>/<id>` a 1280×720 scalato (con il link per aprirli da soli), e la route li rende a tutta pagina dentro `.example-frame.example-page` (lo screenshot del test visivo è la finestra intera).
   - Le parti interne di un componente grande stanno in una cartella accanto chiamata come il suo slug (`search/filters/` per Filters): `getComponentDoc` legge anche i loro `<style>`, così le variabili `--{slug}-*` che usano restano nelle docs del componente.
 
 ### Test e regole di migrazione (in uso dal 2026-10-09)

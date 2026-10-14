@@ -1,7 +1,13 @@
 import { describe, expect, test } from 'vitest';
 import { formatLetters, libraryTexts, TEXTS_EN, TEXTS_IT } from '../../src/lib/utils/texts.js';
 
-const SAME_IN_ITALIAN = ['dataTable.rangeOpen', 'table.no', 'timePicker.period'];
+const SAME_IN_ITALIAN = [
+	'dataTable.rangeOpen',
+	'hierarchyMenu.label',
+	'sidebarLayout.menu',
+	'table.no',
+	'timePicker.period'
+];
 
 function entries(texts: object, prefix = ''): [string, string][] {
 	return Object.entries(texts).flatMap(([key, value]) =>

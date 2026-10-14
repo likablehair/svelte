@@ -1,0 +1,39 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--sidebar-layout-default-background: var(--global-color-bg);
+		--sidebar-layout-default-duration: var(--global-duration-slow);
+		--sidebar-layout-default-easing: var(--global-ease);
+
+		--sidebar-layout-default-sidebar-width: 4rem;
+		--sidebar-layout-default-sidebar-expanded-width: 18rem;
+		--sidebar-layout-default-sidebar-background: var(--global-color-surface);
+		--sidebar-layout-default-sidebar-border: var(--global-border-width) solid var(--global-color-border);
+		--sidebar-layout-default-sidebar-padding: 0 0 14px;
+		--sidebar-layout-default-sidebar-inline-padding: 10px;
+		--sidebar-layout-default-sidebar-gap: 8px;
+		--sidebar-layout-default-sidebar-overlay-background: var(--global-color-surface-pop);
+		--sidebar-layout-default-sidebar-overlay-box-shadow: var(--global-shadow-lg);
+
+		--sidebar-layout-default-header-height: 3.5rem;
+		--sidebar-layout-default-header-position: sticky;
+		--sidebar-layout-default-header-padding: 0 2rem;
+		--sidebar-layout-default-header-gap: 12px;
+		--sidebar-layout-default-header-background: color-mix(
+			in srgb,
+			var(--global-color-bg) 80%,
+			transparent
+		);
+		--sidebar-layout-default-header-backdrop-filter: blur(16px);
+		--sidebar-layout-default-header-border: var(--global-border-width) solid var(--global-color-border);
+
+		--sidebar-layout-default-content-padding: 1rem 2rem;
+
+		--sidebar-layout-default-drawer-width: 18rem;
+		--sidebar-layout-default-drawer-padding: 0 0 14px;
+
+		--sidebar-layout-default-skip-background: var(--global-color-surface-pop);
+		--sidebar-layout-default-skip-color: var(--global-color-text);
+	}
+}

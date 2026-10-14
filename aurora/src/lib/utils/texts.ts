@@ -88,6 +88,7 @@ export interface LibraryTexts {
 		close: string;
 		noResults: string;
 	};
+	hierarchyMenu: { label: string; submenu: string };
 	monthSelector: { label: string };
 	noData: { title: string };
 	paginator: {
@@ -100,6 +101,7 @@ export interface LibraryTexts {
 		status: string;
 	};
 	searchBar: { clear: string };
+	sidebarLayout: { menu: string; sidebar: string; skip: string };
 	table: {
 		selectAll: string;
 		selectAllShort: string;
@@ -226,6 +228,7 @@ export const TEXTS_EN: LibraryTexts = {
 		close: 'Close',
 		noResults: 'No options'
 	},
+	hierarchyMenu: { label: 'Menu', submenu: '{label} submenu' },
 	monthSelector: { label: 'Month' },
 	noData: { title: 'No data available' },
 	paginator: {
@@ -238,6 +241,7 @@ export const TEXTS_EN: LibraryTexts = {
 		status: 'Page {page} of {count}'
 	},
 	searchBar: { clear: 'Clear search' },
+	sidebarLayout: { menu: 'Menu', sidebar: 'Sidebar', skip: 'Skip to content' },
 	table: {
 		selectAll: 'Select all rows',
 		selectAllShort: 'Select all',
@@ -364,6 +368,7 @@ export const TEXTS_IT: LibraryTexts = {
 		close: 'Chiudi',
 		noResults: 'Nessuna opzione'
 	},
+	hierarchyMenu: { label: 'Menu', submenu: 'Sottomenu di {label}' },
 	monthSelector: { label: 'Mese' },
 	noData: { title: 'Nessun dato disponibile' },
 	paginator: {
@@ -376,6 +381,7 @@ export const TEXTS_IT: LibraryTexts = {
 		status: 'Pagina {page} di {count}'
 	},
 	searchBar: { clear: 'Cancella la ricerca' },
+	sidebarLayout: { menu: 'Menu', sidebar: 'Barra laterale', skip: 'Vai al contenuto' },
 	table: {
 		selectAll: 'Seleziona tutte le righe',
 		selectAllShort: 'Seleziona tutto',

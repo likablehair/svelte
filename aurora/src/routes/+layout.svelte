@@ -5,7 +5,16 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import type { ThemeMode } from '#lib/theme.svelte.js';
-	import { Toaster } from '#lib';
+	import {
+		HierarchyMenu,
+		Select,
+		SidebarLayout,
+		TabSwitcher,
+		Toaster,
+		type HierarchyMenuOption,
+		type Item,
+		type Tab
+	} from '#lib';
 	import { appearance, changeMode, changeTheme, syncAppearance } from '../docs/appearance.svelte.js';
 
 	import.meta.glob(['/src/lib/themes/*.css', '/src/docs/themes/*.css'], { eager: true });
@@ -13,76 +22,100 @@
 	let { children, data } = $props();
 
 	const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).replace(/-/g, ' ');
-	let themes = $derived([
-		{ value: '', label: 'Aurora' },
-		...data.themes.map((t) => ({ value: t, label: capitalize(t) }))
+	let themeItems: Item<{ gallery: boolean }>[] = $derived([
+		{ value: '', label: 'Aurora', data: { gallery: false } },
+		...data.themes.map((t) => ({ value: t, label: capitalize(t), data: { gallery: false } })),
+		...data.galleryThemes.map((t) => ({ value: t, label: capitalize(t), data: { gallery: true } }))
 	]);
-	let galleryThemes = $derived(data.galleryThemes.map((t) => ({ value: t, label: capitalize(t) })));
-	const modes: { value: ThemeMode; label: string }[] = [
-		{ value: 'light', label: 'Light' },
-		{ value: 'system', label: 'System' },
-		{ value: 'dark', label: 'Dark' }
+	const modeTabs: Tab[] = [
+		{ name: 'light', label: 'Light' },
+		{ name: 'system', label: 'System' },
+		{ name: 'dark', label: 'Dark' }
 	];
+
+	let nav = $derived(
+		data.nav.map((group) => ({
+			title: group.title,
+			options: group.links.map(
+				(link): HierarchyMenuOption => ({ name: link.href, label: link.label, href: link.href })
+			)
+		}))
+	);
 
 	onMount(syncAppearance);
 </script>
+
+{#snippet brand()}
+	<div class="brand">
+		<span class="brand-mark">L</span>
+		<div>
+			<b>Likable Aurora</b>
+			<small>@likable-hair/svelte 5</small>
+		</div>
+	</div>
+{/snippet}
+
+{#snippet switcher(place: string)}
+	<div class="switcher switcher-{place}" role="group" aria-label="Appearance">
+		<Select
+			items={themeItems}
+			value={appearance.theme}
+			aria-label="Theme"
+			--select-width="170px"
+			onchange={(e: Event) => changeTheme((e.currentTarget as HTMLSelectElement).value)}
+		>
+			{#snippet itemSnippet({ item })}
+				<span class="theme-option">
+					{item.label}
+					{#if item.data?.gallery}<small>gallery</small>{/if}
+				</span>
+			{/snippet}
+		</Select>
+		<TabSwitcher
+			tabs={modeTabs}
+			selected={appearance.mode}
+			variant="segmented"
+			aria-label="Mode"
+			--tab-switcher-width="auto"
+			ontabClick={({ tab }) => changeMode(tab.name as ThemeMode)}
+		/>
+	</div>
+{/snippet}
 
 {#if page.route.id === '/examples/[slug]/[id]'}
 	{@render children()}
 	<Toaster position="top-end" />
 {:else}
-<div class="page">
-	<aside class="toc">
-		<div class="brand">
-			<span class="brand-mark">L</span>
-			<div>
-				<b>Likable Aurora</b>
-				<small>@likable-hair/svelte 5</small>
-			</div>
-		</div>
-		{#each data.nav as group (group.title)}
-			<h6>{group.title}</h6>
-			{#each group.links as link (link.href)}
-				<a
-					href={link.href}
-					class:active={page.url.pathname === link.href}
-					aria-current={page.url.pathname === link.href ? 'page' : undefined}>{link.label}</a
-				>
+	<SidebarLayout
+		expandOn="none"
+		sidebarExpanded
+		currentPath={page.url.pathname}
+		class={{ container: 'docs-shell' }}
+	>
+		{#snippet logoSnippet()}
+			{@render brand()}
+		{/snippet}
+		{#snippet menuSnippet()}
+			{#each nav as group (group.title)}
+				<h6 class="nav-title" id="nav-{group.title.toLowerCase()}">{group.title}</h6>
+				<HierarchyMenu
+					options={group.options}
+					currentPath={page.url.pathname}
+					aria-labelledby="nav-{group.title.toLowerCase()}"
+				/>
 			{/each}
-		{/each}
-	</aside>
+		{/snippet}
+		{#snippet headerSnippet()}
+			<div class="header-brand">{@render brand()}</div>
+			<div class="header-space"></div>
+			{@render switcher('header')}
+		{/snippet}
+		{#snippet userSnippet({ hamburgerVisible })}
+			{#if hamburgerVisible}{@render switcher('drawer')}{/if}
+		{/snippet}
 
-	<main>
 		{@render children()}
-	</main>
+	</SidebarLayout>
 
 	<Toaster position="top-end" />
-
-	<div class="switcher" role="group" aria-label="Appearance">
-		<label>
-			<span class="visually-hidden">Theme</span>
-			<select value={appearance.theme} onchange={(e) => changeTheme(e.currentTarget.value)}>
-				<optgroup label="Library">
-					{#each themes as t (t.value)}
-						<option value={t.value}>{t.label}</option>
-					{/each}
-				</optgroup>
-				<optgroup label="Gallery">
-					{#each galleryThemes as t (t.value)}
-						<option value={t.value}>{t.label}</option>
-					{/each}
-				</optgroup>
-			</select>
-		</label>
-		<div class="segmented">
-			{#each modes as m (m.value)}
-				<button
-					type="button"
-					aria-pressed={appearance.mode === m.value}
-					onclick={() => changeMode(m.value)}>{m.label}</button
-				>
-			{/each}
-		</div>
-	</div>
-</div>
 {/if}
