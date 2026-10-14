@@ -3,6 +3,7 @@ Date and time field: type them or choose them in a panel with a calendar and the
 -->
 <script lang="ts">
 	import '../../../css/tokens.css';
+	import { breakpoints } from '../../../utils/breakpoints.svelte.js';
 	import './DateTimePickerTextField.css';
 	import { tick, untrack, type Snippet } from 'svelte';
 	import type { HTMLInputAttributes } from 'svelte/elements';
@@ -35,7 +36,7 @@ Date and time field: type them or choose them in a panel with a calendar and the
 		toISODateTime,
 		type TimeOfDay
 	} from '../../../utils/time.js';
-	import { inheritedLocale } from '../../../utils/locale.js';
+	import { inheritedLocale, warnWithoutLocale } from '../../../utils/locale.js';
 	import { formatLetters, libraryTexts } from '../../../utils/texts.js';
 
 	const CALENDAR_CLOCK_ICON =
@@ -270,6 +271,7 @@ Date and time field: type them or choose them in a panel with a calendar and the
 	}: Props = $props();
 
 	const defaultLocale = inheritedLocale();
+	warnWithoutLocale('DateTimePickerTextField', () => localeProp);
 	let locale = $derived(localeProp ?? defaultLocale());
 	let texts = $derived(libraryTexts(locale));
 	let invalidText = $derived(invalidTextProp ?? texts.dateTimePickerTextField.invalid);
@@ -280,12 +282,11 @@ Date and time field: type them or choose them in a panel with a calendar and the
 	const hintId = `${uid}-hint`;
 	const formatId = `${uid}-format`;
 	const panelId = `${uid}-panel`;
-	const mobile = new MediaQuery('max-width: 1024px', false);
 	const narrow = new MediaQuery('max-width: 600px', false);
 	const ISO_INPUT = /^\s*(\d{4}-\d{2}-\d{2})(?:[Tt\s](\d{2}:\d{2}))?/;
 
 	let inputId = $derived(id ?? `${uid}-input`);
-	let drawerMode = $derived(mobileDrawer && mobile.current);
+	let drawerMode = $derived(mobileDrawer && breakpoints.mAndDown);
 	let pattern = $derived(format ?? formatOf(locale));
 	let twelve = $derived(hour12 ?? hour12Of(locale));
 	let periods = $derived(periodNames(locale));

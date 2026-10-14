@@ -1,5 +1,6 @@
 import type { Snippet } from 'svelte';
 import type FilterBuilder from '../filters/builder.js';
+import type { FilterGroup } from '../filters/model.js';
 
 /** A column of a `Table`: what it shows, how it formats, sorts and sizes it. */
 export interface TableColumn<Row = any> {
@@ -74,3 +75,66 @@ export interface TableColumnState {
 	/** Whether the column is pinned on the left. */
 	pinned?: boolean;
 }
+
+/** What a `DataTable` asks the server for. A change of page, page size, sorting, search or filters makes a new query. */
+export interface DataTableQuery {
+	/** Page to show, from 1. In `infinite` mode, the batch to load. */
+	page: number;
+	/** Rows per page, or per batch in `infinite` mode. */
+	pageSize: number;
+	/** Current sorting, if any. */
+	sort?: TableSort;
+	/** Text of the search field, trimmed: empty without a search. */
+	search: string;
+	/** Tree of the filters (the `value` of `Filters`), with complete conditions only. */
+	filterValue: FilterGroup;
+	/** The whole query for the backend: filters, search (an `ilike` group on `searchColumns`) and sorting. Send `builder.toJson()` together with `page` and `pageSize`. */
+	builder: FilterBuilder;
+}
+
+/** What the `loader` of a `DataTable` returns. */
+export interface DataTableLoadResult<Row = any> {
+	/** Rows of the requested page or batch. */
+	rows: Row[];
+	/** Number of rows of the whole result, on every page. */
+	total?: number;
+	/** Number of pages, when the backend gives it instead of `total`. */
+	pageCount?: number;
+}
+
+/** What the `onclick` of a `DataTableAction` receives. */
+export interface DataTableActionContext<Row = any> {
+	/** Selected rows (empty while `selectedAll`). */
+	selected: Row[];
+	/** Every row of the result is selected, except `excluded`. */
+	selectedAll: boolean;
+	/** Rows left out of `selectedAll`. */
+	excluded: Row[];
+	/** Number of selected rows; `undefined` when every row is selected and the total is unknown. */
+	count: number | undefined;
+	/** Empties the selection. */
+	clear: () => void;
+	/** The native click. */
+	event: MouseEvent;
+}
+
+/** An action on the selected rows of a `DataTable`, drawn as a button of the selection bar. */
+export interface DataTableAction<Row = any> {
+	/** Text of the button. */
+	label: string;
+	/** SVG path of the icon. */
+	icon?: string;
+	/** `danger` for destructive actions, in the error color. */
+	variant?: 'default' | 'danger';
+	/** The action cannot run; with `disabledInfo` a tooltip says why. */
+	disabled?: boolean;
+	/** Shows a spinner on the button. The button also spins while the promise returned by `onclick` is pending. */
+	loading?: boolean;
+	/** Explanation of the action, in a tooltip on the button. */
+	info?: string;
+	/** Why the action is disabled, in a tooltip on the button. */
+	disabledInfo?: string;
+	/** Runs the action. Return a promise to show a spinner until it settles. */
+	onclick: (context: DataTableActionContext<Row>) => void | Promise<unknown>;
+}
+

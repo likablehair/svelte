@@ -213,7 +213,7 @@ export function tokensMarkdown(groups: TokenGroup[], themes: string[]) {
 	out.push(
 		'## Themes',
 		'',
-		`Import the theme CSS (\`import '${PACKAGE}/themes/<name>.css'\`) and activate it with \`setTheme('<name>')\`, which sets \`data-theme\` on \`<html>\`. \`setMode('light' | 'dark' | 'system')\` forces the mode.`,
+		`Import the theme CSS (\`import '${PACKAGE}/themes/<name>.css'\`) and activate it with \`setTheme('<name>')\`, which sets \`data-theme\` on \`<html>\`. \`setMode('light' | 'dark' | 'system')\` forces the mode and \`toggleMode()\` switches it; \`theme.dark\` (also \`$theme.dark\` as a store) is reactive. \`rememberAppearance()\` in the root layout saves and restores the choice in \`localStorage\`, and \`appearanceScript()\` in \`<svelte:head>\` applies it before the first paint.`,
 		'',
 		'- `aurora`: default theme, already included in `tokens.css`.'
 	);

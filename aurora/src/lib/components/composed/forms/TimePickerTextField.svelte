@@ -3,10 +3,10 @@ Time field: type the time or choose it in a panel of hours and minutes. The valu
 -->
 <script lang="ts">
 	import '../../../css/tokens.css';
+	import { breakpoints } from '../../../utils/breakpoints.svelte.js';
 	import './TimePickerTextField.css';
 	import { tick, untrack, type Snippet } from 'svelte';
 	import type { HTMLInputAttributes } from 'svelte/elements';
-	import { MediaQuery } from 'svelte/reactivity';
 	import Menu from '../../simple/common/Menu.svelte';
 	import TimePicker from '../../simple/dates/TimePicker.svelte';
 	import Icon from '../../simple/media/Icon.svelte';
@@ -21,7 +21,7 @@ Time field: type the time or choose it in a panel of hours and minutes. The valu
 		periodNames,
 		timeKey
 	} from '../../../utils/time.js';
-	import { inheritedLocale } from '../../../utils/locale.js';
+	import { inheritedLocale, warnWithoutLocale } from '../../../utils/locale.js';
 	import { libraryTexts } from '../../../utils/texts.js';
 
 	const CLOCK_ICON =
@@ -221,6 +221,7 @@ Time field: type the time or choose it in a panel of hours and minutes. The valu
 	}: Props = $props();
 
 	const defaultLocale = inheritedLocale();
+	warnWithoutLocale('TimePickerTextField', () => localeProp);
 	let locale = $derived(localeProp ?? defaultLocale());
 	let texts = $derived(libraryTexts(locale).timePickerTextField);
 	let invalidText = $derived(invalidTextProp ?? texts.invalid);
@@ -231,10 +232,9 @@ Time field: type the time or choose it in a panel of hours and minutes. The valu
 	const hintId = `${uid}-hint`;
 	const formatId = `${uid}-format`;
 	const pickerId = `${uid}-picker`;
-	const mobile = new MediaQuery('max-width: 1024px', false);
 
 	let inputId = $derived(id ?? `${uid}-input`);
-	let drawerMode = $derived(mobileDrawer && mobile.current);
+	let drawerMode = $derived(mobileDrawer && breakpoints.mAndDown);
 	let twelve = $derived(hour12 ?? hour12Of(locale));
 	let periods = $derived(periodNames(locale));
 	let length = $derived(twelve ? 6 + Math.min(periods[0].length, periods[1].length) : 5);

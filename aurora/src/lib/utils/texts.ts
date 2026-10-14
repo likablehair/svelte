@@ -48,6 +48,26 @@ export interface LibraryTexts {
 		typeBoolean: string;
 	};
 	confirmOrCancelButtons: { confirm: string; cancel: string };
+	dataTable: {
+		search: string;
+		columns: string;
+		rowsPerPage: string;
+		range: string;
+		rangeOpen: string;
+		loaded: string;
+		results: string;
+		result: string;
+		selected: string;
+		selectedOne: string;
+		allSelected: string;
+		selectAll: string;
+		clearSelection: string;
+		selectionActions: string;
+		moreActions: string;
+		loadError: string;
+		retry: string;
+		loadingMore: string;
+	};
 	datePicker: { previousMonth: string; nextMonth: string; previousYear: string; nextYear: string };
 	datePickerTextField: {
 		invalid: string;
@@ -156,6 +176,26 @@ export const TEXTS_EN: LibraryTexts = {
 		typeBoolean: 'Yes/No'
 	},
 	confirmOrCancelButtons: { confirm: 'Save', cancel: 'Cancel' },
+	dataTable: {
+		search: 'Search…',
+		columns: 'Columns',
+		rowsPerPage: 'Rows per page',
+		range: '{from}–{to} of {total}',
+		rangeOpen: '{from}–{to}',
+		loaded: '{count} of {total}',
+		results: '{count} results',
+		result: '1 result',
+		selected: 'selected',
+		selectedOne: 'selected',
+		allSelected: 'All selected',
+		selectAll: 'Select all {total}',
+		clearSelection: 'Clear selection',
+		selectionActions: 'Actions on the selected rows',
+		moreActions: 'More actions',
+		loadError: "Couldn't load the rows",
+		retry: 'Retry',
+		loadingMore: 'Loading more rows…'
+	},
 	datePicker: {
 		previousMonth: 'Previous month',
 		nextMonth: 'Next month',
@@ -274,6 +314,26 @@ export const TEXTS_IT: LibraryTexts = {
 		typeBoolean: 'Sì/No'
 	},
 	confirmOrCancelButtons: { confirm: 'Salva', cancel: 'Annulla' },
+	dataTable: {
+		search: 'Cerca…',
+		columns: 'Colonne',
+		rowsPerPage: 'Righe per pagina',
+		range: '{from}–{to} di {total}',
+		rangeOpen: '{from}–{to}',
+		loaded: '{count} di {total}',
+		results: '{count} risultati',
+		result: '1 risultato',
+		selected: 'selezionati',
+		selectedOne: 'selezionato',
+		allSelected: 'Tutti selezionati',
+		selectAll: 'Seleziona tutti i {total}',
+		clearSelection: 'Deseleziona tutto',
+		selectionActions: 'Azioni sulle righe selezionate',
+		moreActions: 'Altre azioni',
+		loadError: 'Impossibile caricare le righe',
+		retry: 'Riprova',
+		loadingMore: 'Caricamento di altre righe…'
+	},
 	datePicker: {
 		previousMonth: 'Mese precedente',
 		nextMonth: 'Mese successivo',

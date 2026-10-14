@@ -478,6 +478,17 @@ describe('Table', () => {
 		await expect.poll(() => (headers[1] as HTMLElement).style.insetInlineStart).toBe(`${headers[0].getBoundingClientRect().width}px`);
 	});
 
+	test('selecting every row starts no animation in the rows (thousands of them would block the page)', async () => {
+		const many = Array.from({ length: 60 }, (_, index) => ({ id: index + 1, name: `Item ${index + 1}`, stock: index, price: index }));
+		const screen = await render(Table, { rows: many, columns, selectable: 'multiple' });
+		await screen.getByRole('checkbox', { name: 'Select all rows' }).click();
+		await expect.poll(() => bodyRows(screen.container).filter((row) => row.hasAttribute('data-selected')).length).toBe(60);
+		const cellAnimations = document
+			.getAnimations()
+			.filter((animation) => (animation.effect as KeyframeEffect | null)?.target?.closest('tbody td'));
+		expect(cellAnimations).toEqual([]);
+	});
+
 	test('pinned and regular cells take the row color together, with the same transition', async () => {
 		const screen = await render(Table, {
 			rows: products,
@@ -488,12 +499,10 @@ describe('Table', () => {
 		const [pinned, regular] = row.querySelectorAll('td');
 		const actions = row.querySelector('td.aurora-table-actions')!;
 		expect(pinned.hasAttribute('data-pinned')).toBe(true);
-		for (const cell of [pinned, regular, actions]) {
-			expect(getComputedStyle(cell).transitionProperty).toBe('box-shadow');
-			expect(getComputedStyle(cell).backgroundImage).toBe('none');
-		}
+		for (const cell of [pinned, regular, actions]) expect(getComputedStyle(cell).backgroundImage).toBe('none');
 		const rowColor = (cell: Element) => getComputedStyle(cell).boxShadow.split(' 0px')[0];
 		await userEvent.hover(row);
+		for (const cell of [pinned, regular, actions]) expect(getComputedStyle(cell).transitionProperty).toBe('box-shadow');
 		await expect.poll(() => rowColor(regular)).not.toBe('rgba(0, 0, 0, 0)');
 		expect(rowColor(pinned)).toBe(rowColor(regular));
 		expect(rowColor(actions)).toBe(rowColor(regular));
@@ -762,5 +771,182 @@ describe('Table', () => {
 		const cell = root.querySelector('tbody td.aurora-table-cell')!;
 		expect(getComputedStyle(cell).padding).toBe('3px 7px');
 		expect(getComputedStyle(cell).boxShadow).toContain('rgb(7, 8, 9)');
+	});
+
+	test('the checkbox and expand columns keep their size when the columns do not fit', async () => {
+		const wide: TableColumn<Product>[] = [
+			{ key: 'name', label: 'A rather long product header', minWidth: '260px' },
+			{ key: 'stock', label: 'Stock in the warehouse', type: 'number', minWidth: '220px' },
+			{ key: 'price', label: 'Price', type: 'number', minWidth: '200px' }
+		];
+		const screen = await render(Table, {
+			rows: products,
+			columns: wide,
+			selectable: 'multiple',
+			expandedSnippet: snippet('<p>Detail</p>'),
+			cardBreakpoint: false,
+			style: 'width: 500px'
+		});
+		const scroll = screen.container.querySelector('.aurora-table-scroll')!;
+		await expect.poll(() => scroll.scrollWidth > scroll.clientWidth).toBe(true);
+		const controls = [...screen.container.querySelectorAll('thead th.aurora-table-control')];
+		expect(controls).toHaveLength(2);
+		for (const cell of controls) expect(cell.getBoundingClientRect().width).toBeGreaterThanOrEqual(39.5);
+	});
+
+	test('disabled: rows are not clickable, sorting, selection and resizing are off, expanding still works', async () => {
+		const onrowclick = vi.fn();
+		const screen = await render(Table, {
+			rows: products,
+			columns,
+			onrowclick,
+			rowHref: (row: Product) => `/products/${row.id}`,
+			selectable: 'multiple',
+			resizable: true,
+			expandedSnippet: snippet('<p>Detail</p>'),
+			disabled: true
+		});
+		const root = screen.container.querySelector('.aurora-table')!;
+		expect(root.hasAttribute('data-disabled')).toBe(true);
+		await expect.element(screen.getByRole('button', { name: /^Product/ })).toBeDisabled();
+		await expect.element(screen.getByRole('checkbox', { name: 'Select all rows' })).toBeDisabled();
+		await expect.element(screen.getByRole('checkbox', { name: 'Select Shampoo' })).toBeDisabled();
+		expect(screen.container.querySelector('.aurora-table-resizer')).toBeNull();
+		expect(screen.container.querySelector('.aurora-table-row-link')).toBeNull();
+		const row = bodyRows(screen.container)[0] as HTMLElement;
+		expect(row.hasAttribute('tabindex')).toBe(false);
+		row.querySelector('td.aurora-table-cell')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+		expect(onrowclick).not.toHaveBeenCalled();
+		await screen.getByRole('button', { name: 'Show details' }).first().click();
+		await expect.element(screen.getByText('Detail', { exact: true })).toBeInTheDocument();
+	});
+
+	test('selectAll={false} keeps only the checkbox of each row', async () => {
+		const screen = await render(Table, { rows: products, columns, selectable: 'multiple', selectAll: false });
+		await expect.element(screen.getByRole('checkbox', { name: 'Select Shampoo' })).toBeInTheDocument();
+		expect(screen.getByRole('checkbox', { name: 'Select all rows' }).query()).toBeNull();
+		screen.unmount();
+		const cards = await render(Table, { rows: products, columns, selectable: 'multiple', selectAll: false, cardBreakpoint: 5000 });
+		await expect.element(cards.getByRole('checkbox', { name: 'Select Shampoo' })).toBeInTheDocument();
+		expect(cards.getByRole('checkbox', { name: 'Select all' }).query()).toBeNull();
+	});
+
+	describe('virtual rows', () => {
+		const many = (count: number) =>
+			Array.from({ length: count }, (_, index) => ({ id: index + 1, name: `Item ${index + 1}`, stock: index, price: index }));
+		const indexes = (root: Element) => bodyRows(root).map((row) => Number((row as HTMLElement).dataset.index));
+		const spacers = (root: Element) =>
+			[...root.querySelectorAll('tbody tr.aurora-table-spacer')].map((row) => row.getBoundingClientRect().height);
+
+		test('above virtualize rows only the rows in view are in the page, the others come while scrolling', async () => {
+			const screen = await render(Table, { rows: many(1000), columns, style: '--table-max-height: 300px' });
+			await expect.poll(() => bodyRows(screen.container).length).toBeLessThan(60);
+			expect(indexes(screen.container)[0]).toBe(0);
+			expect(spacers(screen.container).reduce((sum, height) => sum + height, 0)).toBeGreaterThan(10000);
+			const scroll = screen.container.querySelector('.aurora-table-scroll')!;
+			const bottom = () => {
+				scroll.scrollTop = scroll.scrollHeight;
+				return indexes(screen.container).at(-1);
+			};
+			await expect.poll(bottom, { timeout: 5000 }).toBe(999);
+			expect(bodyRows(screen.container).length).toBeLessThan(60);
+			expect(screen.container.querySelector('tbody tr:last-child')?.classList.contains('aurora-table-row')).toBe(true);
+		});
+
+		test('virtualize={false} keeps every row, a number moves the threshold', async () => {
+			const all = await render(Table, { rows: many(300), columns, virtualize: false });
+			expect(bodyRows(all.container)).toHaveLength(300);
+			all.unmount();
+			const below = await render(Table, { rows: many(300), columns, virtualize: 500 });
+			expect(bodyRows(below.container)).toHaveLength(300);
+			below.unmount();
+			const forced = await render(Table, { rows: many(80), columns, virtualize: true, style: '--table-max-height: 200px' });
+			await expect.poll(() => bodyRows(forced.container).length).toBeLessThan(40);
+		});
+
+		test('"select all" selects every row, also those not in the page', async () => {
+			const onselectionchange = vi.fn();
+			const screen = await render(Table, {
+				rows: many(1000),
+				columns,
+				selectable: 'multiple',
+				onselectionchange,
+				style: '--table-max-height: 300px'
+			});
+			await screen.getByRole('checkbox', { name: 'Select all rows' }).click();
+			expect(onselectionchange.mock.calls[0][0].selected).toHaveLength(1000);
+		});
+
+		test('columns keep their widths while other rows come in', async () => {
+			const rows = many(1000).map((row, index) => (index === 995 ? { ...row, name: 'A much longer product name than the others' } : row));
+			const screen = await render(Table, { rows, columns, style: '--table-max-height: 300px' });
+			const widths = () => [...screen.container.querySelectorAll('thead th')].map((cell) => Math.round(cell.getBoundingClientRect().width));
+			await expect.poll(() => screen.container.querySelector('table')?.hasAttribute('data-fixed'), { timeout: 3000 }).toBe(true);
+			const before = widths();
+			const scroll = screen.container.querySelector('.aurora-table-scroll')!;
+			await expect
+				.poll(() => {
+					scroll.scrollTop = scroll.scrollHeight;
+					return indexes(screen.container).includes(995);
+				}, { timeout: 5000 })
+				.toBe(true);
+			expect(widths()).toEqual(before);
+		});
+
+		test('an expanded row is measured with its detail', async () => {
+			const screen = await render(Table, {
+				rows: many(1000),
+				columns,
+				expanded: [1],
+				expandedSnippet: snippet('<div style="height: 300px">Detail</div>'),
+				style: '--table-max-height: 300px'
+			});
+			const scroll = screen.container.querySelector('.aurora-table-scroll')!;
+			await expect.poll(() => screen.container.querySelectorAll('.aurora-table-detail-row').length).toBe(1);
+			await expect.poll(() => scroll.scrollHeight).toBeGreaterThan(1000 * 30 + 300);
+			const bottom = () => {
+				scroll.scrollTop = scroll.scrollHeight;
+				return indexes(screen.container).at(-1);
+			};
+			await expect.poll(bottom, { timeout: 5000 }).toBe(999);
+			expect(screen.container.querySelectorAll('.aurora-table-detail-row')).toHaveLength(0);
+			scroll.scrollTop = 0;
+			await expect.poll(() => screen.container.querySelectorAll('.aurora-table-detail-row').length).toBe(1);
+		});
+
+		test('cards are virtual too', async () => {
+			const screen = await render(Table, { rows: many(1000), columns, cardBreakpoint: 5000 });
+			await expect.poll(() => screen.container.querySelectorAll('li.aurora-table-card').length).toBeLessThan(40);
+			const lastCard = () => {
+				window.scrollTo(0, document.documentElement.scrollHeight);
+				return ([...screen.container.querySelectorAll<HTMLElement>('li.aurora-table-card')].at(-1))?.dataset.index;
+			};
+			await expect.poll(lastCard, { timeout: 5000 }).toBe('999');
+			window.scrollTo(0, 0);
+		});
+	});
+
+	describe('onendreached', () => {
+		test('is called when the last rows are in view', async () => {
+			const onendreached = vi.fn();
+			await render(Table, { rows: products, columns, onendreached });
+			await expect.poll(() => onendreached.mock.calls.length).toBe(1);
+		});
+
+		test('with virtual rows it waits until the end is reached', async () => {
+			const onendreached = vi.fn();
+			const rows = Array.from({ length: 500 }, (_, index) => ({ id: index + 1, name: `Item ${index + 1}`, stock: index, price: index }));
+			const screen = await render(Table, { rows, columns, onendreached, style: '--table-max-height: 300px' });
+			await expect.poll(() => bodyRows(screen.container).length).toBeGreaterThan(0);
+			await new Promise((resolve) => setTimeout(resolve, 100));
+			expect(onendreached).not.toHaveBeenCalled();
+			const scroll = screen.container.querySelector('.aurora-table-scroll')!;
+			await expect
+				.poll(() => {
+					scroll.scrollTop = scroll.scrollHeight;
+					return onendreached.mock.calls.length;
+				}, { timeout: 5000 })
+				.toBeGreaterThan(0);
+		});
 	});
 });

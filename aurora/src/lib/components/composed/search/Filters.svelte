@@ -1,11 +1,12 @@
 <!-- @component
-Filter bar for lists and tables. The app declares the filterable `fields` (text, number, date, options, yes/no or its own input; columns, joins, relations and custom queries are declared on the field), and the user adds the conditions one at a time: "Add filter" lists the fields (with a search when they are many), then a card asks for the operator of that field and the value. Each condition becomes a pill "field · operator · value": click it to edit, its × removes it. The "Filters" button shows how many conditions are active and opens a panel with every condition in rows ("Where … and …"), where `allowOr` lets the user switch to OR and `maxDepth` allows nested groups. `pinned` fields are always in the bar, and `presets` are chips that add ready-made conditions. Changes apply as soon as a condition is complete (after `applyDelay`); with `confirm` the card and the panel have Cancel and Apply. On screens up to 1024px wide the panel opens in a bottom sheet (`mobileDrawer`). The conditions live in `value`, a plain JSON tree (see `createFilters`), and `onchange` receives it with the `FilterBuilder` of the query, built by `filtersToBuilder`. Every text can be translated with `labels`.
+Filter bar for lists and tables. The app declares the filterable `fields` (text, number, date, options, yes/no or its own input; columns, joins, relations and custom queries are declared on the field), and the user adds the conditions one at a time: "Add filter" lists the fields (with a search when they are many), then a card asks for the operator of that field and the value. Each condition becomes a pill "field · operator · value": click it to edit, its × removes it. The "Filters" button shows how many conditions are active and opens a panel with every condition in rows ("Where … and …"), where `allowOr` lets the user switch to OR and `maxDepth` allows nested groups. `pinned` fields are always in the bar, and `presets` are chips that add ready-made conditions. Changes apply as soon as a condition is complete (after `applyDelay`); with `confirm` the card and the panel have Cancel and Apply. On screens up to 1024px wide the panel opens in a bottom sheet (`mobileDrawer`); when the bar is narrower than 640px (a phone, a side column) it is compact: the pills and "Clear" stay on one row that scrolls sideways, "Add filter" lives only in the panel or the sheet opened by "Filters", and next to a `prependSnippet` (for example a search) "Filters" shows only its icon and the count (`data-compact`). The conditions live in `value`, a plain JSON tree (see `createFilters`), and `onchange` receives it with the `FilterBuilder` of the query, built by `filtersToBuilder`. Every text can be translated with `labels`.
 -->
 <script lang="ts">
 	import '../../../css/tokens.css';
+	import { breakpoints } from '../../../utils/breakpoints.svelte.js';
 	import './Filters.css';
 	import { untrack, type Snippet } from 'svelte';
-	import { MediaQuery } from 'svelte/reactivity';
+	import { observeWidth } from '../../../utils/size.js';
 	import type FilterBuilder from '../../../utils/filters/builder.js';
 	import { filtersToBuilder } from '../../../utils/filters/convert.js';
 	import { filterLabels, type FilterLabelsInput } from '../../../utils/filters/labels.js';
@@ -144,14 +145,13 @@ Filter bar for lists and tables. The app declares the filterable `fields` (text,
 
 	const defaultLocale = inheritedLocale();
 	let locale = $derived(localeProp ?? defaultLocale());
-	const mobile = new MediaQuery('max-width: 1024px', false);
 	const uid = $props.id();
 	const panelId = `${uid}-panel`;
 
 	let own = $state(untrack(() => value ?? createFilters()));
 	let tree = $derived(value ?? own);
 	let texts = $derived(filterLabels(textOverrides, locale));
-	let drawerMode = $derived(mobileDrawer && mobile.current);
+	let drawerMode = $derived(mobileDrawer && breakpoints.mAndDown);
 	let byName = $derived(new Map(fields.map((field) => [field.name, field])));
 	let count = $derived(countFilters(tree, fields));
 	let removable = $derived(
@@ -167,6 +167,9 @@ Filter bar for lists and tables. The app declares the filterable `fields` (text,
 	let panelOpen = $state(false);
 	let panelDraft = $state<FilterGroup>();
 	let filtersButton = $state<HTMLButtonElement | HTMLAnchorElement>();
+	let barWidth = $state<number>();
+	let compact = $derived(barWidth !== undefined && barWidth < 640);
+	let iconOnly = $derived(compact && !!prependSnippet);
 
 	let editingField = $derived(draft ? byName.get(draft.field) : undefined);
 	let editingExisting = $derived(!!draft && !!findFilterNode(tree, draft.id));
@@ -178,6 +181,7 @@ Filter bar for lists and tables. The app declares the filterable `fields` (text,
 			return !!field && !field.hidden && (isComplete(node) || node.id === draft?.id);
 		})
 	);
+	let pillRow = $derived(showPills && (pinned.length > 0 || pills.length > 0));
 	let returnTo: HTMLElement | undefined;
 	let operatorOptions = $derived({ set: operatorSet, byType: typeOperators });
 	let ownSaved = $state<SavedFilter[]>(untrack(() => saved ?? []));
@@ -249,7 +253,7 @@ Filter bar for lists and tables. The app declares the filterable `fields` (text,
 					? rootElement?.querySelector<HTMLElement>('.aurora-filters-pill-main[aria-expanded="true"]')
 					: undefined;
 			if (own && own !== popupAnchor) popupAnchor = own;
-			else if (popupAnchor?.isConnected === false) popupAnchor = own ?? addButton;
+			else if (popupAnchor?.isConnected === false) popupAnchor = own ?? (addButton?.isConnected ? addButton : filtersButton);
 		});
 	});
 
@@ -364,7 +368,7 @@ Filter bar for lists and tables. The app declares the filterable `fields` (text,
 		if (findFilterNode(tree, condition.id)) commit(updateFilterNode(tree, condition.id, condition));
 		else commit(addFilterNode(tree, condition));
 		popupOpen = false;
-		(returnTo?.isConnected ? returnTo : addButton)?.focus();
+		(returnTo?.isConnected ? returnTo : addButton?.isConnected ? addButton : filtersButton)?.focus();
 	}
 
 	function remove(id: string) {
@@ -408,35 +412,7 @@ Filter bar for lists and tables. The app declares the filterable `fields` (text,
 	});
 </script>
 
-<div class={['aurora-filters', clazz.container]} bind:this={rootElement} data-count={count} data-open={popupOpen || panelOpen || undefined}>
-	<div class={['aurora-filters-bar', clazz.bar]}>
-		{@render prependSnippet?.()}
-		<Button
-			variant="secondary"
-			size="sm"
-			icon={FILTER_ICON}
-			bind:buttonElement={filtersButton}
-			aria-haspopup="dialog"
-			aria-expanded={panelOpen}
-			aria-controls={panelOpen && !drawerMode ? panelId : undefined}
-			onclick={() => (panelOpen ? closePanel(false) : openPanel())}
-		>
-			{texts.filters}
-			{#if count}<span class="aurora-filters-count">{count}</span>{/if}
-		</Button>
-		{#if showSaved}
-			<Button
-				variant="secondary"
-				size="sm"
-				icon={BOOKMARK_ICON}
-				bind:buttonElement={savedButton}
-				aria-haspopup="dialog"
-				aria-expanded={savedOpen}
-				onclick={() => (savedOpen = !savedOpen)}
-			>
-				{texts.savedFilters}
-			</Button>
-		{/if}
+{#snippet pillList(showAdd: boolean)}
 		<FilterPills
 			{fields}
 			{pinned}
@@ -456,15 +432,60 @@ Filter bar for lists and tables. The app declares the filterable `fields` (text,
 			onstart={start}
 			onopenpanel={() => openPanel()}
 			onopenfields={openFields}
+			{showAdd}
 		/>
 		{#if removable}
 			<Button buttonType="text" size="sm" onclick={clear}>{texts.clear}</Button>
 		{/if}
+{/snippet}
+
+<div
+	class={['aurora-filters', clazz.container]}
+	bind:this={rootElement}
+	{@attach observeWidth((next) => (barWidth = Math.round(next)))}
+	data-count={count}
+	data-open={popupOpen || panelOpen || undefined}
+	data-compact={compact || undefined}
+>
+	<div class={['aurora-filters-bar', clazz.bar]}>
+		{@render prependSnippet?.()}
+		<Button
+			variant="secondary"
+			size="sm"
+			icon={FILTER_ICON}
+			bind:buttonElement={filtersButton}
+			aria-label={iconOnly ? (count ? `${texts.filters} (${count})` : texts.filters) : undefined}
+			aria-haspopup="dialog"
+			aria-expanded={panelOpen}
+			aria-controls={panelOpen && !drawerMode ? panelId : undefined}
+			onclick={() => (panelOpen ? closePanel(false) : openPanel())}
+		>
+			{#if !iconOnly}{texts.filters}{/if}
+			{#if count}<span class="aurora-filters-count">{count}</span>{/if}
+		</Button>
+		{#if showSaved}
+			<Button
+				variant="secondary"
+				size="sm"
+				icon={BOOKMARK_ICON}
+				bind:buttonElement={savedButton}
+				aria-label={iconOnly ? texts.savedFilters : undefined}
+				aria-haspopup="dialog"
+				aria-expanded={savedOpen}
+				onclick={() => (savedOpen = !savedOpen)}
+			>
+				{#if !iconOnly}{texts.savedFilters}{/if}
+			</Button>
+		{/if}
+		{#if !compact}{@render pillList(true)}{/if}
 		{@render appendSnippet?.()}
 		{#if actionsSnippet}
 			<div class="aurora-filters-actions">{@render actionsSnippet()}</div>
 		{/if}
 	</div>
+	{#if compact && (pillRow || removable)}
+		<div class="aurora-filters-row">{@render pillList(false)}</div>
+	{/if}
 	<FilterPresets {presets} {tree} labels={texts} ontoggle={(preset) => commit(togglePreset(tree, preset))} />
 </div>
 
@@ -573,6 +594,33 @@ Filter bar for lists and tables. The app declares the filterable `fields` (text,
 			align-items: center;
 			gap: 8px;
 			margin-inline-start: auto;
+		}
+
+		.aurora-filters-row {
+			display: flex;
+			align-items: center;
+			gap: var(--filters-gap, var(--filters-default-gap));
+			overflow-x: auto;
+			scrollbar-width: none;
+			overscroll-behavior-x: contain;
+		}
+
+		.aurora-filters-row::-webkit-scrollbar {
+			display: none;
+		}
+
+		.aurora-filters-row > :global(*) {
+			flex: none;
+		}
+
+		.aurora-filters[data-compact] :global(.aurora-filters-presets) {
+			flex-wrap: nowrap;
+			overflow-x: auto;
+			scrollbar-width: none;
+		}
+
+		.aurora-filters[data-compact] :global(.aurora-filters-presets > *) {
+			flex: none;
 		}
 	}
 </style>

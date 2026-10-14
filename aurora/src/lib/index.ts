@@ -1,5 +1,17 @@
-export { setTheme, getTheme, setMode, getMode } from './theme.js';
-export type { ThemeMode } from './theme.js';
+export {
+	setTheme,
+	getTheme,
+	setMode,
+	getMode,
+	theme,
+	toggleMode,
+	rememberAppearance,
+	appearanceScript
+} from './theme.svelte.js';
+export { breakpoints, BREAKPOINTS } from './utils/breakpoints.svelte.js';
+export type { Breakpoints } from './utils/breakpoints.svelte.js';
+export { default as MediaQuery } from './components/simple/common/MediaQuery.svelte';
+export type { ThemeMode, ThemeState, AppearanceStorage } from './theme.svelte.js';
 export { setDefaultLocale } from './utils/locale.js';
 
 export { default as Button } from './components/simple/buttons/Button.svelte';
@@ -20,7 +32,16 @@ export type { Tab } from './components/simple/navigation/TabSwitcher.svelte';
 export { default as Paginator } from './components/simple/navigation/Paginator.svelte';
 export { default as Table } from './components/simple/tables/Table.svelte';
 export { default as ColumnManager } from './components/composed/tables/ColumnManager.svelte';
-export type { TableColumn, TableSort, TableColumnState } from './utils/table/types.js';
+export { default as DataTable } from './components/composed/tables/DataTable.svelte';
+export type {
+	TableColumn,
+	TableSort,
+	TableColumnState,
+	DataTableQuery,
+	DataTableLoadResult,
+	DataTableAction,
+	DataTableActionContext
+} from './utils/table/types.js';
 export { default as Checkbox } from './components/simple/forms/Checkbox.svelte';
 export { default as Switch } from './components/simple/forms/Switch.svelte';
 export { default as RadioButton } from './components/simple/forms/RadioButton.svelte';

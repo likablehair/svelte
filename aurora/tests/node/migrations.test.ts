@@ -20,7 +20,13 @@ const files = import.meta.glob<ComponentMigration | GlobalMigration>('/migration
 const global = files['/migrations/v4-to-v5/global.ts'] as GlobalMigration;
 const rules = Object.entries(files)
 	.filter(([path]) => !path.endsWith('/global.ts'))
-	.map(([path, rule]) => ({ file: path.split('/').pop()!.replace(/\.ts$/, ''), rule: rule as ComponentMigration }));
+	.flatMap(([path, rule]) =>
+		[rule as ComponentMigration | ComponentMigration[]].flat().map((entry) => ({
+			file: path.split('/').pop()!.replace(/\.ts$/, ''),
+			from: entry.from,
+			rule: entry
+		}))
+	);
 
 const v4Index = readFileSync(new URL('../../../src/lib/index.ts', import.meta.url), 'utf8');
 const v4Components = [...v4Index.matchAll(/default\s+as\s+(\w+)\s*\}\s*from\s*'[^']+\.svelte'/g)].map(
@@ -90,11 +96,21 @@ describe('v4 → v5 migration rules', () => {
 	});
 
 	test('manual step ids are unique', () => {
-		const ids = [...global.manual, ...rules.flatMap((r) => r.rule.manual ?? [])].map((m) => m.id);
-		expect(ids.filter((id, i) => ids.indexOf(id) !== i)).toEqual([]);
+		const steps = new Map<string, string>();
+		const clashes: string[] = [];
+		for (const step of [...global.manual, ...rules.flatMap((r) => r.rule.manual ?? [])]) {
+			const text = JSON.stringify(step);
+			if (steps.has(step.id) && steps.get(step.id) !== text) clashes.push(step.id);
+			steps.set(step.id, text);
+		}
+		expect(clashes).toEqual([]);
+		for (const { rule } of rules) {
+			const ids = (rule.manual ?? []).map((m) => m.id);
+			expect(ids.filter((id, i) => ids.indexOf(id) !== i)).toEqual([]);
+		}
 	});
 
-	describe.each(rules)('$file', ({ file, rule }) => {
+	describe.each(rules)('$file from $from', ({ file, rule }) => {
 		test('names match the file, a v4 component and a v5 component', () => {
 			expect(rule.to).toBe(file);
 			expect(v4Components).toContain(rule.from);

@@ -163,10 +163,30 @@ describe('ConfirmOrCancelButtons', () => {
 		form.remove();
 	});
 
-	test('v4 bug: no top margin', async () => {
+	test('has no space above it by default; the instance variable and the app default add it, as v4 did with 20px', async () => {
 		const screen = await render(ConfirmOrCancelButtons, {});
-		const root = screen.container.querySelector('.aurora-confirm-or-cancel-buttons')!;
+		const root = screen.container.querySelector<HTMLElement>('.aurora-confirm-or-cancel-buttons')!;
 		expect(getComputedStyle(root).marginTop).toBe('0px');
+		document.documentElement.style.setProperty('--confirm-or-cancel-buttons-default-margin-top', '20px');
+		expect(getComputedStyle(root).marginTop).toBe('20px');
+		screen.container.style.setProperty('--confirm-or-cancel-buttons-margin-top', '4px');
+		expect(getComputedStyle(root).marginTop).toBe('4px');
+		document.documentElement.style.removeProperty('--confirm-or-cancel-buttons-default-margin-top');
+	});
+
+	test('has no margin in the actions of a Dialog or a Drawer, even with the app default', async () => {
+		document.documentElement.style.setProperty('--confirm-or-cancel-buttons-default-margin-top', '20px');
+		for (const name of ['aurora-dialog-actions', 'aurora-drawer-actions']) {
+			const footer = document.createElement('footer');
+			footer.className = name;
+			document.body.append(footer);
+			const screen = await render(ConfirmOrCancelButtons, { target: footer, props: {} });
+			const root = footer.querySelector('.aurora-confirm-or-cancel-buttons')!;
+			expect(getComputedStyle(root).marginTop).toBe('0px');
+			screen.unmount();
+			footer.remove();
+		}
+		document.documentElement.style.removeProperty('--confirm-or-cancel-buttons-default-margin-top');
 	});
 
 	test('in a wide container the buttons sit in a row at the end, cancel first', async () => {

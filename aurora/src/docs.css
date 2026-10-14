@@ -129,6 +129,8 @@
 }
 
 main {
+	--data-table-default-selection-offset: 72px;
+
 	min-width: 0;
 	padding: 0 56px 120px;
 }
@@ -200,7 +202,7 @@ main {
 	background: var(--global-color-surface);
 	border: var(--global-border-width) solid var(--global-color-border);
 	box-shadow: var(--global-shadow-md);
-	overflow: hidden;
+	overflow: clip;
 }
 
 .spec > header {

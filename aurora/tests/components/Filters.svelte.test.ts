@@ -1191,6 +1191,95 @@ describe('Filters', () => {
 			return page.getByRole('dialog', { name: 'Filters' });
 		}
 
+		async function onPhone(run: () => Promise<void>) {
+			await page.viewport(390, 800);
+			try {
+				await run();
+			} finally {
+				await page.viewport(1280, 800);
+			}
+		}
+
+		test('on a phone the bar is compact: pills and Clear on one row that scrolls, no Add filter, Filters only as an icon next to a search', async () => {
+			await onPhone(async () => {
+				const { screen } = await setup({ prependSnippet: snippet('<input type="search" aria-label="Search" />') }, initial());
+				const root = screen.container.querySelector('.aurora-filters')!;
+				await expect.poll(() => root.hasAttribute('data-compact')).toBe(true);
+				const button = screen.getByRole('button', { name: 'Filters (2)' });
+				await expect.element(button).toBeInTheDocument();
+				expect(button.element().textContent?.trim()).toBe('2');
+				expect(screen.container.querySelector('.aurora-filters-add')).toBeNull();
+				const row = root.querySelector('.aurora-filters-row')!;
+				expect(row.querySelectorAll('.aurora-filters-pill')).toHaveLength(2);
+				expect(row.textContent).toContain('Clear');
+				expect(getComputedStyle(row).overflowX).toBe('auto');
+				const middles = [...row.children].map((child) => {
+					const box = child.getBoundingClientRect();
+					return box.top + box.height / 2;
+				});
+				expect(Math.max(...middles) - Math.min(...middles)).toBeLessThan(4);
+			});
+		});
+
+		test('on a phone without a search the Filters button keeps its text', async () => {
+			await onPhone(async () => {
+				const { screen } = await setup({}, initial());
+				const root = screen.container.querySelector('.aurora-filters')!;
+				await expect.poll(() => root.hasAttribute('data-compact')).toBe(true);
+				const button = screen.getByRole('button', { name: /^Filters/ }).element();
+				expect(button.textContent?.replace(/\s+/g, ' ').trim()).toBe('Filters 2');
+				expect(screen.container.querySelector('.aurora-filters-add')).toBeNull();
+			});
+		});
+
+		test('on a phone closing the sheet gives the focus back to the Filters button', async () => {
+			await onPhone(async () => {
+				const { screen } = await setup({}, initial());
+				const button = screen.getByRole('button', { name: /^Filters/ });
+				await button.click();
+				await expect.element(sheet()).toBeVisible();
+				await userEvent.keyboard('{Escape}');
+				await expect.element(sheet()).not.toBeInTheDocument();
+				await expect.element(button).toHaveFocus();
+			});
+		});
+
+		test('a narrow bar is compact on desktop too, and adds from the panel', async () => {
+			const box = document.createElement('div');
+			box.style.width = '500px';
+			document.body.append(box);
+			const value = { current: initial() };
+			const screen = await render(Filters, {
+				target: box,
+				props: {
+					fields,
+					applyDelay: 0,
+					prependSnippet: snippet('<input type="search" aria-label="Search" />'),
+					get value() {
+						return value.current;
+					},
+					set value(next) {
+						value.current = next;
+					}
+				}
+			});
+			const root = box.querySelector('.aurora-filters')!;
+			await expect.poll(() => root.hasAttribute('data-compact')).toBe(true);
+			expect(box.querySelector('.aurora-filters-add')).toBeNull();
+			await screen.getByRole('button', { name: 'Filters (2)' }).click();
+			await expect.element(page.getByRole('button', { name: /Add filter/ }).last()).toBeVisible();
+			screen.unmount();
+			box.remove();
+		});
+
+		test('on a tablet the bar keeps its texts and Add filter', async () => {
+			await onMobile(async () => {
+				const { screen, addButton } = await setup({}, initial());
+				await expect.element(addButton).toBeInTheDocument();
+				expect(screen.container.querySelector('.aurora-filters')!.hasAttribute('data-compact')).toBe(false);
+			});
+		});
+
 		test('Add filter opens a bottom sheet with the rows and a new one; Show results closes it', async () => {
 			await onMobile(async () => {
 				const { addButton, value } = await setup({}, initial());

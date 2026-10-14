@@ -130,28 +130,22 @@ export default {
 	},
 	exports: [
 		{
-			name: 'MediaQuery',
-			kind: 'component',
-			replacement: "MediaQuery from 'svelte/reactivity'",
-			note: 'Svelte 5 has it: `const mobile = new MediaQuery("max-width: 1024px")`, then `mobile.current`. The server renders the desktop variant now.'
-		},
-		{
 			name: 'mediaQuery',
 			kind: 'store',
-			replacement: "MediaQuery from 'svelte/reactivity'",
-			note: 'Replace the store subscription with a `MediaQuery` instance per query.'
+			replacement: 'breakpoints',
+			note: 'Same flags and widths, as a reactive object instead of a store: `$mediaQuery.xs` → `breakpoints.xs`, also `breakpoints.mAndDown` and the other `...AndDown` / `...AndUp`. The server counts as wide (`xl`) now.'
 		},
 		{
 			name: 'theme',
 			kind: 'store',
-			replacement: 'getMode(), getTheme()',
-			note: '`$theme.dark` → `getMode() === "dark"` (not reactive; the app keeps its own state if it needs to react).'
+			replacement: 'theme',
+			note: 'Exported again with the same name: `$theme.dark` keeps working (and `theme.dark` is reactive without `$`), `theme.mode` and `theme.name` are new. `$theme.active` and `$theme.colors` (the runtime colors API, broken in v4) are gone: colors are CSS tokens and themes.'
 		},
 		{
 			name: 'toggleTheme',
 			kind: 'function',
-			replacement: "setMode(isDark ? 'light' : 'dark')",
-			note: '`isDark` is `getMode() === "dark"`, or `getMode() === "system"` and `matchMedia("(prefers-color-scheme: dark)").matches`.'
+			replacement: 'toggleMode()',
+			note: 'Same behaviour. The choice is saved only after `rememberAppearance()` (see `global-dark-mode`).'
 		},
 		{
 			name: 'setTheme',
@@ -230,9 +224,6 @@ export default {
 			'SelectableVerticalList',
 			'SidebarMenuList',
 			'HierarchyMenu',
-			'PaginatedTable',
-			'EnhancedPaginatedTable',
-			'DynamicTable',
 			'GlobalSearchTextField',
 			'Avatar',
 			'DescriptiveAvatar',
@@ -304,7 +295,7 @@ export default {
 			summary:
 				'Dark mode follows `color-scheme` and `data-mode` on `<html>`; `.dark` / `.light` classes do nothing.',
 			action:
-				"Replace `setTheme('dark')` / `toggleTheme()` with `setMode(...)`, `.dark` selectors with `[data-mode='dark']` (plus the `prefers-color-scheme` branch), and Tailwind `darkMode: 'class'` with the variant in MIGRATION.md. Restore the saved mode before the first paint with an inline script in `app.html`. An app without dark mode sets `data-mode=\"light\"` on `<html>`.",
+				"Replace `setTheme('dark')` with `setMode('dark')` and `toggleTheme()` with `toggleMode()`, `.dark` selectors with `[data-mode='dark']` (plus the `prefers-color-scheme` branch), and Tailwind `darkMode: 'class'` with the variant in MIGRATION.md. v4 saved the mode by itself: call `rememberAppearance()` once in the root `+layout.svelte` (it reads and writes the same `theme` key of v4, so users keep their choice) and add `<svelte:head>{@html '<script>' + appearanceScript() + '</script>'}</svelte:head>` there, so the page does not flash in the wrong mode. An app without dark mode sets `data-mode=\"light\"` on `<html>`.",
 			scope: 'app'
 		},
 		{
@@ -339,7 +330,7 @@ export default {
 		{
 			id: 'global-default-locale',
 			summary:
-				'Texts and formats follow `locale` (BCP 47; Italian and English built in, other languages get the English texts): the `locale` prop of a component wins over `setDefaultLocale`, which wins over the default `en`. v4 was Italian by default in the date components (dd/MM/yyyy, Italian names, weeks from Monday) and in some texts ("Annulla" / "Salva", "N Selezionati"), and had `lang` props (default `en`) elsewhere.',
+				'Required in every Italian app: without `setDefaultLocale(\'it\')` the date and time fields read and write in English (MM/DD/YYYY, 12-hour clock), so a typed "05/03" is saved as May 3; in development they warn in the console. Texts and formats follow `locale` (BCP 47; Italian and English built in, other languages get the English texts): the `locale` prop of a component wins over `setDefaultLocale`, which wins over the default `en`. v4 was Italian by default in the date components (dd/MM/yyyy, Italian names, weeks from Monday) and in some texts ("Annulla" / "Salva", "N Selezionati"), and had `lang` props (default `en`) elsewhere.',
 			action:
 				"In the root `src/routes/+layout.svelte` of an Italian app, import `setDefaultLocale` from `@likable-hair/svelte` and call `setDefaultLocale('it')` in its `<script>`: it is a Svelte context (safe with SSR) that reaches every library component of the app, the Toaster and the content of dialogs included. With paraglide, follow the active language: `setDefaultLocale(() => getLocale())` (`getLocale` from `$lib/paraglide/runtime`). Then drop `locale=\"it\"` where it only restored the Italian default and the Italian texts passed only to translate the English defaults (`invalidText`, `closeLabel`, `cancelText=\"Annulla\"`, ...); v4 `lang=\"it\"` becomes `locale=\"it\"`, or nothing. Components that v4 showed in English without `lang` (Dropdown placeholder \"Select\", NoData \"No data available\", Filters, FilterEditor) become Italian: pass `locale=\"en\"` where English is wanted. Text props passed by the app always win. Components rendered outside the layout (`mount()`, tests, a second root) need their own `setDefaultLocale` or `locale`.",
 			scope: 'app'

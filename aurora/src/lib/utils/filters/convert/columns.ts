@@ -24,7 +24,7 @@ const COLUMN_SYMBOLS: Record<string, string> = {
 	columnLte: '<='
 };
 
-function escapeLike(text: string): string {
+export function escapeLike(text: string): string {
 	return text.replace(/[\\%_]/g, (char) => `\\${char}`);
 }
 

@@ -1,4 +1,4 @@
-import { getMode, getTheme, setMode, setTheme, type ThemeMode } from '#lib/theme.js';
+import { getMode, getTheme, setMode, setTheme, type ThemeMode } from '#lib/theme.svelte.js';
 
 export const appearance = $state({ theme: '', mode: 'system' as ThemeMode });
 

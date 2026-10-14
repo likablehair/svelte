@@ -1,10 +1,10 @@
 <!-- @component
-Table of rows and columns. `columns` declares what each column shows (`key`, `label`, a `type` that formats numbers, dates and yes/no with `Intl` in the language of `locale`, `format`, or a `cell` snippet) and `rows` are plain objects, identified by `rowKey`. Sortable columns sort the rows on their own (ascending, descending, unsorted), or only report the new `sort` with `sorting="manual"` when the server sorts. `selectable` adds a checkbox per row (shift-click selects a range), `expandedSnippet` a detail row under each row, `actionsSnippet` a column of buttons that stays on the right while scrolling (with `actionsVisibility="hover"` it shows only on hover and focus). `rowHref` turns every row into a link (Ctrl-click and middle click open it in a new tab), `onrowclick` makes rows clickable and focusable. `pinned` columns stay on the left (unless together with the checkboxes and the actions they would take more than half of the table), `resizable` columns can be dragged or resized with the arrow keys, and `columnState` keeps order, visibility, widths and pins as plain data to save. Empty cells show "—". When the table is narrower than `cardBreakpoint` (640px by default) every row becomes a card, with the `cardColumns` (the first 4 by default) and the other columns behind "Show more fields". While `loading` the table shows a progress bar, or placeholder rows when it has none; with no rows it shows `NoData`. State is exposed as `data-cards`, `data-loading`, `data-resizing`, `data-actions-visibility` and `data-pins-off` on the root, and `data-selected`, `data-expanded` on rows for app CSS.
+Table of rows and columns. `columns` declares what each column shows (`key`, `label`, a `type` that formats numbers, dates and yes/no with `Intl` in the language of `locale`, `format`, or a `cell` snippet) and `rows` are plain objects, identified by `rowKey`. Sortable columns sort the rows on their own (ascending, descending, unsorted), or only report the new `sort` with `sorting="manual"` when the server sorts. `selectable` adds a checkbox per row (shift-click selects a range), `expandedSnippet` a detail row under each row, `actionsSnippet` a column of buttons that stays on the right while scrolling (with `actionsVisibility="hover"` it shows only on hover and focus). `rowHref` turns every row into a link (Ctrl-click and middle click open it in a new tab), `onrowclick` makes rows clickable and focusable. `pinned` columns stay on the left (unless together with the checkboxes and the actions they would take more than half of the table), `resizable` columns can be dragged or resized with the arrow keys, and `columnState` keeps order, visibility, widths and pins as plain data to save. Empty cells show "—". When the table is narrower than `cardBreakpoint` (640px by default) every row becomes a card, with the `cardColumns` (the first 4 by default) and the other columns behind "Show more fields". Above `virtualize` rows (200 by default) only the rows in view are in the page, so thousands of rows stay fast. `onendreached` is called when the last rows come into view, for loading more. While `loading` the table shows a progress bar, or placeholder rows when it has none; with no rows it shows `NoData`. State is exposed as `data-cards`, `data-loading`, `data-disabled`, `data-resizing`, `data-actions-visibility` and `data-pins-off` on the root, and `data-selected`, `data-expanded` on rows for app CSS.
 -->
 <script lang="ts" generics="Row extends Record<string, any>">
 	import '../../../css/tokens.css';
 	import './Table.css';
-	import { onMount, type Snippet } from 'svelte';
+	import { onMount, untrack, type Snippet } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
 	import type { ClassValue, HTMLAttributes } from 'svelte/elements';
 	import Checkbox from '../forms/Checkbox.svelte';
@@ -38,6 +38,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 		setRowsSelected,
 		type Selection
 	} from '../../../utils/table/selection.js';
+	import { createRowWindow, scrollParent, type RowRange } from '../../../utils/table/virtual.js';
 
 	const SORT_ICON = 'M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z';
 	const EXPAND_ICON = 'M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z';
@@ -46,8 +47,12 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 		'M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z';
 	const SELECT_KEY = '\0select';
 	const EXPAND_KEY = '\0expand';
+	const ACTIONS_KEY = '\0actions';
 	const MIN_WIDTH = 48;
 	const CARD_FIELDS = 4;
+	const FIRST_WINDOW = 40;
+	const ROW_ESTIMATE = 41;
+	const CARD_ESTIMATE = 160;
 	const INTERACTIVE =
 		'a, button, input, select, textarea, label, summary, [contenteditable], [role="button"], [role="checkbox"], [role="link"], [role="menuitem"], [role="switch"]';
 
@@ -155,6 +160,14 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 		actionsSnippet?: Snippet<[{ row: Row }]>;
 		/** Replaces `NoData` when there are no rows. */
 		noDataSnippet?: Snippet;
+		/** Above this number of rows only the rows in view, plus a margin, are in the page, so thousands of rows stay fast; the others are drawn while scrolling (the page, the app container or the table with `--table-max-height`). `true` always, `false` never. While it is on, the find of the browser and printing see only the drawn rows, and the columns keep the widths they had on the first rows. */
+		virtualize?: boolean | number;
+		/** Called when the last rows come into view (the third from the end), again when the rows change while they are still in view and when this callback changes: for loading the next rows. */
+		onendreached?: () => void;
+		/** Read-only table, for example while the app saves: rows are not clickable and sorting, selection and resizing are off. Expanding rows still works. */
+		disabled?: boolean;
+		/** With `selectable="multiple"`, shows the checkbox that selects every row (in the header, or above the cards). `false` keeps only the checkbox of each row. */
+		selectAll?: boolean;
 	}
 
 	let {
@@ -196,6 +209,10 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 		expandedSnippet,
 		actionsSnippet,
 		noDataSnippet,
+		virtualize = 200,
+		onendreached,
+		disabled = false,
+		selectAll = true,
 		...rest
 	}: Props = $props();
 
@@ -230,6 +247,9 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 	const openCards = new SvelteSet<string | number>();
 	let hasFooter = $derived(resolved.some((entry) => entry.column.footer !== undefined));
 	let showEmpty = $derived(!loading && rows.length === 0);
+	let clickable = $derived(!disabled && (!!onrowclick || !!rowHref));
+	let focusable = $derived(!disabled && !!onrowclick);
+	let showSelectAll = $derived(selectable === 'multiple' && selectAll);
 	let showSkeleton = $derived(loading && rows.length === 0);
 
 	let selection: Selection<Row> = $derived({
@@ -243,6 +263,36 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 
 	let expandedKeys = $derived(new Set(expanded ?? []));
 
+	let virtualOn = $derived(
+		virtualize === true || (typeof virtualize === 'number' && shownRows.length > virtualize)
+	);
+	let bodyNode = $state<HTMLElement>();
+	let range = $state<RowRange>();
+	let rowWindow = $state.raw<ReturnType<typeof createRowWindow>>();
+	let lockedWidths = $state<Record<string, number>>();
+	const partSizes = new Map<string | number, { main: number; detail: number }>();
+	let estimated = false;
+	let windowStart = $derived(virtualOn && range ? Math.min(range.start, shownRows.length) : 0);
+	let windowEnd = $derived(
+		!virtualOn
+			? shownRows.length
+			: range
+				? Math.min(range.end + 1, shownRows.length)
+				: Math.min(FIRST_WINDOW, shownRows.length)
+	);
+	let windowRows = $derived(virtualOn ? shownRows.slice(windowStart, windowEnd) : shownRows);
+	let spaceBefore = $derived(virtualOn && range ? range.before : 0);
+	let spaceAfter = $derived(
+		!virtualOn
+			? 0
+			: range
+				? range.after
+				: (shownRows.length - windowEnd) * (cards ? CARD_ESTIMATE : ROW_ESTIMATE)
+	);
+	let cardGap = $state(0);
+	let endTarget = $derived(Math.max(0, shownRows.length - 3));
+	let nearEnd = $derived(virtualOn && !!range && range.end >= endTarget);
+
 	let measured = $state<Record<string, number>>({});
 	let liveWidths = $state<Record<string, number>>({});
 	let resizing = $state<string>();
@@ -255,7 +305,11 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 	const headerCells: Record<string, HTMLTableCellElement> = {};
 
 	function widthOf(entry: ResolvedColumn<Row>) {
-		return liveWidths[entry.column.key] ?? entry.width;
+		return (
+			liveWidths[entry.column.key] ??
+			entry.width ??
+			(virtualOn && !cards ? lockedWidths?.[entry.column.key] : undefined)
+		);
 	}
 
 	let fixedLayout = $derived(!cards && resolved.some((entry) => widthOf(entry) !== undefined));
@@ -391,6 +445,122 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 			const total = width + parseFloat(style.paddingInlineStart) + parseFloat(style.paddingInlineEnd);
 			if (actionsWidth === undefined || Math.abs(actionsWidth - total) >= 0.5) actionsWidth = total;
 		});
+	}
+
+	$effect(() => {
+		if (!virtualOn || !bodyNode || !rootNode) return;
+		const body = bodyNode;
+		const gap = cards ? parseFloat(getComputedStyle(body).rowGap) || 0 : 0;
+		cardGap = gap;
+		estimated = false;
+		const windowed = createRowWindow({
+			body,
+			scroller: scrollParent(rootNode, cards ? undefined : scrollNode),
+			count: untrack(() => shownRows.length),
+			estimate: cards ? CARD_ESTIMATE : ROW_ESTIMATE,
+			gap,
+			key: (index) => keyOf(untrack(() => shownRows)[index], rowKey),
+			onChange: (next) => {
+				const current = untrack(() => range);
+				if (
+					!current ||
+					current.start !== next.start ||
+					current.end !== next.end ||
+					Math.abs(current.before - next.before) >= 0.5 ||
+					Math.abs(current.after - next.after) >= 0.5
+				)
+					range = next;
+			}
+		});
+		rowWindow = windowed;
+		return () => {
+			windowed.destroy();
+			rowWindow = undefined;
+			range = undefined;
+		};
+	});
+
+	$effect(() => {
+		const count = shownRows.length;
+		rowWindow?.update({ count, key: (index) => keyOf(untrack(() => shownRows)[index], rowKey) });
+	});
+
+	let lockBasis: { width: number; columns: ResolvedColumn<Row>[] } | undefined;
+
+	$effect(() => {
+		const width = rootWidth;
+		const columnsNow = resolved;
+		untrack(() => {
+			if (!lockedWidths || !lockBasis) return;
+			if (Math.abs((width ?? 0) - lockBasis.width) >= 1 || columnsNow !== lockBasis.columns) lockedWidths = undefined;
+		});
+	});
+
+	$effect(() => {
+		if (!virtualOn || cards || lockedWidths || resizing || rootWidth === undefined) return;
+		const frame = requestAnimationFrame(() => {
+			const widths: Record<string, number> = {};
+			const columnsNow = untrack(() => resolved);
+			for (const key of [...columnsNow.map((entry) => entry.column.key), ACTIONS_KEY]) {
+				const cell = headerCells[key];
+				if (cell) widths[key] = cell.getBoundingClientRect().width;
+			}
+			lockBasis = { width: untrack(() => rootWidth) ?? 0, columns: columnsNow };
+			lockedWidths = widths;
+		});
+		return () => cancelAnimationFrame(frame);
+	});
+
+	$effect(() => {
+		const callback = onendreached;
+		if (!callback || !shownRows.length) return;
+		if (virtualOn) {
+			if (nearEnd) untrack(callback);
+			return;
+		}
+		const node = bodyNode?.querySelector(`:scope > [data-index="${endTarget}"]`);
+		if (!node) return;
+		const observer = new IntersectionObserver((entries) => {
+			if (entries.some((entry) => entry.isIntersecting)) callback();
+		});
+		observer.observe(node);
+		return () => observer.disconnect();
+	});
+
+	function measureRow(index: number, part: 'main' | 'detail') {
+		return (node: HTMLElement) => {
+			const key = untrack(() => keyOf(shownRows[index], rowKey));
+			let frame = 0;
+			const report = () => {
+				const height = node.getBoundingClientRect().height;
+				const entry = partSizes.get(key) ?? { main: 0, detail: 0 };
+				entry[part] = height;
+				partSizes.set(key, entry);
+				if (part === 'main' && !estimated && height > 0) {
+					estimated = true;
+					rowWindow?.update({
+						count: untrack(() => shownRows.length),
+						key: (at) => keyOf(untrack(() => shownRows)[at], rowKey),
+						estimate: height
+					});
+				}
+				rowWindow?.resize(index, entry.main + entry.detail);
+			};
+			const observer = new ResizeObserver(() => {
+				cancelAnimationFrame(frame);
+				frame = requestAnimationFrame(report);
+			});
+			observer.observe(node);
+			return () => {
+				cancelAnimationFrame(frame);
+				observer.disconnect();
+				const entry = partSizes.get(key);
+				if (part === 'detail' && entry && !untrack(() => expandedKeys.has(key))) {
+					entry.detail = 0;
+					rowWindow?.resize(index, entry.main);
+				}
+			};
+		};
 	}
 
 	function rowName(row: Row, index: number) {
@@ -570,6 +740,21 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 		commitColumnState(withWidths(fullColumnState(columns, columnState), widths));
 	}
 
+	function actionsColWidth() {
+		const locked = virtualOn && !cards ? lockedWidths?.[ACTIONS_KEY] : undefined;
+		const width = locked ?? actionsWidth;
+		return fixedLayout && width ? `${width}px` : undefined;
+	}
+
+	function keepHeader(key: string) {
+		return (node: HTMLTableCellElement) => {
+			headerCells[key] = node;
+			return () => {
+				if (headerCells[key] === node) delete headerCells[key];
+			};
+		};
+	}
+
 	function colWidth(entry: ResolvedColumn<Row>) {
 		const width = widthOf(entry);
 		return width !== undefined ? `${width}px` : entry.column.width;
@@ -608,7 +793,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 {/snippet}
 
 {#snippet rowLink(row: Row, index: number)}
-	{@const href = rowHref?.(row)}
+	{@const href = disabled ? undefined : rowHref?.(row)}
 	{#if href}
 		<a class="aurora-table-row-link" {href} tabindex={onrowclick ? -1 : undefined}>
 			{rowName(row, index)}
@@ -619,6 +804,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 {#snippet rowCheckbox(row: Row, index: number)}
 	<Checkbox
 		checked={isSelected(row)}
+		{disabled}
 		aria-label={texts.selectRow.replace('{row}', rowName(row, index))}
 		onclick={(event: MouseEvent) => toggleRow(row, event)}
 	/>
@@ -664,6 +850,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 	class={['aurora-table', clazz.container]}
 	data-cards={cards || undefined}
 	data-loading={loading || undefined}
+	data-disabled={disabled || undefined}
 	data-resizing={resizing ? '' : undefined}
 	data-actions-visibility={actionsSnippet ? actionsVisibility : undefined}
 	data-pins-off={!cards && pinsOff ? '' : undefined}
@@ -671,11 +858,12 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 	data-overflow-end={!cards && overflowEnd ? '' : undefined}
 >
 	{#if cards}
-		{#if (selectable === 'multiple' && rows.length) || sortItems.length > 1}
+		{#if (showSelectAll && rows.length) || sortItems.length > 1}
 			<div class="aurora-table-cards-bar">
-				{#if selectable === 'multiple' && rows.length}
+				{#if showSelectAll && rows.length}
 					<Checkbox
 						label={texts.selectAllShort}
+						{disabled}
 						checked={pageState === 'all'}
 						indeterminate={pageState === 'some'}
 						onclick={toggleAll}
@@ -685,6 +873,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 					<Select
 						class={{ container: 'aurora-table-cards-sort' }}
 						aria-label={texts.sortBy}
+						{disabled}
 						items={sortItems}
 						bind:value={
 							() => (sort ? `${sort.direction}:${sort.key}` : ''), (value) => pickSortItem(value)
@@ -695,6 +884,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 		{/if}
 		{#if caption}<p class="aurora-table-visually-hidden" id="{uid}-caption">{caption}</p>{/if}
 		<ul
+			bind:this={bodyNode}
 			class="aurora-table-cards"
 			aria-busy={loading || undefined}
 			aria-labelledby={caption ? `${uid}-caption` : undefined}
@@ -706,19 +896,25 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 					</li>
 				{/each}
 			{/if}
-			{#each shownRows as row, index (keyOf(row, rowKey))}
+			{#if spaceBefore > cardGap}
+				<li class="aurora-table-spacer" aria-hidden="true" style:height="{spaceBefore - cardGap}px"></li>
+			{/if}
+			{#each windowRows as row, position (keyOf(row, rowKey))}
+				{@const index = windowStart + position}
 				{@const key = keyOf(row, rowKey)}
 				{@const open = expandedKeys.has(key)}
 				<!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -->
 				<li
+					{@attach virtualOn ? measureRow(index, 'main') : undefined}
+					data-index={index}
 					class={['aurora-table-card', clazz.row, rowClass?.(row)]}
 					data-selected={isSelected(row) || undefined}
 					data-expanded={open || undefined}
-					data-clickable={onrowclick || rowHref ? '' : undefined}
-					tabindex={onrowclick ? 0 : undefined}
-					onclick={onrowclick || rowHref ? (event) => activate(row, event) : undefined}
-					onauxclick={rowHref ? (event) => auxActivate(row, event) : undefined}
-					onkeydown={onrowclick ? (event) => keyActivate(row, event) : undefined}
+					data-clickable={clickable ? '' : undefined}
+					tabindex={focusable ? 0 : undefined}
+					onclick={clickable ? (event) => activate(row, event) : undefined}
+					onauxclick={clickable && rowHref ? (event) => auxActivate(row, event) : undefined}
+					onkeydown={focusable ? (event) => keyActivate(row, event) : undefined}
 				>
 					<div class="aurora-table-card-head">
 						{#if selectable}{@render rowCheckbox(row, index)}{/if}
@@ -763,6 +959,9 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 					{/if}
 				</li>
 			{/each}
+			{#if spaceAfter > cardGap}
+				<li class="aurora-table-spacer" aria-hidden="true" style:height="{spaceAfter - cardGap}px"></li>
+			{/if}
 		</ul>
 		{#if showEmpty}
 			<div class="aurora-table-no-data">
@@ -801,7 +1000,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 						<col style:width={colWidth(entry)} />
 					{/each}
 					{#if actionsSnippet}
-						<col style:width={fixedLayout && actionsWidth ? `${actionsWidth}px` : undefined} />
+						<col style:width={actionsColWidth()} />
 					{/if}
 					{#if fixedLayout}<col />{/if}
 				</colgroup>
@@ -815,11 +1014,11 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 								data-pinned-last={lastSticky === SELECT_KEY || undefined}
 								style:inset-inline-start={stickyStart(SELECT_KEY)}
 							>
-								{#if selectable === 'multiple'}
+								{#if showSelectAll}
 									<Checkbox
 										checked={pageState === 'all'}
 										indeterminate={pageState === 'some'}
-										disabled={!rows.length}
+										disabled={disabled || !rows.length}
 										aria-label={texts.selectAll}
 										onclick={toggleAll}
 									/>
@@ -859,6 +1058,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 										<button
 											type="button"
 											class="aurora-table-sort"
+											{disabled}
 											onclick={() => changeSort(nextSort(sort, column.key))}
 										>
 											<span class="aurora-table-header-label">{@render headerLabel(column)}</span>
@@ -879,7 +1079,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 										<Tooltip activator={infoButtons[column.key]} text={column.info} />
 									{/if}
 								</div>
-								{#if resizable && column.resizable !== false}
+								{#if resizable && column.resizable !== false && !disabled}
 									<!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -->
 									<div
 										class="aurora-table-resizer"
@@ -897,7 +1097,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 							</th>
 						{/each}
 						{#if actionsSnippet}
-							<th class={['aurora-table-actions', clazz.header]}>
+							<th {@attach keepHeader(ACTIONS_KEY)} class={['aurora-table-actions', clazz.header]}>
 								<span class="aurora-table-visually-hidden">{texts.actions}</span>
 							</th>
 						{/if}
@@ -909,7 +1109,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 						</tr>
 					{/if}
 				</thead>
-				<tbody>
+				<tbody bind:this={bodyNode}>
 					{#if showSkeleton}
 						{#each { length: loadingRows }, index (index)}
 							<tr class="aurora-table-row aurora-table-skeleton-row" aria-hidden="true">
@@ -933,18 +1133,26 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 							</td>
 						</tr>
 					{/if}
-					{#each shownRows as row, index (keyOf(row, rowKey))}
+					{#if spaceBefore > 0}
+						<tr class="aurora-table-spacer" aria-hidden="true" style:height="{spaceBefore}px">
+							<td colspan={columnCount}></td>
+						</tr>
+					{/if}
+					{#each windowRows as row, position (keyOf(row, rowKey))}
+						{@const index = windowStart + position}
 						{@const key = keyOf(row, rowKey)}
 						{@const open = expandedKeys.has(key)}
 						<tr
+							{@attach virtualOn ? measureRow(index, 'main') : undefined}
+							data-index={index}
 							class={['aurora-table-row', clazz.row, rowClass?.(row)]}
 							data-selected={isSelected(row) || undefined}
 							data-expanded={open || undefined}
-							data-clickable={onrowclick || rowHref ? '' : undefined}
-							tabindex={onrowclick ? 0 : undefined}
-							onclick={onrowclick || rowHref ? (event) => activate(row, event) : undefined}
-							onauxclick={rowHref ? (event) => auxActivate(row, event) : undefined}
-							onkeydown={onrowclick ? (event) => keyActivate(row, event) : undefined}
+							data-clickable={clickable ? '' : undefined}
+							tabindex={focusable ? 0 : undefined}
+							onclick={clickable ? (event) => activate(row, event) : undefined}
+							onauxclick={clickable && rowHref ? (event) => auxActivate(row, event) : undefined}
+							onkeydown={focusable ? (event) => keyActivate(row, event) : undefined}
 						>
 							{#if selectable}
 								<td
@@ -984,7 +1192,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 							{/each}
 							{#if actionsSnippet}
 								<td class="aurora-table-actions">
-									{#if index === 0}
+									{#if position === 0}
 										<div class="aurora-table-actions-content" {@attach measureActions}>
 											{@render actionsSnippet({ row })}
 										</div>
@@ -996,13 +1204,22 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 							{#if fixedLayout}<td class="aurora-table-filler"></td>{/if}
 						</tr>
 						{#if open && canExpand(row)}
-							<tr class="aurora-table-detail-row" data-selected={isSelected(row) || undefined}>
+							<tr
+								{@attach virtualOn ? measureRow(index, 'detail') : undefined}
+								class="aurora-table-detail-row"
+								data-selected={isSelected(row) || undefined}
+							>
 								<td colspan={columnCount} id="{uid}-detail-{index}">
 									{@render expandedSnippet?.({ row })}
 								</td>
 							</tr>
 						{/if}
 					{/each}
+					{#if spaceAfter > 0}
+						<tr class="aurora-table-spacer" aria-hidden="true" style:height="{spaceAfter}px">
+							<td colspan={columnCount}></td>
+						</tr>
+					{/if}
 				</tbody>
 				{#if hasFooter && rows.length}
 					<tfoot>
@@ -1288,11 +1505,20 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 			text-overflow: ellipsis;
 			white-space: nowrap;
 			vertical-align: middle;
-			transition: box-shadow var(--_duration) var(--_easing);
 		}
 
 		.aurora-table-table tbody tr {
 			--_row-bg: var(--table-row-background, var(--table-default-row-background));
+		}
+
+		.aurora-table-table .aurora-table-spacer > td {
+			padding: 0;
+			border: 0;
+			box-shadow: none;
+		}
+
+		.aurora-table-cards > .aurora-table-spacer {
+			list-style: none;
 		}
 
 		.aurora-table-table tbody tr:last-child > td,
@@ -1305,12 +1531,23 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 				--_row-bg: var(--table-row-hover-background, var(--table-default-row-hover-background));
 			}
 
+			.aurora-table-row:hover > td {
+				transition: box-shadow var(--_duration) var(--_easing);
+			}
+
 			.aurora-table-row[data-selected]:hover {
 				--_row-bg: var(
 					--table-row-selected-hover-background,
 					var(--table-default-row-selected-hover-background)
 				);
 			}
+		}
+
+		.aurora-table-row:not(:hover, :focus-within) :global(.aurora-checkbox-box),
+		.aurora-table-row:not(:hover, :focus-within) :global(.aurora-checkbox-box)::after,
+		.aurora-table-card:not(:hover, :focus-within) :global(.aurora-checkbox-box),
+		.aurora-table-card:not(:hover, :focus-within) :global(.aurora-checkbox-box)::after {
+			transition: none;
 		}
 
 		.aurora-table-row[data-selected],
@@ -1396,6 +1633,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 
 		.aurora-table-table .aurora-table-control {
 			width: var(--table-control-size, var(--table-default-control-size));
+			min-width: var(--table-control-size, var(--table-default-control-size));
 			padding-inline: 0;
 			text-align: center;
 		}
@@ -1572,16 +1810,23 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 		}
 
 		.aurora-table-cards-bar {
+			--select-default-height: 32px;
+
 			display: flex;
-			flex-wrap: wrap;
 			align-items: center;
-			gap: 8px 16px;
+			gap: 12px;
+			min-width: 0;
+		}
+
+		.aurora-table-cards-bar > :global(.aurora-checkbox) {
+			flex: none;
 		}
 
 		.aurora-table-cards-bar > :global(.aurora-table-cards-sort) {
-			flex: 0 1 220px;
+			flex: 0 1 auto;
 			width: auto;
 			min-width: 0;
+			max-width: 65%;
 			margin-inline-start: auto;
 		}
 

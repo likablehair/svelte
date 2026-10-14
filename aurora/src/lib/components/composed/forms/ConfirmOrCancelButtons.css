@@ -2,6 +2,7 @@
 
 @layer global.base {
 	:root {
+		--confirm-or-cancel-buttons-default-margin-top: 0px;
 		--confirm-or-cancel-buttons-default-gap: 12px;
 		--confirm-or-cancel-buttons-default-actions-gap: 8px;
 		--confirm-or-cancel-buttons-default-content-gap: 6px;

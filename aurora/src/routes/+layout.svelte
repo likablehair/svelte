@@ -4,7 +4,7 @@
 	import '../docs.css';
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
-	import type { ThemeMode } from '#lib/theme.js';
+	import type { ThemeMode } from '#lib/theme.svelte.js';
 	import { Toaster } from '#lib';
 	import { appearance, changeMode, changeTheme, syncAppearance } from '../docs/appearance.svelte.js';
 

@@ -3,10 +3,10 @@ Year field: type the year or choose it in a scrolling grid of years. The value i
 -->
 <script lang="ts">
 	import '../../../css/tokens.css';
+	import { breakpoints } from '../../../utils/breakpoints.svelte.js';
 	import './YearPickerTextField.css';
 	import { tick, untrack, type Snippet } from 'svelte';
 	import type { HTMLInputAttributes } from 'svelte/elements';
-	import { MediaQuery } from 'svelte/reactivity';
 	import Menu from '../../simple/common/Menu.svelte';
 	import YearSelector from '../../simple/dates/YearSelector.svelte';
 	import Icon from '../../simple/media/Icon.svelte';
@@ -187,10 +187,9 @@ Year field: type the year or choose it in a scrolling grid of years. The value i
 	const labelId = `${uid}-label`;
 	const hintId = `${uid}-hint`;
 	const pickerId = `${uid}-picker`;
-	const mobile = new MediaQuery('max-width: 1024px', false);
 
 	let inputId = $derived(id ?? `${uid}-input`);
-	let drawerMode = $derived(mobileDrawer && mobile.current);
+	let drawerMode = $derived(mobileDrawer && breakpoints.mAndDown);
 	let anchor = $state<HTMLDivElement>();
 	let inputNode = $state<HTMLInputElement>();
 	let menuNode = $state<HTMLDivElement>();

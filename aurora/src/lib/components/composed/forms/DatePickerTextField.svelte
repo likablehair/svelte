@@ -3,10 +3,10 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 -->
 <script lang="ts">
 	import '../../../css/tokens.css';
+	import { breakpoints } from '../../../utils/breakpoints.svelte.js';
 	import './DatePickerTextField.css';
 	import { tick, untrack, type Snippet } from 'svelte';
 	import type { HTMLInputAttributes } from 'svelte/elements';
-	import { MediaQuery } from 'svelte/reactivity';
 	import Menu from '../../simple/common/Menu.svelte';
 	import type { CalendarDay } from '../../simple/dates/Calendar.svelte';
 	import DatePicker from '../../simple/dates/DatePicker.svelte';
@@ -23,7 +23,7 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		sameDay,
 		toISODate
 	} from '../../../utils/dates.js';
-	import { inheritedLocale } from '../../../utils/locale.js';
+	import { inheritedLocale, warnWithoutLocale } from '../../../utils/locale.js';
 	import { formatLetters, libraryTexts } from '../../../utils/texts.js';
 
 	const CALENDAR_ICON =
@@ -250,6 +250,7 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 	}: Props = $props();
 
 	const defaultLocale = inheritedLocale();
+	warnWithoutLocale('DatePickerTextField', () => localeProp);
 	let locale = $derived(localeProp ?? defaultLocale());
 	let texts = $derived(libraryTexts(locale));
 	let invalidText = $derived(invalidTextProp ?? texts.datePickerTextField.invalid);
@@ -262,10 +263,9 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 	const startId = `${uid}-start`;
 	const endId = `${uid}-end`;
 	const pickerId = `${uid}-picker`;
-	const mobile = new MediaQuery('max-width: 1024px', false);
 
 	let inputId = $derived(id ?? `${uid}-input`);
-	let drawerMode = $derived(mobileDrawer && mobile.current);
+	let drawerMode = $derived(mobileDrawer && breakpoints.mAndDown);
 	let pattern = $derived(format ?? formatOf(locale));
 	let length = $derived(formatDate(new Date(2000, 0, 1), pattern).length);
 	let chip = $derived(formatLabel ?? formatLetters(pattern, texts.dateLetters));

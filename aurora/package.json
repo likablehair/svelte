@@ -64,6 +64,7 @@
 		"#lib/*": "./src/lib/*"
 	},
 	"dependencies": {
+		"@tanstack/virtual-core": "^3.17.11",
 		"flag-icons": "^7.5.0"
 	}
 }

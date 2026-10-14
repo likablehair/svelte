@@ -17,6 +17,16 @@ export function inheritedLocale(): () => string {
 	return () => read?.() || 'en';
 }
 
+let warned = false;
+
+export function warnWithoutLocale(component: string, own: () => string | undefined): void {
+	if (!import.meta.env.DEV || warned || own() || getContext(KEY)) return;
+	warned = true;
+	console.warn(
+		`[@likable-hair/svelte] ${component} has no locale, so dates and times are read and written in English (MM/DD/YYYY, 12-hour clock): in an Italian app "05/03" becomes May 3. Call setDefaultLocale('it') in the root +layout.svelte, or pass locale.`
+	);
+}
+
 export function languageOf(locale: string): string {
 	return locale.split(/[-_]/)[0].toLowerCase();
 }

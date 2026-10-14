@@ -1,4 +1,13 @@
-import type { ComponentMigration, Rename, Removal } from '../types.js';
+import type {
+	Changed,
+	ComponentMigration,
+	CssVarRules,
+	EventChange,
+	ManualStep,
+	Removal,
+	Rename,
+	SnippetChange
+} from '../types.js';
 
 const both = (from: string, to: string): Rename[] => [
 	{ from: `--simple-table-${from}`, to: `--table-${to}` },
@@ -10,7 +19,7 @@ const gone = (name: string, note: string, replacement?: string, withDefault = tr
 	...(withDefault ? [{ name: `--simple-table-default-${name}`, note }] : [])
 ];
 
-export default {
+const rule = {
 	from: 'SimpleTable',
 	to: 'Table',
 	props: {
@@ -88,7 +97,7 @@ export default {
 				type: '(row: Row, event: MouseEvent | KeyboardEvent)',
 				note: 'The row is the first argument, the native event the second. With it the rows are focusable and react to Enter and Space; clicks on buttons, links and fields inside the row no longer reach it. When the click opens a page, prefer `rowHref`: see `table-row-links`.'
 			}
-		],
+		] as EventChange[],
 		removed: [
 			{
 				name: 'onrowDoubleClick',
@@ -205,6 +214,14 @@ export default {
 			when: { events: ['onrowClick'] }
 		},
 		{
+			id: 'table-virtual',
+			summary:
+				'Above 200 rows (`virtualize`) only the rows in view, plus a margin, are in the page; the others are drawn while scrolling and the columns keep the widths of the first rows. The find of the browser (Ctrl+F) and printing see only the drawn rows.',
+			action:
+				'Usually nothing to do. Where a page must show every row in the DOM (printing, Ctrl+F on long lists, tests or scripts that query all the rows), pass `virtualize={false}`, or a higher threshold such as `virtualize={1000}`.',
+			scope: 'app'
+		},
+		{
 			id: 'table-look',
 			summary:
 				'Default look changed to the prototype: bordered rounded box, small uppercase grey headers, 9px × 12px cells (v4: 60px rows), monospaced numbers and dates, "—" in empty cells, hover and selected rows tinted; below 640px of width the rows become cards (`cardBreakpoint`).',
@@ -218,6 +235,8 @@ export default {
 		'`selectable` (`single` / `multiple`, shift-click ranges) with `bind:selected`, `selectedAll`, `excluded`, `onselectionchange`.',
 		'`expandedSnippet`, `bind:expanded`, `expandable`, `onexpandedchange`.',
 		'`rowHref`, `rowKey`, keyboard support for `onrowclick`.',
+		'`virtualize` (only the rows in view above 200 rows, or the given number) and `onendreached` for loading more rows.',
+		'`disabled` (read-only table: no row clicks, sorting, selection or resizing) and `selectAll={false}` (multiple selection without "select all").',
 		'`actionsVisibility="hover"`: the buttons of `actionsSnippet` show only on hover and focus, as in the prototype.',
 		'`bind:columnState`, `oncolumnstatechange`, `columnsKey`; resizing with the keyboard.',
 		'Cards below `cardBreakpoint`, `cardTitle`, `cardColumns` (the other columns behind "Show more fields").',
@@ -225,3 +244,49 @@ export default {
 		'`--table-color`, `-row-background`, `-border`, `-border-radius`, `-font-size`, `-header-color`, `-header-letter-spacing`, `-header-text-transform`, `-header-sorted-color`, `-sort-icon-size`, `-info-icon-size`, `-cell-padding`, `-row-selected-*`, `-number-*`, `-date-*`, `-empty-color`, `-boolean-*`, `-pinned-shadow`, `-actions-*`, `-expand-icon-size`, `-detail-*`, `-footer-*`, `-loading-opacity`, `-resizer-width`, `-card-*`, `-focus-ring-*`, `-duration`, `-easing`.'
 	]
 } satisfies ComponentMigration;
+
+export default rule;
+
+export function innerCssVars(rules: CssVarRules | undefined, component: string): Removal[] {
+	return [
+		...(rules?.renamed ?? []).map((r) => ({
+			name: r.from,
+			note: r.note ? `Renamed in the inner ${component}. ${r.note}` : `Renamed in the inner ${component}.`,
+			replacement: r.to
+		})),
+		...(rules?.removed ?? [])
+	];
+}
+
+export function forwarded(
+	prefix: string,
+	skip: string[] = []
+): {
+	props: { renamed: Rename[]; removed: Removal[]; changed: Changed[] };
+	events: { changed: EventChange[]; removed: Removal[] };
+	snippets: { renamed: Rename[]; parameters: SnippetChange[]; removed: Removal[] };
+	cssVars: Removal[];
+	manual: ManualStep[];
+} {
+	const keep = <T extends { name: string }>(list: T[] = []) => list.filter((item) => !skip.includes(item.name));
+	return {
+		props: {
+			renamed: rule.props.renamed.filter((r) => !skip.includes(r.from)),
+			removed: keep(rule.props.removed),
+			changed: keep(rule.props.changed)
+		},
+		events: {
+			changed: keep(rule.events.changed),
+			removed: keep(rule.events.removed)
+		},
+		snippets: {
+			renamed: rule.snippets.renamed.filter((r) => !skip.includes(r.from)),
+			parameters: keep(rule.snippets.parameters),
+			removed: keep(rule.snippets.removed)
+		},
+		cssVars: innerCssVars(rule.cssVars, 'Table'),
+		manual: rule.manual
+			.filter((step) => !skip.includes(step.id))
+			.map((step) => ({ ...step, id: step.id.replace(/^table-/, `${prefix}-`) }))
+	};
+}

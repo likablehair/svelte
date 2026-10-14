@@ -4,10 +4,11 @@ export default {
 	from: 'ConfirmOrCancelButtons',
 	to: 'ConfirmOrCancelButtons',
 	props: {
-		removed: [
+		toCssVar: [
 			{
 				name: 'marginTop',
-				note: 'No margin any more: the app layout decides the space. Replace `marginTop="x"` with a margin or `gap` in the parent, or `class={{ container: "..." }}` with an app class that sets `margin-top: x`. `marginTop="0px"` / `"0"` is simply dropped.'
+				cssVar: '--confirm-or-cancel-buttons-margin-top',
+				note: 'No margin by default (v4: 20px), like every v5 component. `marginTop="x"` → `--confirm-or-cancel-buttons-margin-top="x"`; to keep the v4 space on every instance see `confirm-or-cancel-buttons-spacing`. Inside the `actionsSnippet` of a Dialog or a Drawer the margin is always 0.'
 			}
 		],
 		defaults: [
@@ -68,6 +69,14 @@ export default {
 		]
 	},
 	manual: [
+		{
+			id: 'confirm-or-cancel-buttons-spacing',
+			summary:
+				'v4 put 20px of space above the buttons (215 of 231 uses relied on it); v5 has none, like every component, so forms built without `gap` would lose the space before their buttons.',
+			action:
+				'Add once to the global app CSS: `:root { --confirm-or-cancel-buttons-default-margin-top: 20px; }` (inside `@layer global.base` is not needed: unlayered app CSS wins). New forms laid out with `gap` should not use it.',
+			scope: 'app'
+		},
 		{
 			id: 'confirm-or-cancel-buttons-margin',
 			summary: 'The 20px top margin that v4 added by default is gone.',

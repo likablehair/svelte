@@ -8,7 +8,7 @@ Contents:
 
 - [Checklist](#checklist)
 - [Global changes](#global-changes)
-- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [Menu](#menu), [MonthSelector](#monthselector), [NoData](#nodata), [Paginator](#paginator), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Toaster](#toaster), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
+- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DataTable](#datatable), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [MediaQuery](#mediaquery), [Menu](#menu), [MonthSelector](#monthselector), [NoData](#nodata), [Paginator](#paginator), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Toaster](#toaster), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
 - [Not available yet](#not-available-yet)
 
 ## Checklist
@@ -94,14 +94,16 @@ Derived tokens (`-strong`, `-soft`, `-glow`, focus ring, fills) follow the base 
 | | v4 | v5 |
 |---|---|---|
 | Light/dark | `.dark` / `.light` class on `<html>`, or the OS | `color-scheme`: follows the OS by default, `data-mode="light" \| "dark"` on `<html>` forces it |
-| Set it | `setTheme('dark')`, `toggleTheme()` | `setMode('light' \| 'dark' \| 'system')` |
+| Set it | `setTheme('dark')`, `toggleTheme()` | `setMode('light' \| 'dark' \| 'system')`, `toggleMode()` |
 | "Theme" | light or dark | a named design theme: `setTheme('classic')` sets `data-theme` |
-| Read it | `theme` store (`$theme.dark`) | `getMode()`, `getTheme()` (not reactive) |
-| Persistence | automatic, `localStorage.theme`, on import | none: the app stores the choice and restores it, ideally with an inline script in `app.html` that sets `data-mode` / `data-theme` before the first paint |
+| Read it | `theme` store (`$theme.dark`) | the same `theme`: `$theme.dark` still works, `theme.dark` is reactive without `$`; also `theme.mode`, `theme.name`, `getMode()`, `getTheme()` |
+| Persistence | automatic, `localStorage.theme`, on import | `rememberAppearance()` once in the root layout (same `theme` key, so users keep their choice), plus `appearanceScript()` in the head against the flash of the wrong mode |
 
 - `setTheme('dark')` still type-checks in v5 but activates a theme called "dark", which does not exist. Use `setMode('dark')`.
-- `toggleTheme()` → `setMode(isDark ? 'light' : 'dark')`, where `isDark` is `getMode() === 'dark'`, or `getMode() === 'system'` and `matchMedia('(prefers-color-scheme: dark)').matches`.
-- The functions use `document`: call them in the browser (`onMount`, event handlers).
+- `toggleTheme()` → `toggleMode()`.
+- Persistence, in the root `+layout.svelte`: `rememberAppearance();` in the `<script>` and `<svelte:head>{@html '<script>' + appearanceScript() + '</script>'}</svelte:head>` in the markup.
+- `$theme.active` and `$theme.colors` (the runtime colors API, broken in v4) are gone: colors are CSS tokens and themes.
+- `setMode` and `setTheme` change the page in the browser; on the server they only set the state.
 - `setTheme` and `setMode` pause CSS transitions during the switch (attribute `data-switching` on `<html>`), so the colors change at once instead of animating every component.
 - **The `.dark` / `.light` classes do nothing in v5.** Tailwind `darkMode: 'class'` no longer follows the library; for Tailwind 3 use `darkMode: ['variant', ['&:is([data-mode="dark"] *)', '@media (prefers-color-scheme: dark) { &:not([data-mode="light"] *) }']]`, for Tailwind 4 an `@custom-variant dark` with the same two branches.
 - **v5 sets `color-scheme: light dark` on `<html>`**: on a dark OS, scrollbars, native controls and the default page colors turn dark even if the app never styled for dark. An app without dark mode sets `data-mode="light"` on `<html>`.
@@ -170,7 +172,7 @@ The library does not load fonts, as in v4, but the tokens now name them: `--glob
 
 ### Responsive
 
-The `mediaQuery` store and the `MediaQuery` component are not in v5: use `MediaQuery` from `svelte/reactivity`. Components switch to their mobile variant at 1024px as before, but the **server now renders the desktop variant** (v4 rendered the mobile one).
+The `MediaQuery` component keeps its API (`defaultSnippet({ xs, sAndDown, mAndDown, lAndUp, ... })`, same widths 425 / 768 / 1024 / 1440). The `mediaQuery` store becomes `breakpoints`, a reactive object with the same flags (`$mediaQuery.xs` → `breakpoints.xs`, and `breakpoints.mAndDown` and so on); `BREAKPOINTS` has the widths. Components switch to their mobile variant on `mAndDown` (1024px) as before, but the **server now renders the desktop variant** (v4 rendered the mobile one). `sAndUp` is now false on `xs` (v4 included it by mistake).
 
 ### Dates
 
@@ -494,7 +496,7 @@ New in v5: the panel where the user picks the columns of a table (shown, order, 
 ### ConfirmOrCancelButtons
 
 - **Default texts follow the locale**: "Annulla" / "Salva" with `it` (`setDefaultLocale('it')` or `locale="it"`), "Cancel" / "Save" otherwise. Apps that relied on the Italian defaults call `setDefaultLocale('it')` ([Language of the texts](#language-of-the-texts)); `cancelText` and `confirmText` still win.
-- **No top margin**: `marginTop` (default 20px) is removed. Add the spacing in the app layout, or with `class={{ container: '...' }}`.
+- **Top margin**: v4 put 20px above the buttons; v5 has none by default, like every component. To keep the v4 space everywhere add `:root { --confirm-or-cancel-buttons-default-margin-top: 20px; }` to the app CSS; on one instance, `marginTop="x"` → `--confirm-or-cancel-buttons-margin-top="x"`. Inside the `actionsSnippet` of a Dialog or a Drawer it is always 0.
 - `onconfirmClick({ detail: { nativeEvent } })` → `onconfirmClick(event)`, same for `oncancelClick`. Svelte 4 apps using `on:confirm-click` / `on:cancel-click` switch to these props.
 - In `cancelButtonSnippet` and `confirmButtonSnippet`, `handleCancel` and `handleConfirm` take the native event (v4: `handleConfirm` took Button's `{ detail }` event). `cancelButtonSnippet` also receives `cancelDisable`.
 - `cancelDisable` now really disables the cancel button (v4: it only skipped the callback). `onconfirmClick` is not called while `loading`.
@@ -523,6 +525,39 @@ Everything in [Autocomplete](#autocomplete) applies.
   | `getCountryInfoByAlpha2(code)` | `countryName(code, locale)`: any case; an unknown code returns the code itself instead of `undefined` |
 
 New, optional: `locale`, `dialCode`, `class.dialCode`, `dialCode(code)`, `CountryData`, `--countries-autocomplete-dial-code-*`.
+
+### DataTable
+
+**Replaces PaginatedTable, EnhancedPaginatedTable and DynamicTable** (`import { DataTable, type DataTableQuery } from '@likable-hair/svelte'`): a `Table` with a toolbar (search, `Filters`, "Columns", the app buttons), a floating selection bar and a footer with the pagination. Every prop of [Table](#table) works on it, so the SimpleTable renames apply too (`headers` → `columns`, `items` → `rows`, `customSnippet` → `cellSnippet`, `--simple-table-*` → `--table-*`, ...).
+
+- **One query**: `onpaginationChange`, `onfiltersChange` and `onsort` become one `onquerychange(query)` with `{ page, pageSize, sort, search, filterValue, builder }`; `builder` always has the filters, the search (an `ilike` OR group on `searchColumns`) and the sorting (v4 dropped the search from the builder of a page change). The page goes back to 1 by itself when filters, search, sorting or page size change. It is not called on mount. `onremoveFilter` / `onremoveAllFilters` → `filtersProps={{ onremove }}`.
+- **Better, a `loader`**: `loader={({ page, pageSize, builder, signal }) => service.list(...).then((res) => ({ rows: res.data, total: res.meta.total }))}` replaces the handlers, the `loading` and `maxPage` state and the append code: the table shows the loading, aborts outdated requests, shows an error with "Retry", goes to the last page when a page is past the end, and `reload()` (with `bind:this`) loads again after a create or delete. Pass the first page from `load` as `rows` and `total`.
+- **Renamed**: `rowsPerPage` → `pageSize` (default 20), `rowsPerPageOptions` → `pageSizes` (numbers), `totalElements` / `totalRows` → `total`, `maxPage` → `pageCount` (prefer `total`), `searchBarColumns` → `searchColumns`, `searchText` → `search`, `selectedItems` → `selected`, `unselectedItems` → `excluded`, `uniqueKey` → `rowKey`, `customizeHeaders` → `columnManager`, `showActions` → `selectionBar`, `hideActions` → `selectionBar` inverted, `filterAppendSnippet` (and DynamicTable `appendSnippet`) → `toolbarSnippet`, `searchBarSnippet({ handleSearchChange })` → `searchSnippet({ value, setValue })`, `rangeDescriptorSnippet` → `rangeSnippet({ from, to, total, page, pageCount })`.
+- **Filters**: `filters` (`Filter[]`) → `filterFields` (`FilterField[]`, see [Filters](#filters)) plus `bind:filterValue` (the tree of conditions). They show when `filterFields` has fields (`filtersVisible` removed). Quick filters (`quickFilters`, `quickFiltersVisible` and the DynamicTable chips) → `pinned` fields and `filtersProps={{ presets }}`. `editFilterMode`, `multiEditTabs`, `dynamicFilters` removed; `showActiveFilters`, `filterLabels`, `customFilterChipSnippet`, `customFilterSnippet` → `filtersProps` (`showPills`, `labels`, `pillSnippet`, `inputSnippet`); `dateLocale` → `locale`.
+- **Search**: the field shows when `searchColumns` is set, or with `searchable` (then the text only reaches `query.search`); `searchBarVisible` removed (v4 PaginatedTable showed a field that searched nothing without columns). `searchBarPlaceholder` → `labels={{ search }}`, `searchTimeoutDelay` → `searchBarProps={{ debounce }}` (300 ms; DynamicTable used 800).
+- **Selection**: `showSelection` / `showSelect` + `selectionMode` / `selectMode` → `selectable="multiple"` or `"single"` (DynamicTable defaulted to single). One model: `bind:selected`, then "Select all N" in the bar sets `selectedAll` and unchecked rows go in `excluded` (v4 PaginatedTable could not exclude rows). The selection **stays across pages** (v4 PaginatedTable cleared it at every query) and is cleared when filters or search change. `actionsForSelectedItems` → `selectionActions`: the same objects, drawn by the table as in v4 (the extra ones in a "More actions" menu, `info` and `disabledInfo` tooltips, `loading`), with `onClick({ detail: { nativeEvent } })` → `onclick({ selected, selectedAll, excluded, count, clear, event })`, a returned promise that spins and the new `variant: 'danger'`; `quickActionsDisabled` → `selectionDisabled`; `selectionActionsSnippet` adds other content. The bar floats at the bottom of the table instead of the top of the page. `hideSelectAll` and `selectedAllDisabled` → `selectAll={false}` (multiple selection without "select all"); `useSelectedItemsOnly` and `selectedItemsTextSnippet` removed (`labels={{ selected, selectedOne }}` for the text). DynamicTable `disabled` keeps its name: the table, the pagination and the actions of the bar are locked.
+- **Columns**: EnhancedPaginatedTable `headers` + `headersToShowInTable` → `columns` (with `hidden: true` for those that start hidden) + `columnState`; the "+" in the last header → `columnManager` (a "Columns" button; **add it** where EnhancedPaginatedTable showed the "+"). `onsaveHeadersToShow({ detail: { headersToShow } })` → `oncolumnstatechange({ columnState })`, called when the user saves the view or resizes a column: store `columnState` in the user settings instead of `[{ name, order }]`. `pinnableColumns`, `headerDrawerProps` and the `headerDrawer*` snippets → `columnManagerProps`.
+- **DynamicTable**: `rows` are plain rows (no `{ item, subItems }`); `subHeaders` and the `subRow*` / `subHeader*` snippets → a nested `Table` in `expandedSnippet` (`showExpand` removed); `customRowSnippet({ row })` → `cellSnippet({ row, value, column })` and `rowAppendSnippet` → `actionsSnippet({ row })` with `row` instead of `row.item`; infinite scrolling needs `pagination="infinite"`, and `onfetchData()` → `onloadmore(query)` with the `page` of the next batch (or a `loader`); it now also loads when the first rows do not fill the table. Removed: `cellEdit`, `onsaveCellEdit` (put a field or a Dialog button in a `cell` snippet), `oncellClick`, the window of rendered rows (`renderedRowsNumber`, `sectionRowsNumber`, `sectionThreshold`, `*ThresholdPixel`: the table is virtual above 200 rows on its own, see [Table](#table)), `numberOfResultsVisible` (the footer always counts), `endLineVisible`, `onscroll`.
+- **Footer**: "Rows per page" (hidden with fewer than two `pageSizes`; `hideRowsPerPage` removed), "1–20 of 312" in the language of `locale` (v4: "Per pagina" always in Italian, "viewing 0 - 20 of 40" always in English and off by one) and the [Paginator](#paginator) (`paginatorProps`). `footerSnippet` removed (`rangeSnippet`, `pageSizes`, `paginatorProps`), `totalsSnippet` → the `footer` of the columns.
+- **Look** of the prototype: one bordered box with the toolbar, the table and the footer (below the `cardBreakpoint` of the table the frame goes away and the rows become cards). App CSS on `.paginated-table`, `.searchbar-and-filter-container` must target `.aurora-data-table`, `.aurora-data-table-toolbar`, `.aurora-data-table-footer` or use the `class` parts (`container`, `toolbar`, `footer`, `selectionBar`, `table`, `header`, `row`, `cell`; v4 PaginatedTable `class={{ simpleTable: { ... } }}`).
+- **Wrappers**: migrate `StandardPaginatedTable` and the `<Entity>PaginatedTable` wrappers once, with a `loader`; `lang="it"` → `setDefaultLocale('it')` in the root layout; rows already in memory (`LocalPaginatedTable`) → `Table` + `Paginator`, since DataTable always asks the server.
+
+| v4 | v5 |
+|---|---|
+| `--dynamic-table-background-color` | `--data-table-background` |
+| `--dynamic-table-max-height` (default 70vh) | `--table-max-height` (default none) |
+| `--dynamic-table-header-padding`, `-header-font-size`, `-header-font-weight`, `-header-background-color`, `-header-hover-color` | `--table-header-padding`, `--table-header-font-size`, `--table-header-font-weight`, `--table-header-background`, `--table-header-hover-color` |
+| `--dynamic-table-row-background-color-hover`, `-selected-row-background-color`, `-expanded-row-background-color` | `--table-row-hover-background`, `--table-row-selected-background`, `--table-detail-background` |
+| `--dynamic-table-sticked-background-color`, `-non-resizable-header-width`, `-resizer-color` | `--table-pinned-background`, `--table-control-size`, `--table-resizer-color` |
+| `--dynamic-table-header-height`, `-row-min-height`, `-header-border-radius`, `-header-label-*`, `-border-collapse`, `-cell-border`, `-subheader-*`, `-row-disabled-*`, `-customize-headers-icon-size`, `-cell-editor-*`, `-quick-filter-*`, `-end-line-*` | removed |
+| `--enhanced-paginated-table-customize-headers-icon-size` | removed |
+| `--quick-actions-background-color` | `--data-table-selection-background` |
+| other `--quick-actions-*` | removed: the actions are text `Button`s (`--button-*`) |
+| `--paginator-page-button-*` | `--paginator-button-*`, `--paginator-current-*` (see [Paginator](#paginator)) |
+
+Defaults: the same renames on the `-default-` variables.
+
+New, optional: `loader` with `onloaded`, `onerror`, `errorSnippet`, `reload()`; `pagination` (`pages`, `infinite`, `none`); `searchable`, `bind:search`, `bind:filterValue`; `filtersProps`, `searchBarProps`, `paginatorProps`, `columnManagerProps`; `selectionBar`; `pageCount`; `labels`; `--data-table-*` for the frame (`-border`, `-border-radius`, `-background`, `-color`, `-font-size`, `-width`, `-separator-color`), the toolbar (`-toolbar-*`, `-search-width`, `-control-height`), the footer (`-footer-*`), the messages (`-message-*`, `-error-color`) and the selection bar (`-selection-*`, `-duration`, `-easing`); `data-pagination`, `data-narrow`, `data-selecting`, `data-error` on the root.
 
 ### DatePicker
 
@@ -1085,6 +1120,12 @@ Unchanged: `--link-button-color`, `-font-size`, `-font-weight`, `-line-height`, 
 
 New, optional: `rel`, `bind:linkElement`, `--link-button-hover-color`, `--link-button-underline-*`, `--link-button-icon-*`, focus ring and disabled variables, `data-disabled`.
 
+### MediaQuery
+
+- Same API as v4: `<MediaQuery>{#snippet defaultSnippet({ mAndDown })}…{/snippet}</MediaQuery>`, same flags and widths.
+- In scripts use `breakpoints` (`breakpoints.mAndDown`) instead of the `mediaQuery` store or of a `MediaQuery` wrapper.
+- The server renders the desktop variant (v4: mobile); `sAndUp` is false on `xs`.
+
 ### Menu
 
 | v4 | v5 |
@@ -1327,7 +1368,7 @@ New, optional: `variant`, Tab `badge` / `href` / `disabled` / `panelId`, `tabSni
 
 ### Table
 
-- **Renamed**: `SimpleTable` → `Table` (`import { Table, type TableColumn } from '@likable-hair/svelte'`). PaginatedTable, EnhancedPaginatedTable and DynamicTable will become `DataTable` (not available yet).
+- **Renamed**: `SimpleTable` → `Table` (`import { Table, type TableColumn } from '@likable-hair/svelte'`). PaginatedTable, EnhancedPaginatedTable and DynamicTable became [DataTable](#datatable).
 - `items` → `rows`, `headers` → `columns`, `resizableColumns` → `resizable`, `calculateRowClasses` → `rowClass`, `noItemsText` → `noDataTitle`, `lang` → `locale` (also formats numbers and dates).
 - **Columns**: `value` → `key`, `type: { key, params }` → a flat `type` and options. `string` → `text` (or nothing), `number` (now formatted with `Intl` and right-aligned), `date` with a luxon `format` → `date` or `datetime` with `dateFormat` (Intl options; luxon values still work), `custom` stays and is drawn by `cellSnippet`; `icon` and `checkbox` are gone (they ignored the value). `nullText` → `empty`, `sortModify({ builder, sortDirection })` → `sort({ builder, direction })`, `width` / `minWidth` / `maxWidth` take any CSS length (`width` is preferred, `minWidth` keeps the column from shrinking), `locked` and `data` are gone. New: `value(row)`, `format`, `numberFormat`, `align`, `hidden`, `info`, `footer`, `cell` and `header` snippets.
 - **Sorting**: `sortedBy` + `sortDirection` → `bind:sort` = `{ key, direction }` or `undefined`; `onsort({ detail: { sortedBy, sortDirection, sortModify } })` → `onsortchange({ sort })`. **The table now sorts the rows itself** (v4 only showed the arrow): delete the app code that sorted the items in `onsort`, or pass `sorting="manual"` when the server sorts.
@@ -1336,6 +1377,7 @@ New, optional: `variant`, Tab `badge` / `href` / `disabled` / `panelId`, `tabSni
 - **Columns state**: `resizedColumnSizeWithPadding` and `oncolumnResize` → `bind:columnState` (`[{ key, visible, width?, pinned? }]`, widths in pixels) and `oncolumnstatechange`, called once at the end of a resize (v4 called `oncolumnResize` for every column on any mouseup in the page). `columnsKey` saves it in the browser. Resizing also works with the arrow keys.
 - **Pinned columns** are moved before the others (v4: they worked only when they were the first ones). They scroll with the others while, with the checkboxes and the actions, they would take more than half of a table that scrolls sideways (`data-pins-off`); `stickyMinContainerWidth` (v4: no pins up to 1024px) is removed.
 - **Look** of the prototype: bordered rounded box, small uppercase grey headers, 9 × 12px cells (v4: 60px rows, use `--table-cell-padding` for that density), monospaced numbers and dates, "—" in empty cells (`empty=""` for blank cells), tinted hover and selected rows. `loading` also dims the rows and shows placeholder rows when there are none. App CSS on `.simple-table`, `.item-tr` or `.thead` must target `.aurora-table`, `.aurora-table-row`, `.aurora-table-header` or use the `class` parts (`header` is now on every header cell).
+- **Thousands of rows**: above 200 rows (`virtualize`) only the rows in view, plus a margin, are in the page and the columns keep the widths of the first rows; the find of the browser and printing see only those rows. Pass `virtualize={false}` (or a higher number) where every row must be in the page.
 - **Cards**: below 640px of table width every row becomes a card (title, checkbox and actions on top, label and value of the first 4 other columns or of `cardColumns`, the rest behind "Show more fields", sorting in a select). `cardBreakpoint={false}` keeps the sideways scrolling of v4.
 
 | v4 | v5 |
@@ -1351,7 +1393,7 @@ New, optional: `variant`, Tab `badge` / `href` / `disabled` / `panelId`, `tabSni
 
 Defaults: the same renames on `--simple-table-default-*` → `--table-default-*` (`--simple-table-default-hover-color` → `--table-default-header-hover-color`).
 
-New, optional: `selectable` (`single` / `multiple`, shift-click ranges) with `bind:selected`, `selectedAll`, `excluded`, `onselectionchange`; `expandedSnippet`, `bind:expanded`, `expandable`, `onexpandedchange`; `rowKey`, `rowHref`; `actionsVisibility`; `columnsKey`; `cardBreakpoint`, `cardTitle`, `cardColumns`; `loadingRows`, `caption`, `labels`, `bind:tableElement`, native attributes on the root, `data-cards`, `data-loading`, `data-selected`, `data-expanded`; `--table-color`, `-row-background`, `-border`, `-border-radius`, `-header-sorted-color`, `-cell-padding`, `-row-selected-*`, `-number-*`, `-date-*`, `-empty-color`, `-boolean-*`, `-pinned-shadow`, `-actions-*`, `-detail-*`, `-footer-*`, `-loading-opacity`, `-card-*`, `-focus-ring-*`, `-duration`, `-easing`.
+New, optional: `onendreached` (the last rows came into view, for loading more); `disabled` (read-only table) and `selectAll={false}`; `selectable` (`single` / `multiple`, shift-click ranges) with `bind:selected`, `selectedAll`, `excluded`, `onselectionchange`; `expandedSnippet`, `bind:expanded`, `expandable`, `onexpandedchange`; `rowKey`, `rowHref`; `actionsVisibility`; `columnsKey`; `cardBreakpoint`, `cardTitle`, `cardColumns`; `loadingRows`, `caption`, `labels`, `bind:tableElement`, native attributes on the root, `data-cards`, `data-loading`, `data-selected`, `data-expanded`; `--table-color`, `-row-background`, `-border`, `-border-radius`, `-header-sorted-color`, `-cell-padding`, `-row-selected-*`, `-number-*`, `-date-*`, `-empty-color`, `-boolean-*`, `-pinned-shadow`, `-actions-*`, `-detail-*`, `-footer-*`, `-loading-opacity`, `-card-*`, `-focus-ring-*`, `-duration`, `-easing`.
 
 ### Textarea
 
@@ -1495,6 +1537,6 @@ New, optional: `min`, `max`, `locale` (language of the default name "Year"), `fo
 
 These v4 exports have no v5 version yet. Keep v4 for screens that need them, or wait for the port.
 
-- **Components**: MediaQuery (use `svelte/reactivity`), MenuOrDrawer, MenuOrDrawerOptions, QuickActions, VerticalDraggableList, InfiniteScroll, CollapsibleDivider, PeriodSelector, PeriodPicker, FileInput, FileInputList, VerticalSwitch, VerticalTextSwitch, IconsDropdown, AvatarDropdown, ToggleList, BoxList, ColorInvertedSelector, SelectableMenuList, SelectableVerticalList, SidebarMenuList, HierarchyMenu, PaginatedTable, EnhancedPaginatedTable, DynamicTable, GlobalSearchTextField, Avatar, DescriptiveAvatar, Breadcrumb, HeaderMenu, Navigator, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper, CollapsibleSideBarLayout, StableDividedSideBarLayout, UnstableDividedSideBarLayout.
+- **Components**: MenuOrDrawer, MenuOrDrawerOptions, QuickActions, VerticalDraggableList, InfiniteScroll, CollapsibleDivider, PeriodSelector, PeriodPicker, FileInput, FileInputList, VerticalSwitch, VerticalTextSwitch, IconsDropdown, AvatarDropdown, ToggleList, BoxList, ColorInvertedSelector, SelectableMenuList, SelectableVerticalList, SidebarMenuList, HierarchyMenu, GlobalSearchTextField, Avatar, DescriptiveAvatar, Breadcrumb, HeaderMenu, Navigator, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper, CollapsibleSideBarLayout, StableDividedSideBarLayout, UnstableDividedSideBarLayout.
 - **Utilities**: `scrollAtCenter`.
 - **Stores**: `mediaQuery`, `theme`, `toggleTheme` (see [Dark mode](#dark-mode-and-themes)), `debounce`.

@@ -1,5 +1,5 @@
 <!-- @component
-Pair of buttons that closes a form or a dialog: a text "Cancel" button and a filled "Save" button, aligned to the end, with optional content (such as "Unsaved changes") at the start. When the space they sit in is narrower than 480px (a phone, a narrow drawer) they stack at full width, with the confirm button on top. `loading` shows a spinner on the confirm button and disables it; `confirmType="submit"` makes it submit the surrounding form. Both buttons can be replaced with snippets that receive the handlers. Its state is exposed as `data-loading` for app CSS.
+Pair of buttons that closes a form or a dialog: a text "Cancel" button and a filled "Save" button, aligned to the end, with optional content (such as "Unsaved changes") at the start. When the space they sit in is narrower than 480px (a phone, a narrow drawer) they stack at full width, with the confirm button on top. `loading` shows a spinner on the confirm button and disables it; `confirmType="submit"` makes it submit the surrounding form. Both buttons can be replaced with snippets that receive the handlers. It has no space above it, like every component (the layout decides, for example with `gap`); `--confirm-or-cancel-buttons-margin-top` adds it, and setting `--confirm-or-cancel-buttons-default-margin-top` in the app CSS gives it to every instance, as v4 did with 20px. In the actions of a `Dialog` or a `Drawer`, which have their own padding, it is always 0. Its state is exposed as `data-loading` for app CSS.
 -->
 <script lang="ts">
 	import '../../../css/tokens.css';
@@ -149,7 +149,14 @@ Pair of buttons that closes a form or a dialog: a text "Cancel" button and a fil
 
 	@layer global.components {
 		.aurora-confirm-or-cancel-buttons {
+			--_margin-top: var(--confirm-or-cancel-buttons-default-margin-top);
+
 			container: aurora-confirm-or-cancel-buttons / inline-size;
+			margin-top: var(--confirm-or-cancel-buttons-margin-top, var(--_margin-top));
+		}
+
+		:global(:is(.aurora-dialog-actions, .aurora-drawer-actions)) .aurora-confirm-or-cancel-buttons {
+			--_margin-top: 0px;
 		}
 
 		.aurora-confirm-or-cancel-buttons-row {

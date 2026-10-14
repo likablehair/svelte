@@ -37,6 +37,7 @@
 		onstart: (field: FilterField, anchor: HTMLElement) => void;
 		onopenpanel: () => void;
 		onopenfields: (anchor: HTMLElement) => void;
+		showAdd?: boolean;
 	}
 
 	let {
@@ -57,7 +58,8 @@
 		onremove,
 		onstart,
 		onopenpanel,
-		onopenfields
+		onopenfields,
+		showAdd = true
 	}: Props = $props();
 
 	let byName = $derived(new Map(fields.map((field) => [field.name, field])));
@@ -155,17 +157,19 @@
 		{/if}
 	{/each}
 {/if}
-<button
-	type="button"
-	class="aurora-filters-add"
-	bind:this={addButton}
-	aria-haspopup="listbox"
-	aria-expanded={fieldsOpen}
-	onclick={(event) => onopenfields(event.currentTarget)}
->
-	<Icon path={PLUS_ICON} />
-	{labels.addFilter}
-</button>
+{#if showAdd}
+	<button
+		type="button"
+		class="aurora-filters-add"
+		bind:this={addButton}
+		aria-haspopup="listbox"
+		aria-expanded={fieldsOpen}
+		onclick={(event) => onopenfields(event.currentTarget)}
+	>
+		<Icon path={PLUS_ICON} />
+		{labels.addFilter}
+	</button>
+{/if}
 
 <style>
 	@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;

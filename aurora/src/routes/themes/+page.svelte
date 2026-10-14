@@ -18,6 +18,16 @@ import { setTheme } from '${PACKAGE}';
 
 setTheme('my-theme');`;
 
+	const modeUsage = `<script lang="ts">
+	import { appearanceScript, rememberAppearance, theme, toggleMode } from '${PACKAGE}';
+
+	rememberAppearance();
+<\/script>
+
+<svelte:head>{@html '<script>' + appearanceScript() + '<\/script>'}</svelte:head>
+
+<button onclick={toggleMode}>{theme.dark ? 'Light' : 'Dark'}</button>`;
+
 	let libraryThemes = $derived(data.themes.filter((t) => !t.gallery));
 	let galleryThemes = $derived(data.themes.filter((t) => t.gallery));
 </script>
@@ -44,6 +54,23 @@ setTheme('my-theme');`;
 		<div>
 			<p>2. Import it in the app and activate it.</p>
 			<pre class="snippet"><code>{usage}</code></pre>
+		</div>
+	</div>
+</section>
+
+<section class="group">
+	<h2>Light, dark and remembering the choice</h2>
+	<div class="steps">
+		<div>
+			<p>
+				The mode follows the operating system; <code>setMode('light' | 'dark' | 'system')</code> forces
+				it and <code>toggleMode()</code> switches it. <code>theme.dark</code> says whether the page is
+				dark and is reactive (also as a store, <code>$theme.dark</code>), for logos and chart colors.
+				<code>rememberAppearance()</code>, once in the root layout, saves the mode and the theme in the
+				browser and puts them back; <code>appearanceScript()</code> in the head applies them before the
+				first paint, so the page does not flash in the wrong mode.
+			</p>
+			<pre class="snippet"><code>{modeUsage}</code></pre>
 		</div>
 	</div>
 </section>

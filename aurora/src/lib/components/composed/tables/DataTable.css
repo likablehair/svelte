@@ -1,0 +1,40 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--data-table-default-width: 100%;
+		--data-table-default-background: var(--global-color-surface-solid);
+		--data-table-default-color: var(--global-color-text);
+		--data-table-default-border: var(--global-border-width) solid var(--global-color-border);
+		--data-table-default-border-radius: var(--global-radius-lg);
+		--data-table-default-font-size: 13.5px;
+		--data-table-default-separator-color: var(--global-color-border);
+		--data-table-default-control-height: 28px;
+		--data-table-default-toolbar-background: transparent;
+		--data-table-default-toolbar-padding: 10px 12px;
+		--data-table-default-toolbar-gap: 8px;
+		--data-table-default-search-width: 240px;
+		--data-table-default-footer-padding: 10px 14px;
+		--data-table-default-footer-color: var(--global-color-text-3);
+		--data-table-default-footer-font-size: 12.5px;
+		--data-table-default-message-padding: 12px 14px;
+		--data-table-default-message-color: var(--global-color-text-2);
+		--data-table-default-error-color: var(--global-color-error);
+		--data-table-default-selection-offset: 16px;
+		--data-table-default-selection-padding: 6px 6px 6px 14px;
+		--data-table-default-selection-border: var(--global-border-width) solid var(--global-color-border-strong);
+		--data-table-default-selection-border-radius: var(--global-radius-lg);
+		--data-table-default-selection-background: var(--global-color-surface-pop);
+		--data-table-default-selection-color: var(--global-color-text);
+		--data-table-default-selection-shadow: var(--global-shadow-lg), 0 0 60px -20px var(--global-color-primary-glow);
+		--data-table-default-selection-count-background: var(--global-color-primary);
+		--data-table-default-selection-count-color: var(--global-color-on-primary);
+		--data-table-default-menu-item-padding: 8px 10px;
+		--data-table-default-menu-item-color: var(--global-color-text-2);
+		--data-table-default-menu-item-danger-color: var(--global-color-error);
+		--data-table-default-menu-item-hover-background: var(--global-color-surface-2);
+		--data-table-default-menu-item-disabled-opacity: 0.4;
+		--data-table-default-duration: var(--global-duration-fast);
+		--data-table-default-easing: var(--global-ease);
+	}
+}

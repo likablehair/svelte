@@ -3,10 +3,10 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 -->
 <script lang="ts" generics="Data">
 	import '../../../css/tokens.css';
+	import { breakpoints } from '../../../utils/breakpoints.svelte.js';
 	import './Autocomplete.css';
 	import { tick, untrack, type Snippet } from 'svelte';
 	import type { HTMLAttributes, HTMLInputAttributes } from 'svelte/elements';
-	import { MediaQuery } from 'svelte/reactivity';
 	import Menu from '../common/Menu.svelte';
 	import Tooltip from '../common/Tooltip.svelte';
 	import Icon from '../media/Icon.svelte';
@@ -255,8 +255,7 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 	const listboxId = `${uid}-listbox`;
 	const optionId = (index: number) => `${uid}-option-${index}`;
 
-	const mobile = new MediaQuery('max-width: 1024px', false);
-	let drawerMode = $derived(mobileDrawer && mobile.current);
+	let drawerMode = $derived(mobileDrawer && breakpoints.mAndDown);
 
 	let anchor = $state<HTMLDivElement>();
 	let highlighted = $state<number>();
