@@ -1,0 +1,42 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--file-input-list-default-width: 100%;
+		--file-input-list-default-height: auto;
+		--file-input-list-default-gap: 8px;
+		--file-input-list-default-item-gap: 10px;
+		--file-input-list-default-item-padding: 8px 10px;
+		--file-input-list-default-item-background: var(--global-color-surface-solid);
+		--file-input-list-default-item-border-width: var(--global-border-width);
+		--file-input-list-default-item-border-color: var(--global-color-border);
+		--file-input-list-default-item-border-radius: var(--global-radius-md);
+		--file-input-list-default-icon-box-size: 32px;
+		--file-input-list-default-icon-size: 20px;
+		--file-input-list-default-icon-border-radius: var(--global-radius-sm);
+		--file-input-list-default-pdf-color: var(--global-color-error);
+		--file-input-list-default-image-color: var(--global-color-primary);
+		--file-input-list-default-spreadsheet-color: var(--global-color-accent);
+		--file-input-list-default-document-color: var(--global-color-data-3);
+		--file-input-list-default-presentation-color: var(--global-color-data-5);
+		--file-input-list-default-archive-color: var(--global-color-warning);
+		--file-input-list-default-video-color: var(--global-color-data-6);
+		--file-input-list-default-audio-color: var(--global-color-data-4);
+		--file-input-list-default-other-color: var(--global-color-text-2);
+		--file-input-list-default-name-color: var(--global-color-text);
+		--file-input-list-default-name-font-size: 13.5px;
+		--file-input-list-default-name-font-weight: 500;
+		--file-input-list-default-details-color: var(--global-color-text-3);
+		--file-input-list-default-details-font-family: var(--global-font-family-mono);
+		--file-input-list-default-details-font-size: 11.5px;
+		--file-input-list-default-progress-height: 4px;
+		--file-input-list-default-done-color: var(--global-color-success);
+		--file-input-list-default-error-color: var(--global-color-error);
+		--file-input-list-default-status-icon-size: 20px;
+		--file-input-list-default-card-min-width: 140px;
+		--file-input-list-default-card-media-height: 96px;
+		--file-input-list-default-card-icon-size: 36px;
+		--file-input-list-default-empty-color: var(--global-color-text-3);
+		--file-input-list-default-empty-font-size: 13px;
+	}
+}

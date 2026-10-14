@@ -88,6 +88,25 @@ export interface LibraryTexts {
 		close: string;
 		noResults: string;
 	};
+	fileInput: {
+		title: string;
+		titleSingle: string;
+		or: string;
+		browse: string;
+		rejectedType: string;
+		rejectedSize: string;
+		rejectedCount: string;
+		rejectedDuplicate: string;
+	};
+	fileInputList: {
+		list: string;
+		empty: string;
+		remove: string;
+		removeFile: string;
+		uploading: string;
+		done: string;
+		error: string;
+	};
 	hierarchyMenu: { label: string; submenu: string };
 	monthSelector: { label: string };
 	noData: { title: string };
@@ -228,6 +247,25 @@ export const TEXTS_EN: LibraryTexts = {
 		close: 'Close',
 		noResults: 'No options'
 	},
+	fileInput: {
+		title: 'Drop files here',
+		titleSingle: 'Drop a file here',
+		or: 'or',
+		browse: 'browse your files',
+		rejectedType: '{name}: file type not allowed',
+		rejectedSize: '{name}: larger than {size}',
+		rejectedCount: '{name}: no more than {count} files',
+		rejectedDuplicate: '{name}: already added'
+	},
+	fileInputList: {
+		list: 'Files',
+		empty: 'No files',
+		remove: 'Remove',
+		removeFile: 'Remove {name}',
+		uploading: 'Uploading {name}',
+		done: 'Uploaded',
+		error: 'Upload failed'
+	},
 	hierarchyMenu: { label: 'Menu', submenu: '{label} submenu' },
 	monthSelector: { label: 'Month' },
 	noData: { title: 'No data available' },
@@ -367,6 +405,25 @@ export const TEXTS_IT: LibraryTexts = {
 		clear: 'Cancella la selezione',
 		close: 'Chiudi',
 		noResults: 'Nessuna opzione'
+	},
+	fileInput: {
+		title: 'Trascina qui i file',
+		titleSingle: 'Trascina qui un file',
+		or: 'oppure',
+		browse: 'sfoglia i file',
+		rejectedType: '{name}: tipo di file non ammesso',
+		rejectedSize: '{name}: più grande di {size}',
+		rejectedCount: '{name}: massimo {count} file',
+		rejectedDuplicate: '{name}: già aggiunto'
+	},
+	fileInputList: {
+		list: 'File',
+		empty: 'Nessun file',
+		remove: 'Rimuovi',
+		removeFile: 'Rimuovi {name}',
+		uploading: 'Caricamento di {name}',
+		done: 'Caricato',
+		error: 'Caricamento non riuscito'
 	},
 	hierarchyMenu: { label: 'Menu', submenu: 'Sottomenu di {label}' },
 	monthSelector: { label: 'Mese' },

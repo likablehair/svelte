@@ -8,7 +8,7 @@ Contents:
 
 - [Checklist](#checklist)
 - [Global changes](#global-changes)
-- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DataTable](#datatable), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [HierarchyMenu](#hierarchymenu), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [MediaQuery](#mediaquery), [Menu](#menu), [MonthSelector](#monthselector), [NoData](#nodata), [Paginator](#paginator), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SidebarLayout](#sidebarlayout), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Toaster](#toaster), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
+- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DataTable](#datatable), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FileInput](#fileinput), [FileInputList](#fileinputlist), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [HierarchyMenu](#hierarchymenu), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [MediaQuery](#mediaquery), [Menu](#menu), [MonthSelector](#monthselector), [NoData](#nodata), [Paginator](#paginator), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SidebarLayout](#sidebarlayout), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Toaster](#toaster), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
 - [Not ported](#not-ported)
 - [Not available yet](#not-available-yet)
 
@@ -719,6 +719,53 @@ New, optional: `title`, `titleSnippet`, `closable`, `closeLabel`, `closeSnippet`
 | `--dropdown-button-active-color`, `-active-box-shadow`, `-box-sizing` | removed |
 
 New, optional: `label` (prefix inside the button), `name`, `closeOnSelect`, `variant`, `size`, `selectionText`, `clearLabel`, `closeLabel`, `noResultsText`, `bind:buttonElement`, `class` object, snippets listed above, `--dropdown-*` variables.
+
+### FileInput
+
+v4 FileInput was used by no app on its own (only inside FileInputList); in v5 it is the drop zone for pages that take the files and show them their own way.
+
+- Look of the prototype: dashed zone with an icon tile, "Drop files here / or browse your files" and an optional `description` (v4: a 64px grey box with one line). `compact` gives a one-line zone (about 60px).
+- `placeholder` → `title`. `persistOverUpload={false}` → `replace`.
+- `onfileDrop({ detail: { nativeEvent, files } })` and `onfileSelect(...)` → one `onchange({ files, added, removed })`: `detail.files` → `added`, `nativeEvent` is gone. The v4 `onchange` (native, picker only) is now this callback.
+- `accept`, `maxSize` (bytes, decimal) and `maxFiles` refuse files with a message under the zone and `onreject({ rejected })`; v4 had no `accept` and `maxFiles` dropped the extra files silently. With `maxFiles={1}` the picker chooses one file. A file identical (name, size, date) to one already chosen is refused.
+- Keyboard and forms: a real `<input type="file">` is focusable (Tab, Enter/Space); `name`, `required` and form reset work, and a removed file can be picked again.
+- `class` is an object: `class="x"` → `class={{ zone: 'x' }}`. `bodySnippet({ active })` → `bodySnippet({ dragging, disabled })`.
+- `--file-input-height` is the height of the whole field and defaults to `auto` (v4: 64px).
+
+| v4 | v5 |
+|---|---|
+| `--file-input-background-color` | `--file-input-background` |
+| `--file-input-active-background-color` | `--file-input-dragging-background` |
+| `--file-input-focus-shadow` | removed: hover colors border and background (`--file-input-hover-*`) |
+
+The others keep their name: `height`, `width`, `color`, `border-radius`. Defaults: the same renames on `--file-input-default-*`.
+
+New, optional: `label`, `hint`, `state`, `compact`, `icon`, `description`, `browseLabel`, `locale`, `readonly`, `name`, `required`, `bind:input`, `labelSnippet`, `hintSnippet`, `rejectedSnippet`, `children`, `data-dragging` / `data-full` / `data-disabled` / `data-state`.
+
+### FileInputList
+
+- **Layout**: the files are listed below the zone (v4: inside it, in a box of fixed height); the zone becomes one line while files are listed (`compact="auto"`). `--file-input-list-height` is still the height of the whole field: the zone fills it and the list scrolls. Small heights (100–180px) leave little room: prefer `auto`.
+- Rows of the prototype: icon and color of the file type, thumbnail for images, name, size in kB/MB (v4: raw bytes), remove button with tooltip. No `alert` on click and no row highlight on hover. `icon` is now the zone icon: file icons follow the type (`fileIconSnippet` for custom ones).
+- `message` → `title`; `messageSnippet` is gone: move its icon, title and formats to `icon`, `title`, `description`. `previewFiles` → `view="grid"`. `persistOverUpload={false}` → `replace`.
+- `dropAreaActive` is gone. `disabled={readonly} dropAreaActive={!readonly}` → `readonly={readonly}` (list only). `disabled` also disables the remove buttons.
+- `onfileChange({ detail: { files } })` → `onchange({ files, added, removed })`: drop `.detail`. `onfileDrop()` / `onfileSelect()` → `onchange` with `added.length > 0`.
+- Pages that emptied the list in `onfileChange` and drew their own list: use FileInput with `onchange={({ added }) => ...}`.
+- Type, size and count checks in the callbacks (`isDocxFile`, `files.length == 1`, `slice(0, 1)` + toast) → `accept`, `maxSize`, `maxFiles`.
+- `class` is an object (`container`, `label`, `zone`, `hint`, `list`, `item`). `bodySnippet({ active })` → `{ dragging, disabled }` and replaces only the zone content. `fileListSnippet({ files, previewFiles, fileActive })` → `{ files, remove }`, rendered below the zone.
+
+| v4 | v5 |
+|---|---|
+| `--file-input-list-background-color` | `--file-input-background` (the zone) |
+| `--file-input-list-color` | `--file-input-color` |
+| `--file-input-list-border-radius` | `--file-input-border-radius` (rows: `--file-input-list-item-border-radius`) |
+| `--file-input-list-border` | `--file-input-border-width` + `--file-input-border-color` (`none` → `--file-input-border-width="0"`) |
+| `--file-input-list-border-color` | removed (no effect in v4) |
+| `--file-input-list-hover-color`, `-selected-row-color`, `-selected-row-background` | removed |
+| `--file-input-list-height`, `-width` | same names (default height `auto`, v4: 64px) |
+
+Defaults: the same changes on `--file-input-list-default-*`.
+
+New, optional: `fileStatus` (progress, done, error per file), `view`, `compact`, `readonly`, `emptyLabel`, `removeLabel`, `fileSnippet`, `fileIconSnippet`, every FileInput prop, `--file-input-list-*` variables for rows, file types, progress and cards.
 
 ### FilterEditor
 
@@ -1612,4 +1659,4 @@ These v4 exports are not in v5. Use the replacement; the ones marked "on request
 
 These v4 exports have no v5 version yet. Keep v4 for screens that need them, or wait for the port.
 
-- **Components**: MenuOrDrawer, MenuOrDrawerOptions, PeriodSelector, PeriodPicker, FileInput, FileInputList, IconsDropdown, ToggleList, BoxList, SelectableMenuList, SelectableVerticalList, GlobalSearchTextField, Avatar, DescriptiveAvatar, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper.
+- **Components**: MenuOrDrawer, MenuOrDrawerOptions, PeriodSelector, PeriodPicker, IconsDropdown, ToggleList, BoxList, SelectableMenuList, SelectableVerticalList, GlobalSearchTextField, Avatar, DescriptiveAvatar, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper.

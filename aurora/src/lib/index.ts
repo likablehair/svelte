@@ -60,6 +60,10 @@ export { default as TimePicker } from './components/simple/dates/TimePicker.svel
 export { default as TimePickerTextField } from './components/composed/forms/TimePickerTextField.svelte';
 export { default as DateTimePickerTextField } from './components/composed/forms/DateTimePickerTextField.svelte';
 export { default as Textarea } from './components/simple/forms/Textarea.svelte';
+export { default as FileInput } from './components/simple/forms/FileInput.svelte';
+export { default as FileInputList } from './components/simple/forms/FileInputList.svelte';
+export { formatFileSize } from './utils/files.js';
+export type { FileRejection, FileStatus, FileKind } from './utils/files.js';
 export { default as Autocomplete } from './components/simple/forms/Autocomplete.svelte';
 export { default as Select } from './components/simple/forms/Select.svelte';
 export { default as Dropdown } from './components/composed/forms/Dropdown.svelte';

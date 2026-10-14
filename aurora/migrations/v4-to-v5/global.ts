@@ -284,8 +284,6 @@ export default {
 			'MenuOrDrawerOptions',
 			'PeriodSelector',
 			'PeriodPicker',
-			'FileInput',
-			'FileInputList',
 			'IconsDropdown',
 			'ToggleList',
 			'BoxList',
