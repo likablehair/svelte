@@ -65,6 +65,8 @@
 	},
 	"dependencies": {
 		"@tanstack/virtual-core": "^3.17.11",
+		"chart.js": "^4.5.1",
+		"chartjs-plugin-zoom": "^2.2.0",
 		"flag-icons": "^7.5.0"
 	}
 }

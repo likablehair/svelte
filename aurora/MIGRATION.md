@@ -29,7 +29,7 @@ Contents:
 
 ### Package
 
-- **Runtime dependencies**: v4 had 16 (`chart.js`, `date-fns`, `luxon`, `lodash`, `imask`, `sortablejs`, `svelte-dnd-action`, ...). v5 has only `flag-icons`. Declare in the app's `package.json` every package the app imports itself.
+- **Runtime dependencies**: v4 had 16 (`chart.js`, `date-fns`, `luxon`, `lodash`, `imask`, `sortablejs`, `svelte-dnd-action`, ...). v5 has `flag-icons`, `@tanstack/virtual-core` (virtual rows of the tables), `chart.js` and `chartjs-plugin-zoom` (the charts); `chartjs-adapter-date-fns` is gone. Declare in the app's `package.json` every package the app imports itself.
 - **Svelte**: the peer range is still `^5.0.0`, but the components need **5.29 or later** (`{@attach}`).
 - **`@mdi/js`**: add it to the app if it uses MDI icons. v5 only has it as a dev dependency.
 - **Exports**: `@likable-hair/svelte/package.json` is no longer exported. New: `./tokens.css`, `./base.css`, `./themes/*.css`, `./tailwind.css`, `./tailwind-preset`.
@@ -372,6 +372,32 @@ New, optional: `label`, `state`, `name`, `id`, `icon`, `loading`, `drawerSearch`
 `--avatar-border-radius` and `--avatar-border` keep their name. Defaults: `--avatar-default-width`/`-height` → `--avatar-default-size`, `--avatar-default-text-weight` → `--avatar-default-font-weight`.
 
 New, optional: `name`, `colorKey`, `color`, `size`, `shape="square"`, `ring`, `status` + `statusLabel`, `icon`, `locale`, `badgeSnippet`, `class`, `bind:avatarElement`, native attributes, `data-*` state, `--avatar-gap-color`, `--avatar-ring-*`, `--avatar-status-*`. **AvatarGroup** (new) stacks avatars with a "+N" counter.
+
+### BarChart
+
+| v4 | v5 |
+|---|---|
+| `data={$state.snapshot(x)}` | `data={x}` |
+| dataset `backgroundColor` / `borderColor` | series `color` (a CSS color, also `var(--…)`; an array = one color per bar) |
+| dataset `type: 'line'` + `yAxisID` + its scale | series `type: 'line'`, `axis: 'right'`, `format` |
+| `options.indexAxis: 'y'` | `horizontal` |
+| `options.scales.*.stacked: true` | `stacked` |
+| tick / tooltip callbacks that format numbers | `format` (options of `Intl.NumberFormat`; short form on the axes by itself) |
+| `options.plugins.legend.display` / `position` | `legend` (`auto`: below, only with 2+ series; `false`, `top`, `bottom`, `right`) |
+| `options.maintainAspectRatio: false` | default: the chart fills `--bar-chart-height` (16rem; `100%` fills a widget) |
+| `bind:resetZoom` + a reset button in the app | built-in "Reset zoom" icon in the corner of the plot while zoomed, or a double click; `bind:chart` + `chart.resetZoom()` from code |
+| `width`, `height` on the canvas | `--bar-chart-width`, `--bar-chart-height` (attributes go to the root `<div>`) |
+
+- `data` keeps the chart.js shape (`{ labels, datasets }`) and chart.js dataset keys still work. Pass Svelte state as it is: remove `$state.snapshot(...)`.
+- Colors follow the theme, dark mode and theme changes by themselves. Remove the code that read the v4 tokens for the canvas (`getComputedStyle(...).getPropertyValue('--global-color-…')`, `rgb(${…})`, effects on `$theme.dark`, `hsl(i * N)` palettes): series without `color` take `--global-color-data-1…6` (one series alone gets the brand gradient), `color: 'var(--global-color-…)'` picks a token.
+- `options` is still chart.js, merged over the library defaults and no longer mutated (an option removed later goes away). Most of what the apps passed is a prop or the default now:
+  `maintainAspectRatio`, `ticks.display: true`, `ticks.callback: (v, i) => labels[i]`, `interaction.intersect: false` and `plugins.zoom` can be deleted.
+- New look, like the design prototype: **ticks visible on both axes** (v4 hid them), legend below and only with two or more series, HTML tooltip card, thicker rounded bars, dashed grid. Drag-to-zoom stays on (`zoom={false}` turns it off).
+- One dataset per bar with `stacked` to get one color per bar → one series with an array in `color`.
+- Horizontal charts grow with the rows (`--bar-chart-row-height`, 2.5rem = 40px): remove the wrappers sized `labels.length * 40px`.
+- Props of the v3 charts (`showXTicks`, `enableZoom`, `yMax`, …) did nothing in v4 4.2+: delete them.
+
+New, optional: `label` (screen readers also get a hidden table of the values), `onitemclick({ index, datasetIndex, label, value, event })`, `tooltipSnippet`, `legendSnippet`, `locale`, `resetZoomLabel`, `bind:chart`, `bind:barChartElement`, CSS variables `--bar-chart-*`.
 
 ### Button
 
@@ -1208,6 +1234,30 @@ New, optional: `total`, `label`, `labelSnippet`, `showValue`, `valueSnippet`, `c
 
 New, optional: `title`.
 
+### LineChart
+
+| v4 | v5 |
+|---|---|
+| `data={$state.snapshot(x)}` | `data={x}` |
+| dataset `borderColor` / `backgroundColor` | series `color` |
+| dataset `fill` / `borderDash` | series `area` / `dashed` |
+| dataset `yAxisID` + a scale on the right | series `axis: 'right'`, `format` |
+| `options.scales.y.stacked: true` | `stacked` |
+| tick / tooltip callbacks that format numbers | `format` |
+| `options.plugins.legend` | `legend` |
+| `options.maintainAspectRatio: false` | default: the chart fills `--line-chart-height` (16rem) |
+| `elements.line.borderWidth` | `--line-chart-line-width` |
+| `bind:resetZoom` + a reset button in the app | built-in "Reset zoom" icon in the corner of the plot while zoomed, or a double click; `bind:chart` + `chart.resetZoom()` |
+| `options` (required) | `options` (optional) |
+
+- `data` keeps the chart.js shape (`{ labels, datasets }`) and chart.js dataset keys still work. Pass Svelte state as it is: remove `$state.snapshot(...)`.
+- Colors follow the theme, dark mode and theme changes by themselves. Remove the code that read the v4 tokens for the canvas (`getComputedStyle(...).getPropertyValue('--global-color-…')`, `rgb(${…})`, effects on `$theme.dark`, `hsl(i * N)` palettes): series without `color` take `--global-color-data-1…6` (one series alone gets the brand gradient), `color: 'var(--global-color-…)'` picks a token.
+- `options` is still chart.js, merged over the library defaults and no longer mutated (an option removed later goes away). Most of what the apps passed is a prop or the default now:
+  `maintainAspectRatio`, `ticks.display: true`, `elements.point.radius`, `interaction.intersect: false` and `plugins.zoom` can be deleted.
+- New look, like the design prototype: smooth curves, points only on hover with a vertical guide, **ticks visible on both axes**, legend below and only with two or more series, HTML tooltip card; one series alone gets the brand gradient and a glow. `tension: 0` on a series draws straight segments.
+
+New, optional: `label`, `onitemclick`, `tooltipSnippet`, `legendSnippet`, `locale`, `resetZoomLabel`, `bind:chart`, `bind:lineChartElement`, CSS variables `--line-chart-*`.
+
 ### LinkButton
 
 - **Different look**: v4 drew a grey pill (a link that looks like a button); v5 is an inline text link with an animated underline. For the v4 look use `<Button href="..." variant="secondary">`.
@@ -1332,6 +1382,24 @@ New, optional: `description`, `size`, `children` (actions), `titleSnippet`, `des
 Defaults: the same renames on `--paginator-default-page-button-*` → `--paginator-default-button-*` and `--paginator-default-current-*`.
 
 New, optional: `siblingCount`, `showFirstLast`, `compact` ("7 / 24"), `pageHref` (links, page in the URL), `pageSnippet`, `firstIcon` / `previousIcon` / `nextIcon` / `lastIcon`, `locale` and the `*Label` texts, `bind:paginatorElement`, `class` object (`container`, `button`, `current`), `data-compact`, `data-current`, `--paginator-gap`, `-font-*`, `-icon-size`, `-button-size`, `-button-hover-color`, `-current-box-shadow`, `-ellipsis-*`, `-status-*`, `-disabled-opacity`, `-focus-ring-*`, `-duration`, `-easing`.
+
+### PieChart
+
+| v4 | v5 |
+|---|---|
+| a full pie | **a donut** with the total in the middle: `donut={false}` for the pie |
+| `data={$state.snapshot(x)}` | `data={x}` |
+| dataset `backgroundColor` | series `color` (array of CSS colors, also `var(--…)`) |
+| `options.cutout` | default donut; `--pie-chart-cutout` (72%) for the hole |
+| `options.plugins.legend` | `legend` (default: on the right with the share of every slice, below when narrow) |
+| tooltip callbacks that format numbers | `format` |
+| a total drawn by the app over the canvas | `centerLabel`, `centerSnippet` |
+| `options.onClick` + `getElementsAtEventForMode` | `onitemclick` |
+
+- Colors follow the theme by themselves (see [BarChart](#barchart)); `bind:chart` stays.
+- Clicking a legend entry hides the slice; the total and the shares count only the visible slices.
+
+New, optional: `donut`, `showTotal`, `centerLabel`, `centerSnippet`, `format`, `label` (with a hidden table of values and shares), `tooltipSnippet`, `legendSnippet`, `locale`, `bind:pieChartElement`, CSS variables `--pie-chart-*`.
 
 ### ProgressBar
 
@@ -1725,4 +1793,4 @@ These v4 exports are not in v5. Use the replacement; the ones marked "on request
 
 These v4 exports have no v5 version yet. Keep v4 for screens that need them, or wait for the port.
 
-- **Components**: PeriodSelector, PeriodPicker, IconsDropdown, ToggleList, BoxList, SelectableMenuList, SelectableVerticalList, GlobalSearchTextField, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper.
+- **Components**: PeriodSelector, PeriodPicker, IconsDropdown, ToggleList, BoxList, SelectableMenuList, SelectableVerticalList, GlobalSearchTextField, SimpleTimeLine, DashboardShaper.

@@ -8,9 +8,7 @@ export default {
 		svelte: '>=5.29 (the components use {@attach}); the peer range stays ^5.0.0',
 		droppedDependencies: [
 			'@paralleldrive/cuid2',
-			'chart.js',
 			'chartjs-adapter-date-fns',
-			'chartjs-plugin-zoom',
 			'date-fns',
 			'esm-env',
 			'highlight.js',
@@ -288,9 +286,6 @@ export default {
 			'SelectableMenuList',
 			'SelectableVerticalList',
 			'GlobalSearchTextField',
-			'LineChart',
-			'BarChart',
-			'PieChart',
 			'SimpleTimeLine',
 			'DashboardShaper'
 		])

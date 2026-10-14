@@ -78,6 +78,18 @@ export { default as Avatar } from './components/simple/media/Avatar.svelte';
 export { default as AvatarGroup } from './components/simple/media/AvatarGroup.svelte';
 export type { AvatarGroupItem } from './components/simple/media/AvatarGroup.svelte';
 export { default as DescriptiveAvatar } from './components/simple/media/DescriptiveAvatar.svelte';
+export { default as BarChart } from './components/simple/charts/BarChart.svelte';
+export { default as LineChart } from './components/simple/charts/LineChart.svelte';
+export { default as PieChart } from './components/simple/charts/PieChart.svelte';
+export type {
+	ChartData,
+	ChartSeries,
+	ChartFormat,
+	ChartTooltip,
+	ChartTooltipItem,
+	ChartLegendItem,
+	ChartItemClick
+} from './utils/chart/types.js';
 export { default as CircularLoader } from './components/simple/loaders/CircularLoader.svelte';
 export { default as DotsLoader } from './components/simple/loaders/DotsLoader.svelte';
 export { default as Skeleton } from './components/simple/loaders/Skeleton.svelte';

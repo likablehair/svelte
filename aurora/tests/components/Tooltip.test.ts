@@ -67,6 +67,7 @@ describe('Tooltip', () => {
 
 	test('opens right away on keyboard focus and closes when the focus leaves', async () => {
 		const { screen, activator, isOpen } = await setup({ appearTimeout: 5000 });
+		await screen.getByRole('button', { name: 'After Save' }).hover();
 		await userEvent.keyboard('{Tab}');
 		await expect.element(activator).toHaveFocus();
 		await expect.poll(isOpen).toBe(true);

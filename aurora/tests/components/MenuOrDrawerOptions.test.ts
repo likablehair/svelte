@@ -103,7 +103,8 @@ describe('MenuOrDrawerOptions', () => {
 
 	test('Enter and Space choose the focused option', async () => {
 		const onselect = vi.fn();
-		const { screen, activator } = await open({ onselect });
+		const { screen, activator, menu } = await open({ onselect });
+		await expect.element(menu.getByRole('menuitem', { name: 'Edit' })).toHaveFocus();
 		await userEvent.keyboard('{ArrowDown}{Enter}');
 		await expect.element(screen.getByTestId('state')).toHaveTextContent('closed');
 		expect(onselect.mock.calls[0][0].option.name).toBe('duplicate');
@@ -128,6 +129,7 @@ describe('MenuOrDrawerOptions', () => {
 		const { screen, menu } = await open({ options: list, onselect });
 		const archive = menu.getByRole('menuitem', { name: 'Archive' });
 		await expect.element(archive).toHaveAttribute('aria-disabled', 'true');
+		await expect.element(menu.getByRole('menuitem', { name: 'Edit' })).toHaveFocus();
 		await userEvent.keyboard('{ArrowDown}{ArrowDown}');
 		await expect.element(archive).toHaveFocus();
 		await userEvent.keyboard('{Enter}');

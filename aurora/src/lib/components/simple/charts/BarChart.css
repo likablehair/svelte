@@ -1,0 +1,47 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--bar-chart-default-width: 100%;
+		--bar-chart-default-min-width: 12rem;
+		--bar-chart-default-height: 16rem;
+		--bar-chart-default-row-height: 2.5rem;
+		--bar-chart-default-axis-size: 2rem;
+		--bar-chart-default-gap: 12px;
+		--bar-chart-default-grid-color: var(--global-color-border);
+		--bar-chart-default-tick-color: var(--global-color-text-3);
+		--bar-chart-default-tick-font-family: var(--global-font-family-mono);
+		--bar-chart-default-tick-font-size: 11px;
+		--bar-chart-default-bar-radius: var(--global-radius-sm);
+		--bar-chart-default-gradient-from: var(--global-color-data-1);
+		--bar-chart-default-gradient-to: var(--global-color-data-2);
+		--bar-chart-default-line-width: 2px;
+		--bar-chart-default-point-background: var(--global-color-surface-pop);
+		--bar-chart-default-reset-background: var(--global-color-surface-pop);
+		--bar-chart-default-zoom-color: var(--global-color-primary);
+		--bar-chart-default-legend-gap: 16px;
+		--bar-chart-default-legend-font-size: 12.5px;
+		--bar-chart-default-legend-color: var(--global-color-text-2);
+		--bar-chart-default-legend-swatch-size: 8px;
+		--bar-chart-default-legend-swatch-radius: 2px;
+		--bar-chart-default-legend-hidden-opacity: 0.45;
+		--bar-chart-default-legend-detail-color: var(--global-color-text);
+		--bar-chart-default-legend-detail-font-family: var(--global-font-family-mono);
+		--bar-chart-default-legend-min-width: 180px;
+		--bar-chart-default-tooltip-background: var(--global-color-surface-pop);
+		--bar-chart-default-tooltip-border-color: var(--global-color-border-strong);
+		--bar-chart-default-tooltip-border-width: var(--global-border-width);
+		--bar-chart-default-tooltip-radius: var(--global-radius-lg);
+		--bar-chart-default-tooltip-shadow: var(--global-shadow-md);
+		--bar-chart-default-tooltip-padding: 8px 12px;
+		--bar-chart-default-tooltip-min-width: auto;
+		--bar-chart-default-tooltip-color: var(--global-color-text);
+		--bar-chart-default-tooltip-title-color: var(--global-color-text-3);
+		--bar-chart-default-tooltip-title-font-family: var(--global-font-family-mono);
+		--bar-chart-default-tooltip-title-font-size: 10.5px;
+		--bar-chart-default-tooltip-label-color: var(--global-color-text-2);
+		--bar-chart-default-tooltip-label-font-size: 12px;
+		--bar-chart-default-tooltip-value-font-family: var(--global-font-family-display);
+		--bar-chart-default-tooltip-value-font-size: 13px;
+	}
+}

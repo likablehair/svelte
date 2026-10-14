@@ -11,6 +11,7 @@ export interface LibraryTexts {
 	autocomplete: { loading: string; noResults: string; remove: string; close: string };
 	avatar: { online: string; away: string; busy: string; offline: string };
 	avatarGroup: { more: string };
+	chart: { resetZoom: string };
 	chip: { remove: string };
 	circularLoader: { label: string };
 	columnManager: {
@@ -163,6 +164,7 @@ export const TEXTS_EN: LibraryTexts = {
 	autocomplete: { loading: 'Loading…', noResults: 'No results', remove: 'Remove', close: 'Close' },
 	avatar: { online: 'Online', away: 'Away', busy: 'Busy', offline: 'Offline' },
 	avatarGroup: { more: '{count} more' },
+	chart: { resetZoom: 'Reset zoom' },
 	chip: { remove: 'Remove' },
 	circularLoader: { label: 'Loading' },
 	columnManager: {
@@ -325,6 +327,7 @@ export const TEXTS_IT: LibraryTexts = {
 	autocomplete: { loading: 'Caricamento…', noResults: 'Nessun risultato', remove: 'Rimuovi', close: 'Chiudi' },
 	avatar: { online: 'Online', away: 'Assente', busy: 'Occupato', offline: 'Offline' },
 	avatarGroup: { more: 'Altri {count}' },
+	chart: { resetZoom: 'Reimposta zoom' },
 	chip: { remove: 'Rimuovi' },
 	circularLoader: { label: 'Caricamento' },
 	columnManager: {
