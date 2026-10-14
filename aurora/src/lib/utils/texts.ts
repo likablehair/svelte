@@ -9,6 +9,8 @@ export interface LibraryTexts {
 		typeMore: string;
 	};
 	autocomplete: { loading: string; noResults: string; remove: string; close: string };
+	avatar: { online: string; away: string; busy: string; offline: string };
+	avatarGroup: { more: string };
 	chip: { remove: string };
 	circularLoader: { label: string };
 	columnManager: {
@@ -158,6 +160,8 @@ export const TEXTS_EN: LibraryTexts = {
 		typeMore: 'Type at least {count} characters'
 	},
 	autocomplete: { loading: 'Loading…', noResults: 'No results', remove: 'Remove', close: 'Close' },
+	avatar: { online: 'Online', away: 'Away', busy: 'Busy', offline: 'Offline' },
+	avatarGroup: { more: '{count} more' },
 	chip: { remove: 'Remove' },
 	circularLoader: { label: 'Loading' },
 	columnManager: {
@@ -317,6 +321,8 @@ export const TEXTS_IT: LibraryTexts = {
 		typeMore: 'Scrivi almeno {count} caratteri'
 	},
 	autocomplete: { loading: 'Caricamento…', noResults: 'Nessun risultato', remove: 'Rimuovi', close: 'Chiudi' },
+	avatar: { online: 'Online', away: 'Assente', busy: 'Occupato', offline: 'Offline' },
+	avatarGroup: { more: 'Altri {count}' },
 	chip: { remove: 'Rimuovi' },
 	circularLoader: { label: 'Caricamento' },
 	columnManager: {

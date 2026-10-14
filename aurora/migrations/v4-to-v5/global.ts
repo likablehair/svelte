@@ -290,8 +290,6 @@ export default {
 			'SelectableMenuList',
 			'SelectableVerticalList',
 			'GlobalSearchTextField',
-			'Avatar',
-			'DescriptiveAvatar',
 			'LineChart',
 			'BarChart',
 			'PieChart',

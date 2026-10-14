@@ -2,6 +2,8 @@ import { describe, expect, test } from 'vitest';
 import { formatLetters, libraryTexts, TEXTS_EN, TEXTS_IT } from '../../src/lib/utils/texts.js';
 
 const SAME_IN_ITALIAN = [
+	'avatar.online',
+	'avatar.offline',
 	'dataTable.rangeOpen',
 	'hierarchyMenu.label',
 	'sidebarLayout.menu',

@@ -1,0 +1,14 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--avatar-group-default-overlap: 6px;
+		--avatar-group-default-xs-overlap: 4px;
+		--avatar-group-default-sm-overlap: 5px;
+		--avatar-group-default-lg-overlap: 9px;
+		--avatar-group-default-xl-overlap: 12px;
+		--avatar-group-default-gap-width: 2px;
+		--avatar-group-default-counter-background: var(--avatar-default-neutral-background);
+		--avatar-group-default-counter-color: var(--avatar-default-neutral-color);
+	}
+}

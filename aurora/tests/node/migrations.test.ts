@@ -10,7 +10,8 @@ const NEW_IN_V5 = [
 	'TimePicker',
 	'TimePickerTextField',
 	'DateTimePickerTextField',
-	'ColumnManager'
+	'ColumnManager',
+	'AvatarGroup'
 ];
 
 const files = import.meta.glob<ComponentMigration | GlobalMigration>('/migrations/v4-to-v5/*.ts', {

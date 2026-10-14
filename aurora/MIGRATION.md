@@ -8,7 +8,7 @@ Contents:
 
 - [Checklist](#checklist)
 - [Global changes](#global-changes)
-- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DataTable](#datatable), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FileInput](#fileinput), [FileInputList](#fileinputlist), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [HierarchyMenu](#hierarchymenu), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [MediaQuery](#mediaquery), [Menu](#menu), [MonthSelector](#monthselector), [NoData](#nodata), [Paginator](#paginator), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SidebarLayout](#sidebarlayout), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Toaster](#toaster), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
+- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Avatar](#avatar), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DataTable](#datatable), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [DescriptiveAvatar](#descriptiveavatar), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FileInput](#fileinput), [FileInputList](#fileinputlist), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [HierarchyMenu](#hierarchymenu), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [MediaQuery](#mediaquery), [Menu](#menu), [MonthSelector](#monthselector), [NoData](#nodata), [Paginator](#paginator), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SidebarLayout](#sidebarlayout), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Toaster](#toaster), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
 - [Not ported](#not-ported)
 - [Not available yet](#not-available-yet)
 
@@ -352,6 +352,27 @@ Internal classes: `.selection-container` → `.aurora-autocomplete-field`, `.sel
 
 New, optional: `label`, `state`, `name`, `id`, `icon`, `loading`, `drawerSearch`, `drawerTitle`, texts (`loadingText`, `noResultsText`, `removeLabel`, `closeLabel`) and `locale` (language of the texts), `bind:input`, snippets `labelSnippet`, `stateIconSnippet`, `iconSnippet`, `chipIconSnippet`, `itemIconSnippet`, `itemAppendSnippet`, `loadingSnippet`, `emptySnippet`, `data-*` state attributes.
 
+### Avatar
+
+- **Initials from `name`**: `name="Mario Rossi"` shows "MR" (first letter of the first and of the last word) and is the accessible name. Replace the initials built by hand, `text={username.substring(0, 2).toUpperCase()}` ("MA"), with `name={username}`; keep `text` for text that is not initials (a short company name).
+- **A color per person**: the background is one of six gradients picked from the name (the theme's `--global-color-data-*` tokens), the same for the same name; v4 used the primary color for everyone. `colorKey={id}` picks it from an id, `color` fixes it (`1`–`6`, `primary` for the brand gradient, `neutral`), `--avatar-background` overrides it.
+- **One size**: `size` (`xs` 24, `sm` 32, `md` 40, `lg` 56, `xl` 80) or `--avatar-size`, instead of `--avatar-width` + `--avatar-height`. The avatar never shrinks in a flex row, so the `--avatar-min-width` workarounds go; rectangles are not supported. The text is 0.38 × the size, weight 600 (v4: 700).
+- `children` replaces only the content inside the circle (v4: the whole avatar). Without image, `name` or `text` a person icon is shown (v4: an empty circle; `icon` changes it).
+- The image covers the initials, which stay while it loads and when it fails (v4 downloaded it twice and flashed a broken image). `imageLoadingStatus` gains `'loading'` and is `undefined` without `src`. `src` also takes a `Blob`/`File`: pass downloaded images directly instead of converting them to data URLs.
+- `alt` is the accessible name of the whole avatar and defaults to `name`; `alt=""` makes it decorative (v4: always decorative).
+
+| v4 | v5 |
+|---|---|
+| `--avatar-width`, `--avatar-height` | `--avatar-size` (one value) |
+| `--avatar-background-color`, `--avatar-text-color` | `--avatar-background`, `--avatar-color` |
+| `--avatar-text-size`, `--avatar-text-weight` | `--avatar-font-size`, `--avatar-font-weight` |
+| `--avatar-min-width`, `-max-width`, `-min-height`, `-max-height` | removed |
+| `--avatar-default-background-color`, `--avatar-default-text-color` | `--avatar-default-background-1` … `-6`, `--avatar-default-color` |
+
+`--avatar-border-radius` and `--avatar-border` keep their name. Defaults: `--avatar-default-width`/`-height` → `--avatar-default-size`, `--avatar-default-text-weight` → `--avatar-default-font-weight`.
+
+New, optional: `name`, `colorKey`, `color`, `size`, `shape="square"`, `ring`, `status` + `statusLabel`, `icon`, `locale`, `badgeSnippet`, `class`, `bind:avatarElement`, native attributes, `data-*` state, `--avatar-gap-color`, `--avatar-ring-*`, `--avatar-status-*`. **AvatarGroup** (new) stacks avatars with a "+N" counter.
+
 ### Button
 
 - `icon`: SVG path. `buttonElement` is an `HTMLButtonElement`.
@@ -643,6 +664,17 @@ New in v5: one field for a date and a time, with a `DatePicker` and a `TimePicke
 - The wrapper layout (`.container { display: flex }`, two widths) goes away: the field is one input, 100% wide (`--date-time-picker-text-field-*`).
 
 The field types like the date and time fields (one mask: date, a space, the time; digits only with every separator added; A/P set AM/PM; `yyyy-MM-ddTHH:mm` can be pasted), opens the panel in a Menu on desktop and in a bottom Drawer up to 1024px. Choosing a day keeps the time (00:00 when there is none, moved inside `min` / `max`); choosing the minutes (or AM/PM) once there is a day closes the panel (`closeOnSelect`). [Filters](#filters) with `withTime` use it for their date-and-time values.
+
+### DescriptiveAvatar
+
+- The avatar initials come from `title` as first + last word ("MR"; v4 "MA"). Delete `avatarText` where it only built initials.
+- **Clickable for real**: with `onclick` it is a `<button>`, with `href` (new) a link, with focus, keyboard and a hover background; without them it is a plain `<div>` with no pointer. v4 put the click on a `div role="presentation"` and always showed the pointer. Remove the clickable `div` wrappers (`on:click`/`on:keypress`, `aria-hidden`, `role="button"`) the apps added, and pass the handler once.
+- `children` replaces the title and subtitle even when they are not set (v4 ignored it then). With `reverse` in a row the texts align to the end (v4: to the start, by mistake).
+- `compact` shows only the avatar with the texts in a Tooltip: it replaces the wrappers that switched to a bare Avatar for collapsed sidebars (`showTitleAndDescription`).
+- Look of the prototype: title 14px weight 600, subtitle 12.5px dimmer, gap 12px (v4: 1.1rem bold, 1rem, 8px); clickable ones have padding and a rounded hover background (`--descriptive-avatar-padding="0"` removes the padding). `--descriptive-avatar-cursor` defaults to `pointer` only when clickable.
+- All the Avatar props pass through (`name`, `colorKey`, `color`, `size`, `status`, …), and the `--avatar-*` variables reach the avatar.
+
+The `--descriptive-avatar-*` variables keep their names. New, optional: `href`, `target`, `rel`, `disabled`, `compact`, `avatarSnippet`, `class`, `bind:descriptiveAvatarElement`, native attributes, `data-*` state, `--descriptive-avatar-padding`, `-border-radius`, `-hover-background`, `-title-color`, `-title-font-weight`, `-subtitle-color`.
 
 ### Dialog
 
@@ -1659,4 +1691,4 @@ These v4 exports are not in v5. Use the replacement; the ones marked "on request
 
 These v4 exports have no v5 version yet. Keep v4 for screens that need them, or wait for the port.
 
-- **Components**: MenuOrDrawer, MenuOrDrawerOptions, PeriodSelector, PeriodPicker, IconsDropdown, ToggleList, BoxList, SelectableMenuList, SelectableVerticalList, GlobalSearchTextField, Avatar, DescriptiveAvatar, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper.
+- **Components**: MenuOrDrawer, MenuOrDrawerOptions, PeriodSelector, PeriodPicker, IconsDropdown, ToggleList, BoxList, SelectableMenuList, SelectableVerticalList, GlobalSearchTextField, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper.
