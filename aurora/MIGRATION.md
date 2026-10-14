@@ -8,7 +8,7 @@ Contents:
 
 - [Checklist](#checklist)
 - [Global changes](#global-changes)
-- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Avatar](#avatar), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DataTable](#datatable), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [DescriptiveAvatar](#descriptiveavatar), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FileInput](#fileinput), [FileInputList](#fileinputlist), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [HierarchyMenu](#hierarchymenu), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [MediaQuery](#mediaquery), [Menu](#menu), [MenuOrDrawer](#menuordrawer), [MenuOrDrawerOptions](#menuordraweroptions), [MonthSelector](#monthselector), [NoData](#nodata), [Paginator](#paginator), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SidebarLayout](#sidebarlayout), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Toaster](#toaster), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
+- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Avatar](#avatar), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DashboardShaper](#dashboardshaper), [DataTable](#datatable), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [DescriptiveAvatar](#descriptiveavatar), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FileInput](#fileinput), [FileInputList](#fileinputlist), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [HierarchyMenu](#hierarchymenu), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [MediaQuery](#mediaquery), [Menu](#menu), [MenuOrDrawer](#menuordrawer), [MenuOrDrawerOptions](#menuordraweroptions), [MonthSelector](#monthselector), [NoData](#nodata), [Paginator](#paginator), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SidebarLayout](#sidebarlayout), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Toaster](#toaster), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
 - [Not ported](#not-ported)
 - [Not available yet](#not-available-yet)
 
@@ -573,6 +573,36 @@ Everything in [Autocomplete](#autocomplete) applies.
   | `getCountryInfoByAlpha2(code)` | `countryName(code, locale)`: any case; an unknown code returns the code itself instead of `undefined` |
 
 New, optional: `locale`, `dialCode`, `class.dialCode`, `dialCode(code)`, `CountryData`, `--countries-autocomplete-dial-code-*`.
+
+### DashboardShaper
+
+- **Same data**: `widgets` keep the v4 shape (`{ id, name, width, height, left, top, data }`, places from 1), so the layouts saved by the backends load as they are and are saved the same way. Widgets added by the user get a random string id (v4: a cuid).
+- **Read-only by default**: `canAdd` → `editing`, off by default (v4 `canAdd` was on). Add `editing` on the pages that create or edit a dashboard; `canAdd={false}` → nothing. Read-only, only the rows in use are shown (v4 always drew `layoutHeight` rows).
+- **Moving and resizing**: while editing, widgets are dragged to free cells (on touch screens after holding them for a moment, so the page still scrolls) (onto one of the same size they swap places; the others never move) and resized among the `sizes` of their catalog entry with the corner handle; from the keyboard the handle next to the remove button moves (arrows), resizes (Shift + arrows) and removes (Delete). `movable={false} resizable={false}` keeps exactly the v4 behaviour (add and remove only).
+- While editing the dashboard draws its own remove button and the content of the widgets is inert: delete the remove overlays drawn in `widgetCellSnippet`.
+- `layoutWidth` → `columns`. `layoutHeight` → `rows`, now an optional maximum: a `layoutHeight` computed from the rows in use is not needed anymore.
+- `availableWidgetCells` → `catalog`: `availableSizes: [[2, 4]]` (height first) → `sizes: [{ width: 4, height: 2 }]`, `icon: "mdi-..."` → an SVG path from `@mdi/js`. Entries keep the given order (v4 sorted them by title, "Placeholder" first). New: `category` (tabs in the catalog) and `unique` (once per dashboard, for backends that save widgets by `name`).
+- `someRowSlotEmpty` → `hasEmptySlots`. `lang` → `locale`.
+- `onaddWidgetCell({ widgetCell })` and `onremoveWidgetCell({ widgetCell })` → one `onchange({ widgets, added, removed, changed })` with the widgets (v4 passed an internal cell): `widgetCell.widget` → `added[0]` / `removed[0]`.
+- `widgetCellSnippet({ widgetCell, removeWidgetCell })` → `widgetSnippet({ widget, item, editing, remove })`: `widgetCell.widget` → `widget`, `widgetCell.title` → `item?.title`, `removeWidgetCell({ id })` → `remove()`. `addWidgetButtonSnippet({ handleAddClick, slot })` → `slotSnippet({ width, height, add })`. `widgetSelectionDialogHeaderSnippet` → `catalogHeaderSnippet`.
+- Narrow screens: below `stackBelow` (640px of the component; v4: 800px of the window) the widgets go in one column to be read and keep their height (v4 lost it). While editing there the dashboard shows the real grid in small (each widget a block with icon, title and size, empty spaces to add): tapping a block selects it, then it drags at once and shows its remove button and the handle to resize it; any block also drags after holding it. `preview` thumbnails keep the grid at every width.
+- Apps with their own copy (DashboardShaper + DashboardEditor + DashboardAddButton, `componentName`): replace it with this one, mapping `componentName` to `name`.
+- DashboardGridShaper (a demo on `svelte-grid`, never exported) is not ported: moving and resizing are in DashboardShaper.
+
+| v4 | v5 |
+|---|---|
+| `--dashboard-shaper-widget-height` | `--dashboard-shaper-row-height` |
+| `--dashboard-shaper-cell-preview-background-color` | `--dashboard-shaper-preview-background` |
+| `--dashboard-shaper-widget-preview-border-radius` | `--dashboard-shaper-preview-border-radius` |
+| `--dashboard-shaper-add-widget-button-background-color` | `--dashboard-shaper-slot-background` |
+| `--dashboard-shaper-gap` | same name, default 10px (v4: 4px) |
+| `--dashboard-shaper-display-mobile`, `-flex-direction-mobile` | removed: `stackBelow` |
+| `--dashboard-shaper-dialog-background-color` | `--dialog-background` on the DashboardShaper (`--drawer-background` on mobile) |
+| `--dashboard-shaper-dialog-header-background-color` | removed: `catalogHeaderSnippet` |
+
+Defaults: the same changes on `--dashboard-shaper-default-*`.
+
+New, optional: `movable`, `resizable`, `stackBelow`, `catalogItemSnippet`, `labels`, `class` per part, catalog `category` and `unique`, keyboard and screen reader support, `--dashboard-shaper-*` variables for slots, editing controls, drop target, catalog and `min-height`.
 
 ### DataTable
 
@@ -1793,4 +1823,4 @@ These v4 exports are not in v5. Use the replacement; the ones marked "on request
 
 These v4 exports have no v5 version yet. Keep v4 for screens that need them, or wait for the port.
 
-- **Components**: PeriodSelector, PeriodPicker, IconsDropdown, ToggleList, BoxList, SelectableMenuList, SelectableVerticalList, GlobalSearchTextField, SimpleTimeLine, DashboardShaper.
+- **Components**: PeriodSelector, PeriodPicker, IconsDropdown, ToggleList, BoxList, SelectableMenuList, SelectableVerticalList, GlobalSearchTextField, SimpleTimeLine.

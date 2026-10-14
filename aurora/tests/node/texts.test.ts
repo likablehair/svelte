@@ -4,6 +4,8 @@ import { formatLetters, libraryTexts, TEXTS_EN, TEXTS_IT } from '../../src/lib/u
 const SAME_IN_ITALIAN = [
 	'avatar.online',
 	'avatar.offline',
+	'dashboardShaper.size',
+	'dashboardShaper.widget',
 	'dataTable.rangeOpen',
 	'hierarchyMenu.label',
 	'sidebarLayout.menu',

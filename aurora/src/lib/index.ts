@@ -90,6 +90,13 @@ export type {
 	ChartLegendItem,
 	ChartItemClick
 } from './utils/chart/types.js';
+export { default as DashboardShaper } from './components/composed/dashboard/DashboardShaper.svelte';
+export type {
+	DashboardWidget,
+	DashboardWidgetSize,
+	DashboardCatalogItem,
+	DashboardChange
+} from './utils/dashboard/types.js';
 export { default as CircularLoader } from './components/simple/loaders/CircularLoader.svelte';
 export { default as DotsLoader } from './components/simple/loaders/DotsLoader.svelte';
 export { default as Skeleton } from './components/simple/loaders/Skeleton.svelte';

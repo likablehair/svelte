@@ -69,4 +69,4 @@ Raccomandazione iniziale (P105, ritirata): **SVG della libreria**. È l'unica ch
 
 ## DashboardShaper
 
-Fuori dai grafici: 2 app con quello della libreria, 5 con il loro. Si analizza dopo i grafici come componente a sé.
+Fuori dai grafici: 2 app con quello della libreria, 5 con il loro. Analisi e proposte in `dashboard.md`.

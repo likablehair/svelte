@@ -51,6 +51,27 @@ export interface LibraryTexts {
 		typeBoolean: string;
 	};
 	confirmOrCancelButtons: { confirm: string; cancel: string };
+	dashboardShaper: {
+		add: string;
+		catalog: string;
+		all: string;
+		noFit: string;
+		size: string;
+		addSize: string;
+		widget: string;
+		move: string;
+		moveHint: string;
+		resizeHint: string;
+		removeHint: string;
+		resize: string;
+		remove: string;
+		schemaHint: string;
+		close: string;
+		moved: string;
+		resized: string;
+		removed: string;
+		added: string;
+	};
 	dataTable: {
 		search: string;
 		columns: string;
@@ -204,6 +225,27 @@ export const TEXTS_EN: LibraryTexts = {
 		typeBoolean: 'Yes/No'
 	},
 	confirmOrCancelButtons: { confirm: 'Save', cancel: 'Cancel' },
+	dashboardShaper: {
+		add: 'Add widget',
+		catalog: 'Add widget',
+		all: 'All',
+		noFit: 'No widget fits this space',
+		size: '{width} × {height}',
+		addSize: 'Add {title}, {width} × {height}',
+		widget: '{title}, {width} × {height}',
+		move: 'Arrange {title}',
+		moveHint: 'Arrow keys move the widget.',
+		resizeHint: 'Shift and arrow keys change its size.',
+		removeHint: 'Delete removes it.',
+		resize: 'Resize {title}',
+		remove: 'Remove {title}',
+		schemaHint: 'Tap a widget to select it, then drag it, resize it from its corner or remove it. Holding it drags it too.',
+		close: 'Close',
+		moved: '{title} moved to row {row}, column {column}',
+		resized: '{title} resized to {width} × {height}',
+		removed: '{title} removed',
+		added: '{title} added'
+	},
 	dataTable: {
 		search: 'Search…',
 		columns: 'Columns',
@@ -367,6 +409,27 @@ export const TEXTS_IT: LibraryTexts = {
 		typeBoolean: 'Sì/No'
 	},
 	confirmOrCancelButtons: { confirm: 'Salva', cancel: 'Annulla' },
+	dashboardShaper: {
+		add: 'Aggiungi widget',
+		catalog: 'Aggiungi widget',
+		all: 'Tutti',
+		noFit: 'Nessun widget entra in questo spazio',
+		size: '{width} × {height}',
+		addSize: 'Aggiungi {title}, {width} × {height}',
+		widget: '{title}, {width} × {height}',
+		move: 'Disponi {title}',
+		moveHint: 'Le frecce spostano il widget.',
+		resizeHint: 'Maiusc e frecce ne cambiano la dimensione.',
+		removeHint: 'Canc lo rimuove.',
+		resize: 'Ridimensiona {title}',
+		remove: 'Rimuovi {title}',
+		schemaHint: "Tocca un widget per selezionarlo, poi trascinalo, allargalo dall'angolo o rimuovilo. Anche tenendolo premuto si trascina.",
+		close: 'Chiudi',
+		moved: '{title} spostato alla riga {row}, colonna {column}',
+		resized: '{title} ridimensionato a {width} × {height}',
+		removed: '{title} rimosso',
+		added: '{title} aggiunto'
+	},
 	dataTable: {
 		search: 'Cerca…',
 		columns: 'Colonne',

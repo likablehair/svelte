@@ -286,8 +286,7 @@ export default {
 			'SelectableMenuList',
 			'SelectableVerticalList',
 			'GlobalSearchTextField',
-			'SimpleTimeLine',
-			'DashboardShaper'
+			'SimpleTimeLine'
 		])
 	],
 	manual: [
