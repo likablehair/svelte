@@ -8,7 +8,7 @@ Contents:
 
 - [Checklist](#checklist)
 - [Global changes](#global-changes)
-- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Avatar](#avatar), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DataTable](#datatable), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [DescriptiveAvatar](#descriptiveavatar), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FileInput](#fileinput), [FileInputList](#fileinputlist), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [HierarchyMenu](#hierarchymenu), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [MediaQuery](#mediaquery), [Menu](#menu), [MonthSelector](#monthselector), [NoData](#nodata), [Paginator](#paginator), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SidebarLayout](#sidebarlayout), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Toaster](#toaster), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
+- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Avatar](#avatar), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DataTable](#datatable), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [DescriptiveAvatar](#descriptiveavatar), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FileInput](#fileinput), [FileInputList](#fileinputlist), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [HierarchyMenu](#hierarchymenu), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [MediaQuery](#mediaquery), [Menu](#menu), [MenuOrDrawer](#menuordrawer), [MenuOrDrawerOptions](#menuordraweroptions), [MonthSelector](#monthselector), [NoData](#nodata), [Paginator](#paginator), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SidebarLayout](#sidebarlayout), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Toaster](#toaster), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
 - [Not ported](#not-ported)
 - [Not available yet](#not-available-yet)
 
@@ -1255,6 +1255,40 @@ New, optional: `rel`, `bind:linkElement`, `--link-button-hover-color`, `--link-b
 
 New, optional: `-start`/`-end` placements, `matchActivatorWidth`, virtual activator, `class` and native attributes, `data-side`.
 
+### MenuOrDrawer
+
+| v4 | v5 |
+|---|---|
+| `menuProps={{ activator }}` | `activator` |
+| `menuProps={{ anchor }}` | `placement` (values as in [Menu](#menu); default `bottom` = v4 `bottom-center`) |
+| other `menuProps` keys | `menuProps` with the v5 Menu props; `_width`, `_maxHeight`, `_boxShadow`, `_borderRadius`, … → `--menu-*` style props on MenuOrDrawer; `flipOnOverflow`, `stayInViewport`, `refreshPosition`, `openingId` removed |
+| `drawerProps={{ _space }}` | `--drawer-size` style prop |
+
+- Below 1024px it still opens a bottom `Drawer`, above a `Menu`. The bottom drawer is now as tall as its content, up to 85% of the screen (v4: 20rem): set `--drawer-size` for a fixed height.
+- The menu draws its own surface and the drawer body its own padding: remove the box that the content built in the menu branch (background, border, radius, shadow, padding) and the extra padding in the drawer branch.
+- `menuProps` is no longer bindable nor written to.
+
+New, optional: `mode` (`auto`, `menu`, `drawer`) to force one of the two, `close` in the `children` parameters (closes and gives the focus back to the activator), `bind:menuElement`, `bind:drawerElement`.
+
+### MenuOrDrawerOptions
+
+| v4 | v5 |
+|---|---|
+| `elements` | `options` (`MenuOrDrawerOption[]`) |
+| element `title` | `label` |
+| element `icon: "mdi-pencil"` | `icon: mdiPencil` (SVG path) |
+| element `style: { color: <error> }` | `variant: 'danger'` |
+| element `style` (other) | `class` + app CSS |
+| element `appendIcon` | removed (it did nothing in v4) |
+| `onselect({ detail: { element } })` | `onselect({ option, event })` |
+| `menuProps`, `drawerProps` | as in [MenuOrDrawer](#menuordrawer): `activator` and `placement` are props |
+
+- Choosing an option closes the menu (as before) and gives the focus back to the activator. `onclick` on an option runs before `onselect`, so `data: { action }` patterns can move to `onclick`.
+- It is a real ARIA menu: the first option takes the focus on open, arrows, Home, End and the first letter move, Enter and Space choose. Disabled options stay reachable, with `aria-disabled`.
+- In the bottom sheet the options are taller, and the sheet is as tall as the options.
+
+New, optional: `description` (shown now), `shortcut`, `checked`, `divider`, `class` and `onclick` per option; `aria-label` (default "Actions", from `locale`), `locale`, `optionSnippet`, `mode`, native attributes on the menu element. **DataTable** uses it for the "⋯" actions of the selection bar.
+
 ### MonthSelector
 
 - `onclick({ detail: { monthIndex } })` → `onchange({ month })`.
@@ -1691,4 +1725,4 @@ These v4 exports are not in v5. Use the replacement; the ones marked "on request
 
 These v4 exports have no v5 version yet. Keep v4 for screens that need them, or wait for the port.
 
-- **Components**: MenuOrDrawer, MenuOrDrawerOptions, PeriodSelector, PeriodPicker, IconsDropdown, ToggleList, BoxList, SelectableMenuList, SelectableVerticalList, GlobalSearchTextField, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper.
+- **Components**: PeriodSelector, PeriodPicker, IconsDropdown, ToggleList, BoxList, SelectableMenuList, SelectableVerticalList, GlobalSearchTextField, LineChart, BarChart, PieChart, SimpleTimeLine, DashboardShaper.

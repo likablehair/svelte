@@ -1,0 +1,32 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--menu-or-drawer-options-default-min-width: 180px;
+		--menu-or-drawer-options-default-gap: 1px;
+		--menu-or-drawer-options-default-item-gap: 8px;
+		--menu-or-drawer-options-default-item-padding: 7px 10px;
+		--menu-or-drawer-options-default-drawer-item-padding: 12px 12px;
+		--menu-or-drawer-options-default-item-border-radius: var(--global-radius-sm);
+		--menu-or-drawer-options-default-item-font-size: 13px;
+		--menu-or-drawer-options-default-drawer-item-font-size: 15px;
+		--menu-or-drawer-options-default-item-color: var(--global-color-text-2);
+		--menu-or-drawer-options-default-item-hover-color: var(--global-color-text);
+		--menu-or-drawer-options-default-item-hover-background: var(--global-color-surface-2);
+		--menu-or-drawer-options-default-icon-size: 17px;
+		--menu-or-drawer-options-default-drawer-icon-size: 20px;
+		--menu-or-drawer-options-default-description-color: var(--global-color-text-3);
+		--menu-or-drawer-options-default-description-font-size: 11.5px;
+		--menu-or-drawer-options-default-shortcut-color: var(--global-color-text-3);
+		--menu-or-drawer-options-default-shortcut-font-family: var(--global-font-family-mono);
+		--menu-or-drawer-options-default-shortcut-font-size: 11px;
+		--menu-or-drawer-options-default-checked-color: var(--global-color-text);
+		--menu-or-drawer-options-default-checked-background: var(--global-color-primary-soft);
+		--menu-or-drawer-options-default-check-color: var(--global-color-primary);
+		--menu-or-drawer-options-default-danger-color: var(--global-color-error);
+		--menu-or-drawer-options-default-danger-hover-background: var(--global-color-error-soft);
+		--menu-or-drawer-options-default-disabled-opacity: 0.4;
+		--menu-or-drawer-options-default-divider-color: var(--global-color-border);
+		--menu-or-drawer-options-default-divider-margin: 4px 6px;
+	}
+}

@@ -280,8 +280,6 @@ export default {
 			note: 'Not ported (one app); available on request. A debounce is a few lines in the app (`clearTimeout` + `setTimeout`).'
 		},
 		...pending('component', [
-			'MenuOrDrawer',
-			'MenuOrDrawerOptions',
 			'PeriodSelector',
 			'PeriodPicker',
 			'IconsDropdown',

@@ -4,10 +4,12 @@ Table for server data, with a toolbar (search, `Filters`, the buttons of the app
 <script lang="ts" generics="Row extends Record<string, any>">
 	import '../../../css/tokens.css';
 	import './DataTable.css';
-	import { tick, untrack, type ComponentProps, type Snippet } from 'svelte';
+	import { untrack, type ComponentProps, type Snippet } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
 	import Button from '../../simple/buttons/Button.svelte';
-	import Menu from '../../simple/common/Menu.svelte';
+	import MenuOrDrawerOptions, {
+		type MenuOrDrawerOption
+	} from '../common/MenuOrDrawerOptions.svelte';
 	import NoData from '../../simple/common/NoData.svelte';
 	import Tooltip from '../../simple/common/Tooltip.svelte';
 	import Icon from '../../simple/media/Icon.svelte';
@@ -100,7 +102,7 @@ Table for server data, with a toolbar (search, `Filters`, the buttons of the app
 		columnManager?: boolean;
 		/** Shows the bar of the selected rows while at least one is selected. */
 		selectionBar?: boolean;
-		/** Actions on the selected rows, drawn as buttons of the selection bar with the same look in every app. Those that do not fit (more than 4, or 2 below 640px) go in a "More actions" menu. */
+		/** Actions on the selected rows, drawn as buttons of the selection bar with the same look in every app. Those that do not fit (more than 4, or 2 below 640px) go in a "More actions" `MenuOrDrawerOptions`: a menu, or a bottom sheet on screens up to 1024px wide. */
 		selectionActions?: DataTableAction<Row>[];
 		/** Disables every action of the selection bar, for example while one of them is running. */
 		selectionDisabled?: boolean;
@@ -266,7 +268,6 @@ Table for server data, with a toolbar (search, `Filters`, the buttons of the app
 	let managerOpen = $state(false);
 	let moreOpen = $state(false);
 	let moreButton = $state<HTMLButtonElement | HTMLAnchorElement>();
-	let moreMenu = $state<HTMLDivElement>();
 	let actionButtons = $state<(HTMLButtonElement | HTMLAnchorElement | undefined)[]>([]);
 	const running = new SvelteSet<number>();
 	let width = $state<number>();
@@ -332,6 +333,20 @@ Table for server data, with a toolbar (search, `Filters`, the buttons of the app
 	let actionLimit = $derived(narrow ? 2 : 4);
 	let inlineCount = $derived(
 		selectionActions.length <= actionLimit + 1 ? selectionActions.length : actionLimit
+	);
+	let moreOptions = $derived(
+		selectionActions.slice(inlineCount).map((action, offset): MenuOrDrawerOption => {
+			const index = inlineCount + offset;
+			return {
+				name: index,
+				label: action.label,
+				icon: action.icon,
+				description: actionTip(action),
+				variant: action.variant,
+				disabled: actionOff(action) || action.loading || running.has(index),
+				onclick: (event) => runAction(action, index, event)
+			};
+		})
 	);
 	let showSearch = $derived(searchable ?? !!searchColumns?.length);
 	let showFilters = $derived(fields.length > 0);
@@ -525,29 +540,8 @@ Table for server data, with a toolbar (search, `Filters`, the buttons of the app
 		}
 	}
 
-	async function openMore() {
+	function openMore() {
 		moreOpen = !moreOpen;
-		if (!moreOpen) return;
-		await tick();
-		moreMenu?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
-	}
-
-	function moveInMore(event: KeyboardEvent) {
-		const items = [...(moreMenu?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [])];
-		const at = items.indexOf(document.activeElement as HTMLElement);
-		const next =
-			event.key === 'ArrowDown'
-				? (at + 1) % items.length
-				: event.key === 'ArrowUp'
-					? (at - 1 + items.length) % items.length
-					: event.key === 'Home'
-						? 0
-						: event.key === 'End'
-							? items.length - 1
-							: -1;
-		if (next < 0 || !items.length) return;
-		event.preventDefault();
-		items[next].focus();
 	}
 
 	function setSearch(text: string) {
@@ -743,33 +737,14 @@ Table for server data, with a toolbar (search, `Filters`, the buttons of the app
 								bind:buttonElement={moreButton}
 								onclick={openMore}
 							/>
-							<Menu
+							<MenuOrDrawerOptions
 								bind:open={moreOpen}
-								bind:menuElement={moreMenu}
 								activator={moreButton as HTMLElement | undefined}
-								role="menu"
+								placement="bottom-start"
 								aria-label={texts.moreActions}
-								onkeydown={moveInMore}
-							>
-								{#each selectionActions.slice(inlineCount) as action, offset (offset)}
-									{@const index = inlineCount + offset}
-									{@const tip = actionTip(action)}
-									<button
-										type="button"
-										role="menuitem"
-										class="aurora-data-table-menu-item"
-										data-variant={action.variant === 'danger' ? 'danger' : undefined}
-										aria-disabled={actionOff(action) || action.loading || running.has(index) ? 'true' : undefined}
-										onclick={(event) => runAction(action, index, event)}
-									>
-										{#if action.icon}<Icon path={action.icon} />{/if}
-										<span class="aurora-data-table-menu-item-text">
-											<span>{action.label}</span>
-											{#if tip}<small>{tip}</small>{/if}
-										</span>
-									</button>
-								{/each}
-							</Menu>
+								{locale}
+								options={moreOptions}
+							/>
 						{/if}
 						{#if selectionActionsSnippet}
 							{@render selectionActionsSnippet({
@@ -972,54 +947,6 @@ Table for server data, with a toolbar (search, `Filters`, the buttons of the app
 			align-items: center;
 			flex-wrap: wrap;
 			gap: 6px;
-		}
-
-		.aurora-data-table-menu-item {
-			--icon-size: 17px;
-
-			display: flex;
-			align-items: center;
-			gap: 10px;
-			width: 100%;
-			padding: var(--data-table-menu-item-padding, var(--data-table-default-menu-item-padding));
-			border: 0;
-			border-radius: var(--global-radius-sm);
-			background: none;
-			color: var(--data-table-menu-item-color, var(--data-table-default-menu-item-color));
-			font: inherit;
-			font-size: 13px;
-			text-align: start;
-			cursor: pointer;
-		}
-
-		.aurora-data-table-menu-item[data-variant='danger'] {
-			color: var(--data-table-menu-item-danger-color, var(--data-table-default-menu-item-danger-color));
-		}
-
-		.aurora-data-table-menu-item[aria-disabled='true'] {
-			cursor: not-allowed;
-			opacity: var(--data-table-menu-item-disabled-opacity, var(--data-table-default-menu-item-disabled-opacity));
-		}
-
-		.aurora-data-table-menu-item:focus-visible {
-			outline: var(--global-focus-ring-width) solid var(--global-focus-ring-color);
-			outline-offset: -2px;
-		}
-
-		@media (hover: hover) {
-			.aurora-data-table-menu-item:not([aria-disabled='true']):hover {
-				background: var(--data-table-menu-item-hover-background, var(--data-table-default-menu-item-hover-background));
-			}
-		}
-
-		.aurora-data-table-menu-item-text {
-			display: grid;
-			gap: 2px;
-		}
-
-		.aurora-data-table-menu-item-text small {
-			color: var(--global-color-text-3);
-			font-size: 11.5px;
 		}
 
 		@container aurora-data-table-dock (max-width: 480px) {

@@ -29,11 +29,6 @@
 		--data-table-default-selection-shadow: var(--global-shadow-lg), 0 0 60px -20px var(--global-color-primary-glow);
 		--data-table-default-selection-count-background: var(--global-color-primary);
 		--data-table-default-selection-count-color: var(--global-color-on-primary);
-		--data-table-default-menu-item-padding: 8px 10px;
-		--data-table-default-menu-item-color: var(--global-color-text-2);
-		--data-table-default-menu-item-danger-color: var(--global-color-error);
-		--data-table-default-menu-item-hover-background: var(--global-color-surface-2);
-		--data-table-default-menu-item-disabled-opacity: 0.4;
 		--data-table-default-duration: var(--global-duration-fast);
 		--data-table-default-easing: var(--global-ease);
 	}

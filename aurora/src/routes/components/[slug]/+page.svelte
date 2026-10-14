@@ -100,6 +100,7 @@
 
 	.meta code {
 		font-family: var(--global-font-family-mono);
+		overflow-wrap: anywhere;
 	}
 
 	.missing {

@@ -110,6 +110,7 @@ export interface LibraryTexts {
 		error: string;
 	};
 	hierarchyMenu: { label: string; submenu: string };
+	menuOrDrawerOptions: { label: string };
 	monthSelector: { label: string };
 	noData: { title: string };
 	paginator: {
@@ -271,6 +272,7 @@ export const TEXTS_EN: LibraryTexts = {
 		error: 'Upload failed'
 	},
 	hierarchyMenu: { label: 'Menu', submenu: '{label} submenu' },
+	menuOrDrawerOptions: { label: 'Actions' },
 	monthSelector: { label: 'Month' },
 	noData: { title: 'No data available' },
 	paginator: {
@@ -432,6 +434,7 @@ export const TEXTS_IT: LibraryTexts = {
 		error: 'Caricamento non riuscito'
 	},
 	hierarchyMenu: { label: 'Menu', submenu: 'Sottomenu di {label}' },
+	menuOrDrawerOptions: { label: 'Azioni' },
 	monthSelector: { label: 'Mese' },
 	noData: { title: 'Nessun dato disponibile' },
 	paginator: {

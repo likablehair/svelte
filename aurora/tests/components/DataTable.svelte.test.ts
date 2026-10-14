@@ -765,6 +765,42 @@ describe('DataTable', () => {
 			await expect.element(bar.getByRole('button', { name: 'Action 2' })).toBeInTheDocument();
 		});
 
+		test('on screens up to 1024px the actions that do not fit open in a bottom sheet', async () => {
+			await page.viewport(800, 700);
+			try {
+				document.documentElement.style.setProperty('--drawer-duration', '0s');
+				const ran = vi.fn();
+				const actions = Array.from({ length: 6 }, (_, index) => ({
+					label: `Action ${index + 1}`,
+					variant: index === 5 ? ('danger' as const) : undefined,
+					disabled: index === 4,
+					disabledInfo: 'Not allowed',
+					onclick: () => ran(index + 1)
+				}));
+				const screen = await render(DataTable, {
+					columns,
+					selectable: 'multiple',
+					selected: [people[0]],
+					selectionActions: actions,
+					...slice({ page: 1, pageSize: 20 })
+				});
+				await screen.getByRole('toolbar').getByRole('button', { name: 'More actions' }).click();
+				const sheet = page.getByRole('dialog', { name: 'More actions' });
+				await expect.element(sheet).toBeVisible();
+				const off = sheet.getByRole('menuitem', { name: 'Action 5' });
+				await expect.element(off).toHaveAttribute('aria-disabled', 'true');
+				await expect.element(off).toHaveAccessibleDescription('Not allowed');
+				const danger = sheet.getByRole('menuitem', { name: 'Action 6' });
+				await expect.element(danger).toHaveAttribute('data-variant', 'danger');
+				await danger.click();
+				expect(ran).toHaveBeenCalledWith(6);
+				await expect.element(sheet).not.toBeInTheDocument();
+			} finally {
+				document.documentElement.style.removeProperty('--drawer-duration');
+				await page.viewport(1280, 800);
+			}
+		});
+
 		test('with one action more than the limit every action stays in the bar', async () => {
 			const screen = await render(DataTable, {
 				columns,
