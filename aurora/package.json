@@ -7,12 +7,14 @@
 		"prepare": "svelte-kit sync || echo ''",
 		"package": "svelte-kit sync && svelte-package && publint",
 		"prepack": "npm run package",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && tsc -p migrate",
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"test:related": "vitest related --run",
 		"test:visual": "playwright test",
-		"test:visual:update": "playwright test --update-snapshots"
+		"test:visual:update": "playwright test --update-snapshots",
+		"migrate:rules": "node migrate/scripts/compile-rules.ts",
+		"migrate": "node migrate/src/cli.ts"
 	},
 	"files": [
 		"dist",

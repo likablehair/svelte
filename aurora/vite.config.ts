@@ -32,8 +32,9 @@ export default defineConfig({
 			{
 				test: {
 					name: 'node',
-					include: ['tests/node/**/*.test.ts'],
+					include: ['tests/node/**/*.test.ts', 'migrate/tests/**/*.test.ts'],
 					environment: 'node',
+					css: { include: [/\.css(\?|$)/] },
 					expect: { requireAssertions: true }
 				}
 			}

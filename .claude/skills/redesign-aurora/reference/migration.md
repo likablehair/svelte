@@ -72,9 +72,52 @@ Idea guida: **nessuno deve conoscere tutto**. Le regole le sa lo strumento; lo s
 
 Regola: **commit prima di ogni lavoro di migrazione**; nelle app si tocca qualcosa solo con il loro repo tutto committato e con l'ok dell'utente per quell'app. Gli strumenti in sola lettura (`analyze`) si possono lanciare su tutte le app senza chiedere.
 
+Stato: passi 1–4 fatti il 2026-10-15 (sezione sotto); il passo 5 aspetta l'ok dell'utente per tatum.
+
 1. **Pacchetto** `aurora/migrate/` (`@likable-hair/svelte-migrate`): `package.json` suo, `bin`, dipendenze `svelte` (parser) e `magic-string`; test nel progetto node di aurora o suo.
 2. **Regole compilate** (prima parte di P218): uno script che importa `migrations/v4-to-v5/*.ts` e scrive un JSON unico (con i `forwarded()` risolti), che il pacchetto legge.
 3. **`analyze <cartella app>`** (sola lettura): versioni (lib, Svelte, Kit, pm), fase 0 necessaria (v3/Svelte 4), componenti v4 usati con i file, per ogni uso le regole che scattano davvero (prop rinominate/tolte, passi `manual` con `when`), wrapper `Standard*` (sottili o con logica, quanti file li importano), icone (letterali, nei dati, dinamiche), `.detail`, token v4, style prop, import profondi, `ComponentProps<typeof X>`; stima meccanico/manuale. Uscita Markdown + JSON.
 4. **`analyze` su tutte le 20 app** e tabella riassuntiva da mostrare all'utente, che conferma il pilota.
 5. Poi, con l'ok: setup + codemod meccanico + scioglimento dei wrapper sul pilota (tatum), lista dei punti rimasti, prova a mano; poi MCP e prompt.
+
+## Analisi del 2026-10-15 (`npm run migrate -- analyze`, sola lettura)
+
+`auto` = lo farà il codemod; `check` = meccanico con avvertenza (svelte-check ne indica gran parte); punti manuali = coppie file × passo che chiedono giudizio; generali = cambi di comportamento o aspetto, uno per componente usato; passi app = rilevati come necessari (+ da guardare).
+
+| app | lib | Svelte | fase 0 | file | usi (diretti + wrapper) | wrapper (con logica) | auto | check | punti man. | generali | passi app |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| addibox | 4.1.2 | 5.36 | no | 324 | 821 + 266 | 27 (22) | 841 | 1174 | 610 | 67 | 14 (+25) |
+| astro | 4.1.6 | 5.25 | no | 155 | 314 + 142 | 36 (25) | 336 | 720 | 347 | 55 | 14 (+22) |
+| biblio | 4.3.1 | 5.56 | no | 52 | 120 + 29 | 14 (7) | 113 | 184 | 69 | 43 | 10 (+14) |
+| billboards | 3.2.3 | 4.2 | Svelte 4 + v3 | 35 | 98 + 34 | 12 (6) | 111 | 134 | 71 | 31 | 10 (+13) |
+| cbam | 4.3.2 | 5.40 | no | 182 | 492 + 245 | 27 (24) | 511 | 982 | 475 | 56 | 12 (+22) |
+| contattorapido | 4.3.1 | 5.55 | no | 66 | 163 + 74 | 15 (9) | 183 | 207 | 119 | 42 | 10 (+18) |
+| emarket | 3.2.6 | 4.2 | Svelte 4 + v3 | 35 | 73 + 50 | 15 (10) | 104 | 164 | 112 | 41 | 10 (+16) |
+| epass | 4.1.2 | 5.43 | no | 169 | 375 + 379 | 28 (18) | 500 | 629 | 574 | 43 | 14 (+15) |
+| ermes | 3.3.5 | 4.2 | Svelte 4 + v3 | 34 | 66 + 42 | 13 (8) | 73 | 137 | 103 | 35 | 11 (+14) |
+| forlimusica | 3.1 | 4.2 | Svelte 4 + v3 | 9 | 27 + 2 | 2 (2) | 29 | 44 | 18 | 11 | 8 (+9) |
+| ganymede | 3.3.32 | 4.2 | Svelte 4 + v3 | 223 | 511 + 372 | 23 (15) | 610 | 910 | 550 | 50 | 15 (+19) |
+| h24 | 3.3.5 | 4.2 | Svelte 4 + v3 | 43 | 88 + 52 | 15 (10) | 114 | 172 | 118 | 36 | 12 (+13) |
+| likable-tools | 3.3.32 | 4.2 | Svelte 4 + v3 | 31 | 69 + 23 | 13 (6) | 75 | 122 | 55 | 33 | 12 (+13) |
+| lupette | 3.3.12 | 4.2 | Svelte 4 + v3 | 112 | 224 + 138 | 18 (12) | 231 | 338 | 200 | 57 | 12 (+19) |
+| maya | 4.1.2 | 5.38 | no | 224 | 506 + 267 | 54 (42) | 529 | 1032 | 527 | 67 | 14 (+25) |
+| mufasa | 4.1 | 5.0 | no | 145 | 262 + 89 | 31 (21) | 256 | 305 | 184 | 53 | 12 (+18) |
+| new-vigipass | 4.1.2 | 5.0 | no | 169 | 269 + 361 | 34 (25) | 603 | 669 | 398 | 47 | 14 (+17) |
+| quantum | 3.3.25 | 4.2 | Svelte 4 + v3 | 47 | 127 + 64 | 11 (7) | 141 | 216 | 152 | 41 | 12 (+16) |
+| stramoniumai | 4.2.5 | 5.41 | no | 340 | 1160 + 401 | 33 (20) | 1217 | 1262 | 784 | 65 | 13 (+25) |
+| tatum | 4.3.1 | 5.55 | no | 28 | 49 + 16 | 14 (7) | 55 | 151 | 55 | 35 | 10 (+14) |
+
+Totali: auto 6.632, check 9.552, punti manuali 5.521, generali 908; wrapper 435 (296 con logica) importati da 2.017 file. Git: biblio 3 modifiche non committate, lupette 16; epass dichiara la lib 3.3.18 ma ha installata la 4.1.2 (e Svelte 5.43): si segue l'installata. mufasa, new-vigipass e forlimusica senza `node_modules`: versioni dal `package.json`.
+
+Cosa si vede:
+- **I punti manuali sono per lo più "guarda", non "scrivi"**: i più frequenti (file × passo) sono `button-loading` 370, `button-disabled` 345, `autocomplete-strict-equality` 199, `autocomplete-onchange-unselect` 125, `dialog-content-lifecycle` 84: comportamenti cambiati che si guardano, senza codice da cambiare quasi mai. Quelli da scrivere: `data-table-columns` 210, `data-table-query`/`loader` 187, `data-table-filters` 183, `tooltip-surface` 156, `icon-clickable` 154. Alcuni sono già meccanizzabili (`autocomplete-item-icon` 199 = trasformazione delle icone nei dati; `checkbox-shift-key` duplica l'evento `onchange`). → P220.
+- **App v3**: le prop note solo alla v3 non sono nelle regole (le più frequenti: Icon `click` 86, figli di MediaQuery 28, `rowActionsSnippet` 28, prop di stile di Textarea `paddingTop`… ~70, prop di BarChart/LineChart, SimpleTimeLine). `analyze` le elenca in "Unknown props". → P221.
+- I wrapper "con logica" sono la maggioranza per l'euristica (blocchi `{#if}`, più nodi radice, funzioni): lo scioglimento va guardato wrapper per wrapper; il pilota dirà quanti si sciolgono davvero.
+
+## Proposte nate dall'analisi (non confermate)
+
+| # | Proposta | Nota |
+|---|---|---|
+| P220 | `ManualStep` con un campo `kind`: `review` (comportamento o aspetto cambiato: si guarda, di solito nulla da scrivere) o `edit` (codice da cambiare); la lista dei punti rimasti mostra prima gli `edit` per file e raggruppa le `review` per componente, con le pagine da guardare | parte di P218 (regole leggibili dalla macchina), si classificano i 228 passi esistenti |
+| P221 | Regole **v3 → v4** minime, solo per i nomi v3 trovati da `analyze` nelle 10 app v3 (elenco "Unknown props"), così lo strumento porta una app v3 direttamente alla v5 | completa P216; senza, quelle prop restano errori di svelte-check da risolvere a mano |
 

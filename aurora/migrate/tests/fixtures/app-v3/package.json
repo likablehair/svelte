@@ -1,0 +1,8 @@
+{
+	"name": "fixture-v3",
+	"private": true,
+	"devDependencies": {
+		"@likable-hair/svelte": "^3.3.0",
+		"svelte": "^4.2.0"
+	}
+}

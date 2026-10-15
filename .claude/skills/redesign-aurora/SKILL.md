@@ -184,11 +184,13 @@ Una riga per argomento; la voce completa, con data e motivazioni, è in `referen
 
 ## Proposte (non ancora confermate)
 
-Le nuove proposte vanno in una tabella `| # | Proposta | Nota |`, numerate dal primo numero libero (ultimo usato: P219; P19 e P20 sono state usate per i layer e Tailwind).
+Le nuove proposte vanno in una tabella `| # | Proposta | Nota |`, numerate dal primo numero libero (ultimo usato: P221; P19 e P20 sono state usate per i layer e Tailwind).
 
 | # | Proposta | Nota |
 |---|---|---|
 | P180–P188 | SelectableVerticalList (P180–P186) e SelectableMenuList (P187–P188) superate dalla decisione "Punto 6"; BoxList P172–P179 e ToggleList P189–P191 approvate | elenco in `reference/lists.md` |
+| P220 | Passi `manual` divisi in `review` (si guarda) ed `edit` (si scrive); la lista dei punti rimasti mostra prima gli `edit` | dall'analisi delle 20 app, `reference/migration.md` |
+| P221 | Regole v3 → v4 minime per i nomi v3 trovati da `analyze` nelle 10 app v3 | idem |
 
 ## Domande aperte
 
@@ -200,7 +202,7 @@ Le nuove proposte vanno in una tabella `| # | Proposta | Nota |`, numerate dal p
 
 **Subito, prima del prossimo componente** (deciso il 2026-10-09): fatto il 2026-10-09 (infrastruttura, test e regole dei 30 componenti). Da qui ogni componente nuovo ha test e regole nel suo stesso giro (processo, passi 7b e 8c).
 
-**Ordine dato dall'utente il 2026-10-15**: (1) ricerca delle docs con GlobalSearchTextField (fatta); (2) **studiare un metodo di migrazione semplice**, che funzioni "senza che uno conosca tutto quanto" (chi migra un'app non deve sapere tutta la libreria né leggere MIGRATION.md per intero): P211–P219 approvate il 2026-10-15 (`reference/migration.md`, piano di lavoro nella sezione "Piano"); (3) P56, P104, P40 approvate, da fare.
+**Ordine dato dall'utente il 2026-10-15**: (1) ricerca delle docs con GlobalSearchTextField (fatta); (2) **studiare un metodo di migrazione semplice**, che funzioni "senza che uno conosca tutto quanto" (chi migra un'app non deve sapere tutta la libreria né leggere MIGRATION.md per intero): P211–P219 approvate il 2026-10-15 (`reference/migration.md`, piano di lavoro nella sezione "Piano"; passi 1–4, fino ad `analyze` su tutte le app, fatti il 2026-10-15); (3) P56, P104, P40 approvate, da fare.
 
 **Dopo** (chiesti dal capo, non bloccano i componenti):
 - codemod, server MCP e prompt di migrazione (decisione "Migrazione guidata", `reference/migration.md`), che leggono le regole di ex P44;
@@ -244,6 +246,7 @@ La suite intera (~2.400 test in due browser, 3–4 minuti) e il test visivo inte
 - **Durante il lavoro**, solo i test di ciò che hai toccato:
   - un componente: il **suo file di test** e quelli dei componenti che lo usano direttamente (`npx vitest run --project components tests/components/<C>.test.ts tests/components/<D>.test.ts`);
   - una utility: `npx vitest run --project node tests/node/<x>.test.ts`;
+  - lo strumento di migrazione: `npx vitest run --project node migrate/tests` (e `npm run migrate:rules` se cambia una regola);
   - un pezzo condiviso di cui non sai chi lo usa: `npm run test:related -- <file sorgente>` (Vitest esegue i test che lo importano). Attenzione: i test che importano dall'indice `#lib` risultano collegati a tutto, quindi `test:related` su un componente lancia più file del necessario (Divider: 20 file su 86); per un componente il file diretto è meglio.
 - **Test visivo**: solo gli esempi toccati, `npx playwright test -g "<slug>"`; baseline nuove o cambiate solo per quelli, `npx playwright test -g "<slug>" --update-snapshots=all` (senza `=all` riscrive solo quelle sopra soglia, vedi `traps.md`), poi guardare le immagini. Mai `test:visual:update` su tutto.
 - **`npx svelte-check --threshold error`**: una volta alla fine del giro di modifiche.
@@ -312,4 +315,5 @@ La suite intera (~2.400 test in due browser, 3–4 minuti) e il test visivo inte
 - **2026-10-15, commit e push** su `origin aurora-v5` di ToggleList, PeriodPicker/PeriodSelector (con i ritocchi), GlobalSearchTextField: suite intera 3867 verde, visivo 976, package ok.
 - **2026-10-15, ricerca delle docs** con GlobalSearchTextField nella barra (Ctrl/⌘+K): indice `/search.json` generato dal sorgente (componenti, prop, eventi, snippet, metodi, tipi, variabili CSS, token, esempi, sezioni delle pagine), filtrato nel browser; ogni risultato porta alla riga giusta della pagina, evidenziata. GlobalSearchTextField compatto anche prima dell'idratazione (media query CSS). Commit su `aurora-v5` (push non chiesto) insieme allo studio della migrazione: suite intera verde (corretto un test instabile sotto carico di GlobalSearchTextField), visivo 976, package ok.
 - **2026-10-15, studio della migrazione** (`reference/migration.md`): misurato l'uso della v4 nelle 20 app (10 ancora su lib v3 + Svelte 4; wrapper `Standard*` importati da 1.365 file; FilterBuilder invariato in 727 file) e cosa coprono le regole (nessun componente solo meccanico, 336 passi manuali, buchi del formato); coesistenza v4+v5 possibile ma costosa. Proposta P211–P219 presentata all'utente.
-- **Prossimo**: migrazione guidata, primo passo `analyze` (vedi "Da fare"); poi P56, P104, P40 (approvate).
+- **2026-10-15, strumento di migrazione, `analyze`**: pacchetto `aurora/migrate/` (`@likable-hair/svelte-migrate`), regole compilate in JSON (`npm run migrate:rules`), `npm run migrate -- analyze <app…>` in sola lettura (usi diretti e attraverso i wrapper, auto/check/manual, passi d'app rilevati, rapporto Markdown + JSON + riepilogo); 22 test; lanciato sulle 20 app (tabella in `reference/migration.md`). Commit non chiesto.
+- **Prossimo**: con l'ok dell'utente, pilota su tatum (setup + codemod + scioglimento dei wrapper, piano passo 5 di `reference/migration.md`); P220–P221 da far confermare; poi P56, P104, P40 (approvate).
