@@ -107,6 +107,7 @@ const unstable = {
 				v4: "'hover'",
 				v5: "'toggle'",
 				keepV4: 'expandOn="hover"',
+				behaviour: true,
 				note: 'v5 widens the sidebar with a button in the bar by default. With `hover` and `click` it now widens over the content instead of pushing it; with `click` choosing an option narrows it again (v4 reopened it).'
 			}
 		],
@@ -198,6 +199,7 @@ const collapsible = {
 	events: {
 		changed: [
 			drawerChange,
+			menuSelect,
 			{
 				name: 'onsidebarToggle',
 				argument: { 'detail.expanded': 'expanded', detail: '' },

@@ -421,6 +421,18 @@
 					"buttonElement",
 					"appendIcon"
 				],
+				"bindable": [
+					"active",
+					"buttonElement"
+				],
+				"defaults": {
+					"active": "false",
+					"dot": "true",
+					"size": "'md'",
+					"type": "'button'",
+					"loading": "false",
+					"disabled": "false"
+				},
 				"events": [],
 				"snippets": [
 					"dotSnippet",
@@ -477,6 +489,12 @@
 					"locale",
 					"class"
 				],
+				"bindable": [],
+				"defaults": {
+					"variant": "'info'",
+					"closable": "false",
+					"class": "{}"
+				},
 				"events": [
 					"onclose"
 				],
@@ -599,6 +617,27 @@
 					"input",
 					"class"
 				],
+				"bindable": [
+					"searching",
+					"values",
+					"searchText",
+					"open",
+					"input"
+				],
+				"defaults": {
+					"items": "[]",
+					"searchThreshold": "2",
+					"debounceTimeout": "500",
+					"icon": "SEARCH_ICON",
+					"multiple": "false",
+					"disabled": "false",
+					"mandatory": "false",
+					"clearSearchOnClose": "true",
+					"placement": "'bottom-start'",
+					"mobileDrawer": "false",
+					"drawerSearch": "true",
+					"class": "{}"
+				},
 				"events": [
 					"onerror",
 					"onchange",
@@ -679,6 +718,24 @@
 					"input",
 					"class"
 				],
+				"bindable": [
+					"values",
+					"searchText",
+					"open",
+					"input"
+				],
+				"defaults": {
+					"items": "[]",
+					"multiple": "false",
+					"disabled": "false",
+					"mandatory": "false",
+					"loading": "false",
+					"clearSearchOnClose": "true",
+					"placement": "'bottom-start'",
+					"mobileDrawer": "false",
+					"drawerSearch": "true",
+					"class": "{}"
+				},
 				"events": [
 					"onchange",
 					"onclose"
@@ -851,6 +908,18 @@
 					"avatarElement",
 					"class"
 				],
+				"bindable": [
+					"imageLoadingStatus",
+					"avatarElement"
+				],
+				"defaults": {
+					"color": "'auto'",
+					"size": "'md'",
+					"shape": "'circle'",
+					"ring": "false",
+					"referrerpolicy": "'no-referrer'",
+					"class": "''"
+				},
 				"events": [],
 				"snippets": [
 					"children",
@@ -919,6 +988,15 @@
 					"avatarGroupElement",
 					"class"
 				],
+				"bindable": [
+					"avatarGroupElement"
+				],
+				"defaults": {
+					"size": "'md'",
+					"shape": "'circle'",
+					"tooltips": "true",
+					"class": "''"
+				},
 				"events": [],
 				"snippets": [
 					"avatarSnippet",
@@ -958,6 +1036,17 @@
 					"barChartElement",
 					"class"
 				],
+				"bindable": [
+					"chart",
+					"barChartElement"
+				],
+				"defaults": {
+					"horizontal": "false",
+					"stacked": "false",
+					"legend": "'auto'",
+					"zoom": "true",
+					"class": "''"
+				},
 				"events": [
 					"onitemclick"
 				],
@@ -1058,6 +1147,12 @@
 					"class",
 					"boxListElement"
 				],
+				"bindable": [
+					"boxListElement"
+				],
+				"defaults": {
+					"class": "''"
+				},
 				"events": [
 					"onboxClick"
 				],
@@ -1168,6 +1263,17 @@
 					"buttonElement",
 					"appendIcon"
 				],
+				"bindable": [
+					"buttonElement"
+				],
+				"defaults": {
+					"buttonType": "'default'",
+					"variant": "'primary'",
+					"size": "'md'",
+					"type": "'button'",
+					"loading": "false",
+					"disabled": "false"
+				},
 				"events": [],
 				"snippets": [
 					"children",
@@ -1295,6 +1401,25 @@
 					"class",
 					"calendarElement"
 				],
+				"bindable": [
+					"selectedDate",
+					"selectedDateTo",
+					"visibleMonth",
+					"visibleYear",
+					"previewDate",
+					"calendarElement"
+				],
+				"defaults": {
+					"range": "false",
+					"disabled": "false",
+					"showOutsideDays": "true",
+					"showWeekdays": "true",
+					"weekdayFormat": "'short'",
+					"fillOpenRange": "false",
+					"followSelection": "true",
+					"variant": "'compact'",
+					"class": "{}"
+				},
 				"events": [
 					"ondayClick",
 					"onchange"
@@ -1399,6 +1524,15 @@
 					"input",
 					"class"
 				],
+				"bindable": [
+					"checked",
+					"indeterminate",
+					"input"
+				],
+				"defaults": {
+					"disabled": "false",
+					"class": "{}"
+				},
 				"events": [],
 				"snippets": [
 					"labelSnippet"
@@ -1468,6 +1602,16 @@
 					"tabindex",
 					"chipElement"
 				],
+				"bindable": [
+					"chipElement"
+				],
+				"defaults": {
+					"variant": "'neutral'",
+					"size": "'md'",
+					"disabled": "false",
+					"closable": "false",
+					"closeIcon": "CLOSE_ICON"
+				},
 				"events": [
 					"onclick",
 					"onclose"
@@ -1592,6 +1736,11 @@
 					"locale",
 					"class"
 				],
+				"bindable": [],
+				"defaults": {
+					"total": "100",
+					"class": "''"
+				},
 				"events": [],
 				"snippets": [
 					"children"
@@ -1633,6 +1782,15 @@
 					"drawerElement",
 					"class"
 				],
+				"bindable": [
+					"open",
+					"columnState",
+					"drawerElement"
+				],
+				"defaults": {
+					"pinnable": "true",
+					"class": "{}"
+				},
 				"events": [
 					"onsave",
 					"oncancel"
@@ -1787,6 +1945,15 @@
 					"confirmType",
 					"class"
 				],
+				"bindable": [],
+				"defaults": {
+					"loading": "false",
+					"confirmDisable": "false",
+					"cancelDisable": "false",
+					"confirmVariant": "'primary'",
+					"confirmType": "'button'",
+					"class": "{}"
+				},
 				"events": [
 					"onconfirmClick",
 					"oncancelClick"
@@ -1847,6 +2014,24 @@
 					"closeLabel",
 					"input"
 				],
+				"bindable": [
+					"values",
+					"searchText",
+					"open",
+					"input"
+				],
+				"defaults": {
+					"dialCode": "false",
+					"class": "{}",
+					"multiple": "false",
+					"disabled": "false",
+					"mandatory": "false",
+					"loading": "false",
+					"clearSearchOnClose": "true",
+					"placement": "'bottom-start'",
+					"mobileDrawer": "false",
+					"drawerSearch": "true"
+				},
 				"events": [
 					"onchange",
 					"onclose"
@@ -1895,6 +2080,20 @@
 					"labels",
 					"class"
 				],
+				"bindable": [
+					"widgets",
+					"editing",
+					"hasEmptySlots"
+				],
+				"defaults": {
+					"catalog": "[]",
+					"columns": "6",
+					"movable": "true",
+					"resizable": "true",
+					"preview": "false",
+					"stackBelow": "640",
+					"class": "{}"
+				},
 				"events": [
 					"onchange"
 				],
@@ -2103,6 +2302,38 @@
 					"disabled",
 					"selectAll"
 				],
+				"bindable": [
+					"page",
+					"pageSize",
+					"search",
+					"filterValue",
+					"sort",
+					"selected",
+					"selectedAll",
+					"excluded",
+					"expanded",
+					"columnState",
+					"tableElement"
+				],
+				"defaults": {
+					"pagination": "'pages'",
+					"pageSizes": "[20, 50, 100]",
+					"columnManager": "false",
+					"selectionBar": "true",
+					"selectionActions": "[]",
+					"selectionDisabled": "false",
+					"class": "{}",
+					"rowKey": "'id'",
+					"empty": "'—'",
+					"loading": "false",
+					"loadingRows": "5",
+					"resizable": "false",
+					"actionsVisibility": "'always'",
+					"cardBreakpoint": "640",
+					"virtualize": "200",
+					"disabled": "false",
+					"selectAll": "true"
+				},
 				"events": [
 					"onquerychange",
 					"onloadmore",
@@ -2215,6 +2446,25 @@
 					"previewDate",
 					"followSelection"
 				],
+				"bindable": [
+					"view",
+					"datePickerElement",
+					"selectedDate",
+					"selectedDateTo",
+					"visibleMonth",
+					"visibleYear",
+					"previewDate"
+				],
+				"defaults": {
+					"class": "{}",
+					"range": "false",
+					"disabled": "false",
+					"showOutsideDays": "true",
+					"showWeekdays": "true",
+					"weekdayFormat": "'short'",
+					"fillOpenRange": "false",
+					"followSelection": "true"
+				},
 				"events": [
 					"ondayClick",
 					"onchange"
@@ -2310,6 +2560,27 @@
 					"inputTo",
 					"class"
 				],
+				"bindable": [
+					"selectedDate",
+					"selectedDateTo",
+					"open",
+					"input",
+					"inputTo"
+				],
+				"defaults": {
+					"range": "false",
+					"weekdayFormat": "'short'",
+					"showOutsideDays": "true",
+					"disabled": "false",
+					"readonly": "false",
+					"required": "false",
+					"clearable": "false",
+					"closeOnSelect": "true",
+					"placement": "'bottom-start'",
+					"mobileDrawer": "true",
+					"showFormat": "true",
+					"class": "{}"
+				},
 				"events": [
 					"onchange"
 				],
@@ -2453,6 +2724,25 @@
 					"input",
 					"class"
 				],
+				"bindable": [
+					"value",
+					"open",
+					"input"
+				],
+				"defaults": {
+					"minuteStep": "5",
+					"weekdayFormat": "'short'",
+					"showOutsideDays": "true",
+					"disabled": "false",
+					"readonly": "false",
+					"required": "false",
+					"clearable": "false",
+					"closeOnSelect": "true",
+					"placement": "'bottom-start'",
+					"mobileDrawer": "true",
+					"showFormat": "true",
+					"class": "{}"
+				},
 				"events": [
 					"onchange"
 				],
@@ -2586,6 +2876,21 @@
 					"imageLoadingStatus",
 					"locale"
 				],
+				"bindable": [
+					"descriptiveAvatarElement",
+					"imageLoadingStatus"
+				],
+				"defaults": {
+					"direction": "'row'",
+					"reverse": "false",
+					"compact": "false",
+					"disabled": "false",
+					"class": "''",
+					"size": "'md'",
+					"shape": "'circle'",
+					"ring": "false",
+					"referrerpolicy": "'no-referrer'"
+				},
 				"events": [],
 				"snippets": [
 					"children",
@@ -2638,6 +2943,15 @@
 					"dialogElement",
 					"class"
 				],
+				"bindable": [
+					"open",
+					"dialogElement"
+				],
+				"defaults": {
+					"persistent": "false",
+					"closable": "false",
+					"class": "{}"
+				},
 				"events": [
 					"onclose"
 				],
@@ -2732,6 +3046,13 @@
 					"label",
 					"dividerElement"
 				],
+				"bindable": [
+					"dividerElement"
+				],
+				"defaults": {
+					"variant": "'solid'",
+					"orientation": "'horizontal'"
+				},
 				"events": [],
 				"snippets": [
 					"children"
@@ -2776,6 +3097,10 @@
 					"locale",
 					"class"
 				],
+				"bindable": [],
+				"defaults": {
+					"class": "''"
+				},
 				"events": [],
 				"snippets": [],
 				"native": true,
@@ -2810,6 +3135,16 @@
 					"drawerElement",
 					"class"
 				],
+				"bindable": [
+					"open",
+					"drawerElement"
+				],
+				"defaults": {
+					"position": "'left'",
+					"persistent": "false",
+					"closable": "false",
+					"class": "{}"
+				},
 				"events": [
 					"onclose"
 				],
@@ -2916,6 +3251,23 @@
 					"buttonElement",
 					"class"
 				],
+				"bindable": [
+					"values",
+					"open",
+					"buttonElement"
+				],
+				"defaults": {
+					"items": "[]",
+					"multiple": "false",
+					"clearable": "true",
+					"mandatory": "true",
+					"disabled": "false",
+					"placement": "'bottom-start'",
+					"mobileDrawer": "false",
+					"variant": "'secondary'",
+					"size": "'md'",
+					"class": "{}"
+				},
 				"events": [
 					"onchange",
 					"onclose"
@@ -2989,6 +3341,18 @@
 					"input",
 					"class"
 				],
+				"bindable": [
+					"files",
+					"input"
+				],
+				"defaults": {
+					"replace": "false",
+					"disabled": "false",
+					"readonly": "false",
+					"compact": "false",
+					"icon": "UPLOAD_ICON",
+					"class": "{}"
+				},
 				"events": [
 					"onchange",
 					"onreject"
@@ -3114,6 +3478,19 @@
 					"required",
 					"input"
 				],
+				"bindable": [
+					"files",
+					"input"
+				],
+				"defaults": {
+					"view": "'list'",
+					"compact": "'auto'",
+					"readonly": "false",
+					"class": "{}",
+					"replace": "false",
+					"disabled": "false",
+					"icon": "UPLOAD_ICON"
+				},
 				"events": [
 					"onchange",
 					"onreject"
@@ -3210,6 +3587,15 @@
 					"autofocus",
 					"class"
 				],
+				"bindable": [
+					"condition"
+				],
+				"defaults": {
+					"confirm": "false",
+					"operatorSet": "'standard'",
+					"removable": "false",
+					"autofocus": "false"
+				},
 				"events": [
 					"onchange",
 					"onapply",
@@ -3274,6 +3660,24 @@
 					"mobileDrawer",
 					"class"
 				],
+				"bindable": [
+					"value",
+					"saved"
+				],
+				"defaults": {
+					"allowOr": "false",
+					"maxDepth": "0",
+					"confirm": "false",
+					"applyDelay": "300",
+					"operatorSet": "'standard'",
+					"presets": "[]",
+					"savable": "false",
+					"weekStart": "1",
+					"negativesIncludeEmpty": "true",
+					"showPills": "true",
+					"mobileDrawer": "true",
+					"class": "{}"
+				},
 				"events": [
 					"onchange",
 					"onremove",
@@ -3355,6 +3759,11 @@
 					"title",
 					"class"
 				],
+				"bindable": [],
+				"defaults": {
+					"square": "false",
+					"class": "''"
+				},
 				"events": [],
 				"snippets": [],
 				"native": false,
@@ -3384,6 +3793,16 @@
 					"class",
 					"buttonElement"
 				],
+				"bindable": [
+					"open",
+					"buttonElement"
+				],
+				"defaults": {
+					"shortcut": "'k'",
+					"searchThreshold": "1",
+					"debounceTimeout": "300",
+					"class": "{}"
+				},
 				"events": [
 					"onselect",
 					"onclose",
@@ -3477,6 +3896,16 @@
 					"class",
 					"hierarchyMenuElement"
 				],
+				"bindable": [
+					"selected",
+					"expanded",
+					"hierarchyMenuElement"
+				],
+				"defaults": {
+					"options": "[]",
+					"iconsOnly": "false",
+					"class": "{}"
+				},
 				"events": [
 					"onoptionClick"
 				],
@@ -3604,6 +4033,15 @@
 					"valueTooltip",
 					"class"
 				],
+				"bindable": [],
+				"defaults": {
+					"progresses": "[]",
+					"showValue": "false",
+					"legend": "true",
+					"segmentLabels": "false",
+					"valueTooltip": "true",
+					"class": "''"
+				},
 				"events": [],
 				"snippets": [
 					"labelSnippet",
@@ -3684,6 +4122,10 @@
 					"title",
 					"class"
 				],
+				"bindable": [],
+				"defaults": {
+					"class": "''"
+				},
 				"events": [],
 				"snippets": [],
 				"native": false,
@@ -3722,6 +4164,24 @@
 					"locale",
 					"buttonElement"
 				],
+				"bindable": [
+					"values",
+					"open",
+					"buttonElement"
+				],
+				"defaults": {
+					"items": "[]",
+					"clearable": "false",
+					"maxVisibleIcons": "3",
+					"class": "{}",
+					"multiple": "false",
+					"mandatory": "true",
+					"disabled": "false",
+					"placement": "'bottom-start'",
+					"mobileDrawer": "false",
+					"variant": "'secondary'",
+					"size": "'md'"
+				},
 				"events": [
 					"onchange",
 					"onclose"
@@ -3821,6 +4281,16 @@
 					"lineChartElement",
 					"class"
 				],
+				"bindable": [
+					"chart",
+					"lineChartElement"
+				],
+				"defaults": {
+					"stacked": "false",
+					"legend": "'auto'",
+					"zoom": "true",
+					"class": "''"
+				},
 				"events": [
 					"onitemclick"
 				],
@@ -3927,6 +4397,12 @@
 					"appendIcon",
 					"linkElement"
 				],
+				"bindable": [
+					"linkElement"
+				],
+				"defaults": {
+					"disabled": "false"
+				},
 				"events": [],
 				"snippets": [
 					"children",
@@ -3984,6 +4460,8 @@
 			"MediaQuery": {
 				"slug": "media-query",
 				"props": [],
+				"bindable": [],
+				"defaults": {},
 				"events": [],
 				"snippets": [
 					"defaultSnippet"
@@ -4002,6 +4480,17 @@
 					"closeOnClickOutside",
 					"menuElement"
 				],
+				"bindable": [
+					"open",
+					"activator",
+					"menuElement"
+				],
+				"defaults": {
+					"placement": "'bottom-start'",
+					"offset": "6",
+					"matchActivatorWidth": "false",
+					"closeOnClickOutside": "true"
+				},
 				"events": [],
 				"snippets": [
 					"children"
@@ -4056,6 +4545,17 @@
 					"menuElement",
 					"drawerElement"
 				],
+				"bindable": [
+					"open",
+					"menuElement",
+					"drawerElement"
+				],
+				"defaults": {
+					"placement": "'bottom'",
+					"mode": "'auto'",
+					"menuProps": "{}",
+					"drawerProps": "{}"
+				},
 				"events": [],
 				"snippets": [
 					"children"
@@ -4078,6 +4578,18 @@
 					"menuElement",
 					"drawerElement"
 				],
+				"bindable": [
+					"open",
+					"menuElement",
+					"drawerElement"
+				],
+				"defaults": {
+					"options": "[]",
+					"placement": "'bottom'",
+					"mode": "'auto'",
+					"menuProps": "{}",
+					"drawerProps": "{}"
+				},
 				"events": [
 					"onselect"
 				],
@@ -4150,6 +4662,15 @@
 					"class",
 					"monthSelectorElement"
 				],
+				"bindable": [
+					"selectedMonth",
+					"monthSelectorElement"
+				],
+				"defaults": {
+					"monthFormat": "'short'",
+					"disabled": "false",
+					"class": "{}"
+				},
 				"events": [
 					"onchange"
 				],
@@ -4206,6 +4727,12 @@
 					"locale",
 					"class"
 				],
+				"bindable": [],
+				"defaults": {
+					"icon": "DATABASE_OFF_ICON",
+					"size": "'md'",
+					"class": "''"
+				},
 				"events": [],
 				"snippets": [
 					"children",
@@ -4289,6 +4816,20 @@
 					"class",
 					"paginatorElement"
 				],
+				"bindable": [
+					"page",
+					"paginatorElement"
+				],
+				"defaults": {
+					"siblingCount": "1",
+					"showFirstLast": "true",
+					"compact": "false",
+					"firstIcon": "FIRST_ICON",
+					"previousIcon": "PREVIOUS_ICON",
+					"nextIcon": "NEXT_ICON",
+					"lastIcon": "LAST_ICON",
+					"class": "{}"
+				},
 				"events": [
 					"onchange"
 				],
@@ -4374,6 +4915,18 @@
 					"class",
 					"periodPickerElement"
 				],
+				"bindable": [
+					"timespanSettings",
+					"open",
+					"periodPickerElement"
+				],
+				"defaults": {
+					"shiftable": "true",
+					"months": "1",
+					"disabled": "false",
+					"placement": "'bottom-start'",
+					"class": "''"
+				},
 				"events": [
 					"onchange",
 					"onclose"
@@ -4443,6 +4996,14 @@
 					"class",
 					"periodSelectorElement"
 				],
+				"bindable": [
+					"timespanSettings",
+					"periodSelectorElement"
+				],
+				"defaults": {
+					"months": "1",
+					"class": "''"
+				},
 				"events": [
 					"onchange"
 				],
@@ -4545,6 +5106,16 @@
 					"pieChartElement",
 					"class"
 				],
+				"bindable": [
+					"chart",
+					"pieChartElement"
+				],
+				"defaults": {
+					"donut": "true",
+					"showTotal": "true",
+					"legend": "'auto'",
+					"class": "''"
+				},
 				"events": [
 					"onitemclick"
 				],
@@ -4642,6 +5213,16 @@
 					"valueTooltipLabel",
 					"class"
 				],
+				"bindable": [],
+				"defaults": {
+					"value": "0",
+					"total": "100",
+					"showValue": "false",
+					"indeterminate": "false",
+					"variant": "'primary'",
+					"valueTooltip": "false",
+					"class": "''"
+				},
 				"events": [],
 				"snippets": [
 					"labelSnippet",
@@ -4706,6 +5287,15 @@
 					"input",
 					"class"
 				],
+				"bindable": [
+					"group",
+					"input"
+				],
+				"defaults": {
+					"card": "false",
+					"disabled": "false",
+					"class": "{}"
+				},
 				"events": [],
 				"snippets": [
 					"labelSnippet",
@@ -4796,6 +5386,17 @@
 					"state",
 					"class"
 				],
+				"bindable": [
+					"value"
+				],
+				"defaults": {
+					"items": "[]",
+					"orientation": "'vertical'",
+					"card": "false",
+					"disabled": "false",
+					"required": "false",
+					"class": "{}"
+				},
 				"events": [],
 				"snippets": [
 					"labelSnippet",
@@ -4846,6 +5447,17 @@
 					"input",
 					"class"
 				],
+				"bindable": [
+					"value",
+					"input"
+				],
+				"defaults": {
+					"debounce": "300",
+					"searchOnType": "true",
+					"clearable": "true",
+					"loading": "false",
+					"class": "{}"
+				},
 				"events": [
 					"onsearch"
 				],
@@ -4909,6 +5521,15 @@
 					"select",
 					"class"
 				],
+				"bindable": [
+					"value",
+					"select"
+				],
+				"defaults": {
+					"items": "[]",
+					"disabled": "false",
+					"class": "{}"
+				},
 				"events": [],
 				"snippets": [
 					"labelSnippet",
@@ -5048,6 +5669,17 @@
 					"class",
 					"sidebarLayoutElement"
 				],
+				"bindable": [
+					"sidebarExpanded",
+					"drawerOpened",
+					"selected",
+					"sidebarLayoutElement"
+				],
+				"defaults": {
+					"expandOn": "'toggle'",
+					"options": "[]",
+					"class": "{}"
+				},
 				"events": [
 					"ondrawerChange",
 					"onsidebarToggle",
@@ -5134,6 +5766,16 @@
 					"input",
 					"class"
 				],
+				"bindable": [
+					"value",
+					"input"
+				],
+				"defaults": {
+					"type": "'text'",
+					"disabled": "false",
+					"readonly": "false",
+					"class": "{}"
+				},
 				"events": [],
 				"snippets": [
 					"prependSnippet",
@@ -5217,6 +5859,12 @@
 					"lines",
 					"class"
 				],
+				"bindable": [],
+				"defaults": {
+					"shape": "'rect'",
+					"lines": "1",
+					"class": "''"
+				},
 				"events": [],
 				"snippets": [],
 				"native": true,
@@ -5255,6 +5903,15 @@
 					"input",
 					"class"
 				],
+				"bindable": [
+					"checked",
+					"input"
+				],
+				"defaults": {
+					"size": "'md'",
+					"disabled": "false",
+					"class": "{}"
+				},
 				"events": [],
 				"snippets": [
 					"labelSnippet"
@@ -5357,6 +6014,30 @@
 					"disabled",
 					"selectAll"
 				],
+				"bindable": [
+					"sort",
+					"selected",
+					"selectedAll",
+					"excluded",
+					"expanded",
+					"columnState",
+					"tableElement"
+				],
+				"defaults": {
+					"rows": "[]",
+					"rowKey": "'id'",
+					"sorting": "'local'",
+					"empty": "'—'",
+					"loading": "false",
+					"loadingRows": "5",
+					"resizable": "false",
+					"actionsVisibility": "'always'",
+					"cardBreakpoint": "640",
+					"class": "{}",
+					"virtualize": "200",
+					"disabled": "false",
+					"selectAll": "true"
+				},
 				"events": [
 					"onsortchange",
 					"onselectionchange",
@@ -5509,6 +6190,16 @@
 					"class",
 					"tabSwitcherElement"
 				],
+				"bindable": [
+					"selected",
+					"tabSwitcherElement"
+				],
+				"defaults": {
+					"tabs": "[]",
+					"mandatory": "true",
+					"variant": "'underline'",
+					"class": "{}"
+				},
 				"events": [
 					"ontabClick"
 				],
@@ -5628,6 +6319,18 @@
 					"textarea",
 					"class"
 				],
+				"bindable": [
+					"value",
+					"textarea"
+				],
+				"defaults": {
+					"rows": "3",
+					"counter": "false",
+					"autoGrow": "false",
+					"disabled": "false",
+					"readonly": "false",
+					"class": "{}"
+				},
 				"events": [],
 				"snippets": [
 					"labelSnippet",
@@ -5727,6 +6430,15 @@
 					"class",
 					"timelineElement"
 				],
+				"bindable": [
+					"timelineElement"
+				],
+				"defaults": {
+					"alternate": "false",
+					"variant": "'plain'",
+					"markerAlignment": "'top'",
+					"class": "''"
+				},
 				"events": [],
 				"snippets": [
 					"itemSnippet",
@@ -5827,6 +6539,15 @@
 					"class",
 					"timePickerElement"
 				],
+				"bindable": [
+					"value",
+					"timePickerElement"
+				],
+				"defaults": {
+					"minuteStep": "5",
+					"disabled": "false",
+					"class": "{}"
+				},
 				"events": [
 					"onchange"
 				],
@@ -5931,6 +6652,23 @@
 					"input",
 					"class"
 				],
+				"bindable": [
+					"value",
+					"open",
+					"input"
+				],
+				"defaults": {
+					"minuteStep": "5",
+					"disabled": "false",
+					"readonly": "false",
+					"required": "false",
+					"clearable": "false",
+					"closeOnSelect": "true",
+					"placement": "'bottom-start'",
+					"mobileDrawer": "true",
+					"showFormat": "true",
+					"class": "{}"
+				},
 				"events": [
 					"onchange"
 				],
@@ -6036,6 +6774,11 @@
 					"locale",
 					"class"
 				],
+				"bindable": [],
+				"defaults": {
+					"position": "'bottom-end'",
+					"limit": "5"
+				},
 				"events": [],
 				"snippets": [
 					"toastSnippet"
@@ -6056,6 +6799,16 @@
 					"class",
 					"toggleListElement"
 				],
+				"bindable": [
+					"values",
+					"toggleListElement"
+				],
+				"defaults": {
+					"multiple": "true",
+					"disabled": "false",
+					"dot": "true",
+					"class": "''"
+				},
 				"events": [
 					"onchange"
 				],
@@ -6088,6 +6841,17 @@
 					"tooltipElement",
 					"class"
 				],
+				"bindable": [
+					"activator",
+					"open",
+					"tooltipElement"
+				],
+				"defaults": {
+					"variant": "'plain'",
+					"placement": "'top'",
+					"offset": "10",
+					"appearTimeout": "400"
+				},
 				"events": [],
 				"snippets": [
 					"children",
@@ -6166,6 +6930,23 @@
 					"input",
 					"class"
 				],
+				"bindable": [
+					"selectedYear",
+					"open",
+					"input"
+				],
+				"defaults": {
+					"min": "1900",
+					"max": "2100",
+					"disabled": "false",
+					"readonly": "false",
+					"required": "false",
+					"clearable": "false",
+					"closeOnSelect": "true",
+					"placement": "'bottom-start'",
+					"mobileDrawer": "true",
+					"class": "{}"
+				},
 				"events": [
 					"onchange"
 				],
@@ -6263,6 +7044,16 @@
 					"class",
 					"yearSelectorElement"
 				],
+				"bindable": [
+					"selectedYear",
+					"yearSelectorElement"
+				],
+				"defaults": {
+					"min": "1900",
+					"max": "2100",
+					"disabled": "false",
+					"class": "{}"
+				},
 				"events": [
 					"onchange"
 				],
@@ -6515,6 +7306,7 @@
 				"name": "mediaQuery",
 				"kind": "store",
 				"replacement": "breakpoints",
+				"rename": "breakpoints",
 				"note": "Same flags and widths, as a reactive object instead of a store: `$mediaQuery.xs` → `breakpoints.xs`, also `breakpoints.mAndDown` and the other `...AndDown` / `...AndUp`. The server counts as wide (`xl`) now."
 			},
 			{
@@ -6527,6 +7319,7 @@
 				"name": "toggleTheme",
 				"kind": "function",
 				"replacement": "toggleMode()",
+				"rename": "toggleMode",
 				"note": "Same behaviour. The choice is saved only after `rememberAppearance()` (see `global-dark-mode`)."
 			},
 			{
@@ -7156,6 +7949,7 @@
 						"v4": "false",
 						"v5": "!multiple",
 						"keepV4": "closeOnSelect={false}",
+						"behaviour": true,
 						"note": "A single selection now closes the list, as in Autocomplete."
 					},
 					{
@@ -9634,6 +10428,15 @@
 						"note": "The same object without `detail`. Called when the layout opens or closes the drawer by itself (menu button, Escape, backdrop, choice of an option, `currentPath`); v4 also called it on every option chosen on desktop."
 					},
 					{
+						"name": "onmenuSelect",
+						"argument": {
+							"detail.option": "option",
+							"detail": ""
+						},
+						"type": "{ option: HierarchyMenuOption; nativeEvent: MouseEvent }",
+						"note": "The same object without `detail`: `e.detail.option` → `e.option`. Options with `href` navigate on their own: see `sidebar-layout-links`."
+					},
+					{
 						"name": "onsidebarToggle",
 						"argument": {
 							"detail.expanded": "expanded",
@@ -11242,6 +12045,12 @@
 						"v4": "false",
 						"v5": "true",
 						"keepV4": "closeOnSelect={false}",
+						"behaviour": true,
+						"unless": {
+							"events": [
+								"ondayClick"
+							]
+						},
 						"note": "v4 had no prop and kept the menu open; apps closed it in `ondayClick`. Do not add `closeOnSelect={false}` where the app closed the menu itself: delete that handler instead."
 					},
 					{
@@ -12848,6 +13657,7 @@
 						"v4": "'infinite'",
 						"v5": "'pages'",
 						"keepV4": "pagination=\"infinite\"",
+						"behaviour": true,
 						"note": "DynamicTable always scrolled for more rows."
 					}
 				],
@@ -13816,6 +14626,7 @@
 						"v4": "true",
 						"v5": "false",
 						"keepV4": "columnManager",
+						"behaviour": true,
 						"note": "The \"+\" in the last header opened the drawer; now a \"Columns\" button in the toolbar."
 					}
 				]
@@ -16757,6 +17568,7 @@
 						"v4": "false",
 						"v5": "true",
 						"keepV4": "closeOnClickOutside={false}",
+						"behaviour": true,
 						"note": "With `false` the menu also stays open when another menu opens. Escape closes the menu in both cases."
 					},
 					{
@@ -21025,6 +21837,7 @@
 						"v4": "undefined",
 						"v5": "400",
 						"keepV4": "appearTimeout={0}",
+						"behaviour": true,
 						"note": "v4 opened on the first `mouseenter` when it was omitted. Keyboard focus opens the tooltip right away in any case."
 					}
 				],
@@ -21095,6 +21908,7 @@
 						"v4": "'hover'",
 						"v5": "'toggle'",
 						"keepV4": "expandOn=\"hover\"",
+						"behaviour": true,
 						"note": "v5 widens the sidebar with a button in the bar by default. With `hover` and `click` it now widens over the content instead of pushing it; with `click` choosing an option narrows it again (v4 reopened it)."
 					}
 				],
@@ -21444,6 +22258,7 @@
 						"v4": "false",
 						"v5": "true",
 						"keepV4": "closeOnSelect={false}",
+						"behaviour": true,
 						"note": "v4 had no prop and kept the menu open after a click."
 					},
 					{

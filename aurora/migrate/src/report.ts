@@ -1,5 +1,6 @@
 import { basename, dirname } from 'node:path';
 import type { Analysis } from './analyze.ts';
+import type { CodemodChange, CodemodResult, CodemodSkip } from './codemod.ts';
 import type { Finding } from './match.ts';
 
 export const appLabel = (dir: string) =>
@@ -255,4 +256,79 @@ export function summaryTable(list: Analysis[]): string {
 			];
 		})
 	);
+}
+
+export function codemodReport(r: CodemodResult): string {
+	const out: string[] = [];
+	const check = r.changes.filter((c) => c.check);
+	out.push(`# Codemod: ${appLabel(r.dir)}`, '', `\`${r.dir}\``, '');
+	out.push(
+		table(
+			['', ''],
+			[
+				['Files changed', r.files.length],
+				['Changes', r.changes.length],
+				['Done, to check', check.length],
+				['Not done (by hand)', r.skipped.length],
+				['New defaults to look at', r.defaults.length],
+				['Parse errors', r.parseErrors.length]
+			]
+		),
+		''
+	);
+	const kinds = new Map<string, number>();
+	for (const c of r.changes) kinds.set(c.kind, (kinds.get(c.kind) ?? 0) + 1);
+	out.push('## Changes by kind', '', table(['kind', 'count'], [...kinds].sort((a, b) => b[1] - a[1])), '');
+	const where = (list: { file: string; line: number }[], max = 4) => {
+		const shown = list.slice(0, max).map((c) => `${c.file}:${c.line}`).join(', ');
+		return list.length > max ? `${shown} … +${list.length - max}` : shown;
+	};
+	if (check.length) {
+		const groups = new Map<string, CodemodChange[]>();
+		for (const c of check) groups.set(c.id, [...(groups.get(c.id) ?? []), c]);
+		out.push(
+			'## Done, to check',
+			'',
+			table(
+				['step', 'count', 'change', 'what to check', 'where'],
+				[...groups].map(([id, list]) => [id, list.length, `${list[0].name} → ${list[0].to ?? ''}`, short(list[0].note, 220), where(list)])
+			),
+			''
+		);
+	}
+	if (r.skipped.length) {
+		const groups = new Map<string, CodemodSkip[]>();
+		for (const s of r.skipped) {
+			const key = `${s.id}\n${s.reason}`;
+			groups.set(key, [...(groups.get(key) ?? []), s]);
+		}
+		out.push(
+			'## Not done (by hand)',
+			'',
+			table(['step', 'count', 'why', 'where'], [...groups.values()].map((list) => [list[0].id, list.length, list[0].reason, where(list)])),
+			''
+		);
+	}
+	if (r.defaults.length) {
+		const groups = new Map<string, CodemodResult['defaults']>();
+		for (const d of r.defaults) {
+			const key = `${d.component}.${d.name}`;
+			groups.set(key, [...(groups.get(key) ?? []), d]);
+		}
+		out.push(
+			'## New defaults (not written: look at the pages)',
+			'',
+			table(
+				['prop', 'count', 'kind', 'v4 → v5', 'note', 'where'],
+				[...groups].map(([key, list]) => [key, list.length, list[0].kind, `${list[0].v4} → ${list[0].v5}`, short(list[0].note, 200), where(list)])
+			),
+			''
+		);
+	}
+	if (r.parseErrors.length)
+		out.push('## Parse errors', '', table(['file', 'error'], r.parseErrors.map((e) => [e.file, e.error])), '');
+	const perFile = new Map<string, number>();
+	for (const c of r.changes) perFile.set(c.file, (perFile.get(c.file) ?? 0) + 1);
+	out.push('## Files', '', table(['file', 'changes'], r.files.map((f) => [f.rel, perFile.get(f.rel) ?? 0])), '');
+	return out.join('\n');
 }

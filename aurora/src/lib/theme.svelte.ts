@@ -1,5 +1,5 @@
 import { MediaQuery } from 'svelte/reactivity';
-import { toStore, type Readable } from 'svelte/store';
+import { writable, type Readable, type Writable } from 'svelte/store';
 
 /** `system` follows the operating system (`prefers-color-scheme`). */
 export type ThemeMode = 'light' | 'dark' | 'system';
@@ -29,7 +29,8 @@ const state = $state<{ mode: ThemeMode; name: string | null }>({
 	name: browser ? (document.documentElement.dataset.theme ?? null) : null
 });
 let storage: Required<AppearanceStorage> | undefined;
-let store: Readable<ThemeState> | undefined;
+let store: Writable<ThemeState> | undefined;
+let published: ThemeState | undefined;
 
 function modeOnPage(): ThemeMode {
 	const mode = document.documentElement.dataset.mode;
@@ -42,11 +43,20 @@ if (browser) {
 		const name = document.documentElement.dataset.theme ?? null;
 		if (state.mode !== mode) state.mode = mode;
 		if (state.name !== name) state.name = name;
+		publish();
 	}).observe(document.documentElement, { attributes: true, attributeFilter: ['data-mode', 'data-theme'] });
 }
 
 function snapshot(): ThemeState {
 	return { dark: theme.dark, mode: state.mode, name: state.name };
+}
+
+function publish() {
+	if (!store) return;
+	const next = snapshot();
+	if (published && published.dark === next.dark && published.mode === next.mode && published.name === next.name) return;
+	published = next;
+	store.set(next);
 }
 
 /** The mode and the theme of the page, reactive in templates, `$derived` and `$effect` (`theme.dark`), and also a store as in v4 (`$theme.dark`). */
@@ -61,7 +71,14 @@ export const theme: ThemeState & Readable<ThemeState> = {
 		return state.name;
 	},
 	subscribe(run, invalidate) {
-		store ??= toStore(snapshot);
+		if (!store) {
+			published = snapshot();
+			store = writable(published, () =>
+				$effect.root(() => {
+					$effect.pre(publish);
+				})
+			);
+		}
 		return store.subscribe(run, invalidate);
 	}
 };
@@ -94,6 +111,7 @@ function load(key: string): string | null {
 /** Activates a theme (`data-theme` on `<html>`); the app must import its CSS. `null` goes back to the default theme. Colors change at once: transitions are paused during the switch, which would otherwise animate every component. Saved in the browser after `rememberAppearance()`. */
 export function setTheme(name: string | null): void {
 	state.name = name;
+	publish();
 	if (storage) save(storage.themeKey, name);
 	if (!browser) return;
 	withoutTransitions((root) => {
@@ -110,6 +128,7 @@ export function getTheme(): string | null {
 /** Forces light or dark (`data-mode` on `<html>`), or goes back to following the operating system. Saved in the browser after `rememberAppearance()`. Like `setTheme`, it pauses transitions during the switch. */
 export function setMode(mode: ThemeMode): void {
 	state.mode = mode;
+	publish();
 	if (storage) save(storage.modeKey, mode === 'system' ? null : mode);
 	if (!browser) return;
 	withoutTransitions((root) => {

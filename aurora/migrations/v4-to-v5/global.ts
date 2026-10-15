@@ -129,6 +129,7 @@ export default {
 			name: 'mediaQuery',
 			kind: 'store',
 			replacement: 'breakpoints',
+			rename: 'breakpoints',
 			note: 'Same flags and widths, as a reactive object instead of a store: `$mediaQuery.xs` → `breakpoints.xs`, also `breakpoints.mAndDown` and the other `...AndDown` / `...AndUp`. The server counts as wide (`xl`) now.'
 		},
 		{
@@ -141,6 +142,7 @@ export default {
 			name: 'toggleTheme',
 			kind: 'function',
 			replacement: 'toggleMode()',
+			rename: 'toggleMode',
 			note: 'Same behaviour. The choice is saved only after `rememberAppearance()` (see `global-dark-mode`).'
 		},
 		{

@@ -93,6 +93,7 @@ export default {
 				v4: 'false',
 				v5: 'true',
 				keepV4: 'closeOnClickOutside={false}',
+				behaviour: true,
 				note: 'With `false` the menu also stays open when another menu opens. Escape closes the menu in both cases.'
 			},
 			{ name: 'offset', v4: '5', v5: '6', keepV4: 'offset={5}', note: 'v4 name: `_activatorGap`.' }

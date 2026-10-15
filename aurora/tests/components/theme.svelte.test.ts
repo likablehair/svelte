@@ -51,6 +51,19 @@ describe('theme', () => {
 		cleanup();
 	});
 
+	test('the store is up to date right after a change, as in v4', () => {
+		const values: boolean[] = [];
+		const unsubscribe = theme.subscribe((value) => values.push(value.dark));
+		setMode('light');
+		expect(values.at(-1)).toBe(false);
+		toggleMode();
+		expect(values.at(-1)).toBe(true);
+		const count = values.length;
+		setMode('dark');
+		expect(values.length).toBe(count);
+		unsubscribe();
+	});
+
 	test('toggleMode switches from what the page shows', () => {
 		setMode('system');
 		toggleMode();

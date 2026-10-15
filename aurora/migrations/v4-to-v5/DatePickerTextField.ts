@@ -206,6 +206,8 @@ export default {
 				v4: 'false',
 				v5: 'true',
 				keepV4: 'closeOnSelect={false}',
+				behaviour: true,
+				unless: { events: ['ondayClick'] },
 				note: 'v4 had no prop and kept the menu open; apps closed it in `ondayClick`. Do not add `closeOnSelect={false}` where the app closed the menu itself: delete that handler instead.'
 			},
 			{

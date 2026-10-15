@@ -13,6 +13,10 @@ function componentApi(slug: string): ComponentApi {
 	return {
 		slug,
 		props: doc.props.map((p) => p.name),
+		bindable: doc.props.filter((p) => p.bindable).map((p) => p.name),
+		defaults: Object.fromEntries(
+			doc.props.filter((p) => p.default !== undefined).map((p) => [p.name, p.default!])
+		),
 		events: doc.events.map((e) => e.name),
 		snippets: doc.snippets.map((s) => s.name),
 		native: !!doc.htmlElement,

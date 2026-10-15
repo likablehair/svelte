@@ -372,6 +372,7 @@ const enhanced = {
 				v4: 'true',
 				v5: 'false',
 				keepV4: 'columnManager',
+				behaviour: true,
 				note: 'The "+" in the last header opened the drawer; now a "Columns" button in the toolbar.'
 			}
 		]
@@ -507,6 +508,7 @@ const dynamic = {
 				v4: "'infinite'",
 				v5: "'pages'",
 				keepV4: 'pagination="infinite"',
+				behaviour: true,
 				note: 'DynamicTable always scrolled for more rows.'
 			}
 		],

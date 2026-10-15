@@ -25,6 +25,7 @@ export default {
 				v4: 'undefined',
 				v5: '400',
 				keepV4: 'appearTimeout={0}',
+				behaviour: true,
 				note: 'v4 opened on the first `mouseenter` when it was omitted. Keyboard focus opens the tooltip right away in any case.'
 			}
 		],

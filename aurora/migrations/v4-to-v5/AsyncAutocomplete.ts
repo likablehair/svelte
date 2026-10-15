@@ -25,6 +25,7 @@ export default {
 				v4: 'false',
 				v5: '!multiple',
 				keepV4: 'closeOnSelect={false}',
+				behaviour: true,
 				note: 'A single selection now closes the list, as in Autocomplete.'
 			},
 			{

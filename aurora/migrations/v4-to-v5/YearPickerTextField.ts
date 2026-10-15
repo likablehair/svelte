@@ -62,6 +62,7 @@ export default {
 				v4: 'false',
 				v5: 'true',
 				keepV4: 'closeOnSelect={false}',
+				behaviour: true,
 				note: 'v4 had no prop and kept the menu open after a click.'
 			},
 			{

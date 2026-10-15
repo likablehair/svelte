@@ -16,6 +16,8 @@ export interface DefaultChange {
 	v4: string;
 	v5: string;
 	keepV4?: string;
+	behaviour?: true;
+	unless?: ManualTrigger;
 	note?: string;
 }
 
@@ -124,6 +126,7 @@ export interface ExportChange {
 	name: string;
 	kind: 'component' | 'function' | 'store' | 'type' | 'utility';
 	replacement?: string;
+	rename?: string;
 	pending?: true;
 	note?: string;
 }

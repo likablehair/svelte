@@ -27,8 +27,10 @@ export interface SetupResult {
 const git = (dir: string, args: string[]) =>
 	execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 
+export const currentBranch = (dir: string) => git(dir, ['rev-parse', '--abbrev-ref', 'HEAD']);
+
 export function prepareBranch(dir: string, branch: string): string {
-	const current = git(dir, ['rev-parse', '--abbrev-ref', 'HEAD']);
+	const current = currentBranch(dir);
 	if (current === branch) return current;
 	const dirty = git(dir, ['status', '--porcelain']);
 	if (dirty)

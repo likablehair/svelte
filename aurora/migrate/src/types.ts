@@ -5,6 +5,8 @@ export type * from '../../migrations/types.ts';
 export interface ComponentApi {
 	slug: string;
 	props: string[];
+	bindable: string[];
+	defaults: Record<string, string>;
 	events: string[];
 	snippets: string[];
 	native: boolean;

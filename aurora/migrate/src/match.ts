@@ -166,7 +166,7 @@ export function matchUsage(
 	if (usage.defaults)
 		for (const r of p.defaults ?? []) {
 			if (props.has(r.name)) continue;
-			add(r.keepV4 && !spread ? 'auto' : 'check', 'prop-default', `props.defaults/${r.name}`, r.name, usage.line, {
+			add(r.keepV4 && r.behaviour && !spread ? 'auto' : 'check', 'prop-default', `props.defaults/${r.name}`, r.name, usage.line, {
 				to: r.keepV4,
 				note: `v4 ${r.v4} → v5 ${r.v5}${r.note ? `. ${r.note}` : ''}`
 			});

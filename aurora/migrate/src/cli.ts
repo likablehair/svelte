@@ -2,13 +2,15 @@
 import { existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { analyze } from './analyze.ts';
-import { appLabel, markdownReport, summaryTable } from './report.ts';
+import { codemod } from './codemod.ts';
+import { appLabel, codemodReport, markdownReport, summaryTable } from './report.ts';
 import { loadRules } from './rules.ts';
-import { setup } from './setup.ts';
+import { currentBranch, setup } from './setup.ts';
 
 const USAGE = `Usage:
   svelte-migrate analyze <app-dir...> [--md <file|dir>] [--json <file|dir>] [--summary]
   svelte-migrate setup <app-dir> [--package <version|file.tgz>] [--branch <name>] [--locale <code>] [--no-install]
+  svelte-migrate codemod <app-dir> [--dry-run] [--md <file>] [--branch <name>]
 
   analyze     Read-only report of what the v4 → v5 migration needs in each app.
   --md        Write the Markdown report to a file (one app) or a directory (one file per app).
@@ -21,7 +23,13 @@ const USAGE = `Usage:
               the cascade layer order, the library Tailwind CSS, the library fonts and
               v4-compat.css, moves element rules into @layer reset; calls setDefaultLocale in
               the root layout when the app is not in English (from <html lang>, the interface
-              text or --locale). Can be run again. Never commits.`;
+              text or --locale). Can be run again. Never commits.
+
+  codemod     The mechanical changes, on the branch made by setup: renamed components, props,
+              events, snippets and CSS variables, callback arguments without \`detail\` (inline
+              handlers and functions of the same file, with their types), MDI icon names turned
+              into @mdi/js imports. Running it again changes nothing. Prints what it did, what
+              to check and what is left by hand. --dry-run writes nothing. Never commits.`;
 
 interface Options {
 	command?: string;
@@ -33,10 +41,11 @@ interface Options {
 	locale?: string;
 	branch: string;
 	install: boolean;
+	dryRun: boolean;
 }
 
 function parseArgs(argv: string[]): Options | undefined {
-	const options: Options = { dirs: [], summary: false, branch: 'aurora-v5', install: true };
+	const options: Options = { dirs: [], summary: false, branch: 'aurora-v5', install: true, dryRun: false };
 	for (let i = 0; i < argv.length; i++) {
 		const arg = argv[i];
 		if (arg === '--md') options.md = argv[++i];
@@ -46,6 +55,7 @@ function parseArgs(argv: string[]): Options | undefined {
 		else if (arg === '--branch') options.branch = argv[++i];
 		else if (arg === '--locale') options.locale = argv[++i];
 		else if (arg === '--no-install') options.install = false;
+		else if (arg === '--dry-run') options.dryRun = true;
 		else if (arg === '-h' || arg === '--help') return undefined;
 		else if (!options.command) options.command = arg;
 		else options.dirs.push(arg);
@@ -86,8 +96,22 @@ function runSetup(options: Options) {
 	console.log('Nothing was committed.');
 }
 
+function runCodemod(options: Options) {
+	const dir = resolve(options.dirs[0]);
+	if (!options.dryRun) {
+		const branch = currentBranch(dir);
+		if (branch !== options.branch)
+			throw new Error(`${dir} is on "${branch}", not on "${options.branch}": run setup first (or pass --branch).`);
+	}
+	const result = codemod(dir, loadRules(), { write: !options.dryRun });
+	const report = codemodReport(result);
+	if (options.md) writeFileSync(options.md, report);
+	else process.stdout.write(report);
+	console.log(options.dryRun ? 'Dry run: nothing was written.' : `${result.files.length} files written. Nothing was committed.`);
+}
+
 const options = parseArgs(process.argv.slice(2));
-const commands: Record<string, (options: Options) => void> = { analyze: runAnalyze, setup: runSetup };
+const commands: Record<string, (options: Options) => void> = { analyze: runAnalyze, setup: runSetup, codemod: runCodemod };
 if (!options?.command || !commands[options.command] || !options.dirs.length) {
 	console.log(USAGE);
 	process.exit(options ? 1 : 0);

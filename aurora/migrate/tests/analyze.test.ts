@@ -71,8 +71,9 @@ describe('analyze: app on v4', () => {
 		expect(v4.general.find((g) => g.id === 'button-fixed-height')).toMatchObject({ usages: 2, files: 2 });
 	});
 
-	test('v4 defaults missing from a usage keep the v4 behaviour automatically', () => {
-		expect(find(v4, 'ToolTip/props.defaults/placement')).toMatchObject([{ effort: 'auto', to: 'placement="bottom"' }]);
+	test('v4 defaults missing from a usage: behaviour ones are automatic, look ones to check', () => {
+		expect(find(v4, 'ToolTip/props.defaults/appearTimeout')).toMatchObject([{ effort: 'auto', to: 'appearTimeout={0}' }]);
+		expect(find(v4, 'ToolTip/props.defaults/placement')).toMatchObject([{ effort: 'check', to: 'placement="bottom"' }]);
 		expect(find(v4, 'Button/props.defaults/placement')).toEqual([]);
 	});
 
@@ -125,7 +126,7 @@ describe('reports', () => {
 	test('the Markdown report has the summary and the sections with findings', () => {
 		const report = markdownReport(v4);
 		expect(report).toContain('# Migration analysis: app-v4');
-		expect(report).toContain('| Automatic changes | 11 |');
+		expect(report).toContain('| Automatic changes | 9 |');
 		expect(report).toContain('## Wrappers');
 		expect(report).toContain('| button-disabled | 1 | 1 |');
 	});
