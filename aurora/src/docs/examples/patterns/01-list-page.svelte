@@ -109,7 +109,7 @@ The page of a list of records: a header with the title, a short description and 
 	</form>
 	{#snippet actionsSnippet({ close })}
 		<Button buttonType="text" variant="secondary" onclick={close}>Cancel</Button>
-		<Button type="submit" form="new-booking" loading={saving}>Create</Button>
+		<Button type="submit" form="new-booking" loading={saving}>Create booking</Button>
 	{/snippet}
 </Dialog>
 
@@ -143,7 +143,7 @@ The page of a list of records: a header with the title, a short description and 
 	.who {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.6rem;
+		gap: 0.5rem;
 	}
 
 	.form {

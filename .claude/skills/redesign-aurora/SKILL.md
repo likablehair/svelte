@@ -190,13 +190,14 @@ Una riga per argomento; la voce completa, con data e motivazioni, è in `referen
 
 ## Proposte (non ancora confermate)
 
-Le nuove proposte vanno in una tabella `| # | Proposta | Nota |`, numerate dal primo numero libero (ultimo usato: P221; P19 e P20 sono state usate per i layer e Tailwind).
+Le nuove proposte vanno in una tabella `| # | Proposta | Nota |`, numerate dal primo numero libero (ultimo usato: P222; P19 e P20 sono state usate per i layer e Tailwind).
 
 | # | Proposta | Nota |
 |---|---|---|
 | P180–P188 | SelectableVerticalList (P180–P186) e SelectableMenuList (P187–P188) superate dalla decisione "Punto 6"; BoxList P172–P179 e ToggleList P189–P191 approvate | elenco in `reference/lists.md` |
 | P220 | Passi `manual` divisi in `review` (si guarda) ed `edit` (si scrive); la lista dei punti rimasti mostra prima gli `edit` | dall'analisi delle 20 app, `reference/migration.md` |
 | P221 | Regole v3 → v4 minime per i nomi v3 trovati da `analyze` nelle 10 app v3 | idem |
+| P222 | `--global-color-text-3` in dark (#66728c) ha contrasto ~3,9:1 su `bg`/`surface` (sotto 4,5:1 AA per testo piccolo; in light 4,8–5,4:1): schiarirlo in dark fino ad almeno 4,5:1 | misurato il 2026-10-16 scrivendo la skill `aurora-design`, che intanto lo limita ai testi accessori |
 
 ## Domande aperte
 
@@ -329,4 +330,5 @@ La suite intera (~2.400 test in due browser, 3–4 minuti) e il test visivo inte
 - **2026-10-15, commit** `3090689` su `aurora-v5` (push non chiesto) di `setup` e `v4-compat.css`: suite intera verde salvo SidebarLayout in Firefox (instabile noto, verde da solo); una prima corsa si era bloccata per 10 minuti senza motivo chiaro, rilanciata andava. Spiegazioni all'utente a piccoli passi, una domanda alla volta.
 - **2026-10-15, codemod (prima parte)** su tatum, nulla committato: rinomine di componenti, prop, eventi, snippet e variabili CSS, argomenti senza `detail`, icone MDI → `@mdi/js`, default v4 solo di comportamento; rigiocabile; 30 test. Corretto nella libreria lo store `theme` che si aggiornava in ritardo dopo `toggleMode()`.
 - **2026-10-16, MCP e skill per gli agenti** (COMP-123/124): `dist/spec.json`, pacchetto `aurora/mcp/` con tool, prompt e `init` per 4 agenti, tool di migrazione a richiesta, skill `aurora-design` e `aurora-migrate`, 4 schemi di pagina, pagine docs "Page patterns" e "AI agents"; 118 test node verdi, svelte-check e package ok; nulla committato. Da fare: baseline visive Linux dei 4 schemi, prova in una sessione reale su un'app.
+- **2026-10-16, skill `aurora-design` completata** (COMP-124, richiesta dell'utente: UI e UX complete): SKILL.md con processo (brief, schema, componenti, stati, verifica, critica) e regole essenziali, più 10 riferimenti per area (brief e revisione con euristiche e punteggi, layout e gerarchia, azioni, form, stati, navigazione e dati, colore e testo, responsive e touch, accessibilità, testi it/en) oltre a `themes.md`; tecniche prese da skill di design generiche e adattate alla libreria (token, componenti, misure reali). Schemi di pagina allineati (etichette verbo + oggetto, scala di spaziatura).
 - **Prossimo**: **scioglimento dei wrapper** su tatum (gran parte dei 57 errori di `svelte-check` rimasti), lista dei punti rimasti, prova a mano; P220–P221 da far confermare; poi P56, P104, P40 (approvate).

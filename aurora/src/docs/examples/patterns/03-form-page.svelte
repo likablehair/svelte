@@ -82,7 +82,7 @@ A long form split in sections: each section has a title and a line of explanatio
 		</section>
 
 		<div class="footer">
-			<ConfirmOrCancelButtons confirmText="Save" confirmType="submit" loading={saving} />
+			<ConfirmOrCancelButtons confirmText="Save changes" confirmType="submit" loading={saving} />
 		</div>
 	</form>
 </main>
