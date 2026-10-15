@@ -1264,6 +1264,18 @@ New, optional: `total`, `label`, `labelSnippet`, `showValue`, `valueSnippet`, `c
 
 New, optional: `title`.
 
+### IconsDropdown
+
+- **Items**: `IconItem` is exported (`import { IconsDropdown, type IconItem } from '@likable-hair/svelte'`): drop local copies of the type. Every option needs a `label` (its accessible name, the Tooltip of the highlighted tile and the type-ahead text; v4 options had no text) and `icon` is an `@mdi/js` path instead of an MDI class (`"mdi-format-align-left"` → `mdiFormatAlignLeft`). Pass `label` to the component too: it names the button for screen readers and is not shown.
+- **Callback**: `onchange(e)` receives `{ select, unselect, selection }` directly (`e.detail.selection[0].value` → `e.selection[0].value`); picking another icon also reports the replaced one in `unselect`.
+- **Look**: the button shows the chosen icon in a gradient tile and is as tall as a Button of the same `size`; the list is a grid of tiles (`columns`, default the number of options up to 5) instead of a 60px column. The four arrows move through the grid.
+- `width`, `minWidth`, `menuWidth` → `--icons-dropdown-width`, `--icons-dropdown-min-width`, `--icons-dropdown-menu-width` (the menu now fits the grid; drop `menuWidth`).
+- The v4 overrides on the inner Dropdown (`--button-width="auto"`, `--button-padding`, `--autocomplete-selected-item-color`) no longer fit: remove the first two, and use `--icons-dropdown-option-selected-color` / `-background` for the third.
+- `values` defaults to `undefined` (v4 `[]`). The selected icon is in the server render (v4 showed an empty button until hydration).
+- `clearable` (still off by default) shows a separate "Clear selection" button, hidden while `disabled`.
+
+New, optional: `multiple` with `maxVisibleIcons`, `columns`, `mandatory`, `placement`, `mobileDrawer` (a bottom drawer with 44px tiles on phones), `variant`, `size`, `name`, `bind:open`, `locale`, `selectionText`, `onclose`, `class` per part (with `tile`), `valueSnippet`, `itemSnippet` and the other `Dropdown` snippets, every `--icons-dropdown-*` variable.
+
 ### LineChart
 
 | v4 | v5 |
@@ -1852,4 +1864,4 @@ These v4 exports are not in v5. Use the replacement; the ones marked "on request
 
 These v4 exports have no v5 version yet. Keep v4 for screens that need them, or wait for the port.
 
-- **Components**: PeriodSelector, PeriodPicker, IconsDropdown, ToggleList, BoxList, GlobalSearchTextField.
+- **Components**: PeriodSelector, PeriodPicker, ToggleList, BoxList, GlobalSearchTextField.

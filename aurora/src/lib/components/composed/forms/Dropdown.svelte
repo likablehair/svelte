@@ -62,6 +62,8 @@ Button that opens a list of options (`items`) and picks one or, with `multiple`,
 			| 'right-end';
 		/** On screens up to 1024px wide, opens the list in a bottom drawer instead of a menu. */
 		mobileDrawer?: boolean;
+		/** Lays the options out in a grid with this many columns, for example for icons: all four arrows move through it. */
+		columns?: number;
 		/** Color of the button. */
 		variant?: 'primary' | 'secondary' | 'danger' | 'gradient';
 		/** Height, padding and text size of the button. */
@@ -131,6 +133,7 @@ Button that opens a list of options (`items`) and picks one or, with `multiple`,
 		closeOnSelect,
 		placement = 'bottom-start',
 		mobileDrawer = false,
+		columns,
 		variant = 'secondary',
 		size = 'md',
 		selectionText,
@@ -199,6 +202,7 @@ Button that opens a list of options (`items`) and picks one or, with `multiple`,
 	{closeOnSelect}
 	{placement}
 	{mobileDrawer}
+	{columns}
 	drawerSearch={false}
 	drawerTitle={label}
 	placeholder={label ?? placeholder}

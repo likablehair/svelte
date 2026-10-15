@@ -328,6 +328,21 @@ describe('Dropdown', () => {
 		container.remove();
 	});
 
+	test('columns lays the options out in a grid that all four arrows move through', async () => {
+		const onchange = vi.fn();
+		const screen = await render(Dropdown, { label: 'Status', items: statuses, columns: 3, onchange });
+		const trigger = screen.getByRole('combobox');
+		await userEvent.keyboard('{Tab}{ArrowDown}');
+		await expect.element(screen.getByRole('listbox')).toHaveAttribute('data-columns', '3');
+		const active = () =>
+			document.getElementById(trigger.element().getAttribute('aria-activedescendant') ?? '')?.textContent?.trim();
+		expect(active()).toBe('Booked');
+		await userEvent.keyboard('{ArrowRight}{ArrowDown}');
+		expect(active()).toBe('Cancelled');
+		await userEvent.keyboard('{ArrowLeft}{ArrowUp}{Enter}');
+		expect(onchange.mock.calls[0][0].select).toEqual(statuses[0]);
+	});
+
 	test('bind:open reports opening and closing', async () => {
 		let open: boolean | undefined;
 		const screen = await render(Dropdown, {

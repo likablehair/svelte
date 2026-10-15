@@ -652,6 +652,34 @@ describe('Autocomplete', () => {
 		expect(getComputedStyle(field).borderTopColor).toBe('rgb(1, 2, 3)');
 		target.remove();
 	});
+
+	test('columns: a grid as wide as its options, up and down move by rows, left and right keep moving the caret', async () => {
+		const screen = await render(Autocomplete, { label: 'Service', items: services, columns: 2 });
+		const input = screen.getByRole('combobox');
+		await input.click();
+		const listbox = screen.getByRole('listbox');
+		await expect.element(listbox).toHaveAttribute('data-columns', '2');
+		expect(getComputedStyle(listbox.element()).display).toBe('grid');
+		const options = [...listbox.element().querySelectorAll('[role=option]')];
+		expect(options[1].getBoundingClientRect().top).toBe(options[0].getBoundingClientRect().top);
+		expect(options[2].getBoundingClientRect().top).toBeGreaterThan(options[0].getBoundingClientRect().top);
+		const menu = screen.container.querySelector('.aurora-autocomplete-menu') as HTMLElement;
+		expect(menu.style.width).toBe('');
+
+		const active = () => input.element().getAttribute('aria-activedescendant');
+		await userEvent.keyboard('{ArrowDown}');
+		expect(active()).toBe(options[0].id);
+		await userEvent.keyboard('{ArrowDown}');
+		expect(active()).toBe(options[2].id);
+		await userEvent.keyboard('{ArrowDown}{ArrowDown}');
+		expect(active()).toBe(options[4].id);
+		await userEvent.keyboard('{ArrowUp}');
+		expect(active()).toBe(options[2].id);
+
+		await userEvent.keyboard('ba');
+		await userEvent.keyboard('{ArrowLeft}x');
+		await expect.element(input).toHaveValue('bxa');
+	});
 });
 
 describe('Autocomplete texts', () => {

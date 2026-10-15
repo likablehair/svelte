@@ -1,0 +1,43 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--icons-dropdown-default-width: fit-content;
+		--icons-dropdown-default-min-width: 0;
+		--icons-dropdown-default-padding: 0 6px 0 3px;
+		--icons-dropdown-default-sm-padding: 0 4px 0 3px;
+		--icons-dropdown-default-lg-padding: 0 8px 0 4px;
+		--icons-dropdown-default-gap: 4px;
+		--icons-dropdown-default-value-size: 26px;
+		--icons-dropdown-default-sm-value-size: 20px;
+		--icons-dropdown-default-lg-value-size: 30px;
+		--icons-dropdown-default-value-icon-size: 16px;
+		--icons-dropdown-default-sm-value-icon-size: 14px;
+		--icons-dropdown-default-lg-value-icon-size: 18px;
+		--icons-dropdown-default-value-gap: 3px;
+		--icons-dropdown-default-value-border-radius: var(--global-radius-sm);
+		--icons-dropdown-default-value-background: var(--global-fill-gradient);
+		--icons-dropdown-default-value-color: var(--global-color-on-primary);
+		--icons-dropdown-default-value-box-shadow: 0 4px 12px -6px var(--global-color-primary-glow);
+		--icons-dropdown-default-placeholder-indent: 7px;
+		--icons-dropdown-default-counter-color: var(--global-color-text-2);
+		--icons-dropdown-default-counter-font-size: 12px;
+		--icons-dropdown-default-menu-width: auto;
+		--icons-dropdown-default-menu-gap: 4px;
+		--icons-dropdown-default-option-size: 36px;
+		--icons-dropdown-default-drawer-option-size: 44px;
+		--icons-dropdown-default-drawer-menu-gap: 8px;
+		--icons-dropdown-default-option-icon-size: 18px;
+		--icons-dropdown-default-option-border-radius: var(--global-radius-sm);
+		--icons-dropdown-default-option-background: var(--global-color-surface-2);
+		--icons-dropdown-default-option-border-color: var(--global-color-border);
+		--icons-dropdown-default-option-color: var(--global-color-text-2);
+		--icons-dropdown-default-option-highlighted-background: var(--global-color-primary-soft);
+		--icons-dropdown-default-option-highlighted-border-color: transparent;
+		--icons-dropdown-default-option-highlighted-color: var(--global-color-primary);
+		--icons-dropdown-default-option-highlighted-transform: translateY(-2px);
+		--icons-dropdown-default-option-selected-background: var(--global-fill-gradient);
+		--icons-dropdown-default-option-selected-color: var(--global-color-on-primary);
+		--icons-dropdown-default-option-selected-box-shadow: 0 8px 18px -8px var(--global-color-primary-glow);
+	}
+}

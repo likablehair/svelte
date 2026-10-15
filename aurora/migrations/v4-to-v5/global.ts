@@ -292,7 +292,6 @@ export default {
 		...pending('component', [
 			'PeriodSelector',
 			'PeriodPicker',
-			'IconsDropdown',
 			'ToggleList',
 			'BoxList',
 			'GlobalSearchTextField'

@@ -99,6 +99,8 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 		drawerSearch?: boolean;
 		/** Title of the mobile drawer. Defaults to `label`. */
 		drawerTitle?: string;
+		/** Lays the options out in a grid with this many columns, for example for icons: the left and right arrows move to the previous and next option, the up and down arrows to the one above and below. In a text field the left and right arrows keep moving the caret. The menu takes the width of the grid instead of the one of the field. */
+		columns?: number;
 		/** Text of the loading row. Defaults to "Loading…", in the language of `locale`. */
 		loadingText?: string;
 		/** Text shown when no option matches. Defaults to "No results", in the language of `locale`. */
@@ -211,6 +213,7 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 		mobileDrawer = false,
 		drawerSearch = true,
 		drawerTitle,
+		columns,
 		loadingText,
 		noResultsText,
 		removeLabel,
@@ -351,15 +354,15 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 		open = true;
 	}
 
-	function move(step: 1 | -1) {
+	let grid = $derived(columns !== undefined && columns > 1);
+
+	function move(step: number) {
 		if (!options.length) return;
 		const last = options.length - 1;
-		highlighted =
-			active === undefined
-				? step === 1
-					? 0
-					: last
-				: Math.min(Math.max(active + step, 0), last);
+		const row = (index: number) => Math.floor(index / Math.abs(step));
+		if (active === undefined) highlighted = step > 0 ? 0 : last;
+		else if (active + step > last) highlighted = row(active) < row(last) ? last : active;
+		else highlighted = active + step < 0 ? active : active + step;
 		reveal(highlighted);
 	}
 
@@ -399,12 +402,21 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 			case 'ArrowDown':
 			case 'ArrowUp': {
 				event.preventDefault();
-				const step = event.key === 'ArrowDown' ? 1 : -1;
+				const rowStep = grid ? (columns as number) : 1;
+				const step = event.key === 'ArrowDown' ? rowStep : -rowStep;
 				if (open) move(step);
 				else {
 					openMenu();
 					move(step);
 				}
+				break;
+			}
+			case 'ArrowLeft':
+			case 'ArrowRight': {
+				if (!grid || !open || typing(event)) break;
+				event.preventDefault();
+				const forward = (event.key === 'ArrowRight') !== !!anchor?.matches(':dir(rtl)');
+				move(forward ? 1 : -1);
 				break;
 			}
 			case 'Enter':
@@ -518,6 +530,8 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 			role="listbox"
 			class="aurora-autocomplete-listbox"
 			aria-multiselectable={multiple || undefined}
+			data-columns={grid ? columns : undefined}
+			style:--_columns={grid ? columns : undefined}
 			aria-labelledby={hasLabel ? labelId : undefined}
 			aria-label={hasLabel ? undefined : placeholder}
 			aria-activedescendant={focusable ? activeDescendant : undefined}
@@ -765,7 +779,7 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 		bind:open
 		activator={anchor}
 		{placement}
-		matchActivatorWidth
+		matchActivatorWidth={!grid}
 		class={['aurora-autocomplete-menu', clazz.menu]}
 	>
 		{@render list()}
@@ -995,6 +1009,11 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 			flex-direction: column;
 			gap: var(--autocomplete-option-spacing, var(--autocomplete-default-option-spacing));
 			outline: none;
+		}
+
+		.aurora-autocomplete-listbox[data-columns] {
+			display: grid;
+			grid-template-columns: repeat(var(--_columns), minmax(0, 1fr));
 		}
 
 		.aurora-autocomplete-option {

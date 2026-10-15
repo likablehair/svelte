@@ -17,3 +17,11 @@ export type RadioItem<Data = unknown> = Item<Data> & {
 	/** Disables only this option. */
 	disabled?: boolean;
 };
+
+/** An option of an `IconsDropdown`: an `Item` whose icon and label are required. */
+export type IconItem<Data = unknown> = Item<Data> & {
+	/** Name of the option: read by screen readers, shown in its Tooltip and matched when typing its first letters. */
+	label: string;
+	/** SVG path of the icon, for example from `@mdi/js`. */
+	icon: string;
+};
