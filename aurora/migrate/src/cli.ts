@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { setupAgents } from './agents.ts';
 import { analyze } from './analyze.ts';
 import { codemod } from './codemod.ts';
 import { appLabel, codemodReport, markdownReport, summaryTable } from './report.ts';
@@ -23,7 +24,9 @@ const USAGE = `Usage:
               the cascade layer order, the library Tailwind CSS, the library fonts and
               v4-compat.css, moves element rules into @layer reset; calls setDefaultLocale in
               the root layout when the app is not in English (from <html lang>, the interface
-              text or --locale). Can be run again. Never commits.
+              text or --locale); configures the coding agents of the app (MCP server,
+              aurora-design and aurora-migrate skills, AGENTS.md) with @likable-hair/svelte-mcp.
+              Can be run again. Never commits.
 
   codemod     The mechanical changes, on the branch made by setup: renamed components, props,
               events, snippets and CSS variables, callback arguments without \`detail\` (inline
@@ -86,12 +89,13 @@ function runAnalyze(options: Options) {
 	if (options.summary) console.log(summaryTable(results));
 }
 
-function runSetup(options: Options) {
+async function runSetup(options: Options) {
 	const dir = resolve(options.dirs[0]);
 	const index = loadRules();
 	const result = setup(dir, analyze(dir, index), { ...options, layers: index.rules.global.layers.app });
+	const changes = [...result.changes, ...(await setupAgents(dir))];
 	console.log(`Branch: ${result.branch}`);
-	console.log(result.changes.length ? result.changes.map((c) => `- ${c}`).join('\n') : 'Nothing to change.');
+	console.log(changes.length ? changes.map((c) => `- ${c}`).join('\n') : 'Nothing to change.');
 	if (result.install) console.log(`Installed with \`${result.install}\`.`);
 	console.log('Nothing was committed.');
 }
@@ -111,13 +115,13 @@ function runCodemod(options: Options) {
 }
 
 const options = parseArgs(process.argv.slice(2));
-const commands: Record<string, (options: Options) => void> = { analyze: runAnalyze, setup: runSetup, codemod: runCodemod };
+const commands: Record<string, (options: Options) => void | Promise<void>> = { analyze: runAnalyze, setup: runSetup, codemod: runCodemod };
 if (!options?.command || !commands[options.command] || !options.dirs.length) {
 	console.log(USAGE);
 	process.exit(options ? 1 : 0);
 }
 try {
-	commands[options.command](options);
+	await commands[options.command](options);
 } catch (error) {
 	console.error((error as Error).message);
 	process.exit(1);

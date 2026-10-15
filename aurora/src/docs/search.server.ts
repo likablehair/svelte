@@ -1,6 +1,8 @@
 import { slugify } from './anchors.js';
 import { exportedTypeFiles, getComponentDoc, getExamples, getTokens, listComponents } from './api.server.js';
 import type { ComponentDoc, TypeDoc } from './types.js';
+import { AGENTS_SECTIONS, AGENTS_TITLE } from './agents.js';
+import { getPatterns, PATTERNS_TITLE } from './patterns.server.js';
 import { CLASSES_TITLE, STYLING_SECTIONS, STYLING_TITLE } from './styling.js';
 import type { SearchIndex } from './search.js';
 
@@ -25,7 +27,9 @@ export function searchIndex(): SearchIndex {
 			title: STYLING_TITLE,
 			href: '/styling',
 			sections: [...STYLING_SECTIONS.map((s) => s.title), CLASSES_TITLE]
-		}
+		},
+		{ title: PATTERNS_TITLE, href: '/patterns', sections: getPatterns().map((p) => p.title) },
+		{ title: AGENTS_TITLE, href: '/agents', sections: AGENTS_SECTIONS.map((s) => s.title) }
 	];
 
 	const docs = listComponents().flatMap((entry) => getComponentDoc(entry.slug) ?? []);

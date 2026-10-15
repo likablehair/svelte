@@ -27,3 +27,8 @@ vite.config.ts.timestamp-*
 /tests/visual/report
 /tests/visual/results
 /tests/components/__screenshots__
+
+# Built packages
+/mcp/dist
+/mcp/bundled
+/migrate/dist

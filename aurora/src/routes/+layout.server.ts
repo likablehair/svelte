@@ -14,7 +14,9 @@ export function load() {
 			links: [
 				{ href: '/', label: 'Tokens' },
 				{ href: '/themes', label: 'Themes' },
-				{ href: '/styling', label: 'CSS and Tailwind' }
+				{ href: '/styling', label: 'CSS and Tailwind' },
+				{ href: '/patterns', label: 'Page patterns' },
+				{ href: '/agents', label: 'AI agents' }
 			]
 		},
 		...Object.entries(categories)

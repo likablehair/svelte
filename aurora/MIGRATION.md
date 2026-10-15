@@ -4,6 +4,8 @@ Version 5 of `@likable-hair/svelte` is a rewrite. This file lists everything tha
 
 It is updated together with every ported component. Every v4 component has a v5 version, or is listed in [Not ported](#not-ported) with what to use instead.
 
+You do not have to apply it by hand: `npx @likable-hair/svelte-migrate analyze|setup|codemod <app-dir>` does the mechanical part and lists what is left, and with a coding agent the `aurora` MCP server (`@likable-hair/svelte-mcp`) and the `aurora-migrate` skill drive the whole migration. See the "AI agents" page of the docs.
+
 Contents:
 
 - [Checklist](#checklist)

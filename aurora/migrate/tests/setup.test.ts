@@ -38,7 +38,9 @@ describe('setup: package.json', () => {
 		expect(pkg.dependencies['@likable-hair/svelte']).toBe('^5.0.0');
 		expect(pkg.dependencies['@mdi/js']).toBe('^7.4.47');
 		expect(Object.keys(pkg.dependencies)).toEqual([...Object.keys(pkg.dependencies)].sort());
-		expect(changes).toHaveLength(2);
+		expect(pkg.devDependencies['@likable-hair/svelte-migrate']).toMatch(/^\^\d/);
+		expect(pkg.devDependencies['@likable-hair/svelte-mcp']).toMatch(/^\^\d/);
+		expect(changes).toHaveLength(4);
 	});
 
 	test('copies a .tgz into vendor/ and keeps the indentation of the file', () => {
@@ -95,7 +97,13 @@ describe('setup: branch', () => {
 describe('setup: package spec on a second run', () => {
 	test('keeps a v5 already in package.json when no package is given', () => {
 		const dir = copyApp();
-		writeFileSync(join(dir, 'package.json'), JSON.stringify({ dependencies: { '@likable-hair/svelte': 'file:./vendor/x.tgz', '@mdi/js': '^7.4.47' } }));
+		writeFileSync(
+			join(dir, 'package.json'),
+			JSON.stringify({
+				dependencies: { '@likable-hair/svelte': 'file:./vendor/x.tgz', '@mdi/js': '^7.4.47' },
+				devDependencies: { '@likable-hair/svelte-mcp': '^0.1.0', '@likable-hair/svelte-migrate': '^0.1.0' }
+			})
+		);
 		expect(updatePackageJson(dir, analyze(dir, loadRules()))).toEqual([]);
 	});
 });

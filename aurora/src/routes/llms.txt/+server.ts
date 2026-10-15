@@ -20,6 +20,8 @@ export function GET({ url }) {
 		'',
 		`- [Tokens](${link('/tokens.md')}): \`--global-*\` variables for colors, shape, shadows, fonts, motion; themes and light/dark mode.`,
 		`- [CSS and Tailwind](${link('/styling.md')}): cascade layer order, resets, Tailwind 3 and 4 setup, token classes.`,
+		`- [Page patterns](${link('/patterns.md')}): whole pages (list, detail, form, dashboard) built only with the library and the tokens.`,
+		`- [AI agents](${link('/agents.md')}): MCP server with the specs of the installed version and the aurora-design skill for coding agents; setup with \`npx svelte-mcp init\`.`,
 		'',
 		'## Components',
 		''

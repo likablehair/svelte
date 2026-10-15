@@ -8,6 +8,11 @@ import { addDefaultLocale } from './layout.ts';
 
 const LIB = '@likable-hair/svelte';
 const MDI = ['@mdi/js', '^7.4.47'] as const;
+const OWN_VERSION: string = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version;
+export const AGENT_TOOLS = [
+	['@likable-hair/svelte-migrate', `^${OWN_VERSION}`, 'the migration tools for coding agents, until the migration is over'],
+	['@likable-hair/svelte-mcp', `^${OWN_VERSION}`, 'MCP server and skills for coding agents']
+] as const;
 const MAIN_BRANCHES = new Set(['master', 'main', 'develop', 'dev']);
 
 export interface SetupOptions {
@@ -85,6 +90,11 @@ export function updatePackageJson(dir: string, analysis: Analysis, packageSpec?:
 	for (const dep of analysis.droppedDependencies) {
 		const version = oldLib.dependencies?.[dep] ?? 'latest';
 		if (setDependency(pkg, dep, version)) changes.push(`package.json: ${dep} ${version} (imported by the app, came with v4)`);
+	}
+	for (const [name, version, why] of AGENT_TOOLS) {
+		if (pkg.dependencies?.[name] || pkg.devDependencies?.[name]) continue;
+		setDependency(pkg, name, version, 'devDependencies');
+		changes.push(`package.json: ${name} ${version} (${why})`);
 	}
 	if (changes.length) writeFileSync(path, JSON.stringify(pkg, null, indentOf(text)) + (text.endsWith('\n') ? '\n' : ''));
 	return changes;

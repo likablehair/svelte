@@ -14,6 +14,12 @@ npm run migrate -- analyze ~/projects/*/frontend --md reports/ --summary   # one
 
 `analyze` is read-only: it never writes inside the app.
 
+`setup <app-dir>` and `codemod <app-dir>` change the app (see `npm run migrate -- --help`); neither commits. `setup` also adds this package and `@likable-hair/svelte-mcp` to the dev dependencies and configures the coding agents of the app (MCP server, `aurora-design` and `aurora-migrate` skills, `AGENTS.md`).
+
+## With a coding agent
+
+The same phases are tools of the `aurora` MCP server (`@likable-hair/svelte-mcp`): `migration_analyze`, `migration_setup` (does not install), `migration_codemod`, `migration_rules`, available while the app is on v4 or declares this package. `skills/aurora-migrate` is the skill that takes the agent through them; `init` copies it into the app. `npm run migrate:build` builds `dist/` for publishing.
+
 ## What the report says
 
 - **Summary**: versions, package manager, git state, whether phase 0 is needed (Svelte 4 or library v3 syntax: run `npx sv migrate svelte-5` first).

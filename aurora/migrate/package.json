@@ -7,9 +7,13 @@
 	"bin": {
 		"svelte-migrate": "./dist/cli.js"
 	},
+	"exports": {
+		".": "./dist/index.js"
+	},
 	"files": [
 		"dist",
-		"rules"
+		"rules",
+		"skills"
 	],
 	"engines": {
 		"node": ">=20"
