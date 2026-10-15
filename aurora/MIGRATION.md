@@ -399,6 +399,18 @@ New, optional: `name`, `colorKey`, `color`, `size`, `shape="square"`, `ring`, `s
 
 New, optional: `label` (screen readers also get a hidden table of the values), `onitemclick({ index, datasetIndex, label, value, event })`, `tooltipSnippet`, `legendSnippet`, `locale`, `resetZoomLabel`, `bind:chart`, `bind:barChartElement`, CSS variables `--bar-chart-*`.
 
+### BoxList
+
+- **Look**: a grid of cards (border, optional icon tile, label 14px 600, description under it) as wide as the column instead of grey pills as wide as their text; no arrow (`appendSnippet` with `<Icon path={mdiArrowRight} />` brings it back); a focus ring instead of the blue background that stayed after a click. The grid puts as many columns of `--box-list-min-width` (240px) as fit, one on a phone.
+- **Callback**: `onboxClick(e)` receives `{ box, event }` directly (`e.detail.box` → `e.box`). Still called for links; not for disabled boxes.
+- **Navigation**: where `onboxClick` only maps `box.name` to a URL for `goto`, put the URL in `href` on each box and drop the handler: real links (new tab, preload) and no dead box for a wrong name.
+- `gap` → `--box-list-gap` (15px → 12px). `style` on the boxes is gone: use `--box-list-min-width` on the list.
+- `boxSnippet({ box, index })` is rendered **inside** the link or button of the library: remove the `<a>`/`<button>` the v4 snippet had to draw itself.
+- Markup: `ul` / `li` (v4 had `role="listbox"` without options) with `.aurora-box-list-box`; app CSS on `.box` must move to the `--box-list-*` variables.
+- **Local copies**: most apps use `$lib/components/common/BoxList.svelte` instead of the library. Replace it with `BoxList`: `icon` → `@mdi/js` path, `description` stays (always visible; `descriptionSnippet` with `{@html}` for HTML), `redirectUrl` / `url` → `href`, drop `expanded`, `animateOnMount` and `type`, `on:box-click` → `onboxClick` or `href`. A `prepend` slot with a custom card has no equivalent: render the card next to the list.
+
+New, optional: per box `description`, `icon`, `color` (`primary` or 1–6), `disabled`, `class`, `data`; boxes with neither `href` nor `onboxClick` are plain cards; `iconSnippet`, `labelSnippet`, `descriptionSnippet`, `prependSnippet`, `appendSnippet`; `bind:boxListElement`, `class` and native attributes on the list; `data-color`, `data-interactive`; every `--box-list-*` variable.
+
 ### Button
 
 - `icon`: SVG path. `buttonElement` is an `HTMLButtonElement`.
@@ -1864,4 +1876,4 @@ These v4 exports are not in v5. Use the replacement; the ones marked "on request
 
 These v4 exports have no v5 version yet. Keep v4 for screens that need them, or wait for the port.
 
-- **Components**: PeriodSelector, PeriodPicker, ToggleList, BoxList, GlobalSearchTextField.
+- **Components**: PeriodSelector, PeriodPicker, ToggleList, GlobalSearchTextField.

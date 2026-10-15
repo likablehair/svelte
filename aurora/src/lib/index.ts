@@ -26,6 +26,8 @@ export { default as NoData } from './components/simple/common/NoData.svelte';
 export { default as Divider } from './components/simple/common/Divider.svelte';
 export { default as Timeline } from './components/simple/timeline/Timeline.svelte';
 export type { TimelineItem } from './components/simple/timeline/Timeline.svelte';
+export { default as BoxList } from './components/simple/lists/BoxList.svelte';
+export type { BoxListItem } from './components/simple/lists/BoxList.svelte';
 export { default as Dialog } from './components/simple/dialogs/Dialog.svelte';
 export { default as Drawer } from './components/simple/navigation/Drawer.svelte';
 export { default as MenuOrDrawer } from './components/composed/common/MenuOrDrawer.svelte';

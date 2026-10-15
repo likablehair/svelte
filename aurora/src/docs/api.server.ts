@@ -424,6 +424,14 @@ function jsdoc(comments: Node[] | undefined) {
 }
 
 function htmlTag(name: string) {
-	const tags: Record<string, string> = { Anchor: 'a', Paragraph: 'p', Heading: 'h1', Div: 'div' };
+	const tags: Record<string, string> = {
+		Anchor: 'a',
+		Paragraph: 'p',
+		Heading: 'h1',
+		Div: 'div',
+		UList: 'ul',
+		OList: 'ol',
+		LI: 'li'
+	};
 	return tags[name] ?? name.toLowerCase();
 }
