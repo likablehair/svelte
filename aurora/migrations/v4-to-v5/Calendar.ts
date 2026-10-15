@@ -299,6 +299,7 @@ export default {
 		'`min`, `max`, `isDateDisabled` (days that cannot be chosen).',
 		'`weekStart`, `weekdayFormat`; `locale` takes any BCP 47 tag.',
 		'`variant="grid"` (agenda cells) and `dayAppendSnippet` for events or marks.',
+		'`bind:previewDate` and `followSelection` to show a range on two calendars side by side.',
 		'`onchange({ selectedDate, selectedDateTo })`.',
 		'`focus()` method, `bind:calendarElement`, native attributes on the grid.',
 		'`data-variant`, `data-disabled` on the grid; `data-today`, `data-selected`, `data-outside`, `data-disabled`, `data-range` on the days.',

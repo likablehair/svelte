@@ -1,7 +1,4 @@
-import type { ExportChange, GlobalMigration } from '../types.js';
-
-const pending = (kind: ExportChange['kind'], names: string[]): ExportChange[] =>
-	names.map((name) => ({ name, kind, pending: true }));
+import type { GlobalMigration } from '../types.js';
 
 export default {
 	package: {
@@ -289,12 +286,6 @@ export default {
 			kind: 'store',
 			note: 'Not ported (one app); available on request. A debounce is a few lines in the app (`clearTimeout` + `setTimeout`).'
 		},
-		...pending('component', [
-			'PeriodSelector',
-			'PeriodPicker',
-			'ToggleList',
-			'GlobalSearchTextField'
-		])
 	],
 	manual: [
 		{

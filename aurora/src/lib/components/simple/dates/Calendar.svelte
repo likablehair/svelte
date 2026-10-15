@@ -72,6 +72,10 @@ Grid of the days of one month, to choose a day or, with `range`, a range of days
 		weekdayFormat?: 'narrow' | 'short' | 'long';
 		/** With `range` and only one end chosen, highlights every day after the start (or before the end). */
 		fillOpenRange?: boolean;
+		/** With `range`, the day the preview reaches while the range is being chosen: the day under the pointer or with the focus. Bind the same variable on two calendars to share the preview between them. */
+		previewDate?: Date;
+		/** Shows the month of `selectedDate` or `selectedDateTo` when they change to a month that is not visible. Turn it off when the parent decides the month, as with two calendars side by side. */
+		followSelection?: boolean;
 		/** `compact` is the grid of a date picker; `grid` has large bordered cells for an agenda, with room for events in `dayAppendSnippet`. */
 		variant?: 'compact' | 'grid';
 		/** Extra classes for each part. */
@@ -110,6 +114,8 @@ Grid of the days of one month, to choose a day or, with `range`, a range of days
 		showWeekdays = true,
 		weekdayFormat = 'short',
 		fillOpenRange = false,
+		previewDate = $bindable(),
+		followSelection = true,
 		variant = 'compact',
 		class: clazz = {},
 		calendarElement = $bindable(),
@@ -135,7 +141,6 @@ Grid of the days of one month, to choose a day or, with `range`, a range of days
 	let year = $derived(visibleYear ?? ownYear);
 	let gridNode = $state<HTMLDivElement>();
 	let focused = $state<Date>();
-	let hovered = $state<Date>();
 	let direction = $state<'next' | 'previous'>();
 
 	let firstDay = $derived(weekStart ?? weekStartOf(locale));
@@ -159,8 +164,8 @@ Grid of the days of one month, to choose a day or, with `range`, a range of days
 			const [from, to] = [dayKey(selectedDate), dayKey(selectedDateTo)].sort((a, b) => a - b);
 			return { from, to, preview: false };
 		}
-		if (selectedDate && hovered && !outOfBounds(hovered, min, max, isDateDisabled)) {
-			const [from, to] = [dayKey(selectedDate), dayKey(hovered)].sort((a, b) => a - b);
+		if (selectedDate && previewDate && !outOfBounds(previewDate, min, max, isDateDisabled)) {
+			const [from, to] = [dayKey(selectedDate), dayKey(previewDate)].sort((a, b) => a - b);
 			return { from, to, preview: true };
 		}
 		if (!fillOpenRange) return undefined;
@@ -190,7 +195,7 @@ Grid of the days of one month, to choose a day or, with `range`, a range of days
 		untrack(() => {
 			if (sameDay(date, lastSelected)) return;
 			lastSelected = date;
-			if (date && !isVisible(date)) show(date);
+			if (date && followSelection && !isVisible(date)) show(date);
 		});
 	});
 
@@ -200,7 +205,7 @@ Grid of the days of one month, to choose a day or, with `range`, a range of days
 		untrack(() => {
 			if (sameDay(date, lastSelectedTo)) return;
 			lastSelectedTo = date;
-			if (date && !isVisible(date)) show(date);
+			if (date && followSelection && !isVisible(date)) show(date);
 		});
 	});
 
@@ -260,7 +265,7 @@ Grid of the days of one month, to choose a day or, with `range`, a range of days
 
 	async function moveFocus(date: Date) {
 		focused = date;
-		if (range) hovered = date;
+		if (range) previewDate = date;
 		if (!isVisible(date)) show(date);
 		await tick();
 		gridNode
@@ -318,15 +323,15 @@ Grid of the days of one month, to choose a day or, with `range`, a range of days
 		const date = parseISODate((event.target as HTMLElement).dataset?.date);
 		if (!date) return;
 		focused = date;
-		if (range) hovered = date;
+		if (range) previewDate = date;
 	}}
 	onfocusout={(event) => {
 		onfocusout?.(event);
-		if (!event.currentTarget.contains(event.relatedTarget as Node | null)) hovered = undefined;
+		if (!event.currentTarget.contains(event.relatedTarget as Node | null)) previewDate = undefined;
 	}}
 	onmouseleave={(event) => {
 		onmouseleave?.(event);
-		hovered = undefined;
+		previewDate = undefined;
 	}}
 >
 	{#if showWeekdays}
@@ -372,7 +377,7 @@ Grid of the days of one month, to choose a day or, with `range`, a range of days
 								aria-current={day.today ? 'date' : undefined}
 								onclick={(event) => choose(date, event)}
 								onmouseenter={() => {
-									if (range && !disabled) hovered = date;
+									if (range && !disabled) previewDate = date;
 								}}
 							>
 								<span class="aurora-calendar-day-content" aria-hidden="true">

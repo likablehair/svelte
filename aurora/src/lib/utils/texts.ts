@@ -131,6 +131,19 @@ export interface LibraryTexts {
 		done: string;
 		error: string;
 	};
+	globalSearch: {
+		label: string;
+		placeholder: string;
+		dialog: string;
+		results: string;
+		loading: string;
+		noResults: string;
+		error: string;
+		navigate: string;
+		open: string;
+		close: string;
+		cancel: string;
+	};
 	hierarchyMenu: { label: string; submenu: string };
 	menuOrDrawerOptions: { label: string };
 	monthSelector: { label: string };
@@ -143,6 +156,37 @@ export interface LibraryTexts {
 		last: string;
 		page: string;
 		status: string;
+	};
+	period: {
+		presets: Record<'today' | 'this-week' | 'this-month' | 'last-3month' | 'last-6month' | 'this-year' | 'total', string>;
+		presetsLabel: string;
+		rolling: string;
+		pickDates: string;
+		placeholder: string;
+		start: string;
+		end: string;
+		since: string;
+		until: string;
+		pickEnd: string;
+		pickStart: string;
+		invalid: string;
+		previousMonth: string;
+		nextMonth: string;
+		direction: string;
+		past: string;
+		future: string;
+		amount: string;
+		unit: string;
+		units: Record<'days' | 'weeks' | 'months' | 'years', string>;
+		last: Record<'days' | 'weeks' | 'months' | 'years', string>;
+		lastOne: Record<'days' | 'weeks' | 'months' | 'years', string>;
+		next: Record<'days' | 'weeks' | 'months' | 'years', string>;
+		nextOne: Record<'days' | 'weeks' | 'months' | 'years', string>;
+		previousPeriod: string;
+		nextPeriod: string;
+		open: string;
+		cancel: string;
+		apply: string;
 	};
 	searchBar: { clear: string };
 	sidebarLayout: { menu: string; sidebar: string; skip: string };
@@ -316,6 +360,19 @@ export const TEXTS_EN: LibraryTexts = {
 		done: 'Uploaded',
 		error: 'Upload failed'
 	},
+	globalSearch: {
+		label: 'Search',
+		placeholder: 'Search…',
+		dialog: 'Search',
+		results: 'Results',
+		loading: 'Searching…',
+		noResults: 'No results for “{text}”',
+		error: 'The search failed. Try again.',
+		navigate: 'navigate',
+		open: 'open',
+		close: 'close',
+		cancel: 'Cancel'
+	},
 	hierarchyMenu: { label: 'Menu', submenu: '{label} submenu' },
 	menuOrDrawerOptions: { label: 'Actions' },
 	monthSelector: { label: 'Month' },
@@ -328,6 +385,45 @@ export const TEXTS_EN: LibraryTexts = {
 		last: 'Last page',
 		page: 'Page {page}',
 		status: 'Page {page} of {count}'
+	},
+	period: {
+		presets: {
+			today: 'Today',
+			'this-week': 'This week',
+			'this-month': 'This month',
+			'last-3month': 'Last 3 months',
+			'last-6month': 'Last 6 months',
+			'this-year': 'This year',
+			total: 'All time'
+		},
+		presetsLabel: 'Periods',
+		rolling: 'Relative period',
+		pickDates: 'Choose dates on the calendar',
+		placeholder: 'Select a period',
+		start: 'Start',
+		end: 'End',
+		since: 'From {date}',
+		until: 'Until {date}',
+		pickEnd: 'Pick the end date',
+		pickStart: 'Pick the start date',
+		invalid: 'Enter a valid date',
+		previousMonth: 'Previous month',
+		nextMonth: 'Next month',
+		direction: 'Direction',
+		past: 'In the past',
+		future: 'In the future',
+		amount: 'How many',
+		unit: 'Unit',
+		units: { days: 'Days', weeks: 'Weeks', months: 'Months', years: 'Years' },
+		last: { days: 'Last {n} days', weeks: 'Last {n} weeks', months: 'Last {n} months', years: 'Last {n} years' },
+		lastOne: { days: 'Last day', weeks: 'Last week', months: 'Last month', years: 'Last year' },
+		next: { days: 'Next {n} days', weeks: 'Next {n} weeks', months: 'Next {n} months', years: 'Next {n} years' },
+		nextOne: { days: 'Next day', weeks: 'Next week', months: 'Next month', years: 'Next year' },
+		previousPeriod: 'Previous period',
+		nextPeriod: 'Next period',
+		open: 'Choose period',
+		cancel: 'Cancel',
+		apply: 'Apply'
 	},
 	searchBar: { clear: 'Clear search' },
 	sidebarLayout: { menu: 'Menu', sidebar: 'Sidebar', skip: 'Skip to content' },
@@ -501,6 +597,19 @@ export const TEXTS_IT: LibraryTexts = {
 		done: 'Caricato',
 		error: 'Caricamento non riuscito'
 	},
+	globalSearch: {
+		label: 'Cerca',
+		placeholder: 'Cerca…',
+		dialog: 'Ricerca',
+		results: 'Risultati',
+		loading: 'Ricerca in corso…',
+		noResults: 'Nessun risultato per “{text}”',
+		error: 'La ricerca non è riuscita. Riprova.',
+		navigate: 'naviga',
+		open: 'apri',
+		close: 'chiudi',
+		cancel: 'Annulla'
+	},
 	hierarchyMenu: { label: 'Menu', submenu: 'Sottomenu di {label}' },
 	menuOrDrawerOptions: { label: 'Azioni' },
 	monthSelector: { label: 'Mese' },
@@ -513,6 +622,45 @@ export const TEXTS_IT: LibraryTexts = {
 		last: 'Ultima pagina',
 		page: 'Pagina {page}',
 		status: 'Pagina {page} di {count}'
+	},
+	period: {
+		presets: {
+			today: 'Oggi',
+			'this-week': 'Questa settimana',
+			'this-month': 'Questo mese',
+			'last-3month': 'Ultimi 3 mesi',
+			'last-6month': 'Ultimi 6 mesi',
+			'this-year': "Quest'anno",
+			total: 'Sempre'
+		},
+		presetsLabel: 'Periodi',
+		rolling: 'Periodo dinamico',
+		pickDates: 'Scegli le date sul calendario',
+		placeholder: 'Seleziona un periodo',
+		start: 'Inizio',
+		end: 'Fine',
+		since: 'Dal {date}',
+		until: 'Fino al {date}',
+		pickEnd: 'Scegli la data di fine',
+		pickStart: 'Scegli la data di inizio',
+		invalid: 'Inserisci una data valida',
+		previousMonth: 'Mese precedente',
+		nextMonth: 'Mese successivo',
+		direction: 'Direzione',
+		past: 'Nel passato',
+		future: 'Nel futuro',
+		amount: 'Quanti',
+		unit: 'Unità',
+		units: { days: 'Giorni', weeks: 'Settimane', months: 'Mesi', years: 'Anni' },
+		last: { days: 'Ultimi {n} giorni', weeks: 'Ultime {n} settimane', months: 'Ultimi {n} mesi', years: 'Ultimi {n} anni' },
+		lastOne: { days: 'Ultimo giorno', weeks: 'Ultima settimana', months: 'Ultimo mese', years: 'Ultimo anno' },
+		next: { days: 'Prossimi {n} giorni', weeks: 'Prossime {n} settimane', months: 'Prossimi {n} mesi', years: 'Prossimi {n} anni' },
+		nextOne: { days: 'Prossimo giorno', weeks: 'Prossima settimana', months: 'Prossimo mese', years: 'Prossimo anno' },
+		previousPeriod: 'Periodo precedente',
+		nextPeriod: 'Periodo successivo',
+		open: 'Scegli il periodo',
+		cancel: 'Annulla',
+		apply: 'Applica'
 	},
 	searchBar: { clear: 'Cancella la ricerca' },
 	sidebarLayout: { menu: 'Menu', sidebar: 'Barra laterale', skip: 'Vai al contenuto' },

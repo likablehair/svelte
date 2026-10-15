@@ -766,6 +766,41 @@ describe('Calendar', () => {
 	});
 });
 
+describe('Calendar with a parent that decides the month', () => {
+	test('followSelection={false} keeps the month when the selection moves to another one', async () => {
+		const state = bound({ visibleMonth: 7, visibleYear: 2026 });
+		const screen = await render(Calendar, withBound({ range: true, followSelection: false }, state));
+		state.selectedDate = new Date(2026, 8, 10);
+		await expect.element(screen.getByRole('grid', { name: 'August 2026' })).toBeVisible();
+		expect(state.visibleMonth).toBe(7);
+	});
+
+	test('bind:previewDate shares the range preview between two calendars', async () => {
+		const shared = $state<{ previewDate?: Date }>({});
+		const props = (month: number) =>
+			Object.defineProperty(
+				{ range: true, visibleMonth: month, visibleYear: 2026, selectedDate: new Date(2026, 7, 28), followSelection: false },
+				'previewDate',
+				{
+					enumerable: true,
+					configurable: true,
+					get: () => shared.previewDate,
+					set: (value: Date | undefined) => {
+						shared.previewDate = value;
+					}
+				}
+			);
+		await render(Calendar, props(7));
+		await render(Calendar, props(8));
+		const september = document.querySelector<HTMLElement>('[data-date="2026-09-03"]:not([data-outside])')!;
+		await userEvent.hover(september);
+		await expect.poll(() => shared.previewDate?.getDate()).toBe(3);
+		await expect
+			.poll(() => document.querySelector('[data-date="2026-08-30"]:not([data-outside])')?.getAttribute('data-range'))
+			.toBe('middle');
+	});
+});
+
 describe('Calendar locale', () => {
 	test('setDefaultLocale gives the names and the first day of the week; the locale prop wins', async () => {
 		const props = { visibleMonth: 9, visibleYear: 2026 };

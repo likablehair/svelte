@@ -2,15 +2,14 @@
 
 Version 5 of `@likable-hair/svelte` is a rewrite. This file lists everything that can break, or look different, in an app that moves from the latest 4.x to 5.0: removed or renamed props, changed types and defaults, callbacks, snippets, CSS variables and behaviour. New optional features get one line per component, since they break nothing.
 
-It is updated together with every ported component. Components that v5 does not have yet are listed in [Not available yet](#not-available-yet).
+It is updated together with every ported component. Every v4 component has a v5 version, or is listed in [Not ported](#not-ported) with what to use instead.
 
 Contents:
 
 - [Checklist](#checklist)
 - [Global changes](#global-changes)
-- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Avatar](#avatar), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DashboardShaper](#dashboardshaper), [DataTable](#datatable), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [DescriptiveAvatar](#descriptiveavatar), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FileInput](#fileinput), [FileInputList](#fileinputlist), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [HierarchyMenu](#hierarchymenu), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [MediaQuery](#mediaquery), [Menu](#menu), [MenuOrDrawer](#menuordrawer), [MenuOrDrawerOptions](#menuordraweroptions), [MonthSelector](#monthselector), [NoData](#nodata), [Paginator](#paginator), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SidebarLayout](#sidebarlayout), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Timeline](#timeline), [Toaster](#toaster), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
+- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Avatar](#avatar), [BarChart](#barchart), [BoxList](#boxlist), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DashboardShaper](#dashboardshaper), [DataTable](#datatable), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [DescriptiveAvatar](#descriptiveavatar), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FileInput](#fileinput), [FileInputList](#fileinputlist), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [GlobalSearchTextField](#globalsearchtextfield), [HierarchyMenu](#hierarchymenu), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [IconsDropdown](#iconsdropdown), [LineChart](#linechart), [LinkButton](#linkbutton), [MediaQuery](#mediaquery), [Menu](#menu), [MenuOrDrawer](#menuordrawer), [MenuOrDrawerOptions](#menuordraweroptions), [MonthSelector](#monthselector), [NoData](#nodata), [Paginator](#paginator), [PeriodPicker](#periodpicker), [PeriodSelector](#periodselector), [PieChart](#piechart), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SidebarLayout](#sidebarlayout), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Timeline](#timeline), [Toaster](#toaster), [ToggleList](#togglelist), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
 - [Not ported](#not-ported)
-- [Not available yet](#not-available-yet)
 
 ## Checklist
 
@@ -1206,6 +1205,29 @@ New, optional: field options (`columns`, `words`, `joins`, `through`, `json`, `a
 
 New, optional: `square`, `title`, `--flag-icon-box-shadow`.
 
+### GlobalSearchTextField
+
+- **Results**: `searcher({ searchText, signal })` returns `GlobalSearchItem[]` (`import { GlobalSearchTextField, type GlobalSearchItem } from '@likable-hair/svelte'`): `name` → `value`, `title` → `label`, `subtitle` → `description`, `url` → `href` (now a real link), plus `icon` and `group` (a section title, instead of telling kinds apart by their subtitle). Pass `signal` to `fetch`.
+- **Search**: 300ms after the last keystroke (`debounceTimeout`) from 1 character (`searchThreshold`); a newer search aborts the older one, a failure shows an error (`errorText`, `onerror`) instead of loading forever.
+- **Choice**: `onselect(e)` receives `{ item, event }` with the result (v4 `e.detail.element`), and the dialog closes by itself: drop `searchDialogOpened = false` and, where the handler only did `goto(url)`, the handler itself (use `href`). Arrows and Enter work in the search box, the first result is active, the searched text is highlighted.
+- **Renamed**: `searchButtonText` → `label`, `bind:searchDialogOpened` → `bind:open`, `ontoggleSearchDialog` → `onclose` (at every close, without argument), `searchButtonSnippet({ toggleSearchDialog })` → `triggerSnippet({ open, shortcut })`. `transitionDuration` → `--dialog-duration`.
+- **Removed snippets**: `searchButtonIconSnippet`, `searchButtonTextSnippet`, `searchButtonShortcutSnippet` (→ `triggerSnippet` or `label`), `searchBarSnippet`, `searchResultsSnippet` (→ `itemSnippet`, `groupSnippet`, `emptySnippet`).
+- **Look**: a button styled as a search field (fields radius, 32px, max 220px) instead of a pill; the palette opens near the top, as in the prototype; on screens up to 768px the button is only the magnifier and the palette takes the whole screen with Cancel: remove the code that hid it on phones.
+- **Shortcut**: Ctrl+K (⌘K on a Mac) prevents the browser shortcut, is ignored inside other text fields and is labelled Ctrl on Windows and Linux; `shortcut={false}` turns it off.
+- Texts from `locale` ("Sorry, nothing found" and "Search with ❤️" are gone).
+
+| v4 | v5 |
+|---|---|
+| `--global-search-text-field-ring-color` | `--global-search-text-field-border-color` |
+| `--global-search-text-field-hover-ring-color` | `--global-search-text-field-hover-border-color` |
+| `--global-search-text-field-background-color` | `--global-search-text-field-background` |
+| `--global-search-text-field-max-width`, `-height`, `-border-radius` | same names, defaults 220px, 32px and the radius of the fields |
+| `--search-results-*` | — (`--global-search-text-field-dialog-width`, `-dialog-max-height`, `-dialog-top`, `--dialog-*`) |
+
+The `-default-*` names follow.
+
+New, optional: `placeholder`, `shortcut`, `debounceTimeout`, `searchThreshold`, `emptyText`, `errorText`, `cancelLabel`, `locale`, `onerror`, `itemSnippet`, `groupSnippet`, `emptySnippet`, `footerSnippet`, `class.dialog`, `bind:buttonElement`, `data-*`, every `--global-search-text-field-*` variable.
+
 ### HierarchyMenu
 
 - `onoptionClick({ detail: { option } })` → `onoptionClick({ option, nativeEvent })`: drop `.detail`. A parent without `href` only opens and closes its children: v4 also selected it and called the handler. Give `href` to parents that open a page.
@@ -1436,6 +1458,26 @@ New, optional: `description`, `size`, `children` (actions), `titleSnippet`, `des
 Defaults: the same renames on `--paginator-default-page-button-*` → `--paginator-default-button-*` and `--paginator-default-current-*`.
 
 New, optional: `siblingCount`, `showFirstLast`, `compact` ("7 / 24"), `pageHref` (links, page in the URL), `pageSnippet`, `firstIcon` / `previousIcon` / `nextIcon` / `lastIcon`, `locale` and the `*Label` texts, `bind:paginatorElement`, `class` object (`container`, `button`, `current`), `data-compact`, `data-current`, `--paginator-gap`, `-font-*`, `-icon-size`, `-button-size`, `-button-hover-color`, `-current-box-shadow`, `-ellipsis-*`, `-status-*`, `-disabled-opacity`, `-focus-ring-*`, `-duration`, `-easing`.
+
+### PeriodPicker
+
+- **Value**: same JSON as v4 (`{ method: 'quick' | 'rolling' | 'picker', values }`), the contract with the backends; the `TimespanSettings` type is exported (`import { PeriodPicker, type TimespanSettings } from '@likable-hair/svelte'`), drop `ComponentProps<...>` or copies. Without a value it no longer writes `{}` into the bound variable.
+- **Days**: `onchange({ timespanSettings, from, to })` gives the days the period covers, and `resolvePeriod(value)` computes them anywhere: drop local copies of `getDatesFromQuick` / `getDatesFromRolling` and `toISOString().slice(0, 10)` (use `toISODate`). `this-month` and `this-year` run to the end of the period and "this week" starts on Monday, as in the backends; `last-3month` / `last-6month` are exactly 3 / 6 months counting today, and so are rolling periods ("last 7 days" = today and the 6 before). The backends started those presets on the first of the month and counted one rolling day more: update their helpers in the same release (start at `today.minus(duration).plus({ days: 1 })`, end "next N" at `today.plus(duration).minus({ days: 1 })`).
+- **Look**: a bar at least 300px wide with ‹ › arrows at the start that move the period by its length (`shiftable={false}` hides them; a moved whole month reads "August 2026", landing on the days of a preset goes back to it), then the name of the period and its days (a range of dates without a name shows just the dates); the menu has the presets with their length, one month (`months={2}` for two) and the start and end dates (typed with the mask of `locale`), a bottom drawer up to 1024px.
+- **Draft**: presets apply at once and close; a custom range or a relative period applies with Apply, Cancel / Escape / click outside discard it. `onchange` runs only when the period is applied. Escape and a click outside always close (v4 stayed open on desktop with an invalid value).
+- **Removed**: `lang` (→ `locale`), `mode` (→ `from`/`to`), `valid`, `isSelectionMode`, `quickRangeConvertor` (→ `range` on each preset of `quickSelectOptions`), `setTimespanLabel` (→ `labelSnippet`).
+- `--simple-textfield-width`, `-height`, `-default-border-radius`, `-default-padding` passed by the apps → `--period-picker-width`, `-height`, `-border-radius`, `-padding`; `--simple-textfield-default-border` → `--period-picker-border-width` + `--period-picker-border-color`.
+- Apps with a local `$lib/components/common/PeriodPicker.svelte` (a different JSON read by their backend) keep it until the backend changes too.
+
+New, optional: `shiftable`, `months`, `previousLabel`, `nextLabel`, `placeholder`, `disabled`, `bind:open`, `placement`, `min`, `max`, `weekStart`, `onclose`, `applyLabel`, `cancelLabel`, `rollingLabel`, `labelSnippet`, `presetSnippet`, open ranges, `bind:periodPickerElement`, `class` and native attributes, `data-open`, `data-disabled`, `data-empty`, every `--period-picker-*` variable.
+
+### PeriodSelector
+
+- The panel of `PeriodPicker` on its own: one view with the presets, one month (`months={2}` for two) and the start and end dates instead of a list sliding to a detail view. Every change still updates the value and calls `onchange`, which now also gets `from` and `to`.
+- Value, days and removed props as in `PeriodPicker` (`lang`, `mode`, `valid`, `isSelectionMode`, `quickRangeConvertor`), plus `showTimeRangeLabel` and `setTimespanLabel` (the dates are always at the bottom).
+- `--period-selector-list-element-padding`, `-border-radius`, `-font-size` → `--period-selector-preset-padding`, `-border-radius`, `-font-size`; `--period-selector-width`, `-max-width`, `-min-height` stay.
+
+New, optional: `months`, `compact`, `min`, `max`, `weekStart`, `rollingLabel`, `presetSnippet`, `actionsSnippet`, `bind:periodSelectorElement`, `class` and native attributes, `data-compact`, `data-view`, every `--period-selector-*` variable.
 
 ### PieChart
 
@@ -1806,6 +1848,17 @@ Differences from the melt-ui copies:
 - The names of the close buttons ("Dismiss") and of the region ("Notifications") follow `locale` on the Toaster, else `setDefaultLocale` ("Chiudi", "Notifiche" in Italian); `closeLabel` and `label` win.
 - While a `Dialog` or `Drawer` is open the toasts show inside it and stay clickable.
 
+### ToggleList
+
+- **Look**: toggle buttons (`ActivableButton`, pressed state announced with `aria-pressed`) in a `role="group"` instead of chips; text-only buttons show the state dot (`dot={false}` hides it), `size` changes their height. Give the list an `aria-label`. App CSS aimed at the chips must move to the `--activable-button-*` variables.
+- **Callback**: `onchange(e)` receives `{ select, unselect, selection }` directly (`e.detail.selection` → `e.selection`), as in Autocomplete and Dropdown; with `multiple={false}` picking another option also reports the replaced one in `unselect`.
+- **Single choice**: with `multiple={false}` a second click on the selected option keeps it (`mandatory` is on by default there); v4 emptied the selection. `mandatory={false}` brings the v4 behavior back.
+- `disabled` now really disables the buttons (v4 only faded them). Item `icon` is an `@mdi/js` path; the item type is the exported `Item`.
+- `--toggle-list-heigth` → `--toggle-list-height` (typo). `--toggle-list-width` and `--toggle-list-max-width` stay.
+- Check the usages: an `onchange={() => handler}` never called the handler, and `values` without `bind:` did not follow the clicks.
+
+New, optional: `mandatory`, `size`, `dot`, `itemSnippet`, `bind:toggleListElement`, `class` and native attributes on the root, `data-multiple`, `data-disabled`, `--toggle-list-gap`.
+
 ### Tooltip
 
 - **Renamed**: `ToolTip` → `Tooltip` (`import { Tooltip } from '@likable-hair/svelte'`).
@@ -1872,8 +1925,3 @@ These v4 exports are not in v5. Use the replacement; the ones marked "on request
 | AvatarDropdown, VerticalDraggableList, `debounce` (on request) | — |
 | `scrollAtCenter` | `element.scrollIntoView({ block: 'center', behavior: 'smooth' })` |
 
-## Not available yet
-
-These v4 exports have no v5 version yet. Keep v4 for screens that need them, or wait for the port.
-
-- **Components**: PeriodSelector, PeriodPicker, ToggleList, GlobalSearchTextField.

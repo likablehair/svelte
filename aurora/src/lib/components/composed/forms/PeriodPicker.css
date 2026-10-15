@@ -1,0 +1,27 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--period-picker-default-width: auto;
+		--period-picker-default-min-width: 300px;
+		--period-picker-default-height: 36px;
+		--period-picker-default-padding: 3px;
+		--period-picker-default-border-width: 1px;
+		--period-picker-default-border-color: var(--global-color-border-strong);
+		--period-picker-default-border-radius: var(--global-radius-md);
+		--period-picker-default-background: var(--global-color-surface-solid);
+		--period-picker-default-box-shadow: var(--global-shadow-sm);
+		--period-picker-default-color: var(--global-color-text);
+		--period-picker-default-font-size: 13px;
+		--period-picker-default-divider-color: var(--global-color-border);
+		--period-picker-default-hover-background: var(--global-color-surface-2);
+		--period-picker-default-disabled-opacity: 0.5;
+		--period-picker-default-icon-color: var(--global-color-primary);
+		--period-picker-default-icon-size: 16px;
+		--period-picker-default-label-font-weight: 600;
+		--period-picker-default-placeholder-color: var(--global-color-text-3);
+		--period-picker-default-dates-color: var(--global-color-text-2);
+		--period-picker-default-dates-font-size: 12px;
+		--period-picker-default-chevron-color: var(--global-color-text-3);
+	}
+}
