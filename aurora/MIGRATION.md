@@ -8,7 +8,7 @@ Contents:
 
 - [Checklist](#checklist)
 - [Global changes](#global-changes)
-- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Avatar](#avatar), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DashboardShaper](#dashboardshaper), [DataTable](#datatable), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [DescriptiveAvatar](#descriptiveavatar), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FileInput](#fileinput), [FileInputList](#fileinputlist), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [HierarchyMenu](#hierarchymenu), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [MediaQuery](#mediaquery), [Menu](#menu), [MenuOrDrawer](#menuordrawer), [MenuOrDrawerOptions](#menuordraweroptions), [MonthSelector](#monthselector), [NoData](#nodata), [Paginator](#paginator), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SidebarLayout](#sidebarlayout), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Toaster](#toaster), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
+- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Avatar](#avatar), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DashboardShaper](#dashboardshaper), [DataTable](#datatable), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [DescriptiveAvatar](#descriptiveavatar), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FileInput](#fileinput), [FileInputList](#fileinputlist), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [HierarchyMenu](#hierarchymenu), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [LinkButton](#linkbutton), [MediaQuery](#mediaquery), [Menu](#menu), [MenuOrDrawer](#menuordrawer), [MenuOrDrawerOptions](#menuordraweroptions), [MonthSelector](#monthselector), [NoData](#nodata), [Paginator](#paginator), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SidebarLayout](#sidebarlayout), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Timeline](#timeline), [Toaster](#toaster), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
 - [Not ported](#not-ported)
 - [Not available yet](#not-available-yet)
 
@@ -1702,6 +1702,33 @@ New in v5, with the `TimePicker` panel it opens: v4 had no time field, so apps w
 
 The field types like the date field (digits only, the colon comes by itself, A/P set AM/PM, an impossible or out-of-range time is an error with `invalidText` and blocks the form), opens the panel in a Menu on desktop and in a bottom Drawer up to 1024px, and closes after the minutes (or AM/PM) are chosen. Helpers `parseTime(text)` → `{ hours, minutes }` and `formatTime({ hours, minutes } | Date)` → `HH:mm` are exported for the code around it.
 
+### Timeline
+
+- **Renamed**: `SimpleTimeLine` → `Timeline` (`import { Timeline, type TimelineItem } from '@likable-hair/svelte'`; the item type is now exported).
+- **Items**: `title` is required and is the text shown; v4 required `name` and never displayed it. Where an item has no `title`, rename `name` to `title` (also `item.name` in the snippets); where it has both, `name` → `key` (unique) or drop it. `imageUrl` (never read) is gone: use `icon` with an `@mdi/js` path.
+- **One column by default**: `singleSided` removed. Where it was missing (the v4 alternate layout) add `alternate`, which falls back to one column below 640px of width.
+- **Dates** follow `locale` (`setDefaultLocale`): day, short month, year, plus the time when it is not midnight; `from`–`to` on one line as a range. v4 always wrote Italian dates without the time, on two lines. `dateFormat` takes `Intl.DateTimeFormat` options; `item.time` is a free label (for example "Now") shown instead. Code in the snippets that formatted the dates with luxon or `Intl` can go.
+- `circleAlignment` → `markerAlignment` (same values; `bottom` now works, v4 left the marker at the top).
+- **Snippets**: `circleSnippet` → `markerSnippet`, `timesSnippet({ item, dateToString })` → `timeSnippet({ item, text })`, `infosSnippet` → `contentSnippet`, `infosAppendSnippet` → `appendSnippet({ item, index })`. `itemSnippet`, `contentSnippet`: `{ item, alignment }` → `{ item, index, side }`, with `side` `'start' | 'end'` (in one column `'end'`, v4 said `'left'`).
+- **Look**: one column, a theme-gradient line that stops at the first and last marker, empty markers (filled with `status: 'done'`), date above the title, title 14px. Markup: `ol` / `li` with `.aurora-timeline-item`, the marker is `.aurora-timeline-marker`. Wrappers that contained the v4 `z-index: 5` of the markers (`isolation: isolate`) can go.
+- Day separators made with fake items (`name: '__separator__'` + an empty `circleSnippet`) → `groupBy="day"` or `groupBy={(item) => label}`. Empty messages written around the timeline → `empty` / `emptySnippet` (it shows an empty state by itself).
+- Several apps have an unused copy of `StandardSimpleTimeline.svelte` that passes v1 props (`circleColor`, `circleDiameter`, `timesWidth`, `firstItemMarginTop`): delete it, or drop those props.
+
+| v4 | v5 |
+|---|---|
+| `--simple-time-line-gap` | `--timeline-item-spacing` (16px → 22px) |
+| `--simple-time-line-line-background` | `--timeline-line-color` (grey → theme gradient) |
+| `--simple-time-line-line-width` | `--timeline-line-width` |
+| `--simple-time-line-circle-width`, `-circle-height` | `--timeline-marker-size` |
+| `--simple-time-line-circle-background-color` | `--timeline-marker-color` (border, and fill of done and current markers) |
+| `--simple-time-line-width` | `--timeline-width` |
+| `--simple-time-line-height` | — (as tall as its items) |
+| `--simple-time-line-divider-width`, `-central-line-left`, `-body-width` | — (never settable; `--timeline-rail-width`, `--timeline-content-gap`) |
+
+The `-default-*` names follow.
+
+New, optional: item `status` (done, current, upcoming, with `aria-current="step"`), `icon`, `variant`, `time`, `key`; `groupBy` and `groupSnippet`, `variant="card"`, `dateFormat`, `locale`, `empty` and `emptySnippet`, `titleSnippet`, `descriptionSnippet`, `asideSnippet`, `bind:timelineElement`, `class` and native attributes, `data-*`, every `--timeline-*` variable.
+
 ### Toaster
 
 New in v5: v4 had no toasts, and most apps have their own `Toaster.svelte` copied from the melt-ui demo (`addToast`, `addErrorToast`, `addSuccessToast`, `addWarningToast`, `addInfoToast`, `removeToast` with `{ data: { title, description, ... } }`). The v5 functions have the same names but take the options directly: `addErrorToast({ title, description })`, or a string as the title.
@@ -1814,6 +1841,8 @@ These v4 exports are not in v5. Use the replacement; the ones marked "on request
 | VerticalSwitch | Switch, or TabSwitcher `variant="segmented"` with two tabs |
 | VerticalTextSwitch | TabSwitcher `variant="segmented"` with two tabs |
 | CollapsibleDivider | a `<details>` with a Divider `label` in its `<summary>` |
+| SelectableVerticalList | RadioGroup `card` (`title` → `label`, `name` → `value`); for results picked with the keyboard, Autocomplete or AsyncAutocomplete |
+| SelectableMenuList | [HierarchyMenu](#hierarchymenu) with options without `href` and `onoptionClick` (`collapsed` → `iconsOnly`), or a column of text Buttons |
 | ColorInvertedSelector (on request) | HierarchyMenu or TabSwitcher |
 | SidebarMenuList (on request) | HierarchyMenu with `href` and `currentPath` (`title` → `label`, `url` → `href`, `children` → `options`) |
 | AvatarDropdown, VerticalDraggableList, `debounce` (on request) | — |
@@ -1823,4 +1852,4 @@ These v4 exports are not in v5. Use the replacement; the ones marked "on request
 
 These v4 exports have no v5 version yet. Keep v4 for screens that need them, or wait for the port.
 
-- **Components**: PeriodSelector, PeriodPicker, IconsDropdown, ToggleList, BoxList, SelectableMenuList, SelectableVerticalList, GlobalSearchTextField, SimpleTimeLine.
+- **Components**: PeriodSelector, PeriodPicker, IconsDropdown, ToggleList, BoxList, GlobalSearchTextField.

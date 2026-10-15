@@ -169,6 +169,7 @@ export interface LibraryTexts {
 	};
 	timePicker: { hours: string; minutes: string; period: string };
 	timePickerTextField: { invalid: string; clear: string; close: string; open: string };
+	timeline: { empty: string; done: string; current: string; upcoming: string };
 	toaster: { close: string; label: string; loading: string; progress: string };
 	yearPickerTextField: { invalid: string; clear: string; close: string; open: string };
 	yearSelector: { label: string };
@@ -353,6 +354,7 @@ export const TEXTS_EN: LibraryTexts = {
 	},
 	timePicker: { hours: 'Hours', minutes: 'Minutes', period: 'AM/PM' },
 	timePickerTextField: { invalid: 'Enter a valid time', clear: 'Clear', close: 'Close', open: 'Choose time' },
+	timeline: { empty: 'No events yet', done: 'Completed', current: 'In progress', upcoming: 'Upcoming' },
 	toaster: { close: 'Dismiss', label: 'Notifications', loading: 'Loading', progress: 'Progress' },
 	yearPickerTextField: { invalid: 'Enter a valid year', clear: 'Clear', close: 'Close', open: 'Choose year' },
 	yearSelector: { label: 'Year' }
@@ -541,6 +543,12 @@ export const TEXTS_IT: LibraryTexts = {
 		clear: 'Cancella',
 		close: 'Chiudi',
 		open: "Scegli l'ora"
+	},
+	timeline: {
+		empty: 'Nessun evento',
+		done: 'Completato',
+		current: 'In corso',
+		upcoming: 'In programma'
 	},
 	toaster: { close: 'Chiudi', label: 'Notifiche', loading: 'Caricamento', progress: 'Avanzamento' },
 	yearPickerTextField: {

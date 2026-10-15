@@ -239,6 +239,18 @@ export default {
 			note: 'Not ported: no app used it. Use TabSwitcher `variant="segmented"` with two tabs.'
 		},
 		{
+			name: 'SelectableVerticalList',
+			kind: 'component',
+			replacement: 'RadioGroup',
+			note: 'Not ported: one app used it outside copied v4 filters. For a list where the user picks one entry use RadioGroup `card` (`title` → `label`, `name` → `value`, `description` and `icon` stay); for a list of results with the keyboard use Autocomplete or AsyncAutocomplete.'
+		},
+		{
+			name: 'SelectableMenuList',
+			kind: 'component',
+			replacement: 'HierarchyMenu',
+			note: 'Not ported: two apps used it, as a column of actions. Use HierarchyMenu with options without `href` and `onoptionClick` (`collapsed` → `iconsOnly`, `label` and `icon` stay), or a column of text Buttons.'
+		},
+		{
 			name: 'CollapsibleDivider',
 			kind: 'component',
 			replacement: 'Divider',
@@ -283,10 +295,7 @@ export default {
 			'IconsDropdown',
 			'ToggleList',
 			'BoxList',
-			'SelectableMenuList',
-			'SelectableVerticalList',
-			'GlobalSearchTextField',
-			'SimpleTimeLine'
+			'GlobalSearchTextField'
 		])
 	],
 	manual: [
