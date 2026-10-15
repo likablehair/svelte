@@ -60,6 +60,14 @@ All library CSS lives in cascade layers: tokens and `--{component}-default-*` in
 
 v4 tokens (`--global-color-{background|contrast|grey|primary|secondary|error|warning|success}-{50..950}`, RGB triplets used as `rgb(var(--x))`) and their overrides (`--global-color-light-*`, `--global-color-dark-*`) **do not exist in v5**. Nothing reads them: overrides stop working, and app CSS that uses them gets an undefined variable (transparent backgrounds, inherited colors). v5 never reuses a v4 name, so leftovers are dead rather than wrong.
 
+**Compatibility file**: `@import '@likable-hair/svelte/v4-compat.css';` (after the other imports of the app CSS) defines the 88 v4 names again, in light and dark, so app CSS that uses them keeps working while it is migrated:
+
+- each v4 color becomes the Aurora color with the same place in its ramp: the neutrals keep the order and spacing of their lightness between the lightest surface and the text of Aurora, every `-500` is the Aurora color of that role (`primary` → `--global-color-primary`, `secondary` → `--global-color-accent`, `error`, `warning`, `success`) and the other steps keep the shape of the v4 ramp around it;
+- app overrides still win (`--global-color-light-primary-500: 69, 93, 201`), as in v4, and with the default theme they also set the v5 brand and state colors (`--global-color-primary`, `-accent`, `-error`, `-warning`, `-success`, and what derives from them), so an app keeps its own colors in the components;
+- surfaces and texts of the components stay those of the theme; the values are computed for the default theme, so with another theme the v4 names keep the Aurora values.
+
+Replace the v4 names with the v5 tokens at your pace (table below), then remove the import.
+
 v5 tokens are full colors with a light and a dark value (`light-dark()`). Use `var(--global-color-x)`, not `rgb(var(...))`; for transparency, `color-mix(in oklab, var(--global-color-x) 40%, transparent)` (Tailwind 4: `bg-primary/40`).
 
 The mapping is by role, not by step number:

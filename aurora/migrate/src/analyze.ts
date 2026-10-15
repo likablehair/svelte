@@ -75,7 +75,9 @@ export interface Analysis {
 	icons: { attributes: number; data: number; dataFiles: number; dynamic: number; classes: number };
 	detail: { handlers: number; elsewhere: number; files: number };
 	tokens: { uses: number; overrides: number; rgbVar: number; files: number };
+	language: { guess: 'it' | 'en' | null; it: number; en: number };
 	styleProps: number;
+	droppedDependencies: string[];
 	totals: {
 		auto: number;
 		check: number;
@@ -221,6 +223,17 @@ interface Resolved {
 }
 
 const count = (text: string, pattern: RegExp) => text.match(pattern)?.length ?? 0;
+
+const ITALIAN = /\b(Salva|Annulla|Conferma|Elimina|Modifica|Nuovo|Nuova|Cerca|Indietro|Chiudi|Aggiungi|Impostazioni|Utenti|Ruoli|Nome|Cognome|Profilo|Esci|Caricamento|Nessun|Seleziona)\b/g;
+const ENGLISH = /\b(Save|Cancel|Confirm|Delete|Edit|New|Search|Back|Close|Add|Settings|Users|Roles|Name|Surname|Profile|Logout|Loading|No results|Select)\b/g;
+
+export function guessLanguage(texts: string[]): Analysis['language'] {
+	const markup = texts.map((text) => text.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/g, ''));
+	const it = markup.reduce((sum, text) => sum + count(text, ITALIAN), 0);
+	const en = markup.reduce((sum, text) => sum + count(text, ENGLISH), 0);
+	const guess = it + en < 3 ? null : it >= en * 2 ? 'it' : en >= it * 2 ? 'en' : null;
+	return { guess, it, en };
+}
 
 export function analyze(dir: string, index: RuleIndex): Analysis {
 	dir = resolve(dir);
@@ -625,6 +638,7 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 		}
 	}
 
+	const language = guessLanguage(files.filter((f) => f.svelte).map((f) => f.text));
 	const allText = (pattern: RegExp, filter?: (file: FileData) => boolean) =>
 		files.filter((f) => !filter || filter(f)).reduce((sum, f) => sum + count(f.text, pattern), 0);
 	const imported = (name: string) =>
@@ -679,7 +693,11 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 		'global-overlays': () => ({ needed: has('Dialog', 'Drawer', 'Menu'), signal: '' }),
 		'global-default-locale': () => {
 			const set = allText(/setDefaultLocale\s*\(/g) > 0;
-			return { needed: app.lang?.startsWith('it') ? !set : null, signal: `<html lang="${app.lang ?? '?'}">` };
+			const italian = app.lang?.startsWith('it') || language.guess === 'it';
+			return {
+				needed: set ? false : italian ? true : language.guess === 'en' ? false : null,
+				signal: `<html lang="${app.lang ?? '?'}">, interface text: ${language.it} Italian words, ${language.en} English${set ? ', setDefaultLocale already called' : ''}`
+			};
 		},
 		'global-app-toaster': () => {
 			const local = files.filter((f) => /Toast(er)?\.svelte$/.test(f.path)).map((f) => f.rel);
@@ -750,7 +768,9 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 		icons,
 		detail,
 		tokens,
+		language,
 		styleProps,
+		droppedDependencies: usedDropped,
 		totals: {
 			auto: findings.filter((f) => f.effort === 'auto').length,
 			check: findings.filter((f) => f.effort === 'check').length,

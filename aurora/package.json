@@ -14,6 +14,7 @@
 		"test:visual": "playwright test",
 		"test:visual:update": "playwright test --update-snapshots",
 		"migrate:rules": "node migrate/scripts/compile-rules.ts",
+		"migrate:compat": "node migrate/scripts/v4-compat.ts",
 		"migrate": "node migrate/src/cli.ts"
 	},
 	"files": [
@@ -35,6 +36,7 @@
 		},
 		"./tokens.css": "./dist/css/tokens.css",
 		"./base.css": "./dist/css/base.css",
+		"./v4-compat.css": "./dist/css/v4-compat.css",
 		"./themes/*.css": "./dist/themes/*.css",
 		"./tailwind.css": "./dist/tailwind.css",
 		"./tailwind-preset": {

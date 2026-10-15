@@ -27,6 +27,7 @@ export default {
 			added: [
 				'@likable-hair/svelte/tokens.css',
 				'@likable-hair/svelte/base.css',
+				'@likable-hair/svelte/v4-compat.css',
 				'@likable-hair/svelte/themes/*.css',
 				'@likable-hair/svelte/tailwind.css',
 				'@likable-hair/svelte/tailwind-preset'
@@ -333,9 +334,9 @@ export default {
 		{
 			id: 'global-color-tokens',
 			summary:
-				'v4 color tokens (RGB triplets) do not exist in v5: overrides stop working and uses become undefined.',
+				'v4 color tokens (RGB triplets) do not exist in v5: overrides stop working and uses become undefined, unless the app imports `@likable-hair/svelte/v4-compat.css`.',
 			action:
-				'Find `tokens.find` in app CSS and style attributes; replace each use following `tokens.mappings` by the role the color plays there (not by step number), and `rgb(var(...))` following `tokens.usage`. Remove `--global-color-light-*` / `--global-color-dark-*` overrides: set the v5 tokens with `light-dark()` instead, or use the `classic` theme.'
+				'While migrating, import `@likable-hair/svelte/v4-compat.css` after the other imports of the app CSS (the migration tool does it): v4 names map to the Aurora colors and app overrides keep working and set the v5 brand colors. To finish, find `tokens.find` in app CSS and style attributes; replace each use following `tokens.mappings` by the role the color plays there (not by step number), and `rgb(var(...))` following `tokens.usage`. Remove `--global-color-light-*` / `--global-color-dark-*` overrides: set the v5 tokens with `light-dark()` instead, or use the `classic` theme.'
 		},
 		{
 			id: 'global-dark-mode',
