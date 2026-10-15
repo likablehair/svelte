@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { anchors, slugify } from '../docs/anchors.js';
 	import { inline } from '../docs/inline.js';
 	import { FONT_LINK, FONT_NOTE, TOKENS_INTRO } from '../docs/markdown.js';
 
@@ -32,11 +33,11 @@
 
 {#each data.groups as group (group.title)}
 	<section class="group">
-		<h2>{group.title}</h2>
+		<h2 id={slugify(group.title)}>{group.title}</h2>
 		<div class="swatches">
 			{#each group.tokens as token (token.name)}
 				{@const k = kind(token.name)}
-				<div class="swatch" title={token.value}>
+				<div class="swatch" id={anchors.token(token.name)} title={token.value}>
 					{#if k === 'paint'}
 						<div class="chip" style:background="var({token.name})"></div>
 					{:else if k === 'radius'}
@@ -61,13 +62,13 @@
 {/each}
 
 <section class="group">
-	<h2>Fonts</h2>
+	<h2 id="fonts">Fonts</h2>
 	<p class="text">{@html inline(FONT_NOTE)}</p>
 	<pre class="snippet"><code>{FONT_LINK}</code></pre>
 </section>
 
 <section class="group">
-	<h2>Themes</h2>
+	<h2 id="themes">Themes</h2>
 	<p class="hint">
 		Import the theme CSS and activate it with <code>setTheme('name')</code>. Try them on the
 		<a href="/themes">Themes</a> page or with the picker at the bottom right.

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { anchors } from './anchors.js';
 	import { inline } from './inline.js';
 	import { PACKAGE, styleExample } from './markdown.js';
 	import type { ComponentDoc, PropDoc, SnippetDoc } from './types.js';
@@ -22,7 +23,7 @@
 			</thead>
 			<tbody>
 				{#each rows as p (p.name)}
-					<tr>
+					<tr id={anchors.prop(p.name)}>
 						<td>
 							<code>{p.name}</code>
 							{#if p.bindable}<span class="badge">bindable</span>{/if}
@@ -44,7 +45,7 @@
 			<thead><tr><th>Name</th><th>Parameters</th><th>Description</th></tr></thead>
 			<tbody>
 				{#each rows as s (s.name)}
-					<tr>
+					<tr id={anchors.snippet(s.name)}>
 						<td><code>{s.name}</code></td>
 						<td>{#if s.params}<code>{s.params}</code>{/if}</td>
 						<td>{@html inline(s.description)}</td>
@@ -61,7 +62,7 @@
 			<thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead>
 			<tbody>
 				{#each rows as e (e.name)}
-					<tr>
+					<tr id={anchors.event(e.name)}>
 						<td><code>{e.name}</code></td>
 						<td><code>{e.type}</code></td>
 						<td>{@html inline(e.description)}</td>
@@ -145,7 +146,7 @@
 				<thead><tr><th>Signature</th><th>Description</th></tr></thead>
 				<tbody>
 					{#each doc.methods as m (m.name)}
-						<tr>
+						<tr id={anchors.method(m.name)}>
 							<td><code>{m.signature}</code></td>
 							<td>{@html inline(m.description)}</td>
 						</tr>
@@ -165,7 +166,7 @@
 			>
 		</p>
 		{#each doc.types as t (t.name)}
-			<h3 id="type-{t.name}"><code>{t.name}</code></h3>
+			<h3 id={anchors.type(t.name)}><code>{t.name}</code></h3>
 			{#if t.description}<p>{@html inline(t.description)}</p>{/if}
 			<p><code>{t.declaration}</code></p>
 			{#if t.members.length}
@@ -215,7 +216,7 @@
 					<thead><tr><th>Per-instance variable</th><th>Default</th></tr></thead>
 					<tbody>
 						{#each doc.cssVars as v (v.name)}
-							<tr>
+							<tr id={anchors.css(v.name)}>
 								<td><code>{v.name}</code></td>
 								<td>
 									{#each v.defaults as d (d.name)}

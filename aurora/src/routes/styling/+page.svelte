@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { slugify } from '../../docs/anchors.js';
 	import { inline } from '../../docs/inline.js';
 	import {
 		CLASSES_INTRO,
@@ -25,7 +26,7 @@
 
 {#each STYLING_SECTIONS as section (section.title)}
 	<section class="group">
-		<h2>{section.title}</h2>
+		<h2 id={slugify(section.title)}>{section.title}</h2>
 		{#each section.blocks as block, i (i)}
 			{#if typeof block === 'string'}
 				<p>{@html inline(block)}</p>
@@ -40,7 +41,7 @@
 {/each}
 
 <section class="group">
-	<h2>{CLASSES_TITLE}</h2>
+	<h2 id={slugify(CLASSES_TITLE)}>{CLASSES_TITLE}</h2>
 	<p>{@html inline(CLASSES_INTRO)}</p>
 	<div class="table-wrap">
 		<table>

@@ -2,10 +2,11 @@
 	import '#lib/css/tokens.css';
 	import '#lib/css/base.css';
 	import '../docs.css';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { page } from '$app/state';
 	import type { ThemeMode } from '#lib/theme.svelte.js';
 	import {
+		GlobalSearchTextField,
 		HierarchyMenu,
 		Select,
 		SidebarLayout,
@@ -16,6 +17,7 @@
 		type Tab
 	} from '#lib';
 	import { appearance, changeMode, changeTheme, syncAppearance } from '../docs/appearance.svelte.js';
+	import { searchDocs } from '../docs/search.js';
 
 	import.meta.glob(['/src/lib/themes/*.css', '/src/docs/themes/*.css'], { eager: true });
 
@@ -43,6 +45,21 @@
 	);
 
 	onMount(syncAppearance);
+
+	$effect(() => {
+		const hash = decodeURIComponent(page.url.hash.slice(1));
+		let target: HTMLElement | null = null;
+		let active = true;
+		tick().then(() => {
+			if (!active || !hash) return;
+			target = document.getElementById(hash);
+			target?.setAttribute('data-target', '');
+		});
+		return () => {
+			active = false;
+			target?.removeAttribute('data-target');
+		};
+	});
 </script>
 
 {#snippet brand()}
@@ -107,6 +124,14 @@
 		{/snippet}
 		{#snippet headerSnippet()}
 			<div class="header-brand">{@render brand()}</div>
+			<GlobalSearchTextField
+				searcher={(params) => searchDocs({ ...params, currentPath: page.url.pathname })}
+				debounceTimeout={80}
+				label="Search the docs"
+				placeholder="Components, props, CSS variables, tokens…"
+				class={{ container: 'docs-search' }}
+				--global-search-text-field-max-width="280px"
+			/>
 			<div class="header-space"></div>
 			{@render switcher('header')}
 		{/snippet}

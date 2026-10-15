@@ -86,7 +86,7 @@ describe('GlobalSearchTextField', () => {
 			await new Promise((resolve) => setTimeout(resolve, searchText === 'gi' ? 200 : 0));
 			return everything.filter((item) => item.label.toLowerCase().includes(searchText));
 		});
-		await render(GlobalSearchTextField, { searcher, debounceTimeout: 50 });
+		await render(GlobalSearchTextField, { searcher, debounceTimeout: 400 });
 		const box = await openAndType('gi');
 		await expect.poll(() => searcher.mock.calls.length).toBe(1);
 		await userEvent.type(box, 'u');

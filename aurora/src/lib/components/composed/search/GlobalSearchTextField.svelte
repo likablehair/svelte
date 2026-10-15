@@ -427,6 +427,31 @@ Search of the whole app, as a command palette: a button that looks like a search
 			padding: 0;
 		}
 
+		@media (max-width: 768px) {
+			.aurora-global-search {
+				width: auto;
+			}
+
+			.aurora-global-search .aurora-global-search-button {
+				justify-content: center;
+				width: var(--global-search-text-field-height, var(--global-search-text-field-default-height));
+				padding: 0;
+			}
+
+			.aurora-global-search-button-label {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				overflow: hidden;
+				clip-path: inset(50%);
+				white-space: nowrap;
+			}
+
+			.aurora-global-search-shortcut {
+				display: none;
+			}
+		}
+
 		@media (hover: hover) {
 			.aurora-global-search-button:hover {
 				border-color: var(--global-search-text-field-hover-border-color, var(--global-search-text-field-default-hover-border-color));

@@ -217,7 +217,7 @@ export function getComponentDoc(slug: string): ComponentDoc | undefined {
 	};
 }
 
-function exportedTypeFiles() {
+export function exportedTypeFiles() {
 	const files = new Map<string, string>();
 	for (const m of lib['/src/lib/index.ts'].matchAll(/export\s+type\s*\{([^}]*)\}\s*from\s*'\.\/([^']+)'/g)) {
 		const path = `/src/lib/${m[2].replace(/\.js$/, '.ts')}`;

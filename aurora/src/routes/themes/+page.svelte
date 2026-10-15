@@ -45,7 +45,7 @@ setTheme('my-theme');`;
 </header>
 
 <section class="group">
-	<h2>How to create one</h2>
+	<h2 id="how-to-create-one">How to create one</h2>
 	<div class="steps">
 		<div>
 			<p>1. A CSS file with the tokens to change. The ones you leave out stay as in Aurora.</p>
@@ -59,7 +59,7 @@ setTheme('my-theme');`;
 </section>
 
 <section class="group">
-	<h2>Light, dark and remembering the choice</h2>
+	<h2 id="light-dark-and-remembering-the-choice">Light, dark and remembering the choice</h2>
 	<div class="steps">
 		<div>
 			<p>
@@ -101,7 +101,7 @@ setTheme('my-theme');`;
 {/snippet}
 
 <section class="group">
-	<h2>In the library</h2>
+	<h2 id="in-the-library">In the library</h2>
 	<p class="hint">Shipped in the package: <code>import '{PACKAGE}/themes/&lt;name&gt;.css'</code>.</p>
 	<div class="grid">
 		{@render card('', 'Aurora', 'Default theme, already in tokens.css.')}
@@ -112,7 +112,7 @@ setTheme('my-theme');`;
 </section>
 
 <section class="group">
-	<h2>Gallery</h2>
+	<h2 id="gallery">Gallery</h2>
 	<p class="hint">Examples of how much a few tokens can change. They are not in the package: copy them into your app.</p>
 	<div class="grid">
 		{#each galleryThemes as theme (theme.name)}
