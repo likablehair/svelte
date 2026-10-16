@@ -31,6 +31,10 @@ The same phases are tools of the `aurora` MCP server (`@likable-hair/svelte-mcp`
 - **Wrappers**: local components around a library component (`Standard*` or a root library component spreading the rest of the props). Props passed to a wrapper are checked against the wrapped component.
 - **Unknown props**: names that neither v5 nor the rules know (typos, v3-only names).
 
+## What the codemod does to wrappers
+
+Before the other changes, every use of a `Standard*` wrapper becomes the library component it wraps. What the wrapper props meant is kept (`style` → `variant`, `error` → `state`, `href`, `hint`, `title`: the recipes in `src/dissolve.ts`), and so are the layout measures (widths, margins, `display`); the wrapper's look (colors, padding, heights, radii, shadows, elements around the component) is dropped and listed under "Look dropped with the wrappers". Wrapper files nobody imports any more are deleted. A wrapper in Svelte 4 syntax, with code of its own or without a library component stays ("why kept"); a use that passes a prop the wrapper handled with logic stays too ("Not done").
+
 ## Rules
 
 The rules live in `aurora/migrations/v4-to-v5/*.ts`. `npm run migrate:rules` compiles them, with the v4 and v5 export lists and the v5 API of every component, into `rules/v4-to-v5.json`, which the tool reads; a test fails when the JSON is out of date.

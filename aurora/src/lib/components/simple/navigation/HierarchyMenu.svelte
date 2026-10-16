@@ -1,5 +1,5 @@
 <!-- @component
-Navigation menu of nested options, as in the sidebar of an app (`SidebarLayout` draws one from its `options`). Options are `HierarchyMenuOption` objects, `{ name: string; label: string; icon?: string; href?: string; options?: HierarchyMenuOption[]; badge?: string | number; disabled?: boolean }`, nested to any depth. An option with `href` is a link; with `currentPath` (pass `page.url.pathname`) the option whose `href` is the longest match of the path is selected, and so are the pages below it. Without links, `selected` holds the `name` of the selected option, as `bind:selected`. The options above the selected one are highlighted and opened. A parent opens and closes its children with a click; a parent with `href` is a link with a separate arrow button. With `iconsOnly` (a collapsed sidebar) only the icons show, each with a tooltip, and a parent opens a menu with its children. Keyboard: Tab, plus the arrow keys to move between the options, Right and Left to open and close a parent, Home and End. The state is exposed as `data-selected`, `data-ancestor`, `data-open` and `data-depth` on every row, for app CSS.
+Navigation menu of nested options, as in the sidebar of an app (`SidebarLayout` draws one from its `options`). Options are `HierarchyMenuOption` objects, `{ name: string; label: string; icon?: string; href?: string; options?: HierarchyMenuOption[]; badge?: string | number; disabled?: boolean }`, nested to any depth. An option with `href` is a link; with `currentPath` (pass `page.url.pathname`) the option whose `href` is the longest match of the path is selected, and so are the pages below it; when no `href` matches, no link is selected (with one menu per group, only the menu of the current page shows a selection). Without links, `selected` holds the `name` of the selected option, as `bind:selected`. The options above the selected one are highlighted and opened. A parent opens and closes its children with a click; a parent with `href` is a link with a separate arrow button. With `iconsOnly` (a collapsed sidebar) only the icons show, each with a tooltip, and a parent opens a menu with its children. Keyboard: Tab, plus the arrow keys to move between the options, Right and Left to open and close a parent, Home and End. The state is exposed as `data-selected`, `data-ancestor`, `data-open` and `data-depth` on every row, for app CSS.
 -->
 <script lang="ts" module>
 	export type HierarchyMenuOption = {
@@ -40,7 +40,7 @@ Navigation menu of nested options, as in the sidebar of an app (`SidebarLayout` 
 		options?: HierarchyMenuOption[];
 		/** `name` of the selected option. It changes when an option is chosen and, with `currentPath`, when the path matches an option's `href`. */
 		selected?: string;
-		/** Path of the current page, usually `page.url.pathname`. The option whose `href` is the longest match is selected: equal to the path, or a parent folder of it (`/clients` matches `/clients/12`). `/` matches only itself. */
+		/** Path of the current page, usually `page.url.pathname`. The option whose `href` is the longest match is selected: equal to the path, or a parent folder of it (`/clients` matches `/clients/12`). `/` matches only itself. When no option matches, no link option is selected. */
 		currentPath?: string;
 		/** `name`s of the open parents. The parents of the selected option open by themselves. */
 		expanded?: string[];
@@ -107,10 +107,15 @@ Navigation menu of nested options, as in the sidebar of an app (`SidebarLayout` 
 
 	let matched = $derived(currentPath === undefined ? undefined : optionOfPath(options, currentPath));
 
-	let current = $derived(matched ?? selected);
+	let current = $derived(
+		matched ??
+			(currentPath !== undefined && selected !== undefined && entries.get(selected)?.option.href !== undefined
+				? undefined
+				: selected)
+	);
 
 	$effect(() => {
-		if (matched !== undefined && matched !== selected) selected = matched;
+		if (currentPath !== undefined && current !== selected) selected = current;
 	});
 
 	let ancestors = $derived.by(() => {

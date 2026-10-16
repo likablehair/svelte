@@ -72,7 +72,7 @@ Idea guida: **nessuno deve conoscere tutto**. Le regole le sa lo strumento; lo s
 
 Regola: **commit prima di ogni lavoro di migrazione** nel repo della libreria; nelle app si tocca qualcosa solo con il loro repo tutto committato e con l'ok dell'utente per quell'app, e **non si committa mai** (lo fa l'utente). Gli strumenti in sola lettura (`analyze`) si possono lanciare su tutte le app senza chiedere.
 
-Stato: passi 1–4 fatti il 2026-10-15 (sezione sotto); passo 5 in corso su tatum: setup fatto, codemod meccanico fatto (prima parte, `history.md`), default v4 decisi (solo comportamento); restano lo scioglimento dei wrapper, la lista dei punti rimasti e la prova a mano.
+Stato: passi 1–4 fatti il 2026-10-15 (sezione sotto); passo 5 in corso su tatum: setup fatto, codemod meccanico fatto (prima parte, `history.md`), default v4 decisi (solo comportamento); scioglimento dei wrapper fatto e applicato su tatum (`history.md`); restano la lista dei punti rimasti e la prova a mano.
 
 1. **Pacchetto** `aurora/migrate/` (`@likable-hair/svelte-migrate`): `package.json` suo, `bin`, dipendenze `svelte` (parser) e `magic-string`; test nel progetto node di aurora o suo.
 2. **Regole compilate** (prima parte di P218): uno script che importa `migrations/v4-to-v5/*.ts` e scrive un JSON unico (con i `forwarded()` risolti), che il pacchetto legge.

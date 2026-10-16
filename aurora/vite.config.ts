@@ -1,12 +1,15 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { playwright } from '@vitest/browser-playwright';
+import { availableParallelism, totalmem } from 'node:os';
 import { defineConfig } from 'vitest/config';
 
 const compilerOptions = {
 	runes: ({ filename }: { filename: string }) =>
 		filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 };
+
+const pagesPerBrowser = Math.max(2, Math.min(availableParallelism() - 1, Math.round(totalmem() / 2 ** 32)));
 
 export default defineConfig({
 	plugins: [sveltekit({ compilerOptions })],
@@ -19,6 +22,8 @@ export default defineConfig({
 					include: ['tests/components/**/*.test.ts'],
 					setupFiles: ['tests/setup.ts'],
 					expect: { requireAssertions: true },
+					maxWorkers: pagesPerBrowser,
+					sequence: { groupOrder: 1 },
 					browser: {
 						enabled: true,
 						headless: true,

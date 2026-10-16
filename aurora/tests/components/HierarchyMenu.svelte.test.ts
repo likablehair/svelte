@@ -174,6 +174,31 @@ describe('HierarchyMenu', () => {
 		await expect.element(screen.getByRole('button', { name: 'Billing submenu' })).toHaveAttribute('aria-expanded', 'true');
 	});
 
+	test('a path that matches no option clears the link selected by the previous path', async () => {
+		const props = bound();
+		const screen = await render(HierarchyMenu, {
+			options,
+			currentPath: '/',
+			get selected() {
+				return props.selected;
+			},
+			set selected(value) {
+				props.selected = value;
+			}
+		});
+		await expect.element(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('aria-current', 'page');
+		await screen.rerender({ currentPath: '/components/autocomplete' });
+		await expect.element(screen.getByRole('link', { name: 'Home' })).not.toHaveAttribute('aria-current');
+		expect(screen.container.querySelector('[data-selected]')).toBeNull();
+		await expect.poll(() => props.selected).toBeUndefined();
+	});
+
+	test('a path that matches no option keeps an option without href chosen with a click', async () => {
+		const screen = await render(HierarchyMenu, { options, currentPath: '/elsewhere' });
+		await screen.getByRole('button', { name: 'Reports' }).click();
+		await expect.element(screen.getByRole('button', { name: 'Reports' })).toHaveAttribute('aria-current', 'true');
+	});
+
 	test('currentPath matches whole segments, and "/" only itself', async () => {
 		const screen = await render(HierarchyMenu, { options, currentPath: '/clients-archive' });
 		expect(screen.container.querySelector('[aria-current]')).toBeNull();

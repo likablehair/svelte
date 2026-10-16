@@ -267,6 +267,7 @@ export function codemodReport(r: CodemodResult): string {
 			['', ''],
 			[
 				['Files changed', r.files.length],
+				['Files deleted', r.deleted.length],
 				['Changes', r.changes.length],
 				['Done, to check', check.length],
 				['Not done (by hand)', r.skipped.length],
@@ -276,6 +277,32 @@ export function codemodReport(r: CodemodResult): string {
 		),
 		''
 	);
+	if (r.wrappers.length) {
+		out.push(
+			'## Wrappers',
+			'',
+			'Each use of a wrapper becomes the library component. Kept from the wrapper: what its props mean and the layout (widths, margins); dropped: its look (colors, padding, heights, radius, shadows), listed here to put back as CSS variables if wanted.',
+			'',
+			table(
+				['wrapper', 'component', 'uses dissolved', 'file', 'props', 'why kept'],
+				r.wrappers.map((w) => [
+					w.file.replace(/^.*\//, '').replace(/\.svelte$/, ''),
+					w.target ?? '—',
+					`${w.dissolved} / ${w.usages}`,
+					w.deleted ? 'deleted' : 'kept',
+					w.props.map((p) => `${p.name}: ${p.handling}`).join('; '),
+					w.blockers.join('; ')
+				])
+			),
+			''
+		);
+		const dropped = r.wrappers.filter((w) => w.dropped.length && w.dissolved);
+		if (dropped.length) {
+			out.push('### Look dropped with the wrappers', '');
+			for (const w of dropped) out.push(`- **${w.file.replace(/^.*\//, '').replace(/\.svelte$/, '')}**: ${w.dropped.map((d) => `\`${d}\``).join(', ')}`);
+			out.push('');
+		}
+	}
 	const kinds = new Map<string, number>();
 	for (const c of r.changes) kinds.set(c.kind, (kinds.get(c.kind) ?? 0) + 1);
 	out.push('## Changes by kind', '', table(['kind', 'count'], [...kinds].sort((a, b) => b[1] - a[1])), '');
@@ -329,6 +356,6 @@ export function codemodReport(r: CodemodResult): string {
 		out.push('## Parse errors', '', table(['file', 'error'], r.parseErrors.map((e) => [e.file, e.error])), '');
 	const perFile = new Map<string, number>();
 	for (const c of r.changes) perFile.set(c.file, (perFile.get(c.file) ?? 0) + 1);
-	out.push('## Files', '', table(['file', 'changes'], r.files.map((f) => [f.rel, perFile.get(f.rel) ?? 0])), '');
+	out.push('## Files', '', table(['file', 'changes'], [...r.files.map((f) => [f.rel, perFile.get(f.rel) ?? 0]), ...r.deleted.map((f) => [f, 'deleted'])]), '');
 	return out.join('\n');
 }

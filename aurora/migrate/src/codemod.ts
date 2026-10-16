@@ -1,7 +1,8 @@
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
-import MagicString from 'magic-string';
 import { parse } from 'svelte/compiler';
+import { attrExpression, attrText, Editor, isReference, visit } from './ast.ts';
+import { dissolve, type WrapperSummary } from './dissolve.ts';
 import { Lines, listFiles } from './files.ts';
 import type { RuleIndex } from './rules.ts';
 import type { Node } from './svelte.ts';
@@ -11,7 +12,6 @@ const LIB = '@likable-hair/svelte';
 const MDI = '@mdi/js';
 const ICON = /^mdi-[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const MDI_HELPER = /^mdi-(?:spin|pulse|rotate-\d+|flip-[hv]|\d+px|light|dark|inactive)$/;
-const SKIP_KEYS = new Set(['parent', 'metadata', 'loc', 'leadingComments', 'trailingComments']);
 const SCRIPT_OPEN = '<script lang="ts">';
 const SCRIPT_CLOSE = '\n</script>';
 const IDENTIFIER = /^[A-Za-z_$][\w$]*$/;
@@ -63,6 +63,8 @@ export interface CodemodResult {
 	changes: CodemodChange[];
 	skipped: CodemodSkip[];
 	defaults: CodemodDefault[];
+	wrappers: WrapperSummary[];
+	deleted: string[];
 	parseErrors: { file: string; error: string }[];
 }
 
@@ -117,80 +119,6 @@ export function cssRenames(index: RuleIndex): Map<string, CssRename> {
 		if (new Set(owners.map((r) => r.to)).size === 1) out.set(name, owners[0]);
 	}
 	return out;
-}
-
-function visit(
-	node: unknown,
-	enter: (node: Node, parent: Node | null, key: string) => boolean | void,
-	parent: Node | null = null,
-	key = ''
-) {
-	if (!node || typeof node !== 'object') return;
-	if (Array.isArray(node)) {
-		for (const child of node) visit(child, enter, parent, key);
-		return;
-	}
-	const current = node as Node;
-	const isNode = typeof current.type === 'string';
-	if (isNode && enter(current, parent, key) === false) return;
-	for (const k in current) {
-		if (SKIP_KEYS.has(k)) continue;
-		const value = current[k];
-		if (value && typeof value === 'object') visit(value, enter, isNode ? current : parent, isNode ? k : key);
-	}
-}
-
-function isReference(node: Node, parent: Node | null, key: string) {
-	if (!parent) return true;
-	if ((parent.type === 'MemberExpression' || parent.type === 'TSQualifiedName') && key !== 'object' && key !== 'left')
-		return !!parent.computed;
-	if (
-		(parent.type === 'Property' ||
-			parent.type === 'PropertyDefinition' ||
-			parent.type === 'MethodDefinition' ||
-			parent.type === 'TSPropertySignature' ||
-			parent.type === 'TSMethodSignature') &&
-		key === 'key'
-	)
-		return !!parent.computed;
-	if (parent.type.startsWith('Import') || parent.type.startsWith('Export')) return false;
-	if (parent.type === 'LabeledStatement' || parent.type === 'BreakStatement' || parent.type === 'ContinueStatement')
-		return false;
-	return true;
-}
-
-class Editor {
-	private s: MagicString;
-	private done: [number, number][] = [];
-
-	constructor(text: string) {
-		this.s = new MagicString(text);
-	}
-
-	private inside(pos: number) {
-		return this.done.some(([a, b]) => pos > a && pos < b);
-	}
-
-	replace(start: number, end: number, text: string): boolean {
-		if (this.done.some(([a, b]) => start < b && a < end)) return false;
-		this.done.push([start, end]);
-		this.s.overwrite(start, end, text);
-		return true;
-	}
-
-	insert(pos: number, text: string): boolean {
-		if (this.inside(pos)) return false;
-		this.s.appendLeft(pos, text);
-		return true;
-	}
-
-	get changed() {
-		return this.s.hasChanged();
-	}
-
-	toString() {
-		return this.s.toString();
-	}
 }
 
 interface Context {
@@ -358,20 +286,6 @@ function renameImports(roots: unknown[], programs: Node[], ctx: Context): Map<st
 		});
 	}
 	return scope;
-}
-
-function attrText(attr: Node): string | undefined {
-	if (!Array.isArray(attr.value)) return undefined;
-	const parts = attr.value as Node[];
-	return parts.every((p) => p.type === 'Text') ? parts.map((p) => p.data).join('') : undefined;
-}
-
-function attrExpression(attr: Node): Node | undefined {
-	if (attr.type === 'BindDirective') return attr.expression;
-	if (attr.value && !Array.isArray(attr.value) && attr.value.type === 'ExpressionTag') return attr.value.expression;
-	if (Array.isArray(attr.value) && attr.value.length === 1 && attr.value[0].type === 'ExpressionTag')
-		return attr.value[0].expression;
-	return undefined;
 }
 
 const isShorthand = (ctx: Context, attr: Node) =>
@@ -1126,22 +1040,35 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 	const paths = existsSync(join(dir, 'src')) ? listFiles(join(dir, 'src')) : [];
 	const texts = new Map(paths.map((path) => [path, readFileSync(path, 'utf8')]));
 	const mdiClasses = [...texts.values()].some((text) => /\bclass=["'{][^"'}]*\bmdi\s+(?:mdi-|\{)/.test(text));
-	const result: CodemodResult = { dir, files: [], changes: [], skipped: [], defaults: [], parseErrors: [] };
+	const result: CodemodResult = { dir, files: [], changes: [], skipped: [], defaults: [], wrappers: [], deleted: [], parseErrors: [] };
+	const dissolved = dissolve(dir, index, texts);
+	result.wrappers = dissolved.wrappers;
+	const checked = new Set(['wrapper-look', 'wrapper-style-ignored', 'wrapper-prop-ignored', 'wrapper-spread', 'wrapper-default', 'wrapper-bind-one-way']);
+	for (const c of dissolved.changes)
+		result.changes.push({ file: c.file, line: c.line, kind: c.kind, id: `wrappers/${c.wrapper}`, name: c.name, to: c.to, note: c.note, check: checked.has(c.kind) });
+	for (const s of dissolved.skipped)
+		result.skipped.push({ file: s.file, line: s.line, kind: s.kind, id: `wrappers/${s.wrapper}`, name: s.name, reason: s.reason });
 
 	for (const path of paths) {
 		const original = texts.get(path)!;
 		const rel = relative(dir, path);
+		if (dissolved.deleted.includes(path)) {
+			result.deleted.push(rel);
+			if (options.write) unlinkSync(path);
+			continue;
+		}
+		const input = dissolved.texts.get(path) ?? original;
 		const svelte = path.endsWith('.svelte');
 		const script = /\.(ts|js|mjs|cjs)$/.test(path);
 		const style = /\.(css|pcss|postcss|scss)$/.test(path);
 		if (!svelte && !script && !style) continue;
-		if (script && (!/@likable-hair\/svelte|['"`]mdi-/.test(original) || original.includes('</script'))) continue;
-		const text = script ? `${SCRIPT_OPEN}${original}${SCRIPT_CLOSE}` : original;
+		if (script && (!/@likable-hair\/svelte|['"`]mdi-/.test(input) || input.includes('</script'))) continue;
+		const text = script ? `${SCRIPT_OPEN}${input}${SCRIPT_CLOSE}` : input;
 		const ctx: Context = {
 			rel,
 			text,
 			offset: script ? SCRIPT_OPEN.length : 0,
-			lines: new Lines(original),
+			lines: new Lines(input),
 			edit: new Editor(text),
 			changes: result.changes,
 			skipped: result.skipped,
@@ -1159,8 +1086,7 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 			result.parseErrors.push({ file: rel, error });
 			continue;
 		}
-		if (!ctx.edit.changed) continue;
-		const output = ctx.edit.toString();
+		const output = ctx.edit.changed ? ctx.edit.toString() : text;
 		const after = script ? output.slice(SCRIPT_OPEN.length, output.length - SCRIPT_CLOSE.length) : output;
 		if (after === original) continue;
 		result.files.push({ path, rel, before: original, after });

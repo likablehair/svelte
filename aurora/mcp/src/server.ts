@@ -307,7 +307,7 @@ function registerMigration(server: McpServer, context: ServerContext) {
 		{
 			title: 'Apply the mechanical changes',
 			description:
-				'Renames components, props, events, snippets and CSS variables, removes { detail }, turns MDI names into @mdi/js imports. Runs on the branch made by migration_setup; dryRun writes nothing. Can be run again. Never commits.',
+				'Renames components, props, events, snippets and CSS variables, removes { detail }, turns MDI names into @mdi/js imports, dissolves the Standard* wrappers into the library components (meaning and layout kept, look dropped and listed in the report). Runs on the branch made by migration_setup; dryRun writes nothing. Can be run again. Never commits.',
 			inputSchema: { dir: appDir, dryRun: z.boolean().optional(), branch: z.string().optional() },
 			annotations: { destructiveHint: true, idempotentHint: true, openWorldHint: false }
 		},

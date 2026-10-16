@@ -31,8 +31,10 @@ const USAGE = `Usage:
   codemod     The mechanical changes, on the branch made by setup: renamed components, props,
               events, snippets and CSS variables, callback arguments without \`detail\` (inline
               handlers and functions of the same file, with their types), MDI icon names turned
-              into @mdi/js imports. Running it again changes nothing. Prints what it did, what
-              to check and what is left by hand. --dry-run writes nothing. Never commits.`;
+              into @mdi/js imports; the Standard* wrappers dissolved into the library components
+              (meaning and layout kept, look dropped and listed), wrappers nobody imports any more
+              deleted. Running it again changes nothing. Prints what it did, what to check and
+              what is left by hand. --dry-run writes nothing. Never commits.`;
 
 interface Options {
 	command?: string;
