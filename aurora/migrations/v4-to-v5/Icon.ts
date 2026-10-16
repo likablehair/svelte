@@ -82,6 +82,7 @@ export default {
 	manual: [
 		{
 			id: 'icon-clickable',
+			kind: 'edit',
 			summary:
 				'Icon is only an image: `onclick` and `tabindex` are gone, a clickable icon is a Button.',
 			action:
@@ -100,6 +101,7 @@ export default {
 		},
 		{
 			id: 'icon-svg',
+			kind: 'review',
 			summary:
 				'Icon renders an `<svg>` sized by `--icon-size` (default `1em`) and filled with `--icon-color` (default `currentColor`) instead of a `<span class="icon mdi ...">` font glyph; without `title` it is hidden from screen readers.',
 			action:
@@ -107,6 +109,7 @@ export default {
 		},
 		{
 			id: 'icon-mdi-helpers',
+			kind: 'edit',
 			summary:
 				'MDI helper classes (`mdi-spin`, `mdi-rotate-*`, `mdi-flip-*`, `mdi-18px`, `mdi-24px`, `mdi-36px`, `mdi-48px`, `mdi-light`, `mdi-dark`, `mdi-inactive`) do nothing: the MDI webfont CSS is not loaded.',
 			action:

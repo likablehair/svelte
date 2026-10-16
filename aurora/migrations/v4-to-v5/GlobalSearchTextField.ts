@@ -84,6 +84,7 @@ export default {
 	manual: [
 		{
 			id: 'global-search-text-field-results',
+			kind: 'edit',
 			summary:
 				'Results are `GlobalSearchItem`: `{ value, label, description?, icon?, href?, group?, data? }` instead of `{ name, title, subtitle?, url?, data? }`, and `href` now works.',
 			action:
@@ -91,17 +92,20 @@ export default {
 		},
 		{
 			id: 'global-search-text-field-mobile',
+			kind: 'review',
 			summary: 'On screens up to 768px the button shows only the magnifier and the palette takes the whole screen, with a Cancel button.',
 			action: 'Remove the wrappers or CSS that hid the search on phones, unless the app really wants it hidden there.'
 		},
 		{
 			id: 'global-search-text-field-shortcut',
+			kind: 'review',
 			summary:
 				'Ctrl+K (⌘K on a Mac) now prevents the browser shortcut and is ignored inside other text fields; the label says Ctrl on Windows and Linux.',
 			action: 'Pass `shortcut={false}` where the app uses Ctrl+K for something else, or another letter in `shortcut`. An app without a `searcher` should not render the component.'
 		},
 		{
 			id: 'global-search-text-field-texts',
+			kind: 'review',
 			summary: 'Texts come from `locale` (`it`, `en`): "Sorry, nothing found" and "Search with ❤️" are gone.',
 			action: 'Pass `locale` or call `setDefaultLocale`; `emptyText`, `errorText` and `footerSnippet` change the messages.'
 		}

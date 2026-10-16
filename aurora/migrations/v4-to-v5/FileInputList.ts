@@ -143,6 +143,7 @@ export default {
 	manual: [
 		{
 			id: 'file-input-list-layout',
+			kind: 'review',
 			summary:
 				'The files are listed below the zone, which turns into one line while files are listed (`compact="auto"`); v4 listed them inside the zone, in a box of fixed height.',
 			action:
@@ -151,6 +152,7 @@ export default {
 		},
 		{
 			id: 'file-input-list-drain',
+			kind: 'review',
 			summary:
 				'Pages that copied the files in `onfileChange`, emptied the list (`files = []`) and rendered their own list only need the drop zone.',
 			action:
@@ -159,6 +161,7 @@ export default {
 		},
 		{
 			id: 'file-input-list-validation',
+			kind: 'review',
 			summary: '`accept`, `maxSize` and `maxFiles` refuse files, with a message under the zone and `onreject`.',
 			action:
 				'Replace checks of `file.type`, extensions, `file.size` or `files.length == 1` / `slice(0, 1)` (and the toasts they show) with `accept=".docx"`, `maxSize` (bytes, decimal: 10 MB = `10_000_000`) and `maxFiles={1}`; a hint like "Only .docx files" goes in `description`.',

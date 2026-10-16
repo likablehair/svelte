@@ -47,6 +47,7 @@ export default {
 	manual: [
 		{
 			id: 'icons-dropdown-items',
+			kind: 'edit',
 			summary:
 				'Every option needs a `label`, its accessible name, Tooltip and type-ahead text (v4 options had no text at all), and `icon` is an SVG path (v4: an MDI class name).',
 			action:
@@ -55,6 +56,7 @@ export default {
 		},
 		{
 			id: 'icons-dropdown-look',
+			kind: 'review',
 			summary:
 				'The button shows the chosen icon in a gradient tile and is as tall as a Button of the same `size` (md 34px); the list is a grid of 36px tiles (chosen one with the gradient, highlighted one tinted) with a Tooltip on the highlighted tile. v4 drew a plain button and a 60px column of 20px icons.',
 			action:
@@ -62,6 +64,7 @@ export default {
 		},
 		{
 			id: 'icons-dropdown-css-vars',
+			kind: 'edit',
 			summary:
 				'The v4 overrides on the inner Dropdown no longer fit: `--button-padding` now replaces the padding tuned around the tile, `--button-width` has no effect on this button, and `--autocomplete-selected-item-color` does not reach the tiles.',
 			action:
@@ -70,6 +73,7 @@ export default {
 		},
 		{
 			id: 'icons-dropdown-clear',
+			kind: 'review',
 			summary:
 				'With `clearable` the clear X is a separate button ("Clear selection") shown in place of the arrow, hidden while `disabled`; in v4 it was an icon inside the button that also cleared a disabled dropdown.',
 			action: 'Check flows that cleared a disabled IconsDropdown.',

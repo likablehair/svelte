@@ -43,6 +43,7 @@ export default {
 	manual: [
 		{
 			id: 'radio-group-form',
+			kind: 'review',
 			summary: 'The copies wrapped the radios in a `<form>`; RadioGroup is a `<fieldset>` and can sit inside a form of the page.',
 			action: 'Nothing to do; a click on a label now selects its option (it did not in some copies).'
 		}

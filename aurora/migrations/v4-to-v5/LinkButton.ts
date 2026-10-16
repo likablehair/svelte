@@ -41,6 +41,7 @@ export default {
 	manual: [
 		{
 			id: 'link-button-look',
+			kind: 'review',
 			summary:
 				'v4 drew a grey pill (a link that looks like a button); v5 is a text link with an animated gradient underline and no background.',
 			action:
@@ -48,6 +49,7 @@ export default {
 		},
 		{
 			id: 'link-button-layout',
+			kind: 'review',
 			summary:
 				'It is `inline-flex` (v4: `display: flex`, a block-level box on its own line, content centered).',
 			action:
@@ -55,6 +57,7 @@ export default {
 		},
 		{
 			id: 'link-button-disabled',
+			kind: 'review',
 			summary:
 				'`disabled` removes the `href`, sets `aria-disabled` and stops calling `onclick`: the link no longer navigates and is not focusable (v4 only skipped the callbacks and still navigated).',
 			action: 'Check flows that relied on a disabled link still navigating.',

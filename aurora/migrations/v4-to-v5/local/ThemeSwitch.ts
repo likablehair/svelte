@@ -27,6 +27,7 @@ export default {
 	manual: [
 		{
 			id: 'theme-switch-look',
+			kind: 'review',
 			summary:
 				'Three icons in a pill (light, system, dark) instead of a two-state switch: about 120px wide (100px with `size="sm"`) against 40px.',
 			action:

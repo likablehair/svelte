@@ -185,6 +185,50 @@ describe('remaining: an app after the codemod', () => {
 		expect(next).not.toContain('## src/routes/users/+page.svelte');
 	});
 
+	test('each point says whether it needs code or only a look', () => {
+		const { dir } = migrated();
+		const result = remaining(dir, rules, { check: () => ({ ran: true, diagnostics: [] }) });
+		const table = result.files.find((f) => f.file === 'src/lib/components/UsersTable.svelte')!;
+		const page = result.files.find((f) => f.file === 'src/routes/users/+page.svelte')!;
+		expect(table.review.find((p) => p.id === 'PaginatedTable/props.removed/editFilterMode')?.todo).toBe('edit');
+		expect(page.review.find((p) => p.id === 'button-loading')?.todo).toBe('review');
+		expect(result.files[0].file).toBe('src/lib/components/UsersTable.svelte');
+	});
+
+	test('next lists the points to write file by file, then the points to look at by component', () => {
+		const { dir } = migrated();
+		const next = nextReport(remaining(dir, rules, { check: () => ({ ran: true, diagnostics: [] }) }));
+		const write = next.indexOf('## To write');
+		const look = next.indexOf('## To look at, by component');
+		const pages = next.indexOf('## Pages to try');
+		expect(write).toBeGreaterThan(0);
+		expect(look).toBeGreaterThan(write);
+		expect(pages).toBeGreaterThan(look);
+		expect(next.slice(write, look)).toContain('### src/lib/components/UsersTable.svelte');
+		expect(next.slice(write, look)).toContain('editFilterMode');
+		expect(next.slice(write, look)).not.toContain('button-loading');
+		const button = next.slice(next.indexOf('### Button', look));
+		expect(button).toMatch(/^### Button\n\nPages: \/users\n/);
+		expect(button).toContain('`button-loading`\n  - src/routes/users/+page.svelte:');
+	});
+
+	test('next keeps the points to look at for the end while there are errors, unless a file is asked for', () => {
+		const { dir, read } = migrated();
+		const page = read('src/routes/users/+page.svelte');
+		const diagnostics = [
+			at(page, 'onrowClick', 'src/routes/users/+page.svelte', `Object literal may only specify known properties, and '"onrowClick"' does not exist in type 'Props'.`)
+		];
+		const result = remaining(dir, rules, { check: () => ({ ran: true, diagnostics }) });
+		const next = nextReport(result);
+		expect(next).toContain('## src/routes/users/+page.svelte');
+		expect(next).not.toContain('button-loading');
+		expect(next).toMatch(/\d+ points to look at in this file come at the end/);
+		const file = nextReport(result, 'src/routes/users/+page.svelte');
+		expect(file).toContain('### To look at in this file');
+		expect(file).toContain('button-loading');
+		expect(remainingReport(result)).toContain('| file | errors | to write | to look at | components |');
+	});
+
 	test('without svelte-check it says so and still lists what to look at', () => {
 		const { dir } = migrated();
 		const result = remaining(dir, rules, { check: () => ({ ran: false, diagnostics: [], error: 'svelte-check is not installed in the app' }) });

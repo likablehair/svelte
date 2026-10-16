@@ -179,6 +179,7 @@ export default {
 	manual: [
 		{
 			id: 'dropdown-label-snippet',
+			kind: 'edit',
 			summary:
 				'`labelSnippet` changed meaning: v4 replaced the whole button content, v5 `labelSnippet({ label })` renders only the prefix label before the selection.',
 			action:
@@ -187,6 +188,7 @@ export default {
 		},
 		{
 			id: 'dropdown-selection-text',
+			kind: 'review',
 			summary:
 				'With more than one value the button reads "N selected", or "N selezionati" with the `it` locale (v4: always the Italian "N Selezionati", with a capital S, also with `lang="en"`).',
 			action:
@@ -195,6 +197,7 @@ export default {
 		},
 		{
 			id: 'dropdown-trigger',
+			kind: 'review',
 			summary:
 				'The trigger is a `Button` (`variant="secondary"`, `size="md"`, 34px high) with the combobox role; v4 used a grey translucent button 38.78px high. Clicking it opens and closes the list, Enter, Space and the arrows open and pick, a letter jumps to the first option that starts with it, and Backspace never removes values.',
 			action:
@@ -202,6 +205,7 @@ export default {
 		},
 		{
 			id: 'dropdown-clear',
+			kind: 'review',
 			summary:
 				'The clear X is a separate `<button>` ("Clear selection", `clearLabel`) next to the trigger, shown in place of the arrow while something is selected; clicking it does not open the list and gives the focus back to the trigger.',
 			action:
@@ -209,6 +213,7 @@ export default {
 		},
 		{
 			id: 'dropdown-disabled',
+			kind: 'review',
 			summary:
 				'`disabled` disables the native button and hides the clear button; in v4 the list still opened and the X still cleared.',
 			action: 'Check flows that relied on clearing or opening a disabled Dropdown.',
@@ -216,6 +221,7 @@ export default {
 		},
 		{
 			id: 'dropdown-mobile-drawer',
+			kind: 'review',
 			summary:
 				'With `mobileDrawer`, on screens up to 1024px the list opens in a bottom drawer without a search field, titled with `label`, with the list focused. The server renders the desktop variant.',
 			action: 'Pass `label` so the drawer has a title.',
@@ -223,6 +229,7 @@ export default {
 		},
 		{
 			id: 'dropdown-item-label-snippet',
+			kind: 'review',
 			summary:
 				'`itemLabelSnippet` replaces only the label of an option: the `item.icon` and the check mark of selected options stay (v4 dropped the icon).',
 			action:
@@ -231,6 +238,7 @@ export default {
 		},
 		{
 			id: 'dropdown-item-icon',
+			kind: 'edit',
 			summary: '`Item.icon` of the options is an SVG path (v4: an MDI class name).',
 			action:
 				'Apply the global icon transform to every `icon` in the `items` and `values` data (`"mdi-sort"` → `mdiSort` from `@mdi/js`).',
@@ -238,6 +246,7 @@ export default {
 		},
 		{
 			id: 'dropdown-strict-equality',
+			kind: 'review',
 			summary:
 				'Values are compared with `===` (v4 mixed `==` and `===`) and duplicate `value`s in `items` or `values` throw.',
 			action:

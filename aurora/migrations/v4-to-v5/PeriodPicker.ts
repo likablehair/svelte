@@ -22,6 +22,7 @@ export const removedProps: Removal[] = [
 export const periodManual = (prefix: string): ManualStep[] => [
 	{
 		id: `${prefix}-dates`,
+		kind: 'review',
 		summary:
 			'The days of a period changed: `this-month` and `this-year` run to the end of the month or year and `this-week` starts on Monday (as the backends did); `last-3month` and `last-6month` are exactly 3 or 6 months counting today (the backends started on the first day of the month 2 or 5 months ago); a rolling period counts today, "last 7 days" are today and the 6 days before (v4 and the backends counted 8). v4 computed yet other days on the client.',
 		action:
@@ -29,6 +30,7 @@ export const periodManual = (prefix: string): ManualStep[] => [
 	},
 	{
 		id: `${prefix}-backend-rolling`,
+		kind: 'edit',
 		summary:
 			'Backends must resolve `rolling` periods and the `last-3month` / `last-6month` presets as the library does now, counting today, or the app and the server show different days.',
 		action:
@@ -37,6 +39,7 @@ export const periodManual = (prefix: string): ManualStep[] => [
 	},
 	{
 		id: `${prefix}-default-value`,
+		kind: 'edit',
 		summary: 'Without a value the component no longer writes `{}` into the bound variable when it mounts.',
 		action:
 			'Code that checked for `{}` must accept `undefined`. The `$effect` that many apps repeat to set `{ method: "quick", values: "total" }` can become the initial value of the `$state`.'
@@ -106,6 +109,7 @@ export default {
 	manual: [
 		{
 			id: 'period-picker-look',
+			kind: 'review',
 			summary:
 				'The field is a bar with two arrows at the start that move the period, its name and its days (at least 300px wide); the menu shows presets, one month and the start and end dates instead of a list that slid to a detail view.',
 			action:
@@ -113,6 +117,7 @@ export default {
 		},
 		{
 			id: 'period-picker-draft',
+			kind: 'review',
 			summary:
 				'A custom range or a relative period is a draft until Apply; Cancel, Escape and a click outside discard it. Presets still apply at once and close.',
 			action: 'Nothing to do unless the app reacted to every click inside the menu (no app on record does).'
@@ -120,6 +125,7 @@ export default {
 		...periodManual('period-picker'),
 		{
 			id: 'period-picker-local-copies',
+			kind: 'review',
 			summary:
 				'Several apps use a local `$lib/components/common/PeriodPicker.svelte` with a different JSON (rolling as a number of days, `current-year`, `timespanMethod` with `pickerValues`...), read by their own backend.',
 			action:

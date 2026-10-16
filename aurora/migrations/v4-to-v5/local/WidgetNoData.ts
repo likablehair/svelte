@@ -16,6 +16,7 @@ export default {
 	manual: [
 		{
 			id: 'widget-no-data-look',
+			kind: 'review',
 			summary: 'NoData has an icon above the title and the Aurora look; without `title` it shows the library default ("Nessun dato" in Italian).',
 			action: 'Pass `icon=""` to hide the icon in a small widget; pass `title` where the default text of the copy ("Nessun dato presente") mattered.'
 		}

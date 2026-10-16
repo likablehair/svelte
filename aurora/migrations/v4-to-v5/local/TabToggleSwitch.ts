@@ -37,6 +37,7 @@ export default {
 	manual: [
 		{
 			id: 'tab-toggle-switch-links',
+			kind: 'edit',
 			summary: 'Tabs with `href` are links that navigate by themselves (the copy only preloaded `redirectUrl` and the app navigated in `onTabChange`).',
 			action: 'Remove the `goto` from `ontabClick` where the tab has `href`, or it navigates twice.'
 		}

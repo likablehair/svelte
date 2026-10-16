@@ -17,6 +17,7 @@ export default {
 	manual: [
 		{
 			id: 'time-picker-text-field-local-list',
+			kind: 'review',
 			summary: 'The library field has hour and minute columns (`minuteStep`) instead of a list of times every 15 minutes, and a mask for typing.',
 			action: 'Pass `minuteStep={15}` to keep the steps of the copy.'
 		}

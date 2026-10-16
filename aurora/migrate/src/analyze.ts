@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { Lines, listFiles } from './files.ts';
-import { matchUsage, type Effort, type Finding, type Usage } from './match.ts';
+import { matchUsage, todoOf, type Effort, type Finding, type Usage } from './match.ts';
 import { localRuleFor, type RuleIndex } from './rules.ts';
 import { scanSvelte, type Attr, type ImportRecord, type SvelteFile } from './svelte.ts';
 import type { ManualStep } from './types.ts';
@@ -48,12 +48,14 @@ export interface GeneralStep {
 	id: string;
 	component: string;
 	summary: string;
+	action: string;
 	usages: number;
 	files: number;
 }
 
 export interface AppStep {
 	id: string;
+	kind: ManualStep['kind'];
 	summary: string;
 	component?: string;
 	needed: boolean | null;
@@ -83,6 +85,7 @@ export interface Analysis {
 		check: number;
 		manual: number;
 		manualPoints: number;
+		manualEdit: number;
 		general: number;
 		appSteps: number;
 		appReview: number;
@@ -436,6 +439,7 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 				id: step.id,
 				component: usage.component,
 				summary: step.summary,
+				action: step.action,
 				usages: 0,
 				files: 0,
 				fileSet: new Set<string>()
@@ -447,6 +451,7 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 		for (const step of result.app)
 			appStepsByComponent.set(step.id, {
 				id: step.id,
+				kind: step.kind,
 				summary: step.summary,
 				component: usage.component,
 				needed: null,
@@ -739,6 +744,7 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 	const appSteps: AppStep[] = [
 		...index.rules.global.manual.map((step: ManualStep) => ({
 			id: step.id,
+			kind: step.kind,
 			summary: step.summary,
 			...(signals[step.id]?.() ?? { needed: null })
 		})),
@@ -750,6 +756,7 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 		.map((f) => ({ file: f.rel, error: f.svelte!.error! }));
 	const legacyFiles = files.filter((f) => f.svelte && (f.svelte.legacy.exportLet || f.svelte.legacy.reactive || f.svelte.legacy.dispatch)).length;
 	const manualKeys = new Set(findings.filter((f) => f.effort === 'manual').map((f) => `${f.file}#${f.id}`));
+	const editKeys = new Set(findings.filter((f) => f.effort === 'manual' && todoOf(f) === 'edit').map((f) => `${f.file}#${f.id}`));
 	const generalSteps = [...general.values()].map(({ fileSet, ...step }) => ({ ...step, files: fileSet.size }));
 
 	return {
@@ -784,6 +791,7 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 			check: findings.filter((f) => f.effort === 'check').length,
 			manual: findings.filter((f) => f.effort === 'manual').length,
 			manualPoints: manualKeys.size,
+			manualEdit: editKeys.size,
 			general: generalSteps.length,
 			appSteps: appSteps.filter((s) => s.needed === true).length,
 			appReview: appSteps.filter((s) => s.needed === null).length

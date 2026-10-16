@@ -120,6 +120,7 @@ export default {
 	manual: [
 		{
 			id: 'select-items',
+			kind: 'edit',
 			summary:
 				'`options` becomes `items` and each option changes shape (`text` → `label`, `icon` an SVG path); `Item.value` must be a string or a number and unique, since it keys the list (duplicates throw `each_key_duplicate`).',
 			action:
@@ -128,6 +129,7 @@ export default {
 		},
 		{
 			id: 'select-placeholder',
+			kind: 'review',
 			summary:
 				'`placeholder` now works: a hidden, disabled option shown in the field, and `value` stays `undefined` until the user picks an item. In v4 it did nothing and the first option was selected.',
 			action:
@@ -136,6 +138,7 @@ export default {
 		},
 		{
 			id: 'select-class',
+			kind: 'edit',
 			summary:
 				'`class` is an object; a v4 string replaced the internal class of the `<select>`, so the component lost its own styles.',
 			action:
@@ -144,6 +147,7 @@ export default {
 		},
 		{
 			id: 'select-look',
+			kind: 'review',
 			summary:
 				'The root is a `<div>` with label, field and hint (attributes still go to the `<select>`); the field is 36px high with a border and a focus ring, text is 14px (v4: inherited) and the native arrow is replaced by the library chevron. In Chrome/Edge 135+ and Safari 27+ the list is a styled popup with icons and a check mark; Firefox keeps the native list.',
 			action:

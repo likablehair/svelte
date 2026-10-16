@@ -18,6 +18,7 @@ export default {
 	manual: [
 		{
 			id: 'bar-chart-local-look',
+			kind: 'review',
 			summary: 'The library BarChart applies its defaults (theme colors, rounded bars, visible ticks, zoom) under the `options` of the app.',
 			action: 'Check the chart: remove from `options` what the library already does, and note that `showYTicks`/`showXTicks` of the old wrappers were swapped.'
 		}

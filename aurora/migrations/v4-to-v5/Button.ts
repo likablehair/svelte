@@ -145,6 +145,7 @@ export default {
 	manual: [
 		{
 			id: 'button-loading',
+			kind: 'review',
 			summary:
 				'`loading` disables the button and swaps only the icon for a 16px spinner; v4 replaced the whole content with a 30px loader and stayed clickable.',
 			action:
@@ -153,6 +154,7 @@ export default {
 		},
 		{
 			id: 'button-disabled',
+			kind: 'review',
 			summary:
 				'`disabled` now reaches the native `<button>`: it is not focusable, fires no callbacks and does not submit forms.',
 			action:
@@ -161,6 +163,7 @@ export default {
 		},
 		{
 			id: 'button-text-shape',
+			kind: 'review',
 			summary:
 				'`buttonType="text"` is no longer uppercase and takes its color from `variant` (primary by default).',
 			action:
@@ -169,6 +172,7 @@ export default {
 		},
 		{
 			id: 'button-icon-shape',
+			kind: 'review',
 			summary:
 				'`buttonType="icon"` is a rounded square in the `variant` colors instead of a transparent circle.',
 			action:
@@ -177,6 +181,7 @@ export default {
 		},
 		{
 			id: 'button-append-snippet',
+			kind: 'review',
 			summary:
 				'`appendSnippet` sits after the text in the flow (pushed to the end) instead of absolutely positioned over it.',
 			action: 'Remove app CSS that made room for the absolutely positioned content.',
@@ -184,6 +189,7 @@ export default {
 		},
 		{
 			id: 'button-fixed-height',
+			kind: 'review',
 			summary:
 				'Height is fixed by `size` (28/34/40px, border-box) and the label does not wrap.',
 			action:

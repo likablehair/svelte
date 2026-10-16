@@ -53,6 +53,7 @@ export default {
 	manual: [
 		{
 			id: 'async-autocomplete-items',
+			kind: 'review',
 			summary:
 				'`items` are now suggestions shown while the text is shorter than `searchThreshold`, filtered locally; the results of `searcher` no longer overwrite them. v4 kept showing the last results, unfiltered, below the threshold.',
 			action:
@@ -61,6 +62,7 @@ export default {
 		},
 		{
 			id: 'async-autocomplete-searcher',
+			kind: 'review',
 			summary:
 				'`searcher` receives an `AbortSignal` and runs only while the list is open: opening it with enough text searches at once, reopening with the same text reuses the last results, and `searching` is `true` while a search waits for the debounce or runs, that is once the trimmed text reaches `searchThreshold` with the list open (or after `search()`).',
 			action:
@@ -69,6 +71,7 @@ export default {
 		},
 		{
 			id: 'async-autocomplete-errors',
+			kind: 'review',
 			summary:
 				'A rejected `searcher` shows an error row ("Couldn\'t load results") and calls `onerror(error)`; searches aborted by a newer one or by unmounting the component are not errors. v4 left an unhandled rejection.',
 			action:
@@ -77,6 +80,7 @@ export default {
 		},
 		{
 			id: 'async-autocomplete-loading',
+			kind: 'review',
 			summary:
 				'While searching, the field shows a spinner and the list three skeleton rows (with a hidden "Loading…" text); Enter picks nothing until the results arrive.',
 			action:

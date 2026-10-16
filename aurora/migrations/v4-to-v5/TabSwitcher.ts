@@ -88,6 +88,7 @@ export default {
 	manual: [
 		{
 			id: 'tab-switcher-navigation',
+			kind: 'review',
 			summary:
 				'Tabs that switch page can be links now: with `href` the switcher is a `<nav>` of `<a>` with `aria-current="page"`, so middle click, new tab and SvelteKit preloading work.',
 			action:
@@ -96,6 +97,7 @@ export default {
 		},
 		{
 			id: 'tab-switcher-look',
+			kind: 'review',
 			summary:
 				'Default look changed: tabs are muted text at 14px, the selected one takes the body text color and a gradient underline that slides between tabs, and the line under the tabs is a border token; v4 inherited the font size, colored the selected tab primary and used 8px padding.',
 			action:
@@ -103,6 +105,7 @@ export default {
 		},
 		{
 			id: 'tab-switcher-panels',
+			kind: 'review',
 			summary:
 				'Without `href` the tabs are an ARIA tab list: arrows, Home and End move the focus, Enter and Space select, and only one tab is in the Tab order.',
 			action:
@@ -110,6 +113,7 @@ export default {
 		},
 		{
 			id: 'tab-switcher-markup',
+			kind: 'review',
 			summary:
 				'Markup and classes changed: v4 `.tabs-container`, `.tab-label`, `.selected-tab` (with an `::after` underline) and `.horizontal-guide` are now `.aurora-tab-switcher`, `.aurora-tab-switcher-tab`, `[data-selected]` and `.aurora-tab-switcher-indicator`; the line is a box shadow of the root.',
 			action:
@@ -117,6 +121,7 @@ export default {
 		},
 		{
 			id: 'tab-switcher-wrappers',
+			kind: 'review',
 			summary:
 				'Many apps wrap the switcher in `$lib/components/common/StandardTabSwitcher.svelte`, which adds `marginTop` / `marginBottom` and forwards the rest; older copies re-dispatch `on:tab-click` with `createEventDispatcher`.',
 			action:

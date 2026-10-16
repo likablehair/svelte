@@ -125,6 +125,7 @@ export default {
 	manual: [
 		{
 			id: 'year-picker-text-field-typing',
+			kind: 'review',
 			summary:
 				'Typing accepts four digits; a year outside `min` / `max`, or an unfinished one when the field loses focus, shows the error state with `invalidText` ("Enter a valid year", in Italian "Inserisci un anno valido") and makes the form invalid. The value updates on `input` (v4: on keydown after 30ms).',
 			action:
@@ -132,6 +133,7 @@ export default {
 		},
 		{
 			id: 'year-picker-text-field-look',
+			kind: 'review',
 			summary:
 				'The field is 36px high with a border, the calendar button at the start and a chevron at the end, and fills its container (v4: a 280px filled grey SimpleTextField). The years are a 4-column YearSelector in a Menu (desktop) or a bottom Drawer titled `drawerTitle ?? label` (mobile).',
 			action:
@@ -139,6 +141,7 @@ export default {
 		},
 		{
 			id: 'year-picker-text-field-markup',
+			kind: 'review',
 			summary:
 				'Markup and classes changed: `.year-picker-activator` and the SimpleTextField classes → `.aurora-year-picker-text-field` (`data-state`, `data-disabled`, `data-readonly`, `data-open`), `-label`, `-row`, `-control`, `-hint`; the input is a combobox with a generated id.',
 			action:

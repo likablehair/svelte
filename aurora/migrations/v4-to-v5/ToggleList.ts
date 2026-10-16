@@ -35,6 +35,7 @@ export default {
 	manual: [
 		{
 			id: 'toggle-list-single',
+			kind: 'review',
 			summary:
 				'With `multiple={false}` a second click on the selected option keeps it selected; v4 emptied the selection.',
 			action:
@@ -43,6 +44,7 @@ export default {
 		},
 		{
 			id: 'toggle-list-look',
+			kind: 'review',
 			summary:
 				'The options are toggle buttons (`ActivableButton`, `aria-pressed`) in a `role="group"` instead of chips; text-only buttons show the state dot.',
 			action:
@@ -50,6 +52,7 @@ export default {
 		},
 		{
 			id: 'toggle-list-bindings',
+			kind: 'review',
 			summary: 'An `onchange` written as `() => handler` never called the handler, and `values` without `bind:` never followed the clicks in the app.',
 			action:
 				'Check every usage: write `onchange={handler}` or `onchange={(e) => handler(e)}`, and use `bind:values` when the app reads the selection.',

@@ -97,6 +97,7 @@ export default {
 	manual: [
 		{
 			id: 'alert-banner-look',
+			kind: 'edit',
 			summary:
 				'A tinted banner with a border and a colored icon box, in four variants (default `info`); v4 was a white card with a shadow and a colored strip on the left. Title 14px / 600 (v4: 1.2rem / 700), description 13px.',
 			action:
@@ -104,6 +105,7 @@ export default {
 		},
 		{
 			id: 'alert-banner-role',
+			kind: 'review',
 			summary:
 				'The banner has `role="alert"` (warning, error) or `role="status"` (info, success) and is announced by screen readers when it appears (v4: `role="presentation"`).',
 			action:

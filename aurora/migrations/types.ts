@@ -109,6 +109,7 @@ export interface ManualTrigger {
 
 export interface ManualStep {
 	id: string;
+	kind: 'edit' | 'review';
 	summary: string;
 	action: string;
 	when?: ManualTrigger;

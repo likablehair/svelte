@@ -43,6 +43,7 @@ export default {
 	manual: [
 		{
 			id: 'no-data-look',
+			kind: 'review',
 			summary:
 				'The default (`size="md"`) is a framed icon with dashed rings, a 19px title in the display font, optional description and actions; v4 was a dimmed 40px icon and 12px text. `size="sm"` is close to the v4 look.',
 			action:
@@ -50,6 +51,7 @@ export default {
 		},
 		{
 			id: 'no-data-class',
+			kind: 'review',
 			summary: '`class` is on the root element (v4: on the text `<span>`).',
 			action:
 				'Check app classes passed to NoData: text styles (color, size) now apply to the whole block; target `.aurora-no-data-title` inside the class or use `--no-data-title-*`.',

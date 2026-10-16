@@ -34,6 +34,7 @@ export default {
 	manual: [
 		{
 			id: 'user-avatar-look',
+			kind: 'review',
 			summary: 'Avatar colors per person (from the name) and Aurora texts; one size, `--avatar-size`, instead of width and height.',
 			action: 'Check the user menu and the sidebar footer: `--avatar-width`/`--avatar-height` became `--avatar-size`; `--user-avatar-font-size` never had an effect and can be removed.'
 		}

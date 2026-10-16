@@ -9,6 +9,7 @@ export default {
 	manual: [
 		{
 			id: 'spinner-visible',
+			kind: 'review',
 			summary:
 				'The copy relied on Bootstrap Italia classes that the apps do not load, so it showed only the text "Caricamento..."; CircularLoader draws a spinning ring, announced as "Caricamento" with the Italian locale.',
 			action: 'Check the buttons and forms that show it while loading; `--circular-loader-size` changes its size.'

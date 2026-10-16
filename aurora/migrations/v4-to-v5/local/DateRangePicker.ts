@@ -50,6 +50,7 @@ export default {
 	manual: [
 		{
 			id: 'date-range-picker-clear',
+			kind: 'edit',
 			summary: 'The `clear` event of the copy is gone: Clear calls `onchange` with both dates `undefined`.',
 			action: 'Move the code of the `on:clear` handler into the `onchange` handler, for when `selectedDate` is `undefined`; the `{#key}` blocks that remounted the picker after a clear are no longer needed.',
 			when: { events: ['on:clear'] }

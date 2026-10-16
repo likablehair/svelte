@@ -183,6 +183,7 @@ const rule = {
 	manual: [
 		{
 			id: 'table-columns',
+			kind: 'edit',
 			summary:
 				'`headers` become `columns`: `value` → `key`, `type: { key, params }` → a flat `type` and options. `string` → `text` (or no type), `number` → `number` (now formatted and right-aligned), `date` with a luxon `format` → `date` or `datetime` with `dateFormat` (Intl options, language from `locale`), `custom` stays `custom`, `icon` and `checkbox` are gone (they ignored the value). `nullText` → `empty` (also when it was a function: use `format` or `cell`), `sortModify` → `sort` with `{ builder, direction }` instead of `{ builder, sortDirection }`, `minWidth`/`maxWidth`/`width` accept any CSS length, `pinned` stays, `locked` and `data` are gone.',
 			action:
@@ -191,6 +192,7 @@ const rule = {
 		},
 		{
 			id: 'table-cells',
+			kind: 'edit',
 			summary:
 				'`customSnippet` (now `cellSnippet`) usually holds a chain `{#if header.value == \'a\'} … {:else if header.value == \'b\'} …`. It keeps working with `column.key`, but every column can carry its own `cell` snippet, and formatting that v4 apps did by hand is now built in: dates (`type: \'date\'`), money (`type: \'number\', numberFormat: { style: \'currency\', currency: \'EUR\' }`), yes/no (`type: \'boolean\'`), empty text (`empty`).',
 			action:
@@ -199,6 +201,7 @@ const rule = {
 		},
 		{
 			id: 'table-sort',
+			kind: 'edit',
 			summary:
 				'v4 SimpleTable only showed the arrow: the app sorted the items (or the server did). v5 sorts the rows by itself (`sorting="local"`, the default) by the value of the column, or with its `compare(a, b)`.',
 			action:
@@ -207,6 +210,7 @@ const rule = {
 		},
 		{
 			id: 'table-row-links',
+			kind: 'review',
 			summary:
 				'About half of the row click handlers only navigate (`goto(\'/x/\' + item.id)`). `rowHref` makes the row a real link: Ctrl-click and middle click open a new tab, SvelteKit preloads it, keyboard and screen readers reach it.',
 			action:
@@ -215,6 +219,7 @@ const rule = {
 		},
 		{
 			id: 'table-virtual',
+			kind: 'review',
 			summary:
 				'Above 200 rows (`virtualize`) only the rows in view, plus a margin, are in the page; the others are drawn while scrolling and the columns keep the widths of the first rows. The find of the browser (Ctrl+F) and printing see only the drawn rows.',
 			action:
@@ -223,6 +228,7 @@ const rule = {
 		},
 		{
 			id: 'table-look',
+			kind: 'review',
 			summary:
 				'Default look changed to the prototype: bordered rounded box, small uppercase grey headers, 9px × 12px cells (v4: 60px rows), monospaced numbers and dates, "—" in empty cells, hover and selected rows tinted; below 640px of width the rows become cards (`cardBreakpoint`).',
 			action:

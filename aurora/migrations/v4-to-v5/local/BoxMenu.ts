@@ -19,6 +19,7 @@ export default {
 	manual: [
 		{
 			id: 'box-menu-look',
+			kind: 'review',
 			summary:
 				'Cards of the library: icon tile in the brand tone, label and description always visible, a grid that fills the width (`--box-list-min-width` each).',
 			action: 'Remove app CSS aimed at the classes of the copy; `color` on an item gives its icon another tone.'

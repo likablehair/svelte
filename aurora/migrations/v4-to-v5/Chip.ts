@@ -178,6 +178,7 @@ export default {
 	manual: [
 		{
 			id: 'chip-default-look',
+			kind: 'review',
 			summary:
 				'A chip without `inactive` was filled primary with light text in v4; the v5 default is neutral (surface background, body text, border).',
 			action:
@@ -185,6 +186,7 @@ export default {
 		},
 		{
 			id: 'chip-toggle-colors',
+			kind: 'review',
 			summary:
 				'On a toggle chip v4 `--chip-background-color`, `--chip-color` and `--chip-hover-background-color` styled only the active state; v5 `--chip-background`, `--chip-color` and `--chip-hover-background` apply in every state. In the selected state `--chip-selected-*` win over the base variables, and the hover variables win over both.',
 			action:
@@ -201,6 +203,7 @@ export default {
 		},
 		{
 			id: 'chip-markup',
+			kind: 'review',
 			summary:
 				'The chip is an inline-flex `<span>` that holds a native `<button>` only with `onclick`, and the close button is a sibling of it; v4 was a block-level `<div role="button" class="chip">` (`display: flex`) with the close button inside, focusable only with `buttonTabIndex`.',
 			action:
@@ -208,6 +211,7 @@ export default {
 		},
 		{
 			id: 'chip-size',
+			kind: 'review',
 			summary:
 				'Fixed height 26px (`size="md"`) or 22px (`size="sm"`) with 12.5px / 12px text on one line; v4 was at least 1.8rem tall, inherited the font size and wrapped long text.',
 			action:
@@ -215,6 +219,7 @@ export default {
 		},
 		{
 			id: 'chip-close-bubbles',
+			kind: 'review',
 			summary: 'The close click is no longer stopped: it bubbles to the ancestors of the chip.',
 			action:
 				'If an ancestor handles clicks (a clickable row or card, a field that opens a menu), call `event.stopPropagation()` in `onclose`. The chip `onclick` is not affected: the close button sits outside the chip button.',
@@ -222,6 +227,7 @@ export default {
 		},
 		{
 			id: 'chip-close-button-vars',
+			kind: 'edit',
 			summary:
 				'The close button is no longer a library Button: `--button-*` variables set on a Chip do not reach it.',
 			action:

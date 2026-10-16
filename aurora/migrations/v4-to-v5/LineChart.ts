@@ -16,6 +16,7 @@ export default {
 		),
 		{
 			id: 'line-chart-look',
+			kind: 'review',
 			summary:
 				'v5 draws the lines like the design prototype: smooth curves, points only on hover with a vertical guide, ticks on both axes (v4 hid them), legend below and only with two or more series, HTML tooltip card; one series alone gets the brand gradient and a glow.',
 			action:

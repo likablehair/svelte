@@ -26,6 +26,7 @@ export default {
 	manual: [
 		{
 			id: 'info-box-look',
+			kind: 'review',
 			summary: 'The colored boxes of the copy (per type backgrounds and borders) become the Aurora banners of each variant.',
 			action: 'Nothing to do unless a page relied on the strong colors: `--alert-banner-background` and `--alert-banner-border-color` change them.'
 		}

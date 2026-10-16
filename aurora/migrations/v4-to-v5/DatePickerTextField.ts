@@ -270,6 +270,7 @@ export default {
 	manual: [
 		{
 			id: 'date-picker-text-field-day-click',
+			kind: 'edit',
 			summary:
 				'`ondayClick` is gone and the calendar closes by itself after a choice (with `range`, after the end). Most v4 usages had `bind:menuOpened={open}` plus `ondayClick={() => (open = false)}` only to close it.',
 			action:
@@ -278,6 +279,7 @@ export default {
 		},
 		{
 			id: 'date-picker-text-field-typing',
+			kind: 'review',
 			summary:
 				'Typing accepts digits only and adds the separators of `format`; paste (also `yyyy-MM-dd`) and autofill work, and the value updates on `input` (v4: on keydown after 30ms). A whole date that does not exist, is outside `min` / `max` or disabled, or an unfinished one when the field loses focus, shows the error state with `invalidText` ("Enter a valid date", in Italian "Inserisci una data valida") and makes the form invalid (`setCustomValidity`). Clicking a month or a year in the calendar no longer empties the text.',
 			action:
@@ -285,6 +287,7 @@ export default {
 		},
 		{
 			id: 'date-picker-text-field-range',
+			kind: 'review',
 			summary:
 				'With `range` the field has a start and an end input separated by an arrow, named by `startLabel` / `endLabel` ("Start date" / "End date", in Italian "Data di inizio" / "Data di fine") after the `label`; a typed end before the start, or start after the end, is not accepted.',
 			action:
@@ -293,6 +296,7 @@ export default {
 		},
 		{
 			id: 'date-picker-text-field-mobile',
+			kind: 'review',
 			summary:
 				'Up to 1024px the calendar button opens the calendar in a bottom Drawer titled `drawerTitle ?? label` (v4: a centered Dialog); focusing the field does not open it and the field stays typable with the numeric keyboard. The server renders the desktop variant.',
 			action:
@@ -300,6 +304,7 @@ export default {
 		},
 		{
 			id: 'date-picker-text-field-keyboard',
+			kind: 'review',
 			summary:
 				'The inputs are comboboxes: focus or click opens the calendar (desktop), Arrow Down moves the focus into it, Escape closes it and returns to the field, Tab closes it and moves on, Enter with the calendar open closes it without submitting the form.',
 			action:
@@ -307,6 +312,7 @@ export default {
 		},
 		{
 			id: 'date-picker-text-field-look',
+			kind: 'review',
 			summary:
 				'The field is 36px high with a border, the mono font, the calendar button at the start and a chip with the format at the end ("dd/mm/yyyy"), and it fills its container (v4: a 280px filled grey SimpleTextField in a `fit-content` wrapper). The calendar is a DatePicker in a Menu with the library surface (v4: 300px panel with the colored header).',
 			action:
@@ -314,6 +320,7 @@ export default {
 		},
 		{
 			id: 'date-picker-text-field-picker-variables',
+			kind: 'review',
 			summary:
 				'`--date-picker-*` and `--calendar-*` variables set on the field still reach the calendar, now also in the mobile drawer; the renamed and removed ones are listed in `cssVars.removed`. Apps often passed `--date-picker-header-color` with `--calendar-selected-day-color` set to `primary-foreground` for the v4 colored header.',
 			action:
@@ -322,6 +329,7 @@ export default {
 		},
 		{
 			id: 'date-picker-text-field-ids',
+			kind: 'review',
 			summary:
 				'The inputs get generated ids (v4: fixed `from` and `to`, duplicated when a page had two fields).',
 			action:
@@ -330,6 +338,7 @@ export default {
 		},
 		{
 			id: 'date-picker-text-field-wrappers',
+			kind: 'edit',
 			summary:
 				'Several apps wrap the field (`StandardDatePickerTextfield` in addibox, contattorapido, new-vigipass, stramoniumai); some wrappers forward only a few props (new-vigipass drops `menuOpened`, `ondayClick` and the rest).',
 			action:
@@ -338,6 +347,7 @@ export default {
 		},
 		{
 			id: 'date-picker-text-field-markup',
+			kind: 'review',
 			summary:
 				'Markup and classes changed: `.date-picker-activator` and the SimpleTextField classes (`.textfield-container`, `.textfield`, `.row`, `.hint`) → `.aurora-date-picker-text-field` (`data-state`, `data-disabled`, `data-readonly`, `data-open`, `data-range`), `-label`, `-row`, `-control`, `-hint`; the calendar is `.aurora-date-picker` inside `.aurora-date-picker-text-field-menu` or the drawer.',
 			action:

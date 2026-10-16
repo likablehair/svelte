@@ -158,6 +158,7 @@ export default {
 	manual: [
 		{
 			id: 'simple-text-field-range',
+			kind: 'edit',
 			summary:
 				'Range mode (`range` with `valueTo`, `placeholderTo`, `idTo`, `nameTo`, `inputTo`, `betweenLabel`) is removed.',
 			action:
@@ -168,6 +169,7 @@ export default {
 		},
 		{
 			id: 'simple-text-field-look',
+			kind: 'review',
 			summary:
 				'The field is 36px high (border-box) with a border and a visible focus ring, and fills its container; v4 was 280px wide, filled grey and borderless.',
 			action:
@@ -175,6 +177,7 @@ export default {
 		},
 		{
 			id: 'simple-text-field-hint-snippet',
+			kind: 'review',
 			summary:
 				'`hintSnippet` renders inside the hint element (`.aurora-text-field-hint`, the target of `aria-describedby`) instead of replacing the whole hint row; `class.hint` goes on that element, which exists only with `hint` or `hintSnippet` (v4: an always present row).',
 			action:
@@ -183,6 +186,7 @@ export default {
 		},
 		{
 			id: 'simple-text-field-calendar-icon',
+			kind: 'review',
 			summary:
 				'Date and time fields show the native picker icon; v4 made it transparent but still clickable.',
 			action:
@@ -191,6 +195,7 @@ export default {
 		},
 		{
 			id: 'simple-text-field-password-eye',
+			kind: 'review',
 			summary:
 				'A `type="password"` field shows an eye button inside it that shows and hides the password (`revealable` is on by default); v4 had none.',
 			action:

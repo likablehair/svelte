@@ -136,6 +136,7 @@ export default {
 	manual: [
 		{
 			id: 'menu-self-closing',
+			kind: 'edit',
 			summary:
 				'The menu closes itself on outside clicks (new default), on Escape and when another menu opens; v4 closed only when the app set `open` to false.',
 			action:
@@ -143,6 +144,7 @@ export default {
 		},
 		{
 			id: 'menu-surface',
+			kind: 'edit',
 			summary:
 				'The menu draws its own surface (4px padding, background, border, radius, shadow, blur); v4 was a bare positioned box.',
 			action:
@@ -150,6 +152,7 @@ export default {
 		},
 		{
 			id: 'menu-dom',
+			kind: 'review',
 			summary:
 				'The menu element is a `popover` with `position: fixed`, without `role="presentation"`, `data-menu`, `data-uid` or inline z-index, and the hidden controller div is gone.',
 			action:

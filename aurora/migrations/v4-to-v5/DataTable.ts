@@ -174,6 +174,7 @@ const quickActionsVars: Removal[] = [
 const manual: ManualStep[] = [
 	{
 		id: 'data-table-query',
+		kind: 'edit',
 		summary:
 			'v4 split one query in three callbacks (`onpaginationChange`, `onfiltersChange`, `onsort`) whose bodies were almost the same (load the page with `{ page, perPage, filtersBuilder }`), never reset the page and dropped the search from the builder of a page change. v5 has one `onquerychange(query)` with `{ page, pageSize, sort, search, filterValue, builder }`, the page already back to 1 after a change of filters, search, sorting or page size.',
 		action:
@@ -182,6 +183,7 @@ const manual: ManualStep[] = [
 	},
 	{
 		id: 'data-table-loader',
+		kind: 'edit',
 		summary:
 			'With `loader={(query) => service.list(...)}` returning `{ rows, total }` the table loads by itself: loading state, aborted outdated requests, error with "Retry", page past the end, `reload()` after a create or delete. The first page from the `load` of SvelteKit goes in `rows` and `total`, so it is not loaded twice.',
 		action:
@@ -190,6 +192,7 @@ const manual: ManualStep[] = [
 	},
 	{
 		id: 'data-table-filters',
+		kind: 'edit',
 		summary:
 			'`filters` (v4 `Filter[]`, definition and value together) becomes `filterFields` (`FilterField[]`, definitions only) plus `bind:filterValue` (the tree of conditions, as the `value` of Filters).',
 		action:
@@ -198,6 +201,7 @@ const manual: ManualStep[] = [
 	},
 	{
 		id: 'data-table-quick-filters',
+		kind: 'edit',
 		summary:
 			'The quick filters of the v4 tables (two incompatible models in PaginatedTable and DynamicTable) are fields of the Filters: `pinned` keeps a field as a pill in the bar, `presets` are chips with ready conditions. A "missing value" is the operator `empty`; a boolean with three states is `isTrue` / `isFalse` / no condition.',
 		action:
@@ -206,6 +210,7 @@ const manual: ManualStep[] = [
 	},
 	{
 		id: 'data-table-selection',
+		kind: 'edit',
 		summary:
 			'The selection keeps working across pages and has one model: `bind:selected`, plus `selectedAll` and `excluded` once the user picks "Select all N" in the bar (v4 PaginatedTable could not exclude rows and cleared `selectedItems` at every page). It is cleared when filters or search change. The header checkbox selects the rows of the page (v4 PaginatedTable: every row). The v4 `Action` objects keep working as `selectionActions`.',
 		action:
@@ -214,6 +219,7 @@ const manual: ManualStep[] = [
 	},
 	{
 		id: 'data-table-saved-columns',
+		kind: 'edit',
 		summary:
 			'Apps saved the visible headers as `[{ name, order }]` in the user settings (`populateHeaders`, 53 times). v5 keeps the order, visibility, widths and pins as `columnState` = `[{ key, visible, width?, pinned? }]`, plain data.',
 		action:
@@ -222,6 +228,7 @@ const manual: ManualStep[] = [
 	},
 	{
 		id: 'data-table-wrappers',
+		kind: 'edit',
 		summary:
 			'Many apps wrap the v4 tables (`StandardPaginatedTable`, `<Entity>PaginatedTable`, a `PaginatedTable` with `fetcher` in evote and epass, `LocalPaginatedTable` in lupette) mostly to repeat the same fetch, the same defaults (`lang="it"`, `editFilterMode`) and the same column drawer.',
 		action:
@@ -230,6 +237,7 @@ const manual: ManualStep[] = [
 	},
 	{
 		id: 'data-table-look',
+		kind: 'review',
 		summary:
 			'Default look of the prototype: one bordered box with the toolbar on top (search, filter pills, "Columns", the app buttons on the right), the table and a footer with "Rows per page", "1–20 of 312" and the paginator; the selection bar floats at the bottom of the table. Below the `cardBreakpoint` of the table the frame goes away and the rows become cards.',
 		action:
@@ -672,6 +680,7 @@ const dynamic = {
 		...manual,
 		{
 			id: 'data-table-rows',
+			kind: 'edit',
 			summary:
 				'DynamicTable wanted `rows: { item, subItems }[]` (62 mappings in the apps) and drew the sub-rows with `subHeaders` and the `subRow*` snippets. v5 takes plain rows; the detail of a row is `expandedSnippet`, where a sub-table is a nested `Table`.',
 			action:
@@ -680,6 +689,7 @@ const dynamic = {
 		},
 		{
 			id: 'data-table-cell-edit',
+			kind: 'edit',
 			summary:
 				'The inline cell editor (`cellEdit`, `cellEditorInfo`, `onsaveCellEdit`) is gone: it was active in two apps only and edited the wrong row after scrolling.',
 			action:

@@ -80,6 +80,7 @@ export default {
 	manual: [
 		{
 			id: 'paginator-page-past-count',
+			kind: 'review',
 			summary:
 				'v4 moved `page` back to `maxPage` when `maxPage` shrank (for example after a filter), without calling `onchange`; v5 leaves `page` as it is, marks no number and makes "previous" go to the last page.',
 			action:
@@ -88,6 +89,7 @@ export default {
 		},
 		{
 			id: 'paginator-look',
+			kind: 'review',
 			summary:
 				'Default look changed: the prototype window `« ‹ 1 … 6 7 8 … 24 › »` (v4: previous, current and next page only) with mono digits, 30px buttons and a filled current page; first and previous are disabled on the first page, next and last on the last one.',
 			action:
@@ -95,6 +97,7 @@ export default {
 		},
 		{
 			id: 'paginator-local-copies',
+			kind: 'edit',
 			summary:
 				'Six apps keep a copy of the v4 paginator in `$lib/components/common/StandardPaginator.svelte` (Svelte 4 syntax, `on:change`, MDI icon classes).',
 			action:
@@ -103,6 +106,7 @@ export default {
 		},
 		{
 			id: 'paginator-url',
+			kind: 'review',
 			summary:
 				'With `pageHref` the controls are links, so the page can live in the URL, open in a new tab and be preloaded by SvelteKit.',
 			action:

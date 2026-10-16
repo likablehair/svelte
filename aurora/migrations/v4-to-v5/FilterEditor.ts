@@ -107,6 +107,7 @@ export default {
 	manual: [
 		{
 			id: 'filter-editor-standalone',
+			kind: 'edit',
 			summary:
 				'Used alone (outside Filters), the editor needs a field definition and a condition, and reports through callbacks instead of mutating `filter`.',
 			action:
@@ -115,6 +116,7 @@ export default {
 		},
 		{
 			id: 'filter-editor-look',
+			kind: 'review',
 			summary:
 				'New card: title with the field icon, operators as a segmented control (a select above four), then the input of the value; v4 had a Dropdown for the mode and inputs side by side, with a 5% margin in one-edit.',
 			action:

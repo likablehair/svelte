@@ -147,6 +147,7 @@ export default {
 	manual: [
 		{
 			id: 'drawer-panel',
+			kind: 'review',
 			summary:
 				'`children` sits in a scrolling body inside a panel with padding (18px 12px), an inner border and a shadow; v4 put it straight in the bare panel.',
 			action:
@@ -155,6 +156,7 @@ export default {
 		},
 		{
 			id: 'drawer-modal',
+			kind: 'edit',
 			summary:
 				'The drawer is a modal `<dialog>`: the page behind is inert and does not scroll, focus moves inside and returns to the opener; v4 left the page focusable and scrollable.',
 			action:
@@ -162,6 +164,7 @@ export default {
 		},
 		{
 			id: 'drawer-content-lifecycle',
+			kind: 'review',
 			summary:
 				'The content mounts at every opening and unmounts after closing; v4 mounted it once and kept it in the DOM, off screen.',
 			action:

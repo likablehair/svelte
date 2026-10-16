@@ -8,6 +8,7 @@ export const drawerPropsNote =
 
 export const activatorStep = (prefix: string): ManualStep => ({
 	id: `${prefix}-activator`,
+	kind: 'edit',
 	summary: '`activator` and `anchor` move out of `menuProps` into the `activator` and `placement` props.',
 	action:
 		'`menuProps={{ activator: x, anchor: "right", flipOnOverflow: true }}` → `activator={x} placement="right-start"`. Convert `anchor` with the values of the Menu rule: `bottom-center` → `bottom`, `bottom` → `bottom-start`, `up-center` → `top`, `up` → `top-start`, `right` → `right-start`, `left` → `left-start`, `right-center` → `right`, `left-center` → `left`. Without `anchor` keep the default: the v5 default `bottom` is the v4 default `bottom-center`. Remove `menuProps` when nothing is left in it. Where the app reads the activator from a `bind:activator` on the component (v3 API, it never worked in v4), pass `activator` instead.',
@@ -16,6 +17,7 @@ export const activatorStep = (prefix: string): ManualStep => ({
 
 export const drawerHeightStep = (prefix: string): ManualStep => ({
 	id: `${prefix}-drawer-height`,
+	kind: 'edit',
 	summary:
 		'The bottom drawer is as tall as its content, up to 85% of the screen; v4 used the 20rem of the Drawer (MenuOrDrawerOptions: 56px per option, up to 5).',
 	action:
@@ -37,6 +39,7 @@ export default {
 		drawerHeightStep('menu-or-drawer'),
 		{
 			id: 'menu-or-drawer-surface',
+			kind: 'edit',
 			summary:
 				'The menu draws its own surface (background, border, radius, shadow, 4px padding) and the drawer body its own padding; in v4 the apps built the box of the menu in the content.',
 			action:
@@ -44,6 +47,7 @@ export default {
 		},
 		{
 			id: 'menu-or-drawer-forced-branch',
+			kind: 'review',
 			summary:
 				'Apps that picked the branch by hand (MenuOrDrawer only when `!mAndDown` plus a separate `Drawer` on mobile, or only on mobile without activator) can use `mode`.',
 			action:

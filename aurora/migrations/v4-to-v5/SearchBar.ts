@@ -103,6 +103,7 @@ export default {
 	manual: [
 		{
 			id: 'search-bar-label',
+			kind: 'review',
 			summary:
 				'v4 gave every SearchBar the fixed id `search-content` and an `aria-labelledby` pointing to itself: duplicate ids and a field with no accessible name. v5 names the field and the `role="search"` landmark with `label`, else `aria-label`, else the placeholder.',
 			action:
@@ -110,6 +111,7 @@ export default {
 		},
 		{
 			id: 'search-bar-onsearch',
+			kind: 'review',
 			summary:
 				'`onsearch(text)` fires `debounce` ms (300) after the last keystroke, at once on Enter, on the search button and when the field is emptied. v4 apps and the v4 tables debounced `oninput` themselves (PaginatedTable `searchTimeoutDelay` 300; DynamicTable 800 ms plus Enter).',
 			action:
@@ -118,6 +120,7 @@ export default {
 		},
 		{
 			id: 'search-bar-keyboard',
+			kind: 'review',
 			summary:
 				'The input is `type="search"`: Enter calls `onsearch` and no longer submits the surrounding form, Escape with text empties the field (Escape on an empty field still reaches dialogs and menus).',
 			action:
@@ -126,6 +129,7 @@ export default {
 		},
 		{
 			id: 'search-bar-input-snippet',
+			kind: 'review',
 			summary:
 				'With `inputSnippet` the app input replaces the built-in one, so it gets none of its behaviour: debounce, `onsearch`, Enter / Escape, the accessible name.',
 			action:
@@ -134,6 +138,7 @@ export default {
 		},
 		{
 			id: 'search-bar-look',
+			kind: 'review',
 			summary:
 				'New look: 40px field on the theme input tokens (border, radius, font, hover and focus ring), an 18px MDI magnifier, a clear button while there is text; v4 was a 48px grey bar with a 1px ring.',
 			action:

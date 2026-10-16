@@ -85,6 +85,7 @@ export default {
 	manual: [
 		{
 			id: 'month-selector-look',
+			kind: 'review',
 			summary:
 				'Same 3-column grid, but the months are cells with short names (v4: text Buttons with full names, filled primary when selected); the current month of `year` has a border, the selected one a primary fill.',
 			action:
@@ -92,6 +93,7 @@ export default {
 		},
 		{
 			id: 'month-selector-keyboard',
+			kind: 'review',
 			summary:
 				'It is an ARIA listbox: one Tab stop, the arrows move in the grid, Home and End go to the first and last month, Enter and Space choose. v4 had 12 Buttons in the Tab order.',
 			action:
@@ -99,6 +101,7 @@ export default {
 		},
 		{
 			id: 'month-selector-markup',
+			kind: 'review',
 			summary:
 				'Markup and classes changed: `.selector-container` and the Buttons → `.aurora-month-selector` (`role="listbox"`) and `.aurora-month-selector-month` (`role="option"`) with `[data-selected]`, `[data-current]`, `[data-disabled]`.',
 			action: 'Rewrite app `:global(...)` selectors that target the v4 markup.',

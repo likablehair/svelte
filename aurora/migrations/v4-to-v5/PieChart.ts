@@ -31,6 +31,7 @@ export default {
 		...sharedSteps('pie-chart', 'slice'),
 		{
 			id: 'pie-chart-options',
+			kind: 'edit',
 			summary: 'Most `options` the apps pass are props or defaults now.',
 			action:
 				'`cutout: "75%"` (a donut made by hand) → delete, donut is the default; for that exact hole, `--pie-chart-cutout="75%"`. `maintainAspectRatio: false` → delete. `plugins.legend.display: false` → `legend={false}`; `plugins.legend.position` → `legend="top|bottom|right"` (default: on the right, below when narrow). Tooltip callbacks that format numbers → `format`. A total drawn by the app in the middle (an absolutely positioned element over the canvas) → the built-in total with `centerLabel`, or `centerSnippet`. Click handlers in `options.onClick` with `getElementsAtEventForMode` → `onitemclick`.',
@@ -38,6 +39,7 @@ export default {
 		},
 		{
 			id: 'pie-chart-look',
+			kind: 'review',
 			summary:
 				'v5 draws a donut with the total in the middle and the legend on the right with the share of every slice (v4: a full pie with the chart.js legend on top).',
 			action: 'Open the screen and compare. Pass `donut={false}` where a full pie is wanted, `showTotal={false}` to leave the middle empty.'

@@ -261,6 +261,7 @@ export default {
 	manual: [
 		{
 			id: 'filters-definitions',
+			kind: 'edit',
 			summary:
 				'Each v4 `Filter` (definition and state in one object) becomes a `FilterField` (definition only) in `fields`.',
 			action:
@@ -269,6 +270,7 @@ export default {
 		},
 		{
 			id: 'filters-modes',
+			kind: 'edit',
 			summary: 'v4 `mode` values become v5 operator names, per type.',
 			action:
 				'string: `equal` → `is`; `contains` → `contains`; `like` → `like`, `ilike` → `ilike` (same JSON as v4: the value is sent without `%`). On backends that add `%` themselves (variants A–E, see `global-filter-backends`) v4 like/ilike behaved as "contains": prefer `contains` (it sends `ilike "%v%"` with `%` and `_` escaped, same results there); on epass / new-vigipass (no automatic `%`) v4 ilike was a case-insensitive equality: keep `ilike`. number: `equal` → `eq`, `greater` → `gt`, `lower` → `lt`, `between` → `between` (open ends as in v4). date: `equal` → `is` (whole local day, same JSON), `between` → `between` (whole days, same JSON), `lower` → `before` (< start of the day: same results as v4), `greater` → `after`, which is now after the **whole** chosen day (v4 compared the raw midnight value, so the chosen day was included for timestamp columns): use `onOrAfter` to keep including it. Add `dateOnly: true` to fields on `date` columns (no time): the query then compares `yyyy-MM-dd` strings. select: `equal` → `in` (one value: `where(column, "=", v)`; several: `whereIn`; v4 sent a group of `orWhere`), `different` → `notIn` (`<>` or `notWhereIn`). bool `equal` → `isTrue`.',
@@ -276,6 +278,7 @@ export default {
 		},
 		{
 			id: 'filters-initial-value',
+			kind: 'edit',
 			summary:
 				'Applied state (`active: true` with `value` / `values` / `from` / `to`) moves from the definitions to the `value` tree.',
 			action:
@@ -284,6 +287,7 @@ export default {
 		},
 		{
 			id: 'filters-modify',
+			kind: 'edit',
 			summary:
 				'`modify({ builder, value, values, mode })` is gone: declarative field options cover what apps used it for; `apply(builder, condition)` is the fallback.',
 			action:
@@ -292,6 +296,7 @@ export default {
 		},
 		{
 			id: 'filters-operator-sets',
+			kind: 'review',
 			summary:
 				'v4 `advanced` (the user picks the mode among those of the type) becomes the operator sets: `operatorSet` on Filters (`basic`, `standard` by default, `all`), `typeOperators` per type, `operators` per field (a list or a set name).',
 			action:
@@ -300,6 +305,7 @@ export default {
 		},
 		{
 			id: 'filters-custom',
+			kind: 'edit',
 			summary:
 				'`type: "custom"` filters (value from `customSnippet` + `updateFunction`, query from `modify`) become `type: "custom"` + `apply` + `inputSnippet`, or better a declarative type.',
 			action:
@@ -308,6 +314,7 @@ export default {
 		},
 		{
 			id: 'filters-onchange',
+			kind: 'edit',
 			summary:
 				'One `onchange({ value, builder })` reloads the data for every change, removals included, and it carries the query; `onremove` and `onopen` are only for side effects.',
 			action:
@@ -316,6 +323,7 @@ export default {
 		},
 		{
 			id: 'filters-programmatic-state',
+			kind: 'edit',
 			summary:
 				'App code that changed the v4 array by hand (`filters[i].active = false`, `filters[i].value = x`, `filters = filters`) works on the tree with helpers now.',
 			action:
@@ -324,6 +332,7 @@ export default {
 		},
 		{
 			id: 'filters-labels',
+			kind: 'edit',
 			summary:
 				'Texts follow `locale` (Italian and English built in) with single texts in one `labels` object (`FilterLabels`), and dates and numbers follow `locale` too; `lang` is now `locale`, and `setDefaultLocale` sets it for the whole app.',
 			action:
@@ -344,6 +353,7 @@ export default {
 		},
 		{
 			id: 'filters-append-snippet',
+			kind: 'review',
 			summary:
 				'`appendSnippet` still renders right after the filter buttons; page actions now have their own `actionsSnippet`, pushed to the end of the bar.',
 			action:
@@ -352,6 +362,7 @@ export default {
 		},
 		{
 			id: 'filters-pill-snippet',
+			kind: 'edit',
 			summary: '`customChipSnippet` → `pillSnippet`, which replaces the text of every pill.',
 			action:
 				'If the snippet only formatted the value of custom filters, remove it and give those fields `format: (condition) => text` (the pill keeps field and operator; without it arrays show joined by ", " and objects show nothing). Otherwise rename it to `pillSnippet`, render the default text for other fields (`{field.label} {operator} {value}`) and read `condition.value` instead of `filter.value`. Drop the chip markup and the close button from the snippet: the pill keeps its buttons.',
@@ -359,6 +370,7 @@ export default {
 		},
 		{
 			id: 'filters-look',
+			kind: 'review',
 			summary:
 				'New UI: a bar with the "Filters" button (with the count), one pill per condition (field · operator · value, click to edit, × to remove), "+ Add filter" and Clear; the card of one condition; a panel (880px, `--filters-panel-width`) with every condition in rows, where, with `maxDepth`, every filter is a box with "Add nested filter" and the root has one "Add filter"; a bottom sheet up to 1024px. v4 had a button with a dot, chips, menus or a dialog of cards.',
 			action:

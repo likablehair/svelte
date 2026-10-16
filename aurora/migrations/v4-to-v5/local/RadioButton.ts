@@ -35,6 +35,7 @@ export default {
 	manual: [
 		{
 			id: 'radio-button-first-option',
+			kind: 'review',
 			summary: 'The copies selected the first option by themselves (and failed with no options); RadioGroup starts with nothing selected.',
 			action: 'Where the first option must start selected, initialize the bound variable with its value.'
 		}

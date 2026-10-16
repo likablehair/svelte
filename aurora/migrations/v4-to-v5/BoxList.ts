@@ -43,6 +43,7 @@ export default {
 	manual: [
 		{
 			id: 'box-list-navigation',
+			kind: 'review',
 			summary: 'Boxes that navigate with `goto` inside `onboxClick` can be links.',
 			action:
 				'Where `onboxClick` only maps `box.name` to a URL and calls `goto`, put the URL in `href` on each box and remove the handler: the box becomes a real link (middle click, open in a new tab, preload by SvelteKit) and a wrong name can no longer leave a box doing nothing.',
@@ -50,6 +51,7 @@ export default {
 		},
 		{
 			id: 'box-list-grid',
+			kind: 'review',
 			summary:
 				'The boxes are a grid of cards as wide as the column (`--box-list-min-width`, 240px, as many columns as fit, one on a phone) instead of a row of pills as wide as their text.',
 			action:
@@ -58,6 +60,7 @@ export default {
 		},
 		{
 			id: 'box-list-look',
+			kind: 'review',
 			summary:
 				'New look: a card with border, optional icon tile, label 14px 600 and description under it; no arrow; focus ring instead of the blue background that stayed after a click.',
 			action:
@@ -65,6 +68,7 @@ export default {
 		},
 		{
 			id: 'box-list-local-copies',
+			kind: 'edit',
 			summary:
 				'Most apps use a local copy (`$lib/components/common/BoxList.svelte`) instead of the library one, often with `icon` and a `description` shown on hover.',
 			action:

@@ -85,6 +85,7 @@ export default {
 	manual: [
 		{
 			id: 'radio-button-bind-group',
+			kind: 'edit',
 			summary:
 				'`bind:checked` does not work: v4 declared `checked` bindable but passed it one way, so the binding never updated. v5 binds the group like Svelte: `bind:group` with the same variable on every radio, plus each radio `value`; `checked` is the native one-way attribute, ignored while `group` is defined.',
 			action:
@@ -93,6 +94,7 @@ export default {
 		},
 		{
 			id: 'radio-button-markup',
+			kind: 'review',
 			summary:
 				'The root is a `<label class="aurora-radio-button">` that wraps the input and the text; v4 rendered the `<input>` followed by a sibling `<label for={id}>` (only with `label`), which did nothing without `id`. A click on the text now selects the radio.',
 			action:
@@ -100,6 +102,7 @@ export default {
 		},
 		{
 			id: 'radio-button-look',
+			kind: 'review',
 			summary:
 				'The circle is 18px instead of 21px, 10px from the label (v4: 4px) and aligned with its first line; keyboard focus shows an outline ring; disabled fades the whole radio and its text to 40%.',
 			action:

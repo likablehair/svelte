@@ -42,15 +42,17 @@ const USAGE = `Usage:
 
   next        The remaining points, one file at a time: runs svelte-check in the app and
               explains each error with the migration rule behind it (what changed, what to
-              write), then what to look at in the same file (behaviour or look changed, done
-              with a warning, new defaults). The v4 code is read from git (the commit the
-              migration branch started from), so nothing is written in the app. When no
-              errors are left it lists what to look at and the pages to try.
-              --file shows that file instead of the next one.
+              write), then the points to write in the same file (code the tool could not
+              change). The v4 code is read from git (the commit the migration branch started
+              from), so nothing is written in the app. When no errors are left it lists the
+              points to write, file by file, then the points to look at (behaviour, look or
+              defaults changed) grouped by component with their pages, and the pages to try.
+              --file shows that file, with its points to look at, instead of the next one.
 
-  status      The same data for the whole app: files with errors and points to look at,
-              pages to try (pages that use the changed files), changes per component,
-              app steps, look dropped with the wrappers. Read-only.`;
+  status      The same data for the whole app: files with errors, points to write and to
+              look at, components to look at, pages to try (pages that use the changed
+              files), changes per component, app steps, look dropped with the wrappers.
+              Read-only.`;
 
 interface Options {
 	command?: string;

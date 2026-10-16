@@ -88,6 +88,7 @@ export default {
 	manual: [
 		{
 			id: 'page-title-heading',
+			kind: 'review',
 			summary:
 				'The title is an `h1` heading with the Aurora look (26px display font); the copies drew a big bold `div` with Tailwind classes.',
 			action:
@@ -95,12 +96,14 @@ export default {
 		},
 		{
 			id: 'page-title-subtitle-with-title-snippet',
+			kind: 'review',
 			summary: 'With `titleSnippet` the copies hid `subtitle`; PageHeader shows it under the title.',
 			action: 'Remove `subtitle` where it was passed together with a title snippet and was not visible.',
 			when: { snippets: ['titleSnippet'] }
 		},
 		{
 			id: 'page-title-route-without-back',
+			kind: 'review',
 			summary: '`prependRoute` without `prependVisible` showed nothing; `backHref` shows the back link.',
 			action: 'If the page had no back link, remove `backHref`.',
 			when: { props: ['prependRoute'] }

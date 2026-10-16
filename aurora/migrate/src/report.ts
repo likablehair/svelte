@@ -1,8 +1,8 @@
 import { basename, dirname } from 'node:path';
 import type { Analysis } from './analyze.ts';
 import type { CodemodChange, CodemodResult, CodemodSkip } from './codemod.ts';
-import type { Finding } from './match.ts';
-import type { ErrorPoint, Remaining, ReviewPoint } from './remaining.ts';
+import { todoOf, type Finding, type Todo } from './match.ts';
+import type { ErrorPoint, Remaining, RemainingFile, ReviewPoint } from './remaining.ts';
 
 export const appLabel = (dir: string) =>
 	basename(dir) === 'frontend' ? basename(dirname(dir)) : basename(dir);
@@ -62,7 +62,7 @@ export function markdownReport(a: Analysis): string {
 				['Wrappers', `${a.wrappers.length} (${a.wrappers.filter((w) => w.kind === 'thin').length} thin, ${a.wrappers.filter((w) => w.kind === 'logic').length} with logic), imported by ${a.wrappers.reduce((s, w) => s + w.importers, 0)} files`],
 				['Automatic changes', a.totals.auto],
 				['To check', a.totals.check],
-				['Manual points', `${a.totals.manualPoints} (file × step)`],
+				['Manual points', `${a.totals.manualPoints} (file × step): ${a.totals.manualEdit} to write, ${a.totals.manualPoints - a.totals.manualEdit} to look at`],
 				['General checks', `${a.totals.general} (once per component)`],
 				['App-level steps', `${a.totals.appSteps} needed, ${a.totals.appReview} to review`],
 				['Phase 0', phase0 ? `needed: ${[a.phase0.svelte4 && 'Svelte 4 → 5 (`npx sv migrate svelte-5`)', a.phase0.libV3 && 'library v3 syntax'].filter(Boolean).join(', ')}` : 'not needed'],
@@ -147,8 +147,8 @@ export function markdownReport(a: Analysis): string {
 		);
 	}
 
-	const section = (title: string, effort: Finding['effort']) => {
-		const groups = group(a.findings.filter((f) => f.effort === effort));
+	const section = (title: string, effort: Finding['effort'], todo?: Todo) => {
+		const groups = group(a.findings.filter((f) => f.effort === effort && (!todo || todoOf(f) === todo)));
 		if (!groups.length) return;
 		out.push(`## ${title}`, '');
 		out.push(
@@ -165,7 +165,8 @@ export function markdownReport(a: Analysis): string {
 			''
 		);
 	};
-	section('Manual points', 'manual');
+	section('Manual points: to write', 'manual', 'edit');
+	section('Manual points: to look at', 'manual', 'review');
 	section('To check', 'check');
 
 	const autoKinds = new Map<string, number>();
@@ -230,7 +231,7 @@ export function markdownReport(a: Analysis): string {
 
 export function summaryTable(list: Analysis[]): string {
 	return table(
-		['app', 'lib', 'svelte', 'pm', 'TW', 'git', 'phase 0', 'files', 'usages', 'wrappers', 'auto', 'check', 'manual pts', 'general', 'app steps (+review)', 'icons in data', '.detail else', 'tokens'],
+		['app', 'lib', 'svelte', 'pm', 'TW', 'git', 'phase 0', 'files', 'usages', 'wrappers', 'auto', 'check', 'manual pts (to write)', 'general', 'app steps (+review)', 'icons in data', '.detail else', 'tokens'],
 		list.map((a) => {
 			if (!a.usesLibrary) return [appLabel(a.app.dir), '—', a.app.svelte ?? '', a.app.packageManager, '', '', '', '', 'no library'];
 			const direct = Object.values(a.components).reduce((s, c) => s + c.usages, 0);
@@ -248,7 +249,7 @@ export function summaryTable(list: Analysis[]): string {
 				`${a.wrappers.length} (${a.wrappers.filter((w) => w.kind === 'logic').length} logic)`,
 				a.totals.auto,
 				a.totals.check,
-				a.totals.manualPoints,
+				`${a.totals.manualPoints} (${a.totals.manualEdit})`,
 				a.totals.general,
 				`${a.totals.appSteps} (+${a.totals.appReview})`,
 				a.icons.data,
@@ -381,6 +382,8 @@ const KIND_LABEL: Record<ReviewPoint['kind'], string> = {
 	default: 'new default'
 };
 
+const pointLabel = (p: ReviewPoint) => (p.todo === 'edit' ? (p.kind === 'not-done' ? 'not done by the tool' : 'to write') : KIND_LABEL[p.kind]);
+
 const lineList = (lines: number[], max = 8) =>
 	lines.length > max ? `${lines.slice(0, max).join(', ')} … +${lines.length - max}` : lines.join(', ');
 
@@ -412,8 +415,72 @@ function errorsMarkdown(errors: ErrorPoint[]): string[] {
 
 function reviewMarkdown(points: ReviewPoint[]): string[] {
 	return points.map(
-		(p) => `- line ${lineList(p.lines)} · ${KIND_LABEL[p.kind]}${p.component ? ` · ${p.component}` : ''}: ${p.title}${p.text && p.text !== p.title ? ` ${short(p.text, 400)}` : ''} \`${p.id}\``
+		(p) => `- line ${lineList(p.lines)} · ${pointLabel(p)}${p.component ? ` · ${p.component}` : ''}: ${p.title}${p.text && p.text !== p.title ? ` ${short(p.text, 400)}` : ''} \`${p.id}\``
 	);
+}
+
+const toWrite = (f: RemainingFile) => f.review.filter((p) => p.todo === 'edit');
+const toLook = (f: RemainingFile) => f.review.filter((p) => p.todo === 'review');
+
+interface ComponentReview {
+	component: string;
+	points: { point: ReviewPoint; where: Map<string, number[]> }[];
+	general: Remaining['general'];
+	files: Set<string>;
+	pages: string[];
+}
+
+function reviewByComponent(r: Remaining): ComponentReview[] {
+	const groups = new Map<string, ComponentReview>();
+	const get = (component: string) => {
+		let entry = groups.get(component);
+		if (!entry) groups.set(component, (entry = { component, points: [], general: [], files: new Set(), pages: [] }));
+		return entry;
+	};
+	const steps = new Map<string, { point: ReviewPoint; where: Map<string, number[]> }>();
+	for (const f of r.files)
+		for (const p of toLook(f)) {
+			const entry = get(p.component ?? 'Other');
+			const key = `${entry.component}\n${p.kind}\n${p.id}\n${p.title}`;
+			let step = steps.get(key);
+			if (!step) {
+				steps.set(key, (step = { point: p, where: new Map() }));
+				entry.points.push(step);
+			}
+			step.where.set(f.file, [...(step.where.get(f.file) ?? []), ...p.lines]);
+			entry.files.add(f.file);
+		}
+	for (const g of r.general) {
+		const list = get(g.component).general;
+		const same = list.find((s) => s.id === g.id);
+		if (same) Object.assign(same, { usages: same.usages + g.usages, files: same.files + g.files });
+		else list.push({ ...g });
+	}
+	for (const entry of groups.values())
+		entry.pages = [...r.layouts, ...r.pages].filter((page) => page.touched.some((file) => entry.files.has(file))).map((page) => page.route);
+	const weight = (e: ComponentReview) => e.points.reduce((sum, s) => sum + s.where.size, 0) + e.general.length;
+	return [...groups.values()].sort((a, b) => weight(b) - weight(a) || a.component.localeCompare(b.component));
+}
+
+function whereList(where: Map<string, number[]>, max = 6) {
+	const list = [...where].slice(0, max).map(([file, lines]) => `${file}:${lineList([...new Set(lines)].sort((a, b) => a - b), 4)}`);
+	return where.size > max ? `${list.join(', ')} … +${where.size - max} files` : list.join(', ');
+}
+
+function reviewByComponentMarkdown(groups: ComponentReview[]): string[] {
+	const out: string[] = [];
+	for (const g of groups) {
+		out.push(`### ${g.component}`, '');
+		if (g.pages.length) out.push(`Pages: ${g.pages.slice(0, 12).join(', ')}${g.pages.length > 12 ? ` … +${g.pages.length - 12}` : ''}`, '');
+		for (const { point: p, where } of g.points)
+			out.push(
+				`- ${p.kind === 'manual' ? '' : `${KIND_LABEL[p.kind]}: `}${p.title}${p.text && p.text !== p.title ? ` ${short(p.text, 400)}` : ''} \`${p.id}\``,
+				`  - ${whereList(where)}`
+			);
+		for (const s of g.general) out.push(`- every use (${s.usages} in ${s.files} files): ${s.summary} ${short(s.action, 400)} \`${s.id}\``);
+		out.push('');
+	}
+	return out;
 }
 
 function pagesMarkdown(r: Remaining): string[] {
@@ -422,12 +489,12 @@ function pagesMarkdown(r: Remaining): string[] {
 		out.push(
 			'Layouts (every page under them):',
 			'',
-			table(['route', 'file', 'changed files', 'components to look at'], r.layouts.map((p) => [p.route, p.file, p.touched.length, p.components.join(', ')])),
+			table(['route', 'file', 'files to look at', 'components to look at'], r.layouts.map((p) => [p.route, p.file, p.touched.length, p.components.join(', ')])),
 			''
 		);
 	if (r.pages.length)
 		out.push(
-			table(['page', 'changed files', 'components to look at', 'file'], r.pages.map((p) => [p.route, p.touched.length, p.components.join(', '), p.file])),
+			table(['page', 'files to look at', 'components to look at', 'file'], r.pages.map((p) => [p.route, p.touched.length, p.components.join(', '), p.file])),
 			''
 		);
 	if (r.global.length) out.push(`Changed files no page imports (app shell, config, or loaded in a way the tool cannot follow): ${r.global.map((f) => `\`${f}\``).join(', ')}`, '');
@@ -436,10 +503,12 @@ function pagesMarkdown(r: Remaining): string[] {
 
 function summaryLine(r: Remaining) {
 	const errorFiles = r.files.filter((f) => f.errors.length).length;
-	const reviewPoints = r.files.reduce((sum, f) => sum + f.review.length, 0);
+	const edit = r.files.reduce((sum, f) => sum + toWrite(f).length, 0);
+	const look = r.files.reduce((sum, f) => sum + toLook(f).length, 0);
 	return [
 		r.check.ran ? `svelte-check: **${r.check.errors} errors** in ${errorFiles} files` : `svelte-check did not run: ${r.check.error ?? 'unknown error'}`,
-		`${reviewPoints} points to look at in ${r.files.filter((f) => f.review.length).length} files`,
+		`**${edit} points to write** in ${r.files.filter((f) => toWrite(f).length).length} files`,
+		`${look} to look at for ${reviewByComponent(r).length} components`,
 		`${r.pages.length} pages to try`
 	].join(' · ');
 }
@@ -451,20 +520,34 @@ export function remainingReport(r: Remaining): string {
 		out.push(
 			'## Files',
 			'',
-			'Errors first (fix them in this order: components before the pages that use them), then the files with only points to look at. `next` shows one file with the details.',
+			'Errors first (fix them in this order: components before the pages that use them), then the files with points to write, then those with only points to look at. `next` shows one file with the details.',
 			'',
 			table(
-				['file', 'errors', 'to look at', 'components'],
+				['file', 'errors', 'to write', 'to look at', 'components'],
 				r.files.map((f) => [
 					f.file,
 					f.errors.length || '',
-					f.review.length || '',
+					toWrite(f).length || '',
+					toLook(f).length || '',
 					[...new Set([...f.errors.map((e) => e.component), ...f.review.map((p) => p.component)].filter(Boolean))].join(', ')
 				])
 			),
 			''
 		);
-	out.push('## Pages to try', '', 'Pages that use the changed files, with the components whose behaviour or look changed there. The apps have no tests: open each page, in light and dark, desktop and phone.', '', ...pagesMarkdown(r));
+	const groups = reviewByComponent(r);
+	if (groups.length)
+		out.push(
+			'## To look at, by component',
+			'',
+			'Behaviour, look or defaults changed: most need no code. `next` lists them with the text once the errors are gone.',
+			'',
+			table(
+				['component', 'points', 'files', 'pages'],
+				groups.map((g) => [g.component, g.points.reduce((sum, s) => sum + s.where.size, 0) + g.general.length, g.files.size, g.pages.length])
+			),
+			''
+		);
+	out.push('## Pages to try', '', 'Pages that use the changed files or the files with points, with the components whose behaviour or look changed there. The apps have no tests: open each page, in light and dark, desktop and phone.', '', ...pagesMarkdown(r));
 	if (r.general.length)
 		out.push(
 			'## Changed for every use (per component)',
@@ -473,7 +556,12 @@ export function remainingReport(r: Remaining): string {
 			''
 		);
 	if (r.appSteps.length)
-		out.push('## App steps', '', table(['step', 'what', 'needed'], r.appSteps.map((s) => [s.id, short(s.summary, 240), s.needed === null ? 'look' : 'yes'])), '');
+		out.push(
+			'## App steps',
+			'',
+			table(['step', 'kind', 'what', 'needed'], r.appSteps.map((s) => [s.id, s.kind === 'edit' ? 'to write' : 'to look at', short(s.summary, 240), s.needed === null ? 'look' : 'yes'])),
+			''
+		);
 	if (r.dropped.length) {
 		out.push('## Look dropped with the wrappers', '', 'Put any of it back as CSS variables in the app CSS only if the page really needs it.', '');
 		for (const w of r.dropped) out.push(`- **${basename(w.wrapper, '.svelte')}** (${w.target ?? '?'}): ${w.dropped.map((d) => `\`${short(d, 90)}\``).join(', ')}`);
@@ -493,16 +581,32 @@ export function nextReport(r: Remaining, file?: string): string {
 	if (target) {
 		out.push(`## ${target.file}`, '');
 		if (target.errors.length) out.push(`### Errors (${target.errors.length})`, '', ...errorsMarkdown(target.errors), '');
-		if (target.review.length)
-			out.push('### To look at in this file', '', 'Behaviour or look changed, or done by the tool with a warning: read them while you are in the file; most need no code.', '', ...reviewMarkdown(target.review), '');
+		const edit = toWrite(target);
+		const look = toLook(target);
+		if (edit.length) out.push('### To write in this file', '', 'Code to change: the tool could not do it.', '', ...reviewMarkdown(edit), '');
+		if (look.length && file) out.push('### To look at in this file', '', 'Behaviour or look changed, or done by the tool with a warning: most need no code.', '', ...reviewMarkdown(look), '');
+		else if (look.length) out.push(`${look.length} points to look at in this file come at the end, grouped by component with the pages to open.`, '');
 		const others = r.files.filter((f) => f.errors.length && f !== target);
 		if (others.length)
 			out.push('### Then', '', ...others.slice(0, 10).map((f) => `- ${f.file}: ${f.errors.length} errors`), ...(others.length > 10 ? [`- … ${others.length - 10} more files`] : []), '');
 		out.push('Run `next` again after the changes: svelte-check runs again and the list updates.');
 		return out.join('\n');
 	}
-	out.push('No svelte-check errors left. What is left is to look: the points below and the pages.', '');
-	for (const f of r.files.filter((f) => f.review.length)) out.push(`### ${f.file}`, '', ...reviewMarkdown(f.review), '');
+	const edits = r.files.filter((f) => toWrite(f).length);
+	if (edits.length) {
+		out.push(
+			'No svelte-check errors left. First write what is below, file by file; then look at the points by component and try the pages.',
+			'',
+			'## To write',
+			'',
+			'The tool reads these from the v4 code, so it cannot tell when one is done: they stay listed. Go through them once.',
+			''
+		);
+		for (const f of edits) out.push(`### ${f.file}`, '', ...reviewMarkdown(toWrite(f)), '');
+	} else out.push('No svelte-check errors and nothing to write. What is left is to look: the points by component and the pages.', '');
+	const groups = reviewByComponent(r);
+	if (groups.length)
+		out.push('## To look at, by component', '', 'Behaviour, look or defaults changed: open the pages of each component and check them; write code only where the page relied on the old behaviour.', '', ...reviewByComponentMarkdown(groups));
 	out.push('## Pages to try', '', ...pagesMarkdown(r));
 	return out.join('\n');
 }

@@ -89,6 +89,7 @@ export default {
 	manual: [
 		{
 			id: 'textarea-wrapper',
+			kind: 'review',
 			summary:
 				'Border, background, padding, radius and shadow are on a wrapper (`.aurora-textarea-control`, `class.field`) around a transparent `<textarea>`; the field is bordered like the other inputs (v4: filled grey, no border) and shows a focus ring.',
 			action:
@@ -97,6 +98,7 @@ export default {
 		},
 		{
 			id: 'textarea-resize',
+			kind: 'review',
 			summary: 'The user can drag the field taller (`resize: vertical`); v4 used `resize: none`.',
 			action:
 				'Set `--textarea-resize="none"` where the size must stay fixed, or use `autoGrow` where the field should follow the content.'

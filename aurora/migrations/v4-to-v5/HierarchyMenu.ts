@@ -95,6 +95,7 @@ export default {
 	manual: [
 		{
 			id: 'hierarchy-menu-links',
+			kind: 'review',
 			summary:
 				'Options can be links now: with `href` the option is an `<a>` (middle click, new tab, SvelteKit preloading) and `currentPath` selects the option whose `href` is the longest match of the page path.',
 			action:
@@ -103,6 +104,7 @@ export default {
 		},
 		{
 			id: 'hierarchy-menu-parents',
+			kind: 'review',
 			summary:
 				'A parent without `href` only opens and closes its children: v4 also selected it and called `onoptionClick`.',
 			action:
@@ -111,6 +113,7 @@ export default {
 		},
 		{
 			id: 'hierarchy-menu-style-props',
+			kind: 'edit',
 			summary:
 				'Style props for the icons of the menu (`--icon-size="20px"`, `--icon-cursor`) no longer reach them; the selected look of v4 was a solid primary pill, v5 a soft gradient with a bar on the left.',
 			action:

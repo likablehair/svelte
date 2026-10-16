@@ -1,4 +1,4 @@
-import type { LocalMigration } from '../../types.js';
+import type { LocalMigration, ManualStep } from '../../types.js';
 
 export const boxListItems = [
 	{
@@ -12,14 +12,16 @@ export const boxListItems = [
 	}
 ];
 
-export const boxListManual = [
+export const boxListManual: ManualStep[] = [
 	{
 		id: 'box-list-local-description',
+		kind: 'review',
 		summary: 'The description is always visible and plain text; in the expandable copies it slid in on hover and was HTML (`{@html}`).',
 		action: 'Rewrite descriptions that contained HTML as plain text, or render them with `descriptionSnippet`.'
 	},
 	{
 		id: 'box-list-local-look',
+		kind: 'review',
 		summary: 'Cards of the library in a grid that fills the width (`--box-list-min-width` each), instead of the 260px cards or the wrapping row of the copies.',
 		action: 'Remove app CSS aimed at the classes of the copy; the gap is `--box-list-gap`.'
 	}

@@ -176,6 +176,7 @@ export default {
 	manual: [
 		{
 			id: 'date-picker-look',
+			kind: 'review',
 			summary:
 				'The panel is a title ("October 2026") between two arrows above the grid, on a popup surface 280px wide (border, radius, padding, shadow); the colored header with the year and the chosen date is gone and the height follows the content (v4: `100%` wide, 400px high).',
 			action:
@@ -183,6 +184,7 @@ export default {
 		},
 		{
 			id: 'date-picker-navigation',
+			kind: 'edit',
 			summary:
 				'Clicking the title goes from days to months to years and back; choosing a year shows its months and choosing a month its days, and neither changes the date. v4 had a year button in the header, wrote the choices to `selectedYear` / `selectedMonth` and reported them with `onyearClick` / `onmonthClick`.',
 			action:
@@ -194,6 +196,7 @@ export default {
 		},
 		{
 			id: 'date-picker-years',
+			kind: 'edit',
 			summary:
 				'The year view is a scrolling 4-column grid of every year from `min` to `max` (default 1900–2100), centered on the chosen one; v4 listed `selectableYears` (default the 75 years before and after the current one) and limited the arrows to them.',
 			action:
@@ -202,6 +205,7 @@ export default {
 		},
 		{
 			id: 'date-picker-labels',
+			kind: 'review',
 			summary:
 				'The arrows have accessible names in the language of `locale` ("Previous month", "Mese precedente" in Italian; `previousMonthLabel`, `nextMonthLabel`, `previousYearLabel`, `nextYearLabel` change them) and all the buttons are `type="button"` (v4 header buttons submitted the forms they were in).',
 			action:
@@ -209,6 +213,7 @@ export default {
 		},
 		{
 			id: 'date-picker-calendar-variables',
+			kind: 'review',
 			summary:
 				'`--calendar-*` variables set on a DatePicker still reach its grid. The renamed and removed ones are listed in `cssVars.removed`; the others keep their name with the meaning described in the Calendar rules.',
 			action:
@@ -217,6 +222,7 @@ export default {
 		},
 		{
 			id: 'date-picker-markup',
+			kind: 'review',
 			summary:
 				'Markup and classes changed: `.date-picker-container`, `.header`, `.selector-row`, `.selector-text`, `button.year`, `button.day` → `.aurora-date-picker` (`data-view`, `data-disabled`), `.aurora-date-picker-header`, `.aurora-date-picker-title`; the grids are `.aurora-calendar`, `.aurora-month-selector`, `.aurora-year-selector`.',
 			action:

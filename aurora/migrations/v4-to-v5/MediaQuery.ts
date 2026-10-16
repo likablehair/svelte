@@ -16,6 +16,7 @@ export default {
 	manual: [
 		{
 			id: 'media-query-server',
+			kind: 'review',
 			summary:
 				'On the server the window now counts as wide (`xl`, every `...AndUp` true); v4 rendered the mobile variant first.',
 			action:
@@ -24,6 +25,7 @@ export default {
 		},
 		{
 			id: 'media-query-scripts',
+			kind: 'review',
 			summary: 'In scripts the same flags are reactive as `breakpoints` (`breakpoints.mAndDown`), without the component.',
 			action:
 				'Where a `<MediaQuery>` wraps a whole component only to read one flag, or where the v4 `mediaQuery` store was subscribed, read `breakpoints` in a `$derived` instead.'

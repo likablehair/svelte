@@ -209,6 +209,11 @@ describe('local copy rules', () => {
 		expect(clashes).toEqual([]);
 	});
 
+	test('every manual step says whether it needs code or only a look', () => {
+		const steps = [...global.manual, ...rules.flatMap((r) => r.rule.manual ?? []), ...locals.flatMap((r) => r.rule.manual ?? [])];
+		expect(steps.filter((step) => step.kind !== 'edit' && step.kind !== 'review').map((step) => step.id)).toEqual([]);
+	});
+
 	describe.each(locals)('$file', ({ file, rule }) => {
 		test('names match the file and a v5 component, files are Svelte files', () => {
 			expect(rule.from).toBe(file);

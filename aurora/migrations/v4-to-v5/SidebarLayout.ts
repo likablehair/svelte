@@ -72,6 +72,7 @@ const stateSnippets = (names: string[]): SnippetChange[] =>
 const shellManual: ManualStep[] = [
 	{
 		id: 'sidebar-layout-scroll',
+		kind: 'edit',
 		summary:
 			'The window scrolls the page: the bar and the sidebar stay in place by themselves and the content is in a `<main>` that takes the remaining width. v5 apps do not need their own scroll box.',
 		action:
@@ -81,6 +82,7 @@ const shellManual: ManualStep[] = [
 	},
 	{
 		id: 'sidebar-layout-header',
+		kind: 'edit',
 		summary:
 			'The bar always keeps the library toggle button (menu button on mobile, sidebar button on desktop) and `headerSnippet` is what comes after it. In v4 `headerSnippet` replaced the whole bar, so every app copied the hamburger and the dock icon by hand.',
 		action:
@@ -89,6 +91,7 @@ const shellManual: ManualStep[] = [
 	},
 	{
 		id: 'sidebar-layout-links',
+		kind: 'edit',
 		summary:
 			'The menu drawn from `options` is a HierarchyMenu: options with `href` are links, `currentPath` selects the option of the page and closes the mobile drawer when the page changes.',
 		action:
@@ -169,6 +172,7 @@ const unstable = {
 		...shellManual,
 		{
 			id: 'sidebar-layout-color-inverted-selector',
+			kind: 'review',
 			summary:
 				'The default menu is no longer ColorInvertedSelector, so its style props on the layout (`--color-inverted-selector-selected-background-color` and friends, also the `-default-` ones in app.css) have no effect.',
 			action:
@@ -258,6 +262,7 @@ const collapsible = {
 		...shellManual,
 		{
 			id: 'sidebar-layout-menu-select',
+			kind: 'review',
 			summary:
 				'v4 declared `onmenuSelect` on CollapsibleSideBarLayout but never called it (it had no menu of its own). In v5 it is called when an option of the menu drawn from `options` is chosen.',
 			action:
@@ -325,6 +330,7 @@ const stable = {
 		...shellManual,
 		{
 			id: 'sidebar-layout-stable',
+			kind: 'edit',
 			summary:
 				'StableDividedSideBarLayout is `SidebarLayout expandOn="none" sidebarExpanded`: an always wide sidebar without a button. Its `menuSnippet` was the top bar, which is `headerSnippet` in v5.',
 			action:

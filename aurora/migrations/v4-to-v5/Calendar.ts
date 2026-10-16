@@ -135,6 +135,7 @@ export const dayClick: EventChange = {
 const manual: ManualStep[] = [
 	{
 		id: 'calendar-outside-days',
+		kind: 'review',
 		summary:
 			'Days of the previous and next month can be chosen: a click selects the day and shows its month. v4 ignored the click (only `ondayClick` fired), and with `showExtraMonthDays={false}` the hidden cells still took clicks.',
 		action:
@@ -142,6 +143,7 @@ const manual: ManualStep[] = [
 	},
 	{
 		id: 'calendar-range',
+		kind: 'review',
 		summary:
 			'With `range` the same day clicked twice is a one-day range (`selectedDateTo` equals `selectedDate`; v4 ignored the second click), the third click starts a new range, and hovering or focusing a day previews the band.',
 		action:
@@ -150,6 +152,7 @@ const manual: ManualStep[] = [
 	},
 	{
 		id: 'calendar-keyboard',
+		kind: 'review',
 		summary:
 			'It is an ARIA grid: one Tab stop, arrows move by day and week, Home and End to the ends of the week, Page Up and Page Down change month (with Shift, year), Enter and Space choose; screen readers read the full date of each day and the grid is named by the month. v4 cells were not focusable.',
 		action:
@@ -157,6 +160,7 @@ const manual: ManualStep[] = [
 	},
 	{
 		id: 'calendar-look',
+		kind: 'review',
 		summary:
 			'Always 6 rows of 32px days (v4: only the rows needed, stretched to `--calendar-height`, 100% of the parent); short weekday names ("Mon", v4 one bold letter); today marked by a dot (v4: pale red circle); the selected day a primary fill; outside days at 50% opacity (v4: 30%); the range a continuous band; the new month slides in.',
 		action:
@@ -164,6 +168,7 @@ const manual: ManualStep[] = [
 	},
 	{
 		id: 'calendar-markup',
+		kind: 'review',
 		summary:
 			'Markup and classes changed: `.calendar-container`, `.grid-layout`, `.week-header-slot`, `.day-slot`, `.extra-month`, `.today`, `.selected`, `.between-range`, `.range-start`, `.range-end`, `.hovered` → `.aurora-calendar` (`role="grid"`), `.aurora-calendar-weekday`, `.aurora-calendar-day` (`role="gridcell"`) with `[data-outside]`, `[data-today]`, `[data-selected]`, `[data-range="start|middle|end|single"]`, `[data-preview]`, `[data-disabled]`; the number is in `.aurora-calendar-day-content`.',
 		action:

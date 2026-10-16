@@ -295,6 +295,7 @@ const rule = {
 	manual: [
 		{
 			id: 'autocomplete-item-icon',
+			kind: 'edit',
 			summary:
 				'`Item.icon` is an SVG path (v4: an MDI class name) and `Item` is exported from the package root.',
 			action:
@@ -303,6 +304,7 @@ const rule = {
 		},
 		{
 			id: 'autocomplete-strict-equality',
+			kind: 'review',
 			summary:
 				'Values are compared with `===` (v4 mixed `==` and `===`) and duplicate `value`s in `items` or `values` throw.',
 			action:
@@ -311,6 +313,7 @@ const rule = {
 		},
 		{
 			id: 'autocomplete-keyboard',
+			kind: 'review',
 			summary:
 				'It is an ARIA combobox: the focus stays in the input and options are not tab stops (neither is the v4 wrapper). While typing, the first match is highlighted and Enter picks it without submitting the form; Backspace on an empty field removes the last value; Escape closes the list and keeps the focus; the arrows do not move the caret.',
 			action:
@@ -318,12 +321,14 @@ const rule = {
 		},
 		{
 			id: 'autocomplete-close-on-select',
+			kind: 'review',
 			summary: '`closeOnSelect={true}` now also closes the list with `multiple` (v4 ignored it there).',
 			action: 'Remove `closeOnSelect` from `multiple` usages that must keep the list open.',
 			when: { props: ['closeOnSelect'] }
 		},
 		{
 			id: 'autocomplete-search-text',
+			kind: 'review',
 			summary:
 				'`searchText` keeps its initial value (v4 erased it after mount) and becomes `""` (not `undefined`) when the list closes.',
 			action: 'Replace checks like `searchText === undefined` with `!searchText`.',
@@ -331,6 +336,7 @@ const rule = {
 		},
 		{
 			id: 'autocomplete-onchange-unselect',
+			kind: 'review',
 			summary:
 				'With single selection, picking another option calls `onchange` with the replaced value in `unselect` as well as the new one in `select`.',
 			action:
@@ -339,6 +345,7 @@ const rule = {
 		},
 		{
 			id: 'autocomplete-disabled',
+			kind: 'review',
 			summary:
 				'`disabled` disables the native input: it gets no focus, the list does not open and chips have no remove button. With `mandatory` the last chip has no remove button either.',
 			action:
@@ -347,6 +354,7 @@ const rule = {
 		},
 		{
 			id: 'autocomplete-mobile-drawer',
+			kind: 'review',
 			summary:
 				'With `mobileDrawer`, on screens up to 1024px the list opens in a bottom drawer that has its own search field and a title (`drawerTitle ?? label`); the field on the page becomes read-only. v4 showed only the list. The server renders the desktop variant.',
 			action:
@@ -355,6 +363,7 @@ const rule = {
 		},
 		{
 			id: 'autocomplete-item-snippet',
+			kind: 'edit',
 			summary:
 				'`itemSnippet` replaces the content of an option, not the option: the row keeps its click handling, `role="option"`, the selected and highlighted states and their styles.',
 			action:
@@ -363,6 +372,7 @@ const rule = {
 		},
 		{
 			id: 'autocomplete-item-label-snippet',
+			kind: 'review',
 			summary:
 				'`itemLabelSnippet` replaces only the label: the `item.icon` and the check mark of selected options stay (v4 dropped the icon).',
 			action:
@@ -371,6 +381,7 @@ const rule = {
 		},
 		{
 			id: 'autocomplete-hint-snippet',
+			kind: 'review',
 			summary:
 				'`hintSnippet` renders inside the hint element (linked to the input with `aria-describedby`) instead of in place of it.',
 			action: 'Remove wrappers or margins the snippet added to position itself under the field.',
@@ -378,6 +389,7 @@ const rule = {
 		},
 		{
 			id: 'autocomplete-look',
+			kind: 'review',
 			summary:
 				'New look: the field uses the `--global-input-*` base (36px minimum height, input border and focus ring), takes 100% of the container width, chips are primary `sm` Chips, the selected options are tinted with a check mark (v4: filled primary) and the list is as wide as the field, at most 300px high.',
 			action:
@@ -385,6 +397,7 @@ const rule = {
 		},
 		{
 			id: 'autocomplete-internal-classes',
+			kind: 'review',
 			summary:
 				'Internal classes changed: `.selection-container` → `.aurora-autocomplete-field`, `.autocomplete-input` → `.aurora-autocomplete-field input`, `.selection-item` → `.aurora-autocomplete-option`, `.focused` → `[data-highlighted]`, `.selected` → `[data-selected]`, `.not-visible-chip-number` → `.aurora-autocomplete-counter`, `.hint` → `.aurora-autocomplete-hint`, `li.item-N` → `[role="option"]`.',
 			action:

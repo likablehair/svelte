@@ -100,6 +100,7 @@ export default {
 	manual: [
 		{
 			id: 'countries-autocomplete-names',
+			kind: 'review',
 			summary:
 				'Country names come from the browser (`Intl.DisplayNames`) in `locale` (default: the one of `setDefaultLocale`, else `en`) and the list is sorted by name in that language; v4 had fixed English ISO names sorted by code. In English 48 of the 249 names differ (for example "Czech Republic" → "Czechia").',
 			action:
@@ -107,6 +108,7 @@ export default {
 		},
 		{
 			id: 'countries-autocomplete-value-labels',
+			kind: 'edit',
 			summary:
 				'The labels of `values` are always replaced by the name in `locale`, also in `onchange` and in the bound `values`.',
 			action:
@@ -115,6 +117,7 @@ export default {
 		},
 		{
 			id: 'countries-autocomplete-flags',
+			kind: 'review',
 			summary:
 				'Flags are 4:3 (v4: square) and are the icons of options and chips (`itemIconSnippet`, `chipIconSnippet`) instead of being drawn inside the label snippets.',
 			action:
@@ -122,6 +125,7 @@ export default {
 		},
 		{
 			id: 'countries-autocomplete-search',
+			kind: 'review',
 			summary:
 				'The search ignores accents, also matches the ISO code ("us" → United States) and ranks the results: names that start with the text, then the code, then names with a word that starts with it, then the rest.',
 			action: 'Remove app workarounds that searched codes or stripped accents.'

@@ -112,6 +112,7 @@ export default {
 	manual: [
 		{
 			id: 'switch-focusable',
+			kind: 'review',
 			summary:
 				'The switch is a focusable `<input type="checkbox" role="switch">` inside `<label class="aurora-switch">` (v4 hid the input with `display: none`): it is a new tab stop and Space toggles it.',
 			action:
@@ -119,6 +120,7 @@ export default {
 		},
 		{
 			id: 'switch-label',
+			kind: 'edit',
 			summary:
 				'`label` (or `labelSnippet`) renders the text inside the root label: a click on it toggles the switch and screen readers read it as its name.',
 			action:
@@ -126,6 +128,7 @@ export default {
 		},
 		{
 			id: 'switch-look',
+			kind: 'review',
 			summary:
 				'The track is 36×20 instead of 42×22 (`size="lg"`: 46×26) with a 1px border, the thumb 16px (lg 22px); disabled fades the whole switch and its text to 40% instead of using grey colors.',
 			action:

@@ -26,6 +26,7 @@ export default {
 	manual: [
 		{
 			id: 'flag-icon-size',
+			kind: 'review',
 			summary:
 				'`--flag-icon-default-size` is `1.2em` instead of `1.2rem`, so the flag follows the font size around it; the default radius is 3px instead of 4px, and a 1px ring (`--flag-icon-box-shadow`) is drawn around every flag.',
 			action:
@@ -33,12 +34,14 @@ export default {
 		},
 		{
 			id: 'flag-icon-title',
+			kind: 'review',
 			summary: 'Without `title` the flag is `aria-hidden`.',
 			action:
 				'Where the flag is the only thing that tells the country (no name next to it), pass `title` with the country name, for example `countryName(code, locale)`.'
 		},
 		{
 			id: 'flag-icon-classes',
+			kind: 'review',
 			summary: 'The class `flag-icon` is now `aurora-flag-icon`, and `fis` is set only with `square`.',
 			action:
 				'Rewrite app CSS that targets `.flag-icon` or `.fis` against `.aurora-flag-icon`, or pass `class`.',
@@ -46,6 +49,7 @@ export default {
 		},
 		{
 			id: 'flag-icon-assets',
+			kind: 'review',
 			summary:
 				'Flags come from the `flag-icons` npm package, a dependency of the library (the v4 aliases `uk`, `el`, `xs`, `xi`, `ac`, `ta` still work); Vite inlines the smaller ones in the app CSS (about 320 KB), as v4 did.',
 			action:

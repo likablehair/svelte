@@ -146,6 +146,7 @@ export default {
 	manual: [
 		{
 			id: 'horizontal-stacked-progress-look',
+			kind: 'review',
 			summary:
 				'One 12px bar of separate segments with a 3px gap and a legend in a row below (dot, label, value); v4 drew one 5px ProgressBar per segment with a 4px gap, labels under the segments and no legend (when shown: a column of dot, value, label). Default colors come from `--global-color-data-1…6` (v4: shades of primary).',
 			action:
@@ -153,6 +154,7 @@ export default {
 		},
 		{
 			id: 'horizontal-stacked-progress-accessible-name',
+			kind: 'review',
 			summary:
 				'The root is a `role="group"` named by `label`; the bars are hidden from screen readers, which read the legend list instead (also with `legend={false}`).',
 			action:

@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { parse } from 'svelte/compiler';
 import { analyze, readAliases, scriptImports, type AppStep, type GeneralStep, type Wrapper } from './analyze.ts';
+import { todoOf, type Todo } from './match.ts';
 import { codemod } from './codemod.ts';
 import { RECIPES } from './dissolve.ts';
 import { Lines, listFiles } from './files.ts';
@@ -47,6 +48,7 @@ export interface ReviewPoint {
 	file: string;
 	lines: number[];
 	kind: 'manual' | 'check' | 'not-done' | 'default';
+	todo: Todo;
 	id: string;
 	component?: string;
 	title: string;
@@ -512,7 +514,7 @@ const routeOf = (rel: string) =>
 function pagesToLookAt(env: Env, touched: string[], review: Map<string, ReviewPoint[]>) {
 	const graph = importGraph(env);
 	const memo = new Map<string, Set<string>>();
-	const touchedSet = new Set(touched);
+	const touchedSet = new Set([...touched, ...review.keys()]);
 	const components = (files: string[]) =>
 		[...new Set(files.flatMap((file) => (review.get(file) ?? []).map((point) => point.component).filter((c): c is string => !!c)))].sort();
 	const entry = (file: string): Page | undefined => {
@@ -574,6 +576,7 @@ function reviewFromBase(env: Env, snapshot: string, current: (rel: string) => st
 			{
 				file: f.file,
 				kind: 'manual',
+				todo: todoOf(f),
 				id: f.id,
 				component: v5Name(f.component),
 				title: step?.summary ?? `${f.name}${f.to ? ` → ${f.to}` : ''}`,
@@ -583,10 +586,10 @@ function reviewFromBase(env: Env, snapshot: string, current: (rel: string) => st
 		);
 	}
 	for (const c of result.changes)
-		if (c.check) add({ file: c.file, kind: 'check', id: c.id, component: owner(c.id), title: `${c.name}${c.to ? ` → ${c.to}` : ''}`, text: c.note }, c.line);
-	for (const s of result.skipped) add({ file: s.file, kind: 'not-done', id: s.id, component: owner(s.id), title: s.name, text: s.reason }, s.line);
+		if (c.check) add({ file: c.file, kind: 'check', todo: 'review', id: c.id, component: owner(c.id), title: `${c.name}${c.to ? ` → ${c.to}` : ''}`, text: c.note }, c.line);
+	for (const s of result.skipped) add({ file: s.file, kind: 'not-done', todo: 'edit', id: s.id, component: owner(s.id), title: s.name, text: s.reason }, s.line);
 	for (const d of result.defaults)
-		add({ file: d.file, kind: 'default', id: `${d.component}/defaults/${d.name}`, component: v5Name(d.component), title: `${d.name}: ${d.v4} → ${d.v5} (${d.kind})`, text: d.note }, d.line);
+		add({ file: d.file, kind: 'default', todo: 'review', id: `${d.component}/defaults/${d.name}`, component: v5Name(d.component), title: `${d.name}: ${d.v4} → ${d.v5} (${d.kind})`, text: d.note }, d.line);
 	const review = new Map<string, ReviewPoint[]>();
 	for (const point of byKey.values()) {
 		point.lines.sort((a, b) => a - b);
@@ -598,7 +601,7 @@ function reviewFromBase(env: Env, snapshot: string, current: (rel: string) => st
 	return {
 		review,
 		baseComponents,
-		general: analysis.general,
+		general: analysis.general.map((g) => ({ ...g, component: v5Name(g.component) ?? g.component })),
 		appSteps: analysis.appSteps.filter((step) => step.needed !== false),
 		dropped: result.wrappers.filter((w) => w.dissolved && w.dropped.length).map((w) => ({ wrapper: w.file, target: w.target, dropped: w.dropped }))
 	};
@@ -649,7 +652,8 @@ export function remaining(dir: string, index: RuleIndex, options: RemainingOptio
 	}
 
 	const withErrors = [...errors.keys()].sort(order);
-	const reviewOnly = [...review.keys()].filter((file) => !errors.has(file)).sort(order);
+	const toWrite = (file: string) => Number(!review.get(file)?.some((point) => point.todo === 'edit'));
+	const reviewOnly = [...review.keys()].filter((file) => !errors.has(file)).sort((a, b) => toWrite(a) - toWrite(b) || order(a, b));
 	for (const file of [...withErrors, ...reviewOnly])
 		out.files.push({
 			file,

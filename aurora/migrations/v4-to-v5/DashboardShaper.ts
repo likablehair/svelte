@@ -133,6 +133,7 @@ export default {
 	manual: [
 		{
 			id: 'dashboard-shaper-editing',
+			kind: 'edit',
 			summary:
 				'A DashboardShaper is read-only unless `editing` is set; while editing, widgets can also be moved and resized (v4: only added and removed).',
 			action:
@@ -140,6 +141,7 @@ export default {
 		},
 		{
 			id: 'dashboard-shaper-catalog',
+			kind: 'edit',
 			summary: '`availableWidgetCells` became `catalog`, with `sizes: { width, height }[]` instead of `availableSizes: [height, width][]`.',
 			action:
 				'Rewrite each entry: `availableSizes: [[2, 4]]` → `sizes: [{ width: 4, height: 2 }]` (the v4 pairs are height first), `icon: "mdi-chart-bar"` → `icon: mdiChartBar` from `@mdi/js`. Catalogs filtered by permission stay as they are; for widget types the backend keeps once per dashboard (saved by `name`) add `unique: true`.',
@@ -147,6 +149,7 @@ export default {
 		},
 		{
 			id: 'dashboard-shaper-local-copies',
+			kind: 'review',
 			summary: 'Apps with their own copy of DashboardShaper (with a DashboardEditor wrapper and `componentName`) can use the library one.',
 			action:
 				'Replace the local DashboardShaper/DashboardEditor/DashboardAddButton with the library DashboardShaper: map `componentName` to `name` when loading and back when saving (or keep `componentName` in `data`), move the catalog to `catalog`, the widget switch to `widgetSnippet`, and the data loading to `onchange` (`added`).',

@@ -78,12 +78,14 @@ export default {
 	manual: [
 		{
 			id: 'confirm-or-cancel-dialog-cancel',
+			kind: 'review',
 			summary: '`oncancel` now runs on Escape, the close button and the backdrop too, not only on Cancel.',
 			action: 'Check cancel handlers that do more than closing (cleanup, refusing a pending request): they now run in those cases too. A handler that only sets `open = false` can be removed when `open` is bound.',
 			when: { props: ['cancel'] }
 		},
 		{
 			id: 'confirm-or-cancel-dialog-children',
+			kind: 'review',
 			summary: 'Content passed as children is shown under the description; in the copies it replaced it.',
 			action: 'Remove `description` where children are passed and the description was not visible.'
 		}

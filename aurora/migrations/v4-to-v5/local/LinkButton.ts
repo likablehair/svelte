@@ -19,6 +19,7 @@ export default {
 	manual: [
 		{
 			id: 'link-button-navigation',
+			kind: 'review',
 			summary: 'A text button that only navigates (`() => goto("/")`) is better as a link.',
 			action: 'Replace `onclick={() => goto("/x")}` with `href="/x"` on the Button: it becomes a real link that opens in a new tab and is preloaded.'
 		}

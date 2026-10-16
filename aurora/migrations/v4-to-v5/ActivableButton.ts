@@ -66,6 +66,7 @@ export default {
 	manual: [
 		{
 			id: 'activable-button-look',
+			kind: 'review',
 			summary:
 				'Off it is a neutral surface with a border, on a primary tint with primary text and border (v4: a transparent uppercase text button, filled primary when on). `--button-*` color variables passed to it are ignored.',
 			action:
@@ -73,6 +74,7 @@ export default {
 		},
 		{
 			id: 'activable-button-dot',
+			kind: 'review',
 			summary:
 				'A button with text and no `icon` shows a state dot before the text; icon-only buttons take `icon` instead of an `<Icon>` child.',
 			action:
@@ -80,6 +82,7 @@ export default {
 		},
 		{
 			id: 'activable-button-append-snippet',
+			kind: 'review',
 			summary:
 				'`appendSnippet` sits after the text in the flow (Button rule) instead of absolutely positioned over it.',
 			action: 'Remove app CSS that made room for the absolutely positioned content.',

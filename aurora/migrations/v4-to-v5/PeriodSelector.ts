@@ -45,6 +45,7 @@ export default {
 	manual: [
 		{
 			id: 'period-selector-look',
+			kind: 'review',
 			summary:
 				'One view with the presets in a column, a month and the start and end dates, instead of a list that slid to a detail view with "Back".',
 			action: 'Usually nothing to do. Pass `months={2}` for two months side by side, `compact` to force the phone layout (presets as chips).'

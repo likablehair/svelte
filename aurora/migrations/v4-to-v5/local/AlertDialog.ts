@@ -81,6 +81,7 @@ export default {
 	manual: [
 		{
 			id: 'alert-dialog-look',
+			kind: 'review',
 			summary:
 				'Aurora look: icon in a 40px tinted box, question in the display font, buttons in a row at the end, Cancel neutral (the red Cancel of some copies is gone).',
 			action: 'Nothing to do unless the page relied on the old size: `--confirm-dialog-max-width` changes the width.'

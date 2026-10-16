@@ -45,6 +45,7 @@ export default {
 	manual: [
 		{
 			id: 'divider-markup',
+			kind: 'review',
 			summary:
 				'The divider is a native `<hr>` (a separator for screen readers) with class `aurora-divider`; v4 was an empty `<div>` styled inline.',
 			action:
@@ -52,12 +53,14 @@ export default {
 		},
 		{
 			id: 'divider-side-margin',
+			kind: 'review',
 			summary: 'The 5px left and right margins of v4 are gone: the line now spans the whole container.',
 			action:
 				'Usually nothing to do. Where the inset mattered, set `--divider-margin-left="5px"` and `--divider-margin-right="5px"` on that divider.'
 		},
 		{
 			id: 'divider-local-copies',
+			kind: 'review',
 			summary:
 				'Most apps import their own `$lib/components/common/Divider.svelte` (props `color`, `weight`, `radius`, `marginTop`, `marginBottom`, `marginLeft`, `marginRight`), not the library one.',
 			action:

@@ -43,6 +43,7 @@ export default {
 	manual: [
 		{
 			id: 'descriptive-avatar-initials',
+			kind: 'review',
 			summary:
 				'The avatar initials come from `title` as first + last word ("MR"); app wrappers passed `avatarText={username.substring(0, 2).toUpperCase()}` ("MA").',
 			action:
@@ -51,6 +52,7 @@ export default {
 		},
 		{
 			id: 'descriptive-avatar-click-wrappers',
+			kind: 'review',
 			summary:
 				'The component is a real `<button>` with `onclick` (or a link with `href`); the apps wrapped it in clickable `div`s with `on:click`/`on:keypress`, sometimes with `aria-hidden`, and some called the handler twice.',
 			action:
@@ -59,6 +61,7 @@ export default {
 		},
 		{
 			id: 'descriptive-avatar-children',
+			kind: 'review',
 			summary:
 				'`children` replaces the title and subtitle even when neither is set (v4 ignored it without them); the avatar is no longer part of a `slot="avatar"`.',
 			action:
@@ -67,6 +70,7 @@ export default {
 		},
 		{
 			id: 'descriptive-avatar-compact',
+			kind: 'review',
 			summary:
 				'`compact` shows only the avatar, with the title and subtitle in a Tooltip. App wrappers switched between DescriptiveAvatar and a bare Avatar (`showTitleAndDescription`) for collapsed sidebars.',
 			action:
@@ -74,6 +78,7 @@ export default {
 		},
 		{
 			id: 'descriptive-avatar-look',
+			kind: 'review',
 			summary:
 				'Clickable ones (`onclick`, `href`) have padding and a rounded hover background, as in the new design; the texts are smaller (14px / 12.5px) and the gap is 12px.',
 			action:

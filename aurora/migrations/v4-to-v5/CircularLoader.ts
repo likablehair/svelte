@@ -40,6 +40,7 @@ export default {
 	manual: [
 		{
 			id: 'circular-loader-look',
+			kind: 'review',
 			summary:
 				'The ring is drawn in the theme gradient (`--global-gradient`), 32px by default; v4 always drew it in `currentColor` (the text color around it), 30px.',
 			action:
@@ -47,6 +48,7 @@ export default {
 		},
 		{
 			id: 'circular-loader-label',
+			kind: 'review',
 			summary:
 				'The loader is a `role="progressbar"` named "Loading" for screen readers ("Caricamento" with the `it` locale, from `locale` or `setDefaultLocale`); v4 rendered a bare `<svg>`.',
 			action:
@@ -54,6 +56,7 @@ export default {
 		},
 		{
 			id: 'circular-loader-class',
+			kind: 'review',
 			summary: '`class` is on a `<span>` that holds the ring; v4 put it on the `<svg>`.',
 			action:
 				'App CSS that sized the loader through the class (`width`, `height`, margins) still works. Rules for SVG properties (`stroke`, `fill`, `circle`, the `.active` class) do nothing: use `--circular-loader-color`, `--circular-loader-thickness`, `--circular-loader-size`.',

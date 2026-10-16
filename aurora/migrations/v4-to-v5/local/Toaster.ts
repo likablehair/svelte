@@ -40,18 +40,21 @@ export default {
 	manual: [
 		{
 			id: 'toaster-id',
+			kind: 'edit',
 			summary: 'The `add*` functions return the id of the toast, a number, instead of the melt-ui toast object.',
 			action:
 				'Replace `addXToast(...).id` with the returned value (`const id = addSuccessToast(...)`, then `removeToast(id)`), and types such as `ReturnType<typeof addSuccessToast>` or `Toast` from `@melt-ui/svelte` with `number`. A loading toast can also become the result with `updateToast(id, { variant: "success", title, loading: false })`.'
 		},
 		{
 			id: 'toaster-delays',
+			kind: 'review',
 			summary:
 				'Each copy had its own delays (3000 ms by default, some ignored `closeDelay`, some turned `0` into 3000); the library uses `duration` as given, 5000 ms by default.',
 			action: 'Nothing to do unless a page relied on the old timing: toasts that passed `closeDelay` and were ignored now honour it.'
 		},
 		{
 			id: 'toaster-mount',
+			kind: 'review',
 			summary: 'The Toaster must be mounted once, in the root layout, to show the toasts of every page.',
 			action:
 				'If the app mounts `<Toaster />` in a nested layout (for example `(main)/+layout.svelte`), move it to `src/routes/+layout.svelte`.',

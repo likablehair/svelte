@@ -80,6 +80,18 @@ Stato: passi 1–4 fatti il 2026-10-15 (sezione sotto); passo 5 in corso su tatu
 4. **`analyze` su tutte le 20 app** e tabella riassuntiva da mostrare all'utente, che conferma il pilota.
 5. Poi, con l'ok: setup + codemod meccanico + scioglimento dei wrapper sul pilota (tatum), lista dei punti rimasti, prova a mano; poi MCP e prompt.
 
+## Cosa manca per migrare addibox (stima del 2026-10-16)
+
+Misurato con `analyze` e `codemod --dry-run` (nulla scritto in addibox, branch `testing` pulito): 324 file che importano la libreria, 972 usi diretti + 441 tramite 27 wrapper (22 con logica), 114 pagine. Il codemod farebbe 2.894 cambi in 285 file e cancellerebbe 31 file (14 copie locali sostituite: PageTitle 69 usi, ConfirmOrCancelDialog 25, ToolTipTextField 19, WidgetNoData 16…); **300 usi non fatti** e **849 punti manuali** (372 da scrivere, 477 da guardare) prima delle correzioni sotto.
+
+1. **Buchi dello strumento visti su addibox** (circa 1 giornata): StandardButton (102 usi) resta perché "gestisce `onclick`", ma il gestore blocca solo i clic con `disabled`/`loading`, cosa che il Button v5 fa già: riconoscere questa guardia e sciogliere; LabelAndTextfield (83 usi) è la variante `{#if label}<label for={name}>` + campo dentro un `<div>`, non riconosciuta; StandardSelect, StandardTextarea, LabelAndSelect, LabelAndTextarea (27 usi) avvolgono elementi nativi: portarli su Select e Textarea; poi P233 (passi meccanici). Restano da fare a mano StandardDatePickerTextfield (14, codice in `onMount`), StandardChip (9), StandardDialog (10, snippet `header`).
+2. **Pilota rifatto da zero su un'app media** (contattorapido o biblio; mezza giornata più le prove dell'utente): tatum è stato migrato mentre lo strumento nasceva, serve una corsa intera come la farà addibox.
+3. **Pacchetti pubblicati** (mezza giornata–1 giornata, con decisioni dell'utente: registro, Changesets, chi pubblica): v5 è `"private": true`; `setup` installa da `vendor/*.tgz` e aggiunge `@likable-hair/svelte-migrate` e `@likable-hair/svelte-mcp`, non pubblicati. Per provare basta il `.tgz`; per mandare addibox in produzione serve la v5 pubblicata.
+4. **addibox** (3–5 sessioni di Claude): setup e codemod in pochi minuti, poi i punti rimasti con `next`. Il grosso sono le tabelle: 8 DynamicTable + 5 via wrapper, 1 EnhancedPaginatedTable + 13 via StandardPaginatedTable, 1 PaginatedTable, 18 SimpleTable; scroll infinito, Paginator esterno a DynamicTable (16 pagine), colonne salvate sul backend. Poi DashboardShaper (5), PeriodPicker della libreria (5; addibox legge la forma v4 del JSON) e il backend di addibox per il periodo dinamico (passo `manual`, fuori da questo repo).
+5. **Prove dell'utente**: le app non hanno test; 114 pagine in chiaro e scuro, desktop e telefono (1–2 giorni).
+
+Totale stimato: circa una settimana di lavoro, ~2 giorni di preparazione (punti 1–3) e ~3 giorni per addibox (punti 4–5). Riferimento: tatum (28 file) è passato da 45 errori a 0 in una sessione. P56 e P104 sono funzioni della libreria e non bloccano.
+
 ## Analisi del 2026-10-15 (`npm run migrate -- analyze`, sola lettura)
 
 `auto` = lo farà il codemod; `check` = meccanico con avvertenza (svelte-check ne indica gran parte); punti manuali = coppie file × passo che chiedono giudizio; generali = cambi di comportamento o aspetto, uno per componente usato; passi app = rilevati come necessari (+ da guardare).
@@ -180,7 +192,7 @@ Da valutare quando si fa BoxList: `animateOnMount` di astro/maya (animazione d'i
 
 | # | Proposta | Nota |
 |---|---|---|
-| P220 | `ManualStep` con un campo `kind`: `review` (comportamento o aspetto cambiato: si guarda, di solito nulla da scrivere) o `edit` (codice da cambiare); la lista dei punti rimasti mostra prima gli `edit` per file e raggruppa le `review` per componente, con le pagine da guardare | parte di P218 (regole leggibili dalla macchina), si classificano i 228 passi esistenti **Approvata il 2026-10-16.** |
+| P220 | `ManualStep` con un campo `kind`: `review` (comportamento o aspetto cambiato: si guarda, di solito nulla da scrivere) o `edit` (codice da cambiare); la lista dei punti rimasti mostra prima gli `edit` per file e raggruppa le `review` per componente, con le pagine da guardare | parte di P218 (regole leggibili dalla macchina), si classificano i 228 passi esistenti **Approvata il 2026-10-16, fatta il 2026-10-16** (357 passi: 105 `edit`, 252 `review`; `history.md`) |
 | P221 | Regole **v3 → v4** minime, solo per i nomi v3 trovati da `analyze` nelle 10 app v3 (elenco "Unknown props"), così lo strumento porta una app v3 direttamente alla v5 | completa P216; senza, quelle prop restano errori di svelte-check da risolvere a mano **Respinta il 2026-10-16: le app sulla v3 restano sulla v3.** |
 | P223 | **Gruppo A** dell'indagine del 2026-10-16: il codemod sostituisce le copie locali con la libreria (Toaster e le sue ~2.060 chiamate, ConfirmOrCancelButtons, UserAvatar, BoxList, WidgetNoData/WidgetError, Spinner, InfoBox, ToolTipTextField, IndeterminateCheckbox, RadioGroup, MeltDatePicker, wrapper dei grafici) e cancella i file morti; le piccole perdite si elencano | rientra nella decisione dell'utente del 2026-10-16, da mostrare |
 | P224 | Divider: i `<Divider />` locali senza colore oggi sono invisibili (variabile mai definita); con la v5 diventano linee | **approvata il 2026-10-16**: diventano linee |

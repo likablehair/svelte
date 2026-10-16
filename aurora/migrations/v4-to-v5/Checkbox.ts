@@ -80,6 +80,7 @@ export default {
 	manual: [
 		{
 			id: 'checkbox-shift-key',
+			kind: 'review',
 			summary:
 				'`onchange` no longer reports `shiftKeyPressed`; v4 tracked Shift with two global `window` listeners per checkbox.',
 			action:
@@ -88,6 +89,7 @@ export default {
 		},
 		{
 			id: 'checkbox-label-root',
+			kind: 'review',
 			summary:
 				'The root is a `<label class="aurora-checkbox">` around the input (native attributes and `on*` still reach the input); the text next to the box belongs in `label` or `labelSnippet`.',
 			action:
@@ -95,6 +97,7 @@ export default {
 		},
 		{
 			id: 'checkbox-look',
+			kind: 'review',
 			summary:
 				'The box is 18px instead of 21px with a 1.5px border, keyboard focus shows an outline ring, and disabled fades the whole control and its text to 40%.',
 			action:

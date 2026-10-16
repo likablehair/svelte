@@ -30,6 +30,7 @@ export default {
 	manual: [
 		{
 			id: 'menu-or-drawer-options-items',
+			kind: 'edit',
 			summary:
 				'The options are `MenuOrDrawerOption` objects: `title` → `label`, `icon` is an SVG path, `style` and `appendIcon` are gone.',
 			action:

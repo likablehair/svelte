@@ -67,6 +67,7 @@ export default {
 	manual: [
 		{
 			id: 'dialog-surface',
+			kind: 'edit',
 			summary:
 				'`children` sits inside a styled surface (background, border, radius, shadow, 20px padding, max width 440px) over a blurred backdrop; v4 rendered it bare, centered on a flat overlay.',
 			action:
@@ -75,6 +76,7 @@ export default {
 		},
 		{
 			id: 'dialog-persistent-escape',
+			kind: 'review',
 			summary:
 				'`persistent` now also blocks Escape; v4 closed every open dialog on Escape, persistent or not.',
 			action:
@@ -83,6 +85,7 @@ export default {
 		},
 		{
 			id: 'dialog-content-lifecycle',
+			kind: 'review',
 			summary:
 				'The content mounts at every opening and unmounts after closing; v4 mounted it once and kept it, hidden, in the DOM.',
 			action:
@@ -91,6 +94,7 @@ export default {
 		},
 		{
 			id: 'dialog-accessible-name',
+			kind: 'edit',
 			summary:
 				'The dialog is a real `<dialog>` with `role="dialog"` and focus management; it needs an accessible name (v4 had no ARIA).',
 			action:
@@ -98,6 +102,7 @@ export default {
 		},
 		{
 			id: 'dialog-side-snippets',
+			kind: 'review',
 			summary:
 				'`topRightSnippet` sits 16px from the top right corner and `centerLeftSnippet` / `centerRightSnippet` are centered vertically 16px from the screen edges (`--dialog-inset`); v4 put the top right content at the very corner.',
 			action:

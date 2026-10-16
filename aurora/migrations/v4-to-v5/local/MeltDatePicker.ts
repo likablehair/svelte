@@ -23,11 +23,13 @@ export default {
 	manual: [
 		{
 			id: 'melt-date-picker-initial',
+			kind: 'review',
 			summary: 'The copy emptied the bound date on mount unless `defaultValue` was the same variable; DatePickerTextField shows the value it receives.',
 			action: 'Check the forms that relied on starting empty: initialize their variable to `undefined`.'
 		},
 		{
 			id: 'melt-date-picker-locale',
+			kind: 'review',
 			summary: 'The copy was always Italian; the field follows `setDefaultLocale` (or `locale`) for the format and the calendar.',
 			action: 'Nothing to do in an Italian app that calls `setDefaultLocale("it")`.',
 			scope: 'app'

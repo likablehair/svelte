@@ -71,6 +71,7 @@ export default {
 	manual: [
 		{
 			id: 'confirm-or-cancel-buttons-spacing',
+			kind: 'edit',
 			summary:
 				'v4 put 20px of space above the buttons (215 of 231 uses relied on it); v5 has none, like every component, so forms built without `gap` would lose the space before their buttons.',
 			action:
@@ -79,12 +80,14 @@ export default {
 		},
 		{
 			id: 'confirm-or-cancel-buttons-margin',
+			kind: 'review',
 			summary: 'The 20px top margin that v4 added by default is gone.',
 			action:
 				'Where the buttons sit under form fields and relied on that space, add it in the layout: `gap` on the parent, a margin on a wrapper, or `class={{ container: "..." }}` with `margin-top: 20px` in app CSS.'
 		},
 		{
 			id: 'confirm-or-cancel-buttons-layout',
+			kind: 'review',
 			summary:
 				'The buttons stack (confirm on top, full width) when their own container is narrower than 480px, not when the viewport is under 769px. The root is a size container, so it shrinks to zero width inside a flex row with automatic width.',
 			action:
@@ -92,6 +95,7 @@ export default {
 		},
 		{
 			id: 'confirm-or-cancel-buttons-cancel-button',
+			kind: 'review',
 			summary:
 				'Cancel is a text Button (primary text color, focus ring, disabled look with `cancelDisable`) instead of an unstyled `<button>` that inherited the text color.',
 			action:
@@ -100,6 +104,7 @@ export default {
 		},
 		{
 			id: 'confirm-or-cancel-buttons-loading',
+			kind: 'review',
 			summary:
 				'While `loading` the confirm button is disabled and `onconfirmClick` is not called (v4 kept it clickable and called it).',
 			action: 'Check flows that expected a second click on the confirm button while loading.',

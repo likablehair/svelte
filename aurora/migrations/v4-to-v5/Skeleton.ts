@@ -44,6 +44,7 @@ export default {
 	manual: [
 		{
 			id: 'skeleton-look',
+			kind: 'review',
 			summary:
 				'No shadow (v4: `0 10px 100px`), radius 4px (v4: 5px), a softer shimmer in sync across all skeletons that stops with reduced motion, and a `min-height` of 1em when no `--skeleton-height` is set (v4: 0px tall in a parent without height).',
 			action:
@@ -51,6 +52,7 @@ export default {
 		},
 		{
 			id: 'skeleton-aria',
+			kind: 'review',
 			summary: 'The skeleton is `aria-hidden`: screen readers skip it.',
 			action:
 				'Where a region shows skeletons while it loads, set `aria-busy="true"` on that region until the content arrives.'

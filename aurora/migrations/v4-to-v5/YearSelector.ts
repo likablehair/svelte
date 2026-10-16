@@ -87,6 +87,7 @@ export default {
 	manual: [
 		{
 			id: 'year-selector-deselect',
+			kind: 'review',
 			summary:
 				'Clicking the selected year keeps it selected; v4 set `selectedYear` to `undefined` (and crashed the v4 DatePicker).',
 			action:
@@ -95,6 +96,7 @@ export default {
 		},
 		{
 			id: 'year-selector-look',
+			kind: 'review',
 			summary:
 				'A scrolling grid of 4 columns in the mono font (v4: a vertical list of text Buttons, the selected year bigger and bold); the current year has a border, the selected one a primary fill, and the grid scrolls to it when it appears.',
 			action:
@@ -102,6 +104,7 @@ export default {
 		},
 		{
 			id: 'year-selector-keyboard',
+			kind: 'review',
 			summary:
 				'It is an ARIA listbox: one Tab stop, the arrows move in the grid, Page Up and Page Down jump three rows, Home and End go to the first and last year, Enter and Space choose. v4 had every year as a Button in the Tab order.',
 			action:
@@ -109,6 +112,7 @@ export default {
 		},
 		{
 			id: 'year-selector-markup',
+			kind: 'review',
 			summary:
 				'Markup and classes changed: `.selector-container` and the wrapped Buttons → `.aurora-year-selector` (`role="listbox"`, it scrolls) and `.aurora-year-selector-year` (`role="option"`) with `[data-selected]` and `[data-current]`.',
 			action: 'Rewrite app `:global(...)` selectors that target the v4 markup.',

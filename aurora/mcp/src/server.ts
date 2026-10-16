@@ -328,7 +328,7 @@ function registerMigration(server: McpServer, context: ServerContext) {
 		{
 			title: 'Next remaining point of the migration',
 			description:
-				'After migration_codemod: runs svelte-check in the app and returns the next file to fix, each error explained by the migration rule behind it, plus what to look at in the same file. With no errors left, returns what to look at and the pages to try. Call it again after each file. Read-only (svelte-kit sync aside).',
+				'After migration_codemod: runs svelte-check in the app and returns the next file to fix, each error explained by the migration rule behind it, plus the points to write in the same file. With no errors left, returns the points to write file by file, then the points to look at grouped by component with their pages, and the pages to try. Call it again after each file. Read-only (svelte-kit sync aside).',
 			inputSchema: { dir: appDir, file: z.string().optional().describe('Show this file instead of the next one') },
 			annotations: { readOnlyHint: true, openWorldHint: false }
 		},
@@ -340,7 +340,7 @@ function registerMigration(server: McpServer, context: ServerContext) {
 		{
 			title: 'Remaining points of the whole app',
 			description:
-				'Overview after migration_codemod: files with svelte-check errors and points to look at, pages to try (pages that use the changed files), changes per component, app steps, look dropped with the wrappers. Read-only.',
+				'Overview after migration_codemod: files with svelte-check errors, points to write and to look at, components to look at, pages to try (pages that use the changed files), changes per component, app steps, look dropped with the wrappers. Read-only.',
 			inputSchema: { dir: appDir },
 			annotations: { readOnlyHint: true, openWorldHint: false }
 		},

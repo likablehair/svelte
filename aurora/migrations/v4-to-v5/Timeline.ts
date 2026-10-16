@@ -112,6 +112,7 @@ export default {
 	manual: [
 		{
 			id: 'timeline-items',
+			kind: 'edit',
 			summary:
 				'Items need a `title`, the text the timeline shows; v4 required `name`, which it never displayed, and apps used it as the visible title in their snippets.',
 			action:
@@ -119,6 +120,7 @@ export default {
 		},
 		{
 			id: 'timeline-dates',
+			kind: 'review',
 			summary:
 				'Dates are formatted with `locale` (day, short month, year, plus the time when it is not midnight) and `from`–`to` on one line; v4 always wrote Italian dates without the time, on two lines.',
 			action:
@@ -126,6 +128,7 @@ export default {
 		},
 		{
 			id: 'timeline-look',
+			kind: 'review',
 			summary:
 				'New look: one column, theme-gradient line that stops at the first and last marker, empty markers (filled with `status: "done"`), date above the title.',
 			action:
@@ -133,6 +136,7 @@ export default {
 		},
 		{
 			id: 'timeline-separators',
+			kind: 'review',
 			summary:
 				'Day separators made with fake items (for example `name: "__separator__"` plus an empty `circleSnippet`) can be replaced by `groupBy`.',
 			action:
@@ -141,12 +145,14 @@ export default {
 		},
 		{
 			id: 'timeline-empty',
+			kind: 'review',
 			summary: 'With no items the timeline shows an empty state.',
 			action:
 				'Remove the `{#if items.length}` / empty message written around the timeline, or move the message to `empty` (text) or `emptySnippet`.'
 		},
 		{
 			id: 'timeline-local-copies',
+			kind: 'edit',
 			summary:
 				'Several apps hold a copied `StandardSimpleTimeline.svelte` wrapper, often unused, that passes v1 props (`circleColor`, `circleDiameter`, `timesWidth`, `firstItemMarginTop`) ignored since v3.',
 			action:

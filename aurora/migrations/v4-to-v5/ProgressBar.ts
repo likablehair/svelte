@@ -49,6 +49,7 @@ export default {
 	manual: [
 		{
 			id: 'progress-bar-look',
+			kind: 'review',
 			summary:
 				'An 8px pill track with the theme gradient, a glow and a moving shimmer; v4 was 5px tall, radius 2px, flat primary.',
 			action:
@@ -56,6 +57,7 @@ export default {
 		},
 		{
 			id: 'progress-bar-accessible-name',
+			kind: 'edit',
 			summary:
 				'The root is a `role="progressbar"` with `aria-valuenow`, `aria-valuemin` and `aria-valuemax`; v4 had no role, so it needs an accessible name now.',
 			action:
@@ -63,6 +65,7 @@ export default {
 		},
 		{
 			id: 'progress-bar-tooltip',
+			kind: 'review',
 			summary:
 				'`valueTooltip` opens the v5 `Tooltip` (dark label) above the whole bar after 400 ms; v4 showed a light card below the filled part, unreachable at value 0.',
 			action:

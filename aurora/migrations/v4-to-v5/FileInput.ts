@@ -88,6 +88,7 @@ export default {
 	manual: [
 		{
 			id: 'file-input-look',
+			kind: 'review',
 			summary:
 				'The zone looks like the prototype: dashed border, icon tile, "Drop files here / or browse your files" and an optional `description`; v4 was a 64px grey box with one line of text.',
 			action:
@@ -95,6 +96,7 @@ export default {
 		},
 		{
 			id: 'file-input-validation',
+			kind: 'review',
 			summary: '`accept`, `maxSize` and `maxFiles` refuse files, with a message under the zone and `onreject`.',
 			action:
 				'Replace checks of `file.type`, extensions, `file.size` or the number of files in the callbacks (and the toasts they show) with `accept=".pdf,image/*"`, `maxSize` (bytes, decimal: 10 MB = `10_000_000`) and `maxFiles`.',

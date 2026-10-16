@@ -3,6 +3,7 @@ import { walk } from './svelte.ts';
 import type { ComponentApi, ComponentMigration, ManualStep } from './types.ts';
 
 export type Effort = 'auto' | 'check' | 'manual';
+export type Todo = ManualStep['kind'];
 
 export interface Finding {
 	effort: Effort;
@@ -12,6 +13,7 @@ export interface Finding {
 	component?: string;
 	to?: string;
 	note?: string;
+	todo?: Todo;
 	file: string;
 	line: number;
 	via?: string;
@@ -35,6 +37,8 @@ export interface UsageMatch {
 	app: ManualStep[];
 	unknown: string[];
 }
+
+export const todoOf = (f: Finding): Todo => f.todo ?? (f.kind === 'css-var-removed' ? 'review' : 'edit');
 
 const IGNORED = new Set(['this', 'class', 'style', 'id', 'key', 'slot']);
 
@@ -241,15 +245,17 @@ export function matchUsage(
 			continue;
 		}
 		const when = step.when;
-		if (!when) {
-			if (usage.defaults) general.push(step);
+		if (!when && !usage.defaults) continue;
+		if (!when && step.kind === 'review') {
+			general.push(step);
 			continue;
 		}
-		const hit =
-			when.props?.find((n) => props.has(n)) ??
-			when.events?.find((n) => events.has(n)) ??
-			when.snippets?.find((n) => snippets.has(n)) ??
-			when.cssVars?.find((n) => cssVars.has(n));
+		const hit = when
+			? (when.props?.find((n) => props.has(n)) ??
+				when.events?.find((n) => events.has(n)) ??
+				when.snippets?.find((n) => snippets.has(n)) ??
+				when.cssVars?.find((n) => cssVars.has(n)))
+			: rule.from;
 		if (!hit) continue;
 		const line = props.get(hit)?.line ?? events.get(hit)?.line ?? cssVars.get(hit)?.line ?? snippets.get(hit) ?? usage.line;
 		findings.push({
@@ -259,6 +265,7 @@ export function matchUsage(
 			name: hit,
 			component: rule.from,
 			note: step.summary,
+			todo: step.kind,
 			file: usage.file,
 			line,
 			...(usage.via ? { via: usage.via } : {})

@@ -293,12 +293,14 @@ export default {
 	manual: [
 		{
 			id: 'global-svelte-version',
+			kind: 'edit',
 			summary: 'The components need Svelte 5.29 or later.',
 			action: 'Update `svelte` in the app before anything else.',
 			scope: 'app'
 		},
 		{
 			id: 'global-dependencies',
+			kind: 'edit',
 			summary: 'v5 has one runtime dependency (`flag-icons`); v4 brought 16.',
 			action:
 				'Run `svelte-check` and the build: every import that now fails to resolve (`luxon`, `lodash`, `date-fns`, ...) must be added to the app `package.json`.',
@@ -306,6 +308,7 @@ export default {
 		},
 		{
 			id: 'global-layers',
+			kind: 'edit',
 			summary: 'All library CSS lives in cascade layers; unlayered app CSS always wins.',
 			action:
 				'Put the `layers.app` line at the top of the main app CSS, before any `@import`. Move global element resets (`button {}`, `input {}`, `* { margin: 0 }`, ...) into `@layer reset { ... }`, otherwise they restyle the inside of the components.',
@@ -313,6 +316,7 @@ export default {
 		},
 		{
 			id: 'global-tailwind-3',
+			kind: 'edit',
 			summary: 'Tailwind 3 preflight removes component backgrounds and borders unless it is layered.',
 			action:
 				"Wrap `@tailwind base;` in `@layer reset { ... }` and add `presets: [aurora]` (`import aurora from '@likable-hair/svelte/tailwind-preset'`) to `tailwind.config.js`. Token overrides placed in Tailwind's `@layer base` end up inside `reset` and lose: move them out of the layer.",
@@ -320,6 +324,7 @@ export default {
 		},
 		{
 			id: 'global-tailwind-4',
+			kind: 'edit',
 			summary: 'Tailwind 4 needs the layer line and the library theme mapping.',
 			action:
 				"Put the `layers.app` line before `@import 'tailwindcss'`, then `@import '@likable-hair/svelte/tailwind.css'`. Note that it redefines `rounded-{xs,sm,md,lg,xl}`, `shadow-{sm,md,lg}`, `font-sans` and `font-mono`.",
@@ -327,6 +332,7 @@ export default {
 		},
 		{
 			id: 'global-internal-classes',
+			kind: 'review',
 			summary:
 				'Internal class names changed (`.button`, `.chip`, `.textfield`, `.hint`, `.row`, `.overlay`, `._teleported`, `[data-dialog]` → `aurora-{component}-{part}` and `data-*`).',
 			action:
@@ -335,6 +341,7 @@ export default {
 		},
 		{
 			id: 'global-color-tokens',
+			kind: 'edit',
 			summary:
 				'v4 color tokens (RGB triplets) do not exist in v5: overrides stop working and uses become undefined, unless the app imports `@likable-hair/svelte/v4-compat.css`.',
 			action:
@@ -342,6 +349,7 @@ export default {
 		},
 		{
 			id: 'global-dark-mode',
+			kind: 'edit',
 			summary:
 				'Dark mode follows `color-scheme` and `data-mode` on `<html>`; `.dark` / `.light` classes do nothing.',
 			action:
@@ -350,6 +358,7 @@ export default {
 		},
 		{
 			id: 'global-icons',
+			kind: 'edit',
 			summary:
 				'Every icon prop takes an SVG path; `"mdi-*"` strings type-check but draw nothing, and the global `.mdi` classes are gone.',
 			action:
@@ -357,12 +366,14 @@ export default {
 		},
 		{
 			id: 'global-callbacks',
+			kind: 'edit',
 			summary: 'Callbacks receive native events or plain objects instead of `{ detail: {...} }`.',
 			action:
 				'Apply `callbacks.argument` (or the component rule) to every callback of a library component, including handlers defined as functions elsewhere in the file and their TypeScript types (`CustomEvent<...>`, `ComponentProps<...>["onclick"]`).'
 		},
 		{
 			id: 'global-fonts',
+			kind: 'edit',
 			summary:
 				'Tokens name Geist, Bricolage Grotesque and Geist Mono; the library does not load them.',
 			action:
@@ -371,6 +382,7 @@ export default {
 		},
 		{
 			id: 'global-overlays',
+			kind: 'review',
 			summary:
 				'Dialog, Drawer and Menu use the top layer: the page is inert while a Dialog or Drawer is open, their content inherits from where it is written and unmounts when closed.',
 			action:
@@ -379,6 +391,7 @@ export default {
 		},
 		{
 			id: 'global-default-locale',
+			kind: 'edit',
 			summary:
 				'Required in every Italian app: without `setDefaultLocale(\'it\')` the date and time fields read and write in English (MM/DD/YYYY, 12-hour clock), so a typed "05/03" is saved as May 3; in development they warn in the console. Texts and formats follow `locale` (BCP 47; Italian and English built in, other languages get the English texts): the `locale` prop of a component wins over `setDefaultLocale`, which wins over the default `en`. v4 was Italian by default in the date components (dd/MM/yyyy, Italian names, weeks from Monday) and in some texts ("Annulla" / "Salva", "N Selezionati"), and had `lang` props (default `en`) elsewhere.',
 			action:
@@ -387,6 +400,7 @@ export default {
 		},
 		{
 			id: 'global-app-toaster',
+			kind: 'edit',
 			summary:
 				'v5 has toasts (`<Toaster />`, `addToast`, `addErrorToast`, `addSuccessToast`, `addWarningToast`, `addInfoToast`, `updateToast`, `removeToast`); most apps have their own `Toaster.svelte` copied from the melt-ui demo with the same function names but `{ data: { title, description, closeDelay, showLoading, action } }` arguments.',
 			action:
@@ -395,6 +409,7 @@ export default {
 		},
 		{
 			id: 'global-dates',
+			kind: 'edit',
 			summary:
 				'Date components work with `Date` values at local midnight; `toISOString()` converts them to UTC and gives the previous day in Italy, and `new Date("yyyy-mm-dd")` reads the string as UTC midnight. v4 brought `luxon`, which apps used to convert these dates.',
 			action:
@@ -403,6 +418,7 @@ export default {
 		},
 		{
 			id: 'global-time-fields',
+			kind: 'edit',
 			summary:
 				'v5 has a time field, `TimePickerTextField` (and the `TimePicker` panel); v4 had none, so apps wrap `<SimpleTextField type="time">` / `<StandardTextfield type="time">` or a bare `<input type="time">` in local components (`StandardTimePicker`, a local `TimePickerTextField`, `TimeField`).',
 			action:
@@ -411,6 +427,7 @@ export default {
 		},
 		{
 			id: 'global-date-time-fields',
+			kind: 'edit',
 			summary:
 				'v5 has a date and time field, `DateTimePickerTextField` (a `DatePicker` and a `TimePicker` in one panel, value `Date`); v4 had none, so apps pair a date field and a time field in local components (`StandardDateTimePicker` in likable-tools, addibox, lupette, epass, mufasa, evote; `StandardDateTimePickerTextfield` in stramoniumai).',
 			action:
@@ -419,6 +436,7 @@ export default {
 		},
 		{
 			id: 'global-filter-converter',
+			kind: 'edit',
 			summary:
 				'`FilterConverter` / `Converter` and the v4 `Filter` type are gone; queries come from `filtersToBuilder(value, fields, { builder })`.',
 			action:
@@ -427,6 +445,7 @@ export default {
 		},
 		{
 			id: 'global-filter-backends',
+			kind: 'review',
 			summary:
 				'The filters can now send `kind: "in"` for selects, OR groups and nested groups, `yyyy-MM-dd` strings for dates, Postgres regex and array operators, and the kinds `null`, `column`, `inBuilder`, `jsonSuperset` and `raw` (JSON keys with `cast`); the backends (`FilterModifierApplier`, not in this repo) replay them with different fidelity.',
 			action:
@@ -435,6 +454,7 @@ export default {
 		},
 		{
 			id: 'global-filter-state',
+			kind: 'edit',
 			summary:
 				'Filter state saved by the app (stores, sessionStorage / localStorage, URL presets, load functions) was a v4 `Filter[]` rebuilt by hand; in v5 it is the `value` tree, plain JSON.',
 			action:
@@ -443,6 +463,7 @@ export default {
 		},
 		{
 			id: 'global-ssr-mobile',
+			kind: 'review',
 			summary: 'Components now render the desktop variant on the server (v4 rendered the mobile one).',
 			action: 'Check first paint on mobile for layouts that depended on the v4 server default.',
 			scope: 'app'

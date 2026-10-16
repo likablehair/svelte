@@ -24,6 +24,7 @@ export default {
 	manual: [
 		{
 			id: 'divider-visible',
+			kind: 'review',
 			summary:
 				'In most copies the default color pointed to a CSS variable that no app defines, so a `<Divider />` without `color` drew an invisible 10px spacer; the library one draws a line.',
 			action:
@@ -31,6 +32,7 @@ export default {
 		},
 		{
 			id: 'divider-side-inset',
+			kind: 'review',
 			summary: 'The copies had 5px side margins; the library line spans the whole width.',
 			action: 'Where the inset mattered, set `--divider-margin-left="5px"` and `--divider-margin-right="5px"`.'
 		}

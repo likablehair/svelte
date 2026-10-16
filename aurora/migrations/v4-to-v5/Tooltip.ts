@@ -49,6 +49,7 @@ export default {
 	manual: [
 		{
 			id: 'tooltip-surface',
+			kind: 'edit',
 			summary:
 				'The tooltip draws its own surface and arrow (a dark one-line label, or a card with `variant="rich"`); v4 was an empty Menu and the apps drew the card in `children`.',
 			action:
@@ -57,6 +58,7 @@ export default {
 		},
 		{
 			id: 'tooltip-interaction',
+			kind: 'review',
 			summary:
 				'The tooltip also opens on keyboard focus, closes on Escape, on a click on the activator and on blur, and stays open while the pointer is over it; it is `role="tooltip"` and never interactive.',
 			action:
@@ -64,6 +66,7 @@ export default {
 		},
 		{
 			id: 'tooltip-controlled-open',
+			kind: 'edit',
 			summary:
 				'`open` (v4 `menuOpen`) can still be driven from code, but the tooltip now closes itself on Escape, click, blur and pointer leave.',
 			action:
@@ -72,6 +75,7 @@ export default {
 		},
 		{
 			id: 'tooltip-always-in-dom',
+			kind: 'review',
 			summary:
 				"The tooltip element is always in the DOM (a hidden popover) and adds its id to the activator's `aria-describedby`; v4 rendered nothing while closed.",
 			action:

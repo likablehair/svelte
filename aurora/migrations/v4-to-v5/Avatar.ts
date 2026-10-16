@@ -70,6 +70,7 @@ export default {
 	manual: [
 		{
 			id: 'avatar-initials',
+			kind: 'review',
 			summary:
 				'v5 computes the initials from `name`: first letter of the first and of the last word ("Mario Rossi" → "MR"). The apps passed `text={username.substring(0, 2).toUpperCase()}` ("MA").',
 			action:
@@ -78,6 +79,7 @@ export default {
 		},
 		{
 			id: 'avatar-color',
+			kind: 'review',
 			summary:
 				'The background is a gradient picked from the name, so every person has their own color; v4 used the primary color for everyone.',
 			action:
@@ -85,6 +87,7 @@ export default {
 		},
 		{
 			id: 'avatar-children',
+			kind: 'edit',
 			summary:
 				'`children` now replaces only the content inside the circle (initials or icon); in v4 it replaced the whole avatar, circle included.',
 			action:
@@ -93,11 +96,13 @@ export default {
 		},
 		{
 			id: 'avatar-empty',
+			kind: 'review',
 			summary: 'Without `src`, `name` or `text` the avatar shows a person icon; v4 showed an empty circle.',
 			action: 'Nothing to do unless the empty circle was meant: pass `icon` for another icon, or `text=" "` for an empty avatar.'
 		},
 		{
 			id: 'avatar-look',
+			kind: 'review',
 			summary:
 				'Default look: 40px circle (unchanged), text weight 600 instead of 700, text 0.38 × the size. The image covers the initials, which stay visible while it loads or when it fails (v4 showed the broken image for a moment and downloaded it twice).',
 			action:
@@ -106,6 +111,7 @@ export default {
 		},
 		{
 			id: 'avatar-blob',
+			kind: 'review',
 			summary:
 				'`src` accepts a `Blob`/`File`: images downloaded with authentication no longer need to be turned into data URLs.',
 			action:
