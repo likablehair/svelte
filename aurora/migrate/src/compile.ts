@@ -1,8 +1,11 @@
-import type { CompiledRules, ComponentApi, ComponentMigration, GlobalMigration } from './types.ts';
+import type { CompiledRules, ComponentApi, ComponentMigration, GlobalMigration, LocalMigration } from './types.ts';
+
+export const LOCAL_PREFIX = 'local/';
 
 export interface RuleSources {
 	global: GlobalMigration;
 	components: (ComponentMigration | ComponentMigration[])[];
+	local?: LocalMigration[];
 	v4Index: string;
 	v5Index: string;
 	v5Components: Record<string, ComponentApi>;
@@ -23,9 +26,10 @@ export function compileRules(sources: RuleSources): CompiledRules {
 	const v4Components = [
 		...sources.v4Index.matchAll(/default\s+as\s+(\w+)\s*\}\s*from\s*'[^']+\.svelte'/g)
 	].map((m) => m[1]);
-	const components = sources.components
-		.flat()
-		.sort((a, b) => a.from.localeCompare(b.from) || a.to.localeCompare(b.to));
+	const components = [
+		...sources.components.flat(),
+		...(sources.local ?? []).map((rule) => ({ ...rule, from: `${LOCAL_PREFIX}${rule.from}` }))
+	].sort((a, b) => a.from.localeCompare(b.from) || a.to.localeCompare(b.to));
 	return JSON.parse(
 		JSON.stringify({
 			schema: 1,

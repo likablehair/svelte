@@ -101,6 +101,8 @@ export interface LibraryTexts {
 		open: string;
 		start: string;
 		end: string;
+		apply: string;
+		cancel: string;
 	};
 	dateTimePickerTextField: { invalid: string; clear: string; close: string; open: string };
 	dialog: { close: string };
@@ -193,6 +195,7 @@ export interface LibraryTexts {
 	};
 	searchBar: { clear: string };
 	sidebarLayout: { menu: string; sidebar: string; skip: string };
+	simpleTextField: { showPassword: string };
 	table: {
 		selectAll: string;
 		selectAllShort: string;
@@ -327,7 +330,9 @@ export const TEXTS_EN: LibraryTexts = {
 		close: 'Close',
 		open: 'Choose date',
 		start: 'Start date',
-		end: 'End date'
+		end: 'End date',
+		apply: 'Apply',
+		cancel: 'Cancel'
 	},
 	dateTimePickerTextField: {
 		invalid: 'Enter a valid date and time',
@@ -433,6 +438,7 @@ export const TEXTS_EN: LibraryTexts = {
 	},
 	searchBar: { clear: 'Clear search' },
 	sidebarLayout: { menu: 'Menu', sidebar: 'Sidebar', skip: 'Skip to content' },
+	simpleTextField: { showPassword: 'Show password' },
 	table: {
 		selectAll: 'Select all rows',
 		selectAllShort: 'Select all',
@@ -567,7 +573,9 @@ export const TEXTS_IT: LibraryTexts = {
 		close: 'Chiudi',
 		open: 'Scegli la data',
 		start: 'Data di inizio',
-		end: 'Data di fine'
+		end: 'Data di fine',
+		apply: 'Applica',
+		cancel: 'Annulla'
 	},
 	dateTimePickerTextField: {
 		invalid: "Inserisci una data e un'ora valide",
@@ -673,6 +681,7 @@ export const TEXTS_IT: LibraryTexts = {
 	},
 	searchBar: { clear: 'Cancella la ricerca' },
 	sidebarLayout: { menu: 'Menu', sidebar: 'Barra laterale', skip: 'Vai al contenuto' },
+	simpleTextField: { showPassword: 'Mostra password' },
 	table: {
 		selectAll: 'Seleziona tutte le righe',
 		selectAllShort: 'Seleziona tutto',

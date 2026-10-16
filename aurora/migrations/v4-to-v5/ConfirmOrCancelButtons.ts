@@ -111,6 +111,7 @@ export default {
 		'`confirmType="submit"` submits the surrounding form, with its validation.',
 		'`locale` (BCP 47): language of the default texts, Italian with `it`, English otherwise; without it the one of `setDefaultLocale` (step `global-default-locale`), else `en`. Text props win over it.',
 		'`children`: content at the start of the row (e.g. "Unsaved changes").',
+		'`direction`: `auto` (default, stacks under 480px), `row` (never stacks), `column` (always stacked, confirm on top at full width).',
 		'`class` object: `container`, `content`, `actions`, `cancel`, `confirm`; native attributes on the root.',
 		'`data-loading` attribute.',
 		'`--confirm-or-cancel-buttons-gap`, `-actions-gap`, `-content-gap`, `-content-color`, `-content-font-size`.'

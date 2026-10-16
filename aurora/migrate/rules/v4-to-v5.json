@@ -2020,6 +2020,7 @@
 					"cancelIcon",
 					"confirmVariant",
 					"confirmType",
+					"direction",
 					"class"
 				],
 				"bindable": [],
@@ -2029,6 +2030,7 @@
 					"cancelDisable": "false",
 					"confirmVariant": "'primary'",
 					"confirmType": "'button'",
+					"direction": "'auto'",
 					"class": "{}"
 				},
 				"events": [
@@ -2499,6 +2501,7 @@
 				"slug": "date-picker",
 				"props": [
 					"view",
+					"months",
 					"class",
 					"datePickerElement",
 					"locale",
@@ -2533,6 +2536,7 @@
 					"previewDate"
 				],
 				"defaults": {
+					"months": "1",
 					"class": "{}",
 					"range": "false",
 					"disabled": "false",
@@ -2547,6 +2551,7 @@
 					"onchange"
 				],
 				"snippets": [
+					"footerSnippet",
 					"titleSnippet",
 					"daySnippet",
 					"dayAppendSnippet",
@@ -2567,7 +2572,11 @@
 					"--date-picker-default-box-shadow",
 					"--date-picker-default-color",
 					"--date-picker-default-focus-ring-color",
+					"--date-picker-default-footer-border-color",
+					"--date-picker-default-footer-padding-top",
 					"--date-picker-default-gap",
+					"--date-picker-default-month-width",
+					"--date-picker-default-months-gap",
 					"--date-picker-default-padding",
 					"--date-picker-default-title-border-radius",
 					"--date-picker-default-title-color",
@@ -2578,7 +2587,11 @@
 					"--date-picker-default-title-letter-spacing",
 					"--date-picker-default-width",
 					"--date-picker-focus-ring-color",
+					"--date-picker-footer-border-color",
+					"--date-picker-footer-padding-top",
 					"--date-picker-gap",
+					"--date-picker-month-width",
+					"--date-picker-months-gap",
 					"--date-picker-padding",
 					"--date-picker-title-border-radius",
 					"--date-picker-title-color",
@@ -2620,6 +2633,10 @@
 					"clearable",
 					"clearLabel",
 					"closeOnSelect",
+					"months",
+					"confirm",
+					"applyLabel",
+					"cancelLabel",
 					"placement",
 					"mobileDrawer",
 					"drawerTitle",
@@ -2653,6 +2670,8 @@
 					"required": "false",
 					"clearable": "false",
 					"closeOnSelect": "true",
+					"months": "1",
+					"confirm": "false",
 					"placement": "'bottom-start'",
 					"mobileDrawer": "true",
 					"showFormat": "true",
@@ -6011,17 +6030,23 @@
 					"prependInnerIcon",
 					"appendInnerIcon",
 					"appendIcon",
+					"revealable",
+					"revealed",
+					"revealLabel",
+					"locale",
 					"input",
 					"class"
 				],
 				"bindable": [
 					"value",
+					"revealed",
 					"input"
 				],
 				"defaults": {
 					"type": "'text'",
 					"disabled": "false",
 					"readonly": "false",
+					"revealable": "false",
 					"class": "{}"
 				},
 				"events": [],
@@ -6071,6 +6096,8 @@
 					"--simple-text-field-default-outer-gap",
 					"--simple-text-field-default-padding",
 					"--simple-text-field-default-placeholder-color",
+					"--simple-text-field-default-reveal-color",
+					"--simple-text-field-default-reveal-hover-color",
 					"--simple-text-field-default-success-color",
 					"--simple-text-field-default-width",
 					"--simple-text-field-disabled-background",
@@ -6096,6 +6123,8 @@
 					"--simple-text-field-outer-gap",
 					"--simple-text-field-padding",
 					"--simple-text-field-placeholder-color",
+					"--simple-text-field-reveal-color",
+					"--simple-text-field-reveal-hover-color",
 					"--simple-text-field-success-color",
 					"--simple-text-field-width"
 				]
@@ -7086,6 +7115,7 @@
 					"placement",
 					"offset",
 					"appearTimeout",
+					"interactive",
 					"tooltipElement",
 					"class"
 				],
@@ -7098,7 +7128,8 @@
 					"variant": "'plain'",
 					"placement": "'top'",
 					"offset": "10",
-					"appearTimeout": "400"
+					"appearTimeout": "400",
+					"interactive": "false"
 				},
 				"events": [],
 				"snippets": [
@@ -9427,6 +9458,7 @@
 				"`description` per box, always visible, read as the description of the box by screen readers.",
 				"`icon` per box (an `@mdi/js` path in a tile) and `color` for its tone (`primary` or a data color 1–6).",
 				"`disabled` and `class` per box; `data` for app data passed back to the snippets.",
+				"`onclick` per box, called before `onboxClick`; it makes a box without `href` a button.",
 				"Boxes without `href` and without `onboxClick` render as plain cards (v4 drew a button that did nothing).",
 				"`iconSnippet`, `labelSnippet`, `descriptionSnippet`, `prependSnippet`, `appendSnippet`.",
 				"`bind:boxListElement`, `class` and native attributes (such as `aria-label`) on the list.",
@@ -11082,6 +11114,7 @@
 				"`confirmType=\"submit\"` submits the surrounding form, with its validation.",
 				"`locale` (BCP 47): language of the default texts, Italian with `it`, English otherwise; without it the one of `setDefaultLocale` (step `global-default-locale`), else `en`. Text props win over it.",
 				"`children`: content at the start of the row (e.g. \"Unsaved changes\").",
+				"`direction`: `auto` (default, stacks under 480px), `row` (never stacks), `column` (always stacked, confirm on top at full width).",
 				"`class` object: `container`, `content`, `actions`, `cancel`, `confirm`; native attributes on the root.",
 				"`data-loading` attribute.",
 				"`--confirm-or-cancel-buttons-gap`, `-actions-gap`, `-content-gap`, `-content-color`, `-content-font-size`."
@@ -12191,7 +12224,8 @@
 			],
 			"added": [
 				"`min`, `max`, `isDateDisabled`, `weekStart`, `weekdayFormat`, `showOutsideDays`, `showWeekdays` (from Calendar).",
-				"`titleSnippet`, `daySnippet`, `dayAppendSnippet`, `weekdaySnippet`.",
+				"`months={2}`: two months side by side in the day view, for long ranges; `--date-picker-month-width`, `--date-picker-months-gap`, `data-months`.",
+				"`titleSnippet`, `daySnippet`, `dayAppendSnippet`, `weekdaySnippet`, `footerSnippet` (content under the calendar, inside the panel).",
 				"`onchange({ selectedDate, selectedDateTo })`.",
 				"`previousMonthLabel`, `nextMonthLabel`, `previousYearLabel`, `nextYearLabel`.",
 				"`focus()` method, `bind:datePickerElement`, native attributes on the panel, `data-view` and `data-disabled`.",
@@ -12868,6 +12902,8 @@
 				"`min`, `max`, `isDateDisabled`, `weekStart`, `format`.",
 				"`name` / `nameTo`: hidden inputs that submit `yyyy-MM-dd`; `required`, `readonly`, `id`.",
 				"`clearable`, `clearLabel`, `clearSnippet`; `showFormat`, `formatLabel`, `formatSnippet`.",
+				"`months={2}`: two months side by side in the calendar menu (one in the mobile drawer).",
+				"`confirm`: the calendar works on a draft saved by an Apply button (Cancel, Escape and a click outside discard it; with `clearable` also a Clear button), as the local `DateRangePicker` copies did with `showApply` / `showClear`; `applyLabel`, `cancelLabel`.",
 				"`drawerTitle`, `closeLabel`, `openLabel`, `startLabel`, `endLabel`.",
 				"`locale` (BCP 47): language of the format, the calendar and the default texts, Italian with `it`, English otherwise; without it the one of `setDefaultLocale` (step `global-default-locale`), else `en`. Text props win over it.",
 				"`daySnippet`, `dayAppendSnippet`, `weekdayFormat`, `showOutsideDays` (forwarded to the calendar).",
@@ -17676,6 +17712,161 @@
 			]
 		},
 		{
+			"from": "local/PageTitle",
+			"to": "PageHeader",
+			"files": [
+				"PageTitle.svelte"
+			],
+			"summary": "The local `PageTitle` copy becomes `PageHeader` of the library.",
+			"props": {
+				"renamed": [
+					{
+						"from": "prependVisible",
+						"to": "back",
+						"note": "Shows the back control. Without `backHref` it calls `history.back()`, as the copies did."
+					},
+					{
+						"from": "prependRoute",
+						"to": "backHref",
+						"note": "A link to the route, preloaded on hover. Without `prependVisible` the copies showed nothing: if so, remove `backHref`."
+					},
+					{
+						"from": "titleBack",
+						"to": "backLabel"
+					},
+					{
+						"from": "iconBack",
+						"to": "backIcon",
+						"note": "An SVG path from `@mdi/js`."
+					},
+					{
+						"from": "handleBackClick",
+						"to": "onback",
+						"note": "Runs before the navigation; `event.preventDefault()` stops it, for example to save and then `goto`."
+					},
+					{
+						"from": "titleSize",
+						"to": "size",
+						"note": "`s` and `xs` become `sm`, the rest `md`."
+					}
+				],
+				"values": [
+					{
+						"name": "size",
+						"values": {
+							"s": "sm",
+							"xs": "sm",
+							"sm": "sm",
+							"m": "md",
+							"md": "md",
+							"l": "md",
+							"lg": "md",
+							"xl": "md"
+						}
+					}
+				],
+				"removed": [
+					{
+						"name": "marginTop",
+						"note": "Space above comes from the layout (`gap`) or `style=\"margin-top: …\"` on the PageHeader."
+					},
+					{
+						"name": "paddingTop",
+						"note": "Space above comes from the layout (`gap`) or `style=\"padding-top: …\"` on the PageHeader."
+					},
+					{
+						"name": "titleClass",
+						"note": "Use `class={{ title: \"…\" }}`."
+					},
+					{
+						"name": "subtitleClass",
+						"note": "Use `class={{ subtitle: \"…\" }}`."
+					},
+					{
+						"name": "previousPageUrl",
+						"note": "Replaced by `backHref`, a native link that SvelteKit preloads on hover.",
+						"drop": true
+					}
+				]
+			},
+			"events": {
+				"changed": [
+					{
+						"name": "onclick",
+						"to": "onback",
+						"argument": {},
+						"type": "MouseEvent",
+						"note": "The click on the back control."
+					},
+					{
+						"name": "on:click",
+						"to": "onback",
+						"argument": {},
+						"type": "MouseEvent",
+						"note": "Svelte 4 event directive of older app code: the click on the back control."
+					}
+				]
+			},
+			"snippets": {
+				"renamed": [
+					{
+						"from": "appendSnippet",
+						"to": "actionsSnippet"
+					},
+					{
+						"from": "append",
+						"to": "actionsSnippet"
+					},
+					{
+						"from": "title",
+						"to": "titleSnippet",
+						"note": "It replaces only the title now: a `subtitle` passed with it is shown."
+					},
+					{
+						"from": "prependSnippet",
+						"to": "backSnippet",
+						"note": "It replaces the icon and the text inside the back control, which stays a link or a button. Content before the title (an avatar) goes in `prependSnippet`."
+					},
+					{
+						"from": "prepend",
+						"to": "backSnippet",
+						"note": "It replaces the icon and the text inside the back control, which stays a link or a button. Content before the title (an avatar) goes in `prependSnippet`."
+					}
+				]
+			},
+			"manual": [
+				{
+					"id": "page-title-heading",
+					"summary": "The title is an `h1` heading with the Aurora look (26px display font); the copies drew a big bold `div` with Tailwind classes.",
+					"action": "Inside a component, a panel or a dialog pass `headingLevel={2}` (or deeper) and `size=\"sm\"`. Remove app CSS aimed at the classes of the copy (`.title`, `.prepend-button`)."
+				},
+				{
+					"id": "page-title-subtitle-with-title-snippet",
+					"summary": "With `titleSnippet` the copies hid `subtitle`; PageHeader shows it under the title.",
+					"action": "Remove `subtitle` where it was passed together with a title snippet and was not visible.",
+					"when": {
+						"snippets": [
+							"titleSnippet",
+							"title"
+						],
+						"props": [
+							"subtitle"
+						]
+					}
+				},
+				{
+					"id": "page-title-route-without-back",
+					"summary": "`prependRoute` without `prependVisible` showed nothing; `backHref` shows the back link.",
+					"action": "If the page had no back link, remove `backHref`.",
+					"when": {
+						"props": [
+							"prependRoute"
+						]
+					}
+				}
+			]
+		},
+		{
 			"from": "MediaQuery",
 			"to": "MediaQuery",
 			"snippets": {
@@ -20998,7 +21189,8 @@
 				"`state` (`error` | `success`): colors the field and the hint, shows an icon; `stateIconSnippet` replaces it.",
 				"`class.label`.",
 				"`type` also accepts `email`, `tel`, `search`, `url`.",
-				"`data-state`, `data-disabled`, `data-readonly` attributes.",
+				"`revealable` (with `type=\"password\"`): eye toggle that shows and hides the password; `bind:revealed`, `revealLabel` and `locale` for its name (\"Show password\" / \"Mostra password\").",
+				"`data-state`, `data-disabled`, `data-readonly`, `data-revealed` attributes.",
 				"`--simple-text-field-*` variables for label, placeholder, icons, hover, focus, error, success and disabled."
 			]
 		},
@@ -22142,6 +22334,7 @@
 				"`text` for plain tooltips, `title` and `titleSnippet` for a bold first line.",
 				"`variant` (plain | rich), exposed as `data-variant`; the current side as `data-side`.",
 				"`offset`, and `placement` with `-start` / `-end` variants on every side.",
+				"`interactive`: content with links or buttons (a hover card); waits 300 ms before closing, stays open while the keyboard focus is inside, Escape gives the focus back. Exposed as `data-interactive`.",
 				"`bind:tooltipElement`, `class` and native attributes on the tooltip element.",
 				"`--tooltip-*` CSS variables (background, color, padding, radius, shadow, max width, font, arrow size, duration)."
 			]

@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { Lines, listFiles } from './files.ts';
 import { matchUsage, type Effort, type Finding, type Usage } from './match.ts';
-import type { RuleIndex } from './rules.ts';
+import { localRuleFor, type RuleIndex } from './rules.ts';
 import { scanSvelte, type Attr, type ImportRecord, type SvelteFile } from './svelte.ts';
 import type { ManualStep } from './types.ts';
 
@@ -282,10 +282,18 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 			importers.get(target)!.add(file.rel);
 		}
 
+	const copies = new Map<string, string>();
+	for (const file of files) {
+		const rule = file.path.endsWith('.svelte') ? localRuleFor(index, file.path, file.text) : undefined;
+		if (rule) copies.set(file.path, rule.from);
+	}
+
 	const libScope = (file: FileData) => {
 		const scope = new Map<string, string>();
 		const namespaces = new Set<string>();
 		for (const record of file.imports) {
+			const copy = record.imported === 'default' && !record.type ? copies.get(resolveLocal(file.path, record.source) ?? '') : undefined;
+			if (copy && file.path !== resolveLocal(file.path, record.source)) scope.set(record.local, copy);
 			if (!isLib(record.source) || record.type) continue;
 			if (record.imported === '*') namespaces.add(record.local);
 			const name = libName(record);

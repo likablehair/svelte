@@ -1,5 +1,5 @@
 <!-- @component Buttons
-Without `href` and with `onboxClick` each box is a button; `onboxClick` receives the box and the event, and is called for links too. `disabled` turns a box off. Without `onboxClick` and `href` a box is a plain card. -->
+Without `href` and with `onboxClick` each box is a button; `onboxClick` receives the box and the event, and is called for links too. A box can also have its own `onclick`, which makes it a button without `onboxClick`. `disabled` turns a box off. Without `onboxClick` and `href` a box is a plain card. -->
 <script lang="ts">
 	import { BoxList, type BoxListItem } from '#lib';
 	import { mdiDatabaseExportOutline, mdiDatabaseImportOutline, mdiDeleteSweepOutline } from '@mdi/js';

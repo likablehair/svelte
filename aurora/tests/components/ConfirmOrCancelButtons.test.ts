@@ -213,6 +213,30 @@ describe('ConfirmOrCancelButtons', () => {
 		narrow.remove();
 	});
 
+	test('direction="column" stacks the buttons in a wide container, direction="row" keeps them in a row in a narrow one', async () => {
+		const wide = box('800px');
+		const column = await render(ConfirmOrCancelButtons, {
+			target: wide,
+			props: { direction: 'column' }
+		});
+		const root = wide.querySelector('.aurora-confirm-or-cancel-buttons');
+		expect(root?.getAttribute('data-direction')).toBe('column');
+		let cancel = column.getByRole('button', { name: 'Cancel' }).element().getBoundingClientRect();
+		let confirm = column.getByRole('button', { name: 'Save' }).element().getBoundingClientRect();
+		expect(confirm.bottom).toBeLessThanOrEqual(cancel.top);
+		expect(Math.round(confirm.width)).toBe(800);
+		column.unmount();
+		wide.remove();
+
+		const narrow = box('320px');
+		const row = await render(ConfirmOrCancelButtons, { target: narrow, props: { direction: 'row' } });
+		cancel = row.getByRole('button', { name: 'Cancel' }).element().getBoundingClientRect();
+		confirm = row.getByRole('button', { name: 'Save' }).element().getBoundingClientRect();
+		expect(Math.round(confirm.top)).toBe(Math.round(cancel.top));
+		expect(confirm.left).toBeGreaterThan(cancel.right);
+		narrow.remove();
+	});
+
 	test('children sit at the start of the row; icons and confirmVariant change the buttons', async () => {
 		const wide = box('800px');
 		const screen = await render(ConfirmOrCancelButtons, {

@@ -2,11 +2,11 @@ import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { parse } from 'svelte/compiler';
 import { attrExpression, attrText, Editor, isReference, visit } from './ast.ts';
-import { dissolve, type WrapperSummary } from './dissolve.ts';
+import { dissolve, resolveImport, type WrapperSummary } from './dissolve.ts';
 import { Lines, listFiles } from './files.ts';
-import type { RuleIndex } from './rules.ts';
+import { localRuleFor, type RuleIndex } from './rules.ts';
 import type { Node } from './svelte.ts';
-import type { ComponentApi, ComponentMigration, ManualTrigger } from './types.ts';
+import type { ComponentApi, ComponentMigration, LocalMigration, ManualTrigger } from './types.ts';
 
 const LIB = '@likable-hair/svelte';
 const MDI = '@mdi/js';
@@ -64,8 +64,17 @@ export interface CodemodResult {
 	skipped: CodemodSkip[];
 	defaults: CodemodDefault[];
 	wrappers: WrapperSummary[];
+	locals: LocalSummary[];
 	deleted: string[];
 	parseErrors: { file: string; error: string }[];
+}
+
+export interface LocalSummary {
+	file: string;
+	from: string;
+	to: string;
+	usages: number;
+	deleted: boolean;
 }
 
 export interface CodemodOptions {
@@ -137,6 +146,8 @@ interface Context {
 	convertDataIcons: boolean;
 	typescript: boolean;
 	references: Map<string, number>;
+	local: (source: string) => { path: string; rule: LocalMigration } | undefined;
+	localUsages: Map<string, number>;
 }
 
 const lineOf = (ctx: Context, pos: number) => ctx.lines.at(Math.max(0, pos - ctx.offset));
@@ -165,6 +176,23 @@ interface LibImport {
 	imported: string;
 	local: string;
 	deep: boolean;
+}
+
+interface LocalImport {
+	decl: Node;
+	rule: LocalMigration;
+	path: string;
+}
+
+function localImports(programs: Node[], ctx: Context): LocalImport[] {
+	const out: LocalImport[] = [];
+	for (const program of programs)
+		for (const statement of program.body as Node[]) {
+			if (statement.type !== 'ImportDeclaration' || typeof statement.source.value !== 'string') continue;
+			const found = ctx.local(statement.source.value);
+			if (found) out.push({ decl: statement, ...found });
+		}
+	return out;
 }
 
 function libraryImports(programs: Node[], index: RuleIndex): LibImport[] {
@@ -285,7 +313,55 @@ function renameImports(roots: unknown[], programs: Node[], ctx: Context): Map<st
 			check: !!change?.note && !rule
 		});
 	}
+	replaceLocalImports(roots, programs, ctx, scope, taken);
 	return scope;
+}
+
+function replaceLocalImports(roots: unknown[], programs: Node[], ctx: Context, scope: Map<string, string>, taken: Map<string, string>) {
+	for (const { decl, rule } of localImports(programs, ctx)) {
+		const typeOnly = decl.importKind === 'type';
+		const named: string[] = [];
+		const kept: Node[] = [];
+		for (const spec of decl.specifiers as Node[]) {
+			if (spec.type === 'ImportDefaultSpecifier' && !typeOnly) {
+				const local = spec.local.name as string;
+				const name = taken.get(rule.to) ?? rule.to;
+				if (!taken.has(rule.to)) {
+					named.push(rule.to);
+					taken.set(rule.to, rule.to);
+				}
+				if (local !== name) renameReferences(roots, local, name, ctx);
+				scope.set(local, rule.from);
+				continue;
+			}
+			const imported = spec.type === 'ImportSpecifier' ? ((spec.imported.name ?? spec.imported.value) as string) : undefined;
+			const to = imported ? rule.exports?.find((e) => e.from === imported)?.to : undefined;
+			if (!to) {
+				kept.push(spec);
+				continue;
+			}
+			const local = spec.local.name as string;
+			named.push(`${spec.importKind === 'type' && !typeOnly ? 'type ' : ''}${to === local ? to : `${to} as ${local}`}`);
+		}
+		const quote = decl.source.raw?.[0] ?? "'";
+		const semi = ctx.text.slice(decl.end - 1, decl.end) === ';' ? ';' : '';
+		const kind = typeOnly ? 'type ' : '';
+		const lines = [
+			named.length ? `import ${kind}{ ${named.join(', ')} } from ${quote}${LIB}${quote}${semi}` : '',
+			kept.length ? `import ${kind}{ ${kept.map((spec) => source(ctx, spec)).join(', ')} } from ${decl.source.raw}${semi}` : ''
+		].filter(Boolean);
+		if (kept.length)
+			skip(ctx, decl.start, {
+				kind: 'local-export',
+				id: `${rule.from}/exports`,
+				name: kept.map((spec) => source(ctx, spec)).join(', '),
+				reason: `not exported by the library: move it into the app or replace it (${rule.summary})`
+			});
+		const lineStart = ctx.text.lastIndexOf('\n', decl.start) + 1;
+		const indent = /^[ \t]*/.exec(ctx.text.slice(lineStart))![0];
+		if (ctx.edit.replace(decl.start, decl.end, lines.join(`\n${indent}`)))
+			changed(ctx, decl.start, { kind: 'local-import', id: `${rule.from}/import`, name: decl.source.value, to: rule.to, note: rule.summary, check: false });
+	}
 }
 
 const isShorthand = (ctx: Context, attr: Node) =>
@@ -638,6 +714,13 @@ function transformUsage(
 			continue;
 		}
 
+		const removed = p.removed?.find((x) => x.name === name);
+		if (removed?.drop) {
+			if (removeAttr(ctx, attr))
+				changed(ctx, attr.start, { kind: 'prop-removed', id: id(`props.removed/${name}`), name, to: removed.replacement, note: removed.note, check: true });
+			continue;
+		}
+
 		const renamed = p.renamed?.find((x) => x.from === name);
 		if (renamed) {
 			const to = renamed.to;
@@ -987,6 +1070,9 @@ function transformSvelte(ctx: Context) {
 			handlerUses.set(expression.name, list);
 		}
 
+	for (const { v4 } of usages)
+		if (ctx.index.byV4.get(v4) && 'files' in ctx.index.byV4.get(v4)!) ctx.localUsages.set(v4, (ctx.localUsages.get(v4) ?? 0) + 1);
+
 	const done = new Set<Node>();
 	const libraryRanges: [number, number][] = [];
 	for (const { node, v4 } of usages) {
@@ -1032,6 +1118,29 @@ function transformScript(ctx: Context) {
 	return undefined;
 }
 
+const IMPORT_SOURCE = /(?:from\s+|import\s*\(\s*|import\s+)['"]([^'"]+)['"]/g;
+
+function unusedCopies(dir: string, paths: string[], copies: Map<string, LocalMigration>, text: (path: string) => string, gone: Set<string>) {
+	const unused = new Set<string>();
+	for (let found = true; found; ) {
+		found = false;
+		for (const copy of copies.keys()) {
+			if (unused.has(copy)) continue;
+			const used = paths.some((file) => {
+				if (file === copy || unused.has(file) || gone.has(file) || !/\.(svelte|ts|js)$/.test(file)) return false;
+				for (const match of text(file).matchAll(IMPORT_SOURCE))
+					if (resolveImport(dir, file, match[1].replace(/\?.*$/, '')) === copy) return true;
+				return false;
+			});
+			if (!used) {
+				unused.add(copy);
+				found = true;
+			}
+		}
+	}
+	return unused;
+}
+
 export function codemod(dir: string, index: RuleIndex, options: CodemodOptions = {}): CodemodResult {
 	dir = resolve(dir);
 	const available = mdiNames(dir);
@@ -1040,7 +1149,7 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 	const paths = existsSync(join(dir, 'src')) ? listFiles(join(dir, 'src')) : [];
 	const texts = new Map(paths.map((path) => [path, readFileSync(path, 'utf8')]));
 	const mdiClasses = [...texts.values()].some((text) => /\bclass=["'{][^"'}]*\bmdi\s+(?:mdi-|\{)/.test(text));
-	const result: CodemodResult = { dir, files: [], changes: [], skipped: [], defaults: [], wrappers: [], deleted: [], parseErrors: [] };
+	const result: CodemodResult = { dir, files: [], changes: [], skipped: [], defaults: [], wrappers: [], locals: [], deleted: [], parseErrors: [] };
 	const dissolved = dissolve(dir, index, texts);
 	result.wrappers = dissolved.wrappers;
 	const checked = new Set(['wrapper-look', 'wrapper-style-ignored', 'wrapper-prop-ignored', 'wrapper-spread', 'wrapper-default', 'wrapper-bind-one-way']);
@@ -1048,6 +1157,17 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 		result.changes.push({ file: c.file, line: c.line, kind: c.kind, id: `wrappers/${c.wrapper}`, name: c.name, to: c.to, note: c.note, check: checked.has(c.kind) });
 	for (const s of dissolved.skipped)
 		result.skipped.push({ file: s.file, line: s.line, kind: s.kind, id: `wrappers/${s.wrapper}`, name: s.name, reason: s.reason });
+
+	const copies = new Map<string, LocalMigration>();
+	for (const path of paths) {
+		if (!path.endsWith('.svelte') || dissolved.deleted.includes(path)) continue;
+		const rule = localRuleFor(index, path, texts.get(path));
+		if (rule) copies.set(path, rule);
+	}
+	const copyNames = new Set([...copies.keys()].map((path) => basename(path)));
+	const importsCopy = (text: string) => [...copyNames].some((name) => text.includes(name));
+	const localUsages = new Map<string, number>();
+	const outputs = new Map<string, string>();
 
 	for (const path of paths) {
 		const original = texts.get(path)!;
@@ -1062,7 +1182,7 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 		const script = /\.(ts|js|mjs|cjs)$/.test(path);
 		const style = /\.(css|pcss|postcss|scss)$/.test(path);
 		if (!svelte && !script && !style) continue;
-		if (script && (!/@likable-hair\/svelte|['"`]mdi-/.test(input) || input.includes('</script'))) continue;
+		if (script && ((!/@likable-hair\/svelte|['"`]mdi-/.test(input) && !importsCopy(input)) || input.includes('</script'))) continue;
 		const text = script ? `${SCRIPT_OPEN}${input}${SCRIPT_CLOSE}` : input;
 		const ctx: Context = {
 			rel,
@@ -1079,7 +1199,13 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 			available,
 			convertDataIcons: !mdiClasses,
 			typescript,
-			references: new Map()
+			references: new Map(),
+			local: (from) => {
+				const target = resolveImport(dir, path, from.replace(/\?.*$/, ''));
+				const rule = target ? copies.get(target) : undefined;
+				return target && rule && target !== path ? { path: target, rule } : undefined;
+			},
+			localUsages
 		};
 		const error = svelte ? transformSvelte(ctx) : script ? transformScript(ctx) : (renameCssText(ctx, 0, text.length), undefined);
 		if (error) {
@@ -1088,10 +1214,32 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 		}
 		const output = ctx.edit.changed ? ctx.edit.toString() : text;
 		const after = script ? output.slice(SCRIPT_OPEN.length, output.length - SCRIPT_CLOSE.length) : output;
-		if (after === original) continue;
-		result.files.push({ path, rel, before: original, after });
+		if (after !== original) outputs.set(path, after);
+	}
+
+	const unused = unusedCopies(dir, paths, copies, (path) => outputs.get(path) ?? dissolved.texts.get(path) ?? texts.get(path)!, new Set(dissolved.deleted));
+	for (const [path, rule] of copies)
+		result.locals.push({
+			file: relative(dir, path),
+			from: rule.from,
+			to: rule.to,
+			usages: localUsages.get(rule.from) ?? 0,
+			deleted: unused.has(path)
+		});
+	result.locals.sort((a, b) => a.file.localeCompare(b.file));
+	for (const path of paths) {
+		const rel = relative(dir, path);
+		if (unused.has(path)) {
+			result.deleted.push(rel);
+			if (options.write) unlinkSync(path);
+			continue;
+		}
+		const after = outputs.get(path);
+		if (after === undefined) continue;
+		result.files.push({ path, rel, before: texts.get(path)!, after });
 		if (options.write) writeFileSync(path, after);
 	}
+	result.deleted.sort();
 	if (!available && result.changes.some((c) => c.kind === 'icon-literal'))
 		result.skipped.push({ file: 'package.json', line: 1, kind: 'icon-unknown', id: 'icons/unknown', name: MDI, reason: '@mdi/js is not installed: icon names were not checked' });
 	return result;

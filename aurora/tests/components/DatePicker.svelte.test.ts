@@ -510,4 +510,70 @@ describe('DatePicker texts', () => {
 		await expect.element(button('Previous month')).toBeVisible();
 		await expect.element(button('October 2026')).toBeVisible();
 	});
+
+	test('months={2}: two grids side by side, each labelled by its title, arrows at the outer sides, no outside days', async () => {
+		const state = bound({ selectedDate: new Date(2026, 8, 21) });
+		await render(DatePicker, withBound({ range: true, months: 2 as const }, state));
+		expect(picker().dataset.months).toBe('2');
+		const header = picker().querySelector('.aurora-date-picker-header')!;
+		expect([...header.querySelectorAll('button')].map((node) => node.getAttribute('aria-label') ?? node.textContent?.trim())).toEqual([
+			'Previous month',
+			'September 2026',
+			'October 2026',
+			'Next month'
+		]);
+		await expect.element(page.getByRole('grid', { name: 'September 2026' })).toBeInTheDocument();
+		await expect.element(page.getByRole('grid', { name: 'October 2026' })).toBeInTheDocument();
+		expect(picker().querySelectorAll('[data-outside]').length).toBe(0);
+		await expect.element(day('2026-10-01')).toBeInTheDocument();
+		const [left, right] = [...picker().querySelectorAll<HTMLElement>('.aurora-calendar')];
+		expect(right.getBoundingClientRect().left).toBeGreaterThan(left.getBoundingClientRect().right);
+
+		await day('2026-10-04').click();
+		expect(state.selectedDateTo).toEqual(new Date(2026, 9, 4));
+		await expect.element(button('September 2026')).toBeInTheDocument();
+
+		await button('Next month').click();
+		await expect.element(button('October 2026')).toBeInTheDocument();
+		await expect.element(button('November 2026')).toBeInTheDocument();
+		expect(state.visibleMonth).toBe(9);
+	});
+
+	test('months={2}: max disables the next arrow on the second month; a selection outside both months is shown first', async () => {
+		const state = bound({ selectedDate: new Date(2026, 8, 21) });
+		await render(DatePicker, withBound({ months: 2 as const, max: new Date(2026, 9, 31) }, state));
+		await expect.element(button('Next month')).toBeDisabled();
+		state.selectedDate = new Date(2026, 4, 2);
+		await expect.element(button('May 2026')).toBeInTheDocument();
+		await expect.element(button('June 2026')).toBeInTheDocument();
+		await expect.element(button('Next month')).toBeEnabled();
+		state.selectedDate = new Date(2026, 5, 9);
+		await expect.element(button('May 2026')).toBeInTheDocument();
+	});
+
+	test('months={2}: focus() moves into the month of the selected day; the month view spans both', async () => {
+		const screen = await render(DatePicker, { months: 2 as const, selectedDate: new Date(2026, 9, 9) });
+		await expect.element(button('September 2026')).not.toBeInTheDocument();
+		screen.component.focus();
+		await expect.element(day('2026-10-09')).toHaveFocus();
+		await button('October 2026').click();
+		expect(picker().dataset.view).toBe('month');
+		expect(picker().hasAttribute('data-months')).toBe(false);
+		await option('March').click();
+		await expect.element(button('March 2026')).toBeInTheDocument();
+		await expect.element(button('April 2026')).toBeInTheDocument();
+	});
+
+	test('footerSnippet renders under the calendar, inside the panel', async () => {
+		await render(DatePicker, {
+			selectedDate: new Date(2026, 9, 9),
+			footerSnippet: createRawSnippet(() => ({ render: () => '<p>Two nights</p>' }))
+		});
+		const footer = picker().querySelector('.aurora-date-picker-footer')!;
+		expect(footer.textContent).toBe('Two nights');
+		expect(footer.getBoundingClientRect().top).toBeGreaterThanOrEqual(
+			picker().querySelector('.aurora-calendar')!.getBoundingClientRect().bottom
+		);
+	});
 });
+

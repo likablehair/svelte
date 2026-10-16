@@ -76,6 +76,7 @@ export default {
 		'`description` per box, always visible, read as the description of the box by screen readers.',
 		'`icon` per box (an `@mdi/js` path in a tile) and `color` for its tone (`primary` or a data color 1–6).',
 		'`disabled` and `class` per box; `data` for app data passed back to the snippets.',
+		'`onclick` per box, called before `onboxClick`; it makes a box without `href` a button.',
 		'Boxes without `href` and without `onboxClick` render as plain cards (v4 drew a button that did nothing).',
 		'`iconSnippet`, `labelSnippet`, `descriptionSnippet`, `prependSnippet`, `appendSnippet`.',
 		'`bind:boxListElement`, `class` and native attributes (such as `aria-label`) on the list.',

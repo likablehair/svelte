@@ -189,6 +189,17 @@ describe('Toaster', () => {
 		expect(onclose).toHaveBeenCalledExactlyOnceWith('action');
 	});
 
+	test('an action with href is a link that closes the toast', async () => {
+		await render(Toaster);
+		const onclose = vi.fn();
+		addToast({ title: 'Import finished', action: { label: 'Open', href: '#imports' }, onclose });
+		const link = toast('Import finished').getByRole('link', { name: 'Open' });
+		await expect.element(link).toHaveAttribute('href', '#imports');
+		await link.click();
+		await expect.element(toast('Import finished')).not.toBeInTheDocument();
+		expect(onclose).toHaveBeenCalledExactlyOnceWith('action');
+	});
+
 	test('an action that calls preventDefault keeps the toast open', { retry: 2 }, async () => {
 		await render(Toaster);
 		const onclick = vi.fn((event: MouseEvent) => event.preventDefault());

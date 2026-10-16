@@ -227,7 +227,8 @@ export default {
 	],
 	added: [
 		'`min`, `max`, `isDateDisabled`, `weekStart`, `weekdayFormat`, `showOutsideDays`, `showWeekdays` (from Calendar).',
-		'`titleSnippet`, `daySnippet`, `dayAppendSnippet`, `weekdaySnippet`.',
+		'`months={2}`: two months side by side in the day view, for long ranges; `--date-picker-month-width`, `--date-picker-months-gap`, `data-months`.',
+		'`titleSnippet`, `daySnippet`, `dayAppendSnippet`, `weekdaySnippet`, `footerSnippet` (content under the calendar, inside the panel).',
 		'`onchange({ selectedDate, selectedDateTo })`.',
 		'`previousMonthLabel`, `nextMonthLabel`, `previousYearLabel`, `nextYearLabel`.',
 		'`focus()` method, `bind:datePickerElement`, native attributes on the panel, `data-view` and `data-disabled`.',

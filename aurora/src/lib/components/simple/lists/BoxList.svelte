@@ -1,5 +1,5 @@
 <!-- @component
-Grid of cards, each with an icon, a label and a description, usually the entry points of a section (settings, reports, tools). A box with `href` is a link, one without is a button when `onboxClick` is set and a plain card otherwise; `onboxClick` is called for links too. The grid fills the width with as many columns as fit (`--box-list-min-width` each, one column on a phone). `color` gives a box a different icon tone. Its state is exposed as `data-color` and `data-interactive` on each box for app CSS.
+Grid of cards, each with an icon, a label and a description, usually the entry points of a section (settings, reports, tools). A box with `href` is a link, one without is a button when it has its own `onclick` or `onboxClick` is set, and a plain card otherwise; `onboxClick` is called for links too. The grid fills the width with as many columns as fit (`--box-list-min-width` each, one column on a phone). `color` gives a box a different icon tone. Its state is exposed as `data-color` and `data-interactive` on each box for app CSS.
 -->
 <script lang="ts" module>
 	/** One card of a `BoxList`. */
@@ -16,7 +16,9 @@ Grid of cards, each with an icon, a label and a description, usually the entry p
 		color?: 'primary' | 1 | 2 | 3 | 4 | 5 | 6;
 		/** Makes the box a link to this URL. */
 		href?: string;
-		/** Disables the box: a button gets `disabled`, a link loses its `href` and gets `aria-disabled`; `onboxClick` is not called. */
+		/** Called when this box is clicked, before `onboxClick`. A box without `href` becomes a button. */
+		onclick?: (event: MouseEvent) => void;
+		/** Disables the box: a button gets `disabled`, a link loses its `href` and gets `aria-disabled`; `onclick` and `onboxClick` are not called. */
 		disabled?: boolean;
 		/** Extra classes on the box element. */
 		class?: string;
@@ -35,7 +37,7 @@ Grid of cards, each with an icon, a label and a description, usually the entry p
 	interface Props extends Omit<HTMLAttributes<HTMLUListElement>, 'class' | 'children'> {
 		/** The boxes, shown in this order. */
 		boxes: BoxListItem<Data>[];
-		/** Called when a box is clicked, links included (before the navigation). Without it, the boxes without `href` are plain cards. */
+		/** Called when a box is clicked, links included (before the navigation), after the `onclick` of the box. Without it, the boxes without `href` or `onclick` are plain cards. */
 		onboxClick?: (args: { box: BoxListItem<Data>; event: MouseEvent }) => void;
 		/** Extra classes on the list. */
 		class?: string;
@@ -72,7 +74,7 @@ Grid of cards, each with an icon, a label and a description, usually the entry p
 	const uid = $props.id();
 
 	function tagOf(box: BoxListItem<Data>): 'a' | 'button' | 'div' {
-		return box.href !== undefined ? 'a' : onboxClick ? 'button' : 'div';
+		return box.href !== undefined ? 'a' : onboxClick || box.onclick ? 'button' : 'div';
 	}
 
 	function attributesOf(box: BoxListItem<Data>, index: number): Record<string, unknown> {
@@ -94,6 +96,7 @@ Grid of cards, each with an icon, a label and a description, usually the entry p
 
 	function handleClick(box: BoxListItem<Data>, event: MouseEvent) {
 		if (box.disabled) return;
+		box.onclick?.(event);
 		onboxClick?.({ box, event });
 	}
 </script>

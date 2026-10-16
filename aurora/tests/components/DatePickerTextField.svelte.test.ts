@@ -1219,4 +1219,145 @@ describe('DatePickerTextField texts', () => {
 		await expect.element(field).toHaveAccessibleDescription('mm/dd/yyyy');
 		await expect.element(own.getByRole('button', { name: 'Choose date' })).toBeInTheDocument();
 	});
+
+	describe('confirm and months', () => {
+		instantDrawers();
+
+		test('months={2} shows two months in the menu', async () => {
+			const screen = await render(DatePickerTextField, {
+				label: 'Stay',
+				range: true,
+				months: 2 as const,
+				selectedDate: new Date(2026, 8, 21)
+			});
+			await screen.getByRole('combobox', { name: 'Stay Start date' }).click();
+			await expect.element(page.getByRole('grid', { name: 'September 2026' })).toBeVisible();
+			await expect.element(page.getByRole('grid', { name: 'October 2026' })).toBeVisible();
+		});
+
+		test('confirm: clicks change a draft; Apply saves it, calls onchange once and closes', async () => {
+			const from = bound<Date>(new Date(2026, 8, 7));
+			const to = bound<Date>(new Date(2026, 9, 2));
+			const onchange = vi.fn();
+			const screen = await render(
+				DatePickerTextField,
+				withBound(
+					{ label: 'Stay', range: true, months: 2 as const, confirm: true, onchange },
+					{ selectedDate: from, selectedDateTo: to }
+				)
+			);
+			const start = screen.getByRole('combobox', { name: 'Stay Start date' });
+			const end = screen.getByRole('combobox', { name: 'Stay End date' });
+			await start.click();
+			await day(new Date(2026, 8, 15)).click();
+			await day(new Date(2026, 9, 20)).click();
+			await expect.element(page.getByRole('dialog', { name: 'Stay' })).toBeVisible();
+			await expect.element(start).toHaveValue('09/07/2026');
+			expect(from.value).toEqual(new Date(2026, 8, 7));
+			expect(onchange).not.toHaveBeenCalled();
+
+			await page.getByRole('button', { name: 'Apply' }).click();
+			await expect.element(page.getByRole('dialog', { name: 'Stay' })).not.toBeInTheDocument();
+			await expect.element(start).toHaveValue('09/15/2026');
+			await expect.element(end).toHaveValue('10/20/2026');
+			await expect.element(end).toHaveFocus();
+			expect(from.value).toEqual(new Date(2026, 8, 15));
+			expect(to.value).toEqual(new Date(2026, 9, 20));
+			expect(onchange).toHaveBeenCalledExactlyOnceWith({
+				selectedDate: new Date(2026, 8, 15),
+				selectedDateTo: new Date(2026, 9, 20)
+			});
+		});
+
+		test('confirm: Cancel and Escape discard the draft, which starts again from the value', async () => {
+			const onchange = vi.fn();
+			const screen = await render(DatePickerTextField, {
+				label: 'Day',
+				confirm: true,
+				selectedDate: new Date(2026, 9, 9),
+				onchange
+			});
+			const input = screen.getByRole('combobox', { name: 'Day' });
+			await input.click();
+			await day(new Date(2026, 9, 12)).click();
+			await expect.element(day(new Date(2026, 9, 12))).toHaveAttribute('aria-selected', 'true');
+			await page.getByRole('button', { name: 'Cancel' }).click();
+			await expect.element(page.getByRole('dialog', { name: 'Day' })).not.toBeInTheDocument();
+			await expect.element(input).toHaveValue('10/09/2026');
+			await expect.element(input).toHaveFocus();
+
+			await input.click();
+			await expect.element(day(new Date(2026, 9, 9))).toHaveAttribute('aria-selected', 'true');
+			await day(new Date(2026, 9, 14)).click();
+			await userEvent.keyboard('{Escape}');
+			await expect.element(page.getByRole('dialog', { name: 'Day' })).not.toBeInTheDocument();
+			await expect.element(input).toHaveValue('10/09/2026');
+			expect(onchange).not.toHaveBeenCalled();
+		});
+
+		test('confirm with clearable: Clear empties the field and closes; typing still changes the date at once', async () => {
+			const onchange = vi.fn();
+			const screen = await render(DatePickerTextField, {
+				label: 'Day',
+				confirm: true,
+				clearable: true,
+				locale: 'it',
+				selectedDate: new Date(2026, 9, 9),
+				onchange
+			});
+			const input = screen.getByRole('combobox', { name: 'Day' });
+			await input.click();
+			const footer = document.querySelector('.aurora-date-picker-footer')!;
+			expect([...footer.querySelectorAll('button')].map((node) => node.textContent?.trim())).toEqual([
+				'Cancella',
+				'Annulla',
+				'Applica'
+			]);
+			await page.getByRole('button', { name: 'Cancella', exact: true }).last().click();
+			await expect.element(page.getByRole('dialog', { name: 'Day' })).not.toBeInTheDocument();
+			await expect.element(input).toHaveValue('');
+			expect(onchange).toHaveBeenCalledExactlyOnceWith({ selectedDate: undefined, selectedDateTo: undefined });
+
+			await userEvent.fill(input, '12/10/2026');
+			expect(onchange).toHaveBeenLastCalledWith({ selectedDate: new Date(2026, 9, 12), selectedDateTo: undefined });
+			await input.click();
+			const italian = new Intl.DateTimeFormat('it', { dateStyle: 'full' }).format(new Date(2026, 9, 12));
+			await expect.element(page.getByRole('gridcell', { name: italian, exact: true })).toHaveAttribute('aria-selected', 'true');
+		});
+
+		test('confirm: applyLabel and cancelLabel rename the buttons', async () => {
+			const screen = await render(DatePickerTextField, {
+				label: 'Day',
+				confirm: true,
+				applyLabel: 'Search',
+				cancelLabel: 'Back'
+			});
+			await screen.getByRole('combobox', { name: 'Day' }).click();
+			await expect.element(page.getByRole('button', { name: 'Search' })).toBeVisible();
+			await expect.element(page.getByRole('button', { name: 'Back' })).toBeVisible();
+		});
+
+		test('mobile: the drawer shows one month and the Apply bar', async () => {
+			await page.viewport(800, 700);
+			try {
+				const screen = await render(DatePickerTextField, {
+					label: 'Stay',
+					range: true,
+					months: 2 as const,
+					confirm: true,
+					selectedDate: new Date(2026, 8, 21)
+				});
+				await screen.getByRole('button', { name: 'Choose date' }).click();
+				const drawer = screen.getByRole('dialog', { name: 'Stay' });
+				await expect.element(drawer).toBeVisible();
+				expect(drawer.element().querySelectorAll('.aurora-calendar').length).toBe(1);
+				await expect.element(drawer.getByRole('button', { name: 'Apply' })).toBeVisible();
+				await drawer.getByRole('button', { name: 'Cancel' }).click();
+				await expect.element(drawer).not.toBeInTheDocument();
+			} finally {
+				await page.viewport(1280, 800);
+			}
+		});
+	});
 });
+

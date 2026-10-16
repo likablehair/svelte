@@ -19,8 +19,8 @@ export type ToastOptions = {
 	duration?: number;
 	/** Shows the close button. Default `true`. */
 	closable?: boolean;
-	/** Button on the right. A click closes the toast, unless `onclick` calls `event.preventDefault()`. */
-	action?: { label: string; onclick?: (event: MouseEvent) => void };
+	/** Button on the right. A click closes the toast, unless `onclick` calls `event.preventDefault()`. With `href` the button is a link to that URL, which SvelteKit preloads like any link. */
+	action?: { label: string; href?: string; onclick?: (event: MouseEvent) => void };
 	/** Shows a spinner and a sliding bar, for work in progress. Update the toast when it ends. */
 	loading?: boolean;
 	/** Shows a progress bar at this percentage (0–100). */

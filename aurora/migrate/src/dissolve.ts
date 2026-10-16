@@ -470,7 +470,7 @@ function finish(
 	return plan;
 }
 
-function resolveImport(dir: string, from: string, source: string): string | undefined {
+export function resolveImport(dir: string, from: string, source: string): string | undefined {
 	if (source.startsWith('$lib/')) return join(dir, 'src/lib', source.slice(5));
 	if (source.startsWith('.')) return resolve(dirname(from), source);
 	return undefined;

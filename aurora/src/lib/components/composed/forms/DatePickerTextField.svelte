@@ -1,5 +1,5 @@
 <!-- @component
-Date field: type the date or choose it in a calendar. The value is `selectedDate`, a `Date` at local midnight; with `range` the field has a start and an end input and `selectedDateTo` holds the end. The format comes from `locale` (`en` is MM/dd/yyyy, `it` dd/MM/yyyy) or from `format`, and it is shown as a chip after the text, which hides itself when the field is too narrow for both. Typing accepts digits only and adds the separators; a whole date that does not exist, is outside `min` and `max` or is disabled by `isDateDisabled` (and an unfinished one when the field loses focus) turns the field to the error state with `invalidText`, and the form refuses to submit it. On desktop, focusing or clicking the field opens a `DatePicker` in a menu; Arrow Down moves the focus into it, Escape closes it and Tab leaves it. On screens up to 1024px wide the calendar button opens it in a bottom drawer instead, and the field stays typable with the numeric keyboard (`mobileDrawer`). Choosing a day closes the calendar (`closeOnSelect`). With `name` (and `nameTo`) the value is submitted as `yyyy-MM-dd`. Its state is exposed as `data-state`, `data-disabled`, `data-readonly`, `data-open` and `data-range` for app CSS.
+Date field: type the date or choose it in a calendar. The value is `selectedDate`, a `Date` at local midnight; with `range` the field has a start and an end input and `selectedDateTo` holds the end. The format comes from `locale` (`en` is MM/dd/yyyy, `it` dd/MM/yyyy) or from `format`, and it is shown as a chip after the text, which hides itself when the field is too narrow for both. Typing accepts digits only and adds the separators; a whole date that does not exist, is outside `min` and `max` or is disabled by `isDateDisabled` (and an unfinished one when the field loses focus) turns the field to the error state with `invalidText`, and the form refuses to submit it. On desktop, focusing or clicking the field opens a `DatePicker` in a menu; Arrow Down moves the focus into it, Escape closes it and Tab leaves it. On screens up to 1024px wide the calendar button opens it in a bottom drawer instead, and the field stays typable with the numeric keyboard (`mobileDrawer`). Choosing a day closes the calendar (`closeOnSelect`). `months={2}` shows two months side by side in the menu. With `confirm` the calendar works on a draft that only the Apply button at its bottom saves; Cancel, Escape and a click outside discard it. With `name` (and `nameTo`) the value is submitted as `yyyy-MM-dd`. Its state is exposed as `data-state`, `data-disabled`, `data-readonly`, `data-open` and `data-range` for app CSS.
 -->
 <script lang="ts">
 	import '../../../css/tokens.css';
@@ -8,6 +8,8 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 	import { tick, untrack, type Snippet } from 'svelte';
 	import type { HTMLInputAttributes } from 'svelte/elements';
 	import Menu from '../../simple/common/Menu.svelte';
+	import Button from '../../simple/buttons/Button.svelte';
+	import ConfirmOrCancelButtons from './ConfirmOrCancelButtons.svelte';
 	import type { CalendarDay } from '../../simple/dates/Calendar.svelte';
 	import DatePicker from '../../simple/dates/DatePicker.svelte';
 	import Icon from '../../simple/media/Icon.svelte';
@@ -105,8 +107,16 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		clearable?: boolean;
 		/** Accessible name of the clear button. Defaults to "Clear", in the language of `locale`. */
 		clearLabel?: string;
-		/** Closes the calendar when a day is chosen (with `range`, when the end is chosen). */
+		/** Closes the calendar when a day is chosen (with `range`, when the end is chosen). Ignored with `confirm`. */
 		closeOnSelect?: boolean;
+		/** Months shown side by side in the calendar menu: `2` helps to pick long ranges. The mobile drawer always shows one. */
+		months?: 1 | 2;
+		/** The calendar works on a draft: the date (or the range) changes only with the Apply button at its bottom, while Cancel, Escape and a click outside discard the draft. With `clearable` the bottom also has a Clear button, which empties the field and closes the calendar. Typing in the field still changes the date at once. */
+		confirm?: boolean;
+		/** Text of the Apply button, with `confirm`. Defaults to "Apply", in the language of `locale`. */
+		applyLabel?: string;
+		/** Text of the Cancel button, with `confirm`. Defaults to "Cancel", in the language of `locale`. */
+		cancelLabel?: string;
 		/** Side of the field where the calendar menu opens. It flips when there is not enough space. */
 		placement?:
 			| 'bottom-start'
@@ -213,6 +223,10 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		clearable = false,
 		clearLabel,
 		closeOnSelect = true,
+		months = 1,
+		confirm = false,
+		applyLabel,
+		cancelLabel,
 		placement = 'bottom-start',
 		mobileDrawer = true,
 		drawerTitle,
@@ -300,6 +314,20 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 				shownTo = to;
 				textTo = to ? formatDate(to, current) : '';
 			}
+		});
+	});
+
+	let draftFrom = $state<Date>();
+	let draftTo = $state<Date>();
+
+	$effect(() => {
+		const from = selectedDate;
+		const to = selectedDateTo;
+		void open;
+		untrack(() => {
+			if (!confirm) return;
+			draftFrom = from;
+			draftTo = to;
 		});
 	});
 
@@ -399,7 +427,7 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		picker?.focus();
 	}
 
-	function clear() {
+	function clear(focus = true) {
 		const changed = !!(selectedDate || selectedDateTo);
 		textFrom = '';
 		textTo = '';
@@ -408,10 +436,24 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		selectedDate = undefined;
 		selectedDateTo = undefined;
 		if (changed) onchange?.({ selectedDate, selectedDateTo });
-		focusField('from');
+		if (focus) focusField('from');
+	}
+
+	function apply() {
+		const changed = !sameDay(draftFrom, selectedDate) || (range && !sameDay(draftTo, selectedDateTo));
+		selectedDate = draftFrom;
+		if (range) selectedDateTo = draftTo;
+		if (changed) onchange?.({ selectedDate, selectedDateTo });
+		close(range && draftTo ? 'to' : 'from');
+	}
+
+	function clearAndClose() {
+		close(drawerMode ? undefined : 'from');
+		clear(false);
 	}
 
 	function pickerChange(event: { selectedDate: Date | undefined; selectedDateTo: Date | undefined }) {
+		if (confirm) return;
 		onchange?.(event);
 		if (closeOnSelect && (!range || event.selectedDateTo)) close(range ? 'to' : 'from');
 	}
@@ -490,11 +532,42 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 	/>
 {/snippet}
 
+{#snippet footer()}
+	<ConfirmOrCancelButtons
+		direction="row"
+		{locale}
+		confirmText={applyLabel ?? texts.datePickerTextField.apply}
+		cancelText={cancelLabel ?? texts.datePickerTextField.cancel}
+		onconfirmClick={apply}
+		oncancelClick={() => close(drawerMode ? undefined : origin)}
+	>
+		{#if clearable}
+			<Button buttonType="text" variant="secondary" onclick={clearAndClose}
+				>{clearLabel ?? texts.datePickerTextField.clear}</Button
+			>
+		{/if}
+	</ConfirmOrCancelButtons>
+{/snippet}
+
 {#snippet pickerPanel()}
 	<DatePicker
 		bind:this={picker}
-		bind:selectedDate
-		bind:selectedDateTo
+		bind:selectedDate={
+			() => (confirm ? draftFrom : selectedDate),
+			(value) => {
+				if (confirm) draftFrom = value;
+				else selectedDate = value;
+			}
+		}
+		bind:selectedDateTo={
+			() => (confirm ? draftTo : selectedDateTo),
+			(value) => {
+				if (confirm) draftTo = value;
+				else selectedDateTo = value;
+			}
+		}
+		months={drawerMode ? 1 : months}
+		footerSnippet={confirm ? footer : undefined}
 		{range}
 		{locale}
 		{weekStart}
@@ -615,7 +688,7 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 							class="aurora-date-picker-text-field-clear"
 							aria-label={clearLabel ?? texts.datePickerTextField.clear}
 							onmousedown={(event) => event.preventDefault()}
-							onclick={clear}
+							onclick={() => clear()}
 						>
 							{#if clearSnippet}
 								{@render clearSnippet()}

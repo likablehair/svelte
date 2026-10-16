@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs';
-import type { CompiledRules, ComponentMigration, ExportChange } from './types.ts';
+import { basename } from 'node:path';
+import { LOCAL_PREFIX } from './compile.ts';
+import type { CompiledRules, ComponentMigration, ExportChange, LocalMigration } from './types.ts';
 
 export interface CssVarRule {
 	component: string;
@@ -18,6 +20,16 @@ export interface RuleIndex {
 	v4Exports: Set<string>;
 	v4Components: Set<string>;
 	v5Exports: Set<string>;
+	localFiles: Map<string, LocalMigration[]>;
+}
+
+export const isLocalRule = (rule: ComponentMigration): rule is LocalMigration =>
+	rule.from.startsWith(LOCAL_PREFIX) && 'files' in rule;
+
+export function localRuleFor(index: RuleIndex, path: string, text: string | undefined): LocalMigration | undefined {
+	return index.localFiles
+		.get(basename(path))
+		?.find((rule) => text !== undefined && (rule.contains ?? []).every((needle) => text.includes(needle)));
 }
 
 export function indexRules(rules: CompiledRules): RuleIndex {
@@ -39,8 +51,13 @@ export function indexRules(rules: CompiledRules): RuleIndex {
 		for (const r of rule.cssVars?.changed ?? [])
 			add({ component: rule.from, kind: 'changed', name: r.name, note: r.note });
 	}
+	const localFiles = new Map<string, LocalMigration[]>();
+	for (const rule of rules.components)
+		if (isLocalRule(rule))
+			for (const file of rule.files) localFiles.set(file, [...(localFiles.get(file) ?? []), rule]);
 	return {
 		rules,
+		localFiles,
 		byV4: new Map(rules.components.map((rule) => [rule.from, rule])),
 		cssVars,
 		exportChanges: new Map(rules.global.exports.map((e) => [e.name, e])),

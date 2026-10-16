@@ -1,5 +1,5 @@
 <!-- @component
-Short description of an element, shown on hover after `appearTimeout` and right away on keyboard focus. It stays open while the pointer moves onto it and closes on Escape, on a click or when the pointer and the focus leave; on touch screens a tap on the activator toggles it. It opens on the browser's top layer (`popover`) next to the `activator`, flips and shifts to stay in the viewport, and adds its id to the activator's `aria-describedby`. `variant="plain"` is a dark one-line label, `variant="rich"` a card with a `title` and wrapping text. A tooltip is never interactive: for links or buttons use `Menu`. The current side is exposed as `data-side` and the variant as `data-variant` on the tooltip element.
+Short description of an element, shown on hover after `appearTimeout` and right away on keyboard focus. It stays open while the pointer moves onto it and closes on Escape, on a click or when the pointer and the focus leave; on touch screens a tap on the activator toggles it. It opens on the browser's top layer (`popover`) next to the `activator`, flips and shifts to stay in the viewport, and adds its id to the activator's `aria-describedby`. `variant="plain"` is a dark one-line label, `variant="rich"` a card with a `title` and wrapping text. By default a tooltip is not interactive; with `interactive` its content can hold links, buttons or a scrolling text: it stays open while the pointer or the focus is inside it, and Tab moves into it when the Tooltip comes right after its activator in the markup. For a list of actions use `Menu`. The current side is exposed as `data-side`, the variant as `data-variant` and `interactive` as `data-interactive` on the tooltip element.
 -->
 <script lang="ts" module>
 	let lastClosedAt = 0;
@@ -41,11 +41,13 @@ Short description of an element, shown on hover after `appearTimeout` and right 
 		offset?: number;
 		/** Delay before the tooltip opens on hover, in milliseconds. Keyboard focus opens it right away, and so does hovering another tooltip's activator just after one closed. */
 		appearTimeout?: number;
+		/** Lets the content hold links and buttons: the tooltip becomes a non-modal `dialog`, waits longer before closing when the pointer leaves, stays open while the keyboard focus is inside it, and Escape gives the focus back to the activator. */
+		interactive?: boolean;
 		/** The tooltip element. */
 		tooltipElement?: HTMLDivElement;
 		/** Extra classes on the tooltip element. */
 		class?: string;
-		/** Replaces `text`. Keep it non-interactive. */
+		/** Replaces `text`. Keep it non-interactive unless `interactive` is set. */
 		children?: Snippet;
 		/** Replaces the title. */
 		titleSnippet?: Snippet<[{ title: string | undefined }]>;
@@ -60,6 +62,7 @@ Short description of an element, shown on hover after `appearTimeout` and right 
 		placement = 'top',
 		offset = 10,
 		appearTimeout = 400,
+		interactive = false,
 		tooltipElement = $bindable(),
 		class: clazz,
 		children,
@@ -88,9 +91,23 @@ Short description of an element, shown on hover after `appearTimeout` and right 
 		openTimer = setTimeout(() => (open = true), delay);
 	}
 
+	function focusInside() {
+		return !!tooltipNode?.contains(document.activeElement);
+	}
+
+	function keyboardInside() {
+		return focusInside() && !!document.activeElement?.matches(':focus-visible');
+	}
+
 	function scheduleClose() {
 		clearTimers();
-		closeTimer = setTimeout(() => (open = false), 100);
+		closeTimer = setTimeout(
+			() => {
+				if (interactive && keyboardInside()) return;
+				open = false;
+			},
+			interactive ? 300 : 100
+		);
 	}
 
 	$effect(() => {
@@ -116,7 +133,8 @@ Short description of an element, shown on hover after `appearTimeout` and right 
 			clearTimers();
 			open = true;
 		};
-		const onFocusOut = () => {
+		const onFocusOut = (event: FocusEvent) => {
+			if (interactive && tooltipNode?.contains(event.relatedTarget as Node)) return;
 			clearTimers();
 			if (open) queueMicrotask(() => (open = false));
 		};
@@ -149,11 +167,25 @@ Short description of an element, shown on hover after `appearTimeout` and right 
 		const onPointerLeave = (event: PointerEvent) => {
 			if (event.pointerType !== 'touch') scheduleClose();
 		};
+		const onFocusIn = () => {
+			if (interactive) clearTimers();
+		};
+		const onFocusOut = (event: FocusEvent) => {
+			if (!interactive) return;
+			const next = event.relatedTarget as Node | null;
+			if (node.contains(next) || activator?.contains(next)) return;
+			clearTimers();
+			open = false;
+		};
 		node.addEventListener('pointerenter', onPointerEnter);
 		node.addEventListener('pointerleave', onPointerLeave);
+		node.addEventListener('focusin', onFocusIn);
+		node.addEventListener('focusout', onFocusOut);
 		return () => {
 			node.removeEventListener('pointerenter', onPointerEnter);
 			node.removeEventListener('pointerleave', onPointerLeave);
+			node.removeEventListener('focusin', onFocusIn);
+			node.removeEventListener('focusout', onFocusOut);
 		};
 	});
 
@@ -180,6 +212,7 @@ Short description of an element, shown on hover after `appearTimeout` and right 
 			if (event.key !== 'Escape' || event.defaultPrevented) return;
 			event.preventDefault();
 			clearTimers();
+			if (focusInside()) anchor?.focus();
 			open = false;
 		};
 		const onPointerDown = (event: PointerEvent) => {
@@ -203,16 +236,18 @@ Short description of an element, shown on hover after `appearTimeout` and right 
 	{...rest}
 	{id}
 	popover="manual"
-	role="tooltip"
+	role={interactive ? 'dialog' : 'tooltip'}
+	aria-labelledby={interactive && (title || titleSnippet) ? `${id}-title` : undefined}
 	class={['aurora-tooltip', clazz]}
 	data-variant={variant}
+	data-interactive={interactive || undefined}
 	bind:this={() => tooltipNode, (node) => (tooltipNode = tooltipElement = node)}
 >
 	<span class="aurora-tooltip-arrow"></span>
 	{#if titleSnippet}
-		<span class="aurora-tooltip-title">{@render titleSnippet({ title })}</span>
+		<span id="{id}-title" class="aurora-tooltip-title">{@render titleSnippet({ title })}</span>
 	{:else if title}
-		<span class="aurora-tooltip-title">{title}</span>
+		<span id="{id}-title" class="aurora-tooltip-title">{title}</span>
 	{/if}
 	{#if children}
 		<span class="aurora-tooltip-text">{@render children()}</span>

@@ -9,6 +9,7 @@ export interface Removal {
 	name: string;
 	note: string;
 	replacement?: string;
+	drop?: boolean;
 }
 
 export interface DefaultChange {
@@ -114,6 +115,13 @@ export interface ComponentMigration {
 	cssVars?: CssVarRules;
 	manual?: ManualStep[];
 	added?: string[];
+}
+
+export interface LocalMigration extends ComponentMigration {
+	files: string[];
+	contains?: string[];
+	exports?: Rename[];
+	summary: string;
 }
 
 export interface TokenMapping {

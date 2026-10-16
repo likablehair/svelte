@@ -15,6 +15,8 @@
 		--simple-text-field-default-placeholder-color: var(--global-input-placeholder-color);
 		--simple-text-field-default-icon-color: var(--global-input-icon-color);
 		--simple-text-field-default-icon-size: 18px;
+		--simple-text-field-default-reveal-color: var(--global-input-icon-color);
+		--simple-text-field-default-reveal-hover-color: var(--global-color-text);
 		--simple-text-field-default-background: var(--global-input-background);
 		--simple-text-field-default-border-width: var(--global-input-border-width);
 		--simple-text-field-default-border-color: var(--global-input-border-color);

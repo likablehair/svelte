@@ -11,6 +11,8 @@ import type { RuleIndex } from './rules.ts';
 import { scanSvelte, walk, type ImportRecord, type Node } from './svelte.ts';
 import type { ComponentMigration } from './types.ts';
 
+import { LOCAL_PREFIX } from './compile.ts';
+
 const LIB = '@likable-hair/svelte';
 const SCRIPT_OPEN = '<script lang="ts">';
 
@@ -564,7 +566,7 @@ function reviewFromBase(env: Env, snapshot: string, current: (rel: string) => st
 	const targets = new Map(result.wrappers.map((w) => [`wrappers/${basename(w.file, '.svelte')}`, w.target]));
 	const v5Name = (v4?: string) =>
 		!v4 ? undefined : (env.index.byV4.get(v4)?.to ?? (env.index.rules.v5.components[v4] || env.index.v4Components.has(v4) ? v4 : undefined));
-	const owner = (id: string) => targets.get(id) ?? v5Name(id.split('/')[0]);
+	const owner = (id: string) => targets.get(id) ?? v5Name(id.split('/').slice(0, id.startsWith(LOCAL_PREFIX) ? 2 : 1).join('/'));
 	for (const f of analysis.findings) {
 		if (f.effort !== 'manual') continue;
 		const step = f.kind === 'manual' ? env.index.byV4.get(f.component ?? '')?.manual?.find((s) => s.id === f.id) : undefined;

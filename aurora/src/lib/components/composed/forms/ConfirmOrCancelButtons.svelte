@@ -1,5 +1,5 @@
 <!-- @component
-Pair of buttons that closes a form or a dialog: a text "Cancel" button and a filled "Save" button, aligned to the end, with optional content (such as "Unsaved changes") at the start. When the space they sit in is narrower than 480px (a phone, a narrow drawer) they stack at full width, with the confirm button on top. In the actions of a `PageHeader` they always stay in a row. `loading` shows a spinner on the confirm button and disables it; `confirmType="submit"` makes it submit the surrounding form. Both buttons can be replaced with snippets that receive the handlers. It has no space above it, like every component (the layout decides, for example with `gap`); `--confirm-or-cancel-buttons-margin-top` adds it, and setting `--confirm-or-cancel-buttons-default-margin-top` in the app CSS gives it to every instance, as v4 did with 20px. In the actions of a `Dialog` or a `Drawer`, which have their own padding, it is always 0. Its state is exposed as `data-loading` for app CSS.
+Pair of buttons that closes a form or a dialog: a text "Cancel" button and a filled "Save" button, aligned to the end, with optional content (such as "Unsaved changes") at the start. When the space they sit in is narrower than 480px (a phone, a narrow drawer) they stack at full width, with the confirm button on top; `direction="row"` or `direction="column"` fixes the layout. In the actions of a `PageHeader` they stay in a row unless `direction="column"`. `loading` shows a spinner on the confirm button and disables it; `confirmType="submit"` makes it submit the surrounding form. Both buttons can be replaced with snippets that receive the handlers. It has no space above it, like every component (the layout decides, for example with `gap`); `--confirm-or-cancel-buttons-margin-top` adds it, and setting `--confirm-or-cancel-buttons-default-margin-top` in the app CSS gives it to every instance, as v4 did with 20px. In the actions of a `Dialog` or a `Drawer`, which have their own padding, it is always 0. Its state is exposed as `data-loading` and `data-direction` for app CSS.
 -->
 <script lang="ts">
 	import '../../../css/tokens.css';
@@ -31,6 +31,8 @@ Pair of buttons that closes a form or a dialog: a text "Cancel" button and a fil
 		confirmVariant?: ComponentProps<typeof Button>['variant'];
 		/** Native `type` of the confirm button. `submit` submits the surrounding form, with its validation. */
 		confirmType?: 'button' | 'submit';
+		/** How the buttons are laid out. `auto` keeps them in a row and stacks them at full width, confirm on top, when the space is narrower than 480px; `row` never stacks them; `column` always stacks them. */
+		direction?: 'auto' | 'row' | 'column';
 		/** Extra classes for each part. */
 		class?: {
 			container?: string;
@@ -80,6 +82,7 @@ Pair of buttons that closes a form or a dialog: a text "Cancel" button and a fil
 		cancelIcon,
 		confirmVariant = 'primary',
 		confirmType = 'button',
+		direction = 'auto',
 		class: clazz = {},
 		onconfirmClick,
 		oncancelClick,
@@ -108,6 +111,7 @@ Pair of buttons that closes a form or a dialog: a text "Cancel" button and a fil
 	{...rest}
 	class={['aurora-confirm-or-cancel-buttons', clazz.container]}
 	data-loading={loading || undefined}
+	data-direction={direction}
 >
 	<div class="aurora-confirm-or-cancel-buttons-row">
 		{#if children}
@@ -197,6 +201,23 @@ Pair of buttons that closes a form or a dialog: a text "Cancel" button and a fil
 				var(--confirm-or-cancel-buttons-default-actions-gap)
 			);
 			margin-inline-start: auto;
+		}
+
+		.aurora-confirm-or-cancel-buttons[data-direction='row'] {
+			container-type: normal;
+		}
+
+		.aurora-confirm-or-cancel-buttons[data-direction='column'] .aurora-confirm-or-cancel-buttons-row {
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		.aurora-confirm-or-cancel-buttons[data-direction='column'] .aurora-confirm-or-cancel-buttons-actions {
+			--button-default-width: 100%;
+
+			flex-direction: column-reverse;
+			align-items: stretch;
+			margin-inline-start: 0;
 		}
 
 		@container aurora-confirm-or-cancel-buttons (max-width: 480px) {

@@ -4,6 +4,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import SimpleTextField from '#lib/components/simple/forms/SimpleTextField.svelte';
+import { renderWithDefaultLocale } from '../helpers.js';
 
 function host(style: string) {
 	const element = document.createElement('div');
@@ -334,5 +335,84 @@ describe('SimpleTextField', () => {
 		await input.hover();
 		const control = target.querySelector('.aurora-text-field-control')!;
 		expect(getComputedStyle(control).borderTopColor).toBe('rgb(1, 2, 3)');
+	});
+
+	test('revealable: an eye toggle inside a password field shows and hides the password, keeping the focus', async () => {
+		const target = host('width: 320px');
+		const screen = await render(SimpleTextField, {
+			target,
+			props: { type: 'password', label: 'Password', value: 'secret', revealable: true }
+		});
+		const input = target.querySelector('input')!;
+		const toggle = screen.getByRole('button', { name: 'Show password' });
+		expect(input.type).toBe('password');
+		await expect.element(toggle).toHaveAttribute('aria-pressed', 'false');
+		await expect.element(toggle).toHaveAttribute('aria-controls', input.id);
+		await userEvent.click(input);
+		await toggle.click();
+		expect(input.type).toBe('text');
+		await expect.element(toggle).toHaveAttribute('aria-pressed', 'true');
+		expect(document.activeElement).toBe(input);
+		expect(target.querySelector('.aurora-text-field')?.getAttribute('data-revealed')).toBe('true');
+		await userEvent.keyboard('{Tab}');
+		await expect.element(toggle).toHaveFocus();
+		await userEvent.keyboard('{Enter}');
+		expect(input.type).toBe('password');
+		expect(target.querySelector('.aurora-text-field')?.hasAttribute('data-revealed')).toBe(false);
+		target.remove();
+	});
+
+	test('revealable: no toggle without the prop or on other types; bind:revealed; texts from the locale', async () => {
+		const plain = await render(SimpleTextField, { type: 'password', label: 'Password' });
+		await expect.element(plain.getByRole('button')).not.toBeInTheDocument();
+		plain.unmount();
+		const text = await render(SimpleTextField, { type: 'text', label: 'Name', revealable: true });
+		await expect.element(text.getByRole('button')).not.toBeInTheDocument();
+		text.unmount();
+
+		let revealed = true;
+		const bound = await render(SimpleTextField, {
+			type: 'password',
+			label: 'Password',
+			revealable: true,
+			locale: 'it',
+			get revealed() {
+				return revealed;
+			},
+			set revealed(value: boolean) {
+				revealed = value;
+			}
+		});
+		const toggle = bound.getByRole('button', { name: 'Mostra password' });
+		await expect.element(toggle).toHaveAttribute('aria-pressed', 'true');
+		await toggle.click();
+		expect(revealed).toBe(false);
+		bound.unmount();
+
+		const inherited = await renderWithDefaultLocale('it', SimpleTextField, {
+			type: 'password',
+			label: 'Password',
+			revealable: true
+		});
+		await expect.element(inherited.getByRole('button', { name: 'Mostra password' })).toBeInTheDocument();
+		inherited.unmount();
+
+		const custom = await renderWithDefaultLocale('it', SimpleTextField, {
+			type: 'password',
+			label: 'PIN',
+			revealable: true,
+			revealLabel: 'Show PIN'
+		});
+		await expect.element(custom.getByRole('button', { name: 'Show PIN' })).toBeInTheDocument();
+	});
+
+	test('revealable: the toggle is disabled with the field', async () => {
+		const screen = await render(SimpleTextField, {
+			type: 'password',
+			label: 'Password',
+			revealable: true,
+			disabled: true
+		});
+		await expect.element(screen.getByRole('button', { name: 'Show password' })).toBeDisabled();
 	});
 });

@@ -419,7 +419,7 @@ New, optional: `label` (screen readers also get a hidden table of the values), `
 - Markup: `ul` / `li` (v4 had `role="listbox"` without options) with `.aurora-box-list-box`; app CSS on `.box` must move to the `--box-list-*` variables.
 - **Local copies**: most apps use `$lib/components/common/BoxList.svelte` instead of the library. Replace it with `BoxList`: `icon` → `@mdi/js` path, `description` stays (always visible; `descriptionSnippet` with `{@html}` for HTML), `redirectUrl` / `url` → `href`, drop `expanded`, `animateOnMount` and `type`, `on:box-click` → `onboxClick` or `href`. A `prepend` slot with a custom card has no equivalent: render the card next to the list.
 
-New, optional: per box `description`, `icon`, `color` (`primary` or 1–6), `disabled`, `class`, `data`; boxes with neither `href` nor `onboxClick` are plain cards; `iconSnippet`, `labelSnippet`, `descriptionSnippet`, `prependSnippet`, `appendSnippet`; `bind:boxListElement`, `class` and native attributes on the list; `data-color`, `data-interactive`; every `--box-list-*` variable.
+New, optional: per box `description`, `icon`, `color` (`primary` or 1–6), `disabled`, `class`, `data`, `onclick` (called before `onboxClick`, makes the box a button); boxes with neither `href` nor `onboxClick` are plain cards; `iconSnippet`, `labelSnippet`, `descriptionSnippet`, `prependSnippet`, `appendSnippet`; `bind:boxListElement`, `class` and native attributes on the list; `data-color`, `data-interactive`; every `--box-list-*` variable.
 
 ### Button
 
@@ -627,10 +627,10 @@ New in v5: the dialog that asks to confirm an action (icon, question, descriptio
 - In `cancelButtonSnippet` and `confirmButtonSnippet`, `handleCancel` and `handleConfirm` take the native event (v4: `handleConfirm` took Button's `{ detail }` event). `cancelButtonSnippet` also receives `cancelDisable`.
 - `cancelDisable` now really disables the cancel button (v4: it only skipped the callback). `onconfirmClick` is not called while `loading`.
 - The cancel button is a text Button (v4: an unstyled `<button>`).
-- Stacking: the buttons stack at full width, confirm on top, when their container is narrower than 480px (v4: when the viewport was under 769px). In a wide container on a phone they stay in a row; in a narrow drawer on desktop they stack.
+- Stacking: the buttons stack at full width, confirm on top, when their container is narrower than 480px (v4: when the viewport was under 769px). In a wide container on a phone they stay in a row; in a narrow drawer on desktop they stack. `direction="row"` or `direction="column"` fixes the layout.
 - The root is a size container (`container-type: inline-size`): in a flex row with automatic width it collapses to zero width. Give it a width (`flex: 1` or `width: 100%` through `class.container`) or put it in a block. In the `actionsSnippet` of a `PageHeader` it is not a container and always stays in a row.
 
-New, optional: `locale` (language of the texts), `confirmIcon`, `cancelIcon`, `confirmVariant`, `confirmType`, `children` (content at the start of the row), `class` object, CSS variables `--confirm-or-cancel-buttons-*`, `data-loading`.
+New, optional: `locale` (language of the texts), `confirmIcon`, `cancelIcon`, `confirmVariant`, `confirmType`, `children` (content at the start of the row), `direction` (`row` never stacks, `column` always stacks), `class` object, CSS variables `--confirm-or-cancel-buttons-*`, `data-loading`.
 
 ### CountriesAutocomplete
 
@@ -740,7 +740,7 @@ What [Calendar](#calendar) says about `range`, `locale`, the days of the nearby 
 
 The `-default-*` names follow.
 
-New, optional: `min`, `max`, `isDateDisabled`, `weekStart`, `weekdayFormat`, `showOutsideDays`, `showWeekdays`, `titleSnippet`, `daySnippet`, `dayAppendSnippet`, `weekdaySnippet`, `onchange`, the arrow labels, `focus()`, `bind:datePickerElement`, native attributes, `--date-picker-*` for padding, gap, background, border and title.
+New, optional: `min`, `max`, `isDateDisabled`, `weekStart`, `weekdayFormat`, `showOutsideDays`, `showWeekdays`, `months={2}` (two months side by side), `titleSnippet`, `daySnippet`, `dayAppendSnippet`, `weekdaySnippet`, `footerSnippet`, `onchange`, the arrow labels, `focus()`, `bind:datePickerElement`, native attributes, `--date-picker-*` for padding, gap, background, border and title.
 
 ### DatePickerTextField
 
@@ -776,7 +776,7 @@ The v4 field was styled with SimpleTextField variables passed to DatePickerTextF
 
 The others only change prefix (`max-width`, `outer-gap`, `inner-gap`, `border-radius`, `box-shadow`, `font-size`, `font-weight`, `color`, `hint-font-size`, `hint-color`). `--simple-textfield-default-*` map to `--date-picker-text-field-default-*` the same way (`--simple-textfield-default-radius`, which did not exist, to `-default-border-radius`; `--simple-textfield-default-margin` is dropped).
 
-New, optional: `label`, `hint`, `state`, `invalidText`, `min`, `max`, `isDateDisabled`, `weekStart`, `weekdayFormat`, `showOutsideDays`, `name` / `nameTo` (hidden inputs with `yyyy-MM-dd`), `required`, `readonly`, `id`, `clearable`, `showFormat`, `formatLabel`, `drawerTitle`, texts (`openLabel`, `closeLabel`, `clearLabel`, `startLabel`, `endLabel`, `previousMonthLabel`, `nextMonthLabel`, `previousYearLabel`, `nextYearLabel` for the calendar arrows), snippets `labelSnippet`, `hintSnippet`, `stateIconSnippet`, `clearSnippet`, `formatSnippet`, `daySnippet`, `dayAppendSnippet`, `bind:input` / `bind:inputTo`, native input attributes, `data-*` state attributes.
+New, optional: `label`, `hint`, `state`, `invalidText`, `min`, `max`, `isDateDisabled`, `weekStart`, `weekdayFormat`, `showOutsideDays`, `name` / `nameTo` (hidden inputs with `yyyy-MM-dd`), `required`, `readonly`, `id`, `clearable`, `months={2}` (two months in the menu), `confirm` (draft saved with Apply, with Cancel and, with `clearable`, Clear; replaces the local `DateRangePicker` copies with `showApply` / `showClear` / `twoMonthsView`) with `applyLabel` and `cancelLabel`, `showFormat`, `formatLabel`, `drawerTitle`, texts (`openLabel`, `closeLabel`, `clearLabel`, `startLabel`, `endLabel`, `previousMonthLabel`, `nextMonthLabel`, `previousYearLabel`, `nextYearLabel` for the calendar arrows), snippets `labelSnippet`, `hintSnippet`, `stateIconSnippet`, `clearSnippet`, `formatSnippet`, `daySnippet`, `dayAppendSnippet`, `bind:input` / `bind:inputTo`, native input attributes, `data-*` state attributes.
 
 ### DateTimePickerTextField
 
@@ -1744,7 +1744,7 @@ New, optional: `expandOn`, `options` / `selected` / `currentPath` / `onmenuSelec
 
 The others only change prefix: `width`, `max-width`, `outer-gap`, `inner-gap`, `padding`, `height`, `border-radius`, `box-shadow`, `font-size`, `font-weight`, `color`, `hint-font-size`, `hint-color`.
 
-New, optional: `label`, `state`, `labelSnippet`, `stateIconSnippet`, `class.label`, `type` `email` / `tel` / `search` / `url`, `data-state` / `data-disabled` / `data-readonly`.
+New, optional: `label`, `state`, `labelSnippet`, `stateIconSnippet`, `class.label`, `type` `email` / `tel` / `search` / `url`, `revealable` (eye toggle on a password field, with `bind:revealed`, `revealLabel`, `locale`; replaces the local `PasswordTextfield` copies), `data-state` / `data-disabled` / `data-readonly` / `data-revealed`, `--simple-text-field-reveal-color` / `-reveal-hover-color`.
 
 ### Skeleton
 
@@ -1921,7 +1921,7 @@ To move without touching the call sites, turn the app's `Toaster.svelte` into an
 		description?: string;
 		closeDelay?: number;
 		showLoading?: boolean;
-		action?: { label: string; handler: () => void };
+		action?: { label: string; handler?: () => void; urlToPreload?: string };
 	};
 
 	const options = ({ data }: { data: Data }) => ({
@@ -1929,7 +1929,11 @@ To move without touching the call sites, turn the app's `Toaster.svelte` into an
 		description: data.description,
 		duration: data.closeDelay,
 		loading: data.showLoading,
-		action: data.action && { label: data.action.label, onclick: data.action.handler }
+		action: data.action && {
+			label: data.action.label,
+			href: data.action.urlToPreload,
+			onclick: data.action.handler
+		}
 	});
 
 	export const addErrorToast = (props: { data: Data }) => toasts.addErrorToast(options(props));
@@ -1953,6 +1957,7 @@ Differences from the melt-ui copies:
 - `duration` (ms) replaces `closeDelay`, and it works: `0` keeps the toast open (several copies turned `0` into 3000 or ignored the value). Default 5000 (the copies used 3000).
 - `loading` replaces `showLoading`; `updateToast(id, { variant: 'success', title, loading: false })` turns it into a result instead of removing it and adding a new one. `progress` shows a determinate bar.
 - A click on `action` closes the toast, unless its `onclick` calls `event.preventDefault()` (the copies left it open).
+- `action.urlToPreload` (+ `usePreloadData`) → `action.href`: the action is a link, preloaded by SvelteKit like any link (`data-sveltekit-preload-data` on `<body>`, on by default).
 - Position: bottom right on desktop, full width on screens up to 640px (the copies: top right on mobile). Pass `position` to change it.
 - At most 5 toasts (`limit`); an identical toast still visible restarts its timer instead of stacking.
 - Errors and warnings are announced right away, the others politely (the copies used `role="alert"` for all); the close button has an accessible name.
@@ -1981,7 +1986,9 @@ New, optional: `mandatory`, `size`, `dot`, `itemSnippet`, `bind:toggleListElemen
 - Behaviour: it also opens on keyboard focus, stays open while the pointer is over it, closes on Escape and on click, and adds its id to the activator's `aria-describedby` (v4: hover only, no ARIA). On touch screens a tap on the activator toggles it.
 - Markup: the tooltip element is always in the DOM (hidden while closed), so screen readers can read the description.
 
-New, optional: `text`, `title`, `titleSnippet`, `variant`, `offset`, `bind:tooltipElement`, `class` and native attributes, `data-side`, `data-variant`, every `--tooltip-*` variable.
+- Content with links or buttons (a hover card, as in the local `HoverableTooltip` copies with `closeTimeout`): pass `interactive`. It waits 300 ms before closing when the pointer leaves, stays open while the keyboard focus is inside, and Tab reaches it when the Tooltip comes right after the activator in the markup. Remove the app's `onmouseenter`/`onmouseleave` timers.
+
+New, optional: `text`, `title`, `titleSnippet`, `variant`, `offset`, `interactive`, `bind:tooltipElement`, `class` and native attributes, `data-side`, `data-variant`, `data-interactive`, every `--tooltip-*` variable.
 
 ### YearPickerTextField
 

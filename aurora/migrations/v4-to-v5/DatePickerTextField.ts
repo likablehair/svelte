@@ -350,6 +350,8 @@ export default {
 		'`min`, `max`, `isDateDisabled`, `weekStart`, `format`.',
 		'`name` / `nameTo`: hidden inputs that submit `yyyy-MM-dd`; `required`, `readonly`, `id`.',
 		'`clearable`, `clearLabel`, `clearSnippet`; `showFormat`, `formatLabel`, `formatSnippet`.',
+		'`months={2}`: two months side by side in the calendar menu (one in the mobile drawer).',
+		'`confirm`: the calendar works on a draft saved by an Apply button (Cancel, Escape and a click outside discard it; with `clearable` also a Clear button), as the local `DateRangePicker` copies did with `showApply` / `showClear`; `applyLabel`, `cancelLabel`.',
 		'`drawerTitle`, `closeLabel`, `openLabel`, `startLabel`, `endLabel`.',
 		'`locale` (BCP 47): language of the format, the calendar and the default texts, Italian with `it`, English otherwise; without it the one of `setDefaultLocale` (step `global-default-locale`), else `en`. Text props win over it.',
 		'`daySnippet`, `dayAppendSnippet`, `weekdayFormat`, `showOutsideDays` (forwarded to the calendar).',

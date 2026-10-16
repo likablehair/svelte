@@ -42,7 +42,9 @@
 		>{/if}{/snippet}
 
 {#snippet action()}
-	<Button variant="secondary" size="sm" onclick={act}>{toast.action?.label}</Button>
+	<Button variant="secondary" size="sm" href={toast.action?.href} onclick={act}
+		>{toast.action?.label}</Button
+	>
 {/snippet}
 
 <AlertBanner

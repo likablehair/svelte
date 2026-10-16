@@ -1,12 +1,17 @@
 import { readFileSync } from 'node:fs';
 import { getComponentDoc, listComponents } from '../../src/docs/api.server.ts';
 import type { RuleSources } from '../src/compile.ts';
-import type { ComponentApi, ComponentMigration, GlobalMigration } from '../src/types.ts';
+import type { ComponentApi, ComponentMigration, GlobalMigration, LocalMigration } from '../src/types.ts';
 
 const files = import.meta.glob<ComponentMigration | ComponentMigration[] | GlobalMigration>(
 	'/migrations/v4-to-v5/*.ts',
 	{ import: 'default', eager: true }
 );
+
+const locals = import.meta.glob<LocalMigration>('/migrations/v4-to-v5/local/*.ts', {
+	import: 'default',
+	eager: true
+});
 
 function componentApi(slug: string): ComponentApi {
 	const doc = getComponentDoc(slug)!;
@@ -36,6 +41,7 @@ export function ruleSources(): RuleSources {
 		components: Object.entries(files)
 			.filter(([path]) => !path.endsWith('/global.ts'))
 			.map(([, rule]) => rule as ComponentMigration | ComponentMigration[]),
+		local: Object.values(locals),
 		v4Index: read('../../../src/lib/index.ts'),
 		v5Index: read('../../src/lib/index.ts'),
 		v5Components: Object.fromEntries(listComponents().map((c) => [c.name, componentApi(c.slug)]))

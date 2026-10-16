@@ -195,7 +195,8 @@ export default {
 		'`state` (`error` | `success`): colors the field and the hint, shows an icon; `stateIconSnippet` replaces it.',
 		'`class.label`.',
 		'`type` also accepts `email`, `tel`, `search`, `url`.',
-		'`data-state`, `data-disabled`, `data-readonly` attributes.',
+		'`revealable` (with `type="password"`): eye toggle that shows and hides the password; `bind:revealed`, `revealLabel` and `locale` for its name ("Show password" / "Mostra password").',
+		'`data-state`, `data-disabled`, `data-readonly`, `data-revealed` attributes.',
 		'`--simple-text-field-*` variables for label, placeholder, icons, hover, focus, error, success and disabled.'
 	]
 } satisfies ComponentMigration;

@@ -82,6 +82,7 @@ export default {
 		'`text` for plain tooltips, `title` and `titleSnippet` for a bold first line.',
 		'`variant` (plain | rich), exposed as `data-variant`; the current side as `data-side`.',
 		'`offset`, and `placement` with `-start` / `-end` variants on every side.',
+		'`interactive`: content with links or buttons (a hover card); waits 300 ms before closing, stays open while the keyboard focus is inside, Escape gives the focus back. Exposed as `data-interactive`.',
 		'`bind:tooltipElement`, `class` and native attributes on the tooltip element.',
 		'`--tooltip-*` CSS variables (background, color, padding, radius, shadow, max width, font, arrow size, duration).'
 	]

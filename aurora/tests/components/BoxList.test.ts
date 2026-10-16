@@ -85,6 +85,31 @@ describe('BoxList', () => {
 		expect(onboxClick.mock.calls[1][0].box).toBe(sections[1]);
 	});
 
+	test('the onclick of a box makes it a button and runs before onboxClick, also on links', async () => {
+		const calls: string[] = [];
+		const screen = await render(BoxList, {
+			boxes: [
+				{ name: 'help', label: 'Help', onclick: (event: MouseEvent) => calls.push(`help ${event.type}`) },
+				{ name: 'docs', label: 'Docs', href: '#docs', onclick: () => calls.push('docs') },
+				{ name: 'off', label: 'Off', disabled: true, onclick: () => calls.push('off') }
+			]
+		});
+		const button = screen.getByRole('button', { name: 'Help' });
+		await expect.element(button).toHaveAttribute('data-interactive', 'true');
+		await button.click();
+		await screen.getByRole('link', { name: 'Docs' }).click();
+		expect(calls).toEqual(['help click', 'docs']);
+		screen.unmount();
+
+		const order: string[] = [];
+		const both = await render(BoxList, {
+			boxes: [{ name: 'help', label: 'Help', onclick: () => order.push('box') }],
+			onboxClick: () => order.push('list')
+		});
+		await both.getByRole('button', { name: 'Help' }).click();
+		expect(order).toEqual(['box', 'list']);
+	});
+
 	test('a disabled box is not clickable: the button gets disabled, the link loses href', async () => {
 		const onboxClick = vi.fn();
 		const screen = await render(BoxList, {

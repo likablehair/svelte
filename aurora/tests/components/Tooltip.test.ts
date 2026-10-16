@@ -6,6 +6,7 @@ import RemovableActivator from '../fixtures/tooltip/RemovableActivator.svelte';
 import SpreadAttributes from '../fixtures/tooltip/SpreadAttributes.svelte';
 import TooltipHarness from '../fixtures/tooltip/TooltipHarness.svelte';
 import TooltipInMenu from '../fixtures/tooltip/TooltipInMenu.svelte';
+import InteractiveTooltip from '../fixtures/tooltip/InteractiveTooltip.svelte';
 import { snippet, text } from '../helpers.js';
 
 const instant = '--tooltip-duration: 0s';
@@ -104,6 +105,64 @@ describe('Tooltip', () => {
 		await pause(250);
 		expect(isOpen()).toBe(true);
 		await screen.getByRole('button', { name: 'After Save' }).hover();
+		await expect.poll(isOpen).toBe(false);
+	});
+
+	test('interactive: a named dialog whose links can be clicked, which waits before closing when the pointer leaves', async () => {
+		const onlink = vi.fn();
+		const screen = await render(InteractiveTooltip, { onlink });
+		const element = screen.container.querySelector<HTMLElement>('.aurora-tooltip')!;
+		const isOpen = () => element.matches(':popover-open');
+		expect(element.getAttribute('role')).toBe('dialog');
+		expect(element.getAttribute('data-interactive')).toBe('true');
+		await expect.element(screen.getByRole('dialog', { name: 'Mario Rossi', includeHidden: true })).toBeInTheDocument();
+		await screen.getByRole('button', { name: 'Client' }).hover();
+		await expect.poll(isOpen).toBe(true);
+		const link = screen.getByRole('link', { name: 'Open the client' });
+		await link.hover();
+		await link.click();
+		expect(onlink).toHaveBeenCalledOnce();
+		expect(isOpen()).toBe(true);
+		const leftAt = performance.now();
+		await screen.getByRole('button', { name: 'Next' }).hover();
+		await expect.poll(isOpen).toBe(false);
+		expect(performance.now() - leftAt).toBeGreaterThanOrEqual(250);
+	});
+
+	test('interactive: Tab moves the focus into it and keeps it open, leaving closes it, Escape gives the focus back', async () => {
+		const screen = await render(InteractiveTooltip, {});
+		const element = screen.container.querySelector<HTMLElement>('.aurora-tooltip')!;
+		const isOpen = () => element.matches(':popover-open');
+		const activator = screen.getByRole('button', { name: 'Client' });
+		const link = screen.getByRole('link', { name: 'Open the client' });
+		await userEvent.keyboard('{Tab}');
+		await expect.element(activator).toHaveFocus();
+		await expect.poll(isOpen).toBe(true);
+		await userEvent.keyboard('{Tab}');
+		await expect.element(link).toHaveFocus();
+		await pause(400);
+		expect(isOpen()).toBe(true);
+		await userEvent.keyboard('{Tab}');
+		await expect.element(screen.getByRole('button', { name: 'Next' })).toHaveFocus();
+		await expect.poll(isOpen).toBe(false);
+		await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
+		await expect.element(activator).toHaveFocus();
+		await expect.poll(isOpen).toBe(true);
+		await userEvent.keyboard('{Tab}');
+		await expect.element(link).toHaveFocus();
+		await userEvent.keyboard('{Escape}');
+		await expect.poll(isOpen).toBe(false);
+		await expect.element(activator).toHaveFocus();
+	});
+
+	test('not interactive: the focus leaving the activator closes it at once', async () => {
+		const { activator, isOpen, element } = await setup({ appearTimeout: 0 });
+		expect(element.getAttribute('role')).toBe('tooltip');
+		expect(element.hasAttribute('data-interactive')).toBe(false);
+		await userEvent.keyboard('{Tab}');
+		await expect.element(activator).toHaveFocus();
+		await expect.poll(isOpen).toBe(true);
+		await userEvent.keyboard('{Tab}');
 		await expect.poll(isOpen).toBe(false);
 	});
 

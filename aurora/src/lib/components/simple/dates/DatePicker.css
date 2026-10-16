@@ -19,5 +19,9 @@
 		--date-picker-default-title-hover-background: var(--global-color-surface-2);
 		--date-picker-default-title-border-radius: var(--global-radius-sm);
 		--date-picker-default-focus-ring-color: var(--global-focus-ring-color);
+		--date-picker-default-month-width: 254px;
+		--date-picker-default-months-gap: 24px;
+		--date-picker-default-footer-padding-top: 12px;
+		--date-picker-default-footer-border-color: var(--global-color-border);
 	}
 }
