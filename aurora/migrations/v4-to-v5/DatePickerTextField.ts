@@ -239,6 +239,7 @@ export default {
 		removed: [
 			{
 				name: 'ondayClick',
+				closes: 'menuOpened',
 				note: 'Choosing a day now closes the calendar by itself (`closeOnSelect`): a handler that only closed the menu (`() => (menuOpened = false)`) must be deleted, together with `bind:menuOpened` if nothing else reads it. Other handlers move to `onchange({ selectedDate, selectedDateTo })` (v4 `e.detail.dateStat` → `e.selectedDate`, a `Date`). See `date-picker-text-field-day-click`.'
 			}
 		]
@@ -271,8 +272,9 @@ export default {
 		{
 			id: 'date-picker-text-field-day-click',
 			kind: 'edit',
+			automatic: true,
 			summary:
-				'`ondayClick` is gone and the calendar closes by itself after a choice (with `range`, after the end). Most v4 usages had `bind:menuOpened={open}` plus `ondayClick={() => (open = false)}` only to close it.',
+				'`ondayClick` is gone and the calendar closes by itself after a choice (with `range`, after the end). Most v4 usages had `bind:menuOpened={open}` plus `ondayClick={() => (open = false)}` only to close it: the codemod deletes those handlers.',
 			action:
 				'Delete `ondayClick` handlers that only close the menu, and `bind:menuOpened` / `bind:open` with its variable when nothing else reads it. Move any other code of the handler to `onchange({ selectedDate, selectedDateTo })` or to a `$derived` / `$effect` on the bound `selectedDate`.',
 			when: { events: ['ondayClick'], props: ['menuOpened'] }

@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, test } from 'vitest';
 import { analyze } from '../src/analyze.ts';
 import { loadRules } from '../src/rules.ts';
-import { dropThemePlaceholder, prepareBranch, setHtmlLang, updatePackageJson, updateTitleTemplate } from '../src/setup.ts';
+import { dropThemePlaceholder, prepareBranch, setHtmlLang, updateAppCss, updatePackageJson, updateTailwindConfig, updateTitleTemplate } from '../src/setup.ts';
 
 const fixture = fileURLToPath(new URL('./fixtures/app-v4', import.meta.url));
 const dirs: string[] = [];
@@ -58,6 +58,55 @@ describe('setup: package.json', () => {
 		const dir = copyApp();
 		updatePackageJson(dir, analyze(dir, loadRules()), '^5.0.0');
 		expect(updatePackageJson(dir, analyze(dir, loadRules()), '^5.0.0')).toEqual([]);
+	});
+});
+
+describe('setup: Svelte, Tailwind 3 and the buttons margin', () => {
+	function tailwind3App(config: string) {
+		const dir = copyApp();
+		const path = join(dir, 'package.json');
+		const pkg = JSON.parse(readFileSync(path, 'utf8'));
+		pkg.dependencies.svelte = '^5.0.0';
+		pkg.dependencies.tailwindcss = '^3.3.2';
+		writeFileSync(path, JSON.stringify(pkg, null, '\t'));
+		writeFileSync(join(dir, 'tailwind.config.js'), config);
+		return dir;
+	}
+
+	test('raises svelte below 5.29, and tailwindcss when the dark variant needs it', () => {
+		const dir = tailwind3App("import forms from '@tailwindcss/forms'\n\nconst config = {\n\tdarkMode: ['class'],\n\tplugins: [forms]\n}\n\nexport default config\n");
+		updatePackageJson(dir, analyze(dir, loadRules()), '^5.0.0');
+		const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
+		expect(pkg.dependencies.svelte).toBe('^5.29.0');
+		expect(pkg.dependencies.tailwindcss).toBe('^3.4.1');
+	});
+
+	test('the Tailwind 3 config gets the preset and the dark variant of the library, once', () => {
+		const dir = tailwind3App("import forms from '@tailwindcss/forms'\n\nconst config = {\n\tdarkMode: ['class'],\n\tplugins: [forms]\n}\n\nexport default config\n");
+		expect(updateTailwindConfig(dir, '^3.4.1')).toHaveLength(2);
+		const text = readFileSync(join(dir, 'tailwind.config.js'), 'utf8');
+		expect(text).toContain("import forms from '@tailwindcss/forms'\nimport aurora from '@likable-hair/svelte/tailwind-preset';\n");
+		expect(text).toContain('const config = {\n\tpresets: [aurora],\n\tdarkMode: [\'variant\', [\'&:is([data-mode="dark"] *)\'');
+		expect(updateTailwindConfig(dir, '^3.4.1')).toEqual([]);
+		expect(updateTailwindConfig(dir, '^4.0.0')).toEqual([]);
+	});
+
+	test('an existing presets list gets the library preset first', () => {
+		const dir = tailwind3App("export default {\n\tpresets: [other],\n\tcontent: []\n};\n");
+		updateTailwindConfig(dir, '^3.4.1');
+		expect(readFileSync(join(dir, 'tailwind.config.js'), 'utf8')).toBe(
+			"import aurora from '@likable-hair/svelte/tailwind-preset';\nexport default {\n\tpresets: [aurora, other],\n\tcontent: []\n};\n"
+		);
+	});
+
+	test('the v4 space above ConfirmOrCancelButtons becomes an app default', () => {
+		const dir = copyApp();
+		const changes = updateAppCss(dir, '@layer reset, theme;', false, true);
+		expect(changes.some((c) => c.includes('--confirm-or-cancel-buttons-default-margin-top'))).toBe(true);
+		const css = readFileSync(join(dir, 'src/app.css'), 'utf8');
+		expect(css).toContain(':root {\n\t--confirm-or-cancel-buttons-default-margin-top: 20px;\n}\n');
+		updateAppCss(dir, '@layer reset, theme;', false, true);
+		expect(readFileSync(join(dir, 'src/app.css'), 'utf8')).toBe(css);
 	});
 });
 

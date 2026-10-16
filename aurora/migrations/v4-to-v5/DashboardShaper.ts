@@ -130,6 +130,13 @@ export default {
 			{ name: '--dashboard-shaper-default-gap', note: 'Default 10px (v4: 4px).' }
 		]
 	},
+	items: [
+		{
+			prop: 'availableWidgetCells',
+			pairs: [{ from: 'availableSizes', to: 'sizes', keys: ['height', 'width'] }],
+			note: '`availableSizes: [height, width][]` → `sizes: { width, height }[]`'
+		}
+	],
 	manual: [
 		{
 			id: 'dashboard-shaper-editing',
@@ -141,10 +148,11 @@ export default {
 		},
 		{
 			id: 'dashboard-shaper-catalog',
-			kind: 'edit',
-			summary: '`availableWidgetCells` became `catalog`, with `sizes: { width, height }[]` instead of `availableSizes: [height, width][]`.',
+			kind: 'review',
+			summary:
+				'`availableWidgetCells` became `catalog`, with `sizes: { width, height }[]` instead of `availableSizes: [height, width][]` (the codemod converts the entries written in the same file), and a new `unique`.',
 			action:
-				'Rewrite each entry: `availableSizes: [[2, 4]]` → `sizes: [{ width: 4, height: 2 }]` (the v4 pairs are height first), `icon: "mdi-chart-bar"` → `icon: mdiChartBar` from `@mdi/js`. Catalogs filtered by permission stay as they are; for widget types the backend keeps once per dashboard (saved by `name`) add `unique: true`.',
+				'For widget types the backend keeps once per dashboard (saved by `name`) add `unique: true`. Catalogs filtered by permission stay as they are.',
 			when: { props: ['availableWidgetCells'] }
 		},
 		{

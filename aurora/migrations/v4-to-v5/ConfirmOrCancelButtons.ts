@@ -72,10 +72,11 @@ export default {
 		{
 			id: 'confirm-or-cancel-buttons-spacing',
 			kind: 'edit',
+			automatic: true,
 			summary:
 				'v4 put 20px of space above the buttons (215 of 231 uses relied on it); v5 has none, like every component, so forms built without `gap` would lose the space before their buttons.',
 			action:
-				'Add once to the global app CSS: `:root { --confirm-or-cancel-buttons-default-margin-top: 20px; }` (inside `@layer global.base` is not needed: unlayered app CSS wins). New forms laid out with `gap` should not use it.',
+				'Add once to the global app CSS (`setup` does it): `:root { --confirm-or-cancel-buttons-default-margin-top: 20px; }` (inside `@layer global.base` is not needed: unlayered app CSS wins). New forms laid out with `gap` should not use it.',
 			scope: 'app'
 		},
 		{

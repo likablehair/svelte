@@ -109,14 +109,23 @@ export default {
 			}))
 		]
 	},
+	items: [
+		{
+			prop: 'items',
+			keys: [{ from: 'name', to: 'title', note: 'where both exist, rename `name` to `key` if it is a unique id, else drop it' }],
+			drop: ['imageUrl'],
+			note: 'items need a `title` (v4 `name`, never displayed); `imageUrl` is gone (v4 never read it)'
+		}
+	],
 	manual: [
 		{
 			id: 'timeline-items',
 			kind: 'edit',
 			summary:
-				'Items need a `title`, the text the timeline shows; v4 required `name`, which it never displayed, and apps used it as the visible title in their snippets.',
+				'Items need a `title`, the text the timeline shows; v4 required `name`, which it never displayed, and apps used it as the visible title in their snippets. The codemod renames `name` to `title` where the items are written in the same file.',
 			action:
-				'In the objects passed to `items`: where there is no `title`, rename `name` to `title` (and `item.name` to `item.title` in the snippets). Where both exist, rename `name` to `key` if it is a unique id, else drop it. Drop `imageUrl` (v4 never read it); for an icon use `icon` with an `@mdi/js` path. Import the `TimelineItem` type from the library instead of `ComponentProps<...>` or a local copy.'
+				'In the snippets read `item.title` instead of `item.name`. Import the `TimelineItem` type from the library instead of `ComponentProps<...>` or a local copy.',
+			when: { snippets: ['itemSnippet', 'circleSnippet', 'timesSnippet', 'infosSnippet', 'infosAppendSnippet'] }
 		},
 		{
 			id: 'timeline-dates',

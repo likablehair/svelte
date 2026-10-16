@@ -74,6 +74,23 @@ describe('analyze: app on v4', () => {
 		expect(v4.general.find((g) => g.id === 'button-fixed-height')).toMatchObject({ usages: 2, files: 2 });
 	});
 
+	test('a step the codemod applies counts as automatic, not as a point to write', () => {
+		const dir = mkdtempSync(join(tmpdir(), 'migrate-analyze-'));
+		try {
+			writeFileSync(join(dir, 'package.json'), JSON.stringify({ dependencies: { '@likable-hair/svelte': '^4.3.1', svelte: '^5.30.0' } }));
+			mkdirSync(join(dir, 'src/routes'), { recursive: true });
+			writeFileSync(
+				join(dir, 'src/routes/+page.svelte'),
+				"<script lang=\"ts\">\n\timport { SimpleTable } from '@likable-hair/svelte';\n</script>\n\n<SimpleTable headers={[]} items={[]} />\n"
+			);
+			const columns = analyze(dir, index).findings.filter((f) => f.id === 'table-columns');
+			expect(columns).toMatchObject([{ effort: 'auto', kind: 'step' }]);
+			expect(columns[0].todo).toBeUndefined();
+		} finally {
+			rmSync(dir, { recursive: true, force: true });
+		}
+	});
+
 	test('v4 defaults missing from a usage: behaviour ones are automatic, look ones to check', () => {
 		expect(find(v4, 'ToolTip/props.defaults/appearTimeout')).toMatchObject([{ effort: 'auto', to: 'appearTimeout={0}' }]);
 		expect(find(v4, 'ToolTip/props.defaults/placement')).toMatchObject([{ effort: 'check', to: 'placement="bottom"' }]);
@@ -100,7 +117,7 @@ describe('analyze: app on v4', () => {
 	test('detects the app-level steps from the app', () => {
 		const step = (id: string) => v4.appSteps.find((s) => s.id === id)?.needed;
 		expect(step('global-default-locale')).toBe(true);
-		expect(step('global-tailwind-4')).toBe(true);
+		expect(step('global-tailwind-4')).toBeUndefined();
 		expect(step('global-tailwind-3')).toBe(false);
 		expect(step('global-dark-mode')).toBe(true);
 		expect(step('global-filter-converter')).toBe(true);

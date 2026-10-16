@@ -12,6 +12,8 @@ const renamed: [string, string][] = [
 	['element-selected-font-weight', 'option-selected-font-weight']
 ];
 
+const pill = ['element-selected-background-color', 'element-selected-color'];
+
 const removed: [string, string, string?][] = [
 	['height', 'The menu is as tall as its options. Put it in a container with a height and `overflow: auto` (SidebarLayout already scrolls it).'],
 	['sub-options-padding', 'Nested options are indented under a dashed line.', '--hierarchy-menu-children-indent'],
@@ -76,14 +78,25 @@ export default {
 		]
 	},
 	cssVars: {
-		renamed: renamed.flatMap(([from, to]): Rename[] => [
-			{ from: `--hierarchy-menu-${from}`, to: `--hierarchy-menu-${to}` },
-			{ from: `--hierarchy-menu-default-${from}`, to: `--hierarchy-menu-default-${to}` }
-		]),
-		removed: removed.flatMap(([name, note, replacement]): Removal[] => [
-			{ name: `--hierarchy-menu-${name}`, note, replacement },
-			{ name: `--hierarchy-menu-default-${name}`, note }
-		]),
+		renamed: [
+			...renamed.flatMap(([from, to]): Rename[] => [
+				...(pill.includes(from) ? [] : [{ from: `--hierarchy-menu-${from}`, to: `--hierarchy-menu-${to}` }]),
+				{ from: `--hierarchy-menu-default-${from}`, to: `--hierarchy-menu-default-${to}` }
+			]),
+			{ from: '--icon-size', to: '--hierarchy-menu-icon-size', scoped: true, note: 'Only when set on a HierarchyMenu: the icons of the menu are no longer library Icons reached by `--icon-size`.' }
+		],
+		removed: [
+			...removed.flatMap(([name, note, replacement]): Removal[] => [
+				{ name: `--hierarchy-menu-${name}`, note, replacement },
+				{ name: `--hierarchy-menu-default-${name}`, note }
+			]),
+			{ name: '--icon-cursor', note: 'Only when set on a HierarchyMenu: options always have the pointer cursor.', drop: true },
+			...pill.map((name) => ({
+				name: `--hierarchy-menu-${name}`,
+				note: 'The v4 solid pill of the selected option gives way to the v5 look (soft gradient and a bar on the left). To restyle it use `--hierarchy-menu-option-selected-background` and `-color` with v5 tokens.',
+				drop: true as const
+			}))
+		],
 		changed: [
 			{
 				name: '--hierarchy-menu-gap',
@@ -113,12 +126,12 @@ export default {
 		},
 		{
 			id: 'hierarchy-menu-style-props',
-			kind: 'edit',
+			kind: 'review',
 			summary:
-				'Style props for the icons of the menu (`--icon-size="20px"`, `--icon-cursor`) no longer reach them; the selected look of v4 was a solid primary pill, v5 a soft gradient with a bar on the left.',
+				'The selected look of v4 was a solid primary pill, v5 a soft gradient with a bar on the left. The codemod removes `--hierarchy-menu-element-selected-background-color` and `-selected-color` set on the menu, so the app takes the v5 look.',
 			action:
-				'Replace `--icon-size` on the menu with `--hierarchy-menu-icon-size` and drop `--icon-cursor`. Drop `--hierarchy-menu-element-selected-background-color="rgb(var(--global-color-primary-500))"` and `-selected-color="white"` unless the app wants to keep the v4 solid pill (then use `--hierarchy-menu-option-selected-background` and `-color` with v5 tokens).',
-			when: { cssVars: ['--icon-size', '--icon-cursor', '--hierarchy-menu-element-selected-background-color'] }
+				'Look at the menu with a selected option, in light and dark. To restyle it, use `--hierarchy-menu-option-selected-background` and `--hierarchy-menu-option-selected-color` with v5 tokens (`var(--global-color-primary)`).',
+			when: { cssVars: ['--hierarchy-menu-element-selected-background-color'] }
 		}
 	],
 	added: [

@@ -12,6 +12,7 @@ export default {
 	calls: {
 		functions,
 		unwrap: 'data',
+		result: 'id',
 		keys: [
 			{ from: 'closeDelay', to: 'duration' },
 			{ from: 'showLoading', to: 'loading' },
@@ -41,6 +42,7 @@ export default {
 		{
 			id: 'toaster-id',
 			kind: 'edit',
+			automatic: true,
 			summary: 'The `add*` functions return the id of the toast, a number, instead of the melt-ui toast object.',
 			action:
 				'Replace `addXToast(...).id` with the returned value (`const id = addSuccessToast(...)`, then `removeToast(id)`), and types such as `ReturnType<typeof addSuccessToast>` or `Toast` from `@melt-ui/svelte` with `number`. A loading toast can also become the result with `updateToast(id, { variant: "success", title, loading: false })`.'

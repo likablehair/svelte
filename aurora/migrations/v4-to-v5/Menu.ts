@@ -1,5 +1,16 @@
 import type { ComponentMigration } from '../types.js';
 
+export const anchorPlacement: Record<string, string> = {
+	bottom: 'bottom-start',
+	'bottom-center': 'bottom',
+	up: 'top-start',
+	'up-center': 'top',
+	left: 'left-start',
+	'left-center': 'left',
+	right: 'right-start',
+	'right-center': 'right'
+};
+
 export default {
 	from: 'Menu',
 	to: 'Menu',
@@ -87,6 +98,12 @@ export default {
 			{ name: '_boxShadow', cssVar: '--menu-box-shadow' },
 			{ name: '_borderRadius', cssVar: '--menu-border-radius' }
 		],
+		bind: [
+			{
+				name: 'open',
+				note: 'The menu closes itself (Escape, outside clicks, another menu opening): with `open` passed one-way the app keeps `true` and the next toggle does nothing.'
+			}
+		],
 		defaults: [
 			{
 				name: 'closeOnClickOutside',
@@ -101,16 +118,7 @@ export default {
 		values: [
 			{
 				name: 'placement',
-				values: {
-					bottom: 'bottom-start',
-					'bottom-center': 'bottom',
-					up: 'top-start',
-					'up-center': 'top',
-					left: 'left-start',
-					'left-center': 'left',
-					right: 'right-start',
-					'right-center': 'right'
-				},
+				values: anchorPlacement,
 				note: 'Applies to the value of the v4 `anchor` prop. The v4 default `bottom` equals the v5 default `bottom-start`.'
 			}
 		],
@@ -136,11 +144,11 @@ export default {
 	manual: [
 		{
 			id: 'menu-self-closing',
-			kind: 'edit',
+			kind: 'review',
 			summary:
-				'The menu closes itself on outside clicks (new default), on Escape and when another menu opens; v4 closed only when the app set `open` to false.',
+				'The menu closes itself on outside clicks (new default), on Escape and when another menu opens; v4 closed only when the app set `open` to false. The codemod writes `bind:open` where `open` is a variable of the file and keeps the v4 `closeOnClickOutside={false}`.',
 			action:
-				'Use `bind:open` wherever `open` is passed one-way, otherwise the app keeps `true` after the menu closed and the next toggle does nothing. Menus that must stay open together: render the inner one inside the outer menu `children`, or give it `closeOnClickOutside={false}`; then a click outside (like Escape) closes only the innermost open menu, one level per click. Remove app code that closed menus on Escape or on outside clicks by hand.'
+				'Menus that must stay open together: render the inner one inside the outer menu `children`, or keep `closeOnClickOutside={false}`; then a click outside (like Escape) closes only the innermost open menu, one level per click. Remove app code that closed menus on Escape or on outside clicks by hand.'
 		},
 		{
 			id: 'menu-surface',

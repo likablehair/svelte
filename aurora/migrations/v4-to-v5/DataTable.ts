@@ -347,6 +347,7 @@ const paginated = {
 	cssVars: {
 		removed: [...table.cssVars, ...innerCssVars(paginator.cssVars, 'Paginator'), ...quickActionsVars]
 	},
+	items: table.items,
 	manual: [...table.manual, ...manual],
 	added
 } satisfies ComponentMigration;
@@ -426,6 +427,7 @@ const dynamic = {
 	from: 'DynamicTable',
 	to: 'DataTable',
 	props: {
+		unwrap: [{ prop: 'rows', key: 'item', empty: ['subItems'], note: 'rows are the items themselves (`rows={items}`); where `subItems` were used, write `expandedSnippet({ row })` with a nested `Table`' }],
 		renamed: [
 			...inDynamic(table.props.renamed),
 			...shared.renamed,
@@ -600,9 +602,21 @@ const dynamic = {
 				name: 'cellSnippet',
 				v4: '{ index, columnIndex, header, row }',
 				v5: '{ row, value, column }',
+				params: { header: 'column', row: 'row', index: null, columnIndex: null },
+				members: [
+					{ param: 'header', from: 'value', to: 'key' },
+					{ param: 'row', from: 'item', to: null }
+				],
 				note: '`row` is the row itself (v4 `row.item`), `header` → `column` (its `value` is now `key`); `index` and `columnIndex` are gone.'
 			},
-			{ name: 'actionsSnippet', v4: '{ index, row? }', v5: '{ row }', note: '`row.item` → `row`.' },
+			{
+				name: 'actionsSnippet',
+				v4: '{ index, row? }',
+				v5: '{ row }',
+				params: { row: 'row', index: null },
+				members: [{ param: 'row', from: 'item', to: null }],
+				note: '`row.item` → `row`.'
+			},
 			searchSnippet
 		],
 		removed: [
@@ -675,12 +689,14 @@ const dynamic = {
 			...quickActionsVars
 		]
 	},
+	items: table.items,
 	manual: [
 		...table.manual,
 		...manual,
 		{
 			id: 'data-table-rows',
 			kind: 'edit',
+			automatic: true,
 			summary:
 				'DynamicTable wanted `rows: { item, subItems }[]` (62 mappings in the apps) and drew the sub-rows with `subHeaders` and the `subRow*` snippets. v5 takes plain rows; the detail of a row is `expandedSnippet`, where a sub-table is a nested `Table`.',
 			action:

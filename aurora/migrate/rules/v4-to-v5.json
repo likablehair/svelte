@@ -7754,8 +7754,9 @@
 			{
 				"id": "global-svelte-version",
 				"kind": "edit",
+				"automatic": true,
 				"summary": "The components need Svelte 5.29 or later.",
-				"action": "Update `svelte` in the app before anything else.",
+				"action": "Update `svelte` in the app before anything else (`setup` raises the range in `package.json`).",
 				"scope": "app"
 			},
 			{
@@ -7774,14 +7775,15 @@
 			},
 			{
 				"id": "global-tailwind-3",
-				"kind": "edit",
-				"summary": "Tailwind 3 preflight removes component backgrounds and borders unless it is layered.",
-				"action": "Wrap `@tailwind base;` in `@layer reset { ... }` and add `presets: [aurora]` (`import aurora from '@likable-hair/svelte/tailwind-preset'`) to `tailwind.config.js`. Token overrides placed in Tailwind's `@layer base` end up inside `reset` and lose: move them out of the layer.",
+				"kind": "review",
+				"summary": "Tailwind 3 preflight removes component backgrounds and borders unless it is layered. `setup` wraps `@tailwind base;` in `@layer reset { ... }`, adds `presets: [aurora]` (`import aurora from '@likable-hair/svelte/tailwind-preset'`) to `tailwind.config.js` and turns `darkMode: 'class'` into the variant of the library.",
+				"action": "Token overrides placed in Tailwind's `@layer base` end up inside `reset` and lose: move them out of the layer.",
 				"scope": "app"
 			},
 			{
 				"id": "global-tailwind-4",
 				"kind": "edit",
+				"automatic": true,
 				"summary": "Tailwind 4 needs the layer line and the library theme mapping.",
 				"action": "Put the `layers.app` line before `@import 'tailwindcss'`, then `@import '@likable-hair/svelte/tailwind.css'`. Note that it redefines `rounded-{xs,sm,md,lg,xl}`, `shadow-{sm,md,lg}`, `font-sans` and `font-mono`.",
 				"scope": "app"
@@ -7802,15 +7804,15 @@
 			{
 				"id": "global-dark-mode",
 				"kind": "edit",
-				"summary": "Dark mode follows `color-scheme` and `data-mode` on `<html>`; `.dark` / `.light` classes do nothing.",
-				"action": "Replace `setTheme('dark')` with `setMode('dark')` and `toggleTheme()` with `toggleMode()`, `.dark` selectors with `[data-mode='dark']` (plus the `prefers-color-scheme` branch), and Tailwind `darkMode: 'class'` with the variant in MIGRATION.md. v4 saved the mode by itself: call `rememberAppearance()` once in the root `+layout.svelte` (it reads and writes the same `theme` key of v4, so users keep their choice) and add `<svelte:head>{@html '<script>' + appearanceScript() + '</script>'}</svelte:head>` there, so the page does not flash in the wrong mode. An app without dark mode sets `data-mode=\"light\"` on `<html>`.",
+				"summary": "Dark mode follows `color-scheme` and `data-mode` on `<html>`; `.dark` / `.light` classes do nothing. `setup` calls `rememberAppearance()` and `appearanceScript()` in the root layout (same `theme` key of v4, no flash) and changes Tailwind 3 `darkMode: 'class'`; the codemod renames `toggleTheme()` to `toggleMode()`.",
+				"action": "Replace `setTheme('dark')` with `setMode('dark')`, `.dark` selectors in app CSS with `[data-mode='dark']` plus the `prefers-color-scheme` branch (`@media (prefers-color-scheme: dark) { :root:not([data-mode='light']) ... }`), and a Tailwind 4 `@custom-variant dark` with the variant in MIGRATION.md. An app without dark mode sets `data-mode=\"light\"` on `<html>`.",
 				"scope": "app"
 			},
 			{
 				"id": "global-icons",
 				"kind": "edit",
 				"summary": "Every icon prop takes an SVG path; `\"mdi-*\"` strings type-check but draw nothing, and the global `.mdi` classes are gone.",
-				"action": "Apply `icons.transform` to every icon prop listed in the component rules and to `Item.icon` values in data. Markup that uses `class=\"mdi mdi-*\"` directly needs `@mdi/font` loaded by the app, or an `<Icon path>`."
+				"action": "The codemod turns every `\"mdi-*\"` literal into an `@mdi/js` import (`icons.transform`), in attributes and in data. Left by hand: names built at runtime (`\"mdi-\" + name`: map them to the imported paths), and markup that uses `class=\"mdi mdi-*\"` directly, which needs `@mdi/font` loaded by the app or an `<Icon path>` (while such markup exists the codemod converts only the icons of the library components)."
 			},
 			{
 				"id": "global-callbacks",
@@ -8577,9 +8579,9 @@
 				},
 				{
 					"id": "async-autocomplete-item-icon",
-					"kind": "edit",
-					"summary": "`Item.icon` is an SVG path (v4: an MDI class name) and `Item` is exported from the package root.",
-					"action": "Apply the global icon transform to every `icon` in the `items` and `values` data (`\"mdi-account\"` → `mdiAccount` from `@mdi/js`). Import `type Item` from `@likable-hair/svelte` instead of the component module; with TypeScript, `Item` without a type argument now has `data: unknown`, so pass the type (`Item<{ price: number }>`) where the app reads `item.data`.",
+					"kind": "review",
+					"summary": "`Item.icon` is an SVG path (v4: an MDI class name; the codemod converts the `\"mdi-*\"` literals) and `Item` is exported from the package root.",
+					"action": "Import `type Item` from `@likable-hair/svelte` instead of the component module; with TypeScript, `Item` without a type argument now has `data: unknown`, so pass the type (`Item<{ price: number }>`) where the app reads `item.data`.",
 					"when": {
 						"props": [
 							"items",
@@ -9038,9 +9040,9 @@
 			"manual": [
 				{
 					"id": "autocomplete-item-icon",
-					"kind": "edit",
-					"summary": "`Item.icon` is an SVG path (v4: an MDI class name) and `Item` is exported from the package root.",
-					"action": "Apply the global icon transform to every `icon` in the `items` and `values` data (`\"mdi-account\"` → `mdiAccount` from `@mdi/js`). Import `type Item` from `@likable-hair/svelte` instead of the component module; with TypeScript, `Item` without a type argument now has `data: unknown`, so pass the type (`Item<{ price: number }>`) where the app reads `item.data`.",
+					"kind": "review",
+					"summary": "`Item.icon` is an SVG path (v4: an MDI class name; the codemod converts the `\"mdi-*\"` literals) and `Item` is exported from the package root.",
+					"action": "Import `type Item` from `@likable-hair/svelte` instead of the component module; with TypeScript, `Item` without a type argument now has `data: unknown`, so pass the type (`Item<{ price: number }>`) where the app reads `item.data`.",
 					"when": {
 						"props": [
 							"items",
@@ -9367,6 +9369,51 @@
 						"name": "resetZoom",
 						"note": "While zoomed the chart shows its own \"Reset zoom\" icon in the top-right corner of the plot, and a double click also resets. Remove `bind:resetZoom` and the reset button of the app. To reset from code, `bind:chart` and call `chart.resetZoom()`.",
 						"replacement": "bind:chart + chart.resetZoom()"
+					},
+					{
+						"name": "showXTicks",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "showYTicks",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "pointRadius",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "showLegend",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "rgbTooltipColor",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "rgbTooltipBackgroundColor",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "tooltipLabel",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "displayYGrid",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "displayXGrid",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
 					}
 				]
 			},
@@ -9391,26 +9438,17 @@
 				{
 					"id": "bar-chart-flat-props",
 					"kind": "edit",
-					"summary": "Props of the v3 charts (`showXTicks`, `showYTicks`, `xTickLabel`, `enableZoom`, `pointRadius`, `yMin`, …) did nothing in v4 4.2+: they ended up as attributes of the canvas.",
-					"action": "Delete them. `enableZoom` → `zoom`; `showXTicks`/`showYTicks` → nothing (ticks are visible by default); `xTickLabel`/`yTickLabel` that format numbers → `format`; `xMin`/`xMax`/`yMin`/`yMax` → `options={{ scales: { y: { min, max } } }}`; colors (`rgbTooltipColor`, …) → nothing; `horizontal` is a prop again and keeps working. Check the chart afterwards: in v4 these charts were drawn with the defaults.",
+					"summary": "Props of the v3 charts (`xTickLabel`, `enableZoom`, `yMin`, …) did nothing in v4: they ended up as attributes of the canvas, so the chart was drawn with the defaults. The codemod removes the ones with nothing to keep (`showXTicks`, `pointRadius`, `rgbTooltipColor`, …).",
+					"action": "Delete them, or give them the meaning the app wanted: `enableZoom` → `zoom` (`zoom={false}` turns zooming off, which v4 never did); `xTickLabel`/`yTickLabel` that format numbers → `format`; `xMin`/`xMax`/`yMin`/`yMax` → `options={{ scales: { y: { min, max } } }}`. `horizontal` is a prop again and keeps working.",
 					"when": {
 						"props": [
-							"showXTicks",
-							"showYTicks",
 							"xTickLabel",
 							"yTickLabel",
 							"enableZoom",
-							"pointRadius",
 							"xMin",
 							"xMax",
 							"yMin",
-							"yMax",
-							"showLegend",
-							"rgbTooltipColor",
-							"rgbTooltipBackgroundColor",
-							"tooltipLabel",
-							"displayYGrid",
-							"displayXGrid"
+							"yMax"
 						]
 					}
 				},
@@ -10268,6 +10306,13 @@
 			"from": "Checkbox",
 			"to": "Checkbox",
 			"props": {
+				"toObject": [
+					{
+						"name": "class",
+						"key": "input",
+						"note": "Layout classes (margins, alignment) belong on `container`, the root `<label>`."
+					}
+				],
 				"renamed": [
 					{
 						"from": "value",
@@ -10469,6 +10514,36 @@
 			},
 			"cssVars": {
 				"renamed": [
+					{
+						"from": "--button-hover-background-color",
+						"to": "--chip-close-hover-background",
+						"scoped": true,
+						"note": "Only when set on a Chip: in v4 it reached the close button, which is no longer a library Button."
+					},
+					{
+						"from": "--button-hover-color",
+						"to": "--chip-close-hover-color",
+						"scoped": true,
+						"note": "Only when set on a Chip: in v4 it reached the close button, which is no longer a library Button."
+					},
+					{
+						"from": "--button-height",
+						"to": "--chip-close-size",
+						"scoped": true,
+						"note": "Only when set on a Chip: in v4 it reached the close button, which is no longer a library Button."
+					},
+					{
+						"from": "--button-width",
+						"to": "--chip-close-size",
+						"scoped": true,
+						"note": "Only when set on a Chip: in v4 it reached the close button, which is no longer a library Button."
+					},
+					{
+						"from": "--button-border-radius",
+						"to": "--chip-close-border-radius",
+						"scoped": true,
+						"note": "Only when set on a Chip: in v4 it reached the close button, which is no longer a library Button."
+					},
 					{
 						"from": "--chip-min-height",
 						"to": "--chip-height",
@@ -10693,17 +10768,12 @@
 				{
 					"id": "chip-close-button-vars",
 					"kind": "edit",
-					"summary": "The close button is no longer a library Button: `--button-*` variables set on a Chip do not reach it.",
-					"action": "Use `--chip-close-size`, `--chip-close-color`, `--chip-close-hover-color`, `--chip-close-hover-background`, `--chip-close-border-radius`, `--chip-close-icon-size`, `--chip-close-margin-end`, `--chip-close-focus-ring-offset`.",
+					"summary": "The close button is no longer a library Button: `--button-*` variables set on a Chip do not reach it. The codemod renames the ones with an equivalent (`--button-hover-*`, `--button-height`/`-width`, `--button-border-radius`).",
+					"action": "Replace the others with `--chip-close-size`, `--chip-close-color`, `--chip-close-hover-color`, `--chip-close-hover-background`, `--chip-close-border-radius`, `--chip-close-icon-size`, `--chip-close-margin-end`, `--chip-close-focus-ring-offset`, or remove them.",
 					"when": {
 						"cssVars": [
-							"--button-hover-background-color",
-							"--button-hover-color",
-							"--button-height",
-							"--button-width",
 							"--button-min-height",
 							"--button-min-width",
-							"--button-border-radius",
 							"--button-focus-background-color",
 							"--button-focus-color",
 							"--button-active-color",
@@ -11202,8 +11272,9 @@
 				{
 					"id": "confirm-or-cancel-buttons-spacing",
 					"kind": "edit",
+					"automatic": true,
 					"summary": "v4 put 20px of space above the buttons (215 of 231 uses relied on it); v5 has none, like every component, so forms built without `gap` would lose the space before their buttons.",
-					"action": "Add once to the global app CSS: `:root { --confirm-or-cancel-buttons-default-margin-top: 20px; }` (inside `@layer global.base` is not needed: unlayered app CSS wins). New forms laid out with `gap` should not use it.",
+					"action": "Add once to the global app CSS (`setup` does it): `:root { --confirm-or-cancel-buttons-default-margin-top: 20px; }` (inside `@layer global.base` is not needed: unlayered app CSS wins). New forms laid out with `gap` should not use it.",
 					"scope": "app"
 				},
 				{
@@ -11936,6 +12007,22 @@
 					}
 				]
 			},
+			"items": [
+				{
+					"prop": "availableWidgetCells",
+					"pairs": [
+						{
+							"from": "availableSizes",
+							"to": "sizes",
+							"keys": [
+								"height",
+								"width"
+							]
+						}
+					],
+					"note": "`availableSizes: [height, width][]` → `sizes: { width, height }[]`"
+				}
+			],
 			"manual": [
 				{
 					"id": "dashboard-shaper-editing",
@@ -11945,9 +12032,9 @@
 				},
 				{
 					"id": "dashboard-shaper-catalog",
-					"kind": "edit",
-					"summary": "`availableWidgetCells` became `catalog`, with `sizes: { width, height }[]` instead of `availableSizes: [height, width][]`.",
-					"action": "Rewrite each entry: `availableSizes: [[2, 4]]` → `sizes: [{ width: 4, height: 2 }]` (the v4 pairs are height first), `icon: \"mdi-chart-bar\"` → `icon: mdiChartBar` from `@mdi/js`. Catalogs filtered by permission stay as they are; for widget types the backend keeps once per dashboard (saved by `name`) add `unique: true`.",
+					"kind": "review",
+					"summary": "`availableWidgetCells` became `catalog`, with `sizes: { width, height }[]` instead of `availableSizes: [height, width][]` (the codemod converts the entries written in the same file), and a new `unique`.",
+					"action": "For widget types the backend keeps once per dashboard (saved by `name`) add `unique: true`. Catalogs filtered by permission stay as they are.",
 					"when": {
 						"props": [
 							"availableWidgetCells"
@@ -12527,6 +12614,7 @@
 				"removed": [
 					{
 						"name": "ondayClick",
+						"closes": "menuOpened",
 						"note": "Choosing a day now closes the calendar by itself (`closeOnSelect`): a handler that only closed the menu (`() => (menuOpened = false)`) must be deleted, together with `bind:menuOpened` if nothing else reads it. Other handlers move to `onchange({ selectedDate, selectedDateTo })` (v4 `e.detail.dateStat` → `e.selectedDate`, a `Date`). See `date-picker-text-field-day-click`."
 					}
 				]
@@ -12973,7 +13061,8 @@
 				{
 					"id": "date-picker-text-field-day-click",
 					"kind": "edit",
-					"summary": "`ondayClick` is gone and the calendar closes by itself after a choice (with `range`, after the end). Most v4 usages had `bind:menuOpened={open}` plus `ondayClick={() => (open = false)}` only to close it.",
+					"automatic": true,
+					"summary": "`ondayClick` is gone and the calendar closes by itself after a choice (with `range`, after the end). Most v4 usages had `bind:menuOpened={open}` plus `ondayClick={() => (open = false)}` only to close it: the codemod deletes those handlers.",
 					"action": "Delete `ondayClick` handlers that only close the menu, and `bind:menuOpened` / `bind:open` with its variable when nothing else reads it. Move any other code of the handler to `onchange({ selectedDate, selectedDateTo })` or to a `$derived` / `$effect` on the bound `selectedDate`.",
 					"when": {
 						"events": [
@@ -13887,6 +13976,16 @@
 			"from": "DynamicTable",
 			"to": "DataTable",
 			"props": {
+				"unwrap": [
+					{
+						"prop": "rows",
+						"key": "item",
+						"empty": [
+							"subItems"
+						],
+						"note": "rows are the items themselves (`rows={items}`); where `subItems` were used, write `expandedSnippet({ row })` with a nested `Table`"
+					}
+				],
 				"renamed": [
 					{
 						"from": "headers",
@@ -14265,12 +14364,41 @@
 						"name": "cellSnippet",
 						"v4": "{ index, columnIndex, header, row }",
 						"v5": "{ row, value, column }",
+						"params": {
+							"header": "column",
+							"row": "row",
+							"index": null,
+							"columnIndex": null
+						},
+						"members": [
+							{
+								"param": "header",
+								"from": "value",
+								"to": "key"
+							},
+							{
+								"param": "row",
+								"from": "item",
+								"to": null
+							}
+						],
 						"note": "`row` is the row itself (v4 `row.item`), `header` → `column` (its `value` is now `key`); `index` and `columnIndex` are gone."
 					},
 					{
 						"name": "actionsSnippet",
 						"v4": "{ index, row? }",
 						"v5": "{ row }",
+						"params": {
+							"row": "row",
+							"index": null
+						},
+						"members": [
+							{
+								"param": "row",
+								"from": "item",
+								"to": null
+							}
+						],
 						"note": "`row.item` → `row`."
 					},
 					{
@@ -14721,10 +14849,79 @@
 					}
 				]
 			},
+			"items": [
+				{
+					"prop": "headers",
+					"keys": [
+						{
+							"from": "value",
+							"to": "key"
+						},
+						{
+							"from": "locked",
+							"to": "required",
+							"note": "The column manager cannot hide it, as in v4."
+						},
+						{
+							"from": "sortModify",
+							"to": "sort"
+						}
+					],
+					"nested": [
+						{
+							"key": "type",
+							"tag": "key",
+							"values": {
+								"string": null,
+								"number": "number",
+								"date": "date",
+								"boolean": "boolean",
+								"custom": "custom"
+							},
+							"params": "params",
+							"hoist": [
+								{
+									"from": "nullText",
+									"to": "empty"
+								}
+							],
+							"drop": [
+								"format",
+								"locale"
+							],
+							"time": {
+								"param": "format",
+								"values": {
+									"date": "datetime"
+								}
+							},
+							"check": [
+								"number",
+								"date",
+								"datetime"
+							],
+							"note": "`string` is the default text column; `number` is now formatted and right-aligned; `date` shows day, month and year in digits in the language of `locale` (`dateFormat` for Intl options), `datetime` also the time; `icon` and `checkbox` are gone (draw them with a `cell` snippet)"
+						}
+					],
+					"parameters": [
+						{
+							"key": "sortModify",
+							"renamed": [
+								{
+									"from": "sortDirection",
+									"to": "direction"
+								}
+							]
+						}
+					],
+					"note": "each header becomes a column: `value` → `key`, `type: { key, params }` → a flat `type` (`string` → none, `number`, `date` or `datetime`, `boolean`, `custom`), `params.nullText` → `empty`, `locked` → `required`, `sortModify` → `sort` with `{ builder, direction }`; `icon` and `checkbox` columns are gone (use a `cell` snippet), `data` is gone"
+				}
+			],
 			"manual": [
 				{
 					"id": "data-table-columns",
 					"kind": "edit",
+					"automatic": true,
 					"summary": "`headers` become `columns`: `value` → `key`, `type: { key, params }` → a flat `type` and options. `string` → `text` (or no type), `number` → `number` (now formatted and right-aligned), `date` with a luxon `format` → `date` or `datetime` with `dateFormat` (Intl options, language from `locale`), `custom` stays `custom`, `icon` and `checkbox` are gone (they ignored the value). `nullText` → `empty` (also when it was a function: use `format` or `cell`), `sortModify` → `sort` with `{ builder, direction }` instead of `{ builder, sortDirection }`, `minWidth`/`maxWidth`/`width` accept any CSS length, `pinned` stays, `locked` and `data` are gone.",
 					"action": "Rewrite each header object. A `date` column with `{ format: 'dd/MM/yyyy', locale: 'it' }` usually needs no options: the default is day, month and year in digits in the language of `locale`; luxon values still work. Remove `icon` columns or draw the icon with a `cell` snippet. Where a header had `width` in %, keep it: it is a preferred width; use `minWidth` when the column must not shrink.",
 					"when": {
@@ -14735,9 +14932,9 @@
 				},
 				{
 					"id": "data-table-cells",
-					"kind": "edit",
+					"kind": "review",
 					"summary": "`customSnippet` (now `cellSnippet`) usually holds a chain `{#if header.value == 'a'} … {:else if header.value == 'b'} …`. It keeps working with `column.key`, but every column can carry its own `cell` snippet, and formatting that v4 apps did by hand is now built in: dates (`type: 'date'`), money (`type: 'number', numberFormat: { style: 'currency', currency: 'EUR' }`), yes/no (`type: 'boolean'`), empty text (`empty`).",
-					"action": "Mechanically: `header.value` → `column.key`, `item` → `row`. Then, branch by branch, replace hand-made formatting with the column type, and move the remaining branches to top-level snippets referenced by `cell` in the column definition; delete `cellSnippet` when it is empty.",
+					"action": "The codemod renames the parameters (`header` → `column`, `item` → `row`, `header.value` → `.key`). Then, branch by branch, replace hand-made formatting with the column type, and move the remaining branches to top-level snippets referenced by `cell` in the column definition; delete `cellSnippet` when it is empty.",
 					"when": {
 						"snippets": [
 							"customSnippet"
@@ -14857,6 +15054,7 @@
 				{
 					"id": "data-table-rows",
 					"kind": "edit",
+					"automatic": true,
 					"summary": "DynamicTable wanted `rows: { item, subItems }[]` (62 mappings in the apps) and drew the sub-rows with `subHeaders` and the `subRow*` snippets. v5 takes plain rows; the detail of a row is `expandedSnippet`, where a sub-table is a nested `Table`.",
 					"action": "Pass the items directly (`rows={items}` instead of `items.map((item) => ({ item, subItems: [] }))`), read `row` instead of `row.item` in the snippets. Where `subItems` were used, write `expandedSnippet({ row })` with `<Table rows={row.lines} columns={subColumns} />`.",
 					"when": {
@@ -15225,12 +15423,29 @@
 						"name": "cellSnippet",
 						"v4": "{ index, columnIndex, header, item }",
 						"v5": "{ row, value, column }",
+						"params": {
+							"header": "column",
+							"item": "row",
+							"index": null,
+							"columnIndex": null
+						},
+						"members": [
+							{
+								"param": "header",
+								"from": "value",
+								"to": "key"
+							}
+						],
 						"note": "`item` → `row`, `header` → `column` (its `value` is now `key`), `value` is the value of the cell; `index` and `columnIndex` are gone."
 					},
 					{
 						"name": "actionsSnippet",
 						"v4": "{ index, item? }",
 						"v5": "{ row }",
+						"params": {
+							"item": "row",
+							"index": null
+						},
 						"note": "`item` → `row`; drop the `{#if index === -1}` branch of the header cell."
 					},
 					{
@@ -15717,10 +15932,79 @@
 					}
 				]
 			},
+			"items": [
+				{
+					"prop": "headers",
+					"keys": [
+						{
+							"from": "value",
+							"to": "key"
+						},
+						{
+							"from": "locked",
+							"to": "required",
+							"note": "The column manager cannot hide it, as in v4."
+						},
+						{
+							"from": "sortModify",
+							"to": "sort"
+						}
+					],
+					"nested": [
+						{
+							"key": "type",
+							"tag": "key",
+							"values": {
+								"string": null,
+								"number": "number",
+								"date": "date",
+								"boolean": "boolean",
+								"custom": "custom"
+							},
+							"params": "params",
+							"hoist": [
+								{
+									"from": "nullText",
+									"to": "empty"
+								}
+							],
+							"drop": [
+								"format",
+								"locale"
+							],
+							"time": {
+								"param": "format",
+								"values": {
+									"date": "datetime"
+								}
+							},
+							"check": [
+								"number",
+								"date",
+								"datetime"
+							],
+							"note": "`string` is the default text column; `number` is now formatted and right-aligned; `date` shows day, month and year in digits in the language of `locale` (`dateFormat` for Intl options), `datetime` also the time; `icon` and `checkbox` are gone (draw them with a `cell` snippet)"
+						}
+					],
+					"parameters": [
+						{
+							"key": "sortModify",
+							"renamed": [
+								{
+									"from": "sortDirection",
+									"to": "direction"
+								}
+							]
+						}
+					],
+					"note": "each header becomes a column: `value` → `key`, `type: { key, params }` → a flat `type` (`string` → none, `number`, `date` or `datetime`, `boolean`, `custom`), `params.nullText` → `empty`, `locked` → `required`, `sortModify` → `sort` with `{ builder, direction }`; `icon` and `checkbox` columns are gone (use a `cell` snippet), `data` is gone"
+				}
+			],
 			"manual": [
 				{
 					"id": "data-table-columns",
 					"kind": "edit",
+					"automatic": true,
 					"summary": "`headers` become `columns`: `value` → `key`, `type: { key, params }` → a flat `type` and options. `string` → `text` (or no type), `number` → `number` (now formatted and right-aligned), `date` with a luxon `format` → `date` or `datetime` with `dateFormat` (Intl options, language from `locale`), `custom` stays `custom`, `icon` and `checkbox` are gone (they ignored the value). `nullText` → `empty` (also when it was a function: use `format` or `cell`), `sortModify` → `sort` with `{ builder, direction }` instead of `{ builder, sortDirection }`, `minWidth`/`maxWidth`/`width` accept any CSS length, `pinned` stays, `locked` and `data` are gone.",
 					"action": "Rewrite each header object. A `date` column with `{ format: 'dd/MM/yyyy', locale: 'it' }` usually needs no options: the default is day, month and year in digits in the language of `locale`; luxon values still work. Remove `icon` columns or draw the icon with a `cell` snippet. Where a header had `width` in %, keep it: it is a preferred width; use `minWidth` when the column must not shrink.",
 					"when": {
@@ -15731,9 +16015,9 @@
 				},
 				{
 					"id": "data-table-cells",
-					"kind": "edit",
+					"kind": "review",
 					"summary": "`customSnippet` (now `cellSnippet`) usually holds a chain `{#if header.value == 'a'} … {:else if header.value == 'b'} …`. It keeps working with `column.key`, but every column can carry its own `cell` snippet, and formatting that v4 apps did by hand is now built in: dates (`type: 'date'`), money (`type: 'number', numberFormat: { style: 'currency', currency: 'EUR' }`), yes/no (`type: 'boolean'`), empty text (`empty`).",
-					"action": "Mechanically: `header.value` → `column.key`, `item` → `row`. Then, branch by branch, replace hand-made formatting with the column type, and move the remaining branches to top-level snippets referenced by `cell` in the column definition; delete `cellSnippet` when it is empty.",
+					"action": "The codemod renames the parameters (`header` → `column`, `item` → `row`, `header.value` → `.key`). Then, branch by branch, replace hand-made formatting with the column type, and move the remaining branches to top-level snippets referenced by `cell` in the column definition; delete `cellSnippet` when it is empty.",
 					"when": {
 						"snippets": [
 							"customSnippet"
@@ -15866,6 +16150,12 @@
 			"from": "FileInput",
 			"to": "FileInput",
 			"props": {
+				"toObject": [
+					{
+						"name": "class",
+						"key": "zone"
+					}
+				],
 				"renamed": [
 					{
 						"from": "placeholder",
@@ -16010,6 +16300,12 @@
 			"from": "FileInputList",
 			"to": "FileInputList",
 			"props": {
+				"toObject": [
+					{
+						"name": "class",
+						"key": "container"
+					}
+				],
 				"renamed": [
 					{
 						"from": "message",
@@ -16411,6 +16707,38 @@
 						"note": "Texts follow `locale`: `lang=\"it\"` → `locale=\"it\"` (every label, operator and period in Italian, the lists and the calendar included), or nothing when the root layout calls `setDefaultLocale(\"it\")` (step `global-default-locale`); `lang=\"en\"` → `locale=\"en\"` only in an app with an Italian default. See `filters-labels`."
 					}
 				],
+				"collect": [
+					{
+						"into": "labels",
+						"props": [
+							{
+								"from": "addFilterLabel",
+								"key": "filters"
+							},
+							{
+								"from": "filterTitleLabel",
+								"key": "filters"
+							},
+							{
+								"from": "cancelFilterLabel",
+								"key": "cancel"
+							},
+							{
+								"from": "applyFilterLabel",
+								"key": "apply"
+							},
+							{
+								"from": "trueString",
+								"key": "yes"
+							},
+							{
+								"from": "falseString",
+								"key": "no"
+							}
+						],
+						"note": "Texts come from `locale`; `labels` overrides single ones. Remove an entry that only repeats the default of the language."
+					}
+				],
 				"removed": [
 					{
 						"name": "filters",
@@ -16806,18 +17134,12 @@
 				},
 				{
 					"id": "filters-labels",
-					"kind": "edit",
-					"summary": "Texts follow `locale` (Italian and English built in) with single texts in one `labels` object (`FilterLabels`), and dates and numbers follow `locale` too; `lang` is now `locale`, and `setDefaultLocale` sets it for the whole app.",
-					"action": "Where the app passed `lang=\"it\"`, pass `locale=\"it\"`, or nothing when the root layout calls `setDefaultLocale(\"it\")`: it picks every Italian text. Single texts are overridden on top: `labels={{ filters: \"Filtra\" }}`. Move the v4 label props there: `addFilterLabel` → `filters`, `cancelFilterLabel` → `cancel`, `applyFilterLabel` → `apply`, `filterTitleLabel` → `filters`, `trueString` / `falseString` → `yes` / `no`, `labelsMapper` → `operators` (see the `labelsMapper` removal). App wrappers around Filters should set them inside the wrapper.",
+					"kind": "review",
+					"summary": "Texts follow `locale` (Italian and English built in) with single texts in one `labels` object (`FilterLabels`), and dates and numbers follow `locale` too. The codemod renames `lang` to `locale` and moves the label props into `labels`.",
+					"action": "Where the root layout calls `setDefaultLocale(\"it\")`, drop `locale=\"it\"`: it picks every Italian text anyway. Drop `labels` entries that only repeat the default of the language. `labelsMapper` → `labels.operators` (see the `labelsMapper` removal). App wrappers around Filters should set them inside the wrapper.",
 					"when": {
 						"props": [
 							"lang",
-							"addFilterLabel",
-							"cancelFilterLabel",
-							"applyFilterLabel",
-							"filterTitleLabel",
-							"trueString",
-							"falseString",
 							"labelsMapper",
 							"dateLocale"
 						]
@@ -17214,16 +17536,8 @@
 						"to": "--hierarchy-menu-default-option-hover-color"
 					},
 					{
-						"from": "--hierarchy-menu-element-selected-background-color",
-						"to": "--hierarchy-menu-option-selected-background"
-					},
-					{
 						"from": "--hierarchy-menu-default-element-selected-background-color",
 						"to": "--hierarchy-menu-default-option-selected-background"
-					},
-					{
-						"from": "--hierarchy-menu-element-selected-color",
-						"to": "--hierarchy-menu-option-selected-color"
 					},
 					{
 						"from": "--hierarchy-menu-default-element-selected-color",
@@ -17236,6 +17550,12 @@
 					{
 						"from": "--hierarchy-menu-default-element-selected-font-weight",
 						"to": "--hierarchy-menu-default-option-selected-font-weight"
+					},
+					{
+						"from": "--icon-size",
+						"to": "--hierarchy-menu-icon-size",
+						"scoped": true,
+						"note": "Only when set on a HierarchyMenu: the icons of the menu are no longer library Icons reached by `--icon-size`."
 					}
 				],
 				"removed": [
@@ -17288,6 +17608,21 @@
 					{
 						"name": "--hierarchy-menu-default-icon-button-padding",
 						"note": "Icons are a fixed slot of `--hierarchy-menu-icon-size`; the space around them is `--hierarchy-menu-option-padding` and `--hierarchy-menu-option-gap`."
+					},
+					{
+						"name": "--icon-cursor",
+						"note": "Only when set on a HierarchyMenu: options always have the pointer cursor.",
+						"drop": true
+					},
+					{
+						"name": "--hierarchy-menu-element-selected-background-color",
+						"note": "The v4 solid pill of the selected option gives way to the v5 look (soft gradient and a bar on the left). To restyle it use `--hierarchy-menu-option-selected-background` and `-color` with v5 tokens.",
+						"drop": true
+					},
+					{
+						"name": "--hierarchy-menu-element-selected-color",
+						"note": "The v4 solid pill of the selected option gives way to the v5 look (soft gradient and a bar on the left). To restyle it use `--hierarchy-menu-option-selected-background` and `-color` with v5 tokens.",
+						"drop": true
 					}
 				],
 				"changed": [
@@ -17326,13 +17661,11 @@
 				},
 				{
 					"id": "hierarchy-menu-style-props",
-					"kind": "edit",
-					"summary": "Style props for the icons of the menu (`--icon-size=\"20px\"`, `--icon-cursor`) no longer reach them; the selected look of v4 was a solid primary pill, v5 a soft gradient with a bar on the left.",
-					"action": "Replace `--icon-size` on the menu with `--hierarchy-menu-icon-size` and drop `--icon-cursor`. Drop `--hierarchy-menu-element-selected-background-color=\"rgb(var(--global-color-primary-500))\"` and `-selected-color=\"white\"` unless the app wants to keep the v4 solid pill (then use `--hierarchy-menu-option-selected-background` and `-color` with v5 tokens).",
+					"kind": "review",
+					"summary": "The selected look of v4 was a solid primary pill, v5 a soft gradient with a bar on the left. The codemod removes `--hierarchy-menu-element-selected-background-color` and `-selected-color` set on the menu, so the app takes the v5 look.",
+					"action": "Look at the menu with a selected option, in light and dark. To restyle it, use `--hierarchy-menu-option-selected-background` and `--hierarchy-menu-option-selected-color` with v5 tokens (`var(--global-color-primary)`).",
 					"when": {
 						"cssVars": [
-							"--icon-size",
-							"--icon-cursor",
 							"--hierarchy-menu-element-selected-background-color"
 						]
 					}
@@ -17795,6 +18128,51 @@
 						"name": "resetZoom",
 						"note": "While zoomed the chart shows its own \"Reset zoom\" icon in the top-right corner of the plot, and a double click also resets. Remove `bind:resetZoom` and the reset button of the app. To reset from code, `bind:chart` and call `chart.resetZoom()`.",
 						"replacement": "bind:chart + chart.resetZoom()"
+					},
+					{
+						"name": "showXTicks",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "showYTicks",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "pointRadius",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "showLegend",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "rgbTooltipColor",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "rgbTooltipBackgroundColor",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "tooltipLabel",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "displayYGrid",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "displayXGrid",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
 					}
 				]
 			},
@@ -17819,26 +18197,17 @@
 				{
 					"id": "line-chart-flat-props",
 					"kind": "edit",
-					"summary": "Props of the v3 charts (`showXTicks`, `showYTicks`, `xTickLabel`, `enableZoom`, `pointRadius`, `yMin`, …) did nothing in v4 4.2+: they ended up as attributes of the canvas.",
-					"action": "Delete them. `enableZoom` → `zoom`; `showXTicks`/`showYTicks` → nothing (ticks are visible by default); `xTickLabel`/`yTickLabel` that format numbers → `format`; `xMin`/`xMax`/`yMin`/`yMax` → `options={{ scales: { y: { min, max } } }}`; colors (`rgbTooltipColor`, …) → nothing; `horizontal` is a prop again and keeps working. Check the chart afterwards: in v4 these charts were drawn with the defaults.",
+					"summary": "Props of the v3 charts (`xTickLabel`, `enableZoom`, `yMin`, …) did nothing in v4: they ended up as attributes of the canvas, so the chart was drawn with the defaults. The codemod removes the ones with nothing to keep (`showXTicks`, `pointRadius`, `rgbTooltipColor`, …).",
+					"action": "Delete them, or give them the meaning the app wanted: `enableZoom` → `zoom` (`zoom={false}` turns zooming off, which v4 never did); `xTickLabel`/`yTickLabel` that format numbers → `format`; `xMin`/`xMax`/`yMin`/`yMax` → `options={{ scales: { y: { min, max } } }}`. `horizontal` is a prop again and keeps working.",
 					"when": {
 						"props": [
-							"showXTicks",
-							"showYTicks",
 							"xTickLabel",
 							"yTickLabel",
 							"enableZoom",
-							"pointRadius",
 							"xMin",
 							"xMax",
 							"yMin",
-							"yMax",
-							"showLegend",
-							"rgbTooltipColor",
-							"rgbTooltipBackgroundColor",
-							"tooltipLabel",
-							"displayYGrid",
-							"displayXGrid"
+							"yMax"
 						]
 					}
 				},
@@ -18601,8 +18970,9 @@
 				{
 					"id": "confirm-or-cancel-buttons-spacing",
 					"kind": "edit",
+					"automatic": true,
 					"summary": "v4 put 20px of space above the buttons (215 of 231 uses relied on it); v5 has none, like every component, so forms built without `gap` would lose the space before their buttons.",
-					"action": "Add once to the global app CSS: `:root { --confirm-or-cancel-buttons-default-margin-top: 20px; }` (inside `@layer global.base` is not needed: unlayered app CSS wins). New forms laid out with `gap` should not use it.",
+					"action": "Add once to the global app CSS (`setup` does it): `:root { --confirm-or-cancel-buttons-default-margin-top: 20px; }` (inside `@layer global.base` is not needed: unlayered app CSS wins). New forms laid out with `gap` should not use it.",
 					"scope": "app"
 				},
 				{
@@ -19681,6 +20051,7 @@
 					"addInfoToast"
 				],
 				"unwrap": "data",
+				"result": "id",
 				"keys": [
 					{
 						"from": "closeDelay",
@@ -19727,6 +20098,7 @@
 				{
 					"id": "toaster-id",
 					"kind": "edit",
+					"automatic": true,
 					"summary": "The `add*` functions return the id of the toast, a number, instead of the melt-ui toast object.",
 					"action": "Replace `addXToast(...).id` with the returned value (`const id = addSuccessToast(...)`, then `removeToast(id)`), and types such as `ReturnType<typeof addSuccessToast>` or `Toast` from `@melt-ui/svelte` with `number`. A loading toast can also become the result with `updateToast(id, { variant: \"success\", title, loading: false })`."
 				},
@@ -20045,6 +20417,12 @@
 						"cssVar": "--menu-border-radius"
 					}
 				],
+				"bind": [
+					{
+						"name": "open",
+						"note": "The menu closes itself (Escape, outside clicks, another menu opening): with `open` passed one-way the app keeps `true` and the next toggle does nothing."
+					}
+				],
 				"defaults": [
 					{
 						"name": "closeOnClickOutside",
@@ -20100,9 +20478,9 @@
 			"manual": [
 				{
 					"id": "menu-self-closing",
-					"kind": "edit",
-					"summary": "The menu closes itself on outside clicks (new default), on Escape and when another menu opens; v4 closed only when the app set `open` to false.",
-					"action": "Use `bind:open` wherever `open` is passed one-way, otherwise the app keeps `true` after the menu closed and the next toggle does nothing. Menus that must stay open together: render the inner one inside the outer menu `children`, or give it `closeOnClickOutside={false}`; then a click outside (like Escape) closes only the innermost open menu, one level per click. Remove app code that closed menus on Escape or on outside clicks by hand."
+					"kind": "review",
+					"summary": "The menu closes itself on outside clicks (new default), on Escape and when another menu opens; v4 closed only when the app set `open` to false. The codemod writes `bind:open` where `open` is a variable of the file and keeps the v4 `closeOnClickOutside={false}`.",
+					"action": "Menus that must stay open together: render the inner one inside the outer menu `children`, or keep `closeOnClickOutside={false}`; then a click outside (like Escape) closes only the innermost open menu, one level per click. Remove app code that closed menus on Escape or on outside clicks by hand."
 				},
 				{
 					"id": "menu-surface",
@@ -20138,12 +20516,87 @@
 						"name": "drawerProps",
 						"note": "Takes the props of the v5 `Drawer`, except `open`, `drawerElement` and `children`; `position` still defaults to `bottom`. `_space` becomes the style prop `--drawer-size` on this component (`_space: \"60dvh\"` → `--drawer-size=\"60dvh\"`), `_borderRadius` → `--drawer-border-radius`; the other keys follow the Drawer rule."
 					}
+				],
+				"unpack": [
+					{
+						"from": "menuProps",
+						"keys": [
+							{
+								"key": "activator",
+								"to": "activator"
+							},
+							{
+								"key": "anchor",
+								"to": "placement"
+							},
+							{
+								"key": "_width",
+								"to": "--menu-width"
+							},
+							{
+								"key": "_height",
+								"to": "--menu-height"
+							},
+							{
+								"key": "_maxHeight",
+								"to": "--menu-max-height"
+							},
+							{
+								"key": "_minWidth",
+								"to": "--menu-min-width"
+							},
+							{
+								"key": "_boxShadow",
+								"to": "--menu-box-shadow"
+							},
+							{
+								"key": "_borderRadius",
+								"to": "--menu-border-radius"
+							}
+						],
+						"drop": [
+							"flipOnOverflow",
+							"stayInViewport",
+							"refreshPosition",
+							"openingId"
+						],
+						"note": "the other keys stay in `menuProps` with the names of the v5 Menu (`_activatorGap` → `offset`)"
+					},
+					{
+						"from": "drawerProps",
+						"keys": [
+							{
+								"key": "_space",
+								"to": "--drawer-size"
+							},
+							{
+								"key": "_borderRadius",
+								"to": "--drawer-border-radius"
+							}
+						]
+					}
+				],
+				"values": [
+					{
+						"name": "placement",
+						"values": {
+							"bottom": "bottom-start",
+							"bottom-center": "bottom",
+							"up": "top-start",
+							"up-center": "top",
+							"left": "left-start",
+							"left-center": "left",
+							"right": "right-start",
+							"right-center": "right"
+						}
+					}
 				]
 			},
 			"manual": [
 				{
 					"id": "menu-or-drawer-activator",
 					"kind": "edit",
+					"automatic": true,
 					"summary": "`activator` and `anchor` move out of `menuProps` into the `activator` and `placement` props.",
 					"action": "`menuProps={{ activator: x, anchor: \"right\", flipOnOverflow: true }}` → `activator={x} placement=\"right-start\"`. Convert `anchor` with the values of the Menu rule: `bottom-center` → `bottom`, `bottom` → `bottom-start`, `up-center` → `top`, `up` → `top-start`, `right` → `right-start`, `left` → `left-start`, `right-center` → `right`, `left-center` → `left`. Without `anchor` keep the default: the v5 default `bottom` is the v4 default `bottom-center`. Remove `menuProps` when nothing is left in it. Where the app reads the activator from a `bind:activator` on the component (v3 API, it never worked in v4), pass `activator` instead.",
 					"when": {
@@ -20154,9 +20607,9 @@
 				},
 				{
 					"id": "menu-or-drawer-drawer-height",
-					"kind": "edit",
-					"summary": "The bottom drawer is as tall as its content, up to 85% of the screen; v4 used the 20rem of the Drawer (MenuOrDrawerOptions: 56px per option, up to 5).",
-					"action": "Move `drawerProps._space` to the style prop `--drawer-size` on the component. Without `_space` nothing to do for content of normal height. Content that filled a fixed height (`height: 100%`, a list that must take the whole sheet) needs `--drawer-size`.",
+					"kind": "review",
+					"summary": "The bottom drawer is as tall as its content, up to 85% of the screen; v4 used the 20rem of the Drawer (MenuOrDrawerOptions: 56px per option, up to 5). The codemod moves `drawerProps._space` to `--drawer-size`.",
+					"action": "Content of normal height needs nothing. Content that filled a fixed height (`height: 100%`, a list that must take the whole sheet) needs `--drawer-size` on the component.",
 					"when": {
 						"props": [
 							"drawerProps"
@@ -20204,6 +20657,80 @@
 						"name": "drawerProps",
 						"note": "Takes the props of the v5 `Drawer`, except `open`, `drawerElement` and `children`; `position` still defaults to `bottom`. `_space` becomes the style prop `--drawer-size` on this component (`_space: \"60dvh\"` → `--drawer-size=\"60dvh\"`), `_borderRadius` → `--drawer-border-radius`; the other keys follow the Drawer rule."
 					}
+				],
+				"unpack": [
+					{
+						"from": "menuProps",
+						"keys": [
+							{
+								"key": "activator",
+								"to": "activator"
+							},
+							{
+								"key": "anchor",
+								"to": "placement"
+							},
+							{
+								"key": "_width",
+								"to": "--menu-width"
+							},
+							{
+								"key": "_height",
+								"to": "--menu-height"
+							},
+							{
+								"key": "_maxHeight",
+								"to": "--menu-max-height"
+							},
+							{
+								"key": "_minWidth",
+								"to": "--menu-min-width"
+							},
+							{
+								"key": "_boxShadow",
+								"to": "--menu-box-shadow"
+							},
+							{
+								"key": "_borderRadius",
+								"to": "--menu-border-radius"
+							}
+						],
+						"drop": [
+							"flipOnOverflow",
+							"stayInViewport",
+							"refreshPosition",
+							"openingId"
+						],
+						"note": "the other keys stay in `menuProps` with the names of the v5 Menu (`_activatorGap` → `offset`)"
+					},
+					{
+						"from": "drawerProps",
+						"keys": [
+							{
+								"key": "_space",
+								"to": "--drawer-size"
+							},
+							{
+								"key": "_borderRadius",
+								"to": "--drawer-border-radius"
+							}
+						]
+					}
+				],
+				"values": [
+					{
+						"name": "placement",
+						"values": {
+							"bottom": "bottom-start",
+							"bottom-center": "bottom",
+							"up": "top-start",
+							"up-center": "top",
+							"left": "left-start",
+							"left-center": "left",
+							"right": "right-start",
+							"right-center": "right"
+						}
+					}
 				]
 			},
 			"events": {
@@ -20219,10 +20746,40 @@
 					}
 				]
 			},
+			"items": [
+				{
+					"prop": "elements",
+					"keys": [
+						{
+							"from": "title",
+							"to": "label"
+						}
+					],
+					"drop": [
+						"appendIcon"
+					],
+					"rewrite": [
+						{
+							"key": "style",
+							"match": "^\\{\\s*color:\\s*['\"`][^'\"`]*error[^'\"`]*['\"`],?\\s*\\}$",
+							"to": "variant",
+							"value": "danger"
+						}
+					],
+					"byHand": [
+						{
+							"key": "style",
+							"note": "`style` is gone: a delete action with the error color becomes `variant: \"danger\"`, any other style a `class` plus app CSS"
+						}
+					],
+					"note": "each element is a `MenuOrDrawerOption`: `title` → `label` (a string), `icon` an SVG path, `appendIcon` gone (it did nothing), `style` → `variant: \"danger\"` or `class`"
+				}
+			],
 			"manual": [
 				{
 					"id": "menu-or-drawer-options-items",
 					"kind": "edit",
+					"automatic": true,
 					"summary": "The options are `MenuOrDrawerOption` objects: `title` → `label`, `icon` is an SVG path, `style` and `appendIcon` are gone.",
 					"action": "In every element: rename `title` to `label` (a number becomes a string); convert `icon` with the global icon rule (`\"mdi-pencil\"` → `mdiPencil` from `@mdi/js`); replace `style: { color: <error color> }` (delete actions) with `variant: \"danger\"`, and any other `style` with `class` plus app CSS; remove `appendIcon` (it did nothing in v4). `name`, `description`, `disabled` and `data` stay. Type the array as `MenuOrDrawerOption[]`, imported from the library. Options that call `data.action()` from `onselect` can use the option `onclick` instead.",
 					"when": {
@@ -20234,6 +20791,7 @@
 				{
 					"id": "menu-or-drawer-options-activator",
 					"kind": "edit",
+					"automatic": true,
 					"summary": "`activator` and `anchor` move out of `menuProps` into the `activator` and `placement` props.",
 					"action": "`menuProps={{ activator: x, anchor: \"right\", flipOnOverflow: true }}` → `activator={x} placement=\"right-start\"`. Convert `anchor` with the values of the Menu rule: `bottom-center` → `bottom`, `bottom` → `bottom-start`, `up-center` → `top`, `up` → `top-start`, `right` → `right-start`, `left` → `left-start`, `right-center` → `right`, `left-center` → `left`. Without `anchor` keep the default: the v5 default `bottom` is the v4 default `bottom-center`. Remove `menuProps` when nothing is left in it. Where the app reads the activator from a `bind:activator` on the component (v3 API, it never worked in v4), pass `activator` instead.",
 					"when": {
@@ -20244,9 +20802,9 @@
 				},
 				{
 					"id": "menu-or-drawer-options-drawer-height",
-					"kind": "edit",
-					"summary": "The bottom drawer is as tall as its content, up to 85% of the screen; v4 used the 20rem of the Drawer (MenuOrDrawerOptions: 56px per option, up to 5).",
-					"action": "Move `drawerProps._space` to the style prop `--drawer-size` on the component. Without `_space` nothing to do for content of normal height. Content that filled a fixed height (`height: 100%`, a list that must take the whole sheet) needs `--drawer-size`.",
+					"kind": "review",
+					"summary": "The bottom drawer is as tall as its content, up to 85% of the screen; v4 used the 20rem of the Drawer (MenuOrDrawerOptions: 56px per option, up to 5). The codemod moves `drawerProps._space` to `--drawer-size`.",
+					"action": "Content of normal height needs nothing. Content that filled a fixed height (`height: 100%`, a list that must take the whole sheet) needs `--drawer-size` on the component.",
 					"when": {
 						"props": [
 							"drawerProps"
@@ -20744,12 +21302,29 @@
 						"name": "cellSnippet",
 						"v4": "{ index, columnIndex, header, item }",
 						"v5": "{ row, value, column }",
+						"params": {
+							"header": "column",
+							"item": "row",
+							"index": null,
+							"columnIndex": null
+						},
+						"members": [
+							{
+								"param": "header",
+								"from": "value",
+								"to": "key"
+							}
+						],
 						"note": "`item` → `row`, `header` → `column` (its `value` is now `key`), `value` is the value of the cell; `index` and `columnIndex` are gone."
 					},
 					{
 						"name": "actionsSnippet",
 						"v4": "{ index, item? }",
 						"v5": "{ row }",
+						"params": {
+							"item": "row",
+							"index": null
+						},
 						"note": "`item` → `row`; drop the `{#if index === -1}` branch of the header cell."
 					},
 					{
@@ -21213,10 +21788,79 @@
 					}
 				]
 			},
+			"items": [
+				{
+					"prop": "headers",
+					"keys": [
+						{
+							"from": "value",
+							"to": "key"
+						},
+						{
+							"from": "locked",
+							"to": "required",
+							"note": "The column manager cannot hide it, as in v4."
+						},
+						{
+							"from": "sortModify",
+							"to": "sort"
+						}
+					],
+					"nested": [
+						{
+							"key": "type",
+							"tag": "key",
+							"values": {
+								"string": null,
+								"number": "number",
+								"date": "date",
+								"boolean": "boolean",
+								"custom": "custom"
+							},
+							"params": "params",
+							"hoist": [
+								{
+									"from": "nullText",
+									"to": "empty"
+								}
+							],
+							"drop": [
+								"format",
+								"locale"
+							],
+							"time": {
+								"param": "format",
+								"values": {
+									"date": "datetime"
+								}
+							},
+							"check": [
+								"number",
+								"date",
+								"datetime"
+							],
+							"note": "`string` is the default text column; `number` is now formatted and right-aligned; `date` shows day, month and year in digits in the language of `locale` (`dateFormat` for Intl options), `datetime` also the time; `icon` and `checkbox` are gone (draw them with a `cell` snippet)"
+						}
+					],
+					"parameters": [
+						{
+							"key": "sortModify",
+							"renamed": [
+								{
+									"from": "sortDirection",
+									"to": "direction"
+								}
+							]
+						}
+					],
+					"note": "each header becomes a column: `value` → `key`, `type: { key, params }` → a flat `type` (`string` → none, `number`, `date` or `datetime`, `boolean`, `custom`), `params.nullText` → `empty`, `locked` → `required`, `sortModify` → `sort` with `{ builder, direction }`; `icon` and `checkbox` columns are gone (use a `cell` snippet), `data` is gone"
+				}
+			],
 			"manual": [
 				{
 					"id": "data-table-columns",
 					"kind": "edit",
+					"automatic": true,
 					"summary": "`headers` become `columns`: `value` → `key`, `type: { key, params }` → a flat `type` and options. `string` → `text` (or no type), `number` → `number` (now formatted and right-aligned), `date` with a luxon `format` → `date` or `datetime` with `dateFormat` (Intl options, language from `locale`), `custom` stays `custom`, `icon` and `checkbox` are gone (they ignored the value). `nullText` → `empty` (also when it was a function: use `format` or `cell`), `sortModify` → `sort` with `{ builder, direction }` instead of `{ builder, sortDirection }`, `minWidth`/`maxWidth`/`width` accept any CSS length, `pinned` stays, `locked` and `data` are gone.",
 					"action": "Rewrite each header object. A `date` column with `{ format: 'dd/MM/yyyy', locale: 'it' }` usually needs no options: the default is day, month and year in digits in the language of `locale`; luxon values still work. Remove `icon` columns or draw the icon with a `cell` snippet. Where a header had `width` in %, keep it: it is a preferred width; use `minWidth` when the column must not shrink.",
 					"when": {
@@ -21227,9 +21871,9 @@
 				},
 				{
 					"id": "data-table-cells",
-					"kind": "edit",
+					"kind": "review",
 					"summary": "`customSnippet` (now `cellSnippet`) usually holds a chain `{#if header.value == 'a'} … {:else if header.value == 'b'} …`. It keeps working with `column.key`, but every column can carry its own `cell` snippet, and formatting that v4 apps did by hand is now built in: dates (`type: 'date'`), money (`type: 'number', numberFormat: { style: 'currency', currency: 'EUR' }`), yes/no (`type: 'boolean'`), empty text (`empty`).",
-					"action": "Mechanically: `header.value` → `column.key`, `item` → `row`. Then, branch by branch, replace hand-made formatting with the column type, and move the remaining branches to top-level snippets referenced by `cell` in the column definition; delete `cellSnippet` when it is empty.",
+					"action": "The codemod renames the parameters (`header` → `column`, `item` → `row`, `header.value` → `.key`). Then, branch by branch, replace hand-made formatting with the column type, and move the remaining branches to top-level snippets referenced by `cell` in the column definition; delete `cellSnippet` when it is empty.",
 					"when": {
 						"snippets": [
 							"customSnippet"
@@ -21795,6 +22439,53 @@
 						"note": "Native attributes go to the root `<div>`, no longer to the `<canvas>`. Size the chart with `--pie-chart-width` / `--pie-chart-height` (14rem)."
 					}
 				],
+				"removed": [
+					{
+						"name": "showXTicks",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "showYTicks",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "pointRadius",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "showLegend",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "rgbTooltipColor",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "rgbTooltipBackgroundColor",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "tooltipLabel",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "displayYGrid",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					},
+					{
+						"name": "displayXGrid",
+						"note": "A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.",
+						"drop": true
+					}
+				],
 				"defaults": [
 					{
 						"name": "donut",
@@ -21826,26 +22517,17 @@
 				{
 					"id": "pie-chart-flat-props",
 					"kind": "edit",
-					"summary": "Props of the v3 charts (`showXTicks`, `showYTicks`, `xTickLabel`, `enableZoom`, `pointRadius`, `yMin`, …) did nothing in v4 4.2+: they ended up as attributes of the canvas.",
-					"action": "Delete them. `enableZoom` → `zoom`; `showXTicks`/`showYTicks` → nothing (ticks are visible by default); `xTickLabel`/`yTickLabel` that format numbers → `format`; `xMin`/`xMax`/`yMin`/`yMax` → `options={{ scales: { y: { min, max } } }}`; colors (`rgbTooltipColor`, …) → nothing; `horizontal` is a prop again and keeps working. Check the chart afterwards: in v4 these charts were drawn with the defaults.",
+					"summary": "Props of the v3 charts (`xTickLabel`, `enableZoom`, `yMin`, …) did nothing in v4: they ended up as attributes of the canvas, so the chart was drawn with the defaults. The codemod removes the ones with nothing to keep (`showXTicks`, `pointRadius`, `rgbTooltipColor`, …).",
+					"action": "Delete them, or give them the meaning the app wanted: `enableZoom` → `zoom` (`zoom={false}` turns zooming off, which v4 never did); `xTickLabel`/`yTickLabel` that format numbers → `format`; `xMin`/`xMax`/`yMin`/`yMax` → `options={{ scales: { y: { min, max } } }}`. `horizontal` is a prop again and keeps working.",
 					"when": {
 						"props": [
-							"showXTicks",
-							"showYTicks",
 							"xTickLabel",
 							"yTickLabel",
 							"enableZoom",
-							"pointRadius",
 							"xMin",
 							"xMax",
 							"yMin",
-							"yMax",
-							"showLegend",
-							"rgbTooltipColor",
-							"rgbTooltipBackgroundColor",
-							"tooltipLabel",
-							"displayYGrid",
-							"displayXGrid"
+							"yMax"
 						]
 					}
 				},
@@ -22318,6 +23000,13 @@
 			"from": "Select",
 			"to": "Select",
 			"props": {
+				"toObject": [
+					{
+						"name": "class",
+						"key": "select",
+						"note": "Layout classes (margins, width, grid placement) belong on `container`."
+					}
+				],
 				"renamed": [
 					{
 						"from": "options",
@@ -22448,12 +23137,24 @@
 					}
 				]
 			},
+			"items": [
+				{
+					"prop": "options",
+					"keys": [
+						{
+							"from": "text",
+							"to": "label"
+						}
+					],
+					"note": "each option is an `Item`: `text` → `label`, `icon` an SVG path from `@mdi/js`"
+				}
+			],
 			"manual": [
 				{
 					"id": "select-items",
-					"kind": "edit",
-					"summary": "`options` becomes `items` and each option changes shape (`text` → `label`, `icon` an SVG path); `Item.value` must be a string or a number and unique, since it keys the list (duplicates throw `each_key_duplicate`).",
-					"action": "Rename `text` to `label` where the arrays are built (often a `.map` far from the component) and convert `icon` with the global icon rule. A \"none\" option with `value: undefined` becomes `placeholder` (then `value` is `undefined` until a choice) or gets a real value such as `\"none\"`; never `\"\"`, which the component reads as \"no choice\". Remove duplicate values.",
+					"kind": "review",
+					"summary": "`Item.value` must be a string or a number and unique, since it keys the list (duplicates throw `each_key_duplicate`); `text` is now `label` (the codemod renames it where the options are written in the same file).",
+					"action": "A \"none\" option with `value: undefined` becomes `placeholder` (then `value` is `undefined` until a choice) or gets a real value such as `\"none\"`; never `\"\"`, which the component reads as \"no choice\". Remove duplicate values.",
 					"when": {
 						"props": [
 							"options"
@@ -22473,9 +23174,9 @@
 				},
 				{
 					"id": "select-class",
-					"kind": "edit",
-					"summary": "`class` is an object; a v4 string replaced the internal class of the `<select>`, so the component lost its own styles.",
-					"action": "Pass the class as `class={{ select: \"...\" }}` (layout classes on `container`) and remove app CSS that rebuilt the field look (border, height, padding): the v5 styles now stay, and unlayered app CSS still wins over them.",
+					"kind": "review",
+					"summary": "`class` is an object; a v4 string replaced the internal class of the `<select>`, so the component lost its own styles. The codemod writes `class={{ select: \"...\" }}`.",
+					"action": "Move layout classes to `container` and remove app CSS that rebuilt the field look (border, height, padding): the v5 styles now stay, and unlayered app CSS still wins over them.",
 					"when": {
 						"props": [
 							"class"
@@ -22634,12 +23335,29 @@
 						"name": "cellSnippet",
 						"v4": "{ index, columnIndex, header, item }",
 						"v5": "{ row, value, column }",
+						"params": {
+							"header": "column",
+							"item": "row",
+							"index": null,
+							"columnIndex": null
+						},
+						"members": [
+							{
+								"param": "header",
+								"from": "value",
+								"to": "key"
+							}
+						],
 						"note": "`item` → `row`, `header` → `column` (its `value` is now `key`), `value` is the value of the cell; `index` and `columnIndex` are gone."
 					},
 					{
 						"name": "actionsSnippet",
 						"v4": "{ index, item? }",
 						"v5": "{ row }",
+						"params": {
+							"item": "row",
+							"index": null
+						},
 						"note": "`item` → `row`; drop the `{#if index === -1}` branch of the header cell."
 					}
 				],
@@ -22848,10 +23566,79 @@
 					}
 				]
 			},
+			"items": [
+				{
+					"prop": "headers",
+					"keys": [
+						{
+							"from": "value",
+							"to": "key"
+						},
+						{
+							"from": "locked",
+							"to": "required",
+							"note": "The column manager cannot hide it, as in v4."
+						},
+						{
+							"from": "sortModify",
+							"to": "sort"
+						}
+					],
+					"nested": [
+						{
+							"key": "type",
+							"tag": "key",
+							"values": {
+								"string": null,
+								"number": "number",
+								"date": "date",
+								"boolean": "boolean",
+								"custom": "custom"
+							},
+							"params": "params",
+							"hoist": [
+								{
+									"from": "nullText",
+									"to": "empty"
+								}
+							],
+							"drop": [
+								"format",
+								"locale"
+							],
+							"time": {
+								"param": "format",
+								"values": {
+									"date": "datetime"
+								}
+							},
+							"check": [
+								"number",
+								"date",
+								"datetime"
+							],
+							"note": "`string` is the default text column; `number` is now formatted and right-aligned; `date` shows day, month and year in digits in the language of `locale` (`dateFormat` for Intl options), `datetime` also the time; `icon` and `checkbox` are gone (draw them with a `cell` snippet)"
+						}
+					],
+					"parameters": [
+						{
+							"key": "sortModify",
+							"renamed": [
+								{
+									"from": "sortDirection",
+									"to": "direction"
+								}
+							]
+						}
+					],
+					"note": "each header becomes a column: `value` → `key`, `type: { key, params }` → a flat `type` (`string` → none, `number`, `date` or `datetime`, `boolean`, `custom`), `params.nullText` → `empty`, `locked` → `required`, `sortModify` → `sort` with `{ builder, direction }`; `icon` and `checkbox` columns are gone (use a `cell` snippet), `data` is gone"
+				}
+			],
 			"manual": [
 				{
 					"id": "table-columns",
 					"kind": "edit",
+					"automatic": true,
 					"summary": "`headers` become `columns`: `value` → `key`, `type: { key, params }` → a flat `type` and options. `string` → `text` (or no type), `number` → `number` (now formatted and right-aligned), `date` with a luxon `format` → `date` or `datetime` with `dateFormat` (Intl options, language from `locale`), `custom` stays `custom`, `icon` and `checkbox` are gone (they ignored the value). `nullText` → `empty` (also when it was a function: use `format` or `cell`), `sortModify` → `sort` with `{ builder, direction }` instead of `{ builder, sortDirection }`, `minWidth`/`maxWidth`/`width` accept any CSS length, `pinned` stays, `locked` and `data` are gone.",
 					"action": "Rewrite each header object. A `date` column with `{ format: 'dd/MM/yyyy', locale: 'it' }` usually needs no options: the default is day, month and year in digits in the language of `locale`; luxon values still work. Remove `icon` columns or draw the icon with a `cell` snippet. Where a header had `width` in %, keep it: it is a preferred width; use `minWidth` when the column must not shrink.",
 					"when": {
@@ -22862,9 +23649,9 @@
 				},
 				{
 					"id": "table-cells",
-					"kind": "edit",
+					"kind": "review",
 					"summary": "`customSnippet` (now `cellSnippet`) usually holds a chain `{#if header.value == 'a'} … {:else if header.value == 'b'} …`. It keeps working with `column.key`, but every column can carry its own `cell` snippet, and formatting that v4 apps did by hand is now built in: dates (`type: 'date'`), money (`type: 'number', numberFormat: { style: 'currency', currency: 'EUR' }`), yes/no (`type: 'boolean'`), empty text (`empty`).",
-					"action": "Mechanically: `header.value` → `column.key`, `item` → `row`. Then, branch by branch, replace hand-made formatting with the column type, and move the remaining branches to top-level snippets referenced by `cell` in the column definition; delete `cellSnippet` when it is empty.",
+					"action": "The codemod renames the parameters (`header` → `column`, `item` → `row`, `header.value` → `.key`). Then, branch by branch, replace hand-made formatting with the column type, and move the remaining branches to top-level snippets referenced by `cell` in the column definition; delete `cellSnippet` when it is empty.",
 					"when": {
 						"snippets": [
 							"customSnippet"
@@ -23457,12 +24244,37 @@
 					}
 				]
 			},
+			"items": [
+				{
+					"prop": "items",
+					"keys": [
+						{
+							"from": "name",
+							"to": "title",
+							"note": "where both exist, rename `name` to `key` if it is a unique id, else drop it"
+						}
+					],
+					"drop": [
+						"imageUrl"
+					],
+					"note": "items need a `title` (v4 `name`, never displayed); `imageUrl` is gone (v4 never read it)"
+				}
+			],
 			"manual": [
 				{
 					"id": "timeline-items",
 					"kind": "edit",
-					"summary": "Items need a `title`, the text the timeline shows; v4 required `name`, which it never displayed, and apps used it as the visible title in their snippets.",
-					"action": "In the objects passed to `items`: where there is no `title`, rename `name` to `title` (and `item.name` to `item.title` in the snippets). Where both exist, rename `name` to `key` if it is a unique id, else drop it. Drop `imageUrl` (v4 never read it); for an icon use `icon` with an `@mdi/js` path. Import the `TimelineItem` type from the library instead of `ComponentProps<...>` or a local copy."
+					"summary": "Items need a `title`, the text the timeline shows; v4 required `name`, which it never displayed, and apps used it as the visible title in their snippets. The codemod renames `name` to `title` where the items are written in the same file.",
+					"action": "In the snippets read `item.title` instead of `item.name`. Import the `TimelineItem` type from the library instead of `ComponentProps<...>` or a local copy.",
+					"when": {
+						"snippets": [
+							"itemSnippet",
+							"circleSnippet",
+							"timesSnippet",
+							"infosSnippet",
+							"infosAppendSnippet"
+						]
+					}
 				},
 				{
 					"id": "timeline-dates",
@@ -23622,6 +24434,16 @@
 			"from": "StableDividedSideBarLayout",
 			"to": "SidebarLayout",
 			"props": {
+				"defaults": [
+					{
+						"name": "expandOn",
+						"v4": "\"none\" with a wide sidebar (StableDividedSideBarLayout)",
+						"v5": "\"toggle\"",
+						"keepV4": "expandOn=\"none\" sidebarExpanded",
+						"behaviour": true,
+						"note": "An always wide sidebar without a button, as StableDividedSideBarLayout."
+					}
+				],
 				"changed": [
 					{
 						"name": "class",
@@ -23811,12 +24633,11 @@
 				{
 					"id": "sidebar-layout-stable",
 					"kind": "edit",
-					"summary": "StableDividedSideBarLayout is `SidebarLayout expandOn=\"none\" sidebarExpanded`: an always wide sidebar without a button. Its `menuSnippet` was the top bar, which is `headerSnippet` in v5.",
-					"action": "Add `expandOn=\"none\" sidebarExpanded`. Move the content of `menuSnippet` into `headerSnippet` without the hand-made hamburger (the bar keeps the menu button on mobile). The menu inside the sidebar can stay in `sidebarSnippet`, or move to `logoSnippet` + `menuSnippet` + `userSnippet` to keep the layout scrolling only the menu.",
+					"summary": "StableDividedSideBarLayout is `SidebarLayout expandOn=\"none\" sidebarExpanded` (the codemod adds them): an always wide sidebar without a button. Its `menuSnippet` was the top bar, which is `headerSnippet` in v5.",
+					"action": "Move the content of `menuSnippet` into `headerSnippet` without the hand-made hamburger (the bar keeps the menu button on mobile). The menu inside the sidebar can stay in `sidebarSnippet`, or move to `logoSnippet` + `menuSnippet` + `userSnippet` to keep the layout scrolling only the menu.",
 					"when": {
 						"snippets": [
-							"menuSnippet",
-							"sidebarSnippet"
+							"menuSnippet"
 						]
 					},
 					"scope": "usage"
@@ -24407,6 +25228,23 @@
 						"from": "menuOpen",
 						"to": "open",
 						"note": "Still bindable."
+					}
+				],
+				"unpack": [
+					{
+						"from": "menuProps",
+						"keys": [
+							{
+								"key": "anchor",
+								"to": "placement"
+							},
+							{
+								"key": "_activatorGap",
+								"to": "offset"
+							}
+						],
+						"others": "drop",
+						"note": "the other Menu props have no equivalent on the tooltip"
 					}
 				],
 				"removed": [
@@ -25204,6 +26042,12 @@
 			"from": "YearSelector",
 			"to": "YearSelector",
 			"props": {
+				"toObject": [
+					{
+						"name": "class",
+						"key": "container"
+					}
+				],
 				"removed": [
 					{
 						"name": "selectableYears",

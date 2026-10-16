@@ -1,12 +1,12 @@
 import type { ComponentMigration } from '../types.js';
-import { canvasAttributes, dataNote, optionsNote, optionsStep, resetZoomRemoval, sharedSteps } from './BarChart.js';
+import { canvasAttributes, dataNote, inertProps, optionsNote, optionsStep, resetZoomRemoval, sharedSteps } from './BarChart.js';
 
 export default {
 	from: 'LineChart',
 	to: 'LineChart',
 	props: {
 		changed: [dataNote(false), optionsNote, canvasAttributes],
-		removed: [resetZoomRemoval]
+		removed: [resetZoomRemoval, ...inertProps]
 	},
 	manual: [
 		...sharedSteps('line-chart', 'point'),

@@ -7,6 +7,7 @@ export default {
 	from: 'Select',
 	to: 'Select',
 	props: {
+		toObject: [{ name: 'class', key: 'select', note: 'Layout classes (margins, width, grid placement) belong on `container`.' }],
 		renamed: [
 			{
 				from: 'options',
@@ -117,14 +118,21 @@ export default {
 			}
 		]
 	},
+	items: [
+		{
+			prop: 'options',
+			keys: [{ from: 'text', to: 'label' }],
+			note: 'each option is an `Item`: `text` → `label`, `icon` an SVG path from `@mdi/js`'
+		}
+	],
 	manual: [
 		{
 			id: 'select-items',
-			kind: 'edit',
+			kind: 'review',
 			summary:
-				'`options` becomes `items` and each option changes shape (`text` → `label`, `icon` an SVG path); `Item.value` must be a string or a number and unique, since it keys the list (duplicates throw `each_key_duplicate`).',
+				'`Item.value` must be a string or a number and unique, since it keys the list (duplicates throw `each_key_duplicate`); `text` is now `label` (the codemod renames it where the options are written in the same file).',
 			action:
-				'Rename `text` to `label` where the arrays are built (often a `.map` far from the component) and convert `icon` with the global icon rule. A "none" option with `value: undefined` becomes `placeholder` (then `value` is `undefined` until a choice) or gets a real value such as `"none"`; never `""`, which the component reads as "no choice". Remove duplicate values.',
+				'A "none" option with `value: undefined` becomes `placeholder` (then `value` is `undefined` until a choice) or gets a real value such as `"none"`; never `""`, which the component reads as "no choice". Remove duplicate values.',
 			when: { props: ['options'] }
 		},
 		{
@@ -138,11 +146,11 @@ export default {
 		},
 		{
 			id: 'select-class',
-			kind: 'edit',
+			kind: 'review',
 			summary:
-				'`class` is an object; a v4 string replaced the internal class of the `<select>`, so the component lost its own styles.',
+				'`class` is an object; a v4 string replaced the internal class of the `<select>`, so the component lost its own styles. The codemod writes `class={{ select: "..." }}`.',
 			action:
-				'Pass the class as `class={{ select: "..." }}` (layout classes on `container`) and remove app CSS that rebuilt the field look (border, height, padding): the v5 styles now stay, and unlayered app CSS still wins over them.',
+				'Move layout classes to `container` and remove app CSS that rebuilt the field look (border, height, padding): the v5 styles now stay, and unlayered app CSS still wins over them.',
 			when: { props: ['class'] }
 		},
 		{

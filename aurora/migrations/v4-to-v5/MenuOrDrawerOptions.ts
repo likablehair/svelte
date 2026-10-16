@@ -1,5 +1,5 @@
 import type { ComponentMigration } from '../types.js';
-import { activatorStep, drawerHeightStep, drawerPropsNote, menuPropsNote } from './MenuOrDrawer.js';
+import { activatorStep, drawerHeightStep, drawerPropsNote, menuPropsNote, unpackProps } from './MenuOrDrawer.js';
 
 export default {
 	from: 'MenuOrDrawerOptions',
@@ -15,7 +15,8 @@ export default {
 		changed: [
 			{ name: 'menuProps', note: menuPropsNote },
 			{ name: 'drawerProps', note: drawerPropsNote }
-		]
+		],
+		...unpackProps
 	},
 	events: {
 		changed: [
@@ -27,10 +28,26 @@ export default {
 			}
 		]
 	},
+	items: [
+		{
+			prop: 'elements',
+			keys: [{ from: 'title', to: 'label' }],
+			drop: ['appendIcon'],
+			rewrite: [{ key: 'style', match: '^\\{\\s*color:\\s*[\'"`][^\'"`]*error[^\'"`]*[\'"`],?\\s*\\}$', to: 'variant', value: 'danger' }],
+			byHand: [
+				{
+					key: 'style',
+					note: '`style` is gone: a delete action with the error color becomes `variant: "danger"`, any other style a `class` plus app CSS'
+				}
+			],
+			note: 'each element is a `MenuOrDrawerOption`: `title` → `label` (a string), `icon` an SVG path, `appendIcon` gone (it did nothing), `style` → `variant: "danger"` or `class`'
+		}
+	],
 	manual: [
 		{
 			id: 'menu-or-drawer-options-items',
 			kind: 'edit',
+			automatic: true,
 			summary:
 				'The options are `MenuOrDrawerOption` objects: `title` → `label`, `icon` is an SVG path, `style` and `appendIcon` are gone.',
 			action:

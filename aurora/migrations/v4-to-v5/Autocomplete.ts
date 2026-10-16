@@ -295,11 +295,11 @@ const rule = {
 	manual: [
 		{
 			id: 'autocomplete-item-icon',
-			kind: 'edit',
+			kind: 'review',
 			summary:
-				'`Item.icon` is an SVG path (v4: an MDI class name) and `Item` is exported from the package root.',
+				'`Item.icon` is an SVG path (v4: an MDI class name; the codemod converts the `"mdi-*"` literals) and `Item` is exported from the package root.',
 			action:
-				'Apply the global icon transform to every `icon` in the `items` and `values` data (`"mdi-account"` → `mdiAccount` from `@mdi/js`). Import `type Item` from `@likable-hair/svelte` instead of the component module; with TypeScript, `Item` without a type argument now has `data: unknown`, so pass the type (`Item<{ price: number }>`) where the app reads `item.data`.',
+				'Import `type Item` from `@likable-hair/svelte` instead of the component module; with TypeScript, `Item` without a type argument now has `data: unknown`, so pass the type (`Item<{ price: number }>`) where the app reads `item.data`.',
 			when: { props: ['items', 'values'] }
 		},
 		{

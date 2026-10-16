@@ -3,11 +3,36 @@ import type {
 	ComponentMigration,
 	CssVarRules,
 	EventChange,
+	ItemRules,
 	ManualStep,
 	Removal,
 	Rename,
 	SnippetChange
 } from '../types.js';
+
+export const columnItems: ItemRules = {
+	prop: 'headers',
+	keys: [
+		{ from: 'value', to: 'key' },
+		{ from: 'locked', to: 'required', note: 'The column manager cannot hide it, as in v4.' },
+		{ from: 'sortModify', to: 'sort' }
+	],
+	nested: [
+		{
+			key: 'type',
+			tag: 'key',
+			values: { string: null, number: 'number', date: 'date', boolean: 'boolean', custom: 'custom' },
+			params: 'params',
+			hoist: [{ from: 'nullText', to: 'empty' }],
+			drop: ['format', 'locale'],
+			time: { param: 'format', values: { date: 'datetime' } },
+			check: ['number', 'date', 'datetime'],
+			note: '`string` is the default text column; `number` is now formatted and right-aligned; `date` shows day, month and year in digits in the language of `locale` (`dateFormat` for Intl options), `datetime` also the time; `icon` and `checkbox` are gone (draw them with a `cell` snippet)'
+		}
+	],
+	parameters: [{ key: 'sortModify', renamed: [{ from: 'sortDirection', to: 'direction' }] }],
+	note: 'each header becomes a column: `value` → `key`, `type: { key, params }` → a flat `type` (`string` → none, `number`, `date` or `datetime`, `boolean`, `custom`), `params.nullText` → `empty`, `locked` → `required`, `sortModify` → `sort` with `{ builder, direction }`; `icon` and `checkbox` columns are gone (use a `cell` snippet), `data` is gone'
+};
 
 const both = (from: string, to: string): Rename[] => [
 	{ from: `--simple-table-${from}`, to: `--table-${to}` },
@@ -115,17 +140,20 @@ const rule = {
 			{ from: 'customSnippet', to: 'cellSnippet', note: 'Still draws the cells of `custom` columns; a column can also have its own `cell` snippet. See `table-cells`.' },
 			{ from: 'appendSnippet', to: 'actionsSnippet', note: 'The column of row buttons: always visible as in v4, and now pinned on the right while scrolling (`actionsVisibility="hover"` shows it only on hover and focus). Its header cell is no longer drawn by the snippet (v4 called it with `index: -1` and no item).' }
 		],
-		parameters: [
+		parameters: <SnippetChange[]>[
 			{
 				name: 'cellSnippet',
 				v4: '{ index, columnIndex, header, item }',
 				v5: '{ row, value, column }',
+				params: { header: 'column', item: 'row', index: null, columnIndex: null },
+				members: [{ param: 'header', from: 'value', to: 'key' }],
 				note: '`item` → `row`, `header` → `column` (its `value` is now `key`), `value` is the value of the cell; `index` and `columnIndex` are gone.'
 			},
 			{
 				name: 'actionsSnippet',
 				v4: '{ index, item? }',
 				v5: '{ row }',
+				params: { item: 'row', index: null },
 				note: '`item` → `row`; drop the `{#if index === -1}` branch of the header cell.'
 			}
 		],
@@ -180,10 +208,12 @@ const rule = {
 			...gone('max-width', 'Size the table with `--table-width`, the `class` of `container` or a wrapper.', undefined, false)
 		]
 	},
+	items: [columnItems],
 	manual: [
 		{
 			id: 'table-columns',
 			kind: 'edit',
+			automatic: true,
 			summary:
 				'`headers` become `columns`: `value` → `key`, `type: { key, params }` → a flat `type` and options. `string` → `text` (or no type), `number` → `number` (now formatted and right-aligned), `date` with a luxon `format` → `date` or `datetime` with `dateFormat` (Intl options, language from `locale`), `custom` stays `custom`, `icon` and `checkbox` are gone (they ignored the value). `nullText` → `empty` (also when it was a function: use `format` or `cell`), `sortModify` → `sort` with `{ builder, direction }` instead of `{ builder, sortDirection }`, `minWidth`/`maxWidth`/`width` accept any CSS length, `pinned` stays, `locked` and `data` are gone.',
 			action:
@@ -192,11 +222,11 @@ const rule = {
 		},
 		{
 			id: 'table-cells',
-			kind: 'edit',
+			kind: 'review',
 			summary:
 				'`customSnippet` (now `cellSnippet`) usually holds a chain `{#if header.value == \'a\'} … {:else if header.value == \'b\'} …`. It keeps working with `column.key`, but every column can carry its own `cell` snippet, and formatting that v4 apps did by hand is now built in: dates (`type: \'date\'`), money (`type: \'number\', numberFormat: { style: \'currency\', currency: \'EUR\' }`), yes/no (`type: \'boolean\'`), empty text (`empty`).',
 			action:
-				'Mechanically: `header.value` → `column.key`, `item` → `row`. Then, branch by branch, replace hand-made formatting with the column type, and move the remaining branches to top-level snippets referenced by `cell` in the column definition; delete `cellSnippet` when it is empty.',
+				'The codemod renames the parameters (`header` → `column`, `item` → `row`, `header.value` → `.key`). Then, branch by branch, replace hand-made formatting with the column type, and move the remaining branches to top-level snippets referenced by `cell` in the column definition; delete `cellSnippet` when it is empty.',
 			when: { snippets: ['customSnippet'] }
 		},
 		{
@@ -273,6 +303,7 @@ export function forwarded(
 	snippets: { renamed: Rename[]; parameters: SnippetChange[]; removed: Removal[] };
 	cssVars: Removal[];
 	manual: ManualStep[];
+	items: ItemRules[];
 } {
 	const keep = <T extends { name: string }>(list: T[] = []) => list.filter((item) => !skip.includes(item.name));
 	return {
@@ -291,6 +322,7 @@ export function forwarded(
 			removed: keep(rule.snippets.removed)
 		},
 		cssVars: innerCssVars(rule.cssVars, 'Table'),
+		items: rule.items,
 		manual: rule.manual
 			.filter((step) => !skip.includes(step.id))
 			.map((step) => ({ ...step, id: step.id.replace(/^table-/, `${prefix}-`) }))

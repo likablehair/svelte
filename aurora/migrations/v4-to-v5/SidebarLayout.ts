@@ -281,6 +281,16 @@ const stable = {
 	from: 'StableDividedSideBarLayout',
 	to: 'SidebarLayout',
 	props: {
+		defaults: [
+			{
+				name: 'expandOn',
+				v4: '"none" with a wide sidebar (StableDividedSideBarLayout)',
+				v5: '"toggle"',
+				keepV4: 'expandOn="none" sidebarExpanded',
+				behaviour: true,
+				note: 'An always wide sidebar without a button, as StableDividedSideBarLayout.'
+			}
+		],
 		changed: [
 			classChange('`container` (unchanged), `header` → `sidebar` (it was the sidebar element), `mainSection` → `content` (the `<main>`), `overlay` removed, `header` is now the bar, `drawer` the panel of the mobile drawer.')
 		]
@@ -332,10 +342,10 @@ const stable = {
 			id: 'sidebar-layout-stable',
 			kind: 'edit',
 			summary:
-				'StableDividedSideBarLayout is `SidebarLayout expandOn="none" sidebarExpanded`: an always wide sidebar without a button. Its `menuSnippet` was the top bar, which is `headerSnippet` in v5.',
+				'StableDividedSideBarLayout is `SidebarLayout expandOn="none" sidebarExpanded` (the codemod adds them): an always wide sidebar without a button. Its `menuSnippet` was the top bar, which is `headerSnippet` in v5.',
 			action:
-				'Add `expandOn="none" sidebarExpanded`. Move the content of `menuSnippet` into `headerSnippet` without the hand-made hamburger (the bar keeps the menu button on mobile). The menu inside the sidebar can stay in `sidebarSnippet`, or move to `logoSnippet` + `menuSnippet` + `userSnippet` to keep the layout scrolling only the menu.',
-			when: { snippets: ['menuSnippet', 'sidebarSnippet'] },
+				'Move the content of `menuSnippet` into `headerSnippet` without the hand-made hamburger (the bar keeps the menu button on mobile). The menu inside the sidebar can stay in `sidebarSnippet`, or move to `logoSnippet` + `menuSnippet` + `userSnippet` to keep the layout scrolling only the menu.',
+			when: { snippets: ['menuSnippet'] },
 			scope: 'usage'
 		}
 	],

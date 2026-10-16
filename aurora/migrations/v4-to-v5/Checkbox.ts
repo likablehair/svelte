@@ -6,6 +6,7 @@ export default {
 	from: 'Checkbox',
 	to: 'Checkbox',
 	props: {
+		toObject: [{ name: 'class', key: 'input', note: 'Layout classes (margins, alignment) belong on `container`, the root `<label>`.' }],
 		renamed: [
 			{
 				from: 'value',

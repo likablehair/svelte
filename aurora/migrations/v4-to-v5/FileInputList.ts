@@ -13,6 +13,7 @@ export default {
 	from: 'FileInputList',
 	to: 'FileInputList',
 	props: {
+		toObject: [{ name: 'class', key: 'container' }],
 		renamed: [
 			{ from: 'message', to: 'title' },
 			{

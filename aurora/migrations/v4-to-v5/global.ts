@@ -294,8 +294,9 @@ export default {
 		{
 			id: 'global-svelte-version',
 			kind: 'edit',
+			automatic: true,
 			summary: 'The components need Svelte 5.29 or later.',
-			action: 'Update `svelte` in the app before anything else.',
+			action: 'Update `svelte` in the app before anything else (`setup` raises the range in `package.json`).',
 			scope: 'app'
 		},
 		{
@@ -316,15 +317,16 @@ export default {
 		},
 		{
 			id: 'global-tailwind-3',
-			kind: 'edit',
-			summary: 'Tailwind 3 preflight removes component backgrounds and borders unless it is layered.',
-			action:
-				"Wrap `@tailwind base;` in `@layer reset { ... }` and add `presets: [aurora]` (`import aurora from '@likable-hair/svelte/tailwind-preset'`) to `tailwind.config.js`. Token overrides placed in Tailwind's `@layer base` end up inside `reset` and lose: move them out of the layer.",
+			kind: 'review',
+			summary:
+				"Tailwind 3 preflight removes component backgrounds and borders unless it is layered. `setup` wraps `@tailwind base;` in `@layer reset { ... }`, adds `presets: [aurora]` (`import aurora from '@likable-hair/svelte/tailwind-preset'`) to `tailwind.config.js` and turns `darkMode: 'class'` into the variant of the library.",
+			action: "Token overrides placed in Tailwind's `@layer base` end up inside `reset` and lose: move them out of the layer.",
 			scope: 'app'
 		},
 		{
 			id: 'global-tailwind-4',
 			kind: 'edit',
+			automatic: true,
 			summary: 'Tailwind 4 needs the layer line and the library theme mapping.',
 			action:
 				"Put the `layers.app` line before `@import 'tailwindcss'`, then `@import '@likable-hair/svelte/tailwind.css'`. Note that it redefines `rounded-{xs,sm,md,lg,xl}`, `shadow-{sm,md,lg}`, `font-sans` and `font-mono`.",
@@ -351,9 +353,9 @@ export default {
 			id: 'global-dark-mode',
 			kind: 'edit',
 			summary:
-				'Dark mode follows `color-scheme` and `data-mode` on `<html>`; `.dark` / `.light` classes do nothing.',
+				"Dark mode follows `color-scheme` and `data-mode` on `<html>`; `.dark` / `.light` classes do nothing. `setup` calls `rememberAppearance()` and `appearanceScript()` in the root layout (same `theme` key of v4, no flash) and changes Tailwind 3 `darkMode: 'class'`; the codemod renames `toggleTheme()` to `toggleMode()`.",
 			action:
-				"Replace `setTheme('dark')` with `setMode('dark')` and `toggleTheme()` with `toggleMode()`, `.dark` selectors with `[data-mode='dark']` (plus the `prefers-color-scheme` branch), and Tailwind `darkMode: 'class'` with the variant in MIGRATION.md. v4 saved the mode by itself: call `rememberAppearance()` once in the root `+layout.svelte` (it reads and writes the same `theme` key of v4, so users keep their choice) and add `<svelte:head>{@html '<script>' + appearanceScript() + '</script>'}</svelte:head>` there, so the page does not flash in the wrong mode. An app without dark mode sets `data-mode=\"light\"` on `<html>`.",
+				"Replace `setTheme('dark')` with `setMode('dark')`, `.dark` selectors in app CSS with `[data-mode='dark']` plus the `prefers-color-scheme` branch (`@media (prefers-color-scheme: dark) { :root:not([data-mode='light']) ... }`), and a Tailwind 4 `@custom-variant dark` with the variant in MIGRATION.md. An app without dark mode sets `data-mode=\"light\"` on `<html>`.",
 			scope: 'app'
 		},
 		{
@@ -362,7 +364,7 @@ export default {
 			summary:
 				'Every icon prop takes an SVG path; `"mdi-*"` strings type-check but draw nothing, and the global `.mdi` classes are gone.',
 			action:
-				'Apply `icons.transform` to every icon prop listed in the component rules and to `Item.icon` values in data. Markup that uses `class="mdi mdi-*"` directly needs `@mdi/font` loaded by the app, or an `<Icon path>`.'
+				'The codemod turns every `"mdi-*"` literal into an `@mdi/js` import (`icons.transform`), in attributes and in data. Left by hand: names built at runtime (`"mdi-" + name`: map them to the imported paths), and markup that uses `class="mdi mdi-*"` directly, which needs `@mdi/font` loaded by the app or an `<Icon path>` (while such markup exists the codemod converts only the icons of the library components).'
 		},
 		{
 			id: 'global-callbacks',

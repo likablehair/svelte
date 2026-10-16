@@ -36,6 +36,20 @@ export default {
 				note: 'Texts follow `locale`: `lang="it"` → `locale="it"` (every label, operator and period in Italian, the lists and the calendar included), or nothing when the root layout calls `setDefaultLocale("it")` (step `global-default-locale`); `lang="en"` → `locale="en"` only in an app with an Italian default. See `filters-labels`.'
 			}
 		],
+		collect: [
+			{
+				into: 'labels',
+				props: [
+					{ from: 'addFilterLabel', key: 'filters' },
+					{ from: 'filterTitleLabel', key: 'filters' },
+					{ from: 'cancelFilterLabel', key: 'cancel' },
+					{ from: 'applyFilterLabel', key: 'apply' },
+					{ from: 'trueString', key: 'yes' },
+					{ from: 'falseString', key: 'no' }
+				],
+				note: 'Texts come from `locale`; `labels` overrides single ones. Remove an entry that only repeats the default of the language.'
+			}
+		],
 		removed: [
 			{
 				name: 'filters',
@@ -332,24 +346,12 @@ export default {
 		},
 		{
 			id: 'filters-labels',
-			kind: 'edit',
+			kind: 'review',
 			summary:
-				'Texts follow `locale` (Italian and English built in) with single texts in one `labels` object (`FilterLabels`), and dates and numbers follow `locale` too; `lang` is now `locale`, and `setDefaultLocale` sets it for the whole app.',
+				'Texts follow `locale` (Italian and English built in) with single texts in one `labels` object (`FilterLabels`), and dates and numbers follow `locale` too. The codemod renames `lang` to `locale` and moves the label props into `labels`.',
 			action:
-				'Where the app passed `lang="it"`, pass `locale="it"`, or nothing when the root layout calls `setDefaultLocale("it")`: it picks every Italian text. Single texts are overridden on top: `labels={{ filters: "Filtra" }}`. Move the v4 label props there: `addFilterLabel` → `filters`, `cancelFilterLabel` → `cancel`, `applyFilterLabel` → `apply`, `filterTitleLabel` → `filters`, `trueString` / `falseString` → `yes` / `no`, `labelsMapper` → `operators` (see the `labelsMapper` removal). App wrappers around Filters should set them inside the wrapper.',
-			when: {
-				props: [
-					'lang',
-					'addFilterLabel',
-					'cancelFilterLabel',
-					'applyFilterLabel',
-					'filterTitleLabel',
-					'trueString',
-					'falseString',
-					'labelsMapper',
-					'dateLocale'
-				]
-			}
+				'Where the root layout calls `setDefaultLocale("it")`, drop `locale="it"`: it picks every Italian text anyway. Drop `labels` entries that only repeat the default of the language. `labelsMapper` → `labels.operators` (see the `labelsMapper` removal). App wrappers around Filters should set them inside the wrapper.',
+			when: { props: ['lang', 'labelsMapper', 'dateLocale'] }
 		},
 		{
 			id: 'filters-append-snippet',

@@ -39,9 +39,10 @@ export function indexRules(rules: CompiledRules): RuleIndex {
 			if (!cssVars.has(entry.name)) cssVars.set(entry.name, entry);
 		};
 		for (const r of rule.cssVars?.renamed ?? [])
-			add({ component: rule.from, kind: 'renamed', name: r.from, to: r.to, note: r.note });
+			if (!r.scoped) add({ component: rule.from, kind: 'renamed', name: r.from, to: r.to, note: r.note });
 		for (const r of rule.cssVars?.removed ?? [])
-			add({
+			if (!r.drop)
+				add({
 				component: rule.from,
 				kind: 'removed',
 				name: r.name,

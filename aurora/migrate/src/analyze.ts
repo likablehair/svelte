@@ -449,7 +449,8 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 			general.set(key, current);
 		}
 		for (const step of result.app)
-			appStepsByComponent.set(step.id, {
+			if (!step.automatic)
+				appStepsByComponent.set(step.id, {
 				id: step.id,
 				kind: step.kind,
 				summary: step.summary,
@@ -742,7 +743,7 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 		'global-ssr-mobile': () => ({ needed: imported('mediaQuery') || has('MediaQuery') ? true : null })
 	};
 	const appSteps: AppStep[] = [
-		...index.rules.global.manual.map((step: ManualStep) => ({
+		...index.rules.global.manual.filter((step: ManualStep) => !step.automatic).map((step: ManualStep) => ({
 			id: step.id,
 			kind: step.kind,
 			summary: step.summary,

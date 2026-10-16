@@ -128,7 +128,7 @@ export function matchUsage(
 	for (const r of p.removed ?? []) {
 		const attr = props.get(r.name);
 		if (attr)
-			add(r.replacement ? 'check' : 'manual', 'prop-removed', `props.removed/${r.name}`, r.name, attr.line, {
+			add(r.replacement || r.drop ? 'check' : 'manual', 'prop-removed', `props.removed/${r.name}`, r.name, attr.line, {
 				to: r.replacement,
 				note: r.note
 			});
@@ -189,7 +189,7 @@ export function matchUsage(
 	for (const r of e.removed ?? []) {
 		const attr = events.get(r.name);
 		if (attr)
-			add(r.replacement ? 'check' : 'manual', 'event-removed', `events.removed/${r.name}`, r.name, attr.line, {
+			add(r.replacement || r.closes ? 'check' : 'manual', 'event-removed', `events.removed/${r.name}`, r.name, attr.line, {
 				to: r.replacement,
 				note: r.note
 			});
@@ -227,7 +227,7 @@ export function matchUsage(
 	for (const r of c.removed ?? []) {
 		const attr = cssVars.get(r.name);
 		if (attr)
-			add(r.replacement ? 'check' : 'manual', 'css-var-removed', `cssVars.removed/${r.name}`, r.name, attr.line, {
+			add(r.drop ? 'auto' : r.replacement ? 'check' : 'manual', 'css-var-removed', `cssVars.removed/${r.name}`, r.name, attr.line, {
 				to: r.replacement,
 				note: r.note
 			});
@@ -259,13 +259,13 @@ export function matchUsage(
 		if (!hit) continue;
 		const line = props.get(hit)?.line ?? events.get(hit)?.line ?? cssVars.get(hit)?.line ?? snippets.get(hit) ?? usage.line;
 		findings.push({
-			effort: 'manual',
-			kind: 'manual',
+			effort: step.automatic ? 'auto' : 'manual',
+			kind: step.automatic ? 'step' : 'manual',
 			id: step.id,
 			name: hit,
 			component: rule.from,
 			note: step.summary,
-			todo: step.kind,
+			...(step.automatic ? {} : { todo: step.kind }),
 			file: usage.file,
 			line,
 			...(usage.via ? { via: usage.via } : {})

@@ -23,9 +23,10 @@ const USAGE = `Usage:
 
   setup       Prepare the app: checks that its repository is clean, creates the branch
               (default aurora-v5), puts v5 in package.json (a .tgz is copied into vendor/),
-              adds @mdi/js and the packages that came with v4, installs; in the main CSS adds
-              the cascade layer order, the library Tailwind CSS, the library fonts and
-              v4-compat.css, moves element rules into @layer reset; calls setDefaultLocale in
+              adds @mdi/js and the packages that came with v4, raises svelte to 5.29, installs;
+              in the main CSS adds the cascade layer order, the library Tailwind CSS, the library
+              fonts, v4-compat.css and the v4 space above ConfirmOrCancelButtons, moves element
+              rules into @layer reset; gives a Tailwind 3 config the library preset and dark variant; calls setDefaultLocale in
               the root layout when the app is not in English (from <html lang>, the interface
               text or --locale) and setTitleTemplate with the name of its <title> (PageHeader
               writes the tab title); configures the coding agents of the app (MCP server,
@@ -35,7 +36,8 @@ const USAGE = `Usage:
   codemod     The mechanical changes, on the branch made by setup: renamed components, props,
               events, snippets and CSS variables, callback arguments without \`detail\` (inline
               handlers and functions of the same file, with their types), MDI icon names turned
-              into @mdi/js imports; the Standard* wrappers dissolved into the library components
+              into @mdi/js imports, data passed to props (table columns, options, items) and
+              snippet parameters in the v5 shape; the Standard* wrappers dissolved into the library components
               (meaning and layout kept, look dropped and listed), wrappers nobody imports any more
               deleted. Running it again changes nothing. Prints what it did, what to check and
               what is left by hand. --dry-run writes nothing. Never commits.

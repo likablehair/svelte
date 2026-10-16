@@ -14,6 +14,12 @@ export const AGENT_TOOLS = [
 	['@likable-hair/svelte-mcp', `^${OWN_VERSION}`, 'MCP server and skills for coding agents']
 ] as const;
 const MAIN_BRANCHES = new Set(['master', 'main', 'develop', 'dev']);
+const SVELTE_MIN = [5, 29] as const;
+const TAILWIND_VARIANT_MIN = [3, 4, 1] as const;
+const TAILWIND_CONFIGS = ['tailwind.config.js', 'tailwind.config.mjs', 'tailwind.config.ts', 'tailwind.config.cjs'];
+const PRESET = '@likable-hair/svelte/tailwind-preset';
+const DARK_VARIANT = `['variant', ['&:is([data-mode="dark"] *)', '@media (prefers-color-scheme: dark) { &:not([data-mode="light"] *) }']]`;
+const BUTTONS_MARGIN = '--confirm-or-cancel-buttons-default-margin-top';
 
 export interface SetupOptions {
 	packageSpec?: string;
@@ -63,6 +69,19 @@ function setDependency(pkg: Record<string, any>, name: string, version: string, 
 	return true;
 }
 
+const versionOf = (spec: string | undefined) => /(\d+)\.(\d+)(?:\.(\d+))?/.exec(spec ?? '')?.slice(1).map((n) => Number(n ?? 0));
+
+const below = (spec: string | undefined, min: readonly number[]) => {
+	const v = versionOf(spec);
+	if (!v || v[0] !== min[0]) return false;
+	for (let i = 1; i < min.length; i++) if (v[i] !== min[i]) return v[i] < min[i];
+	return false;
+};
+
+const tailwindConfig = (dir: string) => TAILWIND_CONFIGS.map((name) => join(dir, name)).find((path) => existsSync(path));
+
+const DARK_CLASS = /darkMode\s*:\s*(?:\[\s*(['"])class\1\s*\]|(['"])class\2)/;
+
 const isV5 = (spec: string | undefined) => !!spec && (spec.startsWith('file:') || /^[\^~>=]*5\./.test(spec));
 
 export function updatePackageJson(dir: string, analysis: Analysis, packageSpec?: string): string[] {
@@ -80,6 +99,13 @@ export function updatePackageJson(dir: string, analysis: Analysis, packageSpec?:
 		changes.push(`vendor/${name}: copy of the v5 package`);
 	}
 	if (setDependency(pkg, LIB, spec)) changes.push(`package.json: ${LIB} ${spec}`);
+	const svelte = pkg.dependencies?.svelte ?? pkg.devDependencies?.svelte;
+	if (below(svelte, SVELTE_MIN) && setDependency(pkg, 'svelte', `^${SVELTE_MIN.join('.')}.0`, 'devDependencies'))
+		changes.push(`package.json: svelte ^${SVELTE_MIN.join('.')}.0 (the components use {@attach}; was ${svelte})`);
+	const tailwind = pkg.dependencies?.tailwindcss ?? pkg.devDependencies?.tailwindcss;
+	const config = tailwindConfig(dir);
+	if (config && below(tailwind, TAILWIND_VARIANT_MIN) && DARK_CLASS.test(readFileSync(config, 'utf8')) && setDependency(pkg, 'tailwindcss', `^${TAILWIND_VARIANT_MIN.join('.')}`, 'devDependencies'))
+		changes.push(`package.json: tailwindcss ^${TAILWIND_VARIANT_MIN.join('.')} (the dark variant of the config needs it; was ${tailwind})`);
 	if (analysis.icons.attributes + analysis.icons.data > 0 && setDependency(pkg, MDI[0], MDI[1]))
 		changes.push(`package.json: ${MDI[0]} ${MDI[1]} (MDI icons become SVG paths)`);
 	const oldLib = (() => {
@@ -102,7 +128,7 @@ export function updatePackageJson(dir: string, analysis: Analysis, packageSpec?:
 	return changes;
 }
 
-export function updateAppCss(dir: string, layers: string, compat = false): string[] {
+export function updateAppCss(dir: string, layers: string, compat = false, buttonsMargin = false): string[] {
 	const files = listFiles(join(dir, 'src'))
 		.filter((path) => /\.(css|pcss|postcss)$/.test(path))
 		.map((path) => ({ rel: relative(dir, path), text: readFileSync(path, 'utf8') }));
@@ -122,8 +148,48 @@ export function updateAppCss(dir: string, layers: string, compat = false): strin
 	const layered = prepareAppCss(file.text, layers);
 	const fonts = useLibraryFonts(layered.text, usedElsewhere);
 	const colors = compat ? addV4Compat(fonts.text) : { text: fonts.text, changes: [] };
-	if (colors.text !== file.text) writeFileSync(join(dir, rel), colors.text);
-	return [...layered.changes, ...fonts.changes, ...colors.changes].map((change) => `${rel}: ${change}`);
+	const margin = buttonsMargin && !colors.text.includes(BUTTONS_MARGIN);
+	const text = margin ? `${colors.text.trimEnd()}\n\n:root {\n\t${BUTTONS_MARGIN}: 20px;\n}\n` : colors.text;
+	if (text !== file.text) writeFileSync(join(dir, rel), text);
+	return [
+		...layered.changes,
+		...fonts.changes,
+		...colors.changes,
+		...(margin ? [`${BUTTONS_MARGIN}: 20px (the space v4 put above ConfirmOrCancelButtons)`] : [])
+	].map((change) => `${rel}: ${change}`);
+}
+
+export function updateTailwindConfig(dir: string, tailwind: string | undefined): string[] {
+	const path = tailwindConfig(dir);
+	if (!path || versionOf(tailwind)?.[0] !== 3) return [];
+	const rel = relative(dir, path);
+	const text = readFileSync(path, 'utf8');
+	const changes: string[] = [];
+	let next = text;
+	if (DARK_CLASS.test(next)) {
+		next = next.replace(DARK_CLASS, `darkMode: ${DARK_VARIANT}`);
+		changes.push(`${rel}: darkMode follows data-mode and the OS, as the library (the .dark class does nothing in v5)`);
+	}
+	if (!next.includes(PRESET)) {
+		const object = /(export\s+default|const\s+config(?:\s*:\s*[\w.]+)?\s*=)\s*\{([ \t]*\n([ \t]*))?/.exec(next);
+		if (!object || /module\.exports|require\(/.test(next)) changes.push(`${rel}: add \`presets: [aurora]\` with \`import aurora from '${PRESET}'\` by hand`);
+		else {
+			const presets = /presets\s*:\s*\[/.exec(next);
+			if (presets) next = next.slice(0, presets.index + presets[0].length) + 'aurora, ' + next.slice(presets.index + presets[0].length);
+			else {
+				const at = object.index + object[0].length;
+				const indent = object[3] ?? '\t';
+				next = object[2] ? `${next.slice(0, at)}presets: [aurora],\n${indent}${next.slice(at)}` : `${next.slice(0, at)} presets: [aurora], ${next.slice(at)}`;
+			}
+			const imports = [...next.matchAll(/^import\b[^;\n]*(?:;|$)/gm)];
+			const last = imports.at(-1);
+			const line = `import aurora from '${PRESET}';\n`;
+			next = last ? `${next.slice(0, last.index + last[0].length)}\n${line.trimEnd()}${next.slice(last.index + last[0].length)}` : line + next;
+			changes.push(`${rel}: presets: [aurora] (Tailwind classes use the library tokens)`);
+		}
+	}
+	if (next !== text) writeFileSync(path, next);
+	return changes;
 }
 
 export function appLocale(analysis: Analysis, locale?: string) {
@@ -221,7 +287,10 @@ export function setup(dir: string, analysis: Analysis, options: SetupOptions): S
 	const branch = prepareBranch(dir, options.branch);
 	const changes = updatePackageJson(dir, analysis, options.packageSpec);
 	const installNeeded = changes.length > 0;
-	changes.push(...updateAppCss(dir, options.layers, analysis.tokens.uses + analysis.tokens.overrides > 0));
+	changes.push(
+		...updateAppCss(dir, options.layers, analysis.tokens.uses + analysis.tokens.overrides > 0, (analysis.components.ConfirmOrCancelButtons?.usages ?? 0) > 0),
+		...updateTailwindConfig(dir, analysis.app.tailwind)
+	);
 	const locale = appLocale(analysis, options.locale);
 	if (locale) changes.push(...updateRootLayout(dir, locale), ...updateHtmlLang(dir, locale));
 	changes.push(...updateAppearance(dir), ...updateTitleTemplate(dir));

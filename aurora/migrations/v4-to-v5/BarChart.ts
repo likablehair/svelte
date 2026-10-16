@@ -22,6 +22,22 @@ export const resetZoomRemoval: Removal = {
 	replacement: 'bind:chart + chart.resetZoom()'
 };
 
+export const inertProps: Removal[] = [
+	'showXTicks',
+	'showYTicks',
+	'pointRadius',
+	'showLegend',
+	'rgbTooltipColor',
+	'rgbTooltipBackgroundColor',
+	'tooltipLabel',
+	'displayYGrid',
+	'displayXGrid'
+].map((name) => ({
+	name,
+	note: 'A prop of the v3 charts that did nothing in v4 (it ended up as an attribute of the canvas): the chart keeps its look. Ticks are visible and the legend shows with two or more series by default.',
+	drop: true
+}));
+
 export const sharedSteps = (prefix: string, element: 'bar' | 'point' | 'slice'): ManualStep[] => [
 	{
 		id: `${prefix}-snapshot`,
@@ -41,29 +57,10 @@ export const sharedSteps = (prefix: string, element: 'bar' | 'point' | 'slice'):
 		id: `${prefix}-flat-props`,
 		kind: 'edit',
 		summary:
-			'Props of the v3 charts (`showXTicks`, `showYTicks`, `xTickLabel`, `enableZoom`, `pointRadius`, `yMin`, …) did nothing in v4 4.2+: they ended up as attributes of the canvas.',
+			'Props of the v3 charts (`xTickLabel`, `enableZoom`, `yMin`, …) did nothing in v4: they ended up as attributes of the canvas, so the chart was drawn with the defaults. The codemod removes the ones with nothing to keep (`showXTicks`, `pointRadius`, `rgbTooltipColor`, …).',
 		action:
-			'Delete them. `enableZoom` → `zoom`; `showXTicks`/`showYTicks` → nothing (ticks are visible by default); `xTickLabel`/`yTickLabel` that format numbers → `format`; `xMin`/`xMax`/`yMin`/`yMax` → `options={{ scales: { y: { min, max } } }}`; colors (`rgbTooltipColor`, …) → nothing; `horizontal` is a prop again and keeps working. Check the chart afterwards: in v4 these charts were drawn with the defaults.',
-		when: {
-			props: [
-				'showXTicks',
-				'showYTicks',
-				'xTickLabel',
-				'yTickLabel',
-				'enableZoom',
-				'pointRadius',
-				'xMin',
-				'xMax',
-				'yMin',
-				'yMax',
-				'showLegend',
-				'rgbTooltipColor',
-				'rgbTooltipBackgroundColor',
-				'tooltipLabel',
-				'displayYGrid',
-				'displayXGrid'
-			]
-		}
+			'Delete them, or give them the meaning the app wanted: `enableZoom` → `zoom` (`zoom={false}` turns zooming off, which v4 never did); `xTickLabel`/`yTickLabel` that format numbers → `format`; `xMin`/`xMax`/`yMin`/`yMax` → `options={{ scales: { y: { min, max } } }}`. `horizontal` is a prop again and keeps working.',
+		when: { props: ['xTickLabel', 'yTickLabel', 'enableZoom', 'xMin', 'xMax', 'yMin', 'yMax'] }
 	},
 	{
 		id: `${prefix}-chart-defaults`,
@@ -89,7 +86,7 @@ export default {
 	to: 'BarChart',
 	props: {
 		changed: [dataNote(true), optionsNote, canvasAttributes],
-		removed: [resetZoomRemoval]
+		removed: [resetZoomRemoval, ...inertProps]
 	},
 	manual: [
 		...sharedSteps('bar-chart', 'bar'),

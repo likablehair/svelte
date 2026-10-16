@@ -1,5 +1,5 @@
 import type { ComponentMigration } from '../types.js';
-import { optionsNote, sharedSteps } from './BarChart.js';
+import { inertProps, optionsNote, sharedSteps } from './BarChart.js';
 
 export default {
 	from: 'PieChart',
@@ -17,6 +17,7 @@ export default {
 				note: 'Native attributes go to the root `<div>`, no longer to the `<canvas>`. Size the chart with `--pie-chart-width` / `--pie-chart-height` (14rem).'
 			}
 		],
+		removed: inertProps,
 		defaults: [
 			{
 				name: 'donut',

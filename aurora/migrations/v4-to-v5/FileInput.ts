@@ -4,6 +4,7 @@ export default {
 	from: 'FileInput',
 	to: 'FileInput',
 	props: {
+		toObject: [{ name: 'class', key: 'zone' }],
 		renamed: [{ from: 'placeholder', to: 'title' }],
 		inverted: [
 			{

@@ -2,6 +2,7 @@ export interface Rename {
 	from: string;
 	to: string;
 	native?: true;
+	scoped?: true;
 	note?: string;
 }
 
@@ -10,6 +11,7 @@ export interface Removal {
 	note: string;
 	replacement?: string;
 	drop?: boolean;
+	closes?: string;
 }
 
 export interface DefaultChange {
@@ -54,6 +56,27 @@ export interface ParentRoute {
 	note?: string;
 }
 
+export interface Collect {
+	into: string;
+	props: { from: string; key: string }[];
+	note?: string;
+}
+
+export interface Unpack {
+	from: string;
+	keys: { key: string; to: string }[];
+	drop?: string[];
+	others?: 'keep' | 'drop';
+	note?: string;
+}
+
+export interface Unwrap {
+	prop: string;
+	key: string;
+	empty: string[];
+	note?: string;
+}
+
 export interface PropRules {
 	renamed?: Rename[];
 	inverted?: Rename[];
@@ -66,6 +89,10 @@ export interface PropRules {
 	icons?: string[];
 	bind?: Changed[];
 	parentRoute?: ParentRoute;
+	collect?: Collect[];
+	unpack?: Unpack[];
+	toObject?: { name: string; key: string; note?: string }[];
+	unwrap?: Unwrap[];
 }
 
 export interface EventChange {
@@ -85,6 +112,8 @@ export interface SnippetChange {
 	name: string;
 	v4: string;
 	v5: string;
+	params?: Record<string, string | null>;
+	members?: { param: string; from: string; to: string | null }[];
 	note?: string;
 }
 
@@ -114,6 +143,7 @@ export interface ManualStep {
 	action: string;
 	when?: ManualTrigger;
 	scope?: 'usage' | 'app';
+	automatic?: true;
 }
 
 export interface ComponentMigration {
@@ -124,16 +154,41 @@ export interface ComponentMigration {
 	snippets?: SnippetRules;
 	cssVars?: CssVarRules;
 	manual?: ManualStep[];
+	items?: ItemRules[];
 	added?: string[];
 }
 
 export interface CallRules {
 	functions: string[];
 	unwrap?: string;
+	result?: string;
 	keys?: Rename[];
 	values?: { key: string; values: Record<string, string> }[];
 	drop?: string[];
 	note?: string;
+}
+
+export interface NestedRule {
+	key: string;
+	tag: string;
+	values: Record<string, string | null>;
+	params?: string;
+	hoist?: Rename[];
+	drop?: string[];
+	time?: { param: string; values: Record<string, string> };
+	check?: string[];
+	note?: string;
+}
+
+export interface PairsRule {
+	from: string;
+	to: string;
+	keys: string[];
+}
+
+export interface ParameterRule {
+	key: string;
+	renamed: Rename[];
 }
 
 export interface ItemRules {
@@ -141,6 +196,11 @@ export interface ItemRules {
 	keys?: Rename[];
 	values?: { key: string; values: Record<string, string> }[];
 	drop?: string[];
+	nested?: NestedRule[];
+	pairs?: PairsRule[];
+	parameters?: ParameterRule[];
+	rewrite?: { key: string; match: string; to: string; value: string }[];
+	byHand?: { key: string; note: string }[];
 	note?: string;
 }
 
@@ -150,7 +210,6 @@ export interface LocalMigration extends ComponentMigration {
 	excludes?: string[];
 	exports?: Rename[];
 	calls?: CallRules;
-	items?: ItemRules[];
 	summary: string;
 }
 

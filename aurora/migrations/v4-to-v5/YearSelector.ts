@@ -4,6 +4,7 @@ export default {
 	from: 'YearSelector',
 	to: 'YearSelector',
 	props: {
+		toObject: [{ name: 'class', key: 'container' }],
 		removed: [
 			{
 				name: 'selectableYears',

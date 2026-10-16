@@ -1,4 +1,5 @@
-import type { ComponentMigration, ManualStep } from '../types.js';
+import type { ComponentMigration, ManualStep, PropRules } from '../types.js';
+import { anchorPlacement } from './Menu.js';
 
 export const menuPropsNote =
 	'Takes the props of the v5 `Menu`, except `open`, `activator`, `placement`, `menuElement` and `children`. `activator` becomes the `activator` prop and `anchor` the `placement` prop (see the `-activator` step). The other v4 keys follow the Menu rule: `_activatorGap` → `offset`; `_width`, `_height`, `_maxHeight`, `_minWidth`, `_boxShadow`, `_borderRadius` → style props `--menu-width`, `--menu-height`, `--menu-max-height`, `--menu-min-width`, `--menu-box-shadow`, `--menu-border-radius` on this component; `flipOnOverflow`, `stayInViewport`, `refreshPosition`, `openingId` are always on or automatic: delete them. It is no longer bindable and no longer written to.';
@@ -6,9 +7,38 @@ export const menuPropsNote =
 export const drawerPropsNote =
 	'Takes the props of the v5 `Drawer`, except `open`, `drawerElement` and `children`; `position` still defaults to `bottom`. `_space` becomes the style prop `--drawer-size` on this component (`_space: "60dvh"` → `--drawer-size="60dvh"`), `_borderRadius` → `--drawer-border-radius`; the other keys follow the Drawer rule.';
 
+export const unpackProps: Pick<PropRules, 'unpack' | 'values'> = {
+	unpack: [
+		{
+			from: 'menuProps',
+			keys: [
+				{ key: 'activator', to: 'activator' },
+				{ key: 'anchor', to: 'placement' },
+				{ key: '_width', to: '--menu-width' },
+				{ key: '_height', to: '--menu-height' },
+				{ key: '_maxHeight', to: '--menu-max-height' },
+				{ key: '_minWidth', to: '--menu-min-width' },
+				{ key: '_boxShadow', to: '--menu-box-shadow' },
+				{ key: '_borderRadius', to: '--menu-border-radius' }
+			],
+			drop: ['flipOnOverflow', 'stayInViewport', 'refreshPosition', 'openingId'],
+			note: 'the other keys stay in `menuProps` with the names of the v5 Menu (`_activatorGap` → `offset`)'
+		},
+		{
+			from: 'drawerProps',
+			keys: [
+				{ key: '_space', to: '--drawer-size' },
+				{ key: '_borderRadius', to: '--drawer-border-radius' }
+			]
+		}
+	],
+	values: [{ name: 'placement', values: anchorPlacement }]
+};
+
 export const activatorStep = (prefix: string): ManualStep => ({
 	id: `${prefix}-activator`,
 	kind: 'edit',
+	automatic: true,
 	summary: '`activator` and `anchor` move out of `menuProps` into the `activator` and `placement` props.',
 	action:
 		'`menuProps={{ activator: x, anchor: "right", flipOnOverflow: true }}` → `activator={x} placement="right-start"`. Convert `anchor` with the values of the Menu rule: `bottom-center` → `bottom`, `bottom` → `bottom-start`, `up-center` → `top`, `up` → `top-start`, `right` → `right-start`, `left` → `left-start`, `right-center` → `right`, `left-center` → `left`. Without `anchor` keep the default: the v5 default `bottom` is the v4 default `bottom-center`. Remove `menuProps` when nothing is left in it. Where the app reads the activator from a `bind:activator` on the component (v3 API, it never worked in v4), pass `activator` instead.',
@@ -17,11 +47,11 @@ export const activatorStep = (prefix: string): ManualStep => ({
 
 export const drawerHeightStep = (prefix: string): ManualStep => ({
 	id: `${prefix}-drawer-height`,
-	kind: 'edit',
+	kind: 'review',
 	summary:
-		'The bottom drawer is as tall as its content, up to 85% of the screen; v4 used the 20rem of the Drawer (MenuOrDrawerOptions: 56px per option, up to 5).',
+		'The bottom drawer is as tall as its content, up to 85% of the screen; v4 used the 20rem of the Drawer (MenuOrDrawerOptions: 56px per option, up to 5). The codemod moves `drawerProps._space` to `--drawer-size`.',
 	action:
-		'Move `drawerProps._space` to the style prop `--drawer-size` on the component. Without `_space` nothing to do for content of normal height. Content that filled a fixed height (`height: 100%`, a list that must take the whole sheet) needs `--drawer-size`.',
+		'Content of normal height needs nothing. Content that filled a fixed height (`height: 100%`, a list that must take the whole sheet) needs `--drawer-size` on the component.',
 	when: { props: ['drawerProps'] }
 });
 
@@ -32,7 +62,8 @@ export default {
 		changed: [
 			{ name: 'menuProps', note: menuPropsNote },
 			{ name: 'drawerProps', note: drawerPropsNote }
-		]
+		],
+		...unpackProps
 	},
 	manual: [
 		activatorStep('menu-or-drawer'),

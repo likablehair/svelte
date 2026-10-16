@@ -63,6 +63,20 @@ export default {
 	},
 	cssVars: {
 		renamed: [
+			...(
+				[
+					['--button-hover-background-color', '--chip-close-hover-background'],
+					['--button-hover-color', '--chip-close-hover-color'],
+					['--button-height', '--chip-close-size'],
+					['--button-width', '--chip-close-size'],
+					['--button-border-radius', '--chip-close-border-radius']
+				] as const
+			).map(([from, to]) => ({
+				from,
+				to,
+				scoped: true as const,
+				note: 'Only when set on a Chip: in v4 it reached the close button, which is no longer a library Button.'
+			})),
 			{
 				from: '--chip-min-height',
 				to: '--chip-height',
@@ -229,18 +243,13 @@ export default {
 			id: 'chip-close-button-vars',
 			kind: 'edit',
 			summary:
-				'The close button is no longer a library Button: `--button-*` variables set on a Chip do not reach it.',
+				'The close button is no longer a library Button: `--button-*` variables set on a Chip do not reach it. The codemod renames the ones with an equivalent (`--button-hover-*`, `--button-height`/`-width`, `--button-border-radius`).',
 			action:
-				'Use `--chip-close-size`, `--chip-close-color`, `--chip-close-hover-color`, `--chip-close-hover-background`, `--chip-close-border-radius`, `--chip-close-icon-size`, `--chip-close-margin-end`, `--chip-close-focus-ring-offset`.',
+				'Replace the others with `--chip-close-size`, `--chip-close-color`, `--chip-close-hover-color`, `--chip-close-hover-background`, `--chip-close-border-radius`, `--chip-close-icon-size`, `--chip-close-margin-end`, `--chip-close-focus-ring-offset`, or remove them.',
 			when: {
 				cssVars: [
-					'--button-hover-background-color',
-					'--button-hover-color',
-					'--button-height',
-					'--button-width',
 					'--button-min-height',
 					'--button-min-width',
-					'--button-border-radius',
 					'--button-focus-background-color',
 					'--button-focus-color',
 					'--button-active-color',

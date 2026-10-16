@@ -5,6 +5,17 @@ export default {
 	to: 'Tooltip',
 	props: {
 		renamed: [{ from: 'menuOpen', to: 'open', note: 'Still bindable.' }],
+		unpack: [
+			{
+				from: 'menuProps',
+				keys: [
+					{ key: 'anchor', to: 'placement' },
+					{ key: '_activatorGap', to: 'offset' }
+				],
+				others: 'drop',
+				note: 'the other Menu props have no equivalent on the tooltip'
+			}
+		],
 		removed: [
 			{
 				name: 'menuProps',
