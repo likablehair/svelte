@@ -1,5 +1,5 @@
 <!-- @component Custom look and saving
-CSS variables give a neutral look with the selected option on a raised surface, and `onchange` saves the choice, for example in the user profile. -->
+CSS variables give a neutral pill with round options and the selected one on a raised surface, and `onchange` saves the choice, for example in the user profile. -->
 <script lang="ts">
 	import { ModeSwitch } from '#lib';
 
@@ -11,8 +11,8 @@ CSS variables give a neutral look with the selected option on a raised surface, 
 		onchange={({ mode }) => (saved = mode)}
 		--mode-switch-background="var(--global-color-surface-2)"
 		--mode-switch-border-color="transparent"
-		--mode-switch-border-radius="var(--global-radius-md)"
-		--mode-switch-option-border-radius="var(--global-radius-sm)"
+		--mode-switch-border-radius="var(--global-radius-full)"
+		--mode-switch-option-border-radius="var(--global-radius-full)"
 		--mode-switch-selected-background="var(--global-color-surface-pop)"
 		--mode-switch-selected-color="var(--global-color-text)"
 		--mode-switch-selected-box-shadow="var(--global-shadow-sm)"

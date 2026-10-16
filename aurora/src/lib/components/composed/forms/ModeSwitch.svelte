@@ -1,5 +1,5 @@
 <!-- @component
-Switch for the light and dark mode of the page, with three icons in a pill: light, system (follows the operating system) and dark. `system={false}` leaves only light and dark: while the page still follows the operating system, the icon of the mode it shows is selected, and a click on it fixes that mode. A click on an icon calls `setMode`, so the choice is kept across visits once the root layout calls `rememberAppearance()`. It is a group of native radios (`role="radiogroup"`): Tab enters the group and the arrow keys move the choice; every icon has an accessible name and a `Tooltip`. The pill shows the mode of `<html>` (`data-mode`) from the first paint, before the page is interactive, so with `appearanceScript()` it never flashes the wrong choice. `onchange` runs after the mode changed, for example to save it in the user profile. The selected option is exposed as `data-selected`, the size as `data-size` and the missing system option as `data-no-system` for app CSS.
+Switch for the light and dark mode of the page, with three icons side by side, like a segmented `TabSwitcher`: light, system (follows the operating system) and dark. `system={false}` leaves only light and dark: while the page still follows the operating system, the icon of the mode it shows is selected, and a click on it fixes that mode. A click on an icon calls `setMode`, so the choice is kept across visits once the root layout calls `rememberAppearance()`. It is a group of native radios (`role="radiogroup"`): Tab enters the group and the arrow keys move the choice; every icon has an accessible name and a `Tooltip`. The switch shows the mode of `<html>` (`data-mode`) from the first paint, before the page is interactive, so with `appearanceScript()` it never flashes the wrong choice. `onchange` runs after the mode changed, for example to save it in the user profile. The selected option is exposed as `data-selected`, the size as `data-size` and the missing system option as `data-no-system` for app CSS.
 -->
 <script lang="ts" module>
 	const LIGHT_ICON =
@@ -38,7 +38,7 @@ Switch for the light and dark mode of the page, with three icons in a pill: ligh
 		systemIcon?: string;
 		/** Shows the option that follows the operating system. Without it only light and dark are offered. */
 		system?: boolean;
-		/** `md` (the prototype pill) or `sm` for a crowded bar. */
+		/** `md` (the size of the prototype) or `sm` for a crowded bar. */
 		size?: 'sm' | 'md';
 		/** Disables the three options. */
 		disabled?: boolean;
@@ -60,7 +60,7 @@ Switch for the light and dark mode of the page, with three icons in a pill: ligh
 		locale?: string;
 		/** Called after the user picked a mode, which is already applied. */
 		onchange?: (event: { mode: 'light' | 'dark' | 'system' }) => void;
-		/** Extra classes for each part: the pill and each option. */
+		/** Extra classes for each part: the group and each option. */
 		class?: {
 			container?: string;
 			option?: string;

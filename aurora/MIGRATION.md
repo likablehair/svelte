@@ -1496,7 +1496,7 @@ New in v5: the switch for the light and dark mode, with a third choice, "System"
 <ModeSwitch />
 ```
 
-- Three icons in a pill (light, system, dark) instead of a two-state switch or a text button: a click applies the mode with `setMode`. It is wider than the old switch (about 100px with `size="sm"`, 120px by default, against 40px).
+- Three icons side by side (light, system, dark), shaped like a segmented TabSwitcher, instead of a two-state switch or a text button: a click applies the mode with `setMode`. It is wider than the old switch (about 100px with `size="sm"`, 120px by default, against 40px).
 - To offer only light and dark, as the old switch did, use `system={false}`: until the user picks one the page follows the operating system and the icon of the mode it shows is selected.
 - **The cookie is no longer needed**: remove the `/api/setTheme` endpoint, the `%theme%` placeholder in `app.html` and its replacement in `hooks.server.ts`, and the `fetch('/api/setTheme…')` calls; `rememberAppearance()` and `appearanceScript()` in the root layout keep the choice and apply it before the first paint ([Dark mode and themes](#dark-mode-and-themes)). To also save it elsewhere, for example in the user profile, use `onchange({ mode })`.
 - `value` / `bind:value` of the copies → nothing: ModeSwitch shows the mode of the page (the copies started "off" in dark mode when `value` was not passed). `prefersDark` / `themeSetted` (the three-state copy) → nothing: "System" is a choice that stays available.
