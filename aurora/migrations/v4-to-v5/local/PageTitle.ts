@@ -67,7 +67,6 @@ export default {
 		renamed: [
 			{ from: 'appendSnippet', to: 'actionsSnippet' },
 			{ from: 'append', to: 'actionsSnippet' },
-			{ from: 'title', to: 'titleSnippet', note: 'It replaces only the title now: a `subtitle` passed with it is shown.' },
 			{
 				from: 'prependSnippet',
 				to: 'backSnippet',
@@ -92,7 +91,7 @@ export default {
 			id: 'page-title-subtitle-with-title-snippet',
 			summary: 'With `titleSnippet` the copies hid `subtitle`; PageHeader shows it under the title.',
 			action: 'Remove `subtitle` where it was passed together with a title snippet and was not visible.',
-			when: { snippets: ['titleSnippet', 'title'], props: ['subtitle'] }
+			when: { snippets: ['titleSnippet'] }
 		},
 		{
 			id: 'page-title-route-without-back',

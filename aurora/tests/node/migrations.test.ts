@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, test } from 'vitest';
 import { getComponentDoc, listComponents } from '../../src/docs/api.server.js';
-import type { ComponentMigration, GlobalMigration } from '../../migrations/types.js';
+import type { ComponentMigration, GlobalMigration, LocalMigration } from '../../migrations/types.js';
 
 const NEW_IN_V5 = [
 	'DotsLoader',
@@ -22,6 +22,9 @@ const files = import.meta.glob<ComponentMigration | GlobalMigration>('/migration
 	eager: true
 });
 const global = files['/migrations/v4-to-v5/global.ts'] as GlobalMigration;
+const locals = Object.entries(
+	import.meta.glob<LocalMigration>('/migrations/v4-to-v5/local/*.ts', { import: 'default', eager: true })
+).map(([path, rule]) => ({ file: path.split('/').pop()!.replace(/\.ts$/, ''), from: rule.from, rule }));
 const rules = Object.entries(files)
 	.filter(([path]) => !path.endsWith('/global.ts'))
 	.flatMap(([path, rule]) =>
@@ -74,6 +77,65 @@ function api(name: string) {
 	};
 }
 
+function nameProblems(rule: ComponentMigration, local = false): string[] {
+	const v5 = api(rule.to);
+	const problems: string[] = [];
+	const mustExist = (kind: string, set: Set<string>, name: string) => {
+		if (!set.has(name)) problems.push(`${kind} "${name}" is not in v5 ${rule.to}`);
+	};
+	const mustNotExist = (kind: string, set: Set<string>, name: string) => {
+		if (!local && set.has(name)) problems.push(`${kind} "${name}" still exists in v5 ${rule.to}`);
+	};
+	const { props, events, snippets, cssVars } = rule;
+
+	for (const r of [...(props?.renamed ?? []), ...(props?.inverted ?? [])]) {
+		if (!r.native) mustExist('prop', new Set([...v5.props, ...v5.events]), r.to);
+		mustNotExist('renamed prop', v5.props, r.from);
+	}
+	for (const r of props?.removed ?? []) mustNotExist('removed prop', v5.props, r.name);
+	for (const r of props?.changed ?? []) {
+		if (!r.native) mustExist('changed prop', v5.props, r.name);
+	}
+	for (const r of props?.toCssVar ?? []) {
+		mustExist('CSS variable', v5.cssVars, r.cssVar);
+		mustNotExist('prop moved to CSS', v5.props, r.name);
+	}
+	for (const name of [
+		...(props?.defaults ?? []).map((d) => d.name),
+		...(props?.values ?? []).map((d) => d.name),
+		...(props?.types ?? []).map((d) => d.name),
+		...(props?.icons ?? []),
+		...(props?.bind ?? []).map((b) => b.name)
+	]) {
+		mustExist('prop', v5.props, name);
+	}
+
+	for (const e of events?.changed ?? []) {
+		const name = e.to ?? e.name;
+		if (!v5.events.has(name) && !(v5.forwardsNative && /^on[a-z]+$/.test(name))) {
+			problems.push(`event "${name}" is neither declared nor native in v5 ${rule.to}`);
+		}
+	}
+	for (const r of events?.removed ?? []) mustNotExist('removed event', v5.events, r.name);
+
+	for (const r of snippets?.renamed ?? []) {
+		mustExist('snippet', v5.snippets, r.to);
+		mustNotExist('renamed snippet', v5.snippets, r.from);
+	}
+	for (const r of snippets?.removed ?? []) mustNotExist('removed snippet', v5.snippets, r.name);
+	for (const r of snippets?.parameters ?? []) mustExist('snippet', v5.snippets, r.name);
+
+	for (const r of cssVars?.renamed ?? []) {
+		mustExist('CSS variable', v5.cssVars, r.to);
+		mustNotExist('renamed CSS variable', v5.publicCssVars, r.from);
+	}
+	for (const r of cssVars?.changed ?? []) mustExist('changed CSS variable', v5.cssVars, r.name);
+	for (const r of cssVars?.removed ?? []) {
+		mustNotExist('removed CSS variable', v5.publicCssVars, r.name);
+	}
+	return problems;
+}
+
 describe('v4 → v5 migration rules', () => {
 	test('every v5 component that exists in v4 has its rule file', () => {
 		const covered = new Set(rules.map((r) => r.rule.to));
@@ -122,62 +184,7 @@ describe('v4 → v5 migration rules', () => {
 		});
 
 		test('v5 names exist in the v5 component and removed v4 names do not', () => {
-			const v5 = api(rule.to);
-			const problems: string[] = [];
-			const mustExist = (kind: string, set: Set<string>, name: string) => {
-				if (!set.has(name)) problems.push(`${kind} "${name}" is not in v5 ${rule.to}`);
-			};
-			const mustNotExist = (kind: string, set: Set<string>, name: string) => {
-				if (set.has(name)) problems.push(`${kind} "${name}" still exists in v5 ${rule.to}`);
-			};
-			const { props, events, snippets, cssVars } = rule;
-
-			for (const r of [...(props?.renamed ?? []), ...(props?.inverted ?? [])]) {
-				if (!r.native) mustExist('prop', v5.props, r.to);
-				mustNotExist('renamed prop', v5.props, r.from);
-			}
-			for (const r of props?.removed ?? []) mustNotExist('removed prop', v5.props, r.name);
-			for (const r of props?.changed ?? []) {
-				if (!r.native) mustExist('changed prop', v5.props, r.name);
-			}
-			for (const r of props?.toCssVar ?? []) {
-				mustExist('CSS variable', v5.cssVars, r.cssVar);
-				mustNotExist('prop moved to CSS', v5.props, r.name);
-			}
-			for (const name of [
-				...(props?.defaults ?? []).map((d) => d.name),
-				...(props?.values ?? []).map((d) => d.name),
-				...(props?.types ?? []).map((d) => d.name),
-				...(props?.icons ?? [])
-			]) {
-				mustExist('prop', v5.props, name);
-			}
-
-			for (const e of events?.changed ?? []) {
-				const name = e.to ?? e.name;
-				if (!v5.events.has(name) && !(v5.forwardsNative && /^on[a-z]+$/.test(name))) {
-					problems.push(`event "${name}" is neither declared nor native in v5 ${rule.to}`);
-				}
-			}
-			for (const r of events?.removed ?? []) mustNotExist('removed event', v5.events, r.name);
-
-			for (const r of snippets?.renamed ?? []) {
-				mustExist('snippet', v5.snippets, r.to);
-				mustNotExist('renamed snippet', v5.snippets, r.from);
-			}
-			for (const r of snippets?.removed ?? []) mustNotExist('removed snippet', v5.snippets, r.name);
-			for (const r of snippets?.parameters ?? []) mustExist('snippet', v5.snippets, r.name);
-
-			for (const r of cssVars?.renamed ?? []) {
-				mustExist('CSS variable', v5.cssVars, r.to);
-				mustNotExist('renamed CSS variable', v5.publicCssVars, r.from);
-			}
-			for (const r of cssVars?.changed ?? []) mustExist('changed CSS variable', v5.cssVars, r.name);
-			for (const r of cssVars?.removed ?? []) {
-				mustNotExist('removed CSS variable', v5.publicCssVars, r.name);
-			}
-
-			expect(problems).toEqual([]);
+			expect(nameProblems(rule)).toEqual([]);
 		});
 
 		test('manual step ids start with the component name', () => {
@@ -185,6 +192,39 @@ describe('v4 → v5 migration rules', () => {
 			expect((rule.manual ?? []).map((m) => m.id).filter((id) => !id.startsWith(prefix))).toEqual(
 				[]
 			);
+		});
+	});
+});
+
+describe('local copy rules', () => {
+	test('manual step ids do not clash with other rules', () => {
+		const steps = new Map<string, string>();
+		const clashes: string[] = [];
+		for (const step of [...global.manual, ...rules.flatMap((r) => r.rule.manual ?? []), ...locals.flatMap((r) => r.rule.manual ?? [])]) {
+			const text = JSON.stringify(step);
+			if (steps.has(step.id) && steps.get(step.id) !== text) clashes.push(step.id);
+			steps.set(step.id, text);
+		}
+		expect(clashes).toEqual([]);
+	});
+
+	describe.each(locals)('$file', ({ file, rule }) => {
+		test('names match the file and a v5 component, files are Svelte files', () => {
+			expect(rule.from).toBe(file);
+			expect(v5Components.map((c) => c.name)).toContain(rule.to);
+			expect(rule.files.length).toBeGreaterThan(0);
+			expect(rule.files.filter((f) => !/^\w+\.svelte$/.test(f))).toEqual([]);
+		});
+
+		test('v5 names exist in the v5 component', () => {
+			expect(nameProblems(rule, true)).toEqual([]);
+		});
+
+		test('mapped exports exist in v5 and manual step ids start with the local name', () => {
+			const v5Index = readFileSync(new URL('../../src/lib/index.ts', import.meta.url), 'utf8');
+			expect((rule.exports ?? []).filter((e) => !new RegExp(`\\b${e.to}\\b`).test(v5Index)).map((e) => e.to)).toEqual([]);
+			const prefixes = [`${kebab(rule.from)}-`, `${kebab(rule.to)}-local-`];
+			expect((rule.manual ?? []).map((m) => m.id).filter((id) => !prefixes.some((p) => id.startsWith(p)))).toEqual([]);
 		});
 	});
 });

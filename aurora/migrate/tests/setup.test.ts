@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, test } from 'vitest';
 import { analyze } from '../src/analyze.ts';
 import { loadRules } from '../src/rules.ts';
-import { prepareBranch, setHtmlLang, themeClassToMode, updatePackageJson } from '../src/setup.ts';
+import { dropThemePlaceholder, prepareBranch, setHtmlLang, updatePackageJson } from '../src/setup.ts';
 
 const fixture = fileURLToPath(new URL('./fixtures/app-v4', import.meta.url));
 const dirs: string[] = [];
@@ -116,12 +116,12 @@ describe('setup: <html lang>', () => {
 	});
 });
 
-describe('setup: mode written by the server', () => {
-	test('the %theme% class on <html> becomes data-mode', () => {
-		expect(themeClassToMode('<html lang="it" class="%theme%">')).toBe('<html lang="it" data-mode="%theme%">');
-		expect(themeClassToMode('<html class="h-full %theme%">')).toBe('<html class="h-full" data-mode="%theme%">');
-		expect(themeClassToMode('<html class="h-full">')).toBe('<html class="h-full">');
-		const done = '<html lang="it" data-mode="%theme%">';
-		expect(themeClassToMode(done)).toBe(done);
+describe('setup: saved mode', () => {
+	test('%theme% leaves <html>: the mode comes from appearanceScript', () => {
+		expect(dropThemePlaceholder('<html lang="it" class="%theme%">')).toBe('<html lang="it">');
+		expect(dropThemePlaceholder('<html class="h-full %theme%">')).toBe('<html class="h-full">');
+		expect(dropThemePlaceholder('<html lang="it" data-mode="%theme%">')).toBe('<html lang="it">');
+		const done = '<html class="h-full">';
+		expect(dropThemePlaceholder(done)).toBe(done);
 	});
 });

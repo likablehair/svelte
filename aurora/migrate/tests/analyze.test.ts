@@ -1,3 +1,6 @@
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, test } from 'vitest';
 import { analyze } from '../src/analyze.ts';
@@ -155,3 +158,28 @@ describe('literalStrings', () => {
 		expect(literalStrings(member)).toEqual({ strings: [], pure: false });
 	});
 });
+
+describe('analyze: local copies', () => {
+	test('counts the usages of a local copy under its rule and fires the manual steps of that rule', () => {
+		const dir = mkdtempSync(join(tmpdir(), 'migrate-analyze-'));
+		try {
+			const files: Record<string, string> = {
+				'package.json': JSON.stringify({ dependencies: { '@likable-hair/svelte': '^4.3.1', svelte: '^5.0.0' } }),
+				'svelte.config.js': "export default { kit: { alias: { '@/*': './src/lib/*' } } };\n",
+				'src/lib/components/common/PageTitle.svelte': '<script lang="ts">\n\tlet { title } = $props();\n</script>\n<h1>{title}</h1>\n',
+				'src/routes/+page.svelte':
+					"<script lang=\"ts\">\n\timport PageTitle from '@/components/common/PageTitle.svelte';\n</script>\n\n<PageTitle title=\"Clients\" prependRoute=\"/x\" />\n"
+			};
+			for (const [rel, text] of Object.entries(files)) {
+				mkdirSync(dirname(join(dir, rel)), { recursive: true });
+				writeFileSync(join(dir, rel), text);
+			}
+			const analysis = analyze(dir, index);
+			expect(analysis.components['local/PageTitle']).toMatchObject({ to: 'PageHeader', usages: 1 });
+			expect(analysis.findings.find((f) => f.id === 'page-title-route-without-back')?.file).toBe('src/routes/+page.svelte');
+		} finally {
+			rmSync(dir, { recursive: true, force: true });
+		}
+	});
+});
+

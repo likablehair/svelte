@@ -2,6 +2,7 @@ import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { parse } from 'svelte/compiler';
 import { attrExpression, attrText, Editor, isReference, visit } from './ast.ts';
+import { readAliases } from './analyze.ts';
 import { dissolve, resolveImport, type WrapperSummary } from './dissolve.ts';
 import { Lines, listFiles } from './files.ts';
 import { localRuleFor, type RuleIndex } from './rules.ts';
@@ -147,6 +148,7 @@ interface Context {
 	typescript: boolean;
 	references: Map<string, number>;
 	local: (source: string) => { path: string; rule: LocalMigration } | undefined;
+	lets: Set<string>;
 	localUsages: Map<string, number>;
 }
 
@@ -318,6 +320,7 @@ function renameImports(roots: unknown[], programs: Node[], ctx: Context): Map<st
 }
 
 function replaceLocalImports(roots: unknown[], programs: Node[], ctx: Context, scope: Map<string, string>, taken: Map<string, string>) {
+	const entries: { decl: Node; rule: LocalMigration; typeOnly: boolean; named: string[]; kept: Node[] }[] = [];
 	for (const { decl, rule } of localImports(programs, ctx)) {
 		const typeOnly = decl.importKind === 'type';
 		const named: string[] = [];
@@ -343,13 +346,6 @@ function replaceLocalImports(roots: unknown[], programs: Node[], ctx: Context, s
 			const local = spec.local.name as string;
 			named.push(`${spec.importKind === 'type' && !typeOnly ? 'type ' : ''}${to === local ? to : `${to} as ${local}`}`);
 		}
-		const quote = decl.source.raw?.[0] ?? "'";
-		const semi = ctx.text.slice(decl.end - 1, decl.end) === ';' ? ';' : '';
-		const kind = typeOnly ? 'type ' : '';
-		const lines = [
-			named.length ? `import ${kind}{ ${named.join(', ')} } from ${quote}${LIB}${quote}${semi}` : '',
-			kept.length ? `import ${kind}{ ${kept.map((spec) => source(ctx, spec)).join(', ')} } from ${decl.source.raw}${semi}` : ''
-		].filter(Boolean);
 		if (kept.length)
 			skip(ctx, decl.start, {
 				kind: 'local-export',
@@ -357,11 +353,249 @@ function replaceLocalImports(roots: unknown[], programs: Node[], ctx: Context, s
 				name: kept.map((spec) => source(ctx, spec)).join(', '),
 				reason: `not exported by the library: move it into the app or replace it (${rule.summary})`
 			});
-		const lineStart = ctx.text.lastIndexOf('\n', decl.start) + 1;
-		const indent = /^[ \t]*/.exec(ctx.text.slice(lineStart))![0];
-		if (ctx.edit.replace(decl.start, decl.end, lines.join(`\n${indent}`)))
-			changed(ctx, decl.start, { kind: 'local-import', id: `${rule.from}/import`, name: decl.source.value, to: rule.to, note: rule.summary, check: false });
+		entries.push({ decl, rule, typeOnly, named, kept });
 	}
+	const report = (entry: (typeof entries)[number]) =>
+		changed(ctx, entry.decl.start, { kind: 'local-import', id: `${entry.rule.from}/import`, name: entry.decl.source.value, to: entry.rule.to, note: entry.rule.summary, check: false });
+	const style = (decl: Node) => ({
+		quote: decl.source.raw?.[0] ?? "'",
+		semi: ctx.text.slice(decl.end - 1, decl.end) === ';' ? ';' : '',
+		indent: /^[ \t]*/.exec(ctx.text.slice(ctx.text.lastIndexOf('\n', decl.start) + 1))![0]
+	});
+	const mergeable = entries.filter((e) => !e.typeOnly && !e.kept.length);
+	const names = mergeable.flatMap((e) => e.named);
+	const target = names.length ? libraryTarget(programs) : undefined;
+	if (target) {
+		const specs = target.specifiers as Node[];
+		const last = specs[specs.length - 1];
+		const lineStart = ctx.text.lastIndexOf('\n', last.start) + 1;
+		const multiline = ctx.text.slice(target.start, last.start).includes('\n') && !ctx.text.slice(lineStart, last.start).trim();
+		const glue = multiline ? `,\n${/^[ \t]*/.exec(ctx.text.slice(lineStart))![0]}` : ', ';
+		ctx.edit.insert(last.end, names.map((n) => `${glue}${n}`).join(''));
+	}
+	mergeable.forEach((entry, index) => {
+		const { quote, semi } = style(entry.decl);
+		const first = !target && index === mergeable.findIndex((e) => e.named.length);
+		const done = first ? ctx.edit.replace(entry.decl.start, entry.decl.end, `import { ${names.join(', ')} } from ${quote}${LIB}${quote}${semi}`) : removeStatement(ctx, entry.decl);
+		if (done) report(entry);
+	});
+	for (const entry of entries) {
+		if (mergeable.includes(entry)) continue;
+		const { quote, semi, indent } = style(entry.decl);
+		const kind = entry.typeOnly ? 'type ' : '';
+		const lines = [
+			entry.named.length ? `import ${kind}{ ${entry.named.join(', ')} } from ${quote}${LIB}${quote}${semi}` : '',
+			entry.kept.length ? `import ${kind}{ ${entry.kept.map((spec) => source(ctx, spec)).join(', ')} } from ${entry.decl.source.raw}${semi}` : ''
+		].filter(Boolean);
+		if (ctx.edit.replace(entry.decl.start, entry.decl.end, lines.join(`\n${indent}`))) report(entry);
+	}
+}
+
+function localCallNames(programs: Node[], ctx: Context): Map<string, LocalMigration> {
+	const out = new Map<string, LocalMigration>();
+	for (const { decl, rule } of localImports(programs, ctx)) {
+		if (!rule.calls) continue;
+		for (const spec of decl.specifiers as Node[]) {
+			if (spec.type !== 'ImportSpecifier') continue;
+			const imported = (spec.imported.name ?? spec.imported.value) as string;
+			if (rule.calls.functions.includes(imported)) out.set(spec.local.name, rule);
+		}
+	}
+	return out;
+}
+
+const keyName = (property: Node): string | undefined =>
+	property.type !== 'Property' || property.computed
+		? undefined
+		: property.key.type === 'Identifier'
+			? property.key.name
+			: typeof property.key.value === 'string'
+				? property.key.value
+				: undefined;
+
+function propertyRange(ctx: Context, list: Node[], index: number): [number, number] {
+	const node = list[index];
+	if (index < list.length - 1) return [node.start, list[index + 1].start];
+	if (index > 0) return [list[index - 1].end, node.end];
+	return [node.start, node.end];
+}
+
+type ObjectRules = { keys?: { from: string; to: string }[]; values?: { key: string; values: Record<string, string> }[]; drop?: string[]; note?: string };
+
+function editObject(ctx: Context, object: Node, calls: ObjectRules, prefix: string, id: string) {
+	const properties = object.properties as Node[];
+	properties.forEach((property, index) => {
+		const key = keyName(property);
+		if (!key) return;
+		const path = prefix ? `${prefix}.${key}` : key;
+		if (calls.drop?.includes(path)) {
+			const [start, end] = propertyRange(ctx, properties, index);
+			if (ctx.edit.replace(start, end, '')) changed(ctx, property.start, { kind: 'call-key-dropped', id, name: path, note: calls.note, check: true });
+			return;
+		}
+		const rename = calls.keys?.find((k) => k.from === path);
+		const to = rename ? rename.to.split('.').pop()! : undefined;
+		const mapped = calls.values?.find((v) => v.key === path);
+		const value = property.value as Node;
+		if (mapped && value.type === 'Literal' && typeof value.value === 'string') {
+			const next = mapped.values[value.value] ?? mapped.values[value.value.toUpperCase()] ?? mapped.values[value.value.toLowerCase()];
+			if (next === undefined) {
+				skip(ctx, property.start, { kind: 'call-value', id, name: `${path}: ${source(ctx, value)}`, reason: `no equivalent for this value: set it by hand (${calls.note ?? ''})` });
+				return;
+			}
+			if (ctx.edit.replace(property.start, property.end, `${to ?? key}: ${JSON.stringify(next)}`))
+				changed(ctx, property.start, { kind: 'call-key-renamed', id, name: path, to: `${to ?? key}: ${JSON.stringify(next)}`, check: false });
+			return;
+		}
+		if (mapped) {
+			skip(ctx, property.start, { kind: 'call-value', id, name: path, reason: `the value is not a literal: map it by hand (${calls.note ?? ''})` });
+			return;
+		}
+		if (to && to !== key) {
+			const done = property.shorthand ? ctx.edit.replace(property.start, property.end, `${to}: ${key}`) : ctx.edit.replace(property.key.start, property.key.end, to);
+			if (done) changed(ctx, property.start, { kind: 'call-key-renamed', id, name: path, to: rename!.to, check: false });
+		}
+		if (value.type === 'ObjectExpression') editObject(ctx, value, calls, path, id);
+	});
+}
+
+function editItems(ctx: Context, expression: Node, rules: ObjectRules, id: string, declarations: Map<string, Node>, seen: Set<Node>, depth = 0): boolean {
+	if (depth > 12) return false;
+	switch (expression.type) {
+		case 'ArrayExpression':
+			return (expression.elements as (Node | null)[]).every((element) => !element || editItems(ctx, element, rules, id, declarations, seen, depth + 1));
+		case 'ObjectExpression':
+			editObject(ctx, expression, rules, '', id);
+			return true;
+		case 'SpreadElement':
+			return editItems(ctx, expression.argument, rules, id, declarations, seen, depth + 1);
+		case 'ConditionalExpression':
+			return editItems(ctx, expression.consequent, rules, id, declarations, seen, depth + 1) && editItems(ctx, expression.alternate, rules, id, declarations, seen, depth + 1);
+		case 'LogicalExpression':
+			return editItems(ctx, expression.right, rules, id, declarations, seen, depth + 1);
+		case 'CallExpression':
+			if (expression.callee.type === 'Identifier' && /^\$(state|derived)$/.test(expression.callee.name) && expression.arguments[0])
+				return editItems(ctx, expression.arguments[0], rules, id, declarations, seen, depth + 1);
+			return false;
+		case 'TSAsExpression':
+		case 'TSSatisfiesExpression':
+			return editItems(ctx, expression.expression, rules, id, declarations, seen, depth + 1);
+		case 'Identifier': {
+			const init = declarations.get(expression.name);
+			if (!init) return false;
+			if (seen.has(init)) return true;
+			seen.add(init);
+			return editItems(ctx, init, rules, id, declarations, seen, depth + 1);
+		}
+		case 'Literal':
+			return expression.value === null;
+		default:
+			return false;
+	}
+}
+
+function transformItems(ctx: Context, usages: { node: Node; v4: string }[], instance: Node | undefined) {
+	const declarations = new Map<string, Node>();
+	for (const statement of (instance?.body ?? []) as Node[])
+		if (statement.type === 'VariableDeclaration')
+			for (const d of statement.declarations as Node[]) if (d.id.type === 'Identifier' && d.init) declarations.set(d.id.name, d.init);
+	const seen = new Set<Node>();
+	for (const { node, v4 } of usages) {
+		const rule = ctx.index.byV4.get(v4);
+		if (!rule || !('items' in rule) || !rule.items) continue;
+		for (const items of (rule as LocalMigration).items!) {
+			const attr = (node.attributes as Node[]).find((a) => (a.type === 'Attribute' || a.type === 'BindDirective') && a.name === items.prop);
+			const expression = attr && (attr.type === 'BindDirective' ? attr.expression : attrExpression(attr));
+			if (!attr || !expression) continue;
+			if (!editItems(ctx, expression, items, `${v4}/items/${items.prop}`, declarations, seen))
+				skip(ctx, attr.start, {
+					kind: 'item-keys',
+					id: `${v4}/items/${items.prop}`,
+					name: items.prop,
+					reason: `the items are built elsewhere: rename their keys by hand (${[...(items.keys ?? []).map((k) => `${k.from} → ${k.to}`), ...(items.drop ?? []).map((d) => `${d} removed`)].join(', ')})${items.note ? `. ${items.note}` : ''}`
+				});
+		}
+	}
+}
+
+function retypeMembers(ctx: Context, ast: Node, scope: Map<string, string>) {
+	visit(ast, (node) => {
+		if (node.type !== 'TSTypeQuery' || node.exprName?.type !== 'Identifier') return;
+		const rule = ctx.index.byV4.get(scope.get(node.exprName.name) ?? '');
+		if (!rule || !('files' in rule)) return;
+		const member = /^(?:<[^<>]*>)?\s*>\s*\[\s*(['"])(\w+)\1\s*\]/.exec(ctx.text.slice(node.end));
+		if (!member) return;
+		const name = member[2];
+		const to = rule.props?.renamed?.find((r) => r.from === name)?.to ?? rule.snippets?.renamed?.find((r) => r.from === name)?.to;
+		if (!to || to === name) return;
+		const at = node.end + member.index + member[0].lastIndexOf(name);
+		if (ctx.edit.replace(at, at + name.length, to))
+			changed(ctx, at, { kind: 'type-member', id: `${rule.from}/types/${name}`, name, to, check: false });
+	});
+}
+
+function transformCalls(ctx: Context, roots: unknown[], names: Map<string, LocalMigration>) {
+	if (!names.size) return;
+	for (const root of roots)
+		visit(root, (node) => {
+			if (node.type !== 'CallExpression' || node.callee.type !== 'Identifier') return;
+			const rule = names.get(node.callee.name);
+			if (!rule?.calls) return;
+			const calls = rule.calls;
+			const id = `${rule.from}/calls`;
+			const arg = (node.arguments as Node[])[0];
+			if (!calls.unwrap) {
+				if (arg?.type === 'ObjectExpression') editObject(ctx, arg, calls, '', id);
+				return;
+			}
+			if (arg?.type === 'Literal' && typeof arg.value === 'string') return;
+			const inner = arg?.type === 'ObjectExpression' ? (arg.properties as Node[]).find((p) => keyName(p) === calls.unwrap) : undefined;
+			if (!arg || !inner || inner.value.type !== 'ObjectExpression' || (arg.properties as Node[]).length !== 1) {
+				skip(ctx, node.start, {
+					kind: 'call-unwrap',
+					id,
+					name: node.callee.name,
+					reason: `the argument is not \`{ ${calls.unwrap}: { ... } }\`: pass the options directly by hand (${calls.note ?? ''})`
+				});
+				return false;
+			}
+			const object = inner.value as Node;
+			if (ctx.edit.replace(arg.start, object.start, '') && ctx.edit.replace(object.end, arg.end, ''))
+				changed(ctx, node.start, { kind: 'call-unwrapped', id, name: `${node.callee.name}({ ${calls.unwrap} })`, to: `${node.callee.name}({ ... })`, check: false });
+			editObject(ctx, object, calls, '', id);
+			const indent = (pos: number) => /^[ \t]*/.exec(ctx.text.slice(ctx.text.lastIndexOf('\n', pos - 1) + 1))![0];
+			const outer = indent(arg.start);
+			const own = indent(inner.start);
+			if (own.length > outer.length && own.startsWith(outer)) {
+				const delta = own.slice(outer.length);
+				for (let p = ctx.text.indexOf('\n', object.start); p !== -1 && p < object.end; p = ctx.text.indexOf('\n', p + 1))
+					if (ctx.text.startsWith(delta, p + 1)) ctx.edit.replace(p + 1, p + 1 + delta.length, '');
+			}
+			return false;
+		});
+}
+
+function libraryTarget(programs: Node[]): Node | undefined {
+	for (const program of programs)
+		for (const statement of program.body as Node[])
+			if (
+				statement.type === 'ImportDeclaration' &&
+				statement.source.value === LIB &&
+				statement.importKind !== 'type' &&
+				statement.specifiers.length &&
+				(statement.specifiers as Node[]).every((spec) => spec.type === 'ImportSpecifier')
+			)
+				return statement;
+	return undefined;
+}
+
+function removeStatement(ctx: Context, node: Node) {
+	let start = node.start;
+	while (start > 0 && (ctx.text[start - 1] === ' ' || ctx.text[start - 1] === '\t')) start--;
+	let end = node.end;
+	if (ctx.text[start - 1] === '\n' && (ctx.text[end] === '\n' || end === ctx.text.length)) start--;
+	else if (ctx.text[end] === '\n') end++;
+	return ctx.edit.replace(start, end, '');
 }
 
 const isShorthand = (ctx: Context, attr: Node) =>
@@ -394,6 +628,12 @@ function renameAttr(ctx: Context, attr: Node, to: string, api: ComponentApi | un
 	}
 	if (isShorthand(ctx, attr)) return ctx.edit.replace(attr.start, attr.end, `${to}={${attr.name}}`);
 	return ctx.edit.replace(attr.start, attr.start + attr.name.length, to);
+}
+
+function balanced(value: string) {
+	const open = (value.match(/\(/g) ?? []).length;
+	const close = (value.match(/\)/g) ?? []).length;
+	return /^[a-z-]+\(/.test(value.trim()) && open > close ? value + ')'.repeat(open - close) : value;
 }
 
 function negate(ctx: Context, expression: Node) {
@@ -702,6 +942,21 @@ function transformUsage(
 			continue;
 		}
 
+		if (attr.type === 'OnDirective') {
+			const key = `on:${attr.name}`;
+			const ev = rule.events?.changed?.find((e) => e.name === key && e.to);
+			if (!ev) continue;
+			if ((attr.modifiers as string[] | undefined)?.length || !attr.expression)
+				skip(ctx, attr.start, {
+					kind: 'event-renamed',
+					id: id(`events.changed/${key}`),
+					name: key,
+					reason: `${attr.expression ? 'event modifiers' : 'a forwarded event'}: rewrite it as \`${ev.to}={...}\` by hand`
+				});
+			else transformEvent(ctx, attr, v4, rule, present, functions, handlerUses, done, key);
+			continue;
+		}
+
 		if (attr.type !== 'Attribute' && attr.type !== 'BindDirective') continue;
 		const name = attr.name as string;
 
@@ -711,6 +966,31 @@ function transformUsage(
 				present.set(snippet.to, attr);
 				changed(ctx, attr.start, { kind: 'snippet-renamed', id: id(`snippets.renamed/${name}`), name, to: snippet.to, note: snippet.note, check: !!snippet.note });
 			}
+			continue;
+		}
+
+		if (attr.type === 'BindDirective' && api && api.props.includes(name) && !api.bindable.includes(name) && !p.renamed?.some((x) => x.from === name)) {
+			if (attr.expression.type !== 'SequenceExpression' && ctx.edit.replace(attr.start, attr.end, `${name}={${source(ctx, attr.expression)}}`))
+				changed(ctx, attr.start, {
+					kind: 'bind-one-way',
+					id: id(`props.bind-one-way/${name}`),
+					name: `bind:${name}`,
+					to: name,
+					note: `\`${name}\` is not bindable in v5: the component never changes it, so the value only flows into it.`,
+					check: true
+				});
+			continue;
+		}
+
+		const bound = p.bind?.find((x) => x.name === name);
+		if (bound && attr.type === 'Attribute') {
+			const expression = attrExpression(attr);
+			if (expression?.type === 'Identifier' && ctx.lets.has(expression.name)) {
+				const next = isShorthand(ctx, attr) || expression.name === name ? `bind:${name}` : `bind:${name}={${expression.name}}`;
+				if (ctx.edit.replace(attr.start, attr.end, next))
+					changed(ctx, attr.start, { kind: 'prop-bound', id: id(`props.bind/${name}`), name, to: `bind:${name}`, note: bound.note, check: false });
+			} else if (expression)
+				skip(ctx, attr.start, { kind: 'prop-bound', id: id(`props.bind/${name}`), name, reason: `pass a variable with \`bind:${name}\`: ${bound.note}` });
 			continue;
 		}
 
@@ -729,8 +1009,13 @@ function transformUsage(
 				continue;
 			}
 			const values = p.values?.find((x) => x.name === to);
-			const text = attrText(attr);
 			const literal = attrExpression(attr);
+			const text =
+				attr.value === true
+					? 'true'
+					: literal?.type === 'Literal' && typeof literal.value === 'boolean'
+						? String(literal.value)
+						: attrText(attr);
 			if (values && text !== undefined && text in values.values) {
 				if (ctx.edit.replace(attr.start, attr.end, `${to}${writeValue(values.values[text])}`)) {
 					present.set(to, attr);
@@ -784,9 +1069,20 @@ function transformUsage(
 
 		const css = p.toCssVar?.find((x) => x.name === name);
 		if (css && attr.type === 'Attribute') {
-			const text = attrText(attr);
-			if (text === undefined || present.has(css.cssVar)) continue;
-			if (ctx.edit.replace(attr.start, attr.end, `${css.cssVar}="${text}"`)) {
+			const raw = attrText(attr);
+			const expression = attrExpression(attr);
+			if (present.has(css.cssVar)) continue;
+			const text = raw !== undefined ? balanced(raw) : undefined;
+			const next =
+				text !== undefined
+					? `${css.cssVar}="${text}"`
+					: expression && attr.value !== true && !isShorthand(ctx, attr)
+						? `${css.cssVar}={${source(ctx, expression)}}`
+						: expression && isShorthand(ctx, attr)
+							? `${css.cssVar}={${name}}`
+							: undefined;
+			if (!next) continue;
+			if (ctx.edit.replace(attr.start, attr.end, next)) {
 				present.set(css.cssVar, attr);
 				changed(ctx, attr.start, { kind: 'prop-to-css-var', id: id(`props.toCssVar/${name}`), name, to: css.cssVar, note: css.note, check: !!css.note });
 			}
@@ -842,9 +1138,10 @@ function transformEvent(
 	present: Map<string, Node>,
 	functions: Map<string, Node>,
 	handlerUses: Map<string, HandlerUse[]>,
-	done: Set<Node>
+	done: Set<Node>,
+	key?: string
 ) {
-	const name = attr.name as string;
+	const name = key ?? (attr.name as string);
 	if (rule?.events?.removed?.some((e) => e.name === name)) return;
 	const { ev, mapping } = eventMapping(ctx, rule, name);
 	const expression = attrExpression(attr);
@@ -1049,6 +1346,13 @@ function transformSvelte(ctx: Context) {
 	const programs = [ast.instance?.content, ast.module?.content].filter(Boolean) as Node[];
 	const roots = [ast.instance?.content, ast.module?.content, ast.fragment].filter(Boolean);
 	ctx.references = collectReferenceCounts(roots);
+	ctx.lets = new Set(
+		((ast.instance?.content.body ?? []) as Node[])
+			.filter((n) => n.type === 'VariableDeclaration' && n.kind === 'let')
+			.flatMap((n) => (n.declarations as Node[]).map((d) => (d.id.type === 'Identifier' ? (d.id.name as string) : '')))
+			.filter(Boolean)
+	);
+	transformCalls(ctx, roots, localCallNames(programs, ctx));
 	const scope = renameImports(roots, programs, ctx);
 	const functions = functionsByName(ast.instance ? [ast.instance.content] : []);
 
@@ -1062,16 +1366,20 @@ function transformSvelte(ctx: Context) {
 	const handlerUses = new Map<string, HandlerUse[]>();
 	for (const { node, v4 } of usages)
 		for (const attr of node.attributes as Node[]) {
-			if (attr.type !== 'Attribute' || !/^on[a-z]/.test(attr.name)) continue;
+			const directive = attr.type === 'OnDirective';
+			if (!directive && (attr.type !== 'Attribute' || !/^on[a-z]/.test(attr.name))) continue;
 			const expression = attrExpression(attr);
 			if (expression?.type !== 'Identifier') continue;
 			const list = handlerUses.get(expression.name) ?? [];
-			list.push({ attr, mapping: eventMapping(ctx, ctx.index.byV4.get(v4), attr.name).mapping });
+			list.push({ attr, mapping: eventMapping(ctx, ctx.index.byV4.get(v4), directive ? `on:${attr.name}` : attr.name).mapping });
 			handlerUses.set(expression.name, list);
 		}
 
 	for (const { v4 } of usages)
 		if (ctx.index.byV4.get(v4) && 'files' in ctx.index.byV4.get(v4)!) ctx.localUsages.set(v4, (ctx.localUsages.get(v4) ?? 0) + 1);
+
+	transformItems(ctx, usages, ast.instance?.content);
+	retypeMembers(ctx, ast, scope);
 
 	const done = new Set<Node>();
 	const libraryRanges: [number, number][] = [];
@@ -1112,6 +1420,7 @@ function transformScript(ctx: Context) {
 	const program = ast.instance?.content as Node | undefined;
 	if (!program) return undefined;
 	ctx.references = collectReferenceCounts([program]);
+	transformCalls(ctx, [program], localCallNames([program], ctx));
 	renameImports([program], [program], ctx);
 	iconLiterals(ctx, [program], []);
 	importIcons(ctx, program);
@@ -1120,16 +1429,24 @@ function transformScript(ctx: Context) {
 
 const IMPORT_SOURCE = /(?:from\s+|import\s*\(\s*|import\s+)['"]([^'"]+)['"]/g;
 
-function unusedCopies(dir: string, paths: string[], copies: Map<string, LocalMigration>, text: (path: string) => string, gone: Set<string>) {
+function resolveSource(dir: string, from: string, source: string, aliases: [string, string][]): string | undefined {
+	const clean = source.replace(/\?.*$/, '');
+	if (clean.startsWith('.')) return resolve(dirname(from), clean);
+	for (const [alias, target] of aliases)
+		if (clean === alias || clean.startsWith(`${alias}/`)) return join(dir, target, clean.slice(alias.length));
+	return resolveImport(dir, from, clean);
+}
+
+function unusedCopies(dir: string, paths: string[], copies: string[], text: (path: string) => string, gone: Set<string>, aliases: [string, string][]) {
 	const unused = new Set<string>();
 	for (let found = true; found; ) {
 		found = false;
-		for (const copy of copies.keys()) {
+		for (const copy of copies) {
 			if (unused.has(copy)) continue;
 			const used = paths.some((file) => {
 				if (file === copy || unused.has(file) || gone.has(file) || !/\.(svelte|ts|js)$/.test(file)) return false;
 				for (const match of text(file).matchAll(IMPORT_SOURCE))
-					if (resolveImport(dir, file, match[1].replace(/\?.*$/, '')) === copy) return true;
+					if (resolveSource(dir, file, match[1], aliases) === copy) return true;
 				return false;
 			});
 			if (!used) {
@@ -1139,6 +1456,37 @@ function unusedCopies(dir: string, paths: string[], copies: Map<string, LocalMig
 		}
 	}
 	return unused;
+}
+
+function themeLeftovers(dir: string, paths: string[], text: (path: string) => string, result: CodemodResult): string[] {
+	const html = existsSync(join(dir, 'src/app.html')) ? readFileSync(join(dir, 'src/app.html'), 'utf8') : '';
+	if (!html || html.includes('%theme%')) return [];
+	const out: string[] = [];
+	const endpoint = paths.find((path) => /src[\\/]routes[\\/]api[\\/]setTheme[\\/]\+server\.(ts|js)$/.test(path));
+	const called = paths.some((path) => path !== endpoint && text(path).includes('/api/setTheme'));
+	if (endpoint && !called && /cookies\.set\(\s*['"]theme['"]/.test(text(endpoint))) out.push(endpoint);
+	if (endpoint && called)
+		for (const path of paths)
+			if (path !== endpoint && text(path).includes('/api/setTheme'))
+				result.skipped.push({
+					file: relative(dir, path),
+					line: text(path).slice(0, text(path).indexOf('/api/setTheme')).split('\n').length,
+					kind: 'theme-cookie',
+					id: 'local/ThemeSwitch/cookie',
+					name: '/api/setTheme',
+					reason: 'the light/dark choice is kept by rememberAppearance(): replace this toggle with ModeSwitch and remove the call; the endpoint goes when nothing calls it'
+				});
+	const hooks = paths.find((path) => /src[\\/]hooks\.server\.(ts|js)$/.test(path));
+	if (hooks && text(hooks).includes('%theme%'))
+		result.skipped.push({
+			file: relative(dir, hooks),
+			line: text(hooks).slice(0, text(hooks).indexOf('%theme%')).split('\n').length,
+			kind: 'theme-cookie',
+			id: 'local/ThemeSwitch/hooks',
+			name: '%theme%',
+			reason: 'app.html no longer has %theme%: remove its replacement and the reading of the `theme` cookie'
+		});
+	return out;
 }
 
 export function codemod(dir: string, index: RuleIndex, options: CodemodOptions = {}): CodemodResult {
@@ -1158,6 +1506,7 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 	for (const s of dissolved.skipped)
 		result.skipped.push({ file: s.file, line: s.line, kind: s.kind, id: `wrappers/${s.wrapper}`, name: s.name, reason: s.reason });
 
+	const aliases = readAliases(dir);
 	const copies = new Map<string, LocalMigration>();
 	for (const path of paths) {
 		if (!path.endsWith('.svelte') || dissolved.deleted.includes(path)) continue;
@@ -1201,11 +1550,12 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 			typescript,
 			references: new Map(),
 			local: (from) => {
-				const target = resolveImport(dir, path, from.replace(/\?.*$/, ''));
+				const target = resolveSource(dir, path, from, aliases);
 				const rule = target ? copies.get(target) : undefined;
 				return target && rule && target !== path ? { path: target, rule } : undefined;
 			},
-			localUsages
+			localUsages,
+			lets: new Set()
 		};
 		const error = svelte ? transformSvelte(ctx) : script ? transformScript(ctx) : (renameCssText(ctx, 0, text.length), undefined);
 		if (error) {
@@ -1217,7 +1567,17 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 		if (after !== original) outputs.set(path, after);
 	}
 
-	const unused = unusedCopies(dir, paths, copies, (path) => outputs.get(path) ?? dissolved.texts.get(path) ?? texts.get(path)!, new Set(dissolved.deleted));
+	const unused = unusedCopies(dir, paths, [...copies.keys()], (path) => outputs.get(path) ?? dissolved.texts.get(path) ?? texts.get(path)!, new Set(dissolved.deleted), aliases);
+	const finalText = (path: string) => (unused.has(path) || dissolved.deleted.includes(path) ? '' : (outputs.get(path) ?? dissolved.texts.get(path) ?? texts.get(path) ?? ''));
+	for (const path of themeLeftovers(dir, paths, finalText, result)) unused.add(path);
+	const dead = new Set(index.rules.global.deadFiles ?? []);
+	const candidates = paths.filter(
+		(path) => dead.has(basename(path)) && /[\\/]src[\\/]lib[\\/]components[\\/]/.test(path) && !copies.has(path) && !unused.has(path)
+	);
+	for (const path of unusedCopies(dir, paths.filter((p) => !unused.has(p)), candidates, finalText, new Set(dissolved.deleted), aliases)) {
+		unused.add(path);
+		result.changes.push({ file: relative(dir, path), line: 1, kind: 'dead-file', id: 'global/deadFiles', name: basename(path), note: 'No file imported it.', check: false });
+	}
 	for (const [path, rule] of copies)
 		result.locals.push({
 			file: relative(dir, path),

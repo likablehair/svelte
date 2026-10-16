@@ -84,7 +84,7 @@ export function attrText(attr: Node): string | undefined {
 }
 
 export function attrExpression(attr: Node): Node | undefined {
-	if (attr.type === 'BindDirective') return attr.expression;
+	if (attr.type === 'BindDirective' || attr.type === 'OnDirective') return attr.expression ?? undefined;
 	if (attr.value && !Array.isArray(attr.value) && attr.value.type === 'ExpressionTag') return attr.value.expression;
 	if (Array.isArray(attr.value) && attr.value.length === 1 && attr.value[0].type === 'ExpressionTag')
 		return attr.value[0].expression;

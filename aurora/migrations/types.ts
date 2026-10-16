@@ -57,6 +57,7 @@ export interface PropRules {
 	values?: ValueChange[];
 	types?: TypeChange[];
 	icons?: string[];
+	bind?: Changed[];
 }
 
 export interface EventChange {
@@ -117,10 +118,30 @@ export interface ComponentMigration {
 	added?: string[];
 }
 
+export interface CallRules {
+	functions: string[];
+	unwrap?: string;
+	keys?: Rename[];
+	values?: { key: string; values: Record<string, string> }[];
+	drop?: string[];
+	note?: string;
+}
+
+export interface ItemRules {
+	prop: string;
+	keys?: Rename[];
+	values?: { key: string; values: Record<string, string> }[];
+	drop?: string[];
+	note?: string;
+}
+
 export interface LocalMigration extends ComponentMigration {
 	files: string[];
 	contains?: string[];
+	excludes?: string[];
 	exports?: Rename[];
+	calls?: CallRules;
+	items?: ItemRules[];
 	summary: string;
 }
 
@@ -161,4 +182,5 @@ export interface GlobalMigration {
 	};
 	exports: ExportChange[];
 	manual: ManualStep[];
+	deadFiles?: string[];
 }

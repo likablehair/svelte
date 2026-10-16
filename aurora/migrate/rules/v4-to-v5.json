@@ -7870,6 +7870,24 @@
 				"action": "Check first paint on mobile for layouts that depended on the v4 server default.",
 				"scope": "app"
 			}
+		],
+		"deadFiles": [
+			"Loader.svelte",
+			"NotAuthorized.svelte",
+			"SideCreator.svelte",
+			"JobHeader.svelte",
+			"HeaderMenu.svelte",
+			"Tooltip.svelte",
+			"HeadersSelectorDrawer.svelte",
+			"AlertBanner.svelte",
+			"InfiniteTable.svelte",
+			"LocalFilterEditor.svelte",
+			"Subtitle.svelte",
+			"ButtonGroup.svelte",
+			"OptionSelector.svelte",
+			"OptionMenu.svelte",
+			"DateRangePicker.svelte",
+			"LinkButton.svelte"
 		]
 	},
 	"components": [
@@ -17712,6 +17730,834 @@
 			]
 		},
 		{
+			"from": "local/AlertDialog",
+			"to": "ConfirmDialog",
+			"files": [
+				"AlertDialog.svelte"
+			],
+			"contains": [
+				"alertText"
+			],
+			"summary": "The local `AlertDialog` copy becomes `ConfirmDialog` of the library, with the primary action.",
+			"props": {
+				"renamed": [
+					{
+						"from": "alertText",
+						"to": "description",
+						"note": "Line breaks are kept."
+					},
+					{
+						"from": "onConfirmClick",
+						"to": "onconfirm"
+					},
+					{
+						"from": "onCancelClick",
+						"to": "oncancel",
+						"note": "Called on every way of closing without confirming (Cancel, close button, Escape, backdrop)."
+					}
+				],
+				"bind": [
+					{
+						"name": "open",
+						"note": "With `open={x}` the app did not learn that Escape or the backdrop closed the dialog, so it could not open again."
+					}
+				],
+				"removed": [
+					{
+						"name": "shwoConfirmOrCancel",
+						"note": "The buttons are always there; `actionsSnippet` changes them.",
+						"drop": true
+					},
+					{
+						"name": "_overlayOpacity",
+						"note": "Use `--dialog-backdrop-background`."
+					},
+					{
+						"name": "class",
+						"note": "Width classes (`max-w-[500px]`) become `--confirm-dialog-max-width=\"500px\"`; `class` takes an object of classes per part (`{ dialog, … }`)."
+					}
+				],
+				"defaults": [
+					{
+						"name": "variant",
+						"v4": "a primary action",
+						"v5": "'danger'",
+						"keepV4": "variant=\"primary\"",
+						"behaviour": true,
+						"note": "The action button of the copies was primary (blue); without `confirmText` it says \"Conferma\" / \"Confirm\"."
+					},
+					{
+						"name": "closeOnConfirm",
+						"v4": "false (the app closed it)",
+						"v5": "true",
+						"keepV4": "closeOnConfirm={false}",
+						"behaviour": true,
+						"note": "The copies never closed on confirm, the app set `open = false`. Remove it to let ConfirmDialog close by itself after `onconfirm`."
+					}
+				]
+			},
+			"events": {
+				"changed": [
+					{
+						"name": "onconfirmClick",
+						"to": "onconfirm",
+						"argument": {
+							"detail.nativeEvent": ""
+						},
+						"type": "MouseEvent"
+					},
+					{
+						"name": "oncancelClick",
+						"to": "oncancel",
+						"argument": {
+							"detail.nativeEvent": ""
+						},
+						"type": "MouseEvent | KeyboardEvent",
+						"note": "Called on every way of closing without confirming (Cancel, close button, Escape, backdrop)."
+					},
+					{
+						"name": "on:confirm-click",
+						"to": "onconfirm",
+						"argument": {
+							"detail.nativeEvent.detail.nativeEvent": "",
+							"detail.nativeEvent": ""
+						},
+						"type": "MouseEvent",
+						"note": "Svelte 4 event directive of older app code."
+					},
+					{
+						"name": "on:cancel-click",
+						"to": "oncancel",
+						"argument": {
+							"detail.nativeEvent.detail.nativeEvent": "",
+							"detail.nativeEvent": ""
+						},
+						"type": "MouseEvent | KeyboardEvent",
+						"note": "Svelte 4 event directive of older app code."
+					}
+				]
+			},
+			"snippets": {
+				"renamed": [
+					{
+						"from": "bodySnippet",
+						"to": "children",
+						"note": "Shown under the description."
+					}
+				]
+			},
+			"manual": [
+				{
+					"id": "alert-dialog-look",
+					"summary": "Aurora look: icon in a 40px tinted box, question in the display font, buttons in a row at the end, Cancel neutral (the red Cancel of some copies is gone).",
+					"action": "Nothing to do unless the page relied on the old size: `--confirm-dialog-max-width` changes the width."
+				}
+			]
+		},
+		{
+			"from": "local/BoxList",
+			"to": "BoxList",
+			"files": [
+				"BoxList.svelte"
+			],
+			"contains": [
+				"boxes"
+			],
+			"excludes": [
+				"animateOnMount"
+			],
+			"summary": "The local `BoxList` copy becomes `BoxList` of the library.",
+			"exports": [
+				{
+					"from": "Box",
+					"to": "BoxListItem"
+				}
+			],
+			"props": {
+				"toCssVar": [
+					{
+						"name": "gap",
+						"cssVar": "--box-list-gap"
+					}
+				],
+				"removed": [
+					{
+						"name": "type",
+						"note": "A box with `href` is a link, one with `onclick` or `onboxClick` a button.",
+						"drop": true
+					}
+				]
+			},
+			"events": {
+				"changed": [
+					{
+						"name": "on:box-click",
+						"to": "onboxClick",
+						"argument": {
+							"detail": ""
+						},
+						"type": "{ box: BoxListItem; event: MouseEvent }",
+						"note": "Svelte 4 event directive of older app code: `event.detail.box` becomes `event.box`."
+					}
+				]
+			},
+			"snippets": {
+				"renamed": [
+					{
+						"from": "prepend",
+						"to": "prependSnippet",
+						"note": "Content before the icon and the texts of each box; a whole custom box goes next to the list."
+					}
+				]
+			},
+			"items": [
+				{
+					"prop": "boxes",
+					"keys": [
+						{
+							"from": "redirectUrl",
+							"to": "href"
+						},
+						{
+							"from": "url",
+							"to": "href"
+						}
+					],
+					"drop": [
+						"expanded",
+						"style"
+					],
+					"note": "Each box is a `BoxListItem`: `name`, `label`, `description` (plain text, always visible), `icon` (an `@mdi/js` path), `href`, `onclick`, `color`, `disabled`."
+				}
+			],
+			"manual": [
+				{
+					"id": "box-list-local-description",
+					"summary": "The description is always visible and plain text; in the expandable copies it slid in on hover and was HTML (`{@html}`).",
+					"action": "Rewrite descriptions that contained HTML as plain text, or render them with `descriptionSnippet`."
+				},
+				{
+					"id": "box-list-local-look",
+					"summary": "Cards of the library in a grid that fills the width (`--box-list-min-width` each), instead of the 260px cards or the wrapping row of the copies.",
+					"action": "Remove app CSS aimed at the classes of the copy; the gap is `--box-list-gap`."
+				}
+			]
+		},
+		{
+			"from": "local/BoxListGrid",
+			"to": "BoxList",
+			"files": [
+				"BoxList.svelte"
+			],
+			"contains": [
+				"boxes",
+				"animateOnMount"
+			],
+			"summary": "The local animated `BoxList` copy becomes `BoxList` of the library.",
+			"exports": [
+				{
+					"from": "Box",
+					"to": "BoxListItem"
+				}
+			],
+			"props": {
+				"toCssVar": [
+					{
+						"name": "gap",
+						"cssVar": "--box-list-gap"
+					}
+				],
+				"removed": [
+					{
+						"name": "animateOnMount",
+						"note": "The cards appear without the staggered animation, as every usage asked.",
+						"drop": true
+					}
+				]
+			},
+			"events": {
+				"changed": [
+					{
+						"name": "onboxClick",
+						"argument": {
+							"detail": ""
+						},
+						"type": "{ box: BoxListItem; event: MouseEvent }",
+						"note": "`event.detail.box` becomes `event.box`."
+					}
+				]
+			},
+			"items": [
+				{
+					"prop": "boxes",
+					"keys": [
+						{
+							"from": "redirectUrl",
+							"to": "href"
+						},
+						{
+							"from": "url",
+							"to": "href"
+						}
+					],
+					"drop": [
+						"expanded",
+						"style"
+					],
+					"note": "Each box is a `BoxListItem`: `name`, `label`, `description` (plain text, always visible), `icon` (an `@mdi/js` path), `href`, `onclick`, `color`, `disabled`."
+				}
+			],
+			"manual": [
+				{
+					"id": "box-list-local-description",
+					"summary": "The description is always visible and plain text; in the expandable copies it slid in on hover and was HTML (`{@html}`).",
+					"action": "Rewrite descriptions that contained HTML as plain text, or render them with `descriptionSnippet`."
+				},
+				{
+					"id": "box-list-local-look",
+					"summary": "Cards of the library in a grid that fills the width (`--box-list-min-width` each), instead of the 260px cards or the wrapping row of the copies.",
+					"action": "Remove app CSS aimed at the classes of the copy; the gap is `--box-list-gap`."
+				}
+			]
+		},
+		{
+			"from": "local/BoxMenu",
+			"to": "BoxList",
+			"files": [
+				"BoxMenu.svelte"
+			],
+			"summary": "The local `BoxMenu` copy becomes `BoxList` of the library.",
+			"exports": [
+				{
+					"from": "BoxItem",
+					"to": "BoxListItem"
+				}
+			],
+			"props": {
+				"renamed": [
+					{
+						"from": "items",
+						"to": "boxes"
+					}
+				]
+			},
+			"items": [
+				{
+					"prop": "items",
+					"keys": [
+						{
+							"from": "onClick",
+							"to": "onclick"
+						}
+					],
+					"note": "Each item is a `BoxListItem`: `name`, `label`, `description`, `icon` (an `@mdi/js` path), `href`, `onclick`."
+				}
+			],
+			"manual": [
+				{
+					"id": "box-menu-look",
+					"summary": "Cards of the library: icon tile in the brand tone, label and description always visible, a grid that fills the width (`--box-list-min-width` each).",
+					"action": "Remove app CSS aimed at the classes of the copy; `color` on an item gives its icon another tone."
+				}
+			]
+		},
+		{
+			"from": "local/CircularProgressIndicator",
+			"to": "CircularLoader",
+			"files": [
+				"CircularProgressIndicator.svelte"
+			],
+			"summary": "The local `CircularProgressIndicator` copy becomes `CircularLoader` of the library, with `value`.",
+			"props": {
+				"renamed": [
+					{
+						"from": "progress",
+						"to": "value",
+						"note": "From 0 to `total` (100 by default)."
+					}
+				]
+			},
+			"cssVars": {
+				"renamed": [
+					{
+						"from": "--circular-progress-indicator-height",
+						"to": "--circular-loader-size"
+					},
+					{
+						"from": "--circular-progress-indicator-width",
+						"to": "--circular-loader-size"
+					},
+					{
+						"from": "--circular-progress-indicator-color",
+						"to": "--circular-loader-color"
+					}
+				]
+			},
+			"manual": [
+				{
+					"id": "circular-progress-indicator-track",
+					"summary": "CircularLoader draws its own track (`--circular-loader-track-color`).",
+					"action": "Where two indicators were stacked to draw a track (one at 100 under the real one), remove the one at 100 and set `--circular-loader-track-color` on the other."
+				}
+			]
+		},
+		{
+			"from": "local/ConfirmDialog",
+			"to": "ConfirmDialog",
+			"files": [
+				"ConfirmDialog.svelte"
+			],
+			"contains": [
+				"confirm-click"
+			],
+			"summary": "The local `ConfirmDialog` copy becomes `ConfirmDialog` of the library, with the primary action.",
+			"props": {
+				"defaults": [
+					{
+						"name": "variant",
+						"v4": "a primary action",
+						"v5": "'danger'",
+						"keepV4": "variant=\"primary\"",
+						"behaviour": true,
+						"note": "The action button of the copy was primary (blue)."
+					},
+					{
+						"name": "title",
+						"v4": "'Conferma'",
+						"v5": "required",
+						"keepV4": "title=\"Conferma\"",
+						"behaviour": true,
+						"note": "Better: a question that names the action."
+					},
+					{
+						"name": "description",
+						"v4": "\"Sicuro di confermare l'operazione?\"",
+						"v5": "none",
+						"keepV4": "description=\"Sicuro di confermare l'operazione?\"",
+						"behaviour": true
+					},
+					{
+						"name": "closeOnConfirm",
+						"v4": "false (the app closed it)",
+						"v5": "true",
+						"keepV4": "closeOnConfirm={false}",
+						"behaviour": true,
+						"note": "The copy never closed on confirm. Remove it to let ConfirmDialog close by itself after `onconfirm`."
+					}
+				]
+			},
+			"events": {
+				"changed": [
+					{
+						"name": "on:confirm-click",
+						"to": "onconfirm",
+						"argument": {
+							"detail.nativeEvent": ""
+						},
+						"type": "MouseEvent",
+						"note": "Svelte 4 event directive of older app code."
+					},
+					{
+						"name": "on:cancel-click",
+						"to": "oncancel",
+						"argument": {
+							"detail.nativeEvent": ""
+						},
+						"type": "MouseEvent | KeyboardEvent",
+						"note": "Called on every way of closing without confirming (Cancel, close button, Escape, backdrop)."
+					}
+				]
+			}
+		},
+		{
+			"from": "local/ConfirmOrCancelButtons",
+			"to": "ConfirmOrCancelButtons",
+			"files": [
+				"ConfirmOrCancelButtons.svelte"
+			],
+			"summary": "The local `ConfirmOrCancelButtons` copy becomes the library component with the same name.",
+			"props": {
+				"renamed": [
+					{
+						"from": "onConfirmClick",
+						"to": "onconfirmClick"
+					},
+					{
+						"from": "onCancelClick",
+						"to": "oncancelClick"
+					},
+					{
+						"from": "confirm",
+						"to": "onconfirmClick",
+						"note": "It receives the native `MouseEvent` (the copies passed `{ nativeEvent }`)."
+					},
+					{
+						"from": "cancel",
+						"to": "oncancelClick",
+						"note": "It receives the native event (the copies passed `{ nativeEvent }`)."
+					},
+					{
+						"from": "columnDirection",
+						"to": "direction",
+						"note": "`column` keeps the buttons stacked at full width, confirm on top; `auto` stacks them only when their space is narrower than 480px."
+					}
+				],
+				"values": [
+					{
+						"name": "direction",
+						"values": {
+							"true": "column",
+							"false": "auto"
+						}
+					}
+				],
+				"toCssVar": [
+					{
+						"name": "marginTop",
+						"cssVar": "--confirm-or-cancel-buttons-margin-top",
+						"note": "No margin by default (v4: 20px), like every v5 component. `marginTop=\"x\"` → `--confirm-or-cancel-buttons-margin-top=\"x\"`; to keep the v4 space on every instance see `confirm-or-cancel-buttons-spacing`. Inside the `actionsSnippet` of a Dialog or a Drawer the margin is always 0."
+					}
+				]
+			},
+			"events": {
+				"changed": [
+					{
+						"name": "onconfirmClick",
+						"argument": {
+							"detail.nativeEvent": ""
+						},
+						"type": "MouseEvent"
+					},
+					{
+						"name": "oncancelClick",
+						"argument": {
+							"detail.nativeEvent": ""
+						},
+						"type": "MouseEvent | KeyboardEvent"
+					},
+					{
+						"name": "on:confirm-click",
+						"to": "onconfirmClick",
+						"argument": {
+							"detail.nativeEvent": ""
+						},
+						"type": "MouseEvent",
+						"note": "Svelte 4 event directive of older app code."
+					},
+					{
+						"name": "on:cancel-click",
+						"to": "oncancelClick",
+						"argument": {
+							"detail.nativeEvent": ""
+						},
+						"type": "MouseEvent | KeyboardEvent",
+						"note": "Svelte 4 event directive of older app code."
+					}
+				]
+			},
+			"snippets": {
+				"parameters": [
+					{
+						"name": "cancelButtonSnippet",
+						"v4": "{ loading, handleCancel, cancelText }",
+						"v5": "{ loading, handleCancel, cancelText, cancelDisable }",
+						"note": "`handleCancel(event)` still takes the native event and now does nothing while `cancelDisable`; disable the custom button with `cancelDisable`."
+					},
+					{
+						"name": "confirmButtonSnippet",
+						"v4": "{ loading, handleConfirm, confirmText, confirmDisable }",
+						"v5": "{ loading, handleConfirm, confirmText, confirmDisable }",
+						"note": "`handleConfirm` took Button's `{ detail: { nativeEvent } }` event; it takes the native `MouseEvent` now. `onclick={handleConfirm}` on a library Button keeps working; a call that wraps the event (`handleConfirm({ detail: { nativeEvent: e } })`) becomes `handleConfirm(e)`. It does nothing while `loading` or `confirmDisable`."
+					}
+				]
+			},
+			"manual": [
+				{
+					"id": "confirm-or-cancel-buttons-spacing",
+					"summary": "v4 put 20px of space above the buttons (215 of 231 uses relied on it); v5 has none, like every component, so forms built without `gap` would lose the space before their buttons.",
+					"action": "Add once to the global app CSS: `:root { --confirm-or-cancel-buttons-default-margin-top: 20px; }` (inside `@layer global.base` is not needed: unlayered app CSS wins). New forms laid out with `gap` should not use it.",
+					"scope": "app"
+				},
+				{
+					"id": "confirm-or-cancel-buttons-margin",
+					"summary": "The 20px top margin that v4 added by default is gone.",
+					"action": "Where the buttons sit under form fields and relied on that space, add it in the layout: `gap` on the parent, a margin on a wrapper, or `class={{ container: \"...\" }}` with `margin-top: 20px` in app CSS."
+				},
+				{
+					"id": "confirm-or-cancel-buttons-layout",
+					"summary": "The buttons stack (confirm on top, full width) when their own container is narrower than 480px, not when the viewport is under 769px. The root is a size container, so it shrinks to zero width inside a flex row with automatic width.",
+					"action": "If the component is a child of a `display: flex` row (a footer, a toolbar), give it a width: `class={{ container: \"...\" }}` with `flex: 1` or `width: 100%`, or wrap it in a block element. Check narrow drawers and dialogs on desktop, where the buttons now stack."
+				},
+				{
+					"id": "confirm-or-cancel-buttons-cancel-button",
+					"summary": "Cancel is a text Button (primary text color, focus ring, disabled look with `cancelDisable`) instead of an unstyled `<button>` that inherited the text color.",
+					"action": "App CSS that targeted the v4 internals (`.text-button`, `.link-button-container`, `.button-container`) no longer applies: use `class={{ cancel, confirm, actions, container }}` or `--button-*` on those classes.",
+					"scope": "app"
+				},
+				{
+					"id": "confirm-or-cancel-buttons-loading",
+					"summary": "While `loading` the confirm button is disabled and `onconfirmClick` is not called (v4 kept it clickable and called it).",
+					"action": "Check flows that expected a second click on the confirm button while loading.",
+					"when": {
+						"props": [
+							"loading"
+						]
+					}
+				}
+			]
+		},
+		{
+			"from": "local/ConfirmOrCancelDialog",
+			"to": "ConfirmDialog",
+			"files": [
+				"ConfirmOrCancelDialog.svelte"
+			],
+			"summary": "The local `ConfirmOrCancelDialog` copy becomes `ConfirmDialog` of the library.",
+			"props": {
+				"renamed": [
+					{
+						"from": "confirm",
+						"to": "onconfirm",
+						"note": "Called on confirm; a returned Promise shows the spinner until it settles."
+					},
+					{
+						"from": "cancel",
+						"to": "oncancel",
+						"note": "Called on every way of closing without confirming (Cancel, close button, Escape, backdrop); the copies called it only from Cancel."
+					},
+					{
+						"from": "disableConfirm",
+						"to": "confirmDisable"
+					},
+					{
+						"from": "confirmLabel",
+						"to": "confirmText"
+					},
+					{
+						"from": "cancelLabel",
+						"to": "cancelText"
+					},
+					{
+						"from": "confirmButtonStyle",
+						"to": "variant",
+						"note": "`danger` stays red; any other style becomes `primary`, whose button says \"Conferma\" unless `confirmText` is set."
+					},
+					{
+						"from": "confirmStyle",
+						"to": "variant",
+						"note": "`danger` stays red; any other style becomes `primary`, whose button says \"Conferma\" unless `confirmText` is set."
+					}
+				],
+				"values": [
+					{
+						"name": "variant",
+						"values": {
+							"danger": "danger",
+							"error": "danger",
+							"primary": "primary",
+							"secondary": "primary",
+							"static": "primary",
+							"default": "primary"
+						}
+					}
+				],
+				"bind": [
+					{
+						"name": "open",
+						"note": "With `open={x}` the app did not learn that Escape or the backdrop closed the dialog, so it could not open again."
+					}
+				],
+				"toCssVar": [
+					{
+						"name": "maxWidth",
+						"cssVar": "--confirm-dialog-max-width"
+					}
+				],
+				"removed": [
+					{
+						"name": "minWidth",
+						"note": "It had no visible effect.",
+						"drop": true
+					},
+					{
+						"name": "hideHeader",
+						"note": "It had no visible effect.",
+						"drop": true
+					},
+					{
+						"name": "cancelButtonStyle",
+						"note": "The Cancel button is always neutral: remove `cancelButtonStyle=\"secondary\"`; for another look use `actionsSnippet({ confirm, cancel, loading })`."
+					}
+				],
+				"defaults": [
+					{
+						"name": "closeOnConfirm",
+						"v4": "false (the app closed it)",
+						"v5": "true",
+						"keepV4": "closeOnConfirm={false}",
+						"behaviour": true,
+						"note": "The copies never closed on confirm, the app set `open = false`. Remove it, with the manual `loading` and `open = false`, to let ConfirmDialog close by itself after `onconfirm`."
+					},
+					{
+						"name": "title",
+						"v4": "'Sei sicuro?'",
+						"v5": "required",
+						"keepV4": "title=\"Sei sicuro?\"",
+						"behaviour": true,
+						"note": "Better: a question that names the thing, such as \"Eliminare Mario Rossi?\"."
+					}
+				]
+			},
+			"snippets": {
+				"removed": [
+					{
+						"name": "buttonSnippet",
+						"note": "Use `actionsSnippet({ confirm, cancel, loading })`: `confirm()` and `cancel()` run the same logic as the default buttons."
+					}
+				]
+			},
+			"manual": [
+				{
+					"id": "confirm-or-cancel-dialog-cancel",
+					"summary": "`oncancel` now runs on Escape, the close button and the backdrop too, not only on Cancel.",
+					"action": "Check cancel handlers that do more than closing (cleanup, refusing a pending request): they now run in those cases too. A handler that only sets `open = false` can be removed when `open` is bound.",
+					"when": {
+						"props": [
+							"cancel"
+						]
+					}
+				},
+				{
+					"id": "confirm-or-cancel-dialog-children",
+					"summary": "Content passed as children is shown under the description; in the copies it replaced it.",
+					"action": "Remove `description` where children are passed and the description was not visible."
+				}
+			]
+		},
+		{
+			"from": "local/Divider",
+			"to": "Divider",
+			"files": [
+				"Divider.svelte"
+			],
+			"contains": [
+				"weight"
+			],
+			"summary": "The local `Divider` copy becomes `Divider` of the library: its props become CSS variables.",
+			"props": {
+				"toCssVar": [
+					{
+						"name": "color",
+						"cssVar": "--divider-color",
+						"note": "v4 values are RGB triplets wrapped in `rgb(var(...))`: they keep working through `v4-compat.css`; a missing closing parenthesis is added."
+					},
+					{
+						"name": "weight",
+						"cssVar": "--divider-weight"
+					},
+					{
+						"name": "radius",
+						"cssVar": "--divider-radius"
+					},
+					{
+						"name": "marginTop",
+						"cssVar": "--divider-margin-top"
+					},
+					{
+						"name": "marginBottom",
+						"cssVar": "--divider-margin-bottom"
+					},
+					{
+						"name": "marginLeft",
+						"cssVar": "--divider-margin-left"
+					},
+					{
+						"name": "marginRight",
+						"cssVar": "--divider-margin-right"
+					}
+				]
+			},
+			"manual": [
+				{
+					"id": "divider-visible",
+					"summary": "In most copies the default color pointed to a CSS variable that no app defines, so a `<Divider />` without `color` drew an invisible 10px spacer; the library one draws a line.",
+					"action": "Where a Divider without `color` was meant only as space, replace it with a margin or `gap` in the layout (decided: they become lines)."
+				},
+				{
+					"id": "divider-side-inset",
+					"summary": "The copies had 5px side margins; the library line spans the whole width.",
+					"action": "Where the inset mattered, set `--divider-margin-left=\"5px\"` and `--divider-margin-right=\"5px\"`."
+				}
+			]
+		},
+		{
+			"from": "local/IndeterminateCheckbox",
+			"to": "Checkbox",
+			"files": [
+				"IndeterminateCheckbox.svelte"
+			],
+			"summary": "The local `IndeterminateCheckbox` copy becomes `Checkbox` of the library, which has `indeterminate`.",
+			"props": {
+				"renamed": [
+					{
+						"from": "onCheckedChange",
+						"to": "onchange",
+						"native": true,
+						"note": "The native change event: read `event.currentTarget.checked` instead of `e.checked`; a click on an indeterminate checkbox checks it and clears `indeterminate`, as before."
+					}
+				]
+			}
+		},
+		{
+			"from": "local/InfoBox",
+			"to": "AlertBanner",
+			"files": [
+				"InfoBox.svelte"
+			],
+			"contains": [
+				"message"
+			],
+			"summary": "The local `InfoBox` copy becomes `AlertBanner` of the library.",
+			"props": {
+				"renamed": [
+					{
+						"from": "type",
+						"to": "variant"
+					},
+					{
+						"from": "message",
+						"to": "description"
+					}
+				],
+				"removed": [
+					{
+						"name": "width",
+						"note": "Use `--alert-banner-width`."
+					}
+				]
+			},
+			"snippets": {
+				"renamed": [
+					{
+						"from": "messageSnippet",
+						"to": "descriptionSnippet"
+					},
+					{
+						"from": "alertBannerContentSnippet",
+						"to": "children",
+						"note": "Content under the title and the description; pass `title` and `description` as props."
+					}
+				]
+			},
+			"manual": [
+				{
+					"id": "info-box-look",
+					"summary": "The colored boxes of the copy (per type backgrounds and borders) become the Aurora banners of each variant.",
+					"action": "Nothing to do unless a page relied on the strong colors: `--alert-banner-background` and `--alert-banner-border-color` change them."
+				}
+			]
+		},
+		{
 			"from": "local/PageTitle",
 			"to": "PageHeader",
 			"files": [
@@ -17818,11 +18664,6 @@
 						"to": "actionsSnippet"
 					},
 					{
-						"from": "title",
-						"to": "titleSnippet",
-						"note": "It replaces only the title now: a `subtitle` passed with it is shown."
-					},
-					{
 						"from": "prependSnippet",
 						"to": "backSnippet",
 						"note": "It replaces the icon and the text inside the back control, which stays a link or a button. Content before the title (an avatar) goes in `prependSnippet`."
@@ -17846,11 +18687,7 @@
 					"action": "Remove `subtitle` where it was passed together with a title snippet and was not visible.",
 					"when": {
 						"snippets": [
-							"titleSnippet",
-							"title"
-						],
-						"props": [
-							"subtitle"
+							"titleSnippet"
 						]
 					}
 				},
@@ -17863,6 +18700,326 @@
 							"prependRoute"
 						]
 					}
+				}
+			]
+		},
+		{
+			"from": "local/Spinner",
+			"to": "CircularLoader",
+			"files": [
+				"Spinner.svelte"
+			],
+			"contains": [
+				"progress-spinner"
+			],
+			"summary": "The local `Spinner` copy becomes `CircularLoader` of the library.",
+			"manual": [
+				{
+					"id": "spinner-visible",
+					"summary": "The copy relied on Bootstrap Italia classes that the apps do not load, so it showed only the text \"Caricamento...\"; CircularLoader draws a spinning ring, announced as \"Caricamento\" with the Italian locale.",
+					"action": "Check the buttons and forms that show it while loading; `--circular-loader-size` changes its size."
+				}
+			]
+		},
+		{
+			"from": "local/ThemeSwitch",
+			"to": "ModeSwitch",
+			"files": [
+				"ThemeSwitch.svelte"
+			],
+			"summary": "The local `ThemeSwitch` copy becomes `ModeSwitch` of the library (light, system, dark).",
+			"props": {
+				"removed": [
+					{
+						"name": "value",
+						"note": "ModeSwitch shows the mode of the page by itself (the copies started \"off\" in dark mode when `value` was not passed).",
+						"drop": true
+					},
+					{
+						"name": "prefersDark",
+						"note": "\"System\" is a choice that stays available in ModeSwitch.",
+						"drop": true
+					},
+					{
+						"name": "themeSetted",
+						"note": "\"System\" is a choice that stays available in ModeSwitch.",
+						"drop": true
+					}
+				]
+			},
+			"manual": [
+				{
+					"id": "theme-switch-look",
+					"summary": "Three icons in a pill (light, system, dark) instead of a two-state switch: about 120px wide (100px with `size=\"sm\"`) against 40px.",
+					"action": "In a top bar use `size=\"sm\"`; at the bottom of a sidebar `tooltipPlacement=\"top\"`; to offer only light and dark, as the copy did, `system={false}`. The saved choice keeps the `theme` key of localStorage, so users keep it."
+				}
+			]
+		},
+		{
+			"from": "local/Toaster",
+			"to": "Toaster",
+			"files": [
+				"Toaster.svelte"
+			],
+			"contains": [
+				"createToaster"
+			],
+			"summary": "The local melt-ui `Toaster` copy becomes `Toaster` of the library, and the toast functions are imported from the library.",
+			"exports": [
+				{
+					"from": "addToast",
+					"to": "addToast"
+				},
+				{
+					"from": "addSuccessToast",
+					"to": "addSuccessToast"
+				},
+				{
+					"from": "addErrorToast",
+					"to": "addErrorToast"
+				},
+				{
+					"from": "addWarningToast",
+					"to": "addWarningToast"
+				},
+				{
+					"from": "addInfoToast",
+					"to": "addInfoToast"
+				},
+				{
+					"from": "removeToast",
+					"to": "removeToast"
+				}
+			],
+			"calls": {
+				"functions": [
+					"addToast",
+					"addSuccessToast",
+					"addErrorToast",
+					"addWarningToast",
+					"addInfoToast",
+					"removeToast"
+				],
+				"unwrap": "data",
+				"keys": [
+					{
+						"from": "closeDelay",
+						"to": "duration"
+					},
+					{
+						"from": "showLoading",
+						"to": "loading"
+					},
+					{
+						"from": "color",
+						"to": "variant"
+					},
+					{
+						"from": "action.handler",
+						"to": "action.onclick"
+					},
+					{
+						"from": "action.urlToPreload",
+						"to": "action.href"
+					}
+				],
+				"values": [
+					{
+						"key": "color",
+						"values": {
+							"#0CF574": "success",
+							"#FFC857": "warning",
+							"#0000ff": "info",
+							"info": "info",
+							"green": "success",
+							"blue": "info",
+							"gray": "info",
+							"": "info"
+						}
+					}
+				],
+				"drop": [
+					"action.usePreloadData"
+				],
+				"note": "The options go directly to the function: `duration` (ms, `0` keeps the toast open; default 5000) replaces `closeDelay`, `loading` replaces `showLoading`, `action.onclick` replaces `action.handler`, `action.href` replaces `action.urlToPreload`; the color comes from the function or `variant`."
+			},
+			"manual": [
+				{
+					"id": "toaster-id",
+					"summary": "The `add*` functions return the id of the toast, a number, instead of the melt-ui toast object.",
+					"action": "Replace `addXToast(...).id` with the returned value (`const id = addSuccessToast(...)`, then `removeToast(id)`), and types such as `ReturnType<typeof addSuccessToast>` or `Toast` from `@melt-ui/svelte` with `number`. A loading toast can also become the result with `updateToast(id, { variant: \"success\", title, loading: false })`."
+				},
+				{
+					"id": "toaster-delays",
+					"summary": "Each copy had its own delays (3000 ms by default, some ignored `closeDelay`, some turned `0` into 3000); the library uses `duration` as given, 5000 ms by default.",
+					"action": "Nothing to do unless a page relied on the old timing: toasts that passed `closeDelay` and were ignored now honour it."
+				},
+				{
+					"id": "toaster-mount",
+					"summary": "The Toaster must be mounted once, in the root layout, to show the toasts of every page.",
+					"action": "If the app mounts `<Toaster />` in a nested layout (for example `(main)/+layout.svelte`), move it to `src/routes/+layout.svelte`.",
+					"scope": "app"
+				}
+			]
+		},
+		{
+			"from": "local/ToolTipTextField",
+			"to": "SimpleTextField",
+			"files": [
+				"ToolTipTextField.svelte"
+			],
+			"summary": "The local `ToolTipTextField` copy becomes `SimpleTextField` of the library: the message moves from a tooltip on an icon to the text under the field.",
+			"props": {
+				"renamed": [
+					{
+						"from": "message",
+						"to": "hint",
+						"note": "The hint is always visible: write `hint={valid ? undefined : message}` where the message was only for an invalid value."
+					}
+				],
+				"removed": [
+					{
+						"name": "valid",
+						"note": "Use `state={valid ? undefined : \"error\"}`: the border, the icon and the hint turn red."
+					},
+					{
+						"name": "icon",
+						"note": "The error state shows its own icon; for another icon use `appendInnerIcon` (an `@mdi/js` path)."
+					},
+					{
+						"name": "iconColor",
+						"note": "The icon of the error state takes the error color.",
+						"drop": true
+					}
+				]
+			}
+		},
+		{
+			"from": "local/UserAvatar",
+			"to": "DescriptiveAvatar",
+			"files": [
+				"UserAvatar.svelte"
+			],
+			"contains": [
+				"username"
+			],
+			"summary": "The local `UserAvatar` copy becomes `DescriptiveAvatar` of the library.",
+			"props": {
+				"renamed": [
+					{
+						"from": "username",
+						"to": "title",
+						"note": "It also gives the initials and the color of the avatar."
+					},
+					{
+						"from": "description",
+						"to": "subtitle"
+					}
+				],
+				"inverted": [
+					{
+						"from": "showTitleAndDescription",
+						"to": "compact",
+						"note": "Only the avatar, with the name in a Tooltip; the initials are those of the first and last name."
+					}
+				],
+				"removed": [
+					{
+						"name": "cursor",
+						"note": "The pointer cursor and the hover come with `onclick` or `href`.",
+						"drop": true
+					},
+					{
+						"name": "solanaPublicKey",
+						"note": "Pass the extra line through `children`, which replaces the title and subtitle, or keep a small wrapper of DescriptiveAvatar in the app."
+					}
+				]
+			},
+			"events": {
+				"changed": [
+					{
+						"name": "on:click",
+						"to": "onclick",
+						"argument": {},
+						"type": "MouseEvent",
+						"note": "Svelte 4 event directive of older app code."
+					}
+				]
+			},
+			"manual": [
+				{
+					"id": "user-avatar-look",
+					"summary": "Avatar colors per person (from the name) and Aurora texts; one size, `--avatar-size`, instead of width and height.",
+					"action": "Check the user menu and the sidebar footer: `--avatar-width`/`--avatar-height` became `--avatar-size`; `--user-avatar-font-size` never had an effect and can be removed."
+				}
+			]
+		},
+		{
+			"from": "local/WidgetError",
+			"to": "AlertBanner",
+			"files": [
+				"WidgetError.svelte"
+			],
+			"summary": "The local `WidgetError` copy becomes an error `AlertBanner` of the library.",
+			"props": {
+				"defaults": [
+					{
+						"name": "variant",
+						"v4": "an error box",
+						"v5": "'info'",
+						"keepV4": "variant=\"error\"",
+						"behaviour": true
+					},
+					{
+						"name": "title",
+						"v4": "'Errore'",
+						"v5": "none",
+						"keepV4": "title=\"Errore\"",
+						"behaviour": true
+					},
+					{
+						"name": "description",
+						"v4": "'Si è verificato un problema durante il caricamento dei dati'",
+						"v5": "none",
+						"keepV4": "description=\"Si è verificato un problema durante il caricamento dei dati\"",
+						"behaviour": true
+					}
+				]
+			}
+		},
+		{
+			"from": "local/WidgetNoData",
+			"to": "NoData",
+			"files": [
+				"WidgetNoData.svelte"
+			],
+			"summary": "The local `WidgetNoData` copy becomes `NoData` of the library.",
+			"cssVars": {
+				"renamed": [
+					{
+						"from": "--title-font-size",
+						"to": "--no-data-title-font-size"
+					},
+					{
+						"from": "--description-font-size",
+						"to": "--no-data-description-font-size"
+					},
+					{
+						"from": "--title-margin-bottom",
+						"to": "--no-data-gap",
+						"note": "The space between all the parts (icon, title, description)."
+					},
+					{
+						"from": "--content-padding",
+						"to": "--no-data-padding"
+					}
+				]
+			},
+			"manual": [
+				{
+					"id": "widget-no-data-look",
+					"summary": "NoData has an icon above the title and the Aurora look; without `title` it shows the library default (\"Nessun dato\" in Italian).",
+					"action": "Pass `icon=\"\"` to hide the icon in a small widget; pass `title` where the default text of the copy (\"Nessun dato presente\") mattered."
 				}
 			]
 		},

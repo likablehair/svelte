@@ -377,3 +377,160 @@ describe('codemod: runs', () => {
 			}
 	});
 });
+
+describe('codemod: local copies', () => {
+	const pageTitle = svelte(
+		"\timport { Icon } from '@likable-hair/svelte';\n\tlet { title, prependVisible = false, prependRoute = undefined, appendSnippet } = $props();",
+		'<div>{#if prependVisible}<button><Icon name="mdi-arrow-left" /></button>{/if}<h1>{title}</h1>{@render appendSnippet?.()}</div>'
+	);
+
+	test('replaces a local copy with the library component, applies its rule and deletes the copy', () => {
+		const { result, read, dir } = run({
+			'src/lib/components/common/PageTitle.svelte': pageTitle,
+			'src/routes/+page.svelte': svelte(
+				"\timport PageTitle from '$lib/components/common/PageTitle.svelte';\n\timport { Button } from '@likable-hair/svelte';",
+				'<PageTitle title="Clients" prependVisible prependRoute="/settings" marginTop="10px">\n\t{#snippet appendSnippet()}<Button>New</Button>{/snippet}\n</PageTitle>'
+			),
+			'src/routes/b/+page.svelte': svelte(
+				"\timport Title from '../../lib/components/common/PageTitle.svelte';",
+				'<Title title="Other" titleSize="xs" />'
+			)
+		});
+		const page = read('src/routes/+page.svelte');
+		expect(page).toContain("\timport { Button, PageHeader } from '@likable-hair/svelte';\n</script>");
+		expect(page).not.toContain('PageTitle');
+		expect(page).toContain('<PageHeader title="Clients" back backHref="/settings" marginTop="10px">');
+		expect(page).toContain('{#snippet actionsSnippet()}');
+		expect(page).toContain('</PageHeader>');
+		expect(read('src/routes/b/+page.svelte')).toContain('<PageHeader title="Other" size="sm" />');
+		expect(result.deleted).toEqual(['src/lib/components/common/PageTitle.svelte']);
+		expect(result.locals).toEqual([
+			{ file: 'src/lib/components/common/PageTitle.svelte', from: 'local/PageTitle', to: 'PageHeader', usages: 2, deleted: true }
+		]);
+		expect(result.changes.filter((c) => c.kind === 'local-import').map((c) => c.file).sort()).toEqual([
+			'src/routes/+page.svelte',
+			'src/routes/b/+page.svelte'
+		]);
+		const again = codemod(dir, rules, { write: true });
+		expect(again.files).toEqual([]);
+	});
+
+	test('keeps the copy while a file still imports it, and moves mapped named imports to the library', () => {
+		const { result, read } = run({
+			'src/lib/components/common/PageTitle.svelte': pageTitle,
+			'src/lib/titles.ts': "import PageTitle from './components/common/PageTitle.svelte';\nexport const component = PageTitle;\n",
+			'src/routes/+page.svelte': svelte(
+				"\timport PageTitle, { helper } from '$lib/components/common/PageTitle.svelte';",
+				'<PageTitle title="Clients" />'
+			)
+		});
+		const page = read('src/routes/+page.svelte');
+		expect(page).toContain("import { PageHeader } from '@likable-hair/svelte';");
+		expect(page).toContain("import { helper } from '$lib/components/common/PageTitle.svelte';");
+		expect(result.skipped.find((s) => s.kind === 'local-export')?.name).toBe('helper');
+		expect(read('src/lib/titles.ts')).toContain("import { PageHeader } from '@likable-hair/svelte';\nexport const component = PageHeader;");
+		expect(result.deleted).toEqual([]);
+		expect(result.locals[0].deleted).toBe(false);
+	});
+
+	test('toast calls: imports from the library, options without data, keys renamed, colors mapped, also in .ts files', () => {
+		const toaster = "<script lang=\"ts\" module>\n\timport { createToaster } from '@melt-ui/svelte';\n\texport const addToast = () => {};\n\texport const addErrorToast = () => {};\n\texport const addSuccessToast = () => {};\n\texport const removeToast = () => {};\n</script>\n";
+		const { read, result } = run({
+			'src/lib/components/common/Toaster.svelte': toaster,
+			'src/routes/+layout.svelte': svelte("\timport Toaster from '$lib/components/common/Toaster.svelte';", '<Toaster />'),
+			'src/routes/+page.svelte': svelte(
+				"\timport { addErrorToast } from '$lib/components/common/Toaster.svelte';\n\tfunction fail() {\n\t\taddErrorToast({\n\t\t\tdata: {\n\t\t\t\ttitle: 'Failed',\n\t\t\t\tdescription: 'Retry',\n\t\t\t\tcloseDelay: 0,\n\t\t\t\tshowLoading: true\n\t\t\t}\n\t\t});\n\t}",
+				"<button onclick={() => addErrorToast({ data: { title: 'x', description: 'y' } })}>x</button>"
+			),
+			'src/lib/jobs.ts':
+				"import { addSuccessToast, addToast, removeToast } from '../lib/components/common/Toaster.svelte';\nexport function done() {\n\tconst t = addSuccessToast({ data: { title: 'Done', description: '', action: { label: 'Open', handler: () => {}, urlToPreload: '/x', usePreloadData: true } } });\n\taddToast({ data: { title: 'Info', description: '', color: '#0CF574' } });\n\taddToast({ data: { title: 'Odd', description: '', color: 'purple' } });\n\tremoveToast(t.id);\n}\n"
+		});
+		expect(read('src/routes/+layout.svelte')).toContain("import { Toaster } from '@likable-hair/svelte';");
+		const page = read('src/routes/+page.svelte');
+		expect(page).toContain("import { addErrorToast } from '@likable-hair/svelte';");
+		expect(page).toContain("\t\taddErrorToast({\n\t\t\ttitle: 'Failed',\n\t\t\tdescription: 'Retry',\n\t\t\tduration: 0,\n\t\t\tloading: true\n\t\t});");
+		expect(page).toContain("onclick={() => addErrorToast({ title: 'x', description: 'y' })}");
+		const jobs = read('src/lib/jobs.ts');
+		expect(jobs).toContain("import { addSuccessToast, addToast, removeToast } from '@likable-hair/svelte';");
+		expect(jobs).toContain("addSuccessToast({ title: 'Done', description: '', action: { label: 'Open', onclick: () => {}, href: '/x' } })");
+		expect(jobs).toContain('variant: "success"');
+		expect(jobs).toContain("color: 'purple'");
+		expect(result.skipped.find((s) => s.kind === 'call-value')?.name).toBe("color: 'purple'");
+		expect(result.deleted).toEqual(['src/lib/components/common/Toaster.svelte']);
+	});
+
+	test('item keys, members of ComponentProps types and exported types follow the rule', () => {
+		const boxMenu = "<script lang=\"ts\" module>\n\texport type BoxItem = { name: string; label: string; onClick?: () => void };\n</script>\n<script lang=\"ts\">\n\tlet { items = [] } = $props();\n</script>\n";
+		const { read } = run({
+			'src/lib/components/common/BoxMenu.svelte': boxMenu,
+			'src/routes/+page.svelte': svelte(
+				"\timport BoxMenu, { type BoxItem } from '$lib/components/common/BoxMenu.svelte';\n\timport type { ComponentProps } from 'svelte';\n\tlet extra: ComponentProps<typeof BoxMenu>['items'] = [];\n\tconst more: BoxItem[] = [{ name: 'b', label: 'B', onClick: () => {} }];\n\tlet admin = true;",
+				"<BoxMenu items={[{ name: 'a', label: 'A', onClick: () => {} }, ...(admin ? more : [])]} />"
+			)
+		});
+		const page = read('src/routes/+page.svelte');
+		expect(page).toContain("import { BoxList, type BoxListItem as BoxItem } from '@likable-hair/svelte';");
+		expect(page).toContain("ComponentProps<typeof BoxList>['boxes']");
+		expect(page).toContain("<BoxList boxes={[{ name: 'a', label: 'A', onclick: () => {} }, ...(admin ? more : [])]} />");
+		expect(page).toContain("const more: BoxItem[] = [{ name: 'b', label: 'B', onclick: () => {} }];");
+	});
+
+	test('one-way open becomes bind:open on a let, defaults are written, Svelte 4 events become callback props', () => {
+		const dialog = svelte("\tlet { open = $bindable(), title = 'Sei sicuro?', confirm, cancel } = $props();", '<div></div>');
+		const mufasa = svelte("\timport { createEventDispatcher } from 'svelte';\n\tconst dispatch = createEventDispatcher<{ 'confirm-click': {} }>();", '<div></div>');
+		const { read, result } = run({
+			'src/lib/components/common/ConfirmOrCancelDialog.svelte': dialog,
+			'src/lib/components/common/ConfirmDialog.svelte': mufasa,
+			'src/routes/+page.svelte': svelte(
+				"\timport ConfirmOrCancelDialog from '$lib/components/common/ConfirmOrCancelDialog.svelte';\n\timport ConfirmDialog from '$lib/components/common/ConfirmDialog.svelte';\n\tlet open = $state(false);\n\tconst fixed = false;\n\tfunction save() {}",
+				'<ConfirmOrCancelDialog open={open} confirm={save} />\n<ConfirmOrCancelDialog open={fixed} title="Delete?" />\n<ConfirmDialog bind:open on:confirm-click={save} on:cancel-click={() => (open = false)} />'
+			)
+		});
+		const page = read('src/routes/+page.svelte');
+		expect(page).toContain("import { ConfirmDialog } from '@likable-hair/svelte';");
+		expect(page).toContain('<ConfirmDialog bind:open onconfirm={save} closeOnConfirm={false} title="Sei sicuro?" />');
+		expect(page).toContain('<ConfirmDialog open={fixed} title="Delete?" closeOnConfirm={false} />');
+		expect(result.skipped.find((s) => s.kind === 'prop-bound')?.reason).toContain('bind:open');
+		expect(page).toContain('<ConfirmDialog bind:open onconfirm={save} oncancel={() => (open = false)} variant="primary"');
+		expect(result.deleted.sort()).toEqual(['src/lib/components/common/ConfirmDialog.svelte', 'src/lib/components/common/ConfirmOrCancelDialog.svelte']);
+	});
+
+	test('Divider props become CSS variables, with expressions and a missing parenthesis closed', () => {
+		const divider = svelte("\texport let color = '', weight = '1px', marginTop = '10px';", '<div style:height={weight}></div>');
+		const { read } = run({
+			'src/lib/components/common/Divider.svelte': divider,
+			'src/routes/+page.svelte': svelte(
+				"\timport Divider from '$lib/components/common/Divider.svelte';\n\tlet w = '2px';",
+				'<Divider color="rgb(var(--global-color-primary-500)" weight={w} marginTop="0px" />'
+			)
+		});
+		expect(read('src/routes/+page.svelte')).toContain(
+			'<Divider --divider-color="rgb(var(--global-color-primary-500))" --divider-weight={w} --divider-margin-top="0px" />'
+		);
+	});
+
+	test('the theme cookie leftovers: the endpoint goes when nothing calls it, the hooks replacement is reported', () => {
+		const themeSwitch = svelte("\tlet { value = false } = $props();\n\tfunction toggle() { fetch('/api/setTheme?dark=' + value); }", '<button onclick={toggle}>t</button>');
+		const { read, result } = run({
+			'src/app.html': '<html lang="it">\n<body>%sveltekit.body%</body>\n</html>\n',
+			'src/hooks.server.ts': "export const handle = async ({ event, resolve }) => resolve(event, { transformPageChunk: ({ html }) => html.replace('%theme%', event.cookies.get('theme') ?? '') });\n",
+			'src/routes/api/setTheme/+server.ts': "export const GET = async ({ cookies, url }) => { cookies.set('theme', url.searchParams.get('dark') == 'true' ? 'dark' : 'light', { path: '/' }); return new Response(); };\n",
+			'src/lib/components/common/ThemeSwitch.svelte': themeSwitch,
+			'src/routes/+page.svelte': svelte("\timport ThemeSwitch from '$lib/components/common/ThemeSwitch.svelte';", '<ThemeSwitch value={false} />')
+		});
+		expect(read('src/routes/+page.svelte')).toContain('<ModeSwitch />');
+		expect(result.deleted.sort()).toEqual(['src/lib/components/common/ThemeSwitch.svelte', 'src/routes/api/setTheme/+server.ts']);
+		expect(result.skipped.find((s) => s.id === 'local/ThemeSwitch/hooks')?.file).toBe('src/hooks.server.ts');
+	});
+
+	test('dead copies listed in the global rules go only when nothing imports them', () => {
+		const { result } = run({
+			'src/lib/components/common/Loader.svelte': '<div>loading</div>\n',
+			'src/lib/components/common/Subtitle.svelte': '<h2><slot /></h2>\n',
+			'src/routes/+page.svelte': svelte("\timport Subtitle from '$lib/components/common/Subtitle.svelte';", '<Subtitle>Hi</Subtitle>')
+		});
+		expect(result.deleted).toEqual(['src/lib/components/common/Loader.svelte']);
+		expect(result.changes.filter((c) => c.kind === 'dead-file').map((c) => c.name)).toEqual(['Loader.svelte']);
+	});
+});
+

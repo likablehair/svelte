@@ -179,8 +179,8 @@ export function readAliases(dir: string): [string, string][] {
 		const path = join(dir, name);
 		if (!existsSync(path)) continue;
 		const block = /alias\s*:\s*\{([^}]*)\}/.exec(readFileSync(path, 'utf8'))?.[1] ?? '';
-		for (const m of block.matchAll(/['"]?(\$?[\w@-]+)['"]?\s*:\s*['"]\.?\/?([^'"]+)['"]/g))
-			aliases.push([m[1], m[2].replace(/\/\*$/, '')]);
+		for (const m of block.matchAll(/['"]?(\$?[\w@-]+(?:\/\*)?)['"]?\s*:\s*['"]\.?\/?([^'"]+)['"]/g))
+			aliases.push([m[1].replace(/\/\*$/, ''), m[2].replace(/\/\*$/, '')]);
 	}
 	return aliases;
 }

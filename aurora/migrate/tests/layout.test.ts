@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { addDefaultLocale } from '../src/layout.ts';
+import { addAppearance, addDefaultLocale } from '../src/layout.ts';
 import { guessLanguage } from '../src/analyze.ts';
 
 describe('addDefaultLocale', () => {
@@ -33,3 +33,26 @@ describe('guessLanguage', () => {
 		expect(guessLanguage(['<Button>Save</Button><Button>Cancel</Button><h1>Users</h1>']).guess).toBe('en');
 	});
 });
+
+describe('addAppearance', () => {
+	test('adds the import, the call and the head script, once', () => {
+		const source = "<script lang=\"ts\">\n\timport { Toaster } from '@likable-hair/svelte';\n\timport '../app.css';\n\n\tlet { children } = $props();\n</script>\n\n<Toaster />\n{@render children()}\n";
+		const { text, changed } = addAppearance(source);
+		expect(changed).toBe(true);
+		expect(text).toBe(
+			"<script lang=\"ts\">\n\timport { Toaster, appearanceScript, rememberAppearance } from '@likable-hair/svelte';\n\timport '../app.css';\n\n\trememberAppearance();\n\n\tlet { children } = $props();\n</script>\n\n<svelte:head>{@html '<script>' + appearanceScript() + '</script>'}</svelte:head>\n\n<Toaster />\n{@render children()}\n"
+		);
+		expect(addAppearance(text).changed).toBe(false);
+	});
+
+	test('goes into an existing svelte:head, and works without a script', () => {
+		const withHead = addAppearance("<script>\n\timport x from './x';\n</script>\n\n<svelte:head><title>App</title></svelte:head>\n", false).text;
+		expect(withHead).toContain("<svelte:head>{@html '<script>' + appearanceScript() + '</script>'}<title>App</title></svelte:head>");
+		expect(withHead).toContain("import { appearanceScript, rememberAppearance } from '@likable-hair/svelte';");
+		const bare = addAppearance('<slot />\n', false).text;
+		expect(bare).toBe(
+			"<script>\n\timport { appearanceScript, rememberAppearance } from '@likable-hair/svelte';\n\n\trememberAppearance();\n</script>\n\n<svelte:head>{@html '<script>' + appearanceScript() + '</script>'}</svelte:head>\n\n<slot />\n"
+		);
+	});
+});
+

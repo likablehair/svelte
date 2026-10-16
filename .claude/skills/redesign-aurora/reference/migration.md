@@ -165,7 +165,7 @@ Da valutare quando si fa BoxList: `animateOnMount` di astro/maya (animazione d'i
 
 **Meccanismo del codemod** (da progettare): regole per componenti **locali** (abbinati per nome del file, con le varianti delle copie: callback Svelte 4, `{ detail }`, prop rinominate), nello stesso formato delle regole dei componenti dove si può; `setup` toglie `/api/setTheme`, `%theme%` e la sostituzione in `hooks.server.ts`.
 
-**Ordine**: (1) commit; (2) PageHeader (fatto il 2026-10-16), ConfirmDialog (fatto il 2026-10-16), ModeSwitch (fatto il 2026-10-16); (3) funzioni 1–6 (fatte il 2026-10-16, dettagli in `history.md`; `revealable` è opt-in, P231); (4) regole e codemod dei componenti locali, gruppo A compreso; (5) prova a mano su tatum con `next` (tatum ha PageTitle, ConfirmOrCancelButtons, ConfirmOrCancelDialog, ThemeSwitch, Toaster, BoxMenu, UserAvatar).
+**Ordine**: (1) commit; (2) PageHeader (fatto il 2026-10-16), ConfirmDialog (fatto il 2026-10-16), ModeSwitch (fatto il 2026-10-16); (3) funzioni 1–6 (fatte il 2026-10-16, dettagli in `history.md`; `revealable` è opt-in, P231); (4) regole e codemod: motore e 19 regole fatti il 2026-10-16 (`history.md`), mancano RadioGroup/RadioButton, MeltDatePicker, grafici e il gruppo B; (4) regole e codemod dei componenti locali, gruppo A compreso; (5) prova a mano su tatum con `next` (tatum ha PageTitle, ConfirmOrCancelButtons, ConfirmOrCancelDialog, ThemeSwitch, Toaster, BoxMenu, UserAvatar).
 
 ### ModeSwitch: come le app cambiano tema oggi (analisi del 2026-10-16, subagente)
 

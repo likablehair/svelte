@@ -4,7 +4,7 @@ import { basename, join, relative, resolve } from 'node:path';
 import type { Analysis } from './analyze.ts';
 import { addV4Compat, findAppCss, prepareAppCss, useLibraryFonts } from './css.ts';
 import { listFiles } from './files.ts';
-import { addDefaultLocale } from './layout.ts';
+import { addAppearance, addDefaultLocale } from './layout.ts';
 
 const LIB = '@likable-hair/svelte';
 const MDI = ['@mdi/js', '^7.4.47'] as const;
@@ -152,24 +152,38 @@ export function setHtmlLang(html: string, locale: string): string {
 	return html.slice(0, tag.index) + updated + html.slice(tag.index + tag[0].length);
 }
 
-export function themeClassToMode(html: string): string {
+export function dropThemePlaceholder(html: string): string {
 	const tag = /<html\b[^>]*>/.exec(html);
-	if (!tag || /\bdata-mode=/.test(tag[0])) return html;
-	const cls = /\sclass=(["'])([^"']*%theme%[^"']*)\1/.exec(tag[0]);
-	if (!cls) return html;
-	const rest = cls[2].replace('%theme%', '').trim().replace(/\s+/g, ' ');
-	const updated = tag[0].replace(cls[0], `${rest ? ` class="${rest}"` : ''} data-mode="%theme%"`);
+	if (!tag || !tag[0].includes('%theme%')) return html;
+	let updated = tag[0].replace(/\s+data-mode=(["'])%theme%\1/, '');
+	const cls = /\sclass=(["'])([^"']*)\1/.exec(updated);
+	if (cls && cls[2].includes('%theme%')) {
+		const rest = cls[2].replace('%theme%', '').trim().replace(/\s+/g, ' ');
+		updated = updated.replace(cls[0], rest ? ` class="${rest}"` : '');
+	}
 	return html.slice(0, tag.index) + updated + html.slice(tag.index + tag[0].length);
 }
 
-export function updateHtmlMode(dir: string): string[] {
-	const path = join(dir, 'src/app.html');
-	if (!existsSync(path)) return [];
-	const html = readFileSync(path, 'utf8');
-	const text = themeClassToMode(html);
-	if (text === html) return [];
-	writeFileSync(path, text);
-	return ['src/app.html: the server writes the saved mode as data-mode="%theme%" (v5 reads data-mode, not the .dark class)'];
+export function updateAppearance(dir: string): string[] {
+	const changes: string[] = [];
+	const htmlPath = join(dir, 'src/app.html');
+	if (existsSync(htmlPath)) {
+		const html = readFileSync(htmlPath, 'utf8');
+		const text = dropThemePlaceholder(html);
+		if (text !== html) {
+			writeFileSync(htmlPath, text);
+			changes.push('src/app.html: removed %theme% from <html> (the saved mode is applied by appearanceScript in the root layout)');
+		}
+	}
+	const rel = 'src/routes/+layout.svelte';
+	const layout = join(dir, rel);
+	if (!existsSync(layout)) return [...changes, `${rel} is missing: create it, call rememberAppearance() and put appearanceScript() in <svelte:head>`];
+	const result = addAppearance(readFileSync(layout, 'utf8'), existsSync(join(dir, 'tsconfig.json')));
+	if (result.changed) {
+		writeFileSync(layout, result.text);
+		changes.push(`${rel}: rememberAppearance() and appearanceScript() (the light/dark choice is kept in localStorage, key "theme" as in v4, and applied before the first paint)`);
+	}
+	return changes;
 }
 
 export function updateHtmlLang(dir: string, locale: string): string[] {
@@ -193,7 +207,7 @@ export function setup(dir: string, analysis: Analysis, options: SetupOptions): S
 	changes.push(...updateAppCss(dir, options.layers, analysis.tokens.uses + analysis.tokens.overrides > 0));
 	const locale = appLocale(analysis, options.locale);
 	if (locale) changes.push(...updateRootLayout(dir, locale), ...updateHtmlLang(dir, locale));
-	changes.push(...updateHtmlMode(dir));
+	changes.push(...updateAppearance(dir));
 	let install: string | undefined;
 	if (options.install && installNeeded) {
 		install = `${installCommand(analysis.app.packageManager)} install`;

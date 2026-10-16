@@ -447,5 +447,23 @@ export default {
 			action: 'Check first paint on mobile for layouts that depended on the v4 server default.',
 			scope: 'app'
 		}
+	],
+	deadFiles: [
+		'Loader.svelte',
+		'NotAuthorized.svelte',
+		'SideCreator.svelte',
+		'JobHeader.svelte',
+		'HeaderMenu.svelte',
+		'Tooltip.svelte',
+		'HeadersSelectorDrawer.svelte',
+		'AlertBanner.svelte',
+		'InfiniteTable.svelte',
+		'LocalFilterEditor.svelte',
+		'Subtitle.svelte',
+		'ButtonGroup.svelte',
+		'OptionSelector.svelte',
+		'OptionMenu.svelte',
+		'DateRangePicker.svelte',
+		'LinkButton.svelte'
 	]
 } satisfies GlobalMigration;

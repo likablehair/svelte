@@ -304,6 +304,19 @@ export function codemodReport(r: CodemodResult): string {
 			out.push('');
 		}
 	}
+	if (r.locals.length) {
+		out.push(
+			'## Local copies',
+			'',
+			'Each use of a local copy of a component that the library now has becomes the library component; the copy is deleted when no file imports it any more.',
+			'',
+			table(
+				['copy', 'component', 'uses', 'file'],
+				r.locals.map((l) => [l.file, l.to, l.usages, l.deleted ? 'deleted' : 'kept: still imported'])
+			),
+			''
+		);
+	}
 	const kinds = new Map<string, number>();
 	for (const c of r.changes) kinds.set(c.kind, (kinds.get(c.kind) ?? 0) + 1);
 	out.push('## Changes by kind', '', table(['kind', 'count'], [...kinds].sort((a, b) => b[1] - a[1])), '');

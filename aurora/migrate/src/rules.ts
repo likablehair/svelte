@@ -27,9 +27,9 @@ export const isLocalRule = (rule: ComponentMigration): rule is LocalMigration =>
 	rule.from.startsWith(LOCAL_PREFIX) && 'files' in rule;
 
 export function localRuleFor(index: RuleIndex, path: string, text: string | undefined): LocalMigration | undefined {
-	return index.localFiles
-		.get(basename(path))
-		?.find((rule) => text !== undefined && (rule.contains ?? []).every((needle) => text.includes(needle)));
+	return [...(index.localFiles.get(basename(path)) ?? [])]
+		.sort((a, b) => (b.contains?.length ?? 0) - (a.contains?.length ?? 0))
+		.find((rule) => text !== undefined && (rule.contains ?? []).every((needle) => text.includes(needle)) && !(rule.excludes ?? []).some((needle) => text.includes(needle)));
 }
 
 export function indexRules(rules: CompiledRules): RuleIndex {
