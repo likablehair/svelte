@@ -134,6 +134,16 @@ function nameProblems(rule: ComponentMigration, local = false): string[] {
 	for (const r of cssVars?.removed ?? []) {
 		mustNotExist('removed CSS variable', v5.publicCssVars, r.name);
 	}
+
+	for (const step of rule.manual ?? []) {
+		const unless = step.unless;
+		if (!unless) continue;
+		for (const name of unless.props ?? [])
+			if (!(v5.forwardsNative && /^aria-[a-z]+$/.test(name))) mustExist(`prop of ${step.id} unless`, v5.props, name);
+		for (const name of unless.events ?? []) mustExist(`event of ${step.id} unless`, v5.events, name);
+		for (const name of unless.snippets ?? []) mustExist(`snippet of ${step.id} unless`, v5.snippets, name);
+		for (const name of unless.cssVars ?? []) mustExist(`CSS variable of ${step.id} unless`, v5.cssVars, name);
+	}
 	return problems;
 }
 

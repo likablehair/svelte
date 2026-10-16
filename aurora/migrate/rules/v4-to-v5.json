@@ -12028,7 +12028,12 @@
 					"id": "dashboard-shaper-editing",
 					"kind": "edit",
 					"summary": "A DashboardShaper is read-only unless `editing` is set; while editing, widgets can also be moved and resized (v4: only added and removed).",
-					"action": "On the pages that create or edit a dashboard add `editing` (replacing `canAdd`, `canDelete` and similar app props). The layout is saved as before (`left`, `top`, `width`, `height`); to keep exactly the v4 behaviour pass `movable={false} resizable={false}`. Remove delete overlays drawn in `widgetCellSnippet`: the dashboard shows its own remove button while editing."
+					"action": "On the pages that create or edit a dashboard add `editing` (replacing `canAdd`, `canDelete` and similar app props). The layout is saved as before (`left`, `top`, `width`, `height`); to keep exactly the v4 behaviour pass `movable={false} resizable={false}`. Remove delete overlays drawn in `widgetCellSnippet`: the dashboard shows its own remove button while editing.",
+					"unless": {
+						"props": [
+							"editing"
+						]
+					}
 				},
 				{
 					"id": "dashboard-shaper-catalog",
@@ -13364,7 +13369,23 @@
 					"id": "dialog-accessible-name",
 					"kind": "edit",
 					"summary": "The dialog is a real `<dialog>` with `role=\"dialog\"` and focus management; it needs an accessible name (v4 had no ARIA).",
-					"action": "Pass `title` (shown in the header and used as the name) or `aria-label` / `aria-labelledby` when the content has its own heading. Remove app code that focused the first field after opening (often with `setTimeout`): the first focusable element, or the one with `autofocus`, gets the focus, and the focus goes back to the opener on close."
+					"action": "Pass `title` (shown in the header and used as the name) or `aria-label` / `aria-labelledby` when the content has its own heading.",
+					"unless": {
+						"props": [
+							"title",
+							"aria-label",
+							"aria-labelledby"
+						],
+						"snippets": [
+							"titleSnippet"
+						]
+					}
+				},
+				{
+					"id": "dialog-initial-focus",
+					"kind": "review",
+					"summary": "When the dialog opens, the first focusable element (or the one with `autofocus`) gets the focus, and the focus goes back to the opener on close.",
+					"action": "Remove app code that focused the first field after opening (often with `setTimeout`)."
 				},
 				{
 					"id": "dialog-side-snippets",
@@ -17224,7 +17245,12 @@
 					"id": "flag-icon-title",
 					"kind": "review",
 					"summary": "Without `title` the flag is `aria-hidden`.",
-					"action": "Where the flag is the only thing that tells the country (no name next to it), pass `title` with the country name, for example `countryName(code, locale)`."
+					"action": "Where the flag is the only thing that tells the country (no name next to it), pass `title` with the country name, for example `countryName(code, locale)`.",
+					"unless": {
+						"props": [
+							"title"
+						]
+					}
 				},
 				{
 					"id": "flag-icon-classes",
@@ -22639,7 +22665,14 @@
 					"id": "progress-bar-accessible-name",
 					"kind": "edit",
 					"summary": "The root is a `role=\"progressbar\"` with `aria-valuenow`, `aria-valuemin` and `aria-valuemax`; v4 had no role, so it needs an accessible name now.",
-					"action": "Pass `label` (a visible text above the bar, which also names it) or `aria-label`; when a visible text next to the bar already describes it, point `aria-labelledby` at it."
+					"action": "Pass `label` (a visible text above the bar, which also names it) or `aria-label`; when a visible text next to the bar already describes it, point `aria-labelledby` at it.",
+					"unless": {
+						"props": [
+							"label",
+							"aria-label",
+							"aria-labelledby"
+						]
+					}
 				},
 				{
 					"id": "progress-bar-tooltip",
@@ -24820,7 +24853,17 @@
 					"id": "switch-label",
 					"kind": "edit",
 					"summary": "`label` (or `labelSnippet`) renders the text inside the root label: a click on it toggles the switch and screen readers read it as its name.",
-					"action": "Move text placed next to the v4 switch (a sibling span, a wrapping element) into `label`; a switch without visible text needs `aria-label`."
+					"action": "Move text placed next to the v4 switch (a sibling span, a wrapping element) into `label`; a switch without visible text needs `aria-label`.",
+					"unless": {
+						"props": [
+							"label",
+							"aria-label",
+							"aria-labelledby"
+						],
+						"snippets": [
+							"labelSnippet"
+						]
+					}
 				},
 				{
 					"id": "switch-look",

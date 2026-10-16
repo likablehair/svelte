@@ -4,12 +4,12 @@ import { tmpdir } from 'node:os';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { parse } from 'svelte/compiler';
 import { analyze, readAliases, scriptImports, type AppStep, type GeneralStep, type Wrapper } from './analyze.ts';
-import { todoOf, type Todo } from './match.ts';
+import { todoOf, unlessMet, type Todo } from './match.ts';
 import { codemod } from './codemod.ts';
 import { RECIPES } from './dissolve.ts';
 import { Lines, listFiles } from './files.ts';
 import type { RuleIndex } from './rules.ts';
-import { scanSvelte, walk, type ImportRecord, type Node } from './svelte.ts';
+import { scanSvelte, walk, type ComponentNode, type ImportRecord, type Node, type SvelteFile } from './svelte.ts';
 import type { ComponentMigration } from './types.ts';
 
 import { LOCAL_PREFIX } from './compile.ts';
@@ -569,9 +569,29 @@ function reviewFromBase(env: Env, snapshot: string, current: (rel: string) => st
 	const v5Name = (v4?: string) =>
 		!v4 ? undefined : (env.index.byV4.get(v4)?.to ?? (env.index.rules.v5.components[v4] || env.index.v4Components.has(v4) ? v4 : undefined));
 	const owner = (id: string) => targets.get(id) ?? v5Name(id.split('/').slice(0, id.startsWith(LOCAL_PREFIX) ? 2 : 1).join('/'));
+	const scans = new Map<string, { scan: SvelteFile; lines: Lines } | undefined>();
+	const currentUsage = (rel: string, line: number, tags: string[]): ComponentNode | undefined => {
+		if (!scans.has(rel)) {
+			const text = rel.endsWith('.svelte') ? current(rel) : undefined;
+			scans.set(rel, text === undefined ? undefined : { scan: scanSvelte(text), lines: new Lines(text) });
+		}
+		const found = scans.get(rel);
+		if (!found) return undefined;
+		const names = new Set([...tags, ...found.scan.imports.filter((i) => tags.includes(i.imported)).map((i) => i.local)]);
+		return found.scan.components
+			.filter((c) => names.has(c.tag) && c.line <= line && found.lines.at(c.end) >= line)
+			.sort((a, b) => b.start - a.start)[0];
+	};
 	for (const f of analysis.findings) {
 		if (f.effort !== 'manual') continue;
-		const step = f.kind === 'manual' ? env.index.byV4.get(f.component ?? '')?.manual?.find((s) => s.id === f.id) : undefined;
+		const rule = env.index.byV4.get(f.component ?? '');
+		const step = f.kind === 'manual' ? rule?.manual?.find((s) => s.id === f.id) : undefined;
+		if (step?.unless) {
+			const mapped = mapLine(f.file, f.line);
+			const tags = [f.component, v5Name(f.component)].filter((t): t is string => !!t);
+			const usage = mapped === undefined ? undefined : currentUsage(f.file, mapped, tags);
+			if (usage && unlessMet(step.unless, usage, rule)) continue;
+		}
 		add(
 			{
 				file: f.file,
@@ -601,7 +621,13 @@ function reviewFromBase(env: Env, snapshot: string, current: (rel: string) => st
 	return {
 		review,
 		baseComponents,
-		general: analysis.general.map((g) => ({ ...g, component: v5Name(g.component) ?? g.component })),
+		general: analysis.general.flatMap((g) => {
+			const byFile = Object.fromEntries(Object.entries(g.byFile).filter(([file]) => current(file) !== undefined));
+			const files = Object.keys(byFile).length;
+			if (!files) return [];
+			const usages = Object.values(byFile).reduce((sum, n) => sum + n, 0);
+			return [{ ...g, component: v5Name(g.component) ?? g.component, usages, files, byFile }];
+		}),
 		appSteps: analysis.appSteps.filter((step) => step.needed !== false),
 		dropped: result.wrappers.filter((w) => w.dissolved && w.dropped.length).map((w) => ({ wrapper: w.file, target: w.target, dropped: w.dropped }))
 	};

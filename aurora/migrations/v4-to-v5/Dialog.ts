@@ -98,7 +98,15 @@ export default {
 			summary:
 				'The dialog is a real `<dialog>` with `role="dialog"` and focus management; it needs an accessible name (v4 had no ARIA).',
 			action:
-				'Pass `title` (shown in the header and used as the name) or `aria-label` / `aria-labelledby` when the content has its own heading. Remove app code that focused the first field after opening (often with `setTimeout`): the first focusable element, or the one with `autofocus`, gets the focus, and the focus goes back to the opener on close.'
+				'Pass `title` (shown in the header and used as the name) or `aria-label` / `aria-labelledby` when the content has its own heading.',
+			unless: { props: ['title', 'aria-label', 'aria-labelledby'], snippets: ['titleSnippet'] }
+		},
+		{
+			id: 'dialog-initial-focus',
+			kind: 'review',
+			summary:
+				'When the dialog opens, the first focusable element (or the one with `autofocus`) gets the focus, and the focus goes back to the opener on close.',
+			action: 'Remove app code that focused the first field after opening (often with `setTimeout`).'
 		},
 		{
 			id: 'dialog-side-snippets',

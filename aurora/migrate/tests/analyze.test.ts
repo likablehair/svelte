@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, test } from 'vitest';
 import { analyze } from '../src/analyze.ts';
-import { literalStrings } from '../src/match.ts';
+import { literalStrings, matchUsage, unlessMet, type Usage } from '../src/match.ts';
 import { markdownReport, summaryTable } from '../src/report.ts';
 import { loadRules } from '../src/rules.ts';
 
@@ -200,3 +200,38 @@ describe('analyze: local copies', () => {
 	});
 });
 
+describe('analyze: manual steps with unless', () => {
+	const usage = (component: string, props: string[]): Usage => ({
+		component,
+		file: 'src/routes/+page.svelte',
+		line: 1,
+		attrs: props.map((name) => ({ kind: 'prop' as const, name, source: name, line: 1, start: 0, end: 0 })),
+		snippets: [],
+		slots: [],
+		children: false,
+		defaults: true
+	});
+	const match = (component: string, props: string[]) => {
+		const rule = index.byV4.get(component)!;
+		return matchUsage(usage(component, props), rule, index.rules.v5.components[rule.to]);
+	};
+
+	test('a step does not show on a usage that already has one of its unless props', () => {
+		expect(match('Dialog', []).findings.map((f) => f.id)).toContain('dialog-accessible-name');
+		expect(match('Dialog', ['aria-label']).findings.map((f) => f.id)).not.toContain('dialog-accessible-name');
+		expect(match('Dialog', ['aria-label']).general.map((s) => s.id)).toContain('dialog-initial-focus');
+	});
+
+	test('a v4 prop renamed to an unless prop counts', () => {
+		const rule = { from: 'Old', to: 'New', props: { renamed: [{ from: 'caption', to: 'title' }] } };
+		expect(unlessMet({ props: ['title'] }, usage('Old', ['caption']), rule)).toBe('caption');
+		expect(unlessMet({ props: ['title'] }, usage('Old', ['subtitle']), rule)).toBeUndefined();
+	});
+
+	test('a review step with unless is listed per usage, not once for the component', () => {
+		const result = match('FlagIcon', []);
+		expect(result.findings.find((f) => f.id === 'flag-icon-title')).toMatchObject({ todo: 'review', file: 'src/routes/+page.svelte' });
+		expect(result.general.map((s) => s.id)).not.toContain('flag-icon-title');
+		expect(match('FlagIcon', ['title']).findings.map((f) => f.id)).not.toContain('flag-icon-title');
+	});
+});

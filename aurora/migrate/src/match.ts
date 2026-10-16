@@ -1,6 +1,6 @@
 import type { Attr, Node } from './svelte.ts';
 import { walk } from './svelte.ts';
-import type { ComponentApi, ComponentMigration, ManualStep } from './types.ts';
+import type { ComponentApi, ComponentMigration, ManualStep, ManualTrigger, Rename } from './types.ts';
 
 export type Effort = 'auto' | 'check' | 'manual';
 export type Todo = ManualStep['kind'];
@@ -63,6 +63,29 @@ export function literalStrings(expression: Node | undefined): { strings: string[
 	};
 	const pure = leaf(expression);
 	return { strings, pure };
+}
+
+export function unlessMet(
+	trigger: ManualTrigger | undefined,
+	usage: Pick<Usage, 'attrs' | 'snippets' | 'slots' | 'children'>,
+	rule?: ComponentMigration
+): string | undefined {
+	if (!trigger) return undefined;
+	const withV4 = (names: string[] | undefined, renamed: Rename[] | undefined) =>
+		(names ?? []).flatMap((n) => [n, ...(renamed ?? []).filter((r) => r.to === n).map((r) => r.from)]);
+	const has = (kinds: Attr['kind'][], name: string) => usage.attrs.some((a) => kinds.includes(a.kind) && a.name === name);
+	return (
+		withV4(trigger.props, rule?.props?.renamed).find((n) => has(['prop', 'bind'], n)) ??
+		trigger.events?.find((n) => has(['event', 'on'], n)) ??
+		withV4(trigger.snippets, rule?.snippets?.renamed).find(
+			(n) =>
+				usage.snippets.includes(n) ||
+				usage.slots.includes(n.replace(/Snippet$/, '')) ||
+				has(['prop'], n) ||
+				(n === 'children' && usage.children)
+		) ??
+		withV4(trigger.cssVars, rule?.cssVars?.renamed).find((n) => has(['style'], n))
+	);
 }
 
 export function matchUsage(
@@ -246,7 +269,8 @@ export function matchUsage(
 		}
 		const when = step.when;
 		if (!when && !usage.defaults) continue;
-		if (!when && step.kind === 'review') {
+		if (unlessMet(step.unless, usage, rule)) continue;
+		if (!when && step.kind === 'review' && !step.unless) {
 			general.push(step);
 			continue;
 		}

@@ -61,7 +61,8 @@ export default {
 			summary:
 				'The root is a `role="progressbar"` with `aria-valuenow`, `aria-valuemin` and `aria-valuemax`; v4 had no role, so it needs an accessible name now.',
 			action:
-				'Pass `label` (a visible text above the bar, which also names it) or `aria-label`; when a visible text next to the bar already describes it, point `aria-labelledby` at it.'
+				'Pass `label` (a visible text above the bar, which also names it) or `aria-label`; when a visible text next to the bar already describes it, point `aria-labelledby` at it.',
+			unless: { props: ['label', 'aria-label', 'aria-labelledby'] }
 		},
 		{
 			id: 'progress-bar-tooltip',

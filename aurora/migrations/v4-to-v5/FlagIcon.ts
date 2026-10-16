@@ -37,7 +37,8 @@ export default {
 			kind: 'review',
 			summary: 'Without `title` the flag is `aria-hidden`.',
 			action:
-				'Where the flag is the only thing that tells the country (no name next to it), pass `title` with the country name, for example `countryName(code, locale)`.'
+				'Where the flag is the only thing that tells the country (no name next to it), pass `title` with the country name, for example `countryName(code, locale)`.',
+			unless: { props: ['title'] }
 		},
 		{
 			id: 'flag-icon-classes',

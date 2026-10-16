@@ -142,6 +142,7 @@ export interface ManualStep {
 	summary: string;
 	action: string;
 	when?: ManualTrigger;
+	unless?: ManualTrigger;
 	scope?: 'usage' | 'app';
 	automatic?: true;
 }

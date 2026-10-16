@@ -236,3 +236,37 @@ describe('remaining: an app after the codemod', () => {
 		expect(result.files.some((f) => f.review.length)).toBe(true);
 	});
 });
+
+describe('remaining: steps with unless', () => {
+	test('a point leaves next once the usage has one of its unless props', () => {
+		const page = svelte(
+			"\timport { Dialog } from '@likable-hair/svelte'\n\tlet a = $state(false), b = $state(false)",
+			'<Dialog bind:open={a}>\n\t<p>Edit</p>\n</Dialog>\n<Dialog bind:open={b}>\n\t<p>Delete</p>\n</Dialog>'
+		);
+		const { dir, read } = app({ 'src/routes/+page.svelte': page });
+		prepareBranch(dir, 'aurora-v5');
+		codemod(dir, rules, { write: true });
+		const points = () =>
+			remaining(dir, rules, { check: () => ({ ran: true, diagnostics: [] }) })
+				.files.flatMap((f) => f.review)
+				.filter((p) => p.id === 'dialog-accessible-name');
+		const current = read('src/routes/+page.svelte');
+		const second = current.split('\n').findIndex((line) => line.includes('bind:open={b}')) + 1;
+		expect(points()[0].lines).toHaveLength(2);
+		writeFileSync(join(dir, 'src/routes/+page.svelte'), current.replace('<Dialog bind:open={a}>', '<Dialog bind:open={a} title="Edit">'));
+		expect(points()[0].lines).toEqual([second]);
+	});
+
+	test('a step for every use leaves out the files deleted since the v4 code', () => {
+		const dialog = svelte("\timport { Dialog } from '@likable-hair/svelte'\n\tlet open = $state(false)", '<Dialog bind:open title="Edit"><p>Edit</p></Dialog>');
+		const { dir } = app({ 'src/lib/components/OldDialog.svelte': dialog, 'src/routes/+page.svelte': dialog });
+		prepareBranch(dir, 'aurora-v5');
+		codemod(dir, rules, { write: true });
+		const focus = () => remaining(dir, rules, { check: () => ({ ran: true, diagnostics: [] }) }).general.find((g) => g.id === 'dialog-initial-focus');
+		expect(focus()).toMatchObject({ usages: 2, files: 2 });
+		rmSync(join(dir, 'src/lib/components/OldDialog.svelte'));
+		expect(focus()).toMatchObject({ usages: 1, files: 1, byFile: { 'src/routes/+page.svelte': 1 } });
+		rmSync(join(dir, 'src/routes/+page.svelte'));
+		expect(focus()).toBeUndefined();
+	});
+});

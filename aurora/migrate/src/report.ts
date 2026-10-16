@@ -599,7 +599,7 @@ export function nextReport(r: Remaining, file?: string): string {
 			'',
 			'## To write',
 			'',
-			'The tool reads these from the v4 code, so it cannot tell when one is done: they stay listed. Go through them once.',
+			'The tool reads these from the v4 code, so most stay listed after they are done: go through them once. A point that a prop settles (a name, a label) leaves as soon as the use has that prop.',
 			''
 		);
 		for (const f of edits) out.push(`### ${f.file}`, '', ...reviewMarkdown(toWrite(f)), '');

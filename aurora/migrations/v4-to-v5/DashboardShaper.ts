@@ -144,7 +144,8 @@ export default {
 			summary:
 				'A DashboardShaper is read-only unless `editing` is set; while editing, widgets can also be moved and resized (v4: only added and removed).',
 			action:
-				'On the pages that create or edit a dashboard add `editing` (replacing `canAdd`, `canDelete` and similar app props). The layout is saved as before (`left`, `top`, `width`, `height`); to keep exactly the v4 behaviour pass `movable={false} resizable={false}`. Remove delete overlays drawn in `widgetCellSnippet`: the dashboard shows its own remove button while editing.'
+				'On the pages that create or edit a dashboard add `editing` (replacing `canAdd`, `canDelete` and similar app props). The layout is saved as before (`left`, `top`, `width`, `height`); to keep exactly the v4 behaviour pass `movable={false} resizable={false}`. Remove delete overlays drawn in `widgetCellSnippet`: the dashboard shows its own remove button while editing.',
+			unless: { props: ['editing'] }
 		},
 		{
 			id: 'dashboard-shaper-catalog',

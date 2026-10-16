@@ -124,7 +124,8 @@ export default {
 			summary:
 				'`label` (or `labelSnippet`) renders the text inside the root label: a click on it toggles the switch and screen readers read it as its name.',
 			action:
-				'Move text placed next to the v4 switch (a sibling span, a wrapping element) into `label`; a switch without visible text needs `aria-label`.'
+				'Move text placed next to the v4 switch (a sibling span, a wrapping element) into `label`; a switch without visible text needs `aria-label`.',
+			unless: { props: ['label', 'aria-label', 'aria-labelledby'], snippets: ['labelSnippet'] }
 		},
 		{
 			id: 'switch-look',

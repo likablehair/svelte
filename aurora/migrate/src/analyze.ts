@@ -51,6 +51,7 @@ export interface GeneralStep {
 	action: string;
 	usages: number;
 	files: number;
+	byFile: Record<string, number>;
 }
 
 export interface AppStep {
@@ -378,7 +379,7 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 	const findings: Finding[] = [];
 	const components: Record<string, ComponentSummary> = {};
 	const componentFiles = new Map<string, Set<string>>();
-	const general = new Map<string, GeneralStep & { fileSet: Set<string> }>();
+	const general = new Map<string, GeneralStep>();
 	const appStepsByComponent = new Map<string, AppStep>();
 	const unknown: Analysis['unknown'] = {};
 	const usageRanges = new Map<string, [number, number][]>();
@@ -442,10 +443,11 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 				action: step.action,
 				usages: 0,
 				files: 0,
-				fileSet: new Set<string>()
+				byFile: {}
 			};
 			current.usages++;
-			current.fileSet.add(usage.file);
+			current.byFile[usage.file] = (current.byFile[usage.file] ?? 0) + 1;
+			current.files = Object.keys(current.byFile).length;
 			general.set(key, current);
 		}
 		for (const step of result.app)
@@ -758,7 +760,7 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 	const legacyFiles = files.filter((f) => f.svelte && (f.svelte.legacy.exportLet || f.svelte.legacy.reactive || f.svelte.legacy.dispatch)).length;
 	const manualKeys = new Set(findings.filter((f) => f.effort === 'manual').map((f) => `${f.file}#${f.id}`));
 	const editKeys = new Set(findings.filter((f) => f.effort === 'manual' && todoOf(f) === 'edit').map((f) => `${f.file}#${f.id}`));
-	const generalSteps = [...general.values()].map(({ fileSet, ...step }) => ({ ...step, files: fileSet.size }));
+	const generalSteps = [...general.values()];
 
 	return {
 		app,
