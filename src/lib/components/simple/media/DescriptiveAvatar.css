@@ -1,7 +1,22 @@
-:root {
-  --descriptive-avatar-default-image-gap: 8px;
-  --descriptive-avatar-default-text-gap: 2px;
-  --descriptive-avatar-default-title-font-size: 1.1rem;
-  --descriptive-avatar-default-subtitle-font-size: 1rem;
-  --descriptive-avatar-default-cursor: pointer;
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--descriptive-avatar-default-image-gap: 12px;
+		--descriptive-avatar-default-text-gap: 2px;
+		--descriptive-avatar-default-color: var(--global-color-text);
+		--descriptive-avatar-default-title-color: var(--global-color-text);
+		--descriptive-avatar-default-title-font-size: 14px;
+		--descriptive-avatar-default-title-font-weight: 600;
+		--descriptive-avatar-default-subtitle-color: var(--global-color-text-3);
+		--descriptive-avatar-default-subtitle-font-size: 12.5px;
+		--descriptive-avatar-default-interactive-padding: 8px 14px 8px 8px;
+		--descriptive-avatar-default-interactive-reverse-padding: 8px 8px 8px 14px;
+		--descriptive-avatar-default-interactive-column-padding: 16px;
+		--descriptive-avatar-default-interactive-compact-padding: 4px;
+		--descriptive-avatar-default-interactive-border-radius: var(--global-radius-full);
+		--descriptive-avatar-default-interactive-column-border-radius: var(--global-radius-lg);
+		--descriptive-avatar-default-hover-background: var(--global-color-surface-2);
+		--descriptive-avatar-default-disabled-opacity: 0.5;
+	}
 }

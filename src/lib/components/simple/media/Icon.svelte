@@ -1,74 +1,44 @@
+<!-- @component
+SVG icon from a path on a 24×24 viewBox, for example from `@mdi/js`. It inherits color and size from the surrounding text (`--icon-size` and `--icon-color` change them). Without `title` it is decorative and hidden from screen readers. It is not clickable: for a clickable icon use `Button` with `buttonType="text"`, `icon` and `aria-label`.
+-->
 <script lang="ts">
-  import "../common/materialDesign.css";
+	import '../../../css/tokens.css';
+	import './Icon.css';
 
-  interface Props {
-    name: string;
-    tabindex?: number | null;
-    class?: string
-    onclick?: (event?: (KeyboardEvent | MouseEvent) & { currentTarget: EventTarget & HTMLSpanElement; }) => void
-  }
+	interface Props {
+		/** SVG path on a 24×24 viewBox, for example from `@mdi/js` (`import { mdiPlus } from '@mdi/js'`). */
+		path: string;
+		/** Accessible name. Without it the icon is decorative and hidden from screen readers. */
+		title?: string;
+		/** Extra classes on the `<svg>` element. */
+		class?: string;
+	}
 
-  let {
-    name,
-    class: clazz = '',
-    onclick,
-    tabindex = !!onclick ? 0 : undefined,
-  }: Props = $props();
-
-  function handleIconClick(e: (KeyboardEvent | MouseEvent) & { currentTarget: EventTarget & HTMLSpanElement; }) {
-    if(onclick) {
-      onclick(e)
-    }
-  }
+	let { path, title, class: clazz = '' }: Props = $props();
 </script>
 
-<span
-  role="button"
-  onclick={handleIconClick}
-  onkeypress={handleIconClick}
-  class="icon mdi {name} {clazz} {onclick ? 'click' : ''}"
-  {tabindex}
-></span>
+<svg
+	class="aurora-icon {clazz}"
+	viewBox="0 0 24 24"
+	role={title ? 'img' : undefined}
+	aria-hidden={title ? undefined : 'true'}
+	focusable="false"
+>
+	{#if title}<title>{title}</title>{/if}
+	<path d={path} />
+</svg>
 
 <style>
-  .icon {
-    font-size: var(
-      --icon-size,
-      var(--icon-default-size)
-    );
-    color: var(
-      --icon-color,
-      var(--icon-default-color)
-    );
-    cursor: var(--icon-cursor, default);
-  }
-  .icon.click {
-    cursor: var(--icon-cursor, pointer);
-    pointer-events: var(--icon-pointer-events, auto);
-    height: var(
-      --icon-container-height,
-      var(--icon-default-container-height)
-    );
-    width: var(
-      --icon-container-width,
-      var(--icon-default-container-width)
-    );
-  }
-  .icon.click:not(.click) {
-    pointer-events: var(--icon-pointer-events, none);
-  }
-  .click:hover, .click:focus {
-    color: var(
-      --icon-hover-color,
-      rgb(var(--global-color-primary-500))
-    );
-    outline: none;
-  }
-  .click:active {
-    color: var(
-      --icon-active-color,
-      rgb(var(--global-color-primary-600))
-    );
-    outline: none;
-  }
+	@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+	@layer global.components {
+		.aurora-icon {
+			display: inline-block;
+			flex-shrink: 0;
+			width: var(--icon-size, var(--icon-default-size));
+			height: var(--icon-size, var(--icon-default-size));
+			fill: var(--icon-color, var(--icon-default-color));
+			vertical-align: middle;
+		}
+	}
 </style>

@@ -1,6 +1,6 @@
 # Redesign Aurora: strategia di transizione
 
-> **Aggiornamento 2026-10-08.** Si è deciso di riscrivere la libreria da zero in `aurora/` invece di restilizzare quella attuale. Restano validi come riferimento: la proposta di token globali (sezione 2), la palette (sezione 3), il contratto delle variabili CSS (sezione 4) e i livelli L0–L3 come criterio per capire quando una modifica tocca la logica. Le fasi in-place (sezione 6) e il piano di rilascio (sezione 8) sono superati. Lo stato aggiornato delle decisioni è nella skill `.claude/skills/redesign-aurora/SKILL.md`.
+> **Aggiornamento 2026-10-08.** Si è deciso di riscrivere la libreria da zero in `aurora/` (dal 2026-10-16 alla radice del repo; la v4 sta nel branch `4.x`) invece di restilizzare quella attuale. Restano validi come riferimento: la proposta di token globali (sezione 2), la palette (sezione 3), il contratto delle variabili CSS (sezione 4) e i livelli L0–L3 come criterio per capire quando una modifica tocca la logica. Le fasi in-place (sezione 6) e il piano di rilascio (sezione 8) sono superati. Lo stato aggiornato delle decisioni è nella skill `.claude/skills/redesign-aurora/SKILL.md`.
 
 Proposta su come portare i componenti di `@likable-hair/svelte` verso il prototipo `design/components-prototype.html` senza bloccare il lavoro e senza rompere le app che usano la libreria. Il contesto tecnico (bug, debolezze, numeri) è in `design/AUDIT.md`.
 

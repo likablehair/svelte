@@ -1,447 +1,365 @@
+<!-- @component
+Card that edits one filter condition: the field name with its icon, the operators of the field (side by side when they are up to four, otherwise a select) and the input of the value, which depends on the operator (text, number with unit, range, date, date range, period, last N days, options from a list, a search or countries, yes/no, or the app's input). Every change calls `onchange`; with `confirm` it shows Cancel and Apply instead, and Enter applies. `Filters` shows it under a pill or after "Add filter"; it can also be used alone, for example in a page of settings.
+-->
 <script lang="ts">
-  import type { Filter, NumberMode, SelectMode, StringMode } from "$lib/utils/filters/filters";
-  import Dropdown from "../forms/Dropdown.svelte";
-  import { GENERIC_MODES, SELECT_MODES, STRING_MODES } from '$lib/utils/filters/filters';
-  import type { DateMode } from "$lib/utils/filters/filters";
-  import SimpleTextField from "$lib/components/simple/forms/SimpleTextField.svelte";
-  import DatePickerTextField from "$lib/components/composed/forms/DatePickerTextField.svelte";
-  import Validator from "$lib/utils/filters/validator";
-  import Autocomplete, { type Item } from "$lib/components/simple/forms/Autocomplete.svelte";
-  import Checkbox from "$lib/components/simple/forms/Checkbox.svelte";
-  import type { LabelMapper } from "./Filters.svelte";
-  import Icon from "$lib/components/simple/media/Icon.svelte";
-  import ToggleList from "$lib/components/composed/forms/ToggleList.svelte";
-  import type { KeyboardEventHandler, MouseEventHandler } from "svelte/elements";
-  import { tick, type Snippet } from "svelte";
+	import '../../../css/tokens.css';
+	import './FilterEditor.css';
+	import { tick, untrack, type Snippet } from 'svelte';
+	import {
+		conditionOperators,
+		isConditionComplete,
+		operatorOf,
+		type FilterCondition,
+		type FilterField
+	} from '../../../utils/filters/model.js';
+	import {
+		filterLabels,
+		operatorLabel,
+		type FilterLabels,
+		type FilterLabelsInput
+	} from '../../../utils/filters/labels.js';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import Button from '../../simple/buttons/Button.svelte';
+	import Select from '../../simple/forms/Select.svelte';
+	import Icon from '../../simple/media/Icon.svelte';
+	import FilterValueInput from './FilterValueInput.svelte';
 
-  interface Props {
-    filter?: Filter;
-    lang?: 'en' | 'it';
-    betweenFromLabel?: string;
-    betweenToLabel?: string;
-    labelsMapper: LabelMapper;
-    forceApplyValid?: boolean;
-    editFilterMode?: 'one-edit' | 'multi-edit';
-    tmpFilter?: Filter;
-    mobile?: boolean;
-    onchange?: (event:{
-      detail: {
-        filter: Filter | undefined,
-        tmpFilter: Filter | undefined
-      }
-    }) => void
-    onclick?: MouseEventHandler<HTMLDivElement>
-    onkeypress?: KeyboardEventHandler<HTMLDivElement>
-    customSnippet?: Snippet<[{
-      filter: typeof tmpFilter
-    }]>
-    filterActionsSnippet?: Snippet<[{
-      applyFilterDisabled: typeof applyFilterDisabled,
-      filter: typeof tmpFilter
-    }]>
-  }
+	const CLOSE_ICON =
+		'M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z';
 
-  let {
-    filter = $bindable(),
-    lang = 'en',
-    betweenFromLabel = lang === 'en' ? "From" : "Da",
-    betweenToLabel = lang === 'en' ? "To" : "A",
-    labelsMapper,
-    forceApplyValid = false,
-    editFilterMode = 'one-edit',
-    tmpFilter = $bindable(),
-    mobile = false,
-    onchange,
-    onclick: onclickInternal,
-    onkeypress,
-    customSnippet,
-    filterActionsSnippet,
-  }: Props = $props();
+	interface Props {
+		/** The field of the condition. */
+		field: FilterField;
+		/** The condition being edited. A new one is a condition with the field's default operator and no value. */
+		condition: FilterCondition;
+		/** Shows Cancel and Apply: changes reach `onapply` only when the user applies. Without it every change calls `onchange`. */
+		confirm?: boolean;
+		/** Operators offered when the field has no `operators`: `basic`, `standard` (default) or `all`. */
+		operatorSet?: 'basic' | 'standard' | 'all';
+		/** Own operator list per field type, instead of `operatorSet`. */
+		typeOperators?: Partial<Record<'string' | 'number' | 'date' | 'select' | 'bool' | 'custom', string[]>>;
+		/** Shows a Remove button (for a condition already in the filters). */
+		removable?: boolean;
+		/** Texts to change (see `FilterLabels`), on top of those of `locale`. */
+		labels?: FilterLabelsInput;
+		/** BCP 47 locale: the language of every text (`it` and `en` are built in, others fall back to English) and the format of dates and numbers. Defaults to the one set with `setDefaultLocale`, else `en`. */
+		locale?: string;
+		/** Moves the focus to the value input when the card appears. */
+		autofocus?: boolean;
+		/** Extra classes on the card. */
+		class?: string;
+		/** Input of the value for `custom` fields and for operators with `input: 'custom'`. Call `setValue` with the new value. */
+		inputSnippet?: Snippet<
+			[{ field: FilterField; operator: string; value: unknown; setValue: (value: unknown) => void }]
+		>;
+		/** Called at every change of operator or value (without `confirm`). */
+		onchange?: (condition: FilterCondition) => void;
+		/** Called by Apply and by Enter, with the edited condition (with `confirm`), or by Enter alone. */
+		onapply?: (condition: FilterCondition) => void;
+		/** Called by Cancel. */
+		oncancel?: () => void;
+		/** Called by Remove. */
+		onremove?: () => void;
+		/** Shows a close button in the header and calls this when it is clicked. */
+		onclose?: () => void;
+	}
 
-  let advancedModeOptions: Item[] | undefined = $state(),
-    advancedModeSelectedOptions: Item[] = $state([])
+	let {
+		field,
+		condition = $bindable(),
+		confirm = false,
+		operatorSet = 'standard',
+		typeOperators,
+		removable = false,
+		labels: textOverrides,
+		locale: localeProp,
+		autofocus = false,
+		class: clazz,
+		inputSnippet,
+		onchange,
+		onapply,
+		oncancel,
+		onremove,
+		onclose
+	}: Props = $props();
 
-  function closeDropDown() {
-    dropdownOpened = false
-  }
+	const uid = $props.id();
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
+	let texts: FilterLabels = $derived(filterLabels(textOverrides, locale));
+	let operators = $derived(
+		conditionOperators(field, condition.operator, { set: operatorSet, byType: typeOperators })
+	);
+	let operator = $derived(operatorOf(field, condition.operator) ?? operators[0]);
+	let segmented = $derived(
+		field.type === 'bool' ||
+			(operators.length <= 4 &&
+				operators.reduce((width, candidate) => width + label(candidate.name).length * 7.5 + 22, 0) <= 288)
+	);
+	let complete = $derived(isConditionComplete(condition, field));
+	const editing = untrack(() => complete);
 
-  $effect(() => {
-    if(!!filter && !tmpFilter) {
-      tick().then(() => {
-        tmpFilter = filter === undefined ? undefined : {...filter}
-        closeDropDown();
-      });
-    }
-    
-    if(!!tmpFilter && ['string', 'number', 'date', 'select'].includes(tmpFilter.type) && Object.keys(tmpFilter).includes('mode')) {
-      //@ts-ignore
-      if((tmpFilter.mode == 'between' && tmpFilter.from !== undefined && tmpFilter.to !== undefined) || tmpFilter.value !== undefined || (tmpFilter.type == 'select' && tmpFilter.values !== undefined && tmpFilter.values.length > 0)) {
-        advancedModeSelectedOptions = [{
-          //@ts-ignore
-          value: tmpFilter.mode, label: labelsMapper[tmpFilter.mode].short || tmpFilter.mode
-        }]
-      }
-    }
-  }) 
+	function label(name: string) {
+		if (field.type === 'bool')
+			return name === 'isTrue' ? (field.trueLabel ?? texts.yes) : (field.falseLabel ?? texts.no);
+		return operatorLabel(field, name, texts);
+	}
 
-  $effect(() => {
-    if(!!tmpFilter) {
-      let modes
-      if(tmpFilter.type == 'string') {
-        modes = STRING_MODES
-      } else if(tmpFilter.type == 'date') {
-        modes = GENERIC_MODES
-      } else if(tmpFilter.type == 'number') {
-        modes = GENERIC_MODES
-      } else if(tmpFilter.type == 'select') {
-        modes = SELECT_MODES
-      } else if(tmpFilter.type == 'bool') {
-        modes = undefined
-      }
-  
-      if(!!modes) {
-        advancedModeOptions = modes.map(mode => {
-          return {
-            value: mode,
-            label: labelsMapper[mode].short || mode
-          }
-        })
-      }
-    }
-  }) 
+	function update(patch: Partial<FilterCondition>) {
+		condition = { ...condition, ...patch };
+		if (!confirm) onchange?.(condition);
+	}
 
-  $effect(() => {
-    if(!tmpFilter?.advanced) {
-      advancedModeSelectedOptions = []
-    }
-  }) 
+	function choose(name: string) {
+		if (name === condition.operator) return;
+		const next = operatorOf(field, name);
+		update({ operator: name, value: next?.input === operator?.input ? condition.value : undefined });
+	}
 
-  let dropdownOpened: boolean = $state(false),
-    calendarOpened: boolean = $state(false),
-    calendarOpened2: boolean = $state(false)
+	function radioKeydown(event: KeyboardEvent & { currentTarget: HTMLElement }) {
+		const forward = ['ArrowRight', 'ArrowDown'];
+		const backward = ['ArrowLeft', 'ArrowUp'];
+		if (![...forward, ...backward, 'Home', 'End'].includes(event.key)) return;
+		event.preventDefault();
+		const index = operators.findIndex((candidate) => candidate.name === operator?.name);
+		const rtl = getComputedStyle(event.currentTarget).direction === 'rtl';
+		let step = forward.includes(event.key) ? 1 : -1;
+		if (rtl && event.key.startsWith('ArrowL')) step = 1;
+		if (rtl && event.key.startsWith('ArrowR')) step = -1;
+		const next =
+			event.key === 'Home'
+				? 0
+				: event.key === 'End'
+					? operators.length - 1
+					: (index + step + operators.length) % operators.length;
+		choose(operators[next].name);
+		event.currentTarget.querySelectorAll<HTMLElement>('[role="radio"]')[next]?.focus();
+	}
 
-  // TODO I don't like that there is a singlo dropdow to handle all filter advance mode.
-  // In some case would be necessary to handle more than one selection and this code
-  // could become non sense
-  function handleAdvancedModeSelection() {
-    if(advancedModeSelectedOptions.length > 0 && !!tmpFilter) {
-      if(tmpFilter.type == 'date') tmpFilter.mode = advancedModeSelectedOptions[0].value as DateMode
-      else if(tmpFilter.type == 'number') tmpFilter.mode = advancedModeSelectedOptions[0].value as NumberMode
-      else if(tmpFilter.type == 'string') tmpFilter.mode = advancedModeSelectedOptions[0].value as StringMode
-      else if(tmpFilter.type == 'select') tmpFilter.mode = advancedModeSelectedOptions[0].value as SelectMode
-    }
+	function apply() {
+		if (complete) onapply?.(condition);
+	}
 
-    dropdownOpened = false;
-    handleChangeValue()
-  }
+	function focusInside(card: HTMLElement) {
+		if (!autofocus) return;
+		tick().then(() => {
+			if (card.contains(document.activeElement)) return;
+			const target = [
+				...(editing ? ['.aurora-filter-value input:not([role="combobox"])'] : []),
+				'[role="radio"][aria-checked="true"]',
+				...(editing ? [] : ['.aurora-filter-value input', '.aurora-filter-value select', '.aurora-filter-value button']),
+				'select',
+				'button:not([disabled])'
+			]
+				.map((selector) => card.querySelector<HTMLElement>(selector))
+				.find(Boolean);
+			target?.focus();
+		});
+	}
 
-  let applyFilterDisabled = $derived(!Validator.isValid(tmpFilter) && !forceApplyValid)
-
-  $effect.pre(() => {
-    if(!!tmpFilter && tmpFilter.type == 'bool') {
-      if(tmpFilter.value === undefined) {
-        tmpFilter.value = false
-      }
-    }
-  })
-
-  $effect.pre(() => {
-    if(!!tmpFilter && tmpFilter.type == 'select') {
-      if(tmpFilter.values === undefined) {
-        tmpFilter.values = []
-      }
-    }
-  })
-  
-  function handleChangeValue(isCalendarOpened = false) {  
-    calendarOpened = isCalendarOpened
-    calendarOpened2 = isCalendarOpened
-    if(onchange) {
-      onchange({
-        detail: {
-          filter,
-          tmpFilter
-        }
-      })
-    }
-  }
-
-  function onclick(event: MouseEvent & {
-    currentTarget: EventTarget & HTMLDivElement;
-  }) {
-    event.stopPropagation()
-    if(onclickInternal) {
-      onclickInternal(event)
-    }
-  }
+	function keydown(event: KeyboardEvent) {
+		if (!confirm || event.key !== 'Enter' || event.defaultPrevented) return;
+		if ((event.target as HTMLElement).closest('button, textarea')) return;
+		event.preventDefault();
+		apply();
+	}
 </script>
 
-
-{#if !!filter && !!tmpFilter}
-  <div class="filter-container" style:margin={editFilterMode === 'one-edit' ? '5%' : '0'}>
-    <div class="filter-editor" class:row={
-      (tmpFilter.type == 'number' || tmpFilter.type == 'string' || (tmpFilter.type == 'date' && ((advancedModeSelectedOptions.length && advancedModeSelectedOptions[0].value != 'between') || tmpFilter.betweenModeSingleTextField)))
-    }>
-      {#if filter.advanced}
-        <div class="advanced-mode">
-          <div class="advaced-mode-selector" {onclick} {onkeypress} role="presentation" tabindex="-1">
-            <Dropdown
-              items={advancedModeOptions}
-              bind:values={advancedModeSelectedOptions}
-              onchange={handleAdvancedModeSelection}
-              bind:menuOpened={dropdownOpened}
-              openingId="advanced-filter"
-              mobileDrawer={mobile}
-              {lang}
-              minWidth="100px"
-              height="100%"
-              --button-padding="10px 12px"
-              --button-border='var(--dropdown-button-border)'
-              --button-background-color='var(--dropdown-button-background-color)'
-              --button-hover-background-color='var(--dropdown-button-hover-color)'
-              --button-focus-background-color='var(--dropdown-button-focus-color)'
-              --button-active-background-color='var(--dropdown-button-active-color)'
-              --button-border-radius='var(--dropdown-button-border-radius)'
-              --button-default-height='var(--dropdown-button-height)'
-              --button-active-box-shadow='var(--dropdown-button-active-box-shadow)'
-              --button-focus-box-shadow='var(--dropdown-button-focus-box-shadow)'
-              --button-box-sizing='var(--dropdown-button-box-sizing)'
-              --button-hover-color='rgb(var(--global-color-contrast-800))'
-              --autocomplete-default-selected-item-background-color='rgb(var(--global-color-background-500), .5)'
-              --autocomplete-default-selected-item-color='rgb(var(--global-color-contrast-800))'
-              --autocomplete-default-hover-item-background-color='rgb(var(--global-color-background-300), .5)'
-              ></Dropdown>
-          </div>
-        </div>
-      {/if}
-  
-      {#if !tmpFilter.advanced || (advancedModeSelectedOptions.length > 0)}
-        <div class="fields" style:width="100%" {onclick} {onkeypress} role="presentation" tabindex="-1">
-          {#if tmpFilter.type === "string" }
-            <SimpleTextField
-              bind:value={tmpFilter.value}
-              type="text"
-              placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
-              --simple-textfield-width="100%"
-              --simple-textfield-padding='0.45rem 0.6rem'
-              oninput={() => handleChangeValue()}
-            ></SimpleTextField>
-          {:else if tmpFilter.type === "date" && tmpFilter.mode !== 'between'}
-            <div>
-              <DatePickerTextField
-                bind:selectedDate={tmpFilter.value}
-                openingId="advanced-filter"
-                bind:menuOpened={calendarOpened}
-                --simple-textfield-width="100%"
-                --simple-textfield-padding='0.45rem 0.6rem'
-                flipOnOverflow
-                oninput={() => handleChangeValue()}
-                ondayClick={() => handleChangeValue()}
-              >
-                {#snippet appendInnerSnippet()}
-                  <Icon
-                    name="mdi-close-circle"
-                    onclick={() => {
-                      if(!!tmpFilter && tmpFilter.type === 'date' && tmpFilter.mode !== 'between') {
-                        tmpFilter.value = undefined
-                      }
-                    }}
-                  ></Icon>
-                {/snippet}
-              </DatePickerTextField>
-            </div>
-          {:else if tmpFilter.type === "number" && tmpFilter.mode !== 'between'}
-            <div>
-              <SimpleTextField
-                bind:value={tmpFilter.value}
-                type="number"
-                placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
-                --simple-textfield-width="100%"
-                --simple-textfield-padding='0.45rem 0.6rem'
-                onchange={() => handleChangeValue()}
-              ></SimpleTextField>
-            </div>
-          {:else if tmpFilter.type === "select" && (tmpFilter.view === undefined || tmpFilter.view === 'autocomplete')}
-            <div
-              style:width="100%"
-            >
-              <Autocomplete
-                bind:values={tmpFilter.values}
-                items={tmpFilter.items}
-                multiple
-                maxVisibleChips={2}
-                --autocomplete-min-height="0px"
-                --chip-min-height="12px"
-                mobileDrawer={mobile}
-                onchange={() => handleChangeValue()}
-                placeholder={editFilterMode == 'one-edit' ? tmpFilter?.label : undefined}
-                minWidth=""
-                ></Autocomplete>
-            </div>
-          {:else if tmpFilter.type === "select" && (tmpFilter.view === 'toggle')}
-            <div
-              style:width="100%"
-            >
-              <ToggleList
-                bind:values={tmpFilter.values}
-                items={tmpFilter.items}
-                multiple
-                onchange={() => handleChangeValue()}
-              ></ToggleList>
-            </div>
-          {:else if tmpFilter.type === "date" && tmpFilter.mode === 'between'}
-            {#if tmpFilter.betweenModeSingleTextField}
-              <DatePickerTextField
-                type='dateRange'
-                bind:selectedDate={tmpFilter.from}
-                bind:selectedDateTo={tmpFilter.to}
-                openingId="advanced-filter"
-                placeholder={betweenFromLabel}
-                placeholderTo={betweenToLabel}
-                bind:menuOpened={calendarOpened}
-                --simple-textfield-width="100%"
-                --simple-textfield-padding='0.45rem 0.6rem'
-                oninput={() => handleChangeValue(tmpFilter?.type == 'date' && tmpFilter.mode == 'between' && (!tmpFilter.from || !tmpFilter.to))}
-                ondayClick={() => handleChangeValue(tmpFilter?.type == 'date' && tmpFilter.mode == 'between' && (!tmpFilter.from || !tmpFilter.to))}
-              >
-                {#snippet appendInnerSnippet()}
-                  <Icon
-                    name="mdi-close-circle"
-                    onclick={() => {
-                      if(!!tmpFilter && tmpFilter.type === 'date' && tmpFilter.mode === 'between') {
-                        tmpFilter.from = undefined
-                        tmpFilter.to = undefined
-                      }
-                    }}
-                  ></Icon>
-                {/snippet}
-              </DatePickerTextField>
-            {:else}
-              <div class="between-container">
-                <div style="width: 50%;">
-                  <DatePickerTextField
-                    bind:selectedDate={tmpFilter.from}
-                    openingId="advanced-filter"
-                    placeholder={betweenFromLabel}
-                    bind:menuOpened={calendarOpened}
-                    --simple-textfield-width="100%"
-                    --simple-textfield-padding='0.45rem 0.6rem'
-                    oninput={() => handleChangeValue()}
-                    ondayClick={() => handleChangeValue()}
-                  >
-                    {#snippet appendInnerSnippet()}
-                      <Icon
-                        name="mdi-close-circle"
-                        onclick={() => {
-                          if(!!tmpFilter && tmpFilter.type === 'date' && tmpFilter.mode === 'between') {
-                            tmpFilter.from = undefined
-                          }
-                        }}
-                      ></Icon>
-                    {/snippet}
-                  </DatePickerTextField>
-                </div>
-
-                <div style="width: 50%;">
-                  <DatePickerTextField
-                    bind:selectedDate={tmpFilter.to}
-                    openingId="advanced-filter"
-                    placeholder={betweenToLabel}
-                    bind:menuOpened={calendarOpened2}
-                    --simple-textfield-width="100%"
-                    --simple-textfield-padding='0.45rem 0.6rem'
-                    flipOnOverflow
-                    oninput={() => handleChangeValue()}
-                    ondayClick={() => handleChangeValue()}
-                  >
-                    {#snippet appendInnerSnippet()}
-                      <Icon
-                        name="mdi-close-circle"
-                        onclick={() => {
-                          if(!!tmpFilter && tmpFilter.type === 'date' && tmpFilter.mode === 'between') {
-                            tmpFilter.to = undefined
-                          }
-                        }}
-                      ></Icon>
-                    {/snippet}
-                  </DatePickerTextField>
-                </div>
-              </div>
-            {/if}
-          {:else if tmpFilter.type === "number" && tmpFilter.mode === 'between'}
-            <div class="between-container">
-              <div style="width: 50%;">
-                <SimpleTextField
-                  bind:value={tmpFilter.from}
-                  type="number"
-                  placeholder={betweenFromLabel}
-                  --simple-textfield-width="100%"
-                  --simple-textfield-padding='0.45rem 0.6rem'
-                  onchange={() => handleChangeValue()}
-                ></SimpleTextField>
-              </div>
-              <div style="width: 50%;">
-                <SimpleTextField
-                  bind:value={tmpFilter.to}
-                  type="number"
-                  placeholder={betweenToLabel}
-                  --simple-textfield-width="100%"
-                  --simple-textfield-padding='0.45rem 0.6rem'
-                  onchange={() => handleChangeValue()}
-                ></SimpleTextField>
-              </div>
-            </div>
-          {:else if tmpFilter.type == 'bool'}
-            <div class="bool-filter">
-              <Checkbox
-                bind:value={tmpFilter.value}
-                onchange={() => handleChangeValue()}
-              ></Checkbox>
-              <span style:margin-left="10px">
-                {tmpFilter.description}
-              </span>
-            </div>
-          {:else if tmpFilter.type == 'custom'}
-            {@render customSnippet?.({ filter: tmpFilter })}
-          {/if}
-        </div>
-      {/if}
-    </div>
-    {@render filterActionsSnippet?.({ applyFilterDisabled, filter: tmpFilter })}
-  </div>
-{/if}
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<div
+	class={['aurora-filter-editor', clazz]}
+	role="group"
+	aria-labelledby="{uid}-title"
+	data-type={field.type}
+	onkeydown={keydown}
+	{@attach focusInside}
+>
+	<div class="aurora-filter-editor-head">
+		<span class="aurora-filter-editor-title" id="{uid}-title">
+			{#if field.icon}<Icon path={field.icon} />{/if}
+			{field.label}
+		</span>
+		{#if onclose}
+			<Button
+				buttonType="icon"
+				variant="secondary"
+				size="sm"
+				icon={CLOSE_ICON}
+				aria-label={texts.close}
+				onclick={() => onclose?.()}
+			/>
+		{/if}
+	</div>
+	{#if operators.length > 1}
+		{#if segmented}
+			<div
+				class="aurora-filter-editor-operators"
+				role="radiogroup"
+				aria-label={texts.operator}
+				tabindex="-1"
+				onkeydown={radioKeydown}
+			>
+				{#each operators as candidate (candidate.name)}
+					<button
+						type="button"
+						role="radio"
+						aria-checked={candidate.name === operator?.name}
+						tabindex={candidate.name === operator?.name ? 0 : -1}
+						onclick={() => choose(candidate.name)}
+					>
+						{label(candidate.name)}
+					</button>
+				{/each}
+			</div>
+		{:else}
+			<Select
+				items={operators.map((candidate) => ({ value: candidate.name, label: label(candidate.name) }))}
+				value={operator?.name}
+				aria-label={texts.operator}
+				onchange={(event) => choose(event.currentTarget.value)}
+			/>
+		{/if}
+	{/if}
+	{#if operators.length === 1 && operator?.input === 'none'}
+		<p class="aurora-filter-editor-summary">{label(operator.name)}</p>
+	{/if}
+	{#if operator && operator.input !== 'none'}
+		{#key operator.input}
+			<FilterValueInput
+				{field}
+				{operator}
+				bind:value={() => condition.value, (value) => update({ value })}
+				labels={texts}
+				{locale}
+				label={field.label}
+				autofocus={autofocus && !editing}
+				{inputSnippet}
+				onsubmit={() => (confirm ? apply() : complete && onapply?.(condition))}
+			/>
+		{/key}
+	{/if}
+	{#if confirm || removable}
+		<div class="aurora-filter-editor-actions">
+			{#if removable}
+				<Button buttonType="text" variant="danger" size="sm" onclick={() => onremove?.()}>
+					{texts.remove}
+				</Button>
+			{/if}
+			{#if confirm}
+				<span class="aurora-filter-editor-spacer"></span>
+				<Button buttonType="text" size="sm" onclick={() => oncancel?.()}>{texts.cancel}</Button>
+				<Button size="sm" disabled={!complete} onclick={apply}>{texts.apply}</Button>
+			{/if}
+		</div>
+	{/if}
+</div>
 
 <style>
-  .filter-container {
-    display: flex;
-    flex-direction: column;
-    gap:10px;
-  }
-  .filter-editor {
-    display: flex;
-    flex-direction: column;
-    align-items: left;
-    gap:10px;
-  }
+	@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
 
-  .row {
-    flex-direction: row;
-  }
+	@layer global.components {
+		.aurora-filter-editor {
+			display: flex;
+			flex-direction: column;
+			gap: var(--filter-editor-gap, var(--filter-editor-default-gap));
+			box-sizing: border-box;
+			width: var(--filter-editor-width, var(--filter-editor-default-width));
+			max-width: 100%;
+			padding: var(--filter-editor-padding, var(--filter-editor-default-padding));
+			color: var(--filter-editor-color, var(--filter-editor-default-color));
+		}
 
-  .advanced-mode {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
+		.aurora-filter-editor-head {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 8px;
+			min-height: 28px;
+		}
 
-  .advaced-mode-selector {
-    height: 100%;
-  }
+		.aurora-filter-editor-title {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			font-size: var(--filter-editor-title-font-size, var(--filter-editor-default-title-font-size));
+			font-weight: var(--filter-editor-title-font-weight, var(--filter-editor-default-title-font-weight));
+			--icon-size: 18px;
+			--icon-color: var(--filter-editor-icon-color, var(--filter-editor-default-icon-color));
+		}
 
-  .between-container {
-    display: flex;
-    flex-direction: row;
-    gap: 5px;
-  }
+		.aurora-filter-editor-operators {
+			display: flex;
+			gap: 2px;
+			padding: 3px;
+			border-radius: var(--filter-editor-operators-border-radius, var(--filter-editor-default-operators-border-radius));
+			background: var(--filter-editor-operators-background, var(--filter-editor-default-operators-background));
+			outline: none;
+		}
 
+		.aurora-filter-editor-operators button {
+			flex: 1 1 auto;
+			min-width: 0;
+			margin: 0;
+			padding: 6px 10px;
+			border: 0;
+			border-radius: calc(
+				var(--filter-editor-operators-border-radius, var(--filter-editor-default-operators-border-radius)) - 3px
+			);
+			background: transparent;
+			color: var(--filter-editor-operator-color, var(--filter-editor-default-operator-color));
+			font: inherit;
+			font-size: 13px;
+			font-weight: 500;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			cursor: pointer;
+			transition:
+				background-color var(--global-duration) var(--global-ease),
+				color var(--global-duration) var(--global-ease);
+		}
+
+		@media (hover: hover) {
+			.aurora-filter-editor-operators button[aria-checked='false']:hover {
+				color: var(--global-color-text);
+			}
+		}
+
+		.aurora-filter-editor-operators button[aria-checked='true'] {
+			background: var(
+				--filter-editor-operator-selected-background,
+				var(--filter-editor-default-operator-selected-background)
+			);
+			color: var(--filter-editor-operator-selected-color, var(--filter-editor-default-operator-selected-color));
+			font-weight: 600;
+			box-shadow:
+				inset 0 0 0 var(--global-border-width)
+					var(
+						--filter-editor-operator-selected-border-color,
+						var(--filter-editor-default-operator-selected-border-color)
+					),
+				var(--global-shadow-sm);
+		}
+
+		.aurora-filter-editor-operators button:focus-visible {
+			outline: var(--global-focus-ring-width) solid var(--global-focus-ring-color);
+			outline-offset: 0;
+		}
+
+		.aurora-filter-editor-summary {
+			margin: 0;
+			color: var(--global-color-text-2);
+			font-size: 13px;
+		}
+
+		.aurora-filter-editor-actions {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.aurora-filter-editor-spacer {
+			flex: 1;
+		}
+	}
 </style>

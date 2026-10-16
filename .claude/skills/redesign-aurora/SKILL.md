@@ -1,6 +1,6 @@
 ---
 name: redesign-aurora
-description: Contesto, decisioni e processo della riscrittura "Aurora" di @likable-hair/svelte nella cartella aurora/ (componenti, token, temi switchabili a runtime, documentazione generata e leggibile da LLM). Usala per qualsiasi lavoro dentro aurora/, quando si porta un componente dalla vecchia libreria, o quando si parla di redesign, temi, token o docs della nuova libreria. Va aggiornata ogni volta che una decisione cambia.
+description: Contesto, decisioni e processo della riscrittura "Aurora" di @likable-hair/svelte, la v5, alla radice del repo dal 2026-10-16 (la v4 nel branch 4.x) (componenti, token, temi switchabili a runtime, documentazione generata e leggibile da LLM). Usala per qualsiasi lavoro nel repo, quando si porta un componente dalla vecchia libreria, o quando si parla di redesign, temi, token o docs della nuova libreria. Va aggiornata ogni volta che una decisione cambia.
 ---
 
 # Redesign Aurora
@@ -9,7 +9,7 @@ Questa skill è la memoria condivisa del progetto: la leggono tutte le sessioni 
 
 ## Come è organizzata la skill
 
-Questo file è corto di proposito (si carica a ogni lavoro su `aurora/`): regole, decisioni in vigore in sintesi, processo, convenzioni e trappole essenziali, stato. I dettagli stanno in `reference/`, accanto, e si leggono **solo quando servono**:
+Questo file è corto di proposito (si carica a ogni lavoro nel repo): regole, decisioni in vigore in sintesi, processo, convenzioni e trappole essenziali, stato. I dettagli stanno in `reference/`, accanto, e si leggono **solo quando servono**:
 
 | File | Quando leggerlo |
 |---|---|
@@ -47,7 +47,7 @@ Questo file è corto di proposito (si carica a ogni lavoro su `aurora/`): regole
 ## Ripartenza dopo un `/clear`
 
 1. Leggi "Stato" in fondo: l'ultima voce "Prossimo" dice da dove riprendere.
-2. Il dev server delle docs gira su http://localhost:5180; se non risponde: `cd aurora && npx vite dev --port 5180` in background.
+2. Il dev server delle docs gira su http://localhost:5180; se non risponde: `npx vite dev --port 5180` dalla radice, in background.
 3. Segui "Processo per un componente" e la "Regola dei test". Per leggere componenti v4 grandi usa un subagente.
 4. A componente finito, con la skill aggiornata, sul "procedi" suggerisci `/clear` prima del successivo (non puoi lanciarlo tu). La conversazione lunga rallenta ogni risposta: meglio ripartire spesso.
 5. Leggi "Team, account e modo di lavorare": vale per chiunque usi la skill.
@@ -57,30 +57,30 @@ Questo file è corto di proposito (si carica a ogni lavoro su `aurora/`): regole
 Cose che non stanno nel codice e che finora sapeva solo l'utente (2026-10-09). Le memorie personali di Claude (`~/.claude/projects/...`) **non sono condivise**: tutto quello che serve al team va scritto qui.
 
 - **Chi lavora**: l'utente e, dal 2026-10-09, anche il suo capo, ciascuno con la sua sessione di Claude Code. Questa skill è il riferimento comune: decisioni, processo e stato valgono per entrambi. "L'utente" in questo file è chi sta usando la sessione; le decisioni si prendono con lui e si scrivono qui con la data.
-- **Account Claude del capo: niente Artifact.** Non pubblicare pagine su claude.ai (Artifact o simili): l'account è del capo e l'utente non deve usare la parte web. Un documento da far vedere a qualcuno si consegna come **file locale**: PDF per leggerlo o mandarlo (HTML → PDF con il Chromium headless di Playwright della root, vedi "Trappole note"), Markdown se deve vivere nel repo. I documenti temporanei si cancellano quando l'utente ha finito.
+- **Account Claude del capo: niente Artifact.** Non pubblicare pagine su claude.ai (Artifact o simili): l'account è del capo e l'utente non deve usare la parte web. Un documento da far vedere a qualcuno si consegna come **file locale**: PDF per leggerlo o mandarlo (HTML → PDF con il Chromium headless del `playwright` del repo, vedi "Trappole note"), Markdown se deve vivere nel repo. I documenti temporanei si cancellano quando l'utente ha finito.
 - **Git**: branch, commit e push **solo quando l'utente lo chiede**. Le approvazioni delle proposte si registrano nella skill **senza un commit per ciascuna** (2026-10-16, utente: "non fare un commit per ogni approvazione"); si propongono **2 o 3 alla volta**. Repo di lavoro: **`likablehair/svelte`** (il repo ufficiale, l'utente è admin), deciso il 2026-10-09; il fork personale `vincenzodisieno/svelte` non si usa più (nella cartella locale `origin` punta a `likablehair/svelte` e `aurora-v5` lo segue; il fork resta come remoto `fork`). Il lavoro di Aurora sta sul branch **`aurora-v5`**, partito da `master` `e618d43` (uguale nel fork e nel repo ufficiale): commit `633a9d3` con tutto `aurora/`, skill, `CLAUDE.md`, `.mcp.json`, `design/AUDIT.md`, `design/REDESIGN-STRATEGY.md`. Dal 2026-10-09 il push su `origin aurora-v5` funziona dalla sessione di Claude, ma si fa solo quando l'utente lo chiede.
 - **Commit e migrazione** (2026-10-15, richieste dell'utente): **nel repo della libreria** prima di iniziare un lavoro legato alla migrazione (strumento, regole) si fa un commit di quello che c'è, così parte da uno stato salvato; push solo se chiesto. **Nelle app migrate non si committa mai**: né Claude né lo strumento fanno commit (niente commit per fase); si modificano i file e li committa l'utente dopo averli guardati. Prima di toccare un'app il suo repo deve essere pulito (lo strumento lo controlla), così le modifiche non committate sono tutte e solo della migrazione; si lavora su un branch nuovo creato dallo strumento. Gli hook di commit delle app (es. lefthook di tatum, che lancia check e build) quindi non entrano in gioco.
 - **Niente riferimenti ad altri progetti** (2026-10-13, richiesta dell'utente): nei file (codice, docs, skill, test) non si citano progetti dell'utente che non sono questa libreria o le app che la usano; se uno serve da spunto, si scrive solo la tecnica.
-- **Lingua**: con l'utente si parla italiano e la skill resta in italiano; tutto ciò che sta in `aurora/` è in inglese (vedi Convenzioni).
+- **Lingua**: con l'utente si parla italiano e la skill resta in italiano; tutto il resto del repo (codice, docs, test, regole, `CLAUDE.md`) è in inglese (vedi Convenzioni).
 - **Contesto e costi**: a fine componente, con la skill aggiornata, sul "procedi" suggerisci `/clear` (solo se non si perde niente); le letture pesanti (componenti v4 grandi, giri tra le app) vanno nei subagenti.
 - **Le app che usano la libreria** stanno, sulla macchina dell'utente, in `~/Documents/progetti/<app>/frontend` (22 app; `~/Documents/progetti/svelte` è questo repo, da escludere; `test_backup/` dà errori di permesso). Servono a misurare come si usa un componente prima di cambiarne l'API, per esempio: `grep -rlE --include='*.svelte' --exclude-dir=node_modules --exclude-dir=.svelte-kit --exclude-dir=svelte "<Tooltip\b" ~/Documents/progetti | wc -l` (dentro `bash -c`: con zsh i glob non quotati falliscono). I numeri sono un indizio, non il criterio (vedi "Regola di manutenzione").
 - **Il capo** ha approvato i cambi di logica e ha chiesto MCP di migrazione, prompt, test e pipeline di rilascio (Requisiti, punto 4). Le richieste vanno trattate come quelle dell'utente.
 
 ## Contesto
 
-- Il repo contiene **due progetti separati**:
-  - **root**: libreria attuale v4.3.2 (`src/lib`). È il **riferimento per il comportamento** dei componenti; si toccano solo i fix di manutenzione.
-  - **`aurora/`**: la nuova libreria, riscritta da zero. Ha il suo `package.json` e il suo `node_modules`.
-- In `aurora/` c'è il template library di SvelteKit 3:
-  - la config sta in `aurora/vite.config.ts` (non esiste `svelte.config.js`);
+- **Dal 2026-10-16 la v5 sta alla radice** del repo (decisione "La v5 alla radice"), nel branch `aurora-v5`:
+  - `src/lib` è la libreria, `src/routes` e `src/docs` le docs; `migrate/` lo strumento di migrazione, `mcp/` il server MCP, `migrations/` le regole, `skills/` la skill `aurora-design`; `migrate/v4/` è una copia ferma dei file v4 che lo strumento e i test leggono (indice degli export, `main.css`, `FilterBuilder`).
+  - la **v4** (4.3.2) sta nel branch **`4.x`** (creato da `master`): resta il **riferimento per il comportamento** dei componenti e riceve solo fix di manutenzione per le app non ancora migrate. Si legge con `git show 4.x:src/lib/<percorso>` o con un worktree (`git worktree add ../svelte-v4 4.x`).
+- Template library di SvelteKit 3:
+  - la config sta in `vite.config.ts` (non esiste `svelte.config.js`);
   - nome `@likable-hair/svelte`, versione `5.0.0`, `"private": true`;
-  - 0 dipendenze runtime, `"sideEffects": ["**/*.css"]`.
-- Comandi, **da dentro `aurora/`**: `npm run dev`, `npm run check`, `npm run package`.
+  - 0 dipendenze runtime oltre a quelle approvate, `"sideEffects": ["**/*.css"]`.
+- Comandi, **dalla radice**: `npm run dev` (o `npx vite dev --port 5180`), `npm run check`, `npm run package`.
 - Riferimenti:
   - `design/components-prototype.html`: il target visivo ("Likable Aurora UI"). Ogni card ha il percorso del componente v4 in `<div class="path">simple/buttons/Button.svelte</div>`, quindi un grep sul percorso porta alla sezione giusta.
   - `design/AUDIT.md`: bug e debolezze della v4 da non ripetere.
   - `design/REDESIGN-STRATEGY.md`: proposta sui token (sezioni 2–4) e livelli L0–L3. Le sezioni su fasi e rilascio sono superate.
-  - Componenti v4: `src/lib/components/{simple,composed,layouts}/`. Pagine docs v4: `src/routes/docs/components/`. Gli array `props`, `styleProps` e gli snippet sono scritti a mano, ma servono come inventario dell'API.
+  - Componenti v4 (branch `4.x`): `src/lib/components/{simple,composed,layouts}/`. Pagine docs v4: `src/routes/docs/components/`. Gli array `props`, `styleProps` e gli snippet sono scritti a mano, ma servono come inventario dell'API.
 - Per il confronto visivo con il prototipo c'è Playwright MCP, configurato in `.mcp.json` della root.
 
 ## Requisiti (dai brief delle tre task, svolte in parallelo)
@@ -89,7 +89,7 @@ Cose che non stanno nel codice e che finora sapeva solo l'utente (2026-10-09). L
    - Avvicinare il più possibile l'aspetto di default al prototipo, prendendolo come ispirazione.
    - Ogni componente deve essere personalizzabile tramite variabili CSS.
    - Nuove tonalità di default, sia light sia dark, vicine al prototipo.
-   - Il brief originale chiede di **non cambiare la logica** dei componenti e di chiedere prima se serve farlo. Vale anche nella riscrittura: il comportamento della v4 è la specifica, e ogni scostamento si chiede. Il "solo CSS" chiesto all'inizio dal capo è superato: il 2026-10-09 il capo ha approvato di cambiare anche la logica e le API quando serve, documentate in `aurora/MIGRATION.md`, purché la migrazione sia supportata da strumenti (punto 4).
+   - Il brief originale chiede di **non cambiare la logica** dei componenti e di chiedere prima se serve farlo. Vale anche nella riscrittura: il comportamento della v4 è la specifica, e ogni scostamento si chiede. Il "solo CSS" chiesto all'inizio dal capo è superato: il 2026-10-09 il capo ha approvato di cambiare anche la logica e le API quando serve, documentate in `MIGRATION.md`, purché la migrazione sia supportata da strumenti (punto 4).
 2. **Documentazione**
    - Redesign ispirato al prototipo, possibilmente costruito con i componenti stessi della libreria.
    - Una pagina dedicata per ogni componente, con: esempio grafico, props, variabili CSS disponibili, snippet disponibili.
@@ -110,12 +110,13 @@ Cose che non stanno nel codice e che finora sapeva solo l'utente (2026-10-09). L
 Una riga per argomento; la voce completa, con data e motivazioni, è in `reference/decisions.md`.
 
 **Progetto**
-- Aurora è la **v5 di `@likable-hair/svelte`** (stesso nome, `5.0.0`, `"private": true` finché non si pubblica), riscritta da zero in `aurora/`; nessuna strategia `next`/alias.
+- Aurora è la **v5 di `@likable-hair/svelte`** (stesso nome, `5.0.0`, `"private": true` finché non si pubblica), riscritta da zero; nessuna strategia `next`/alias.
+- **La v5 alla radice** (2026-10-16, utente: "in questo branch. poi prima di mergiare in master, creo un nuovo branch con la v4. oppure crealo direttamente tu"): nel branch `aurora-v5` il contenuto di `aurora/` passa alla radice e la v4 esce dalla radice; la v4 resta nel branch **`4.x`**, creato da `master` (4.3.2), per le correzioni alle app ancora sulla v4 finché non sono migrate. Poi `aurora-v5` si unisce in `master`.
 - Partire minimali: dipendenze solo quando servono (runtime: `flag-icons`, dal 2026-10-13 `@tanstack/virtual-core` per la virtualizzazione delle righe, dal 2026-10-14 `chart.js` e `chartjs-plugin-zoom` per i grafici). Le tre task (componenti, docs, temi) procedono insieme.
 - **Niente pubblicazione da noi** (2026-10-16, utente: "non pubblicare nulla, noi ora facciamo solo codice. poi il capo pubblica npm"): non si pubblica niente (né la v5 né `svelte-migrate`/`svelte-mcp`), i pacchetti restano `"private": true`; pubblica il capo su npm (dove sta la v4). Pipeline e Changesets si decidono col capo quando pubblica.
-- **Cambiare logica e API è approvato** (dal capo, 2026-10-09), ma ogni cambio che rompe chi migra va in `aurora/MIGRATION.md` e nelle regole `migrations/v4-to-v5/` (aggiunte opzionali: una riga).
+- **Cambiare logica e API è approvato** (dal capo, 2026-10-09), ma ogni cambio che rompe chi migra va in `MIGRATION.md` e nelle regole `migrations/v4-to-v5/` (aggiunte opzionali: una riga).
 - **Parità con la v4**: ogni capacità v4 ha un equivalente o è scartata con l'ok dell'utente.
-- Tutto ciò che sta in `aurora/` è in **inglese**; la skill in italiano. Testi di default dei componenti in inglese (nei filtri la lingua viene da `locale`).
+- Tutto ciò che sta nel repo è in **inglese**, salvo la skill (in italiano). Testi di default dei componenti in inglese (nei filtri la lingua viene da `locale`).
 
 **Stile, token e temi**
 - Token su 3 livelli: `--global-*` → `--{comp}-default-*` → `--{comp}-*` per istanza. Precedenza con i **cascade layer** (riga dei layer in testa a ogni CSS): default in `global.base`, temi in `global.theme`, regole dei componenti in `global.components`; il CSS dell'app senza layer vince sempre.
@@ -150,7 +151,7 @@ Una riga per argomento; la voce completa, con data e motivazioni, è in `referen
 - Vitest in browser mode (Chromium + Firefox) per i componenti, progetto node per utility e regole; un test visivo Playwright che fotografa ogni esempio in 4 aspetti.
 - **Test e regole di migrazione si scrivono insieme al componente**: `tests/components/<C>.test.ts`, `migrations/v4-to-v5/<C>.ts` (dati tipizzati), `MIGRATION.md`.
 - **Si lanciano solo i test strettamente necessari** (2026-10-13): vedi "Regola dei test".
-- **Migrazione guidata** (P211–P219 approvate il 2026-10-15, con due modifiche; dettaglio in `reference/migration.md`): pacchetto separato `@likable-hair/svelte-migrate` in `aurora/migrate/`, un comando a fasi (`analyze` in sola lettura, setup, codemod meccanico deterministico e rigiocabile, lista dei punti rimasti per file da `svelte-check` + regole con l'elenco delle pagine da guardare, pulizia), `v4-compat.css` nei due sensi, MCP e prompt come strato sopra, app v3 con `sv migrate svelte-5` + sintassi v3, regole rese leggibili dalla macchina e MIGRATION.md per componente generato, pilota su tatum dopo `analyze` su tutte le app.
+- **Migrazione guidata** (P211–P219 approvate il 2026-10-15, con due modifiche; dettaglio in `reference/migration.md`): pacchetto separato `@likable-hair/svelte-migrate` in `migrate/`, un comando a fasi (`analyze` in sola lettura, setup, codemod meccanico deterministico e rigiocabile, lista dei punti rimasti per file da `svelte-check` + regole con l'elenco delle pagine da guardare, pulizia), `v4-compat.css` nei due sensi, MCP e prompt come strato sopra, app v3 con `sv migrate svelte-5` + sintassi v3, regole rese leggibili dalla macchina e MIGRATION.md per componente generato, pilota su tatum dopo `analyze` su tutte le app.
 - **Niente wrapper `Standard*`** (2026-10-15, utente): le app usano sempre i componenti della libreria; lo stile si dà con le variabili CSS (default dell'app nel suo CSS), non con un wrapper. Un wrapper resta solo se strettamente necessario (casi estremi). **Precisato il 2026-10-16**: le funzioni delle copie locali non si perdono (si portano nella libreria o, se no, gli snippet devono permetterle); se una cosa resta nell'app è un wrapper della libreria riusato in tutta l'app; le pagine usano componenti, niente codice scritto in una sola pagina. Nella migrazione i wrapper si **sciolgono**: ogni uso diventa il componente della libreria; quelli con logica vera si segnalano.
 - **Tema delle app: `appearanceScript` + `ModeSwitch`** (ex P227, 2026-10-16, utente): via `/api/setTheme`, `%theme%` e la sostituzione in `hooks.server.ts` (20 app); nuovo `ModeSwitch` della libreria (sole/luna) al posto di ThemeSwitch (9 app) e dei toggle nei layout (11). **Deve permettere di scegliere anche il modo di sistema** (2026-10-16, utente): **tre icone in fila** (sole, sistema, luna), con la forma di TabSwitcher segmentato (raggi del tema `md`/`sm`, non più la pillola del prototipo: 2026-10-16, utente, "per rimanere in tema"), un clic per modo (scelta fra tre icone / icona con menu / tre icone + compatta / switch a tre posizioni). Fatto il 2026-10-16 (API approvata dall'utente il 2026-10-16: `reference/decisions.md`); **"sistema" si può togliere** con `system={false}` (2026-10-16, utente).
 - **Divider locali → Divider v5** (ex P224, 2026-10-16, utente): anche i 16 `<Divider />` oggi invisibili (variabile mai definita) diventano linee.
@@ -165,11 +166,11 @@ Una riga per argomento; la voce completa, con data e motivazioni, è in `referen
 - **Le app sulla v3 restano sulla v3** (2026-10-16, utente: "quelli della v3 rimangono alla v3"): si migrano alla v5 solo le app sulla v4 (addibox, astro, biblio, biblio-smart-folder, cbam, contattorapido, maya, mufasa, new-vigipass, stramoniumai, tatum); le 10 su lib v3 + Svelte 4 (billboards, emarket, epass, ermes, forlimusica, ganymede, h24, likable-tools, lupette, quantum) non si migrano. P221 (regole v3 → v4) respinta; la parte di P216 sulle app v3 non serve più (il codice già scritto resta, niente lavoro nuovo).
 - **Via dalle app tutto ciò che la v5 rende inutile** (2026-10-16, utente): come i `Standard*`, anche i `LabelAnd*` (LabelAndTextfield/Select/Checkbox/Textarea, 18–26 copie ciascuno → campo con `label`) e ogni altro componente locale che è un wrapper sottile, una copia di un componente della libreria o un pezzo che la v5 fa già; restano e si segnalano solo quelli con logica vera o contratto diverso.
 - **Stile dei wrapper sciolti: aspetto Aurora** (2026-10-15, utente): del wrapper si tengono il significato (`style` → `variant`, `error` → `state`…) e le misure di layout (larghezze, margini); colori, padding, altezze, raggi e ombre si tolgono e si elencano nel rapporto.
-- **Niente coesistenza v4 + v5** (2026-10-15, utente): ogni app si migra tutta, poi si ritesta tutto; niente alias né 4.x di manutenzione per la convivenza.
+- **Niente coesistenza v4 + v5** (2026-10-15, utente): ogni app si migra tutta, poi si ritesta tutto; niente alias né 4.x dentro un'app migrata per la convivenza (il branch `4.x` serve solo alle app ancora tutte sulla v4).
 - **Font delle app migrate** (2026-10-15, utente, scelta 2 su 2): le app passano ai font del prototipo (Geist, Bricolage Grotesque, Geist Mono); li carica l'app da Google Fonts con lo stesso URL del prototipo, la pagina prende `var(--global-font-family)`, il vecchio import (es. Inter) si toglie se non è più usato. Lo fa `setup`.
 - **Tema delle app migrate: Aurora** (2026-10-15, utente, fra Aurora e `classic`): nessun import di tema; i colori v4 usati dal CSS dell'app passano per `v4-compat.css` (ex P40/P213, fatto), che li porta sui colori Aurora con la stessa posizione nella scala e lascia vincere gli override `--global-color-light/dark-*` dell'app, che col tema di default diventano anche i colori di brand e di stato della v5. `setup` aggiunge l'import.
 - **Niente commit nelle app** (2026-10-15, utente): lo strumento e Claude modificano i file dell'app ma non committano mai (sostituisce "una fase = un commit" di P211); committa l'utente.
-- **MCP e skill per gli agenti** (COMP-123/124, 2026-10-15, utente): server MCP locale stdio `@likable-hair/svelte-mcp` (`aurora/mcp/`) con le specifiche da `dist/spec.json` della libreria installata (generato dalle funzioni delle docs; copia v5 inclusa per le app sulla 4.x), temi della galleria, `validate_usage`; **un solo server** anche per la migrazione, con `svelte-migrate` **pacchetto separato** caricato a richiesta e tool `migration_*` solo per app `<5`; skill **`aurora-design`** (solo metodo, niente specifiche) dentro `@likable-hair/svelte`, `aurora-migrate` dentro `svelte-migrate`; `npx svelte-mcp init` per Claude Code, Codex, Cursor, Copilot + blocco in `AGENTS.md`, chiamato da `setup`; pagina docs "AI agents" e schemi di pagina.
+- **MCP e skill per gli agenti** (COMP-123/124, 2026-10-15, utente): server MCP locale stdio `@likable-hair/svelte-mcp` (`mcp/`) con le specifiche da `dist/spec.json` della libreria installata (generato dalle funzioni delle docs; copia v5 inclusa per le app sulla 4.x), temi della galleria, `validate_usage`; **un solo server** anche per la migrazione, con `svelte-migrate` **pacchetto separato** caricato a richiesta e tool `migration_*` solo per app `<5`; skill **`aurora-design`** (solo metodo, niente specifiche) dentro `@likable-hair/svelte`, `aurora-migrate` dentro `svelte-migrate`; `npx svelte-mcp init` per Claude Code, Codex, Cursor, Copilot + blocco in `AGENTS.md`, chiamato da `setup`; pagina docs "AI agents" e schemi di pagina.
 - **Default v4 nelle app migrate: solo comportamento** (2026-10-15, utente, fra solo comportamento / tutti / nessuno): il codemod scrive il default v4 (`keepV4`) solo dove senza la prop l'app farebbe una cosa diversa (regole con `behaviour: true`: menu e campi che restano aperti, tooltip immediato, sidebar al passaggio, scorrimento infinito, gestore delle colonne); per aspetto e lingua non scrive niente (le app migrate sembrano le nuove; la lingua viene da `setDefaultLocale`) e li elenca come pagine da guardare.
 
 **Componenti (scelte principali; il dettaglio di ognuno è in `reference/decisions.md`)**
@@ -256,15 +257,15 @@ Il Toast, chiesto il 2026-10-08, è fatto il 2026-10-09.
 2. **Riferimento visivo**: la card del prototipo `design/components-prototype.html` (cerca il percorso v4 del componente); stati, varianti, light e dark.
 3. **Differenze e parità**: ogni capacità della v4 e il suo equivalente; quello che manca o si scarta, e ogni cambio di comportamento o API, si chiede **prima** di implementare. Segnala i comportamenti senza senso.
 4. **Contratto di personalizzazione** (5 punti) e convenzioni: leggi `reference/conventions.md`.
-5. **Implementazione** in `aurora/src/lib/components/...`, solo token; variabili CSS per ogni parte e stato.
+5. **Implementazione** in `src/lib/components/...`, solo token; variabili CSS per ogni parte e stato.
 6. **Docs**: `@component`, JSDoc di ogni prop, esempi in `src/docs/examples/<slug>/`.
 7. **Verifica a mano** nel browser (light/dark, Aurora/classic, tastiera, mobile se serve), poi **test** in `tests/components/<C>.test.ts` (quello verificato a mano diventa un test) e baseline visive dei soli esempi nuovi.
-8. **Export** da `aurora/src/lib/index.ts`; **migrazione** in `MIGRATION.md` e `migrations/v4-to-v5/<C>.ts`.
+8. **Export** da `src/lib/index.ts`; **migrazione** in `MIGRATION.md` e `migrations/v4-to-v5/<C>.ts`.
 9. **Skill**: una riga in "Stato" qui, i dettagli in `reference/history.md`, le decisioni in entrambi i posti.
 
 ## Regola dei test (2026-10-13, richiesta dell'utente: girano solo i test strettamente necessari)
 
-La suite intera (~4.000 test in due browser, ~2 minuti) e il test visivo intero (~1.000 screenshot, ~5 minuti) non si lanciano dopo ogni modifica. Ogni browser apre al massimo una scheda ogni 4 GB di RAM (`pagesPerBrowser` in `vite.config.ts`, 4 su 16 GB; `VITEST_MAX_WORKERS=n` lo cambia): senza limite la suite riempiva RAM e swap (vedi `traps.md`). Da `aurora/`:
+La suite intera (~4.000 test in due browser, ~2 minuti) e il test visivo intero (~1.000 screenshot, ~5 minuti) non si lanciano dopo ogni modifica. Ogni browser apre al massimo una scheda ogni 4 GB di RAM (`pagesPerBrowser` in `vite.config.ts`, 4 su 16 GB; `VITEST_MAX_WORKERS=n` lo cambia): senza limite la suite riempiva RAM e swap (vedi `traps.md`). Dalla radice:
 
 - **Durante il lavoro**, solo i test di ciò che hai toccato:
   - un componente: il **suo file di test** e quelli dei componenti che lo usano direttamente (`npx vitest run --project components tests/components/<C>.test.ts tests/components/<D>.test.ts`);
@@ -295,7 +296,7 @@ La suite intera (~4.000 test in due browser, ~2 minuti) e il test visivo intero 
 ## Trappole più frequenti (elenco completo in `reference/traps.md`)
 
 - `cp`, `rm`, `mv` (e `ps`) sono alias interattivi: `command cp -f`, `command rm`, `command mv -f`, altrimenti il comando resta fermo.
-- I comandi npm vanno lanciati **da `aurora/`** (dalla root agiscono sulla v4). Aurora non ha Prettier: non lanciarlo.
+- I comandi npm si lanciano **dalla radice** (dal 2026-10-16; prima stavano in `aurora/`). Niente Prettier né ESLint: non lanciarli.
 - `sed -i` a volte non viene visto dal watcher di Vite: usare Edit/Python o fare `touch`.
 - SvelteKit 3: niente `$lib` (si usa `#lib/...` in docs e test, percorsi relativi in `src/lib`); `$app/environment` deprecato, usare `import.meta.env.DEV`.
 - Un `<dialog>` modale rende inerti anche i popover aperti fuori da lui: un popover che deve funzionare con un modale aperto va messo dentro il `<dialog>`.
@@ -372,4 +373,5 @@ La suite intera (~4.000 test in due browser, ~2 minuti) e il test visivo intero 
 - **2026-10-16, commit di P233** su `aurora-v5` (push non chiesto): 811 test node verdi, regole rigenerate invariate, `npm run check` 0/0 (suite dei componenti non rilanciata: niente in `src/lib`).
 - **2026-10-16, P234 fatto** (dettagli in `history.md`): `unless` nei passi, guardato anche sul codice attuale in `next`; su 5 regole; corretti i passi generali che contavano usi in file cancellati; 816 test node, `check` 0/0. Scelte senza domanda approvate dall'utente il 2026-10-16.
 - **2026-10-16, P235 fatto** (dettagli in `history.md`): paraglide 2 rilevato, `setup` scrive `setDefaultLocale(() => getLocale())`, `lang` da `getLocale()` tolto allo scioglimento; corretto `<html lang="%lang%">` letto come lingua; 821 test node, `check` 0/0. Scelte senza domanda approvate dall'utente il 2026-10-16.
-- **Prossimo**, in quest'ordine ((a)–(c) committati in `60917e9`, (d) P233 committato in `1977b07`; (e) pubblicazione: decisa il 2026-10-16, non la facciamo noi): P234 committato; P235 committato; poi P56 e P104 (funzioni della libreria: suite intera e visivo prima del commit). Pilota e pipeline restano fermi (decisioni "Niente pilota" e "Niente pubblicazione da noi"). Attenzione: `setup` ora aggiunge alle app `@likable-hair/svelte-migrate` e `@likable-hair/svelte-mcp` (non pubblicati: rilanciato su tatum l'install fallirebbe senza `.tgz`) e scrive i file degli agenti (`.mcp.json`, `.claude/skills`, `AGENTS.md`…).
+- **2026-10-16, la v5 alla radice** (decisione omonima; dettagli in `history.md`): branch `4.x` creato da `master`; `aurora/` spostata alla radice di `aurora-v5`, file v4 che servono copiati in `migrate/v4/`; `CLAUDE.md` e skill aggiornati; suite intera 4.349 verde, visivo 1.068, package ok; scelte senza domanda approvate dall'utente; commit su `aurora-v5` (push non chiesto).
+- **Prossimo**, in quest'ordine ((a)–(c) committati in `60917e9`, (d) P233 committato in `1977b07`; (e) pubblicazione: decisa il 2026-10-16, non la facciamo noi): P234 e P235 committati; v5 alla radice committata. Poi P56 e P104 (funzioni della libreria: suite intera e visivo prima del commit). **Prima del merge in `master`**: push di `4.x` e `aurora-v5` (da chiedere) e workflow della CI da rifare con la pipeline. Pilota e pipeline restano fermi (decisioni "Niente pilota" e "Niente pubblicazione da noi"). Attenzione: `setup` ora aggiunge alle app `@likable-hair/svelte-migrate` e `@likable-hair/svelte-mcp` (non pubblicati: rilanciato su tatum l'install fallirebbe senza `.tgz`) e scrive i file degli agenti (`.mcp.json`, `.claude/skills`, `AGENTS.md`…).

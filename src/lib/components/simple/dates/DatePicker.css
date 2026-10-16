@@ -1,10 +1,27 @@
-:root {
-  --date-picker-default-primary-color: rgb(var(--global-color-primary-600));
-  --date-picker-default-height: 400px;
-  --date-picker-default-width: 100%;
-  --date-picker-default-header-background-color: rgb(var(--global-color-primary-600));
-  --date-picker-default-header-color: rgb(var(--global-color-grey-50));
-  --date-picker-default-box-shadow: 0 4px 6px -1px rgb(var(--global-color-contrast-300), .1),
-    0 2px 4px -2px rgb(var(--global-color-contrast-300), .1);
-  --date-picker-default-overflow: hidden;
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--date-picker-default-width: 280px;
+		--date-picker-default-padding: 12px;
+		--date-picker-default-gap: 12px;
+		--date-picker-default-background: var(--global-color-surface-pop);
+		--date-picker-default-color: var(--global-color-text);
+		--date-picker-default-border-width: var(--global-border-width);
+		--date-picker-default-border-color: var(--global-color-border-strong);
+		--date-picker-default-border-radius: var(--global-radius-lg);
+		--date-picker-default-box-shadow: var(--global-shadow-lg);
+		--date-picker-default-title-color: var(--global-color-text);
+		--date-picker-default-title-font-family: var(--global-font-family-display);
+		--date-picker-default-title-font-size: 16px;
+		--date-picker-default-title-font-weight: 600;
+		--date-picker-default-title-letter-spacing: -0.02em;
+		--date-picker-default-title-hover-background: var(--global-color-surface-2);
+		--date-picker-default-title-border-radius: var(--global-radius-sm);
+		--date-picker-default-focus-ring-color: var(--global-focus-ring-color);
+		--date-picker-default-month-width: 254px;
+		--date-picker-default-months-gap: 24px;
+		--date-picker-default-footer-padding-top: 12px;
+		--date-picker-default-footer-border-color: var(--global-color-border);
+	}
 }
