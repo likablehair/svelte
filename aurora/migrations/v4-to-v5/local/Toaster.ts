@@ -1,6 +1,6 @@
 import type { LocalMigration } from '../../types.js';
 
-const functions = ['addToast', 'addSuccessToast', 'addErrorToast', 'addWarningToast', 'addInfoToast', 'removeToast'];
+const functions = ['addToast', 'addSuccessToast', 'addErrorToast', 'addWarningToast', 'addInfoToast'];
 
 export default {
 	from: 'Toaster',
@@ -8,7 +8,7 @@ export default {
 	files: ['Toaster.svelte'],
 	contains: ['createToaster'],
 	summary: 'The local melt-ui `Toaster` copy becomes `Toaster` of the library, and the toast functions are imported from the library.',
-	exports: functions.map((name) => ({ from: name, to: name })),
+	exports: [...functions, 'removeToast'].map((name) => ({ from: name, to: name })),
 	calls: {
 		functions,
 		unwrap: 'data',

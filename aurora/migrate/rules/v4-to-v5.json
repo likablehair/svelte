@@ -5664,7 +5664,9 @@
 					"required": "false",
 					"class": "{}"
 				},
-				"events": [],
+				"events": [
+					"onchange"
+				],
 				"snippets": [
 					"labelSnippet",
 					"itemSnippet",
@@ -17855,6 +17857,35 @@
 			]
 		},
 		{
+			"from": "local/BarChart",
+			"to": "BarChart",
+			"files": [
+				"BarChart.svelte"
+			],
+			"contains": [
+				"resetZoom"
+			],
+			"excludes": [
+				"defaultOptions"
+			],
+			"summary": "The local old copy of `BarChart` becomes `BarChart` of the library.",
+			"props": {
+				"removed": [
+					{
+						"name": "resetZoom",
+						"note": "The chart shows a \"Reset zoom\" button while zoomed, and a double click resets it; from code use `bind:chart` and `chart.resetZoom()`."
+					}
+				]
+			},
+			"manual": [
+				{
+					"id": "bar-chart-local-look",
+					"summary": "The library BarChart applies its defaults (theme colors, rounded bars, visible ticks, zoom) under the `options` of the app.",
+					"action": "Check the chart: remove from `options` what the library already does, and note that `showYTicks`/`showXTicks` of the old wrappers were swapped."
+				}
+			]
+		},
+		{
 			"from": "local/BoxList",
 			"to": "BoxList",
 			"files": [
@@ -18060,6 +18091,48 @@
 					"action": "Remove app CSS aimed at the classes of the copy; `color` on an item gives its icon another tone."
 				}
 			]
+		},
+		{
+			"from": "local/ButtonGroup",
+			"to": "RadioGroup",
+			"files": [
+				"ButtonGroup.svelte"
+			],
+			"contains": [
+				"selectedButton"
+			],
+			"summary": "The local `ButtonGroup` copy (a selector of cards) becomes `RadioGroup` of the library with `card`.",
+			"props": {
+				"renamed": [
+					{
+						"from": "buttons",
+						"to": "items",
+						"note": "Each item is a `RadioItem`: `value`, `label`, `description`, `icon` (an `@mdi/js` path), `disabled`."
+					},
+					{
+						"from": "selectedButton",
+						"to": "value"
+					}
+				],
+				"defaults": [
+					{
+						"name": "card",
+						"v4": "cards",
+						"v5": "false",
+						"keepV4": "card",
+						"behaviour": true
+					}
+				]
+			},
+			"snippets": {
+				"renamed": [
+					{
+						"from": "children",
+						"to": "itemSnippet",
+						"note": "It receives `{ item, index, checked }` instead of `{ button, selected }`. With `card` RadioGroup already shows the icon, the label and the description of each item: remove the snippet if it only did that."
+					}
+				]
+			}
 		},
 		{
 			"from": "local/CircularProgressIndicator",
@@ -18435,6 +18508,132 @@
 			]
 		},
 		{
+			"from": "local/DateRangePicker",
+			"to": "DatePickerTextField",
+			"files": [
+				"DateRangePicker.svelte"
+			],
+			"contains": [
+				"createDateRangePicker"
+			],
+			"summary": "The local melt-ui `DateRangePicker` copy becomes `DatePickerTextField` of the library with `range`.",
+			"props": {
+				"renamed": [
+					{
+						"from": "labelDatePicker",
+						"to": "label"
+					},
+					{
+						"from": "descriptionDatePicker",
+						"to": "hint"
+					},
+					{
+						"from": "validFrom",
+						"to": "selectedDate",
+						"note": "The start of the range, a `Date` at local midnight."
+					},
+					{
+						"from": "validTo",
+						"to": "selectedDateTo",
+						"note": "The end of the range."
+					},
+					{
+						"from": "from",
+						"to": "selectedDate",
+						"note": "The start of the range, a `Date` at local midnight."
+					},
+					{
+						"from": "to",
+						"to": "selectedDateTo",
+						"note": "The end of the range."
+					},
+					{
+						"from": "minValue",
+						"to": "min"
+					},
+					{
+						"from": "maxValue",
+						"to": "max"
+					},
+					{
+						"from": "showApply",
+						"to": "confirm",
+						"note": "The calendar works on a draft that Apply saves; Cancel, Escape and a click outside discard it."
+					},
+					{
+						"from": "showClear",
+						"to": "clearable",
+						"note": "With `confirm` the bottom of the calendar also has Clear."
+					},
+					{
+						"from": "twoMonthsView",
+						"to": "months",
+						"note": "Two months side by side in the menu (one on phones)."
+					},
+					{
+						"from": "applyText",
+						"to": "applyLabel"
+					}
+				],
+				"values": [
+					{
+						"name": "months",
+						"values": {
+							"true": "2",
+							"false": "1"
+						}
+					}
+				],
+				"removed": [
+					{
+						"name": "defaultStartDate",
+						"note": "The field shows the bound `selectedDate` from the start and follows it when the app changes it.",
+						"drop": true
+					},
+					{
+						"name": "defaultEndDate",
+						"note": "The field shows the bound `selectedDateTo` from the start.",
+						"drop": true
+					}
+				],
+				"defaults": [
+					{
+						"name": "range",
+						"v4": "a range",
+						"v5": "one date",
+						"keepV4": "range",
+						"behaviour": true
+					}
+				]
+			},
+			"events": {
+				"changed": [
+					{
+						"name": "on:apply",
+						"to": "onchange",
+						"argument": {
+							"detail.from": "selectedDate",
+							"detail.to": "selectedDateTo"
+						},
+						"type": "{ selectedDate: Date | undefined; selectedDateTo: Date | undefined }",
+						"note": "With `confirm`, `onchange` runs on Apply and on Clear (with both dates `undefined`), and when a date is typed in the field."
+					}
+				]
+			},
+			"manual": [
+				{
+					"id": "date-range-picker-clear",
+					"summary": "The `clear` event of the copy is gone: Clear calls `onchange` with both dates `undefined`.",
+					"action": "Move the code of the `on:clear` handler into the `onchange` handler, for when `selectedDate` is `undefined`; the `{#key}` blocks that remounted the picker after a clear are no longer needed.",
+					"when": {
+						"events": [
+							"on:clear"
+						]
+					}
+				}
+			]
+		},
+		{
 			"from": "local/Divider",
 			"to": "Divider",
 			"files": [
@@ -18554,6 +18753,105 @@
 					"id": "info-box-look",
 					"summary": "The colored boxes of the copy (per type backgrounds and borders) become the Aurora banners of each variant.",
 					"action": "Nothing to do unless a page relied on the strong colors: `--alert-banner-background` and `--alert-banner-border-color` change them."
+				}
+			]
+		},
+		{
+			"from": "local/LinkButton",
+			"to": "Button",
+			"files": [
+				"LinkButton.svelte"
+			],
+			"contains": [
+				"fit-content"
+			],
+			"summary": "The local `LinkButton` copy (clickable text) becomes a text `Button` of the library.",
+			"props": {
+				"removed": [
+					{
+						"name": "marginTop",
+						"note": "Space comes from the layout.",
+						"drop": true
+					},
+					{
+						"name": "fontSize",
+						"note": "Use `--button-font-size`."
+					}
+				],
+				"defaults": [
+					{
+						"name": "buttonType",
+						"v4": "clickable text",
+						"v5": "'default'",
+						"keepV4": "buttonType=\"text\"",
+						"behaviour": true
+					}
+				]
+			},
+			"events": {
+				"changed": [
+					{
+						"name": "on:click",
+						"to": "onclick",
+						"argument": {},
+						"type": "MouseEvent",
+						"note": "Svelte 4 event directive of older app code."
+					}
+				]
+			},
+			"manual": [
+				{
+					"id": "link-button-navigation",
+					"summary": "A text button that only navigates (`() => goto(\"/\")`) is better as a link.",
+					"action": "Replace `onclick={() => goto(\"/x\")}` with `href=\"/x\"` on the Button: it becomes a real link that opens in a new tab and is preloaded."
+				}
+			]
+		},
+		{
+			"from": "local/MeltDatePicker",
+			"to": "DatePickerTextField",
+			"files": [
+				"MeltDatePicker.svelte"
+			],
+			"contains": [
+				"createDatePicker"
+			],
+			"summary": "The local melt-ui `MeltDatePicker` copy becomes `DatePickerTextField` of the library.",
+			"props": {
+				"renamed": [
+					{
+						"from": "date",
+						"to": "selectedDate",
+						"note": "A `Date` at local midnight (the copy returned midnight CET)."
+					},
+					{
+						"from": "minValue",
+						"to": "min"
+					},
+					{
+						"from": "maxValue",
+						"to": "max"
+					}
+				],
+				"removed": [
+					{
+						"name": "defaultValue",
+						"note": "The field shows the bound `selectedDate` from the start; `defaultValue={x} bind:date={x}` was there only because the copy overwrote the bound value on mount.",
+						"drop": true
+					}
+				]
+			},
+			"manual": [
+				{
+					"id": "melt-date-picker-initial",
+					"summary": "The copy emptied the bound date on mount unless `defaultValue` was the same variable; DatePickerTextField shows the value it receives.",
+					"action": "Check the forms that relied on starting empty: initialize their variable to `undefined`."
+				},
+				{
+					"id": "melt-date-picker-locale",
+					"summary": "The copy was always Italian; the field follows `setDefaultLocale` (or `locale`) for the format and the calendar.",
+					"action": "Nothing to do in an Italian app that calls `setDefaultLocale(\"it\")`.",
+					"scope": "app"
 				}
 			]
 		},
@@ -18704,6 +19002,201 @@
 			]
 		},
 		{
+			"from": "local/PasswordTextfield",
+			"to": "SimpleTextField",
+			"files": [
+				"PasswordTextfield.svelte"
+			],
+			"summary": "The local `PasswordTextfield` copy becomes a password `SimpleTextField` of the library with its eye button.",
+			"props": {
+				"defaults": [
+					{
+						"name": "type",
+						"v4": "'password'",
+						"v5": "'text'",
+						"keepV4": "type=\"password\"",
+						"behaviour": true
+					},
+					{
+						"name": "revealable",
+						"v4": "an eye button",
+						"v5": "false",
+						"keepV4": "revealable",
+						"behaviour": true
+					}
+				]
+			},
+			"events": {
+				"changed": [
+					{
+						"name": "on:input",
+						"to": "oninput",
+						"argument": {},
+						"type": "Event",
+						"note": "Svelte 4 event directive of older app code."
+					},
+					{
+						"name": "on:keydown",
+						"to": "onkeydown",
+						"argument": {},
+						"type": "KeyboardEvent",
+						"note": "Svelte 4 event directive of older app code."
+					}
+				]
+			}
+		},
+		{
+			"from": "local/RadioButton",
+			"to": "RadioGroup",
+			"files": [
+				"RadioButton.svelte"
+			],
+			"contains": [
+				"userSelected"
+			],
+			"summary": "The local `RadioButton` copy, a whole group despite its name, becomes `RadioGroup` of the library.",
+			"props": {
+				"renamed": [
+					{
+						"from": "legend",
+						"to": "label"
+					},
+					{
+						"from": "options",
+						"to": "items"
+					},
+					{
+						"from": "userSelected",
+						"to": "value"
+					},
+					{
+						"from": "flexDirection",
+						"to": "orientation"
+					}
+				],
+				"values": [
+					{
+						"name": "orientation",
+						"values": {
+							"column": "vertical",
+							"row": "horizontal"
+						}
+					}
+				],
+				"removed": [
+					{
+						"name": "fontSize",
+						"note": "The text follows the theme; `--radio-button-label-font-size` changes it.",
+						"drop": true
+					}
+				]
+			},
+			"events": {
+				"changed": [
+					{
+						"name": "onchange",
+						"argument": {
+							"selectedValue": "value"
+						},
+						"type": "{ value: string | number | undefined; item: RadioItem | undefined; event: Event }"
+					},
+					{
+						"name": "on:change",
+						"to": "onchange",
+						"argument": {},
+						"type": "{ value: string | number | undefined; item: RadioItem | undefined; event: Event }",
+						"note": "Svelte 4 event directive of older app code."
+					}
+				]
+			},
+			"manual": [
+				{
+					"id": "radio-button-first-option",
+					"summary": "The copies selected the first option by themselves (and failed with no options); RadioGroup starts with nothing selected.",
+					"action": "Where the first option must start selected, initialize the bound variable with its value."
+				}
+			]
+		},
+		{
+			"from": "local/RadioGroup",
+			"to": "RadioGroup",
+			"files": [
+				"RadioGroup.svelte"
+			],
+			"contains": [
+				"checkedValue"
+			],
+			"summary": "The local `RadioGroup` copy becomes `RadioGroup` of the library.",
+			"props": {
+				"renamed": [
+					{
+						"from": "legend",
+						"to": "label"
+					},
+					{
+						"from": "options",
+						"to": "items"
+					},
+					{
+						"from": "checkedValue",
+						"to": "value",
+						"note": "The selected value; pass a variable with `bind:value` to read the choice without `onchange`."
+					}
+				],
+				"removed": [
+					{
+						"name": "containerPaddingTop",
+						"note": "Space around the group comes from the layout.",
+						"drop": true
+					},
+					{
+						"name": "containerPaddingBottom",
+						"note": "Space around the group comes from the layout.",
+						"drop": true
+					},
+					{
+						"name": "containerPaddingLeft",
+						"note": "Space around the group comes from the layout.",
+						"drop": true
+					},
+					{
+						"name": "containerPaddingRight",
+						"note": "Space around the group comes from the layout.",
+						"drop": true
+					}
+				]
+			},
+			"events": {
+				"changed": [
+					{
+						"name": "onchange",
+						"argument": {
+							"detail": "value",
+							"selectedValue": "value"
+						},
+						"type": "{ value: string | number | undefined; item: RadioItem | undefined; event: Event }",
+						"note": "The chosen value is `e.value` (the copies passed it as `e.detail` or `e.selectedValue`)."
+					},
+					{
+						"name": "on:change",
+						"to": "onchange",
+						"argument": {
+							"detail": "value"
+						},
+						"type": "{ value: string | number | undefined; item: RadioItem | undefined; event: Event }",
+						"note": "Svelte 4 event directive of older app code: `e.detail` becomes `e.value`."
+					}
+				]
+			},
+			"manual": [
+				{
+					"id": "radio-group-form",
+					"summary": "The copies wrapped the radios in a `<form>`; RadioGroup is a `<fieldset>` and can sit inside a form of the page.",
+					"action": "Nothing to do; a click on a label now selects its option (it did not in some copies)."
+				}
+			]
+		},
+		{
 			"from": "local/Spinner",
 			"to": "CircularLoader",
 			"files": [
@@ -18718,6 +19211,91 @@
 					"id": "spinner-visible",
 					"summary": "The copy relied on Bootstrap Italia classes that the apps do not load, so it showed only the text \"Caricamento...\"; CircularLoader draws a spinning ring, announced as \"Caricamento\" with the Italian locale.",
 					"action": "Check the buttons and forms that show it while loading; `--circular-loader-size` changes its size."
+				}
+			]
+		},
+		{
+			"from": "local/TabToggleSwitch",
+			"to": "TabSwitcher",
+			"files": [
+				"TabToggleSwitch.svelte"
+			],
+			"summary": "The local `TabToggleSwitch` copy becomes `TabSwitcher` of the library with the segmented look.",
+			"exports": [
+				{
+					"from": "TabToggle",
+					"to": "Tab"
+				}
+			],
+			"props": {
+				"renamed": [
+					{
+						"from": "activeTab",
+						"to": "selected"
+					}
+				],
+				"removed": [
+					{
+						"name": "maxWidth",
+						"note": "Tabs that do not fit scroll sideways.",
+						"drop": true
+					},
+					{
+						"name": "minWidth",
+						"note": "Tabs that do not fit scroll sideways.",
+						"drop": true
+					},
+					{
+						"name": "equalWidth",
+						"note": "The segmented tabs size to their text.",
+						"drop": true
+					},
+					{
+						"name": "scrollOnOverflow",
+						"note": "Tabs that do not fit always scroll sideways.",
+						"drop": true
+					}
+				],
+				"defaults": [
+					{
+						"name": "variant",
+						"v4": "a segmented pill",
+						"v5": "'underline'",
+						"keepV4": "variant=\"segmented\"",
+						"behaviour": true
+					}
+				]
+			},
+			"events": {
+				"changed": [
+					{
+						"name": "onTabChange",
+						"to": "ontabClick",
+						"argument": {
+							"": "tab.name"
+						},
+						"type": "{ tab: Tab; nativeEvent: MouseEvent }",
+						"note": "The handler receives `{ tab, nativeEvent }`: the name of the tab is `tab.name`."
+					}
+				]
+			},
+			"items": [
+				{
+					"prop": "tabs",
+					"keys": [
+						{
+							"from": "redirectUrl",
+							"to": "href"
+						}
+					],
+					"note": "Each tab is a `Tab`: `name`, `label`, `icon` (an `@mdi/js` path), `href`, `badge`, `disabled`."
+				}
+			],
+			"manual": [
+				{
+					"id": "tab-toggle-switch-links",
+					"summary": "Tabs with `href` are links that navigate by themselves (the copy only preloaded `redirectUrl` and the app navigated in `onTabChange`).",
+					"action": "Remove the `goto` from `ontabClick` where the tab has `href`, or it navigates twice."
 				}
 			]
 		},
@@ -18752,6 +19330,32 @@
 					"id": "theme-switch-look",
 					"summary": "Three icons in a pill (light, system, dark) instead of a two-state switch: about 120px wide (100px with `size=\"sm\"`) against 40px.",
 					"action": "In a top bar use `size=\"sm\"`; at the bottom of a sidebar `tooltipPlacement=\"top\"`; to offer only light and dark, as the copy did, `system={false}`. The saved choice keeps the `theme` key of localStorage, so users keep it."
+				}
+			]
+		},
+		{
+			"from": "local/TimePickerTextField",
+			"to": "TimePickerTextField",
+			"files": [
+				"TimePickerTextField.svelte"
+			],
+			"contains": [
+				"MenuOrDrawer"
+			],
+			"summary": "The local `TimePickerTextField` copy becomes `TimePickerTextField` of the library (value `\"HH:mm\"`).",
+			"props": {
+				"removed": [
+					{
+						"name": "error",
+						"note": "Use `state={error ? \"error\" : undefined}`: the border, the icon and the hint turn red."
+					}
+				]
+			},
+			"manual": [
+				{
+					"id": "time-picker-text-field-local-list",
+					"summary": "The library field has hour and minute columns (`minuteStep`) instead of a list of times every 15 minutes, and a mask for typing.",
+					"action": "Pass `minuteStep={15}` to keep the steps of the copy."
 				}
 			]
 		},
@@ -18797,8 +19401,7 @@
 					"addSuccessToast",
 					"addErrorToast",
 					"addWarningToast",
-					"addInfoToast",
-					"removeToast"
+					"addInfoToast"
 				],
 				"unwrap": "data",
 				"keys": [

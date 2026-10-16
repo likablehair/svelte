@@ -11,6 +11,7 @@ Contents:
 - [Checklist](#checklist)
 - [Global changes](#global-changes)
 - [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Avatar](#avatar), [BarChart](#barchart), [BoxList](#boxlist), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmDialog](#confirmdialog), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DashboardShaper](#dashboardshaper), [DataTable](#datatable), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [DescriptiveAvatar](#descriptiveavatar), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FileInput](#fileinput), [FileInputList](#fileinputlist), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [GlobalSearchTextField](#globalsearchtextfield), [HierarchyMenu](#hierarchymenu), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [IconsDropdown](#iconsdropdown), [LineChart](#linechart), [LinkButton](#linkbutton), [MediaQuery](#mediaquery), [Menu](#menu), [MenuOrDrawer](#menuordrawer), [MenuOrDrawerOptions](#menuordraweroptions), [ModeSwitch](#modeswitch), [MonthSelector](#monthselector), [NoData](#nodata), [PageHeader](#pageheader), [Paginator](#paginator), [PeriodPicker](#periodpicker), [PeriodSelector](#periodselector), [PieChart](#piechart), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SidebarLayout](#sidebarlayout), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Timeline](#timeline), [Toaster](#toaster), [ToggleList](#togglelist), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
+- [Local copies of components](#local-copies-of-components)
 - [Not ported](#not-ported)
 
 ## Checklist
@@ -1628,7 +1629,7 @@ New, optional: `label`, `labelSnippet`, `showValue`, `valueSnippet`, `indetermin
 ### RadioButton
 
 - `bind:checked` → `bind:group` with the same variable on every radio of the group, plus each radio's own `value` (`<RadioButton bind:group={plan} value="monthly" />`). In v4 `checked` was declared bindable but passed one way, so the binding never updated. `checked` is now only the native attribute, used while `group` is `undefined`.
-- To render a group from a list, use the new `RadioGroup` (`items`, `bind:value`, `label` as legend, generated `name`) instead of a wrapper of your own.
+- To render a group from a list, use the new `RadioGroup` (`items`, `bind:value`, `label` as legend, generated `name`, `onchange({ value, item, event })`) instead of a wrapper of your own. The local `RadioGroup` and `RadioButton` copies of the apps map onto it: `legend` → `label`, `options` → `items`, `checkedValue` / `bind:userSelected` → `value` / `bind:value`, `e.detail` and `e.selectedValue` in the change handlers → `e.value`.
 - `value` accepts `string | number`; `name` is optional (radios without it do not form a group).
 - The root is a `<label>` around the input, so the text selects the radio without an `id` (in v4 `<label for={id}>` did nothing when `id` was missing). Attributes and events go to the input (now every native attribute, not only the v4 list). The callbacks receive the native event as in v4, but are now typed with it (v4 typed them `() => void`).
 - New `class` object: `{ container, input, label, description }`.
@@ -2021,6 +2022,32 @@ New, optional: `label`, `hint`, `state`, `invalidText`, `name`, `required`, `rea
 The `-default-*` names follow.
 
 New, optional: `min`, `max`, `locale` (language of the default name "Year"), `focus()`, `bind:yearSelectorElement`, native attributes, `data-*`, `--year-selector-*` for columns, gap, padding, font, colors and states.
+
+## Local copies of components
+
+Many apps keep their own copies of components in `src/lib/components` (a `PageTitle`, a melt-ui `Toaster`, a `ConfirmOrCancelDialog`, ...). Where the library now has the component, the migration tool (`codemod`) replaces every use of the copy with the library component, renames props, events and snippets, and deletes the copy once no file imports it. What stays to check is listed by `next`, with the reason.
+
+| local copy | library component | notes |
+|---|---|---|
+| `PageTitle` | [PageHeader](#pageheader) | `prependVisible` → `back`, `prependRoute` → `backHref`, `appendSnippet` / `append` → `actionsSnippet` |
+| `ConfirmOrCancelDialog`, `AlertDialog`, `ConfirmDialog` | [ConfirmDialog](#confirmdialog) | `confirm` → `onconfirm`, `cancel` → `oncancel`, `open={x}` → `bind:open={x}`, `closeOnConfirm={false}` written to keep the app closing it |
+| `ThemeSwitch` | [ModeSwitch](#modeswitch) | the `/api/setTheme` endpoint goes when nothing calls it; `setup` replaces `%theme%` with `appearanceScript` |
+| `ConfirmOrCancelButtons` | [ConfirmOrCancelButtons](#confirmorcancelbuttons) | `onConfirmClick` / `confirm` → `onconfirmClick`, `columnDirection` → `direction="column"` |
+| `Toaster` (melt-ui) | [Toaster](#toaster) | `addErrorToast({ data: { ... } })` → `addErrorToast({ ... })`, `closeDelay` → `duration`, `showLoading` → `loading`, `action.handler` → `action.onclick`, `action.urlToPreload` → `action.href`; also in `.ts` files |
+| `Divider` | [Divider](#divider) | its props become CSS variables (`color` → `--divider-color`, ...); dividers without a color become visible lines |
+| `UserAvatar` | [DescriptiveAvatar](#descriptiveavatar) | `username` → `title`, `description` → `subtitle`, `showTitleAndDescription={false}` → `compact` |
+| `BoxList`, `BoxMenu` | [BoxList](#boxlist) | `redirectUrl` / `url` → `href` and `onClick` → `onclick` in the boxes, `gap` → `--box-list-gap`, `event.detail.box` → `event.box` |
+| `WidgetNoData`, `WidgetError`, `InfoBox` | [NoData](#nodata), [AlertBanner](#alertbanner) | `type` → `variant`, `message` → `description` |
+| `Spinner`, `CircularProgressIndicator` | [CircularLoader](#circularloader) | `progress` → `value` |
+| `RadioGroup`, `RadioButton`, `ButtonGroup` (mufasa) | [RadioButton](#radiobutton) (`RadioGroup`) | `legend` → `label`, `options` / `buttons` → `items`, the chosen value is `e.value` in `onchange` |
+| `MeltDatePicker`, `DateRangePicker` | [DatePickerTextField](#datepickertextfield) | `date` / `validFrom` / `from` → `selectedDate`, `showApply` → `confirm`, `twoMonthsView` → `months={2}` |
+| `TabToggleSwitch` | [TabSwitcher](#tabswitcher) | `activeTab` → `selected`, `onTabChange(name)` → `ontabClick(e)` with `e.tab.name`, `redirectUrl` → `href`, segmented look |
+| `LinkButton` | [Button](#button) | `buttonType="text"` |
+| `PasswordTextfield`, `ToolTipTextField` | [SimpleTextField](#simpletextfield) | `type="password" revealable`; `message` → `hint` |
+| `IndeterminateCheckbox` | [Checkbox](#checkbox) | `onCheckedChange` → the native `onchange` |
+| `TimePickerTextField` (stramoniumai), `BarChart` (mufasa) | [TimePickerTextField](#timepickertextfield), [BarChart](#barchart) | |
+
+Copies that nothing imports (`Loader`, `NotAuthorized`, `Subtitle`, ...) are deleted. Copies with logic of their own stay in the app as small wrappers of the library, and the tool migrates the library components inside them: `OptionMenu`, `OptionSelector`, `SimpleOptionMenu`, `HoverableTooltip` (use `Tooltip` with `interactive` inside it), `StackedBarChart`, `SimpleBarChart`, the local `PeriodPicker` and `DashboardShaper` copies.
 
 ## Not ported
 

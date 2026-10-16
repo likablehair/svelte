@@ -1,6 +1,6 @@
 import { mdiEmailOutline } from '@mdi/js';
 import { createRawSnippet } from 'svelte';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import RadioGroup from '#lib/components/simple/forms/RadioGroup.svelte';
@@ -90,6 +90,20 @@ describe('RadioGroup', () => {
 		await screen.getByText('Seven').click();
 		expect(value).toBe(7);
 		await expect.element(screen.getByRole('radio', { name: 'Email' })).not.toBeChecked();
+	});
+
+	test('onchange reports the choice of the user with the value, the item and the native event', async () => {
+		const onchange = vi.fn();
+		const screen = await render(RadioGroup, { label: 'Contact', items, value: 'email', onchange });
+		await screen.getByRole('radio', { name: 'SMS' }).click();
+		expect(onchange).toHaveBeenCalledOnce();
+		const [args] = onchange.mock.calls[0];
+		expect(args.value).toBe('sms');
+		expect(args.item).toBe(items[1]);
+		expect(args.event).toBeInstanceOf(Event);
+		await userEvent.keyboard('{ArrowDown}');
+		expect(onchange).toHaveBeenCalledTimes(2);
+		expect(onchange.mock.calls[1][0].value).toBe('post');
 	});
 
 	test('a value set from outside checks the matching radio', async () => {

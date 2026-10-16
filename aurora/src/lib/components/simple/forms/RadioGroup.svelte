@@ -1,5 +1,5 @@
 <!-- @component
-Group of radio buttons built from a list, inside a `<fieldset>` with `role="radiogroup"`: `label` is its legend, every radio shares a generated `name` so Tab enters the group and the arrow keys move the selection, and `disabled` and `required` work as in HTML forms. Options are `RadioItem` objects, `{ value: string | number; label?: string | number; icon?: string; description?: string; disabled?: boolean; data?: Data }`, and `value` holds the `value` of the selected one (`bind:value`). `card` shows every option as a bordered box, and `orientation="horizontal"` puts them side by side. Its state is exposed as `data-state`, `data-disabled` and `data-orientation` for app CSS.
+Group of radio buttons built from a list, inside a `<fieldset>` with `role="radiogroup"`: `label` is its legend, every radio shares a generated `name` so Tab enters the group and the arrow keys move the selection, and `disabled` and `required` work as in HTML forms. Options are `RadioItem` objects, `{ value: string | number; label?: string | number; icon?: string; description?: string; disabled?: boolean; data?: Data }`, and `value` holds the `value` of the selected one (`bind:value`); `onchange` reports each choice of the user. `card` shows every option as a bordered box, and `orientation="horizontal"` puts them side by side. Its state is exposed as `data-state`, `data-disabled` and `data-orientation` for app CSS.
 -->
 <script lang="ts" generics="Data">
 	import '../../../css/tokens.css';
@@ -10,7 +10,7 @@ Group of radio buttons built from a list, inside a `<fieldset>` with `role="radi
 	import RadioButton from './RadioButton.svelte';
 	import type { RadioItem } from './item.js';
 
-	interface Props extends Omit<HTMLFieldsetAttributes, 'class' | 'children'> {
+	interface Props extends Omit<HTMLFieldsetAttributes, 'class' | 'children' | 'onchange'> {
 		/** Options to choose from. */
 		items?: RadioItem<Data>[];
 		/** `value` of the selected option. `undefined` while none is selected. */
@@ -47,6 +47,8 @@ Group of radio buttons built from a list, inside a `<fieldset>` with `role="radi
 		itemDescriptionSnippet?: Snippet<[{ item: RadioItem<Data>; index: number; checked: boolean }]>;
 		/** Replaces the hint below the options. */
 		hintSnippet?: Snippet<[{ hint: string | undefined }]>;
+		/** Called when the user selects an option, after `value` changed, with the new value, its item and the native change event. */
+		onchange?: (args: { value: string | number | undefined; item: RadioItem<Data> | undefined; event: Event }) => void;
 	}
 
 	let {
@@ -65,6 +67,7 @@ Group of radio buttons built from a list, inside a `<fieldset>` with `role="radi
 		itemSnippet,
 		itemDescriptionSnippet,
 		hintSnippet,
+		onchange,
 		...rest
 	}: Props = $props();
 
@@ -91,6 +94,11 @@ Group of radio buttons built from a list, inside a `<fieldset>` with `role="radi
 	data-disabled={disabled || undefined}
 	data-orientation={orientation}
 	data-card={card || undefined}
+	onchange={(event) => {
+		const target = event.target as HTMLInputElement;
+		if (target.type !== 'radio' || target.name !== groupName) return;
+		onchange?.({ value, item: items.find((item) => item.value === value), event });
+	}}
 >
 	{#if labelSnippet}
 		<legend class={['aurora-radio-group-label', clazz.label]} id={legendId}

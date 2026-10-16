@@ -742,6 +742,12 @@ function rewriteRefs(
 	for (const ref of refs) {
 		const { nodes, path } = memberChain(parents, ref);
 		const full = [...prefix, ...path];
+		if (!full.length && mapping[''] !== undefined) {
+			const whole = mapping[''];
+			if (whole === null) report(ref.start, `\`${name}\` has no counterpart in v5`);
+			else if (whole && ctx.edit.replace(ref.start, ref.end, `${name}.${whole}`)) count++;
+			continue;
+		}
 		let k = full.length;
 		while (k > 0 && mapping[full.slice(0, k).join('.')] === undefined) k--;
 		if (k === 0) {
@@ -870,7 +876,10 @@ function rewriteFunction(
 	let count = 0;
 	if (param.type === 'Identifier') {
 		count += rewriteRefs(ctx, fn.body, param.name, [], mapping, report);
-		if (!rewriteType(ctx, param.typeAnnotation, mapping, ruleType)) report(param.start, 'the parameter type needs a by-hand update');
+		const primitive = /^(string|number|boolean|any|unknown)$/.test(param.typeAnnotation ? source(ctx, param.typeAnnotation.typeAnnotation) : '');
+		if (mapping[''] && primitive) {
+			if (ctx.edit.replace(param.typeAnnotation.start, param.typeAnnotation.end, '')) count++;
+		} else if (!rewriteType(ctx, param.typeAnnotation, mapping, ruleType)) report(param.start, 'the parameter type needs a by-hand update');
 		else if (param.typeAnnotation) count++;
 		return count;
 	}
@@ -894,8 +903,10 @@ interface HandlerUse {
 	mapping: Mapping;
 }
 
-function hasDetail(ctx: Context, node: Node) {
-	return /\bdetail\b/.test(source(ctx, node));
+function hasDetail(ctx: Context, node: Node, mapping: Mapping = {}) {
+	const text = source(ctx, node);
+	if (mapping[''] !== undefined) return true;
+	return [...new Set(['detail', ...Object.keys(mapping).filter(Boolean).map((key) => key.split('.')[0])])].some((head) => new RegExp(`\\b${head}\\b`).test(text));
 }
 
 function addAttr(ctx: Context, node: Node, text: string) {
@@ -937,7 +948,7 @@ function transformUsage(
 	for (const attr of attrs) {
 		if (attr.type === 'Attribute' && attr.name.startsWith('--')) continue;
 
-		if (attr.type === 'Attribute' && /^on[a-z]/.test(attr.name)) {
+		if (attr.type === 'Attribute' && (/^on[a-z]/.test(attr.name) || rule.events?.changed?.some((e) => e.name === attr.name))) {
 			transformEvent(ctx, attr, v4, rule, present, functions, handlerUses, done);
 			continue;
 		}
@@ -1150,10 +1161,10 @@ function transformEvent(
 	let rewritten = 0;
 	if (expression && Object.keys(mapping).length) {
 		if (expression.type === 'ArrowFunctionExpression' || expression.type === 'FunctionExpression') {
-			if (hasDetail(ctx, expression)) rewritten = rewriteFunction(ctx, expression, mapping, ev?.type, report);
+			if (hasDetail(ctx, expression, mapping)) rewritten = rewriteFunction(ctx, expression, mapping, ev?.type, report);
 		} else if (expression.type === 'Identifier' && functions.has(expression.name)) {
 			const fn = functions.get(expression.name)!;
-			if (!done.has(fn) && hasDetail(ctx, fn)) {
+			if (!done.has(fn) && hasDetail(ctx, fn, mapping)) {
 				done.add(fn);
 				const uses = handlerUses.get(expression.name) ?? [];
 				const refs = ctx.references.get(expression.name) ?? 0;
@@ -1162,7 +1173,7 @@ function transformEvent(
 				else if (signatures.size > 1) report(fn.start, `\`${expression.name}\` handles callbacks with different arguments`);
 				else rewritten = rewriteFunction(ctx, fn, mapping, ev?.type, report);
 			}
-		} else if (hasDetail(ctx, expression)) report(expression.start, 'handler is not a function: update it by hand');
+		} else if (hasDetail(ctx, expression, mapping)) report(expression.start, 'handler is not a function: update it by hand');
 	}
 	if (rewritten)
 		changed(ctx, attr.start, { kind: 'event-argument', id, name, note: ev?.note, check: !!ev?.note && !ev.to });
@@ -1367,7 +1378,8 @@ function transformSvelte(ctx: Context) {
 	for (const { node, v4 } of usages)
 		for (const attr of node.attributes as Node[]) {
 			const directive = attr.type === 'OnDirective';
-			if (!directive && (attr.type !== 'Attribute' || !/^on[a-z]/.test(attr.name))) continue;
+			const listed = !!ctx.index.byV4.get(v4)?.events?.changed?.some((e) => e.name === attr.name);
+			if (!directive && (attr.type !== 'Attribute' || (!/^on[a-z]/.test(attr.name) && !listed))) continue;
 			const expression = attrExpression(attr);
 			if (expression?.type !== 'Identifier') continue;
 			const list = handlerUses.get(expression.name) ?? [];

@@ -532,5 +532,20 @@ describe('codemod: local copies', () => {
 		expect(result.deleted).toEqual(['src/lib/components/common/Loader.svelte']);
 		expect(result.changes.filter((c) => c.kind === 'dead-file').map((c) => c.name)).toEqual(['Loader.svelte']);
 	});
+
+	test('TabToggleSwitch: the bare tab name becomes event.tab.name, tabs get href, the type is the library one', () => {
+		const copy = "<script lang=\"ts\" module>\n\texport type TabToggle = { name: string; label: string; redirectUrl?: string };\n</script>\n<script lang=\"ts\">\n\tlet { activeTab = $bindable(''), tabs, onTabChange = () => {} } = $props();\n</script>\n";
+		const { read } = run({
+			'src/lib/components/common/TabToggleSwitch.svelte': copy,
+			'src/routes/+page.svelte': svelte(
+				"\timport TabToggleSwitch, { type TabToggle } from '$lib/components/common/TabToggleSwitch.svelte';\n\tlet active = $state('a');\n\tconst tabs: TabToggle[] = [{ name: 'a', label: 'A', redirectUrl: '/a' }];",
+				'<TabToggleSwitch bind:activeTab={active} {tabs} minWidth="100%" onTabChange={(tabName: string) => console.log(tabName)} />'
+			)
+		});
+		const page = read('src/routes/+page.svelte');
+		expect(page).toContain("import { TabSwitcher, type Tab as TabToggle } from '@likable-hair/svelte';");
+		expect(page).toContain("const tabs: TabToggle[] = [{ name: 'a', label: 'A', href: '/a' }];");
+		expect(page).toContain('<TabSwitcher bind:selected={active} {tabs} ontabClick={(tabName) => console.log(tabName.tab.name)} variant="segmented" />');
+	});
 });
 
