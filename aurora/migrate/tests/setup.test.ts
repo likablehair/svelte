@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, test } from 'vitest';
 import { analyze } from '../src/analyze.ts';
 import { loadRules } from '../src/rules.ts';
-import { dropThemePlaceholder, prepareBranch, setHtmlLang, updateAppCss, updatePackageJson, updateTailwindConfig, updateTitleTemplate } from '../src/setup.ts';
+import { dropThemePlaceholder, prepareBranch, setHtmlLang, setup, updateAppCss, updatePackageJson, updateTailwindConfig, updateTitleTemplate } from '../src/setup.ts';
 
 const fixture = fileURLToPath(new URL('./fixtures/app-v4', import.meta.url));
 const dirs: string[] = [];
@@ -162,6 +162,37 @@ describe('setup: <html lang>', () => {
 		expect(setHtmlLang('<!DOCTYPE html>\n<html lang="en" class="%theme%">\n', 'it')).toBe('<!DOCTYPE html>\n<html lang="it" class="%theme%">\n');
 		expect(setHtmlLang('<html>\n', 'it')).toBe('<html lang="it">\n');
 		expect(setHtmlLang('<html lang="it-IT">', 'it')).toBe('<html lang="it-IT">');
+		expect(setHtmlLang('<html lang="%lang%" class="%theme%">', 'it')).toBe('<html lang="%lang%" class="%theme%">');
+	});
+});
+
+describe('setup: paraglide', () => {
+	const paraglideApp = (config?: string) => {
+		const dir = copyApp();
+		const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
+		pkg.dependencies['@inlang/paraglide-js'] = '2.0.13';
+		writeFileSync(join(dir, 'package.json'), JSON.stringify(pkg, null, '\t'));
+		if (config) writeFileSync(join(dir, 'vite.config.ts'), config);
+		writeFileSync(join(dir, 'src/app.html'), '<!DOCTYPE html>\n<html lang="%lang%">\n<body>%sveltekit.body%</body>\n</html>\n');
+		writeFileSync(join(dir, 'src/routes/+layout.svelte'), "<script lang=\"ts\">\n\timport '../app.css';\n</script>\n");
+		gitRepo(dir);
+		return dir;
+	};
+
+	test('the components follow getLocale() and the <html lang> placeholder stays', () => {
+		const dir = paraglideApp("paraglideVitePlugin({ project: './project.inlang', outdir: './src/paraglide' })\n");
+		const analysis = analyze(dir, loadRules());
+		expect(analysis.app).toMatchObject({ paraglide: '../paraglide/runtime', lang: undefined });
+		const result = setup(dir, analysis, { branch: 'aurora-v5', install: false, layers: '@layer reset, theme;' });
+		const layout = readFileSync(join(dir, 'src/routes/+layout.svelte'), 'utf8');
+		expect(layout).toContain("import { getLocale } from '../paraglide/runtime';");
+		expect(layout).toContain('setDefaultLocale(() => getLocale());');
+		expect(readFileSync(join(dir, 'src/app.html'), 'utf8')).toContain('<html lang="%lang%">');
+		expect(result.changes.some((c) => c.includes('follow the paraglide language'))).toBe(true);
+	});
+
+	test('the default output folder of paraglide is read through $lib', () => {
+		expect(analyze(paraglideApp(), loadRules()).app.paraglide).toBe('$lib/paraglide/runtime');
 	});
 });
 

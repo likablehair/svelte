@@ -3,9 +3,10 @@ import type { Node } from './svelte.ts';
 
 const LIB = '@likable-hair/svelte';
 
-export function addDefaultLocale(source: string, locale: string, typescript = true): { text: string; changed: boolean } {
+export function addDefaultLocale(source: string, locale: string | { runtime: string }, typescript = true): { text: string; changed: boolean } {
 	if (/\bsetDefaultLocale\s*\(/.test(source)) return { text: source, changed: false };
-	return addLibraryCall(source, 'setDefaultLocale', `setDefaultLocale('${locale}')`, typescript);
+	if (typeof locale === 'string') return addLibraryCall(source, 'setDefaultLocale', `setDefaultLocale('${locale}')`, typescript);
+	return addLibraryCall(source, 'setDefaultLocale', 'setDefaultLocale(() => getLocale())', typescript, { name: 'getLocale', from: locale.runtime });
 }
 
 export function addTitleTemplate(source: string, name: string, typescript = true): { text: string; changed: boolean } {
@@ -20,13 +21,20 @@ export function staticTitle(source: string): string | undefined {
 	return text || undefined;
 }
 
-function addLibraryCall(source: string, name: string, statement: string, typescript: boolean): { text: string; changed: boolean } {
+function addLibraryCall(
+	source: string,
+	name: string,
+	statement: string,
+	typescript: boolean,
+	extra?: { name: string; from: string }
+): { text: string; changed: boolean } {
 	const ast = parse(source, { modern: true }) as unknown as Node;
 	const script = ast.instance as Node | undefined;
 	if (!script) {
 		const lang = typescript ? ' lang="ts"' : '';
+		const extraLine = extra ? `\timport { ${extra.name} } from '${extra.from}';\n` : '';
 		return {
-			text: `<script${lang}>\n\timport { ${name} } from '${LIB}';\n\n\t${statement};\n</script>\n\n${source}`,
+			text: `<script${lang}>\n\timport { ${name} } from '${LIB}';\n${extraLine}\n\t${statement};\n</script>\n\n${source}`,
 			changed: true
 		};
 	}
@@ -50,7 +58,9 @@ function addLibraryCall(source: string, name: string, statement: string, typescr
 	}
 	const after = last ? last.end : script.content.start;
 	const importLine = library ? '' : `\n${indent}import { ${name} } from '${LIB}'${semi}`;
-	edits.push({ at: after, value: `${importLine}\n\n${indent}${statement}${semi}` });
+	const imported = (local: string) => imports.some((n) => n.specifiers.some((s: Node) => s.local?.name === local));
+	const extraLine = extra && !imported(extra.name) ? `\n${indent}import { ${extra.name} } from '${extra.from}'${semi}` : '';
+	edits.push({ at: after, value: `${importLine}${extraLine}\n\n${indent}${statement}${semi}` });
 	let text = source;
 	for (const edit of edits.sort((a, b) => b.at - a.at)) text = text.slice(0, edit.at) + edit.value + text.slice(edit.at);
 	return { text, changed: true };

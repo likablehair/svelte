@@ -24,6 +24,16 @@ describe('addDefaultLocale', () => {
 		const done = "<script>\n\timport { setDefaultLocale } from '@likable-hair/svelte';\n\tsetDefaultLocale('it');\n</script>\n";
 		expect(addDefaultLocale(done, 'it')).toEqual({ text: done, changed: false });
 	});
+
+	test('an app with paraglide follows getLocale(), imported once', () => {
+		const runtime = { runtime: '../paraglide/runtime' };
+		expect(addDefaultLocale("<script lang=\"ts\">\n\timport '../app.css';\n</script>\n", runtime).text).toBe(
+			"<script lang=\"ts\">\n\timport '../app.css';\n\timport { setDefaultLocale } from '@likable-hair/svelte';\n\timport { getLocale } from '../paraglide/runtime';\n\n\tsetDefaultLocale(() => getLocale());\n</script>\n"
+		);
+		expect(addDefaultLocale("<script lang=\"ts\">\n\timport { getLocale } from '../paraglide/runtime';\n</script>\n", runtime).text).toBe(
+			"<script lang=\"ts\">\n\timport { getLocale } from '../paraglide/runtime';\n\timport { setDefaultLocale } from '@likable-hair/svelte';\n\n\tsetDefaultLocale(() => getLocale());\n</script>\n"
+		);
+	});
 });
 
 describe('guessLanguage', () => {

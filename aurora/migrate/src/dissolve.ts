@@ -119,6 +119,8 @@ export interface DissolveResult {
 const isLib = (source: string) => source === LIB || source.startsWith(`${LIB}/`);
 const src = (text: string, node: Node) => text.slice(node.start, node.end);
 
+
+const PARAGLIDE_RUNTIME = /(^|\/)paraglide\/runtime(\.js)?$/;
 function references(root: unknown, names: Set<string>): Node[] {
 	const out: Node[] = [];
 	visit(root, (node, parent, key) => {
@@ -235,7 +237,30 @@ export function planWrapper(path: string, rel: string, text: string, index: Rule
 		declared.push({ name, local: value.name, fallback });
 	}
 	const byLocal = new Map(declared.map((d) => [d.local, d.name]));
-	const locals = new Set([...topLevelNames(program ? [program] : []).keys(), ...(restLocal ? [restLocal] : [])]);
+	const topLevel = topLevelNames(program ? [program] : []);
+	const locals = new Set([...topLevel.keys(), ...(restLocal ? [restLocal] : [])]);
+	const isGetLocale = (node: Node | undefined) => {
+		if (node?.type !== 'CallExpression' || node.arguments.length || node.callee.type !== 'Identifier') return false;
+		const statement = topLevel.get(node.callee.name);
+		return (
+			statement?.type === 'ImportDeclaration' &&
+			PARAGLIDE_RUNTIME.test(statement.source.value) &&
+			(statement.specifiers as Node[]).some((s) => s.local.name === node.callee.name && s.imported?.name === 'getLocale')
+		);
+	};
+	const followsParaglide = (expression: Node | undefined) => {
+		if (isGetLocale(expression)) return true;
+		if (expression?.type !== 'Identifier') return false;
+		const statement = topLevel.get(expression.name);
+		if (statement?.type !== 'VariableDeclaration') return false;
+		const declaration = (statement.declarations as Node[]).find((d) => d.id.type === 'Identifier' && d.id.name === expression.name);
+		let assigned = false;
+		visit(program, (node) => {
+			const target = node.type === 'AssignmentExpression' ? node.left : node.type === 'UpdateExpression' ? node.argument : undefined;
+			if (target?.type === 'Identifier' && target.name === expression.name) assigned = true;
+		});
+		return !assigned && isGetLocale(declaration?.init);
+	};
 	const tracked = new Set([...byLocal.keys(), ...derived.keys(), ...functions.keys()]);
 
 	const sinks = new Map<string, Sink[]>(declared.map((d) => [d.name, []]));
@@ -456,6 +481,7 @@ export function planWrapper(path: string, rel: string, text: string, index: Rule
 		}
 		if (own) {
 			if (removed.has(name) || name === 'class' || name === 'style') plan.dropped.push(src(text, attr).replace(/\s+/g, ' '));
+			else if ((name === 'lang' || name === 'locale') && followsParaglide(expression)) return;
 			else plan.blockers.push(`\`${name}\` is computed from the wrapper's own values`);
 			return;
 		}

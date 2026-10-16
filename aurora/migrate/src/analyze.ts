@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
-import { basename, dirname, join, relative, resolve } from 'node:path';
+import { basename, dirname, join, posix, relative, resolve } from 'node:path';
 import { Lines, listFiles } from './files.ts';
 import { matchUsage, todoOf, type Effort, type Finding, type Usage } from './match.ts';
 import { localRuleFor, type RuleIndex } from './rules.ts';
@@ -20,6 +20,7 @@ export interface AppInfo {
 	kit?: string;
 	tailwind?: string;
 	lang?: string;
+	paraglide?: string;
 	git: { clean: boolean | null; branch?: string; changes?: number };
 	warnings: string[];
 }
@@ -131,6 +132,17 @@ function lockfileManager(dir: string) {
 	return 'unknown';
 }
 
+function paraglideRuntime(dir: string, deps: Record<string, string>): string | undefined {
+	const version = deps['@inlang/paraglide-js'];
+	if (!version || (major(version) ?? 0) < 2) return undefined;
+	const config = ['vite.config.ts', 'vite.config.js', 'vite.config.mts', 'vite.config.mjs']
+		.map((name) => join(dir, name))
+		.find((path) => existsSync(path));
+	const outdir = (config && /\boutdir\s*:\s*['"]([^'"]+)['"]/.exec(readFileSync(config, 'utf8'))?.[1]) || './src/lib/paraglide';
+	const folder = posix.normalize(outdir).replace(/^\.\//, '').replace(/\/$/, '');
+	return folder.startsWith('src/lib/') ? `$lib/${folder.slice('src/lib/'.length)}/runtime` : `${posix.relative('src/routes', folder)}/runtime`;
+}
+
 function appInfo(dir: string): AppInfo {
 	const pkg = readJson(join(dir, 'package.json')) ?? {};
 	const deps = { ...pkg.devDependencies, ...pkg.dependencies } as Record<string, string>;
@@ -171,7 +183,8 @@ function appInfo(dir: string): AppInfo {
 		svelteInstalled: installed('svelte'),
 		kit: deps['@sveltejs/kit'],
 		tailwind: deps.tailwindcss,
-		lang: /<html[^>]*\blang="([^"]+)"/.exec(html)?.[1],
+		lang: /<html[^>]*\blang="([^"%]+)"/.exec(html)?.[1],
+		paraglide: paraglideRuntime(dir, deps),
 		git,
 		warnings
 	};
@@ -711,8 +724,8 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 			const set = allText(/setDefaultLocale\s*\(/g) > 0;
 			const italian = app.lang?.startsWith('it') || language.guess === 'it';
 			return {
-				needed: set ? false : italian ? true : language.guess === 'en' ? false : null,
-				signal: `<html lang="${app.lang ?? '?'}">, interface text: ${language.it} Italian words, ${language.en} English${set ? ', setDefaultLocale already called' : ''}`
+				needed: set ? false : italian || app.paraglide ? true : language.guess === 'en' ? false : null,
+				signal: `<html lang="${app.lang ?? '?'}">, interface text: ${language.it} Italian words, ${language.en} English${app.paraglide ? ', paraglide: the language follows getLocale()' : ''}${set ? ', setDefaultLocale already called' : ''}`
 			};
 		},
 		'global-app-toaster': () => {

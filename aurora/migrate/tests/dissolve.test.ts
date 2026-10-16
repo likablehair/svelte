@@ -447,6 +447,35 @@ const labelAndTextfield = (inner: 'StandardTextfield' | 'SimpleTextField') =>
 		].join('\n')
 	);
 
+describe('dissolve: language from paraglide', () => {
+	const table = (extra: string) =>
+		svelte(
+			[
+				"\timport { PaginatedTable } from '@likable-hair/svelte'",
+				"\timport { getLocale } from '../../../paraglide/runtime'",
+				"\timport type { ComponentProps } from 'svelte'",
+				'\tlet { ...rest }: ComponentProps<typeof PaginatedTable> = $props()',
+				'\tlet lang = getLocale()',
+				extra
+			].join('\n'),
+			'<PaginatedTable {lang} {...rest} />'
+		);
+	const page = svelte("\timport StandardPaginatedTable from '$lib/components/common/StandardPaginatedTable.svelte'", '<StandardPaginatedTable />');
+
+	test('a lang computed from getLocale() is dropped, the language comes from setDefaultLocale', () => {
+		const { read, result } = run({ [`${W}/StandardPaginatedTable.svelte`]: table(''), 'src/routes/+page.svelte': page });
+		const text = read('src/routes/+page.svelte');
+		expect(result.wrappers[0]).toMatchObject({ dissolved: 1 });
+		expect(text).toContain('<DataTable');
+		expect(text).not.toMatch(/\{lang\}|lang=\{|locale|getLocale/);
+	});
+
+	test('a lang that the wrapper changes later still keeps the wrapper', () => {
+		const { result } = run({ [`${W}/StandardPaginatedTable.svelte`]: table("\tfunction english() { lang = 'en' }"), 'src/routes/+page.svelte': page });
+		expect(result.wrappers[0]).toMatchObject({ dissolved: 0 });
+	});
+});
+
 describe('dissolve: LabelAnd* components', () => {
 	test('a LabelAndTextfield around a Standard wrapper becomes SimpleTextField with label, and the props of the inner wrapper are mapped', () => {
 		const { read, exists, result } = run({

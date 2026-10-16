@@ -199,14 +199,19 @@ export function appLocale(analysis: Analysis, locale?: string) {
 	return analysis.language.guess === 'it' ? 'it' : undefined;
 }
 
-export function updateRootLayout(dir: string, locale: string): string[] {
+export function updateRootLayout(dir: string, locale: string | { runtime: string }): string[] {
 	const rel = 'src/routes/+layout.svelte';
 	const path = join(dir, rel);
-	if (!existsSync(path)) return [`${rel} is missing: create it and call setDefaultLocale('${locale}') in its script`];
+	const call = typeof locale === 'string' ? `setDefaultLocale('${locale}')` : 'setDefaultLocale(() => getLocale())';
+	if (!existsSync(path)) return [`${rel} is missing: create it and call ${call} in its script`];
 	const result = addDefaultLocale(readFileSync(path, 'utf8'), locale, existsSync(join(dir, 'tsconfig.json')));
 	if (!result.changed) return [];
 	writeFileSync(path, result.text);
-	return [`${rel}: setDefaultLocale('${locale}') (texts and date formats of the components in that language)`];
+	return [
+		typeof locale === 'string'
+			? `${rel}: ${call} (texts and date formats of the components in that language)`
+			: `${rel}: ${call} with getLocale from ${locale.runtime} (texts and date formats of the components follow the paraglide language)`
+	];
 }
 
 export function updateTitleTemplate(dir: string): string[] {
@@ -230,7 +235,7 @@ export function setHtmlLang(html: string, locale: string): string {
 	const tag = /<html\b[^>]*>/.exec(html);
 	if (!tag) return html;
 	const lang = /\blang=(["'])([^"']*)\1/.exec(tag[0]);
-	if (lang && lang[2].split('-')[0] === locale.split('-')[0]) return html;
+	if (lang && (lang[2].includes('%') || lang[2].split('-')[0] === locale.split('-')[0])) return html;
 	const updated = lang ? tag[0].replace(lang[0], `lang="${locale}"`) : tag[0].replace(/^<html/, `<html lang="${locale}"`);
 	return html.slice(0, tag.index) + updated + html.slice(tag.index + tag[0].length);
 }
@@ -292,7 +297,8 @@ export function setup(dir: string, analysis: Analysis, options: SetupOptions): S
 		...updateTailwindConfig(dir, analysis.app.tailwind)
 	);
 	const locale = appLocale(analysis, options.locale);
-	if (locale) changes.push(...updateRootLayout(dir, locale), ...updateHtmlLang(dir, locale));
+	if (analysis.app.paraglide && !options.locale) changes.push(...updateRootLayout(dir, { runtime: analysis.app.paraglide }));
+	else if (locale) changes.push(...updateRootLayout(dir, locale), ...updateHtmlLang(dir, locale));
 	changes.push(...updateAppearance(dir), ...updateTitleTemplate(dir));
 	let install: string | undefined;
 	if (options.install && installNeeded) {
