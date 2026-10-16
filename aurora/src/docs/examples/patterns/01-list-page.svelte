@@ -1,17 +1,20 @@
 <!-- @component List page
-The page of a list of records: a header with the title, a short description and the main action, then a `DataTable` that loads from the server with search, `Filters`, column manager, row actions and selection actions. "New booking" opens a `Dialog` with a form whose submit button sits in the footer (`form` attribute); the draft lives in the page state because the dialog is unmounted when closed. Spacing between blocks is the app's choice (rem); colors, radii and fonts come from the tokens. -->
+The page of a list of records: a `PageHeader` with the title, a short description and the main action, then a `DataTable` that loads from the server with search, `Filters`, column manager, row actions and selection actions. "Cancel bookings" asks first in a `ConfirmDialog` that names how many and the consequence; it closes by itself when the request ends. "New booking" opens a `Dialog` with a form whose submit button sits in the footer (`form` attribute); the draft lives in the page state because the dialog is unmounted when closed. Spacing between blocks is the app's choice (rem); colors, radii and fonts come from the tokens. -->
 <script lang="ts">
 	import { mdiDeleteOutline, mdiDownload, mdiEmailOutline, mdiPencilOutline, mdiPlus } from '@mdi/js';
 	import {
 		Avatar,
 		Button,
 		Chip,
+		ConfirmDialog,
 		DataTable,
 		DatePickerTextField,
 		Dialog,
+		PageHeader,
 		Select,
 		SimpleTextField,
 		type DataTableAction,
+		type DataTableActionContext,
 		type FilterGroup,
 		type TableColumn
 	} from '#lib';
@@ -32,8 +35,22 @@ The page of a list of records: a header with the title, a short description and 
 	const selectionActions: DataTableAction<Booking>[] = [
 		{ label: 'Send reminder', icon: mdiEmailOutline, onclick: () => new Promise((resolve) => setTimeout(resolve, 800)) },
 		{ label: 'Export', icon: mdiDownload, onclick: () => undefined },
-		{ label: 'Cancel bookings', icon: mdiDeleteOutline, variant: 'danger', onclick: ({ clear }) => clear() }
+		{ label: 'Cancel bookings', icon: mdiDeleteOutline, variant: 'danger', onclick: openCancel }
 	];
+
+	let cancelOpen = $state(false);
+	let cancelling = $state<DataTableActionContext<Booking>>();
+
+	function openCancel(context: DataTableActionContext<Booking>) {
+		cancelling = context;
+		cancelOpen = true;
+	}
+
+	async function cancelBookings() {
+		await new Promise((resolve) => setTimeout(resolve, 800));
+		cancelling?.clear();
+		table?.reload();
+	}
 
 	const services = ['Cut', 'Cut and beard', 'Colour', 'Balayage', 'Blow-dry'].map((label) => ({ value: label, label }));
 
@@ -64,13 +81,11 @@ The page of a list of records: a header with the title, a short description and 
 {/snippet}
 
 <main class="page">
-	<header class="page-header">
-		<div>
-			<h1>Bookings</h1>
-			<p>Every appointment of the salon, past and upcoming.</p>
-		</div>
-		<Button icon={mdiPlus} onclick={create}>New booking</Button>
-	</header>
+	<PageHeader title="Bookings" subtitle="Every appointment of the salon, past and upcoming.">
+		{#snippet actionsSnippet()}
+			<Button icon={mdiPlus} onclick={create}>New booking</Button>
+		{/snippet}
+	</PageHeader>
 
 	<DataTable
 		bind:this={table}
@@ -93,6 +108,16 @@ The page of a list of records: a header with the title, a short description and 
 		{/snippet}
 	</DataTable>
 </main>
+
+<ConfirmDialog
+	bind:open={cancelOpen}
+	title={cancelling?.count === 1 ? 'Cancel 1 booking?' : `Cancel ${cancelling?.count ?? 'the selected'} bookings?`}
+	description="Clients get an email that the appointment is cancelled. This cannot be undone."
+	icon={mdiDeleteOutline}
+	confirmText="Cancel bookings"
+	cancelText="Keep bookings"
+	onconfirm={cancelBookings}
+/>
 
 <Dialog bind:open title="New booking" closable --dialog-max-width="440px">
 	<form
@@ -118,26 +143,6 @@ The page of a list of records: a header with the title, a short description and 
 		display: grid;
 		gap: 1.5rem;
 		padding: 1.5rem;
-	}
-
-	.page-header {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: end;
-		justify-content: space-between;
-		gap: 1rem;
-	}
-
-	h1 {
-		margin: 0;
-		font-family: var(--global-font-family-display);
-		font-size: 1.6rem;
-		color: var(--global-color-text);
-	}
-
-	.page-header p {
-		margin: 0.25rem 0 0;
-		color: var(--global-color-text-2);
 	}
 
 	.who {

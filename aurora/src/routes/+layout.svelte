@@ -4,17 +4,15 @@
 	import '../docs.css';
 	import { onMount, tick } from 'svelte';
 	import { page } from '$app/state';
-	import type { ThemeMode } from '#lib/theme.svelte.js';
 	import {
 		GlobalSearchTextField,
 		HierarchyMenu,
+		ModeSwitch,
 		Select,
 		SidebarLayout,
-		TabSwitcher,
 		Toaster,
 		type HierarchyMenuOption,
-		type Item,
-		type Tab
+		type Item
 	} from '#lib';
 	import { appearance, changeMode, changeTheme, syncAppearance } from '../docs/appearance.svelte.js';
 	import { searchDocs } from '../docs/search.js';
@@ -29,11 +27,6 @@
 		...data.themes.map((t) => ({ value: t, label: capitalize(t), data: { gallery: false } })),
 		...data.galleryThemes.map((t) => ({ value: t, label: capitalize(t), data: { gallery: true } }))
 	]);
-	const modeTabs: Tab[] = [
-		{ name: 'light', label: 'Light' },
-		{ name: 'system', label: 'System' },
-		{ name: 'dark', label: 'Dark' }
-	];
 
 	let nav = $derived(
 		data.nav.map((group) => ({
@@ -88,14 +81,7 @@
 				</span>
 			{/snippet}
 		</Select>
-		<TabSwitcher
-			tabs={modeTabs}
-			selected={appearance.mode}
-			variant="segmented"
-			aria-label="Mode"
-			--tab-switcher-width="auto"
-			ontabClick={({ tab }) => changeMode(tab.name as ThemeMode)}
-		/>
+		<ModeSwitch label="Mode" onchange={({ mode }) => changeMode(mode)} />
 	</div>
 {/snippet}
 

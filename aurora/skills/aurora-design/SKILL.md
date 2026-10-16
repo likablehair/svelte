@@ -32,7 +32,7 @@ The facts come from the `aurora` MCP server, which reads the version installed i
 **Actions** (`reference/actions.md`)
 - Labels are verb + object ("Save changes", "Create booking", "Delete 3 clients"), never "OK", "Submit", "Yes".
 - In dialogs and form footers: secondary left, primary right (`ConfirmOrCancelButtons`, or `Button`s in the `Dialog` `actionsSnippet`).
-- Destructive actions use `variant="danger"`, sit apart from the primary action, and name what they destroy. Prefer **undo** (a toast with an `action`) for recoverable deletes; **confirm** in a `Dialog` only what cannot be undone.
+- Destructive actions use `variant="danger"`, sit apart from the primary action, and name what they destroy. Prefer **undo** (a toast with an `action`) for recoverable deletes; **confirm** with a `ConfirmDialog` only what cannot be undone.
 - Async buttons show `loading` and cannot be pressed twice. Disabled actions say why (tooltip or hint) or are not shown.
 - Never put an action only on hover, never behind a gesture only.
 
@@ -73,6 +73,7 @@ The facts come from the `aurora` MCP server, which reads the version installed i
 | Need | Component |
 |---|---|
 | App shell with sidebar and top bar | `SidebarLayout` (+ `HierarchyMenu` options) |
+| Light / system / dark choice for the user | `ModeSwitch` (top bar, or the bottom of the sidebar) |
 | Records from a server: search, filters, paging, selection | `DataTable` (`loader`, `filterFields`, `selectionActions`) |
 | Small in-memory table | `Table` (+ `Paginator`) |
 | Filters alone | `Filters`, `SearchBar` |

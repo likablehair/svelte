@@ -14,8 +14,8 @@
 
 ## Placement and order
 
-- **Page actions**: in the page header, right side; primary last (rightmost).
-- **Dialogs and form footers**: secondary/cancel on the left, primary on the right (`ConfirmOrCancelButtons` already does this; in a `Dialog` put the `Button`s in `actionsSnippet` in that order).
+- **Page actions**: in the `actionsSnippet` of `PageHeader`, right side; primary last (rightmost).
+- **Dialogs and form footers**: secondary/cancel on the left, primary on the right (`ConfirmOrCancelButtons` and `ConfirmDialog` already do this; in a `Dialog` put the `Button`s in `actionsSnippet` in that order).
 - **Toolbar of a table**: page-level buttons in `toolbarSnippet` of `DataTable`; actions on selected rows in `selectionActions` (the floating bar), actions on one row in `actionsSnippet` (always visible by default; `actionsVisibility="hover"` only on desktop-dense tables, touch devices still see them).
 - Keep destructive actions away from the primary: at the far left of a footer, at the end of a menu after a divider, or in a "danger zone" section of settings.
 - An action is in the same place on every screen of the same kind.
@@ -36,8 +36,19 @@
 addToast({ title: 'Booking deleted', action: { label: 'Undo', onclick: restore } });
 ```
 
-- **Irreversible or expensive** (permanent delete, sending messages to clients, bulk changes): confirm in a `Dialog` that names the thing and the consequence, with specific buttons:
-  title "Delete Mario Rossi?", text "His 12 bookings are deleted too. This cannot be undone.", buttons "Keep client" (secondary) and "Delete client" (`variant="danger"`). Never "Are you sure?".
+- **Irreversible or expensive** (permanent delete, sending messages to clients, bulk changes): confirm with a `ConfirmDialog` that names the thing and the consequence, with specific buttons:
+  title "Delete Mario Rossi?", text "His 12 bookings are deleted too. This cannot be undone.", buttons "Keep client" and "Delete client". Never "Are you sure?". Return the request's Promise from `onconfirm`: the dialog shows the spinner, cannot be closed meanwhile, closes when it succeeds and stays open when it fails. `variant="primary"` for confirmations that are not destructive (sending, publishing).
+
+```svelte
+<ConfirmDialog
+	bind:open
+	title="Delete Mario Rossi?"
+	description="His 12 bookings are deleted too. This cannot be undone."
+	confirmText="Delete client"
+	cancelText="Keep client"
+	onconfirm={() => deleteClient(client.id)}
+/>
+```
 - Ask before closing a dialog or leaving a page with unsaved changes.
 
 ## Async and disabled

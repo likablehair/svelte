@@ -1,0 +1,41 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--page-header-default-gap: 10px;
+		--page-header-default-main-gap: 12px 16px;
+		--page-header-default-text-min-width: 16rem;
+		--page-header-default-title-color: var(--global-color-text);
+		--page-header-default-title-font-family: var(--global-font-family-display);
+		--page-header-default-title-font-size: 26px;
+		--page-header-default-title-font-weight: 600;
+		--page-header-default-title-line-height: 1.2;
+		--page-header-default-subtitle-color: var(--global-color-text-2);
+		--page-header-default-subtitle-font-size: 14px;
+		--page-header-default-description-color: var(--global-color-text-2);
+		--page-header-default-description-font-size: 13px;
+		--page-header-default-text-gap: 4px;
+		--page-header-default-actions-gap: 8px;
+		--page-header-default-sm-title-font-size: 19px;
+		--page-header-default-sm-subtitle-font-size: 13px;
+		--page-header-default-sm-description-font-size: 12px;
+		--page-header-default-back-color: var(--global-color-text-2);
+		--page-header-default-back-hover-color: var(--global-color-text);
+		--page-header-default-back-font-size: 13px;
+		--page-header-default-back-font-weight: 500;
+		--page-header-default-back-gap: 6px;
+		--page-header-default-back-icon-size: 18px;
+		--page-header-default-back-icon-shift: -3px;
+		--page-header-default-back-border-radius: var(--global-radius-xs);
+		--page-header-default-focus-ring-width: var(--global-focus-ring-width);
+		--page-header-default-focus-ring-color: var(--global-focus-ring-color);
+		--page-header-default-focus-ring-offset: var(--global-focus-ring-offset);
+	}
+
+	@media (max-width: 768px) {
+		:root {
+			--page-header-default-title-font-size: 22px;
+			--page-header-default-sm-title-font-size: 17px;
+		}
+	}
+}

@@ -1,0 +1,29 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--mode-switch-default-gap: 4px;
+		--mode-switch-default-padding: 4px;
+		--mode-switch-default-sm-padding: 3px;
+		--mode-switch-default-background: var(--global-color-surface-solid);
+		--mode-switch-default-border-width: var(--global-border-width);
+		--mode-switch-default-border-color: var(--global-color-border);
+		--mode-switch-default-border-radius: var(--global-radius-full);
+		--mode-switch-default-box-shadow: none;
+		--mode-switch-default-option-width: 34px;
+		--mode-switch-default-option-height: 30px;
+		--mode-switch-default-sm-option-width: 28px;
+		--mode-switch-default-sm-option-height: 24px;
+		--mode-switch-default-option-border-radius: var(--global-radius-full);
+		--mode-switch-default-icon-size: 16px;
+		--mode-switch-default-sm-icon-size: 14px;
+		--mode-switch-default-color: var(--global-color-text-3);
+		--mode-switch-default-hover-color: var(--global-color-text);
+		--mode-switch-default-hover-background: transparent;
+		--mode-switch-default-selected-color: var(--global-color-on-primary);
+		--mode-switch-default-selected-background: var(--global-fill-primary);
+		--mode-switch-default-selected-box-shadow: var(--global-shadow-fill);
+		--mode-switch-default-focus-ring-color: var(--global-focus-ring-color);
+		--mode-switch-default-disabled-opacity: var(--global-input-disabled-opacity);
+	}
+}

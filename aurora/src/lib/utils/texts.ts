@@ -51,6 +51,7 @@ export interface LibraryTexts {
 		typeBoolean: string;
 	};
 	confirmOrCancelButtons: { confirm: string; cancel: string };
+	confirmDialog: { confirm: string; delete: string; cancel: string };
 	dashboardShaper: {
 		add: string;
 		catalog: string;
@@ -146,8 +147,10 @@ export interface LibraryTexts {
 	};
 	hierarchyMenu: { label: string; submenu: string };
 	menuOrDrawerOptions: { label: string };
+	modeSwitch: { label: string; light: string; dark: string; system: string };
 	monthSelector: { label: string };
 	noData: { title: string };
+	pageHeader: { back: string };
 	paginator: {
 		label: string;
 		first: string;
@@ -270,6 +273,7 @@ export const TEXTS_EN: LibraryTexts = {
 		typeBoolean: 'Yes/No'
 	},
 	confirmOrCancelButtons: { confirm: 'Save', cancel: 'Cancel' },
+	confirmDialog: { confirm: 'Confirm', delete: 'Delete', cancel: 'Cancel' },
 	dashboardShaper: {
 		add: 'Add widget',
 		catalog: 'Add widget',
@@ -375,8 +379,10 @@ export const TEXTS_EN: LibraryTexts = {
 	},
 	hierarchyMenu: { label: 'Menu', submenu: '{label} submenu' },
 	menuOrDrawerOptions: { label: 'Actions' },
+	modeSwitch: { label: 'Theme', light: 'Light', dark: 'Dark', system: 'System' },
 	monthSelector: { label: 'Month' },
 	noData: { title: 'No data available' },
+	pageHeader: { back: 'Back' },
 	paginator: {
 		label: 'Pagination',
 		first: 'First page',
@@ -507,6 +513,7 @@ export const TEXTS_IT: LibraryTexts = {
 		typeBoolean: 'Sì/No'
 	},
 	confirmOrCancelButtons: { confirm: 'Salva', cancel: 'Annulla' },
+	confirmDialog: { confirm: 'Conferma', delete: 'Elimina', cancel: 'Annulla' },
 	dashboardShaper: {
 		add: 'Aggiungi widget',
 		catalog: 'Aggiungi widget',
@@ -612,8 +619,10 @@ export const TEXTS_IT: LibraryTexts = {
 	},
 	hierarchyMenu: { label: 'Menu', submenu: 'Sottomenu di {label}' },
 	menuOrDrawerOptions: { label: 'Azioni' },
+	modeSwitch: { label: 'Tema', light: 'Chiaro', dark: 'Scuro', system: 'Sistema' },
 	monthSelector: { label: 'Mese' },
 	noData: { title: 'Nessun dato disponibile' },
+	pageHeader: { back: 'Indietro' },
 	paginator: {
 		label: 'Paginazione',
 		first: 'Prima pagina',

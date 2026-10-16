@@ -1,8 +1,8 @@
 <!-- @component Detail page
-The page of one record: a link back to the list, a header with the `Avatar`, the name, a status `Chip` and the actions, an `AlertBanner` for what needs attention, then a `TabSwitcher` with the sections. Each section is a card made with the surface tokens; facts are a description list and the history a `Timeline`. -->
+The page of one record: a `PageHeader` with the link back to the list, the `Avatar`, the name, a status `Chip` and the actions, an `AlertBanner` for what needs attention, then a `TabSwitcher` with the sections. Each section is a card made with the surface tokens; facts are a description list and the history a `Timeline`. -->
 <script lang="ts">
-	import { mdiArrowLeft, mdiCalendarPlus, mdiPencilOutline } from '@mdi/js';
-	import { AlertBanner, Avatar, Button, Chip, LinkButton, TabSwitcher, Timeline, type TimelineItem } from '#lib';
+	import { mdiCalendarPlus, mdiPencilOutline } from '@mdi/js';
+	import { AlertBanner, Avatar, Button, Chip, PageHeader, TabSwitcher, Timeline, type TimelineItem } from '#lib';
 
 	const client = {
 		name: 'Giulia Marini',
@@ -33,19 +33,18 @@ The page of one record: a link back to the list, a header with the `Avatar`, the
 </script>
 
 <main class="page">
-	<LinkButton href="#clients" prependIcon={mdiArrowLeft}>Clients</LinkButton>
-
-	<header class="page-header">
-		<Avatar name={client.name} size="xl" />
-		<div class="title">
-			<h1>{client.name}</h1>
-			<p>Client since {date.format(client.since)} <Chip size="sm" variant="success">Active</Chip></p>
-		</div>
-		<div class="actions">
+	<PageHeader title={client.name} backHref="#clients" backLabel="Clients">
+		{#snippet prependSnippet()}
+			<Avatar name={client.name} size="xl" />
+		{/snippet}
+		{#snippet subtitleSnippet()}
+			<span class="since">Client since {date.format(client.since)} <Chip size="sm" variant="success">Active</Chip></span>
+		{/snippet}
+		{#snippet actionsSnippet()}
 			<Button variant="secondary" icon={mdiPencilOutline}>Edit</Button>
 			<Button icon={mdiCalendarPlus}>New booking</Button>
-		</div>
-	</header>
+		{/snippet}
+	</PageHeader>
 
 	<AlertBanner
 		variant="warning"
@@ -94,42 +93,12 @@ The page of one record: a link back to the list, a header with the `Avatar`, the
 		display: grid;
 		gap: 1.25rem;
 		padding: 1.5rem;
-		justify-items: start;
 	}
 
-	.page > :not(:global(a)) {
-		justify-self: stretch;
-	}
-
-	.page-header {
-		display: flex;
+	.since {
+		display: inline-flex;
 		flex-wrap: wrap;
 		align-items: center;
-		gap: 1rem;
-	}
-
-	.title {
-		flex: 1;
-		min-width: 12rem;
-	}
-
-	h1 {
-		margin: 0;
-		font-family: var(--global-font-family-display);
-		font-size: 1.6rem;
-		color: var(--global-color-text);
-	}
-
-	.title p {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		margin: 0.25rem 0 0;
-		color: var(--global-color-text-2);
-	}
-
-	.actions {
-		display: flex;
 		gap: 0.5rem;
 	}
 

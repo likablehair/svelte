@@ -1,7 +1,15 @@
 <!-- @component Form page
-A long form split in sections: each section has a title and a line of explanation on the left and its fields on the right, and stacks on narrow screens. Fields are the library ones with `label`, `hint` and `state`; errors appear after the first submit. `ConfirmOrCancelButtons` closes the form, in a bar that stays at the bottom while scrolling. -->
+A `PageHeader`, then a long form split in sections: each section has a title and a line of explanation on the left and its fields on the right, and stacks on narrow screens. Fields are the library ones with `label`, `hint` and `state`; errors appear after the first submit. `ConfirmOrCancelButtons` closes the form, in a bar that stays at the bottom while scrolling. -->
 <script lang="ts">
-	import { ConfirmOrCancelButtons, DatePickerTextField, Select, SimpleTextField, Switch, Textarea } from '#lib';
+	import {
+		ConfirmOrCancelButtons,
+		DatePickerTextField,
+		PageHeader,
+		Select,
+		SimpleTextField,
+		Switch,
+		Textarea
+	} from '#lib';
 
 	let salon = $state({
 		name: 'Likable Milano',
@@ -29,10 +37,7 @@ A long form split in sections: each section has a title and a line of explanatio
 </script>
 
 <main class="page">
-	<header>
-		<h1>Salon settings</h1>
-		<p>How the salon appears to clients and how bookings work.</p>
-	</header>
+	<PageHeader title="Salon settings" subtitle="How the salon appears to clients and how bookings work." />
 
 	<form
 		onsubmit={(event) => {
@@ -95,14 +100,6 @@ A long form split in sections: each section has a title and a line of explanatio
 		padding: 1.5rem;
 	}
 
-	h1 {
-		margin: 0;
-		font-family: var(--global-font-family-display);
-		font-size: 1.6rem;
-		color: var(--global-color-text);
-	}
-
-	header p,
 	.about p {
 		margin: 0.25rem 0 0;
 		color: var(--global-color-text-2);

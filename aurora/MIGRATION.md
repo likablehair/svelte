@@ -10,7 +10,7 @@ Contents:
 
 - [Checklist](#checklist)
 - [Global changes](#global-changes)
-- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Avatar](#avatar), [BarChart](#barchart), [BoxList](#boxlist), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DashboardShaper](#dashboardshaper), [DataTable](#datatable), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [DescriptiveAvatar](#descriptiveavatar), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FileInput](#fileinput), [FileInputList](#fileinputlist), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [GlobalSearchTextField](#globalsearchtextfield), [HierarchyMenu](#hierarchymenu), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [IconsDropdown](#iconsdropdown), [LineChart](#linechart), [LinkButton](#linkbutton), [MediaQuery](#mediaquery), [Menu](#menu), [MenuOrDrawer](#menuordrawer), [MenuOrDrawerOptions](#menuordraweroptions), [MonthSelector](#monthselector), [NoData](#nodata), [Paginator](#paginator), [PeriodPicker](#periodpicker), [PeriodSelector](#periodselector), [PieChart](#piechart), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SidebarLayout](#sidebarlayout), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Timeline](#timeline), [Toaster](#toaster), [ToggleList](#togglelist), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
+- [Components](#components): [ActivableButton](#activablebutton), [AlertBanner](#alertbanner), [AsyncAutocomplete](#asyncautocomplete), [Autocomplete](#autocomplete), [Avatar](#avatar), [BarChart](#barchart), [BoxList](#boxlist), [Button](#button), [Calendar](#calendar), [Checkbox](#checkbox), [Chip](#chip), [CircularLoader](#circularloader), [ColumnManager](#columnmanager), [ConfirmDialog](#confirmdialog), [ConfirmOrCancelButtons](#confirmorcancelbuttons), [CountriesAutocomplete](#countriesautocomplete), [DashboardShaper](#dashboardshaper), [DataTable](#datatable), [DatePicker](#datepicker), [DatePickerTextField](#datepickertextfield), [DateTimePickerTextField](#datetimepickertextfield), [DescriptiveAvatar](#descriptiveavatar), [Dialog](#dialog), [Divider](#divider), [Drawer](#drawer), [Dropdown](#dropdown), [FileInput](#fileinput), [FileInputList](#fileinputlist), [FilterEditor](#filtereditor), [Filters](#filters), [FlagIcon](#flagicon), [GlobalSearchTextField](#globalsearchtextfield), [HierarchyMenu](#hierarchymenu), [HorizontalStackedProgress](#horizontalstackedprogress), [Icon](#icon), [IconsDropdown](#iconsdropdown), [LineChart](#linechart), [LinkButton](#linkbutton), [MediaQuery](#mediaquery), [Menu](#menu), [MenuOrDrawer](#menuordrawer), [MenuOrDrawerOptions](#menuordraweroptions), [ModeSwitch](#modeswitch), [MonthSelector](#monthselector), [NoData](#nodata), [PageHeader](#pageheader), [Paginator](#paginator), [PeriodPicker](#periodpicker), [PeriodSelector](#periodselector), [PieChart](#piechart), [ProgressBar](#progressbar), [RadioButton](#radiobutton), [SearchBar](#searchbar), [Select](#select), [SidebarLayout](#sidebarlayout), [SimpleTextField](#simpletextfield), [Skeleton](#skeleton), [Switch](#switch), [TabSwitcher](#tabswitcher), [Table](#table), [Textarea](#textarea), [TimePickerTextField](#timepickertextfield), [Timeline](#timeline), [Toaster](#toaster), [ToggleList](#togglelist), [Tooltip](#tooltip), [YearPickerTextField](#yearpickertextfield), [YearSelector](#yearselector)
 - [Not ported](#not-ported)
 
 ## Checklist
@@ -111,6 +111,7 @@ Derived tokens (`-strong`, `-soft`, `-glow`, focus ring, fills) follow the base 
 
 - `setTheme('dark')` still type-checks in v5 but activates a theme called "dark", which does not exist. Use `setMode('dark')`.
 - `toggleTheme()` → `toggleMode()`.
+- A local `ThemeSwitch` or a light/dark button in the layout → [`ModeSwitch`](#modeswitch).
 - Persistence, in the root `+layout.svelte`: `rememberAppearance();` in the `<script>` and `<svelte:head>{@html '<script>' + appearanceScript() + '</script>'}</svelte:head>` in the markup.
 - `$theme.active` and `$theme.colors` (the runtime colors API, broken in v4) are gone: colors are CSS tokens and themes.
 - `setMode` and `setTheme` change the page in the browser; on the server they only set the state.
@@ -562,6 +563,62 @@ New in v5: the panel where the user picks the columns of a table (shown, order, 
 - `pinnableColumns` (default off in v4) becomes `pinnable`, **on by default**; `locked` columns of v4 are `required` columns of `Table` (always visible).
 - Each column can have an `icon` and a `description` for the panel (`info`, the tooltip of the header, is used when there is no `description`).
 
+### ConfirmDialog
+
+New in v5: the dialog that asks to confirm an action (icon, question, description, Cancel and the action, usually a delete). v4 had none, so 14 apps keep local copies: `ConfirmOrCancelDialog.svelte` (9 apps), `AlertDialog.svelte` (4 apps) and `ConfirmDialog.svelte` (mufasa), about 140 usages in 10 variants. Replace each usage with `ConfirmDialog` and delete the local copy:
+
+```svelte
+<!-- v4 app -->
+<ConfirmOrCancelDialog
+	bind:open={deleteOpen}
+	title="Eliminare il cliente?"
+	description="L'operazione non si può annullare."
+	{loading}
+	confirm={async () => {
+		loading = true;
+		await deleteClient();
+		loading = false;
+		deleteOpen = false;
+	}}
+	cancel={() => (deleteOpen = false)}
+/>
+
+<!-- v5, written by the migration: the app still closes it -->
+<ConfirmDialog
+	bind:open={deleteOpen}
+	title="Eliminare il cliente?"
+	description="L'operazione non si può annullare."
+	{loading}
+	closeOnConfirm={false}
+	onconfirm={async () => {
+		loading = true;
+		await deleteClient();
+		loading = false;
+		deleteOpen = false;
+	}}
+/>
+
+<!-- v5, by hand: it shows the spinner and closes by itself -->
+<ConfirmDialog
+	bind:open={deleteOpen}
+	title="Eliminare il cliente?"
+	description="L'operazione non si può annullare."
+	onconfirm={() => deleteClient()}
+/>
+```
+
+- **Closing**: the copies never closed on confirm, the app set `open = false`. ConfirmDialog closes by itself after `onconfirm`, and when `onconfirm` returns a Promise it waits for it with a spinner, closes if it resolves and stays open if it rejects. The migration writes `closeOnConfirm={false}` on every migrated usage, so the app keeps closing it as before; remove it, together with the manual `loading` and `open = false`, to use the new behaviour. Even with `closeOnConfirm={false}`, a Promise returned by `onconfirm` shows the spinner and blocks closing until it settles.
+- **`oncancel` runs on every way of closing without confirming**: Cancel, the close button, Escape and a click on the backdrop. The copies called `cancel` only from the Cancel button, so cleanup (`deletingX = undefined`, a pending request to refuse) was skipped on Escape. Check the handlers that do more than closing: they now run in those cases too. A cancel handler that only sets `open = false` can be removed with `bind:open`.
+- **`open` one way** (`open={x}` instead of `bind:open={x}`, about 40 usages): closing with Escape or the backdrop did not update the app, and the dialog could not open again. Use `bind:open`.
+- `loading` blocks every way of closing, not only the button, and the action cannot be clicked twice while it is on (the copies built on `StandardButton` let clicks through). `persistent` now blocks Escape too, not only the backdrop.
+- `ConfirmOrCancelDialog`: `confirm` → `onconfirm`, `cancel` → `oncancel`; `title`, `description` (also `string[]`), `confirmText`, `cancelText`, `loading`, `persistent` keep their names. `title` is required: where the usage relied on the default, the migration writes `title="Sei sicuro?"` (better: a question that names the thing, "Eliminare Mario Rossi?"). The default buttons are the same in Italian ("Elimina", "Annulla"; English with another locale). `confirmButtonStyle="danger"` is the default `variant`, any other value → `variant="primary"` (its button says "Conferma" unless `confirmText` is set). `cancelButtonStyle` other than `secondary`, and `buttonSnippet` → `actionsSnippet({ confirm, cancel, loading })`. `icon="mdi-…"` → `icon` with an SVG path from `@mdi/js`. `disableConfirm` → `confirmDisable`. `maxWidth` → `--confirm-dialog-max-width`; `minWidth` and `hideHeader` did nothing visible: drop them. The default snippet (`children`) replaced the description: now it is shown under it, so drop `description` where `children` is passed.
+- `ConfirmOrCancelDialog` of addibox: `confirmLabel` → `confirmText`, `cancelLabel` → `cancelText`, `confirmStyle`/`cancelStyle` as above; its default description ("L'azione sarà permanente.") is not a library default: write it as `description` where the usage relied on it.
+- `AlertDialog`: `alertText` → `description` (line breaks are kept). `onConfirmClick(event)`, `onconfirmClick({ detail: { nativeEvent } })` and `on:confirm-click` → `onconfirm(event)`; the same for cancel → `oncancel(event)`. Its action button was primary: add `variant="primary"` (the default text becomes "Conferma"/"Confirm"). `shwoConfirmOrCancel` → drop it (the buttons are always there; use `actionsSnippet` to change them). `confirmDisable`, `cancelDisable`, `loading` keep their names (`loading` was not forwarded by the copies of astro and maya: now the spinner shows). `bodySnippet` / default snippet / default slot → `children`. `_overlayOpacity` → `--dialog-backdrop-background`. Width classes in `class` → `--confirm-dialog-max-width`. The red Cancel of cbam becomes the neutral one.
+- `ConfirmDialog` of mufasa: same name, import it from the library. `on:confirm-click` / `on:cancel-click` → `onconfirm` / `oncancel` (no `detail`). Add `variant="primary"`; its defaults ("Conferma" as title, "Sicuro di confermare l'operazione?" as description) are not the library ones: write them where the usage relied on them.
+- A confirmation that needs input (type the name, a checkbox, notes): put the field in `children` and drive `confirmDisable`; the value stays in the app.
+- Look: Aurora (icon in a 40px tinted box, question in the display font, buttons in a row at the end, Cancel neutral and the action red or blue); the copies had a 50px icon and full-width stacked buttons. `--confirm-dialog-*` and the `--dialog-*` variables change it.
+- Accessibility: `role="alertdialog"` named by the title and described by the description, focus on Cancel when it opens (on the action with `variant="primary"`) and back on the opener when it closes.
+
 ### ConfirmOrCancelButtons
 
 - **Default texts follow the locale**: "Annulla" / "Salva" with `it` (`setDefaultLocale('it')` or `locale="it"`), "Cancel" / "Save" otherwise. Apps that relied on the Italian defaults call `setDefaultLocale('it')` ([Language of the texts](#language-of-the-texts)); `cancelText` and `confirmText` still win.
@@ -571,7 +628,7 @@ New in v5: the panel where the user picks the columns of a table (shown, order, 
 - `cancelDisable` now really disables the cancel button (v4: it only skipped the callback). `onconfirmClick` is not called while `loading`.
 - The cancel button is a text Button (v4: an unstyled `<button>`).
 - Stacking: the buttons stack at full width, confirm on top, when their container is narrower than 480px (v4: when the viewport was under 769px). In a wide container on a phone they stay in a row; in a narrow drawer on desktop they stack.
-- The root is a size container (`container-type: inline-size`): in a flex row with automatic width it collapses to zero width. Give it a width (`flex: 1` or `width: 100%` through `class.container`) or put it in a block.
+- The root is a size container (`container-type: inline-size`): in a flex row with automatic width it collapses to zero width. Give it a width (`flex: 1` or `width: 100%` through `class.container`) or put it in a block. In the `actionsSnippet` of a `PageHeader` it is not a container and always stays in a row.
 
 New, optional: `locale` (language of the texts), `confirmIcon`, `cancelIcon`, `confirmVariant`, `confirmType`, `children` (content at the start of the row), `class` object, CSS variables `--confirm-or-cancel-buttons-*`, `data-loading`.
 
@@ -1425,6 +1482,26 @@ New, optional: `mode` (`auto`, `menu`, `drawer`) to force one of the two, `close
 
 New, optional: `description` (shown now), `shortcut`, `checked`, `divider`, `class` and `onclick` per option; `aria-label` (default "Actions", from `locale`), `locale`, `optionSnippet`, `mode`, native attributes on the menu element. **DataTable** uses it for the "⋯" actions of the selection bar.
 
+### ModeSwitch
+
+New in v5: the switch for the light and dark mode, with a third choice, "System", that follows the operating system. v4 had none, so 9 apps keep a local `ThemeSwitch.svelte` and 11 write a text button ("Tema scuro" / "Tema chiaro") at the bottom of the sidebar; both call `toggleTheme()` and then `fetch('/api/setTheme?dark=…')`. Replace them with `ModeSwitch` and delete the copies:
+
+```svelte
+<!-- v4 app -->
+<ThemeSwitch />
+<button onclick={handleDarkThemeClick}>{$theme.dark ? 'Tema chiaro' : 'Tema scuro'}</button>
+
+<!-- v5 -->
+<ModeSwitch />
+```
+
+- Three icons in a pill (light, system, dark) instead of a two-state switch or a text button: a click applies the mode with `setMode`. It is wider than the old switch (about 100px with `size="sm"`, 120px by default, against 40px).
+- To offer only light and dark, as the old switch did, use `system={false}`: until the user picks one the page follows the operating system and the icon of the mode it shows is selected.
+- **The cookie is no longer needed**: remove the `/api/setTheme` endpoint, the `%theme%` placeholder in `app.html` and its replacement in `hooks.server.ts`, and the `fetch('/api/setTheme…')` calls; `rememberAppearance()` and `appearanceScript()` in the root layout keep the choice and apply it before the first paint ([Dark mode and themes](#dark-mode-and-themes)). To also save it elsewhere, for example in the user profile, use `onchange({ mode })`.
+- `value` / `bind:value` of the copies → nothing: ModeSwitch shows the mode of the page (the copies started "off" in dark mode when `value` was not passed). `prefersDark` / `themeSetted` (the three-state copy) → nothing: "System" is a choice that stays available.
+- The tooltip "Tema" on the whole switch → a tooltip with the name of each icon ("Chiaro", "Sistema", "Scuro" with the Italian locale). At the bottom of a sidebar use `tooltipPlacement="top"`; a row with a visible label ("Tema") names the group with `aria-labelledby`.
+- The switch is reachable with the keyboard (the copies hid the checkbox with `display: none`): Tab enters it and the arrow keys change the mode.
+
 ### MonthSelector
 
 - `onclick({ detail: { monthIndex } })` → `onchange({ month })`.
@@ -1447,6 +1524,30 @@ New, optional: `year`, `min`, `max`, `disabled`, `monthFormat`, `focus()`, `bind
 Unchanged: `--no-data-gap`.
 
 New, optional: `description`, `size`, `children` (actions), `titleSnippet`, `descriptionSnippet`, `iconSnippet`, native attributes, `data-size`, `--no-data-min-height`, `-padding`, `-max-width`, `-icon-*`, `-ring-color`, `-title-*`, `-description-*`, `-actions-gap`.
+
+### PageHeader
+
+New in v5: the header of a page (title as a heading, subtitle, description, link back, actions). v4 had none, so every app keeps a local `PageTitle.svelte` (21 apps, about 590 usages, around 15 variants). Replace each usage with `PageHeader` and delete the local copy:
+
+```svelte
+<!-- v4 app -->
+<PageTitle title="Client" subtitle={client.email} prependVisible prependRoute="/clients">
+	{#snippet appendSnippet()}<StandardButton onclick={save}>Save</StandardButton>{/snippet}
+</PageTitle>
+
+<!-- v5 -->
+<PageHeader title="Client" subtitle={client.email} backHref="/clients">
+	{#snippet actionsSnippet()}<Button onclick={save}>Save</Button>{/snippet}
+</PageHeader>
+```
+
+- `prependVisible` + `prependRoute="/x"` → `backHref="/x"`: a native link (it opens in a new tab and SvelteKit preloads it on hover, which replaces `previousPageUrl` and the `preloadData` on hover of some copies). `prependVisible` alone → `back`: a button that calls `history.back()`, as before. `prependRoute` without `prependVisible` showed nothing: drop it.
+- `titleBack` → `backLabel`, `iconBack` → `backIcon` (SVG path). The default label follows the locale ("Indietro" with `it`, "Back" otherwise), as the copies that used paraglide `m.back()`.
+- A custom back handler (`handleBackClick`, a forwarded `on:click`) → `onback(event)`: it runs before the navigation and `event.preventDefault()` stops it, for example to save and then `goto`.
+- Snippets and slots: `append` / `appendSnippet` / `slot="append"` → `actionsSnippet`; `title` / `titleSnippet` / `slot="title"` → `titleSnippet`, which now replaces only the title: a `subtitle` passed with it is shown (the copies hid it), so drop it where it was not visible; `prepend` / `prependSnippet` (the back control) → `backSnippet` (its content) or `prependSnippet` (before the title, for an avatar).
+- The title is a heading: `h1` by default. Inside a component, a panel or a dialog use `headingLevel={2}` (or deeper) and, for a smaller look, `size="sm"` (`titleSize="s"`/`"xs"` of some copies).
+- `marginTop` / `paddingTop` → `style="margin-top: …"` or the app layout (`gap`). `titleClass` / `subtitleClass` → `class={{ title, subtitle }}`.
+- Look: the copies used Tailwind classes (`text-4xl`, `font-bold`, `mb-4`, 22pt). PageHeader has the Aurora look (26px display font, 22px on phones), no empty space when there is no subtitle, and the actions wrap under the text when there is no room; `--page-header-*` variables change it. The line clamp of the title in one copy is not kept: long titles wrap.
 
 ### Paginator
 

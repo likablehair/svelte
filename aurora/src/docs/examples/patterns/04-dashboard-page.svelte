@@ -1,8 +1,17 @@
 <!-- @component Dashboard page
-Numbers first, then trends: a header with the `PeriodPicker` that drives the page, a row of indicator cards (value, change as a `Chip`), a `BarChart` and a `LineChart` side by side, and a `Table` of the best services. Charts take the data colors of the theme, so the page follows themes and dark mode without extra code. -->
+Numbers first, then trends: a `PageHeader` with the `PeriodPicker` that drives the page, a row of indicator cards (value, change as a `Chip`), a `BarChart` and a `LineChart` side by side, and a `Table` of the best services. Charts take the data colors of the theme, so the page follows themes and dark mode without extra code. -->
 <script lang="ts">
 	import { mdiTrendingDown, mdiTrendingUp } from '@mdi/js';
-	import { BarChart, Chip, LineChart, PeriodPicker, Table, type TableColumn, type TimespanSettings } from '#lib';
+	import {
+		BarChart,
+		Chip,
+		LineChart,
+		PageHeader,
+		PeriodPicker,
+		Table,
+		type TableColumn,
+		type TimespanSettings
+	} from '#lib';
 
 	let timespanSettings = $state<TimespanSettings>({ method: 'quick', values: 'this-month' });
 
@@ -45,10 +54,11 @@ Numbers first, then trends: a header with the `PeriodPicker` that drives the pag
 </script>
 
 <main class="page">
-	<header class="page-header">
-		<h1>Overview</h1>
-		<PeriodPicker bind:timespanSettings locale="en" />
-	</header>
+	<PageHeader title="Overview">
+		{#snippet actionsSnippet()}
+			<PeriodPicker bind:timespanSettings locale="en" />
+		{/snippet}
+	</PageHeader>
 
 	<div class="indicators">
 		{#each indicators as indicator (indicator.label)}
@@ -88,21 +98,6 @@ Numbers first, then trends: a header with the `PeriodPicker` that drives the pag
 		display: grid;
 		gap: 1.25rem;
 		padding: 1.5rem;
-	}
-
-	.page-header {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
-	}
-
-	h1 {
-		margin: 0;
-		font-family: var(--global-font-family-display);
-		font-size: 1.6rem;
-		color: var(--global-color-text);
 	}
 
 	.indicators {

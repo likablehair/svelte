@@ -7,6 +7,7 @@
 - Do not mix navigation systems at the same level (sidebar + top tabs + another menu for the same sections). Tabs (`TabSwitcher`) are for sections **inside** one page or record.
 - Put the state of a view in the URL when it can be shared, reloaded or reached with Back: filters, search, page, selected tab, open record. Back must return to the same list with the same filters and scroll.
 - Global search and quick jumps: `GlobalSearchTextField` (Ctrl/⌘+K) in the top bar.
+- Light/dark choice: `ModeSwitch` on the right of the top bar next to the user (`size="sm"` when crowded), or in a row at the bottom of the sidebar with `tooltipPlacement="top"`; one per app.
 - A record opens in its own page when it has a lot to show or edit; in a `Drawer` when the user works through a list one by one; inline when it is a single value.
 
 ## Tables and lists of records
