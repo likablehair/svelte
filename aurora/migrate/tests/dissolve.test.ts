@@ -168,6 +168,225 @@ describe('dissolve: wrappers', () => {
 		expect(result.changes.some((c) => c.kind === 'wrapper-style-ignored' && c.name === '--button-background-color')).toBe(true);
 	});
 
+	const guarded = (props: string, handler: string[]) =>
+		svelte(
+			["\timport { Button } from '@likable-hair/svelte'", `\tlet { loading = $bindable(false), disabled = false, children, ${props}...rest } = $props()`, ...handler].join('\n'),
+			'<Button {loading} {disabled} {...rest} onclick={handleClick}>{@render children?.()}</Button>'
+		);
+
+	test('a click guard on disabled and loading is dropped, since the library Button ignores those clicks', () => {
+		const { read, exists, result } = run({
+			[`${W}/StandardSaveButton.svelte`]: guarded('', ['\tfunction handleClick(event) {', '\t\tif (!disabled && !loading) rest.onclick?.(event)', '\t}']),
+			[`${W}/StandardSendButton.svelte`]: guarded('onclick, ', ['\tfunction handleClick(e) {', '\t\tif (!disabled && !loading && onclick) onclick(e)', '\t}']),
+			[`${W}/StandardBackButton.svelte`]: guarded('', ['\tfunction handleClick(e) {', '\t\tif (disabled || loading) return', '\t\trest.onclick?.(e)', '\t}']),
+			'src/routes/+page.svelte': svelte(
+				[
+					"\timport StandardSaveButton from '$lib/components/common/StandardSaveButton.svelte'",
+					"\timport StandardSendButton from '$lib/components/common/StandardSendButton.svelte'",
+					"\timport StandardBackButton from '$lib/components/common/StandardBackButton.svelte'",
+					'\tlet busy = $state(false)',
+					'\tfunction go() {}'
+				].join('\n'),
+				[
+					'<StandardSaveButton onclick={go} disabled={busy}>Save</StandardSaveButton>',
+					'<StandardSendButton onclick={go} loading={busy}>Send</StandardSendButton>',
+					'<StandardBackButton onclick={go}>Back</StandardBackButton>'
+				].join('\n')
+			)
+		});
+		const page = read('src/routes/+page.svelte');
+		expect(page).toContain('<Button onclick={go} disabled={busy}>Save</Button>');
+		expect(page).toContain('<Button onclick={go} loading={busy}>Send</Button>');
+		expect(page).toContain('<Button onclick={go}>Back</Button>');
+		expect(result.wrappers.every((w) => w.deleted && !w.blockers.length)).toBe(true);
+		expect(exists(`${W}/StandardSaveButton.svelte`)).toBe(false);
+	});
+
+	test('a click handler that does more than the guard keeps the wrapper', () => {
+		const { read, result } = run({
+			[`${W}/StandardTrackButton.svelte`]: guarded('', ['\tfunction handleClick(e) {', '\t\tif (!disabled) {', '\t\t\tconsole.log(e)', '\t\t\trest.onclick?.(e)', '\t\t}', '\t}']),
+			[`${W}/StandardBusyButton.svelte`]: guarded('busy = false, ', ['\tfunction handleClick(e) {', '\t\tif (!busy) rest.onclick?.(e)', '\t}']),
+			'src/routes/+page.svelte': svelte(
+				"\timport StandardTrackButton from '$lib/components/common/StandardTrackButton.svelte'\n\timport StandardBusyButton from '$lib/components/common/StandardBusyButton.svelte'",
+				'<StandardTrackButton>A</StandardTrackButton>\n<StandardBusyButton busy>B</StandardBusyButton>'
+			)
+		});
+		const page = read('src/routes/+page.svelte');
+		expect(page).toContain('<StandardTrackButton>A</StandardTrackButton>');
+		expect(page).toContain('<StandardBusyButton busy>B</StandardBusyButton>');
+		for (const wrapper of result.wrappers) expect(wrapper.blockers).toContain('the wrapper handles `onclick`');
+	});
+
+	const nativeSelect = svelte(
+		[
+			"\timport { Icon } from '@likable-hair/svelte'",
+			'\ttype Option = { value: string | number | undefined; text: string }',
+			'\tinterface Props { options: Option[]; value?: string | number; disabled?: boolean; height?: string; onchange?: () => void }',
+			'\tlet { options, value = $bindable(undefined), disabled = false, height = undefined, onchange }: Props = $props()'
+		].join('\n'),
+		[
+			'<div class="select-wrapper" class:disabled>',
+			'\t<select bind:value={value} onchange={onchange} class="select" style:border-radius="5px" style:height={height ?? "39px"} disabled={disabled}>',
+			'\t\t{#each options as option}',
+			'\t\t\t<option value={option.value} style:padding="10px">',
+			'\t\t\t\t{option.text}',
+			'\t\t\t</option>',
+			'\t\t{/each}',
+			'\t</select>',
+			'\t<span class="select-chevron"><Icon name="mdi-chevron-down" /></span>',
+			'</div>'
+		].join('\n')
+	);
+
+	test('a wrapper of a native <select> becomes Select, and the options are renamed where they are built', () => {
+		const { read, exists, result } = run({
+			[`${W}/StandardSelect.svelte`]: nativeSelect,
+			'src/routes/+page.svelte': svelte(
+				[
+					"\timport StandardSelect from '$lib/components/common/StandardSelect.svelte'",
+					'\tlet { list }: { list: { id: number; name: string }[] } = $props()',
+					"\tconst types: { value: string; text: string }[] = [{ value: 'a', text: 'A' }]",
+					"\tconst roles = ['x', 'y'].map((role) => ({ value: role, text: role.toUpperCase() }))",
+					'\tlet accounts = $derived(list.map((a) => {',
+					'\t\treturn { value: a.id, text: a.name }',
+					'\t}))',
+					'\tlet type = $state(), role = $state(), account = $state()',
+					'\tfunction go() {}'
+				].join('\n'),
+				[
+					'<StandardSelect options={types} bind:value={type} onchange={go} height="30px" />',
+					'<StandardSelect options={roles} bind:value={role} disabled />',
+					"<StandardSelect options={[{ value: '', text: 'None' }, ...accounts]} bind:value={account} />"
+				].join('\n')
+			)
+		});
+		const page = read('src/routes/+page.svelte');
+		expect(page).toContain("import { Select } from '@likable-hair/svelte'");
+		expect(page).toContain("const types: { value: string; label: string }[] = [{ value: 'a', label: 'A' }]");
+		expect(page).toContain('({ value: role, label: role.toUpperCase() })');
+		expect(page).toContain('return { value: a.id, label: a.name }');
+		expect(page).toContain('<Select items={types} bind:value={type} onchange={go} />');
+		expect(page).toContain('<Select items={roles} bind:value={role} disabled />');
+		expect(page).toContain("<Select items={[{ value: '', label: 'None' }, ...accounts]} bind:value={account} />");
+		expect(exists(`${W}/StandardSelect.svelte`)).toBe(false);
+		const summary = result.wrappers[0];
+		expect(summary).toMatchObject({ target: 'Select', dissolved: 3 });
+		expect(summary.props).toContainEqual({ name: 'options', handling: '→ items (text → label)' });
+		expect(summary.dropped.join(' ')).toContain('style:border-radius="5px"');
+	});
+
+	test('options built in another file, or read elsewhere, keep the wrapper and say where to rename them', () => {
+		const { read, result } = run({
+			[`${W}/StandardSelect.svelte`]: nativeSelect,
+			'src/routes/+page.svelte': svelte(
+				[
+					"\timport StandardSelect from '$lib/components/common/StandardSelect.svelte'",
+					'\tlet { warehouses }: { warehouses: { value: number; text: string }[] } = $props()',
+					"\tconst units = [{ value: 'kg', text: 'Kilos' }]",
+					'\tlet w = $state(), u = $state()'
+				].join('\n'),
+				[
+					'<StandardSelect options={warehouses} bind:value={w} />',
+					'<StandardSelect options={units} bind:value={u} />',
+					'<p>{units.find((x) => x.value === u)?.text}</p>'
+				].join('\n')
+			)
+		});
+		const page = read('src/routes/+page.svelte');
+		expect(page).toContain('<StandardSelect options={warehouses} bind:value={w} />');
+		expect(page).toContain('<StandardSelect options={units} bind:value={u} />');
+		expect(page).toContain("const units = [{ value: 'kg', text: 'Kilos' }]");
+		const reasons = result.skipped.map((s) => s.reason);
+		expect(reasons).toContain('`options`: `warehouses` comes from a prop; rename `text` to `label` where the options are built, then run again');
+		expect(reasons).toContain('`options`: `units` is also used outside the options; rename `text` to `label` where the options are built, then run again');
+	});
+
+	test('a wrapper of a native <textarea> becomes Textarea, and LabelAndSelect over a native select becomes Select with label', () => {
+		const { read, exists } = run({
+			[`${W}/StandardSelect.svelte`]: nativeSelect,
+			[`${W}/LabelAndSelect.svelte`]: svelte(
+				[
+					"\timport StandardSelect from '$lib/components/common/StandardSelect.svelte'",
+					"\timport type { ComponentProps } from 'svelte'",
+					'\ttype Props = { label: string; name: string } & ComponentProps<typeof StandardSelect>',
+					'\tlet { value = $bindable(undefined), label, name, ...restProps }: Props = $props()'
+				].join('\n'),
+				'<label style:font-weight="500" for={name}>{label}</label>\n<div style:margin-top="5px">\n\t<StandardSelect bind:value {...restProps}></StandardSelect>\n</div>'
+			),
+			[`${W}/StandardTextarea.svelte`]: svelte(
+				'\tlet { placeholder = "", value = $bindable(), disabled, error, hint, oninput }: { placeholder?: string; value?: string; disabled?: boolean; error?: boolean; hint?: string; oninput?: () => void } = $props()',
+				[
+					'<div class="flex flex-col w-full gap-2">',
+					'\t<textarea bind:value {placeholder} {disabled} style:--border-color={error ? "red" : "grey"} oninput={oninput}></textarea>',
+					'\t{#if hint}<div class="text-xs" style:color={error ? "red" : undefined}>{hint}</div>{/if}',
+					'</div>'
+				].join('\n')
+			),
+			'src/routes/+page.svelte': svelte(
+				[
+					"\timport LabelAndSelect from '$lib/components/common/LabelAndSelect.svelte'",
+					"\timport StandardTextarea from '$lib/components/common/StandardTextarea.svelte'",
+					"\tconst kinds = [{ value: 1, text: 'One' }]",
+					"\tlet kind = $state(1), note = $state(''), bad = $state(false)"
+				].join('\n'),
+				'<LabelAndSelect label="Tipo" name="kind" options={kinds} bind:value={kind} />\n<StandardTextarea bind:value={note} error={bad} hint="Required" placeholder="Note" />'
+			)
+		});
+		const page = read('src/routes/+page.svelte');
+		expect(page).toContain("import { Textarea, Select } from '@likable-hair/svelte'");
+		expect(page).toContain("const kinds = [{ value: 1, label: 'One' }]");
+		expect(page).toContain('<Select label="Tipo" name="kind" items={kinds} bind:value={kind} />');
+		expect(page).toContain(`<Textarea bind:value={note} state={bad ? 'error' : undefined} hint="Required" placeholder="Note" />`);
+		for (const name of ['StandardSelect', 'LabelAndSelect', 'StandardTextarea']) expect(exists(`${W}/${name}.svelte`)).toBe(false);
+	});
+
+	test('an event handled by an element around the children is behaviour, not look', () => {
+		const { read, result } = run({
+			[`${W}/StandardButton.svelte`]: svelte(
+				[
+					"\timport { Button } from '@likable-hair/svelte'",
+					"\timport { preloadData } from '$app/navigation'",
+					'\tlet { urlToPreload = undefined, children, ...rest } = $props()',
+					'\tfunction preload() {',
+					'\t\tif (urlToPreload) preloadData(urlToPreload)',
+					'\t}'
+				].join('\n'),
+				'<Button {...rest}>\n\t<div style:display="flex" onmouseenter={preload}>{@render children?.()}</div>\n</Button>'
+			),
+			'src/routes/+page.svelte': svelte(
+				"\timport StandardButton from '$lib/components/common/StandardButton.svelte'",
+				'<StandardButton urlToPreload="/a">A</StandardButton>\n<StandardButton>B</StandardButton>'
+			)
+		});
+		const page = read('src/routes/+page.svelte');
+		expect(page).toContain('<StandardButton urlToPreload="/a">A</StandardButton>');
+		expect(page).toContain('<Button>B</Button>');
+		expect(result.skipped.find((s) => s.id === 'wrappers/StandardButton')?.reason).toBe('`urlToPreload` handled by `onmouseenter` of <div>');
+	});
+
+	test('a value computed from names of the wrapper is not copied into the page', () => {
+		const { read, result } = run({
+			[`${W}/StandardTextfield.svelte`]: svelte(
+				"\timport { SimpleTextField } from '@likable-hair/svelte'\n\tlet { value = $bindable(), ...restProps } = $props()",
+				"<SimpleTextField bind:value {...restProps} --simple-textfield-default-margin-bottom={restProps.hint ? '2px' : '0px'} --simple-textfield-default-width=\"100%\" />"
+			),
+			[`${W}/StandardAddButton.svelte`]: svelte(
+				"\timport { Button } from '@likable-hair/svelte'\n\timport { mdiPlus } from '@mdi/js'\n\tlet { ...rest } = $props()",
+				'<Button icon={mdiPlus} {...rest} />'
+			),
+			'src/routes/+page.svelte': svelte(
+				"\timport StandardTextfield from '$lib/components/common/StandardTextfield.svelte'\n\timport StandardAddButton from '$lib/components/common/StandardAddButton.svelte'\n\tlet v = $state('')",
+				'<StandardTextfield bind:value={v} hint="Required" />\n<StandardAddButton />'
+			)
+		});
+		const page = read('src/routes/+page.svelte');
+		expect(page).toContain('<SimpleTextField --simple-text-field-default-width="100%" bind:value={v} hint="Required" />');
+		expect(page).toContain('<StandardAddButton />');
+		const textfield = result.wrappers.find((w) => w.file.endsWith('StandardTextfield.svelte'))!;
+		expect(textfield.dropped.join(' ')).toContain('restProps.hint');
+		expect(result.wrappers.find((w) => w.file.endsWith('StandardAddButton.svelte'))?.blockers).toEqual(["`icon` is computed from the wrapper's own values"]);
+	});
+
 	test('rewrites the wrapper in types, also a prop picked by name', () => {
 		const { read } = run({
 			[`${W}/StandardButton.svelte`]: button,
@@ -299,6 +518,35 @@ describe('dissolve: LabelAnd* components', () => {
 			)
 		});
 		expect(read('src/routes/+page.svelte')).toContain('<Select label="Ruolo" name="role" {items} bind:value={role} />');
+	});
+
+	test('a label shown only when the label prop is set becomes the label of the component; a label behind another condition does not', () => {
+		const { read, exists } = run({
+			[`${W}/StandardTextfield.svelte`]: textfield,
+			[`${W}/LabelAndTextfield.svelte`]: svelte(
+				[
+					"\timport StandardTextfield from '$lib/components/common/StandardTextfield.svelte'",
+					"\timport type { ComponentProps } from 'svelte'",
+					'\ttype Props = { value?: string; label?: string; name: string } & ComponentProps<typeof StandardTextfield>',
+					'\tlet { value = $bindable(), label = undefined, name, ...restProps }: Props = $props()'
+				].join('\n'),
+				"{#if !!label}\n\t<label style:font-weight=\"500\" for={name}>{label || ''}</label>\n{/if}\n\n<div>\n\t<StandardTextfield bind:value={value} {...restProps}></StandardTextfield>\n</div>"
+			),
+			[`${W}/LabelAndInput.svelte`]: svelte(
+				"\timport { SimpleTextField } from '@likable-hair/svelte'\n\tlet { label, showLabel = true, ...rest } = $props()",
+				'{#if showLabel}<label>{label}</label>{/if}\n<SimpleTextField {...rest} />'
+			),
+			'src/routes/+page.svelte': svelte(
+				"\timport LabelAndTextfield from '$lib/components/common/LabelAndTextfield.svelte'\n\timport LabelAndInput from '$lib/components/common/LabelAndInput.svelte'\n\tlet v = $state('')",
+				'<LabelAndTextfield label="Nome" name="name" bind:value={v} />\n<LabelAndTextfield name="code" bind:value={v} />\n<LabelAndInput label="Codice" />'
+			)
+		});
+		const page = read('src/routes/+page.svelte');
+		expect(page).toContain('<SimpleTextField label="Nome" name="name" bind:value={v} />');
+		expect(page).toContain('<SimpleTextField name="code" bind:value={v} />');
+		expect(page).toContain('<LabelAndInput label="Codice" />');
+		expect(exists(`${W}/LabelAndTextfield.svelte`)).toBe(false);
+		expect(exists(`${W}/LabelAndInput.svelte`)).toBe(true);
 	});
 
 	test('a label with more than the label prop keeps the component', () => {

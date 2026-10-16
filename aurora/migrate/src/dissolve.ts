@@ -9,6 +9,9 @@ const LIB = '@likable-hair/svelte';
 const WRAPPERS = [/^Standard[A-Z]\w*\.svelte$/, /^LabelAnd[A-Z]\w*\.svelte$/];
 const LAYOUT_VAR = /-(?:(?:min|max)-)?width$|-margin(?:-(?:top|right|bottom|left))?$|-display$|-flex(?:-(?:grow|shrink|basis))?$|-align-self$/;
 const TRIVIAL = new Set(['undefined', 'null', 'false', "''", '""', '``']);
+const BLOCKS: Record<string, string[]> = { Button: ['disabled', 'loading'] };
+const NATIVE: Record<string, string> = { select: 'Select', textarea: 'Textarea' };
+const KEEP_SHAPE = new Set(['filter', 'slice', 'sort', 'toSorted', 'reverse', 'toReversed']);
 
 export interface Recipe {
 	to?: string;
@@ -42,9 +45,19 @@ type Handling =
 	| { kind: 'forward'; to: string; bind: boolean }
 	| { kind: 'recipe'; recipe: Recipe }
 	| { kind: 'layout'; to: string }
+	| { kind: 'items'; to: string; keys: Record<string, string> }
 	| { kind: 'look' }
 	| { kind: 'children' }
 	| { kind: 'unknown'; reason: string };
+
+type Sink = {
+	forward?: { to: string; bind: boolean };
+	layout?: string;
+	items?: Record<string, string>;
+	look?: boolean;
+	unknown?: string;
+	soft?: boolean;
+};
 
 interface WrapperProp {
 	name: string;
@@ -222,9 +235,9 @@ export function planWrapper(path: string, rel: string, text: string, index: Rule
 		declared.push({ name, local: value.name, fallback });
 	}
 	const byLocal = new Map(declared.map((d) => [d.local, d.name]));
+	const locals = new Set([...topLevelNames(program ? [program] : []).keys(), ...(restLocal ? [restLocal] : [])]);
 	const tracked = new Set([...byLocal.keys(), ...derived.keys(), ...functions.keys()]);
 
-	type Sink = { forward?: { to: string; bind: boolean }; layout?: string; look?: boolean; unknown?: string; soft?: boolean };
 	const sinks = new Map<string, Sink[]>(declared.map((d) => [d.name, []]));
 	const expanding = new Set<string>();
 	const sink = (root: unknown, entry: Sink | ((name: string) => Sink)) => {
@@ -248,17 +261,22 @@ export function planWrapper(path: string, rel: string, text: string, index: Rule
 	}
 
 	const libNodes: Node[] = [];
+	const natives: Node[] = [];
 	visit(ast.fragment, (node) => {
 		if (node.type === 'Component' && libLocals.has(node.name)) libNodes.push(node);
+		else if (node.type === 'RegularElement' && NATIVE[node.name] && components.has(NATIVE[node.name])) natives.push(node);
 	});
 	const spreadsRest = (node: Node) =>
 		(node.attributes as Node[]).some((a) => a.type === 'SpreadAttribute' && a.expression.type === 'Identifier' && a.expression.name === restLocal);
-	const element = libNodes.find(spreadsRest) ?? (libNodes.length === 1 ? libNodes[0] : undefined);
+	const bindsValue = (node: Node) =>
+		(node.attributes as Node[]).some((a) => a.type === 'BindDirective' && a.name === 'value' && a.expression.type === 'Identifier' && byLocal.has(a.expression.name));
+	const native = !libNodes.some(spreadsRest) && natives.length === 1 && bindsValue(natives[0]) ? natives[0] : undefined;
+	const element = native ?? libNodes.find(spreadsRest) ?? (libNodes.length === 1 ? libNodes[0] : undefined);
 	if (!element) {
 		plan.blockers.push(libNodes.length ? 'more than one library component and none receives the rest props' : 'does not wrap a library component');
 		return finish(plan, declared, sinks, text, index);
 	}
-	plan.target = libLocals.get(element.name)!;
+	plan.target = native ? NATIVE[native.name] : libLocals.get(element.name)!;
 	const recipes = RECIPES[plan.target] ?? {};
 	const covered = (where: string) => (name: string): Sink => (recipes[name]?.to ? {} : { unknown: `used in ${where}`, soft: true });
 
@@ -271,12 +289,23 @@ export function planWrapper(path: string, rel: string, text: string, index: Rule
 
 	const api = index.rules.v5.components[plan.target];
 	const accepts = (name: string) => !!api && (api.props.includes(name) || (api.native && (name === 'id' || name === 'name')));
-	const ownLabel = (node: Node) => {
+	const sinkAttributes = (node: Node, entry: Sink | ((name: string) => Sink)) => {
+		for (const attr of node.attributes as Node[])
+			sink(attr, attr.type === 'OnDirective' || /^on[a-z]/.test(attr.name) ? { unknown: `handled by \`${attr.name}\` of <${node.name}>` } : entry);
+	};
+	const meaningful = (nodes: Node[]) => nodes.filter((n) => n.type !== 'Comment' && !(n.type === 'Text' && !n.data.trim()));
+	const ownLabel = (node: Node, local?: string): boolean => {
+		if (node.type === 'IfBlock' && !local) {
+			let test = node.test as Node;
+			while (test.type === 'UnaryExpression' && test.operator === '!' && test.argument.type === 'UnaryExpression' && test.argument.operator === '!') test = test.argument.argument;
+			const inside = meaningful(node.consequent.nodes);
+			return !node.alternate && test.type === 'Identifier' && byLocal.has(test.name) && inside.length === 1 && ownLabel(inside[0], test.name);
+		}
 		if (node.type !== 'RegularElement' || node.name !== 'label' || !accepts('label')) return false;
-		const content = (node.fragment.nodes as Node[]).filter((n) => n.type !== 'Comment' && !(n.type === 'Text' && !n.data.trim()));
+		const content = meaningful(node.fragment.nodes);
 		if (content.length !== 1 || content[0].type !== 'ExpressionTag') return false;
 		const refs = references(content[0].expression, tracked);
-		if (refs.length !== 1 || !byLocal.has(refs[0].name)) return false;
+		if (refs.length !== 1 || !byLocal.has(refs[0].name) || (local && refs[0].name !== local)) return false;
 		sinks.get(byLocal.get(refs[0].name)!)!.push({ forward: { to: 'label', bind: false } });
 		for (const attr of node.attributes as Node[])
 			if (attr.type === 'Attribute' && attr.name === 'for') sink(attr, (name) => (accepts(name) ? { forward: { to: name, bind: false } } : { look: true }));
@@ -300,7 +329,7 @@ export function planWrapper(path: string, rel: string, text: string, index: Rule
 			if (node === element) continue;
 			if (node.type === 'RegularElement') {
 				plan.dropped.push(`wrapping ${describe(node, text)}`);
-				sink(node.attributes, covered(`the wrapping <${node.name}>`));
+				sinkAttributes(node, covered(`the wrapping <${node.name}>`));
 				walk(node.fragment.nodes, 'path', where);
 			} else if (node.type === 'IfBlock') {
 				sink(node.test, covered('an {#if} around the component'));
@@ -314,6 +343,41 @@ export function planWrapper(path: string, rel: string, text: string, index: Rule
 		}
 	};
 	walk(ast.fragment.nodes, 'path', 'markup around the component');
+
+	const terms = (node: Node, operator: string): Node[] =>
+		node.type === 'LogicalExpression' && node.operator === operator ? [...terms(node.left, operator), ...terms(node.right, operator)] : [node];
+	const guardedBy = (fn: Node, event: string): string[] | undefined => {
+		const params = fn.params as Node[];
+		if (params.length !== 1 || params[0].type !== 'Identifier') return undefined;
+		const forwards = (node: Node | undefined): boolean => {
+			if (node?.type === 'BlockStatement') return node.body.length === 1 && forwards(node.body[0]);
+			if (node?.type !== 'ExpressionStatement') return false;
+			const call = node.expression.type === 'ChainExpression' ? node.expression.expression : node.expression;
+			if (call.type !== 'CallExpression' || call.arguments.length !== 1 || call.arguments[0].type !== 'Identifier' || call.arguments[0].name !== params[0].name) return false;
+			const callee = call.callee as Node;
+			if (callee.type === 'Identifier') return byLocal.get(callee.name) === event;
+			return callee.type === 'MemberExpression' && !callee.computed && callee.object.type === 'Identifier' && callee.object.name === restLocal && callee.property.name === event;
+		};
+		const exits = (node: Node | undefined): boolean =>
+			node?.type === 'ReturnStatement' ? !node.argument : node?.type === 'BlockStatement' && node.body.length === 1 && exits(node.body[0]);
+		const props: string[] = [];
+		const body = fn.body.body as Node[];
+		const test = body[0]?.type === 'IfStatement' && !body[0].alternate ? (body[0].test as Node) : undefined;
+		if (test && body.length === 1 && forwards(body[0].consequent)) {
+			for (const term of terms(test, '&&')) {
+				if (term.type === 'Identifier' && byLocal.get(term.name) === event) continue;
+				if (term.type !== 'UnaryExpression' || term.operator !== '!' || term.argument.type !== 'Identifier' || !byLocal.has(term.argument.name)) return undefined;
+				props.push(byLocal.get(term.argument.name)!);
+			}
+		} else if (test && body.length === 2 && exits(body[0].consequent) && forwards(body[1])) {
+			for (const term of terms(test, '||')) {
+				if (term.type !== 'Identifier' || !byLocal.has(term.name)) return undefined;
+				props.push(byLocal.get(term.name)!);
+			}
+		} else return undefined;
+		return props.length ? props : undefined;
+	};
+	const guards: { event: string; props: string[] }[] = [];
 
 	const attrs = element.attributes as Node[];
 	const restIndex = attrs.findIndex((a) => a.type === 'SpreadAttribute' && a.expression.type === 'Identifier' && a.expression.name === restLocal);
@@ -335,6 +399,11 @@ export function planWrapper(path: string, rel: string, text: string, index: Rule
 			else sink(expression, { unknown: `bound to \`${attr.name}\`` });
 			return;
 		}
+		if (native && (attr.type === 'StyleDirective' || attr.type === 'ClassDirective')) {
+			plan.dropped.push(src(text, attr).replace(/\s+/g, ' '));
+			sink(attr, { look: true });
+			return;
+		}
 		if (attr.type !== 'Attribute') {
 			plan.blockers.push(`uses \`${src(text, attr)}\``);
 			return;
@@ -342,11 +411,12 @@ export function planWrapper(path: string, rel: string, text: string, index: Rule
 		const name = attr.name as string;
 		const expression = attrExpression(attr);
 		const found = references(attr, tracked);
+		const own = !found.length && references(attr, locals).length > 0;
 		if (name.startsWith('--')) {
 			plan.ownStyles.add(name);
 			const layout = LAYOUT_VAR.test(name);
 			if (!found.length) {
-				if (layout) plan.fixed.push({ name, text: src(text, attr), afterRest });
+				if (layout && !own) plan.fixed.push({ name, text: src(text, attr), afterRest });
 				else plan.dropped.push(src(text, attr).replace(/\s+/g, ' '));
 				return;
 			}
@@ -359,7 +429,14 @@ export function planWrapper(path: string, rel: string, text: string, index: Rule
 			return;
 		}
 		if (found.some((ref) => functions.has(ref.name))) {
-			plan.blockers.push(`the wrapper handles \`${name}\``);
+			const fn = expression?.type === 'Identifier' ? functions.get(expression.name) : undefined;
+			const props = fn && /^on[a-z]/.test(name) ? guardedBy(fn, name) : undefined;
+			if (!props) {
+				plan.blockers.push(`the wrapper handles \`${name}\``);
+				return;
+			}
+			guards.push({ event: name, props });
+			sinks.get(name)?.push({ forward: { to: name, bind: false } });
 			return;
 		}
 		if (expression?.type === 'Identifier' && byLocal.has(expression.name)) {
@@ -377,8 +454,13 @@ export function planWrapper(path: string, rel: string, text: string, index: Rule
 				return;
 			}
 		}
+		if (own) {
+			if (removed.has(name) || name === 'class' || name === 'style') plan.dropped.push(src(text, attr).replace(/\s+/g, ' '));
+			else plan.blockers.push(`\`${name}\` is computed from the wrapper's own values`);
+			return;
+		}
 		if (!found.length) {
-			if (removed.has(name)) plan.dropped.push(src(text, attr).replace(/\s+/g, ' '));
+			if (removed.has(name) || (native && (name === 'class' || name === 'style'))) plan.dropped.push(src(text, attr).replace(/\s+/g, ' '));
 			else plan.fixed.push({ name, text: src(text, attr), afterRest });
 			return;
 		}
@@ -420,7 +502,7 @@ export function planWrapper(path: string, rel: string, text: string, index: Rule
 			if (node === renderTag) continue;
 			if (node.type === 'RegularElement') {
 				plan.dropped.push(`element ${describe(node, text)} around the children`);
-				sink(node.attributes, { look: true });
+				sinkAttributes(node, { look: true });
 				walkContent(node.fragment.nodes);
 			} else if (node.type === 'IfBlock') {
 				sink(node.test, covered('an {#if} around the children'));
@@ -432,14 +514,46 @@ export function planWrapper(path: string, rel: string, text: string, index: Rule
 			else plan.blockers.push(`the children are inside ${node.type}`);
 		}
 	};
-	walkContent(content);
-	return finish(plan, declared, sinks, text, index);
+	const optionKeys = (nodes: Node[]) => {
+		const each = nodes.length === 1 && nodes[0].type === 'EachBlock' && !nodes[0].fallback ? nodes[0] : undefined;
+		if (!each || each.expression.type !== 'Identifier' || !byLocal.has(each.expression.name) || each.context?.type !== 'Identifier') return undefined;
+		const field = (node: Node | undefined) =>
+			node?.type === 'MemberExpression' && !node.computed && node.object.type === 'Identifier' && node.object.name === each.context.name ? (node.property.name as string) : undefined;
+		const body = meaningful(each.body.nodes);
+		const option = body.length === 1 && body[0].type === 'RegularElement' && body[0].name === 'option' ? body[0] : undefined;
+		if (!option) return undefined;
+		let value: string | undefined;
+		for (const attr of option.attributes as Node[]) {
+			if (attr.type === 'Attribute' && attr.name === 'value') value = field(attrExpression(attr));
+			else if (attr.type !== 'StyleDirective' && !(attr.type === 'Attribute' && (attr.name === 'class' || attr.name === 'style'))) return undefined;
+		}
+		const shown = meaningful(option.fragment.nodes);
+		const label = shown.length === 1 && shown[0].type === 'ExpressionTag' ? field(shown[0].expression) : undefined;
+		if (!value || !label || value === label) return undefined;
+		return { prop: byLocal.get(each.expression.name)!, keys: { [value]: 'value', [label]: 'label' } };
+	};
+	if (native) {
+		const inside = meaningful(content);
+		const options = native.name === 'select' ? optionKeys(inside) : undefined;
+		if (options) sinks.get(options.prop)!.push({ items: options.keys });
+		else if (inside.length) plan.blockers.push(`draws its own content inside <${native.name}>`);
+	} else walkContent(content);
+	finish(plan, declared, sinks, text, index);
+	const blocks = BLOCKS[plan.target] ?? [];
+	for (const guard of guards) {
+		const covered = guard.props.every((name) => {
+			const h = plan.props.get(name)?.handling;
+			return h?.kind === 'forward' && blocks.includes(h.to);
+		});
+		if (!covered) plan.blockers.push(`the wrapper handles \`${guard.event}\``);
+	}
+	return plan;
 }
 
 function finish(
 	plan: WrapperPlan,
 	declared: { name: string; local: string; fallback?: Node }[],
-	sinks: Map<string, { forward?: { to: string; bind: boolean }; layout?: string; look?: boolean; unknown?: string; soft?: boolean }[]>,
+	sinks: Map<string, Sink[]>,
 	text: string,
 	index: RuleIndex
 ): WrapperPlan {
@@ -448,13 +562,15 @@ function finish(
 	for (const { name, local, fallback } of declared) {
 		const list = sinks.get(name) ?? [];
 		const forwards = [...new Set(list.filter((s) => s.forward).map((s) => `${s.forward!.bind ? 'bind:' : ''}${s.forward!.to}`))];
-		const unknown = list.find((s) => s.unknown && !(s.soft && (forwards.length || name === 'children')))?.unknown;
+		const items = list.find((s) => s.items)?.items;
+		const unknown = list.find((s) => s.unknown && !(s.soft && (forwards.length || items || name === 'children')))?.unknown;
 		const layout = list.find((s) => s.layout)?.layout;
 		let handling: Handling;
 		if (name === 'children' && plan.children) handling = { kind: 'children' };
 		else if (recipes[name]?.manual) handling = { kind: 'unknown', reason: recipes[name].manual! };
 		else if (recipes[name]) handling = { kind: 'recipe', recipe: recipes[name] };
 		else if (unknown) handling = { kind: 'unknown', reason: unknown };
+		else if (items) handling = forwards.length ? { kind: 'unknown', reason: `passed as ${forwards.join(' and ')} and drawn as options` } : { kind: 'items', to: 'items', keys: items };
 		else if (forwards.length > 1) handling = { kind: 'unknown', reason: `passed as ${forwards.join(' and ')}` };
 		else if (forwards.length && removed.has(forwards[0].replace(/^bind:/, ''))) {
 			handling = { kind: 'look' };
@@ -515,6 +631,104 @@ function v5Default(index: RuleIndex, target: string, prop: string) {
 	return raw?.replace(/^['"]|['"]$/g, '');
 }
 
+type Edit = { start: number; end: number; text: string };
+
+interface FileScope {
+	declared: Map<string, Node>;
+	props: Set<string>;
+}
+
+function fileScope(programs: Node[]): FileScope {
+	const scope: FileScope = { declared: new Map(), props: new Set() };
+	for (const program of programs)
+		for (const statement of program.body as Node[]) {
+			if (statement.type !== 'VariableDeclaration') continue;
+			for (const decl of statement.declarations as Node[]) {
+				if (decl.id.type === 'Identifier') scope.declared.set(decl.id.name, decl);
+				else if (decl.id.type === 'ObjectPattern' && decl.init?.type === 'CallExpression' && decl.init.callee.name === '$props')
+					for (const p of decl.id.properties as Node[]) {
+						const value = p.type === 'RestElement' ? p.argument : p.value.type === 'AssignmentPattern' ? p.value.left : p.value;
+						if (value.type === 'Identifier') scope.props.add(value.name);
+					}
+			}
+		}
+	return scope;
+}
+
+function relabel(text: string, root: Node, keys: Record<string, string>, scope: FileScope): { edits: Edit[]; chased: string[] } | string {
+	const edits: Edit[] = [];
+	const chased: string[] = [];
+	const renames = Object.entries(keys).filter(([from, to]) => from !== to);
+	const types = (annotation: Node) =>
+		visit(annotation, (node) => {
+			const key = node.type === 'TSPropertySignature' && !node.computed ? (node.key.name ?? node.key.value) : undefined;
+			if (key && keys[key] && keys[key] !== key) edits.push({ start: node.key.start, end: node.key.end, text: keys[key] });
+		});
+	const option = (node: Node): string | undefined => {
+		if (node.type === 'TSAsExpression' || node.type === 'TSSatisfiesExpression') return option(node.expression);
+		if (node.type === 'ConditionalExpression') return option(node.consequent) ?? option(node.alternate);
+		if (node.type !== 'ObjectExpression') return `an option is built as \`${src(text, node).replace(/\s+/g, ' ').slice(0, 40)}\``;
+		for (const [from, to] of renames) {
+			const p = (node.properties as Node[]).find((q) => q.type === 'Property' && !q.computed && (q.key.name ?? q.key.value) === from);
+			if (!p) return `an option has no \`${from}\``;
+			edits.push(p.shorthand ? { start: p.start, end: p.end, text: `${to}: ${from}` } : { start: p.key.start, end: p.key.end, text: to });
+		}
+		return undefined;
+	};
+	const list = (node: Node): string | undefined => {
+		switch (node.type) {
+			case 'TSAsExpression':
+			case 'TSSatisfiesExpression':
+			case 'TSNonNullExpression':
+				return list(node.expression);
+			case 'ArrayExpression':
+				for (const element of node.elements as (Node | null)[]) {
+					const fail = !element ? undefined : element.type === 'SpreadElement' ? list(element.argument) : option(element);
+					if (fail) return fail;
+				}
+				return undefined;
+			case 'ConditionalExpression':
+				return list(node.consequent) ?? list(node.alternate);
+			case 'LogicalExpression':
+				return list(node.left) ?? list(node.right);
+			case 'Identifier': {
+				if (chased.includes(node.name)) return undefined;
+				if (scope.props.has(node.name)) return `\`${node.name}\` comes from a prop`;
+				const decl = scope.declared.get(node.name);
+				if (!decl?.init) return `\`${node.name}\` is not built in this file`;
+				chased.push(node.name);
+				if (decl.id.typeAnnotation) types(decl.id.typeAnnotation);
+				return list(decl.init);
+			}
+			case 'CallExpression': {
+				const callee = node.callee as Node;
+				const rune = callee.type === 'Identifier' ? callee.name : callee.type === 'MemberExpression' && callee.object.type === 'Identifier' ? `${callee.object.name}.${callee.property.name}` : '';
+				if (rune === '$state' || rune === '$state.raw' || rune === '$derived') return node.arguments[0] ? list(node.arguments[0]) : `\`${rune}()\` is empty`;
+				const method = callee.type === 'MemberExpression' && !callee.computed ? (callee.property.name as string) : '';
+				if (KEEP_SHAPE.has(method)) return list(callee.object);
+				if (method === 'concat') return list(callee.object) ?? (node.arguments as Node[]).map(list).find(Boolean);
+				const fn = method === 'map' ? (node.arguments[0] as Node | undefined) : undefined;
+				if (fn?.type !== 'ArrowFunctionExpression' && fn?.type !== 'FunctionExpression') break;
+				if (fn.body.type !== 'BlockStatement') return option(fn.body);
+				const returns: Node[] = [];
+				visit(fn.body, (inner) => {
+					if (inner.type.includes('Function')) return false;
+					if (inner.type === 'ReturnStatement') returns.push(inner);
+				});
+				if (!returns.length) return 'the `.map()` returns nothing';
+				for (const r of returns) {
+					const fail = r.argument ? option(r.argument) : 'the `.map()` returns nothing';
+					if (fail) return fail;
+				}
+				return undefined;
+			}
+		}
+		return `\`${src(text, node).replace(/\s+/g, ' ').slice(0, 40)}\` cannot be followed`;
+	};
+	const fail = list(root);
+	return fail ?? { edits, chased };
+}
+
 interface Rewrite {
 	attrs: { node: Node; text: string | null }[];
 	added: string[];
@@ -534,7 +748,7 @@ function carried(plan: WrapperPlan, name: string, index: RuleIndex): WrapperProp
 	return { name, local: name, handling: { kind: 'recipe', recipe } };
 }
 
-function rewriteUsage(text: string, usage: Node, plan: WrapperPlan, index: RuleIndex): Rewrite | string {
+function rewriteUsage(text: string, usage: Node, plan: WrapperPlan, index: RuleIndex, items: Map<Node, string> = new Map()): Rewrite | string {
 	const out: Rewrite = { attrs: [], added: [], notes: [] };
 	const attrs = usage.attributes as Node[];
 	const passed = new Set<string>();
@@ -569,6 +783,12 @@ function rewriteUsage(text: string, usage: Node, plan: WrapperPlan, index: RuleI
 		const h = prop.handling;
 		if (h.kind === 'unknown') return `\`${name}\` ${h.reason}`;
 		if (h.kind === 'children') continue;
+		if (h.kind === 'items') {
+			out.attrs.push({ node: attr, text: items.get(attr) ?? `${h.to}=${value ?? ''}` });
+			const renamed = Object.entries(h.keys).filter(([from, to]) => from !== to);
+			out.notes.push({ kind: 'wrapper-prop', name, to: h.to, note: renamed.length ? `option keys renamed where built: ${renamed.map(([from, to]) => `\`${from}\` → \`${to}\``).join(', ')}` : undefined });
+			continue;
+		}
 		if (h.kind === 'look') {
 			out.attrs.push({ node: attr, text: null });
 			out.notes.push({ kind: 'wrapper-look', name, note: 'look of the wrapper, not carried over' });
@@ -716,6 +936,71 @@ function removeRange(text: string, node: Node): [number, number] {
 	return [node.start, end];
 }
 
+function relabelItems(text: string, ast: Node, programs: Node[], index: RuleIndex, imports: { plan: WrapperPlan; usages: Node[] }[]) {
+	const scope = fileScope(programs);
+	const texts = new Map<Node, string>();
+	const failed = new Map<Node, string>();
+	const script = new Map<Node, Edit[]>();
+	const shared: Record<string, string> = {};
+	type Candidate = { usage: Node; attrs: { attr: Node; root: Node; to: string }[]; edits: Edit[]; chased: string[] };
+	const candidates: Candidate[] = [];
+	for (const { plan, usages } of imports)
+		for (const usage of usages) {
+			const attrs = (usage.attributes as Node[]).filter((a) => a.type === 'Attribute' && (plan.props.get(a.name) ?? carried(plan, a.name, index))?.handling.kind === 'items');
+			if (!attrs.length || typeof rewriteUsage(text, usage, plan, index) === 'string') continue;
+			const candidate: Candidate = { usage, attrs: [], edits: [], chased: [] };
+			for (const attr of attrs) {
+				const h = (plan.props.get(attr.name) ?? carried(plan, attr.name, index))!.handling as Extract<Handling, { kind: 'items' }>;
+				const renames = Object.entries(h.keys).filter(([from, to]) => from !== to).map(([from, to]) => `\`${from}\` to \`${to}\``).join(' and ');
+				const why = (detail: string) => `\`${attr.name}\`: ${detail}; rename ${renames} where the options are built, then run again`;
+				const root = attrExpression(attr);
+				const found = root ? relabel(text, root, h.keys, scope) : 'not an expression';
+				if (typeof found === 'string') {
+					failed.set(usage, why(found));
+					break;
+				}
+				candidate.attrs.push({ attr, root: root!, to: h.to });
+				candidate.edits.push(...found.edits);
+				candidate.chased.push(...found.chased);
+				for (const name of found.chased) shared[name] ??= why(`\`${name}\` is also used outside the options`);
+			}
+			if (!failed.has(usage)) candidates.push(candidate);
+		}
+	for (let changed = true; changed; ) {
+		changed = false;
+		const live = candidates.filter((c) => !failed.has(c.usage));
+		const names = new Set(live.flatMap((c) => c.chased));
+		const ranges = [...live.flatMap((c) => c.attrs.map((a) => a.root)), ...[...names].map((name) => scope.declared.get(name)!.init as Node)];
+		for (const name of names) {
+			const decl = scope.declared.get(name)!;
+			let outside = false;
+			visit(ast, (node, parent, key) => {
+				if (outside) return false;
+				if (node.type === 'Identifier' && node.name === name && node !== decl.id && isReference(node, parent, key) && !ranges.some((r) => node.start >= r.start && node.end <= r.end))
+					outside = true;
+			});
+			if (!outside) continue;
+			for (const c of live)
+				if (c.chased.includes(name) && !failed.has(c.usage)) {
+					failed.set(c.usage, shared[name]);
+					changed = true;
+				}
+		}
+	}
+	for (const c of candidates) {
+		if (failed.has(c.usage)) continue;
+		const inAttr = (e: Edit) => c.attrs.some(({ root }) => e.start >= root.start && e.end <= root.end);
+		for (const { attr, root, to } of c.attrs) {
+			let expression = text.slice(root.start, root.end);
+			for (const e of c.edits.filter((x) => x.start >= root.start && x.end <= root.end).sort((a, b) => b.start - a.start))
+				expression = expression.slice(0, e.start - root.start) + e.text + expression.slice(e.end - root.start);
+			texts.set(attr, `${to}={${expression}}`);
+		}
+		script.set(c.usage, c.edits.filter((e) => !inAttr(e)));
+	}
+	return { texts, failed, script };
+}
+
 function rewriteFile(
 	dir: string,
 	path: string,
@@ -742,6 +1027,7 @@ function rewriteFile(
 				for (const spec of s.specifiers as Node[]) if (spec.type === 'ImportSpecifier') libNames.set(spec.imported.name ?? spec.imported.value, spec.local.name);
 	const addImports: string[] = [];
 
+	const imports: { statement: Node; plan: WrapperPlan; local: string; usages: Node[]; others: Node[]; typeRefs: Node[] }[] = [];
 	for (const program of programs)
 		for (const statement of program.body as Node[]) {
 			if (statement.type !== 'ImportDeclaration' || statement.specifiers.length !== 1 || statement.specifiers[0].type !== 'ImportDefaultSpecifier') continue;
@@ -749,85 +1035,93 @@ function rewriteFile(
 			const plan = target ? plans.get(target) : undefined;
 			if (!plan) continue;
 			const local = statement.specifiers[0].local.name as string;
-			const count = counts.get(plan.path)!;
-			const usages: Node[] = [];
-			const others: Node[] = [];
-			const typeRefs: Node[] = [];
+			const entry = { statement, plan, local, usages: [] as Node[], others: [] as Node[], typeRefs: [] as Node[] };
 			visit(ast, (node, parent, key) => {
-				if (node.type === 'Component' && node.name === local) usages.push(node);
+				if (node.type === 'Component' && node.name === local) entry.usages.push(node);
 				else if (node.type === 'Identifier' && node.name === local && node !== statement.specifiers[0].local && isReference(node, parent, key)) {
-					if (parent?.type === 'TSTypeQuery') typeRefs.push(node);
-					else others.push(node);
+					if (parent?.type === 'TSTypeQuery') entry.typeRefs.push(node);
+					else entry.others.push(node);
 				}
 			});
-			count.usages += usages.length;
-			const line = (node: Node) => lines.at(node.start);
-			const skip = (node: Node, reason: string) =>
-				result.skipped.push({ file: rel, line: line(node), wrapper: plan.name, kind: 'wrapper-usage', name: plan.name, reason });
-			if (plan.blockers.length) {
-				for (const usage of usages) skip(usage, plan.blockers[0]);
-				continue;
-			}
-			let lib = libNames.get(plan.target);
-			if (!lib) {
-				const taken = names.get(plan.target);
-				if (taken && taken !== statement) {
-					for (const usage of usages) skip(usage, `\`${plan.target}\` is already a name in this file`);
-					continue;
-				}
-				lib = plan.target;
-			}
-			let kept = others.length > 0;
-			let done = 0;
-			for (const node of others) skip(node, `\`${local}\` is used as a value`);
-			for (const usage of usages) {
-				const rewrite = rewriteUsage(text, usage, plan, index);
-				if (typeof rewrite === 'string') {
-					skip(usage, rewrite);
-					kept = true;
-					continue;
-				}
-				edit.replace(usage.start + 1, usage.start + 1 + local.length, lib);
-				const close = text.lastIndexOf(`</${local}`, usage.end);
-				if (close > usage.start && text.slice(usage.end - 2, usage.end) !== '/>') edit.replace(close + 2, close + 2 + local.length, lib);
-				for (const { node, text: next } of rewrite.attrs) {
-					if (next === null) {
-						const [a, b] = removeRange(text, node);
-						edit.replace(a, b, '');
-					} else edit.replace(node.start, node.end, next);
-				}
-				insertAttrs(text, edit, usage, rewrite.added);
-				if ((usage.attributes as Node[]).some((a) => a.type === 'SpreadAttribute')) spreadFrom.set(path, plan);
-				count.dissolved++;
-				done++;
-				result.changes.push({ file: rel, line: line(usage), wrapper: plan.name, kind: 'wrapper-dissolved', name: plan.name, to: plan.target });
-				for (const note of rewrite.notes) result.changes.push({ file: rel, line: line(usage), wrapper: plan.name, ...note });
-			}
-			if (!usages.length && !others.length && !typeRefs.length) {
-				const [a, b] = removeRange(text, statement);
-				edit.replace(a, b, '');
-				continue;
-			}
-			if (!done && !typeRefs.length) continue;
-			for (const node of typeRefs) {
-				edit.replace(node.start, node.end, lib);
-				const member = /^(?:<[^<>]*>)?\s*>\s*\[\s*(['"])(\w+)\1\s*\]/.exec(text.slice(node.end));
-				const prop = member && plan.props.get(member[2]);
-				const h = prop?.handling;
-				const to = h?.kind === 'forward' ? h.to : h?.kind === 'recipe' ? h.recipe.to : undefined;
-				if (!member || !to || to === member[2]) continue;
-				const at = node.end + member.index + member[0].lastIndexOf(member[2]);
-				edit.replace(at, at + member[2].length, to);
-			}
-			if (!libNames.has(plan.target)) {
-				libNames.set(plan.target, lib);
-				addImports.push(lib);
-			}
-			if (!kept) {
-				const [a, b] = removeRange(text, statement);
-				edit.replace(a, b, '');
-			}
+			imports.push(entry);
 		}
+	const conflict = (plan: WrapperPlan, statement: Node) => !libNames.has(plan.target) && !!names.get(plan.target) && names.get(plan.target) !== statement;
+	const items = relabelItems(text, ast, programs, index, imports.filter((i) => !i.plan.blockers.length && !conflict(i.plan, i.statement)));
+	const dissolvedUsages = new Set<Node>();
+
+	for (const { statement, plan, local, usages, others, typeRefs } of imports) {
+		const count = counts.get(plan.path)!;
+		count.usages += usages.length;
+		const line = (node: Node) => lines.at(node.start);
+		const skip = (node: Node, reason: string) =>
+			result.skipped.push({ file: rel, line: line(node), wrapper: plan.name, kind: 'wrapper-usage', name: plan.name, reason });
+		if (plan.blockers.length) {
+			for (const usage of usages) skip(usage, plan.blockers[0]);
+			continue;
+		}
+		let lib = libNames.get(plan.target);
+		if (!lib) {
+			const taken = names.get(plan.target);
+			if (taken && taken !== statement) {
+				for (const usage of usages) skip(usage, `\`${plan.target}\` is already a name in this file`);
+				continue;
+			}
+			lib = plan.target;
+		}
+		let kept = others.length > 0;
+		let done = 0;
+		for (const node of others) skip(node, `\`${local}\` is used as a value`);
+		for (const usage of usages) {
+			const failed = items.failed.get(usage);
+			const rewrite = failed ?? rewriteUsage(text, usage, plan, index, items.texts);
+			if (typeof rewrite === 'string') {
+				skip(usage, rewrite);
+				kept = true;
+				continue;
+			}
+			edit.replace(usage.start + 1, usage.start + 1 + local.length, lib);
+			const close = text.lastIndexOf(`</${local}`, usage.end);
+			if (close > usage.start && text.slice(usage.end - 2, usage.end) !== '/>') edit.replace(close + 2, close + 2 + local.length, lib);
+			for (const { node, text: next } of rewrite.attrs) {
+				if (next === null) {
+					const [a, b] = removeRange(text, node);
+					edit.replace(a, b, '');
+				} else edit.replace(node.start, node.end, next);
+			}
+			insertAttrs(text, edit, usage, rewrite.added);
+			if ((usage.attributes as Node[]).some((a) => a.type === 'SpreadAttribute')) spreadFrom.set(path, plan);
+			count.dissolved++;
+			dissolvedUsages.add(usage);
+			done++;
+			result.changes.push({ file: rel, line: line(usage), wrapper: plan.name, kind: 'wrapper-dissolved', name: plan.name, to: plan.target });
+			for (const note of rewrite.notes) result.changes.push({ file: rel, line: line(usage), wrapper: plan.name, ...note });
+		}
+		if (!usages.length && !others.length && !typeRefs.length) {
+			const [a, b] = removeRange(text, statement);
+			edit.replace(a, b, '');
+			continue;
+		}
+		if (!done && !typeRefs.length) continue;
+		for (const node of typeRefs) {
+			edit.replace(node.start, node.end, lib);
+			const member = /^(?:<[^<>]*>)?\s*>\s*\[\s*(['"])(\w+)\1\s*\]/.exec(text.slice(node.end));
+			const prop = member && plan.props.get(member[2]);
+			const h = prop?.handling;
+			const to = h?.kind === 'forward' || h?.kind === 'items' ? h.to : h?.kind === 'recipe' ? h.recipe.to : undefined;
+			if (!member || !to || to === member[2]) continue;
+			const at = node.end + member.index + member[0].lastIndexOf(member[2]);
+			edit.replace(at, at + member[2].length, to);
+		}
+		if (!libNames.has(plan.target)) {
+			libNames.set(plan.target, lib);
+			addImports.push(lib);
+		}
+		if (!kept) {
+			const [a, b] = removeRange(text, statement);
+			edit.replace(a, b, '');
+		}
+	}
+	for (const [usage, edits] of items.script) if (dissolvedUsages.has(usage)) for (const e of edits) edit.replace(e.start, e.end, e.text);
 	if (addImports.length) {
 		if (libImport) {
 			const last = libImport.specifiers[libImport.specifiers.length - 1];
@@ -905,6 +1199,8 @@ export function dissolve(dir: string, index: RuleIndex, texts: Map<string, strin
 							? `→ ${p.handling.recipe.to}`
 							: p.handling.kind === 'layout'
 								? p.handling.to
+								: p.handling.kind === 'items'
+									? `→ ${p.handling.to} (${Object.entries(p.handling.keys).filter(([from, to]) => from !== to).map(([from, to]) => `${from} → ${to}`).join(', ')})`
 								: p.handling.kind === 'unknown'
 									? `kept: ${p.handling.reason}`
 									: p.handling.kind
