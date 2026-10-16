@@ -62,27 +62,17 @@
 	padding-left: 6px;
 }
 
-.brand-mark {
-	flex-shrink: 0;
-	width: 34px;
-	height: 34px;
-	border-radius: var(--global-radius-md);
-	background: var(--global-gradient);
-	display: grid;
-	place-items: center;
-	box-shadow: 0 8px 24px -6px var(--global-color-primary-glow);
-	color: var(--global-color-on-primary);
-	font-family: var(--global-font-family-display);
-	font-weight: 800;
-	font-size: 17px;
-}
-
 .brand b {
 	display: block;
 	font-family: var(--global-font-family-display);
-	font-size: 16px;
-	letter-spacing: -0.02em;
+	font-size: 17px;
+	font-weight: 800;
+	letter-spacing: -0.04em;
 	white-space: nowrap;
+}
+
+.brand b span {
+	font-weight: 400;
 }
 
 .brand small {
@@ -171,9 +161,8 @@
 	}
 
 	.header-brand .brand-mark {
-		width: 30px;
-		height: 30px;
-		font-size: 15px;
+		width: 26px;
+		height: 26px;
 	}
 
 	.header-brand small {

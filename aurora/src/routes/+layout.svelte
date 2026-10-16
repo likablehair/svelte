@@ -16,6 +16,7 @@
 	} from '#lib';
 	import { appearance, changeMode, changeTheme, syncAppearance } from '../docs/appearance.svelte.js';
 	import { searchDocs } from '../docs/search.js';
+	import BrandMark from '../docs/BrandMark.svelte';
 
 	import.meta.glob(['/src/lib/themes/*.css', '/src/docs/themes/*.css'], { eager: true });
 
@@ -57,9 +58,9 @@
 
 {#snippet brand()}
 	<div class="brand">
-		<span class="brand-mark">L</span>
+		<BrandMark />
 		<div>
-			<b>Likable Aurora</b>
+			<b>Likable <span>Aurora</span></b>
 			<small>@likable-hair/svelte 5</small>
 		</div>
 	</div>
