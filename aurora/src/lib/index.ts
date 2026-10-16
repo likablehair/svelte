@@ -13,6 +13,7 @@ export type { Breakpoints } from './utils/breakpoints.svelte.js';
 export { default as MediaQuery } from './components/simple/common/MediaQuery.svelte';
 export type { ThemeMode, ThemeState, AppearanceStorage } from './theme.svelte.js';
 export { setDefaultLocale } from './utils/locale.js';
+export { setTitleTemplate } from './utils/title.js';
 
 export { default as Button } from './components/simple/buttons/Button.svelte';
 export { default as LinkButton } from './components/simple/buttons/LinkButton.svelte';

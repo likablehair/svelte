@@ -5,6 +5,7 @@ import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import PageHeader from '#lib/components/simple/common/PageHeader.svelte';
 import WithConfirmButtons from '../fixtures/page-header/WithConfirmButtons.svelte';
+import WithTitleTemplate from '../fixtures/page-header/WithTitleTemplate.svelte';
 import { renderWithDefaultLocale, snippet } from '../helpers.js';
 
 function withArgs<T>(markup: (args: T) => string) {
@@ -266,5 +267,63 @@ describe('PageHeader', () => {
 		expect(getComputedStyle(screen.getByRole('button', { name: 'Back' }).element()).color).toBe(
 			'rgb(0, 120, 0)'
 		);
+	});
+
+	describe('tab title', () => {
+		afterEach(() => {
+			document.title = '';
+		});
+
+		test('without setTitleTemplate the tab title is left alone', async () => {
+			await render(WithTitleTemplate, { page: 'a' });
+			await expect.poll(() => document.title).toBe('Tatum');
+		});
+
+		test('with setTitleTemplate the h1 header writes the tab title in the app format', async () => {
+			const screen = await render(WithTitleTemplate, { template: '{title} · Tatum', page: 'a' });
+			await expect.poll(() => document.title).toBe('Users · Tatum');
+			await screen.rerender({ titleA: 'Clients' });
+			await expect.poll(() => document.title).toBe('Clients · Tatum');
+		});
+
+		test('a function template receives the title', async () => {
+			await render(WithTitleTemplate, { template: (title: string) => `Tatum - ${title.toUpperCase()}`, page: 'a' });
+			await expect.poll(() => document.title).toBe('Tatum - USERS');
+		});
+
+		test('leaving the page for one without PageHeader brings back the layout title', async () => {
+			const screen = await render(WithTitleTemplate, { template: '{title} · Tatum', page: 'a' });
+			await expect.poll(() => document.title).toBe('Users · Tatum');
+			await screen.rerender({ page: 'none' });
+			await expect.poll(() => document.title).toBe('Tatum');
+		});
+
+		test('moving between pages keeps the title of the page shown, also with the same title', async () => {
+			const screen = await render(WithTitleTemplate, { template: '{title} · Tatum', page: 'a' });
+			await expect.poll(() => document.title).toBe('Users · Tatum');
+			await screen.rerender({ page: 'b' });
+			await expect.poll(() => document.title).toBe('Roles · Tatum');
+			await screen.rerender({ page: 'a', titleA: 'Roles' });
+			await expect.poll(() => document.title).toBe('Roles · Tatum');
+			await screen.rerender({ page: 'none' });
+			await expect.poll(() => document.title).toBe('Tatum');
+		});
+
+		test('documentTitle gives another text, false leaves the title alone', async () => {
+			const screen = await render(WithTitleTemplate, {
+				template: '{title} · Tatum',
+				page: 'a',
+				documentTitle: 'Team'
+			});
+			await expect.poll(() => document.title).toBe('Team · Tatum');
+			await expect.element(screen.getByRole('heading', { name: 'Users' })).toBeInTheDocument();
+			await screen.rerender({ documentTitle: false });
+			await expect.poll(() => document.title).toBe('Tatum');
+		});
+
+		test('a header with another heading level does not write the tab title', async () => {
+			await render(WithTitleTemplate, { template: '{title} · Tatum', page: 'a', headingLevel: 2 });
+			await expect.poll(() => document.title).toBe('Tatum');
+		});
 	});
 });

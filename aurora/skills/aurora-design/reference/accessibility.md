@@ -26,7 +26,7 @@ The library components are built accessible (native elements, ARIA, keyboard, fo
 
 ## Visual
 
-- Contrast: text at least 4.5:1 (3:1 for large text), controls and icons 3:1. The text tokens meet it on the theme surfaces, except `--global-color-text-3` in dark mode: use it only for accessory text. Never grey text on colored backgrounds.
+- Contrast: text at least 4.5:1 (3:1 for large text), controls and icons 3:1. The text tokens meet it on the surfaces of the default theme; `--global-color-text-3` only just, so use it only for accessory text. Never grey text on colored backgrounds.
 - Never convey information by color only (status with a word or icon, errors with an icon and a message, charts with labels or a table).
 - The page must work at 200% zoom and with larger text: `rem` sizes, wrapping text, no fixed heights on text containers.
 

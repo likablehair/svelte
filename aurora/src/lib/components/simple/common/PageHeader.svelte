@@ -1,5 +1,5 @@
 <!-- @component
-Header of a page: an optional link back, the title as a heading (`h1` by default, `headingLevel` to change it), a subtitle, a description and the page actions on the right, which wrap under the text when there is no room. With `backHref` the back control is a native link (it can be opened in a new tab and SvelteKit preloads it); with only `back` it is a button that goes back in the browser history. `onback` runs before either and can stop it with `event.preventDefault()`, for example to save first. `size="sm"` is for headers inside a section or a panel. Its size is exposed as `data-size` for app CSS.
+Header of a page: an optional link back, the title as a heading (`h1` by default, `headingLevel` to change it), a subtitle, a description and the page actions on the right, which wrap under the text when there is no room. With `backHref` the back control is a native link (it can be opened in a new tab and SvelteKit preloads it); with only `back` it is a button that goes back in the browser history. `onback` runs before either and can stop it with `event.preventDefault()`, for example to save first. `size="sm"` is for headers inside a section or a panel. Once the root layout calls `setTitleTemplate`, a header with `headingLevel` 1 also writes the title of the browser tab in the format of the app (`documentTitle` changes or turns it off). Its size is exposed as `data-size` for app CSS.
 -->
 <script lang="ts" module>
 	const ARROW_LEFT_ICON = 'M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z';
@@ -13,6 +13,7 @@ Header of a page: an optional link back, the title as a heading (`h1` by default
 	import Icon from '../media/Icon.svelte';
 	import { inheritedLocale } from '../../../utils/locale.js';
 	import { libraryTexts } from '../../../utils/texts.js';
+	import { titleContext } from '../../../utils/title.js';
 
 	interface Props extends Omit<HTMLAttributes<HTMLElement>, 'class' | 'children' | 'title'> {
 		/** Title of the page, rendered as a heading. Without it (and without `titleSnippet`) no heading is rendered. */
@@ -35,6 +36,8 @@ Header of a page: an optional link back, the title as a heading (`h1` by default
 		backIcon?: string;
 		/** Called when the back control is clicked, before it navigates. `event.preventDefault()` stops the navigation. */
 		onback?: (event: MouseEvent) => void;
+		/** Title of the browser tab for this page, in the format given to `setTitleTemplate`: another text than `title`, or `false` to leave the tab title alone. Without `setTitleTemplate` in a layout, or with a `headingLevel` other than 1, the tab title is never written. Defaults to `title`. */
+		documentTitle?: string | false;
 		/** BCP 47 locale of the texts: `it` and `en` are built in, other languages fall back to English. Defaults to the one set with `setDefaultLocale`, else `en`. */
 		locale?: string;
 		/** Extra classes for each part. */
@@ -71,6 +74,7 @@ Header of a page: an optional link back, the title as a heading (`h1` by default
 		backLabel: backLabelProp,
 		backIcon = ARROW_LEFT_ICON,
 		onback,
+		documentTitle,
 		locale: localeProp,
 		class: clazz = {},
 		titleSnippet,
@@ -92,11 +96,44 @@ Header of a page: an optional link back, the title as a heading (`h1` by default
 	let hasText = $derived(hasTitle || hasSubtitle || hasDescription);
 	let hasMain = $derived(hasText || !!prependSnippet || !!actionsSnippet);
 
+	const titles = titleContext();
+	let tabTitle = $derived.by(() => {
+		if (!titles || headingLevel !== 1 || documentTitle === false) return undefined;
+		const text = documentTitle ?? title;
+		return text ? titles.format(text) : undefined;
+	});
+
+	const titleToken = {};
+
+	function claimTitle(text: string) {
+		if (titles && typeof document !== 'undefined') {
+			if (!titles.owner) titles.base = document.title;
+			titles.owner = titleToken;
+		}
+		return text;
+	}
+
+	function releaseTitle() {
+		if (!titles || titles.owner !== titleToken) return;
+		titles.owner = null;
+		if (titles.base !== undefined) document.title = titles.base;
+	}
+
+	$effect(() => {
+		if (tabTitle === undefined) releaseTitle();
+	});
+
+	$effect(() => releaseTitle);
+
 	function goBack(event: MouseEvent) {
 		onback?.(event);
 		if (!event.defaultPrevented) history.back();
 	}
 </script>
+
+<svelte:head>
+	{#if tabTitle !== undefined}<title>{claimTitle(tabTitle)}</title>{/if}
+</svelte:head>
 
 {#snippet backContent()}
 	{#if backSnippet}

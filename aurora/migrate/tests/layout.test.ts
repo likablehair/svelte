@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { addAppearance, addDefaultLocale } from '../src/layout.ts';
+import { addAppearance, addDefaultLocale, addTitleTemplate, staticTitle } from '../src/layout.ts';
 import { guessLanguage } from '../src/analyze.ts';
 
 describe('addDefaultLocale', () => {
@@ -53,6 +53,25 @@ describe('addAppearance', () => {
 		expect(bare).toBe(
 			"<script>\n\timport { appearanceScript, rememberAppearance } from '@likable-hair/svelte';\n\n\trememberAppearance();\n</script>\n\n<svelte:head>{@html '<script>' + appearanceScript() + '</script>'}</svelte:head>\n\n<slot />\n"
 		);
+	});
+});
+
+describe('addTitleTemplate', () => {
+	test('reads the fixed title and adds the call next to the other library calls', () => {
+		const source = "<script lang=\"ts\">\n\timport { rememberAppearance } from '@likable-hair/svelte';\n\n\trememberAppearance();\n</script>\n\n<svelte:head>\n\t<title>\n\t\tTatum sample application\n\t</title>\n</svelte:head>\n";
+		const name = staticTitle(source)!;
+		expect(name).toBe('Tatum sample application');
+		const { text, changed } = addTitleTemplate(source, name);
+		expect(changed).toBe(true);
+		expect(text).toContain("import { rememberAppearance, setTitleTemplate } from '@likable-hair/svelte';");
+		expect(text).toContain("\tsetTitleTemplate('{title} · Tatum sample application');");
+		expect(addTitleTemplate(text, name).changed).toBe(false);
+	});
+
+	test('quotes are escaped; a title with an expression is not fixed', () => {
+		expect(addTitleTemplate('<slot />\n', "Rock'n'roll", false).text).toContain("setTitleTemplate('{title} · Rock\\'n\\'roll');");
+		expect(staticTitle('<svelte:head><title>{data.name}</title></svelte:head>')).toBe(undefined);
+		expect(staticTitle('<p>no title</p>')).toBe(undefined);
 	});
 });
 

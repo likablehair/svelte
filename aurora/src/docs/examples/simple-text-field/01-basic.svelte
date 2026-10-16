@@ -1,5 +1,5 @@
 <!-- @component Basic
-A field with label, placeholder, icon and hint. `bind:value` keeps the value in sync. `revealable` adds an eye button to a password field. -->
+A field with label, placeholder, icon and hint. `bind:value` keeps the value in sync. A password field has an eye button that shows and hides the password. -->
 <script lang="ts">
 	import { mdiEmailOutline, mdiLockOutline } from '@mdi/js';
 	import { SimpleTextField } from '#lib';
@@ -21,7 +21,6 @@ A field with label, placeholder, icon and hint. `bind:value` keeps the value in 
 		label="Password"
 		type="password"
 		prependInnerIcon={mdiLockOutline}
-		revealable
 		bind:value={password}
 	/>
 </div>

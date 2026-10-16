@@ -13,6 +13,7 @@ export function GET({ url }) {
 		`- Styles: \`import '${PACKAGE}/tokens.css'\` (components import it themselves), optional \`${PACKAGE}/base.css\` for the page.`,
 		'- Callbacks receive the native event; icons are SVG paths (`@mdi/js`).',
 		"- Texts: English and Italian are built in and follow the `locale` prop of each component (other languages fall back to English; text props win); `setDefaultLocale('it')` in the root `+layout.svelte` sets the locale of every component, dates included.",
+		"- Tab title: `setTitleTemplate('{title} · App')` in the root `+layout.svelte` lets the `PageHeader` of each page write the browser tab title; the layout `<title>` stays for pages without one.",
 		`- CSS: the library is in cascade layers, so app CSS and Tailwind utilities override it; Tailwind classes for the tokens via \`${PACKAGE}/tailwind.css\` (v4) or \`${PACKAGE}/tailwind-preset\` (v3).`,
 		`- Full version in a single file: ${link('/llms-full.txt')}`,
 		'',

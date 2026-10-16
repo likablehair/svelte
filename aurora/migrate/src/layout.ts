@@ -5,12 +5,28 @@ const LIB = '@likable-hair/svelte';
 
 export function addDefaultLocale(source: string, locale: string, typescript = true): { text: string; changed: boolean } {
 	if (/\bsetDefaultLocale\s*\(/.test(source)) return { text: source, changed: false };
+	return addLibraryCall(source, 'setDefaultLocale', `setDefaultLocale('${locale}')`, typescript);
+}
+
+export function addTitleTemplate(source: string, name: string, typescript = true): { text: string; changed: boolean } {
+	if (/\bsetTitleTemplate\s*\(/.test(source)) return { text: source, changed: false };
+	const quoted = name.replaceAll('\\', '\\\\').replaceAll("'", "\\'");
+	return addLibraryCall(source, 'setTitleTemplate', `setTitleTemplate('{title} · ${quoted}')`, typescript);
+}
+
+export function staticTitle(source: string): string | undefined {
+	const match = /<title>([^<{]*)<\/title>/.exec(source);
+	const text = match?.[1].replace(/\s+/g, ' ').trim();
+	return text || undefined;
+}
+
+function addLibraryCall(source: string, name: string, statement: string, typescript: boolean): { text: string; changed: boolean } {
 	const ast = parse(source, { modern: true }) as unknown as Node;
 	const script = ast.instance as Node | undefined;
 	if (!script) {
 		const lang = typescript ? ' lang="ts"' : '';
 		return {
-			text: `<script${lang}>\n\timport { setDefaultLocale } from '${LIB}';\n\n\tsetDefaultLocale('${locale}');\n</script>\n\n${source}`,
+			text: `<script${lang}>\n\timport { ${name} } from '${LIB}';\n\n\t${statement};\n</script>\n\n${source}`,
 			changed: true
 		};
 	}
@@ -20,7 +36,6 @@ export function addDefaultLocale(source: string, locale: string, typescript = tr
 	const lineStart = (offset: number) => source.lastIndexOf('\n', offset - 1) + 1;
 	const indent = last ? /^[ \t]*/.exec(source.slice(lineStart(last.start)))![0] : '\t';
 	const semi = !last || source[last.end - 1] === ';' ? ';' : '';
-	const call = `setDefaultLocale('${locale}')${semi}`;
 	const library = imports.find(
 		(n) =>
 			n.source.value === LIB &&
@@ -31,11 +46,11 @@ export function addDefaultLocale(source: string, locale: string, typescript = tr
 	const edits: { at: number; value: string }[] = [];
 	if (library) {
 		const lastSpecifier = library.specifiers[library.specifiers.length - 1] as Node;
-		edits.push({ at: lastSpecifier.end, value: ', setDefaultLocale' });
+		edits.push({ at: lastSpecifier.end, value: `, ${name}` });
 	}
 	const after = last ? last.end : script.content.start;
-	const importLine = library ? '' : `\n${indent}import { setDefaultLocale } from '${LIB}'${semi}`;
-	edits.push({ at: after, value: `${importLine}\n\n${indent}${call}` });
+	const importLine = library ? '' : `\n${indent}import { ${name} } from '${LIB}'${semi}`;
+	edits.push({ at: after, value: `${importLine}\n\n${indent}${statement}${semi}` });
 	let text = source;
 	for (const edit of edits.sort((a, b) => b.at - a.at)) text = text.slice(0, edit.at) + edit.value + text.slice(edit.at);
 	return { text, changed: true };

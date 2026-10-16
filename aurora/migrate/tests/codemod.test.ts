@@ -415,6 +415,32 @@ describe('codemod: local copies', () => {
 		expect(again.files).toEqual([]);
 	});
 
+	test('the back control without a route links to the parent page of a +page.svelte', () => {
+		const use = (markup: string) => svelte("\timport PageTitle from '$lib/components/common/PageTitle.svelte';", markup);
+		const { result, read } = run({
+			'src/lib/components/common/PageTitle.svelte': pageTitle,
+			'src/routes/+page.svelte': use('<p>home</p>'),
+			'src/routes/(main)/settings/users/+page.svelte': use('<PageTitle title="Users" />'),
+			'src/routes/(main)/settings/users/create/+page.svelte': use('<PageTitle title="New user" prependVisible />'),
+			'src/routes/(main)/settings/users/[id]/+page@.svelte': use('<PageTitle title="User" prependVisible={true} />'),
+			'src/routes/(main)/clients/[id]/edit/+page.svelte': use('<PageTitle title="Edit" prependVisible />'),
+			'src/routes/reports/monthly/+page.svelte': use('<PageTitle title="Monthly" prependVisible />'),
+			'src/routes/(main)/settings/roles/+page.svelte': use('<PageTitle title="Roles" prependVisible={open} />'),
+			'src/lib/components/Panel.svelte': use('<PageTitle title="Panel" prependVisible />')
+		});
+		expect(read('src/routes/(main)/settings/users/create/+page.svelte')).toContain('<PageHeader title="New user" backHref="/settings/users" />');
+		expect(read('src/routes/(main)/settings/users/[id]/+page@.svelte')).toContain('<PageHeader title="User" backHref="/settings/users" />');
+		expect(read('src/routes/(main)/clients/[id]/edit/+page.svelte')).toContain('<PageHeader title="Edit" back />');
+		expect(read('src/routes/reports/monthly/+page.svelte')).toContain('<PageHeader title="Monthly" backHref="/" />');
+		expect(read('src/routes/(main)/settings/roles/+page.svelte')).toContain('<PageHeader title="Roles" back={open} />');
+		expect(read('src/lib/components/Panel.svelte')).toContain('<PageHeader title="Panel" back />');
+		expect(result.changes.filter((c) => c.kind === 'prop-parent-route').map((c) => c.to)).toEqual([
+			'backHref="/settings/users"',
+			'backHref="/settings/users"',
+			'backHref="/"'
+		]);
+	});
+
 	test('keeps the copy while a file still imports it, and moves mapped named imports to the library', () => {
 		const { result, read } = run({
 			'src/lib/components/common/PageTitle.svelte': pageTitle,

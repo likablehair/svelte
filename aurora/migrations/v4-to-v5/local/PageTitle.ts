@@ -26,6 +26,12 @@ export default {
 			},
 			{ from: 'titleSize', to: 'size', note: '`s` and `xs` become `sm`, the rest `md`.' }
 		],
+		parentRoute: {
+			from: 'prependVisible',
+			to: 'backHref',
+			unless: ['prependRoute'],
+			note: 'In a `+page.svelte` the back control without a route becomes a link to the parent page (the nearest existing page up the path, `(groups)` left out), so a page opened from outside (an email, a new tab) no longer leaves the app; it goes to that page instead of the previous one. Not done when a parameter (`[id]`) comes first: there `back` keeps `history.back()`.'
+		},
 		values: [{ name: 'size', values: { s: 'sm', xs: 'sm', sm: 'sm', m: 'md', md: 'md', l: 'md', lg: 'md', xl: 'md' } }],
 		removed: [
 			{

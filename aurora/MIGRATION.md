@@ -1542,11 +1542,12 @@ New in v5: the header of a page (title as a heading, subtitle, description, link
 </PageHeader>
 ```
 
-- `prependVisible` + `prependRoute="/x"` → `backHref="/x"`: a native link (it opens in a new tab and SvelteKit preloads it on hover, which replaces `previousPageUrl` and the `preloadData` on hover of some copies). `prependVisible` alone → `back`: a button that calls `history.back()`, as before. `prependRoute` without `prependVisible` showed nothing: drop it.
+- `prependVisible` + `prependRoute="/x"` → `backHref="/x"`: a native link (it opens in a new tab and SvelteKit preloads it on hover, which replaces `previousPageUrl` and the `preloadData` on hover of some copies). `prependVisible` alone in a `+page.svelte` → `backHref` with the parent page, which the codemod reads from the path of the file (`(groups)` left out, the nearest existing page up the path: `/settings/users/create` → `/settings/users`, a first-level page → `/`): "Back" now goes to that page instead of the previous one, so a page opened from an email or a new tab no longer leaves the app. Where a parameter comes first (`/clients/[id]/edit`), in components outside `src/routes` and with `prependVisible={expression}` it becomes `back`: a button that calls `history.back()`, as before. `prependRoute` without `prependVisible` showed nothing: drop it.
 - `titleBack` → `backLabel`, `iconBack` → `backIcon` (SVG path). The default label follows the locale ("Indietro" with `it`, "Back" otherwise), as the copies that used paraglide `m.back()`.
 - A custom back handler (`handleBackClick`, a forwarded `on:click`) → `onback(event)`: it runs before the navigation and `event.preventDefault()` stops it, for example to save and then `goto`.
 - Snippets and slots: `append` / `appendSnippet` / `slot="append"` → `actionsSnippet`; `title` / `titleSnippet` / `slot="title"` → `titleSnippet`, which now replaces only the title: a `subtitle` passed with it is shown (the copies hid it), so drop it where it was not visible; `prepend` / `prependSnippet` (the back control) → `backSnippet` (its content) or `prependSnippet` (before the title, for an avatar).
 - The title is a heading: `h1` by default. Inside a component, a panel or a dialog use `headingLevel={2}` (or deeper) and, for a smaller look, `size="sm"` (`titleSize="s"`/`"xs"` of some copies).
+- **Tab title** (new): with `setTitleTemplate('{title} · Tatum')` in the root `+layout.svelte`, every PageHeader with `headingLevel` 1 writes the title of the browser tab ("Users · Tatum"), also in the server render; the `<title>` of the layout stays for the pages without a PageHeader and comes back when one is left for them. `documentTitle="…"` gives another text for one page, `documentTitle={false}` leaves the tab title alone. `setup` adds the call with the name of the app `<title>`; without the call PageHeader never touches the title. Remove the `<svelte:head><title>` of pages that repeat their PageHeader title.
 - `marginTop` / `paddingTop` → `style="margin-top: …"` or the app layout (`gap`). `titleClass` / `subtitleClass` → `class={{ title, subtitle }}`.
 - Look: the copies used Tailwind classes (`text-4xl`, `font-bold`, `mb-4`, 22pt). PageHeader has the Aurora look (26px display font, 22px on phones), no empty space when there is no subtitle, and the actions wrap under the text when there is no room; `--page-header-*` variables change it. The line clamp of the title in one copy is not kept: long titles wrap.
 
@@ -1733,6 +1734,7 @@ New, optional: `expandOn`, `options` / `selected` / `currentPath` / `onmenuSelec
 - An `aria-describedby` passed by the app is merged with the hint id, and its `aria-invalid` is kept (`state="error"` also sets it).
 - `hintSnippet` renders inside the hint element; `class.hint` goes on that element, which exists only with a hint.
 - Look: 36px high with a border (v4: filled grey, no border), visible focus, visible native date/time picker icon.
+- A `type="password"` field has an eye button that shows and hides the password (v4: none). Remove an eye or a show-password checkbox the app drew next to it; `revealable={false}` removes the library one.
 - **CSS prefix renamed**: `--simple-textfield-*` → `--simple-text-field-*` (defaults too).
 
 | v4 | v5 |
@@ -1745,7 +1747,7 @@ New, optional: `expandOn`, `options` / `selected` / `currentPath` / `onmenuSelec
 
 The others only change prefix: `width`, `max-width`, `outer-gap`, `inner-gap`, `padding`, `height`, `border-radius`, `box-shadow`, `font-size`, `font-weight`, `color`, `hint-font-size`, `hint-color`.
 
-New, optional: `label`, `state`, `labelSnippet`, `stateIconSnippet`, `class.label`, `type` `email` / `tel` / `search` / `url`, `revealable` (eye toggle on a password field, with `bind:revealed`, `revealLabel`, `locale`; replaces the local `PasswordTextfield` copies), `data-state` / `data-disabled` / `data-readonly` / `data-revealed`, `--simple-text-field-reveal-color` / `-reveal-hover-color`.
+New, optional: `label`, `state`, `labelSnippet`, `stateIconSnippet`, `class.label`, `type` `email` / `tel` / `search` / `url`, `revealable` (eye toggle on a password field, on by default, `revealable={false}` removes it; with `bind:revealed`, `revealLabel`, `locale`; replaces the local `PasswordTextfield` copies), `data-state` / `data-disabled` / `data-readonly` / `data-revealed`, `--simple-text-field-reveal-color` / `-reveal-hover-color`.
 
 ### Skeleton
 
@@ -2043,7 +2045,7 @@ Many apps keep their own copies of components in `src/lib/components` (a `PageTi
 | `MeltDatePicker`, `DateRangePicker` | [DatePickerTextField](#datepickertextfield) | `date` / `validFrom` / `from` → `selectedDate`, `showApply` → `confirm`, `twoMonthsView` → `months={2}` |
 | `TabToggleSwitch` | [TabSwitcher](#tabswitcher) | `activeTab` → `selected`, `onTabChange(name)` → `ontabClick(e)` with `e.tab.name`, `redirectUrl` → `href`, segmented look |
 | `LinkButton` | [Button](#button) | `buttonType="text"` |
-| `PasswordTextfield`, `ToolTipTextField` | [SimpleTextField](#simpletextfield) | `type="password" revealable`; `message` → `hint` |
+| `PasswordTextfield`, `ToolTipTextField` | [SimpleTextField](#simpletextfield) | `type="password"` (the eye button is on by default); `message` → `hint` |
 | `IndeterminateCheckbox` | [Checkbox](#checkbox) | `onCheckedChange` → the native `onchange` |
 | `TimePickerTextField` (stramoniumai), `BarChart` (mufasa) | [TimePickerTextField](#timepickertextfield), [BarChart](#barchart) | |
 

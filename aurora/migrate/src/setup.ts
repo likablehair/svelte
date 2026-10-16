@@ -4,7 +4,7 @@ import { basename, join, relative, resolve } from 'node:path';
 import type { Analysis } from './analyze.ts';
 import { addV4Compat, findAppCss, prepareAppCss, useLibraryFonts } from './css.ts';
 import { listFiles } from './files.ts';
-import { addAppearance, addDefaultLocale } from './layout.ts';
+import { addAppearance, addDefaultLocale, addTitleTemplate, staticTitle } from './layout.ts';
 
 const LIB = '@likable-hair/svelte';
 const MDI = ['@mdi/js', '^7.4.47'] as const;
@@ -143,6 +143,23 @@ export function updateRootLayout(dir: string, locale: string): string[] {
 	return [`${rel}: setDefaultLocale('${locale}') (texts and date formats of the components in that language)`];
 }
 
+export function updateTitleTemplate(dir: string): string[] {
+	const rel = 'src/routes/+layout.svelte';
+	const path = join(dir, rel);
+	if (!existsSync(path)) return [];
+	const source = readFileSync(path, 'utf8');
+	const html = join(dir, 'src/app.html');
+	const name = staticTitle(source) ?? (existsSync(html) ? staticTitle(readFileSync(html, 'utf8')) : undefined);
+	if (!name) {
+		if (/\bsetTitleTemplate\s*\(/.test(source)) return [];
+		return [`${rel}: no fixed <title> found, so setTitleTemplate is not called: call setTitleTemplate('{title} · <app name>') by hand to let PageHeader write the tab title`];
+	}
+	const result = addTitleTemplate(source, name, existsSync(join(dir, 'tsconfig.json')));
+	if (!result.changed) return [];
+	writeFileSync(path, result.text);
+	return [`${rel}: setTitleTemplate('{title} · ${name}') (every PageHeader writes the tab title, "${name}" stays for the pages without one)`];
+}
+
 export function setHtmlLang(html: string, locale: string): string {
 	const tag = /<html\b[^>]*>/.exec(html);
 	if (!tag) return html;
@@ -207,7 +224,7 @@ export function setup(dir: string, analysis: Analysis, options: SetupOptions): S
 	changes.push(...updateAppCss(dir, options.layers, analysis.tokens.uses + analysis.tokens.overrides > 0));
 	const locale = appLocale(analysis, options.locale);
 	if (locale) changes.push(...updateRootLayout(dir, locale), ...updateHtmlLang(dir, locale));
-	changes.push(...updateAppearance(dir));
+	changes.push(...updateAppearance(dir), ...updateTitleTemplate(dir));
 	let install: string | undefined;
 	if (options.install && installNeeded) {
 		install = `${installCommand(analysis.app.packageManager)} install`;

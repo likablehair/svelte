@@ -368,6 +368,7 @@
 			"setDefaultLocale",
 			"setMode",
 			"setTheme",
+			"setTitleTemplate",
 			"SidebarLayout",
 			"SimpleTextField",
 			"Skeleton",
@@ -4980,6 +4981,7 @@
 					"backHref",
 					"backLabel",
 					"backIcon",
+					"documentTitle",
 					"locale",
 					"class"
 				],
@@ -6048,7 +6050,7 @@
 					"type": "'text'",
 					"disabled": "false",
 					"readonly": "false",
-					"revealable": "false",
+					"revealable": "true",
 					"class": "{}"
 				},
 				"events": [],
@@ -18894,6 +18896,14 @@
 						"note": "`s` and `xs` become `sm`, the rest `md`."
 					}
 				],
+				"parentRoute": {
+					"from": "prependVisible",
+					"to": "backHref",
+					"unless": [
+						"prependRoute"
+					],
+					"note": "In a `+page.svelte` the back control without a route becomes a link to the parent page (the nearest existing page up the path, `(groups)` left out), so a page opened from outside (an email, a new tab) no longer leaves the app; it goes to that page instead of the previous one. Not done when a parameter (`[id]`) comes first: there `back` keeps `history.back()`."
+				},
 				"values": [
 					{
 						"name": "size",
@@ -19015,13 +19025,6 @@
 						"v4": "'password'",
 						"v5": "'text'",
 						"keepV4": "type=\"password\"",
-						"behaviour": true
-					},
-					{
-						"name": "revealable",
-						"v4": "an eye button",
-						"v5": "false",
-						"keepV4": "revealable",
 						"behaviour": true
 					}
 				]
@@ -22942,6 +22945,16 @@
 							"type"
 						]
 					}
+				},
+				{
+					"id": "simple-text-field-password-eye",
+					"summary": "A `type=\"password\"` field shows an eye button inside it that shows and hides the password (`revealable` is on by default); v4 had none.",
+					"action": "Remove an eye button or show-password checkbox the app drew next to the field, or the page shows two. Pass `revealable={false}` where the password must never be shown, for example a PIN typed in front of others.",
+					"when": {
+						"props": [
+							"type"
+						]
+					}
 				}
 			],
 			"added": [
@@ -22949,7 +22962,7 @@
 				"`state` (`error` | `success`): colors the field and the hint, shows an icon; `stateIconSnippet` replaces it.",
 				"`class.label`.",
 				"`type` also accepts `email`, `tel`, `search`, `url`.",
-				"`revealable` (with `type=\"password\"`): eye toggle that shows and hides the password; `bind:revealed`, `revealLabel` and `locale` for its name (\"Show password\" / \"Mostra password\").",
+				"`revealable` (on by default with `type=\"password\"`): eye toggle that shows and hides the password, `revealable={false}` removes it; `bind:revealed`, `revealLabel` and `locale` for its name (\"Show password\" / \"Mostra password\").",
 				"`data-state`, `data-disabled`, `data-readonly`, `data-revealed` attributes.",
 				"`--simple-text-field-*` variables for label, placeholder, icons, hover, focus, error, success and disabled."
 			]

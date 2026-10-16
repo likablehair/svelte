@@ -47,6 +47,13 @@ export interface PropToCssVar {
 	note?: string;
 }
 
+export interface ParentRoute {
+	from: string;
+	to: string;
+	unless?: string[];
+	note?: string;
+}
+
 export interface PropRules {
 	renamed?: Rename[];
 	inverted?: Rename[];
@@ -58,6 +65,7 @@ export interface PropRules {
 	types?: TypeChange[];
 	icons?: string[];
 	bind?: Changed[];
+	parentRoute?: ParentRoute;
 }
 
 export interface EventChange {

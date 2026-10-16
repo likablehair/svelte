@@ -27,7 +27,8 @@ const USAGE = `Usage:
               the cascade layer order, the library Tailwind CSS, the library fonts and
               v4-compat.css, moves element rules into @layer reset; calls setDefaultLocale in
               the root layout when the app is not in English (from <html lang>, the interface
-              text or --locale); configures the coding agents of the app (MCP server,
+              text or --locale) and setTitleTemplate with the name of its <title> (PageHeader
+              writes the tab title); configures the coding agents of the app (MCP server,
               aurora-design and aurora-migrate skills, AGENTS.md) with @likable-hair/svelte-mcp.
               Can be run again. Never commits.
 

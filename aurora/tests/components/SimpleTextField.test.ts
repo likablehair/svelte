@@ -337,11 +337,11 @@ describe('SimpleTextField', () => {
 		expect(getComputedStyle(control).borderTopColor).toBe('rgb(1, 2, 3)');
 	});
 
-	test('revealable: an eye toggle inside a password field shows and hides the password, keeping the focus', async () => {
+	test('revealable: by default an eye toggle inside a password field shows and hides the password, keeping the focus', async () => {
 		const target = host('width: 320px');
 		const screen = await render(SimpleTextField, {
 			target,
-			props: { type: 'password', label: 'Password', value: 'secret', revealable: true }
+			props: { type: 'password', label: 'Password', value: 'secret' }
 		});
 		const input = target.querySelector('input')!;
 		const toggle = screen.getByRole('button', { name: 'Show password' });
@@ -362,9 +362,10 @@ describe('SimpleTextField', () => {
 		target.remove();
 	});
 
-	test('revealable: no toggle without the prop or on other types; bind:revealed; texts from the locale', async () => {
-		const plain = await render(SimpleTextField, { type: 'password', label: 'Password' });
+	test('revealable: no toggle with revealable={false} or on other types; bind:revealed; texts from the locale', async () => {
+		const plain = await render(SimpleTextField, { type: 'password', label: 'Password', revealable: false });
 		await expect.element(plain.getByRole('button')).not.toBeInTheDocument();
+		expect(plain.container.querySelector('input')!.type).toBe('password');
 		plain.unmount();
 		const text = await render(SimpleTextField, { type: 'text', label: 'Name', revealable: true });
 		await expect.element(text.getByRole('button')).not.toBeInTheDocument();

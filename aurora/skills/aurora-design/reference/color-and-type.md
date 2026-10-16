@@ -20,7 +20,7 @@ The colors and fonts come from the tokens and the theme: never write hex, rgb or
 | Secondary text, descriptions, labels of facts | `--global-color-text-2` |
 | Accessory text only: timestamps, counters, captions next to a clearer element | `--global-color-text-3` |
 
-`--global-color-text-3` is under 4.5:1 on dark surfaces: never use it for anything the user must read to act (values, errors, instructions, table content).
+`--global-color-text-3` is the faintest text color (just above 4.5:1 on the surfaces of the default theme): never use it for anything the user must read to act (values, errors, instructions, table content).
 
 - Page title `h1` in `--global-font-family-display`, about `1.5`–`1.75rem`, weight 600–700; section headings `0.95`–`1.25rem`, 600; body `0.875`–`1rem`, 400; small text not below `0.75rem`.
 - At most 3–4 sizes and 2–3 weights per view; sizes clearly apart (not 14/15/16px). Use `rem`, not fluid sizes.

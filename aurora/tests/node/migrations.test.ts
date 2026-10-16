@@ -105,7 +105,8 @@ function nameProblems(rule: ComponentMigration, local = false): string[] {
 		...(props?.values ?? []).map((d) => d.name),
 		...(props?.types ?? []).map((d) => d.name),
 		...(props?.icons ?? []),
-		...(props?.bind ?? []).map((b) => b.name)
+		...(props?.bind ?? []).map((b) => b.name),
+		...(props?.parentRoute ? [props.parentRoute.to] : [])
 	]) {
 		mustExist('prop', v5.props, name);
 	}

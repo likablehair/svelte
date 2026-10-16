@@ -4,7 +4,7 @@
 
 A page inside the app shell (`SidebarLayout`) is usually:
 
-1. **Header**: a `PageHeader` with the title (an `h1`), optionally a `subtitle` (one line) and the page actions in `actionsSnippet`: one primary, the others secondary or in a menu. A detail page adds `backHref` to its list and, if it helps, an `Avatar` in `prependSnippet`; a header inside a section or a panel uses `size="sm"` and `headingLevel={2}`.
+1. **Header**: a `PageHeader` with the title (an `h1`), optionally a `subtitle` (one line) and the page actions in `actionsSnippet`: one primary, the others secondary or in a menu. A detail page adds `backHref` to its list and, if it helps, an `Avatar` in `prependSnippet`; a header inside a section or a panel uses `size="sm"` and `headingLevel={2}`. With `setTitleTemplate` in the root layout the page `PageHeader` also gives the browser tab its title: do not add a `<svelte:head><title>` to the page.
 2. **Attention** (optional): an `AlertBanner` for what the user must act on now. Not for general information.
 3. **Content**: one main component (a `DataTable`, a form, a set of sections), or sections switched by a `TabSwitcher`.
 

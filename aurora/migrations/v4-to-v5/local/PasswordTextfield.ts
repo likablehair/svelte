@@ -7,8 +7,7 @@ export default {
 	summary: 'The local `PasswordTextfield` copy becomes a password `SimpleTextField` of the library with its eye button.',
 	props: {
 		defaults: [
-			{ name: 'type', v4: "'password'", v5: "'text'", keepV4: 'type="password"', behaviour: true },
-			{ name: 'revealable', v4: 'an eye button', v5: 'false', keepV4: 'revealable', behaviour: true }
+			{ name: 'type', v4: "'password'", v5: "'text'", keepV4: 'type="password"', behaviour: true }
 		]
 	},
 	events: {

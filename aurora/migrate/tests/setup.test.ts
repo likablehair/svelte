@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, test } from 'vitest';
 import { analyze } from '../src/analyze.ts';
 import { loadRules } from '../src/rules.ts';
-import { dropThemePlaceholder, prepareBranch, setHtmlLang, updatePackageJson } from '../src/setup.ts';
+import { dropThemePlaceholder, prepareBranch, setHtmlLang, updatePackageJson, updateTitleTemplate } from '../src/setup.ts';
 
 const fixture = fileURLToPath(new URL('./fixtures/app-v4', import.meta.url));
 const dirs: string[] = [];
@@ -125,3 +125,29 @@ describe('setup: saved mode', () => {
 		expect(dropThemePlaceholder(done)).toBe(done);
 	});
 });
+
+describe('setup: tab title', () => {
+	test('setTitleTemplate with the name of the <title> of the root layout, else of app.html', () => {
+		const dir = copyApp();
+		const layout = join(dir, 'src/routes/+layout.svelte');
+		writeFileSync(layout, '<svelte:head><title>Tatum</title></svelte:head>\n<slot />\n');
+		expect(updateTitleTemplate(dir)[0]).toContain("setTitleTemplate('{title} · Tatum')");
+		expect(readFileSync(layout, 'utf8')).toContain("setTitleTemplate('{title} · Tatum');");
+		expect(updateTitleTemplate(dir)).toEqual([]);
+
+		writeFileSync(layout, '<slot />\n');
+		writeFileSync(join(dir, 'src/app.html'), '<html><head><title>Biblio</title>%sveltekit.head%</head></html>');
+		updateTitleTemplate(dir);
+		expect(readFileSync(layout, 'utf8')).toContain("setTitleTemplate('{title} · Biblio');");
+	});
+
+	test('without a fixed title it only says what to do', () => {
+		const dir = copyApp();
+		const layout = join(dir, 'src/routes/+layout.svelte');
+		writeFileSync(layout, '<svelte:head><title>{name}</title></svelte:head>\n');
+		writeFileSync(join(dir, 'src/app.html'), '<html><head>%sveltekit.head%</head></html>');
+		expect(updateTitleTemplate(dir)[0]).toContain('call setTitleTemplate');
+		expect(readFileSync(layout, 'utf8')).toBe('<svelte:head><title>{name}</title></svelte:head>\n');
+	});
+});
+

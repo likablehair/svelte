@@ -1,5 +1,5 @@
 <!-- @component
-Text input with an optional label, hint and validation state. It renders a native `<input>`: `type`, `disabled`, `readonly`, `required` and events (`oninput`, `onchange`, ...) work as in HTML. Icons can sit outside or inside the field, on either side, and every piece of content (label, icons, state icon, hint) can be replaced with a snippet. With `type="password"` and `revealable` an eye button inside the field shows and hides the password. Its state is exposed as `data-state`, `data-disabled`, `data-readonly` and `data-revealed` for app CSS.
+Text input with an optional label, hint and validation state. It renders a native `<input>`: `type`, `disabled`, `readonly`, `required` and events (`oninput`, `onchange`, ...) work as in HTML. Icons can sit outside or inside the field, on either side, and every piece of content (label, icons, state icon, hint) can be replaced with a snippet. With `type="password"` an eye button inside the field shows and hides the password; `revealable={false}` removes it. Its state is exposed as `data-state`, `data-disabled`, `data-readonly` and `data-revealed` for app CSS.
 -->
 <script lang="ts">
 	import '../../../css/tokens.css';
@@ -48,7 +48,7 @@ Text input with an optional label, hint and validation state. It renders a nativ
 		appendInnerIcon?: string;
 		/** SVG path of an icon outside the field, on the right. */
 		appendIcon?: string;
-		/** With `type="password"`, shows an eye button inside the field that shows and hides the password. */
+		/** With `type="password"`, shows an eye button inside the field that shows and hides the password. On by default: `false` removes it. */
 		revealable?: boolean;
 		/** Whether the password is shown as plain text, with `revealable`. Bind it to read or set it. */
 		revealed?: boolean;
@@ -98,7 +98,7 @@ Text input with an optional label, hint and validation state. It renders a nativ
 		prependInnerIcon,
 		appendInnerIcon,
 		appendIcon,
-		revealable = false,
+		revealable = true,
 		revealed = $bindable(),
 		revealLabel,
 		locale: localeProp,

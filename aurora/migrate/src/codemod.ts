@@ -6,8 +6,9 @@ import { readAliases } from './analyze.ts';
 import { dissolve, resolveImport, type WrapperSummary } from './dissolve.ts';
 import { Lines, listFiles } from './files.ts';
 import { localRuleFor, type RuleIndex } from './rules.ts';
+import { pageUrl, parentPage } from './routes.ts';
 import type { Node } from './svelte.ts';
-import type { ComponentApi, ComponentMigration, LocalMigration, ManualTrigger } from './types.ts';
+import type { ComponentApi, ComponentMigration, LocalMigration, ManualTrigger, ParentRoute } from './types.ts';
 
 const LIB = '@likable-hair/svelte';
 const MDI = '@mdi/js';
@@ -150,6 +151,7 @@ interface Context {
 	local: (source: string) => { path: string; rule: LocalMigration } | undefined;
 	lets: Set<string>;
 	localUsages: Map<string, number>;
+	parent?: string;
 }
 
 const lineOf = (ctx: Context, pos: number) => ctx.lines.at(Math.max(0, pos - ctx.offset));
@@ -930,6 +932,14 @@ function triggered(node: Node, present: Map<string, Node>, when: ManualTrigger |
 	);
 }
 
+function parentRouteAttr(ctx: Context, route: ParentRoute | undefined, present: Map<string, Node>) {
+	if (!route || ctx.parent === undefined || present.has(route.to) || route.unless?.some((name) => present.has(name))) return undefined;
+	const attr = present.get(route.from);
+	if (!attr || attr.type !== 'Attribute') return undefined;
+	const expression = attrExpression(attr);
+	return attr.value === true || (expression?.type === 'Literal' && expression.value === true) ? attr : undefined;
+}
+
 function transformUsage(
 	ctx: Context,
 	node: Node,
@@ -945,7 +955,21 @@ function transformUsage(
 	const id = (path: string) => `${v4}/${path}`;
 	const p = rule.props ?? {};
 
+	const routed = parentRouteAttr(ctx, p.parentRoute, present);
+	if (routed && p.parentRoute && ctx.edit.replace(routed.start, routed.end, `${p.parentRoute.to}="${ctx.parent}"`)) {
+		present.set(p.parentRoute.to, routed);
+		changed(ctx, routed.start, {
+			kind: 'prop-parent-route',
+			id: id(`props.parentRoute/${p.parentRoute.from}`),
+			name: p.parentRoute.from,
+			to: `${p.parentRoute.to}="${ctx.parent}"`,
+			note: p.parentRoute.note,
+			check: true
+		});
+	}
+
 	for (const attr of attrs) {
+		if (attr === routed) continue;
 		if (attr.type === 'Attribute' && attr.name.startsWith('--')) continue;
 
 		if (attr.type === 'Attribute' && (/^on[a-z]/.test(attr.name) || rule.events?.changed?.some((e) => e.name === attr.name))) {
@@ -1529,6 +1553,7 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 	const importsCopy = (text: string) => [...copyNames].some((name) => text.includes(name));
 	const localUsages = new Map<string, number>();
 	const outputs = new Map<string, string>();
+	const pages = new Set(paths.map((path) => pageUrl(relative(dir, path))).filter((url) => url !== undefined));
 
 	for (const path of paths) {
 		const original = texts.get(path)!;
@@ -1567,7 +1592,8 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 				return target && rule && target !== path ? { path: target, rule } : undefined;
 			},
 			localUsages,
-			lets: new Set()
+			lets: new Set(),
+			parent: parentPage(rel, pages)
 		};
 		const error = svelte ? transformSvelte(ctx) : script ? transformScript(ctx) : (renameCssText(ctx, 0, text.length), undefined);
 		if (error) {

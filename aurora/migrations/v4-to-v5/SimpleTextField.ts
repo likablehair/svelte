@@ -188,6 +188,14 @@ export default {
 			action:
 				'Remove a calendar or clock `appendInnerIcon` drawn over the invisible native icon, or the field shows two icons.',
 			when: { props: ['type'] }
+		},
+		{
+			id: 'simple-text-field-password-eye',
+			summary:
+				'A `type="password"` field shows an eye button inside it that shows and hides the password (`revealable` is on by default); v4 had none.',
+			action:
+				'Remove an eye button or show-password checkbox the app drew next to the field, or the page shows two. Pass `revealable={false}` where the password must never be shown, for example a PIN typed in front of others.',
+			when: { props: ['type'] }
 		}
 	],
 	added: [
@@ -195,7 +203,7 @@ export default {
 		'`state` (`error` | `success`): colors the field and the hint, shows an icon; `stateIconSnippet` replaces it.',
 		'`class.label`.',
 		'`type` also accepts `email`, `tel`, `search`, `url`.',
-		'`revealable` (with `type="password"`): eye toggle that shows and hides the password; `bind:revealed`, `revealLabel` and `locale` for its name ("Show password" / "Mostra password").',
+		'`revealable` (on by default with `type="password"`): eye toggle that shows and hides the password, `revealable={false}` removes it; `bind:revealed`, `revealLabel` and `locale` for its name ("Show password" / "Mostra password").',
 		'`data-state`, `data-disabled`, `data-readonly`, `data-revealed` attributes.',
 		'`--simple-text-field-*` variables for label, placeholder, icons, hover, focus, error, success and disabled.'
 	]
