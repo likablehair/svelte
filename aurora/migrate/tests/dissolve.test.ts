@@ -207,3 +207,112 @@ describe('dissolve: wrappers', () => {
 		expect(second.deleted).toEqual([]);
 	});
 });
+
+const labelAndTextfield = (inner: 'StandardTextfield' | 'SimpleTextField') =>
+	svelte(
+		[
+			inner === 'StandardTextfield'
+				? "\timport StandardTextfield from '$lib/components/common/StandardTextfield.svelte'"
+				: "\timport { SimpleTextField } from '@likable-hair/svelte'",
+			"\timport type { ComponentProps } from 'svelte'",
+			`\tinterface Props extends Omit<ComponentProps<typeof ${inner}>, 'class'> { label?: string; class?: { label?: string; input?: string } }`,
+			'\tlet { value = $bindable(), label, name, class: clazz = {}, ...rest }: Props = $props()'
+		].join('\n'),
+		[
+			'<label style:font-weight="500" style:margin-left="3px" for={name} class={clazz.label}',
+			"\t>{label || ''}</label",
+			'>',
+			'<div style:margin-top="5px">',
+			`\t<${inner} bind:value {name} class={clazz.input} {...rest}></${inner}>`,
+			'</div>'
+		].join('\n')
+	);
+
+describe('dissolve: LabelAnd* components', () => {
+	test('a LabelAndTextfield around a Standard wrapper becomes SimpleTextField with label, and the props of the inner wrapper are mapped', () => {
+		const { read, exists, result } = run({
+			[`${W}/StandardTextfield.svelte`]: textfield,
+			[`${W}/LabelAndTextfield.svelte`]: labelAndTextfield('StandardTextfield'),
+			'src/routes/+page.svelte': svelte(
+				"\timport LabelAndTextfield from '$lib/components/common/LabelAndTextfield.svelte'\n\tlet name = $state(''), missing = $state(false)",
+				'<LabelAndTextfield label="Nome" name="name" bind:value={name} error={missing} />'
+			)
+		});
+		const page = read('src/routes/+page.svelte');
+		expect(page).toContain("import { SimpleTextField } from '@likable-hair/svelte'");
+		expect(page).toContain(`<SimpleTextField label="Nome" name="name" bind:value={name} state={missing ? 'error' : undefined} />`);
+		expect(exists(`${W}/LabelAndTextfield.svelte`)).toBe(false);
+		expect(exists(`${W}/StandardTextfield.svelte`)).toBe(false);
+		const summary = result.wrappers.find((w) => w.file.endsWith('LabelAndTextfield.svelte'))!;
+		expect(summary).toMatchObject({ target: 'SimpleTextField', dissolved: 1, deleted: true });
+		expect(summary.dropped.join(' ')).toContain('the component draws its own `label`');
+	});
+
+	test('a LabelAndTextfield already on the library component still maps the props the old wrapper handled', () => {
+		const { read } = run({
+			[`${W}/LabelAndTextfield.svelte`]: labelAndTextfield('SimpleTextField'),
+			'src/routes/+page.svelte': svelte(
+				"\timport LabelAndTextfield from '$lib/components/common/LabelAndTextfield.svelte'\n\tlet mail = $state(''), wrong = $state(false)",
+				'<LabelAndTextfield label="Email" name="email" type="email" bind:value={mail} error={wrong} hint="Required" />'
+			)
+		});
+		expect(read('src/routes/+page.svelte')).toContain(
+			`<SimpleTextField label="Email" name="email" type="email" bind:value={mail} state={wrong ? 'error' : undefined} hint="Required" />`
+		);
+	});
+
+	test('LabelAndCheckbox becomes Checkbox with label, and the id of the <label for> reaches the checkbox', () => {
+		const { read, exists } = run({
+			[`${W}/StandardCheckbox.svelte`]: checkbox,
+			[`${W}/LabelAndCheckbox.svelte`]: svelte(
+				[
+					"\timport StandardCheckbox from '$lib/components/common/StandardCheckbox.svelte'",
+					"\timport type { ComponentProps } from 'svelte'",
+					'\tinterface Props extends ComponentProps<typeof StandardCheckbox> { label: string }',
+					'\tlet { label, id, value = $bindable(false), ...rest }: Props = $props()'
+				].join('\n'),
+				'<div class="container">\n\t<StandardCheckbox bind:value {...rest} />\n\t<label style:margin-left="0.7rem" for={id}>{label} </label>\n</div>\n\n<style>\n\t.container { display: flex; }\n</style>'
+			),
+			'src/routes/+page.svelte': svelte(
+				"\timport LabelAndCheckbox from '$lib/components/common/LabelAndCheckbox.svelte'\n\tlet active = $state(false)",
+				'<LabelAndCheckbox label="Attivo" id="active" bind:value={active} />'
+			)
+		});
+		expect(read('src/routes/+page.svelte')).toContain('<Checkbox label="Attivo" id="active" bind:checked={active} />');
+		expect(exists(`${W}/LabelAndCheckbox.svelte`)).toBe(false);
+	});
+
+	test('LabelAndSelect gives its name to the Select, which v4 kept for the <label> only', () => {
+		const { read } = run({
+			[`${W}/LabelAndSelect.svelte`]: svelte(
+				[
+					"\timport { Select } from '@likable-hair/svelte'",
+					"\timport type { ComponentProps } from 'svelte'",
+					'\tinterface Props extends ComponentProps<typeof Select> { label: string; name: string }',
+					'\tlet { value = $bindable(undefined), label, name, ...rest }: Props = $props()'
+				].join('\n'),
+				'<label style:font-weight="500" for={name}>{label}</label>\n<div style:margin-top="5px">\n\t<Select bind:value {...rest} />\n</div>'
+			),
+			'src/routes/+page.svelte': svelte(
+				"\timport LabelAndSelect from '$lib/components/common/LabelAndSelect.svelte'\n\tlet role = $state('a')\n\tconst items = [{ value: 'a', label: 'A' }]",
+				'<LabelAndSelect label="Ruolo" name="role" {items} bind:value={role} />'
+			)
+		});
+		expect(read('src/routes/+page.svelte')).toContain('<Select label="Ruolo" name="role" {items} bind:value={role} />');
+	});
+
+	test('a label with more than the label prop keeps the component', () => {
+		const { result, exists } = run({
+			[`${W}/LabelAndTextfield.svelte`]: svelte(
+				"\timport { SimpleTextField } from '@likable-hair/svelte'\n\tlet { label, required = false, ...rest } = $props()",
+				'<label>{label}{#if required}<span>*</span>{/if}</label>\n<SimpleTextField {required} {...rest} />'
+			),
+			'src/routes/+page.svelte': svelte(
+				"\timport LabelAndTextfield from '$lib/components/common/LabelAndTextfield.svelte'",
+				'<LabelAndTextfield label="Nome" required />'
+			)
+		});
+		expect(exists(`${W}/LabelAndTextfield.svelte`)).toBe(true);
+		expect(result.skipped.some((s) => s.id === 'wrappers/LabelAndTextfield')).toBe(true);
+	});
+});

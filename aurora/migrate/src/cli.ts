@@ -4,7 +4,8 @@ import { join, resolve } from 'node:path';
 import { setupAgents } from './agents.ts';
 import { analyze } from './analyze.ts';
 import { codemod } from './codemod.ts';
-import { appLabel, codemodReport, markdownReport, summaryTable } from './report.ts';
+import { remaining } from './remaining.ts';
+import { appLabel, codemodReport, markdownReport, nextReport, remainingReport, summaryTable } from './report.ts';
 import { loadRules } from './rules.ts';
 import { currentBranch, setup } from './setup.ts';
 
@@ -12,6 +13,8 @@ const USAGE = `Usage:
   svelte-migrate analyze <app-dir...> [--md <file|dir>] [--json <file|dir>] [--summary]
   svelte-migrate setup <app-dir> [--package <version|file.tgz>] [--branch <name>] [--locale <code>] [--no-install]
   svelte-migrate codemod <app-dir> [--dry-run] [--md <file>] [--branch <name>]
+  svelte-migrate next <app-dir> [--file <path>]
+  svelte-migrate status <app-dir> [--md <file>]
 
   analyze     Read-only report of what the v4 → v5 migration needs in each app.
   --md        Write the Markdown report to a file (one app) or a directory (one file per app).
@@ -34,7 +37,19 @@ const USAGE = `Usage:
               into @mdi/js imports; the Standard* wrappers dissolved into the library components
               (meaning and layout kept, look dropped and listed), wrappers nobody imports any more
               deleted. Running it again changes nothing. Prints what it did, what to check and
-              what is left by hand. --dry-run writes nothing. Never commits.`;
+              what is left by hand. --dry-run writes nothing. Never commits.
+
+  next        The remaining points, one file at a time: runs svelte-check in the app and
+              explains each error with the migration rule behind it (what changed, what to
+              write), then what to look at in the same file (behaviour or look changed, done
+              with a warning, new defaults). The v4 code is read from git (the commit the
+              migration branch started from), so nothing is written in the app. When no
+              errors are left it lists what to look at and the pages to try.
+              --file shows that file instead of the next one.
+
+  status      The same data for the whole app: files with errors and points to look at,
+              pages to try (pages that use the changed files), changes per component,
+              app steps, look dropped with the wrappers. Read-only.`;
 
 interface Options {
 	command?: string;
@@ -47,6 +62,7 @@ interface Options {
 	branch: string;
 	install: boolean;
 	dryRun: boolean;
+	file?: string;
 }
 
 function parseArgs(argv: string[]): Options | undefined {
@@ -61,6 +77,7 @@ function parseArgs(argv: string[]): Options | undefined {
 		else if (arg === '--locale') options.locale = argv[++i];
 		else if (arg === '--no-install') options.install = false;
 		else if (arg === '--dry-run') options.dryRun = true;
+		else if (arg === '--file') options.file = argv[++i];
 		else if (arg === '-h' || arg === '--help') return undefined;
 		else if (!options.command) options.command = arg;
 		else options.dirs.push(arg);
@@ -116,8 +133,25 @@ function runCodemod(options: Options) {
 	console.log(options.dryRun ? 'Dry run: nothing was written.' : `${result.files.length} files written. Nothing was committed.`);
 }
 
+function runNext(options: Options) {
+	const result = remaining(resolve(options.dirs[0]), loadRules());
+	process.stdout.write(`${nextReport(result, options.file)}\n`);
+}
+
+function runStatus(options: Options) {
+	const report = remainingReport(remaining(resolve(options.dirs[0]), loadRules()));
+	if (options.md) writeFileSync(options.md, report);
+	else process.stdout.write(`${report}\n`);
+}
+
 const options = parseArgs(process.argv.slice(2));
-const commands: Record<string, (options: Options) => void | Promise<void>> = { analyze: runAnalyze, setup: runSetup, codemod: runCodemod };
+const commands: Record<string, (options: Options) => void | Promise<void>> = {
+	analyze: runAnalyze,
+	setup: runSetup,
+	codemod: runCodemod,
+	next: runNext,
+	status: runStatus
+};
 if (!options?.command || !commands[options.command] || !options.dirs.length) {
 	console.log(USAGE);
 	process.exit(options ? 1 : 0);

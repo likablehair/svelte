@@ -173,7 +173,7 @@ function appInfo(dir: string): AppInfo {
 	};
 }
 
-function readAliases(dir: string): [string, string][] {
+export function readAliases(dir: string): [string, string][] {
 	const aliases: [string, string][] = [['$lib', 'src/lib']];
 	for (const name of ['svelte.config.js', 'svelte.config.ts', 'svelte.config.mjs']) {
 		const path = join(dir, name);
@@ -187,7 +187,7 @@ function readAliases(dir: string): [string, string][] {
 
 const IMPORT = /import\s+(type\s+)?(?:([\w$]+)\s*,?\s*)?(?:\*\s+as\s+([\w$]+)\s*)?(\{[^}]*\})?\s*from\s*['"]([^'"]+)['"]/g;
 
-function scriptImports(text: string, lines: Lines): ImportRecord[] {
+export function scriptImports(text: string, lines: Lines): ImportRecord[] {
 	const records: ImportRecord[] = [];
 	for (const m of text.matchAll(IMPORT)) {
 		const [, typeAll, def, ns, named, source] = m;

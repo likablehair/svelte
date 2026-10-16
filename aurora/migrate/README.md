@@ -14,11 +14,11 @@ npm run migrate -- analyze ~/projects/*/frontend --md reports/ --summary   # one
 
 `analyze` is read-only: it never writes inside the app.
 
-`setup <app-dir>` and `codemod <app-dir>` change the app (see `npm run migrate -- --help`); neither commits. `setup` also adds this package and `@likable-hair/svelte-mcp` to the dev dependencies and configures the coding agents of the app (MCP server, `aurora-design` and `aurora-migrate` skills, `AGENTS.md`).
+`setup <app-dir>` and `codemod <app-dir>` change the app (see `npm run migrate -- --help`); neither commits. After the codemod, `next <app-dir>` gives the remaining points one file at a time and `status <app-dir>` the whole list (both read-only, see below). `setup` also adds this package and `@likable-hair/svelte-mcp` to the dev dependencies and configures the coding agents of the app (MCP server, `aurora-design` and `aurora-migrate` skills, `AGENTS.md`).
 
 ## With a coding agent
 
-The same phases are tools of the `aurora` MCP server (`@likable-hair/svelte-mcp`): `migration_analyze`, `migration_setup` (does not install), `migration_codemod`, `migration_rules`, available while the app is on v4 or declares this package. `skills/aurora-migrate` is the skill that takes the agent through them; `init` copies it into the app. `npm run migrate:build` builds `dist/` for publishing.
+The same phases are tools of the `aurora` MCP server (`@likable-hair/svelte-mcp`): `migration_analyze`, `migration_setup` (does not install), `migration_codemod`, `migration_next`, `migration_status`, `migration_rules`, available while the app is on v4 or declares this package. `skills/aurora-migrate` is the skill that takes the agent through them; `init` copies it into the app. `npm run migrate:build` builds `dist/` for publishing.
 
 ## What the report says
 
@@ -33,7 +33,11 @@ The same phases are tools of the `aurora` MCP server (`@likable-hair/svelte-mcp`
 
 ## What the codemod does to wrappers
 
-Before the other changes, every use of a `Standard*` wrapper becomes the library component it wraps. What the wrapper props meant is kept (`style` → `variant`, `error` → `state`, `href`, `hint`, `title`: the recipes in `src/dissolve.ts`), and so are the layout measures (widths, margins, `display`); the wrapper's look (colors, padding, heights, radii, shadows, elements around the component) is dropped and listed under "Look dropped with the wrappers". Wrapper files nobody imports any more are deleted. A wrapper in Svelte 4 syntax, with code of its own or without a library component stays ("why kept"); a use that passes a prop the wrapper handled with logic stays too ("Not done").
+Before the other changes, every use of a `Standard*` wrapper becomes the library component it wraps; then the same happens to the `LabelAnd*` components (a `<label>` next to a field: the v5 field has its own `label`), and the props they passed on to a dissolved `Standard*` get that wrapper's mapping. What the wrapper props meant is kept (`style` → `variant`, `error` → `state`, `href`, `hint`, `title`: the recipes in `src/dissolve.ts`), and so are the layout measures (widths, margins, `display`); the wrapper's look (colors, padding, heights, radii, shadows, elements around the component) is dropped and listed under "Look dropped with the wrappers". Wrapper files nobody imports any more are deleted. A wrapper in Svelte 4 syntax, with code of its own or without a library component stays ("why kept"); a use that passes a prop the wrapper handled with logic stays too ("Not done").
+
+## Remaining points (`next`, `status`)
+
+After the codemod the strict v5 types make `svelte-check` flag every use that is still wrong. `next` runs it in the app and, for each error, finds the library component behind it (also through an app component that passes its props on) and the rule that explains it: what changed, what to write, with the rule id (`migration_rules` shows the whole rule). It also lists what to look at in the same file: behaviour or look changes, changes done with a warning, uses the codemod skipped, new defaults. These come from the v4 code, read from git at the commit the migration branch started from (`setup` records it as `branch.<name>.migrateBase` in the local git config; otherwise the oldest reflog entry of the branch), so nothing is written in the app and the list stays right after the user commits. When no errors are left, `next` lists what to look at and the **pages to try**: the routes whose imports reach a changed file, with the components to look at there, and the layouts (every page under them).
 
 ## Rules
 

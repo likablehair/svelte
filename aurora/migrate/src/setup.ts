@@ -44,7 +44,9 @@ export function prepareBranch(dir: string, branch: string): string {
 		);
 	if (!MAIN_BRANCHES.has(current))
 		throw new Error(`${dir} is on "${current}": switch to the main branch or pass --branch ${current} to keep working on it.`);
+	const base = git(dir, ['rev-parse', 'HEAD']);
 	git(dir, ['switch', '-c', branch]);
+	git(dir, ['config', `branch.${branch}.migrateBase`, base]);
 	return branch;
 }
 

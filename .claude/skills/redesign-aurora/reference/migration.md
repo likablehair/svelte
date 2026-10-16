@@ -72,7 +72,7 @@ Idea guida: **nessuno deve conoscere tutto**. Le regole le sa lo strumento; lo s
 
 Regola: **commit prima di ogni lavoro di migrazione** nel repo della libreria; nelle app si tocca qualcosa solo con il loro repo tutto committato e con l'ok dell'utente per quell'app, e **non si committa mai** (lo fa l'utente). Gli strumenti in sola lettura (`analyze`) si possono lanciare su tutte le app senza chiedere.
 
-Stato: passi 1–4 fatti il 2026-10-15 (sezione sotto); passo 5 in corso su tatum: setup fatto, codemod meccanico fatto (prima parte, `history.md`), default v4 decisi (solo comportamento); scioglimento dei wrapper fatto e applicato su tatum (`history.md`); restano la lista dei punti rimasti e la prova a mano.
+Stato: passi 1–4 fatti il 2026-10-15 (sezione sotto); passo 5 in corso su tatum: setup fatto, codemod meccanico fatto (prima parte, `history.md`), default v4 decisi (solo comportamento); scioglimento dei wrapper fatto e applicato su tatum, anche dei `LabelAnd*` (2026-10-16); lista dei punti rimasti fatta (`next`/`status`, `migration_next`/`migration_status`, 2026-10-16); restano la rimozione degli altri componenti locali resi inutili dalla v5 (decisione del 2026-10-16, indagine in corso) e la prova a mano su tatum con `next`.
 
 1. **Pacchetto** `aurora/migrate/` (`@likable-hair/svelte-migrate`): `package.json` suo, `bin`, dipendenze `svelte` (parser) e `magic-string`; test nel progetto node di aurora o suo.
 2. **Regole compilate** (prima parte di P218): uno script che importa `migrations/v4-to-v5/*.ts` e scrive un JSON unico (con i `forwarded()` risolti), che il pacchetto legge.
@@ -114,10 +114,69 @@ Cosa si vede:
 - **App v3**: le prop note solo alla v3 non sono nelle regole (le più frequenti: Icon `click` 86, figli di MediaQuery 28, `rowActionsSnippet` 28, prop di stile di Textarea `paddingTop`… ~70, prop di BarChart/LineChart, SimpleTimeLine). `analyze` le elenca in "Unknown props". → P221.
 - I wrapper "con logica" sono la maggioranza per l'euristica (blocchi `{#if}`, più nodi radice, funzioni): lo scioglimento va guardato wrapper per wrapper; il pilota dirà quanti si sciolgono davvero.
 
+## Componenti locali resi inutili dalla v5 (indagine del 2026-10-16)
+
+Decisione dell'utente (2026-10-16): via dalle app tutto ciò che la v5 rende inutile. Indagine su 23 cartelle `*/frontend`: metanalysis e rex non usano la libreria (kit proprio), esclusi; tatum è già sulla 5.0.0; restano 21 app, 2.391 file `.svelte`. "File" = file che importano la copia locale (somma sulle app). Dati grezzi nello scratchpad della sessione (non durano), comandi per rifarli: inventario `find */frontend/src/lib/components -name '*.svelte'`, poi per ogni nome `grep -rlE "(from|import)[[:space:]]+['\"][^'\"]*/<Nome>\.svelte['\"]"` nelle `src` delle app che lo hanno.
+
+**Sostituibili dalla libreria, quasi senza perdite** (gruppo A):
+
+| componente locale | app | file | sostituto v5 | note |
+|---|---|---|---|---|
+| Toaster (copia melt-ui, stessa API ovunque) | 17 | 637 | `Toaster` + `addToast`/`addSuccessToast`/… | ~2.060 chiamate `addXToast({ data: { title, description } })`: togliere `data`; `closeDelay` → `duration`, `showLoading` → `loading`, `action.handler` → `action.onclick`; `color` → `variant` (`#0CF574` success, `#FFC857` warning, `error-500` error, altri a mano); id da stringa a numero. Perso: `action.urlToPreload`/`usePreloadData` (3 toast in astro, cbam, maya). Con DateRangePicker e MeltDatePicker toglie `@melt-ui/svelte` da 15 app su 17 |
+| ConfirmOrCancelButtons (copia v4) | 19 | 193 | ConfirmOrCancelButtons | 4 stili di callback (`on:confirm-click` Svelte 4 in 10 app, `confirm=` con `{nativeEvent}`, `onConfirmClick`, `onconfirmClick`); testi en `Save/Back` contro v5 `Save/Cancel` (passare `cancelText`); lupette usa paraglide; `columnDirection` (5 app) senza prop v5 (si impila da container query) |
+| UserAvatar (wrapper) | 16 | 37 | DescriptiveAvatar (`title`, `subtitle`, `src`, `direction`, `reverse`, `onclick`, `compact`) | `compact` aggiunge un Tooltip; copie Svelte 4 con `cursor`, `on:click`; mufasa stampa una riga in più |
+| BoxList (copia, 10 varianti) | 13 | 30 | BoxList (già deciso, ex P172–P179) | `redirectUrl`/`url` → `href`, `gap` → `--box-list-gap`, `onboxClick({ box, event })`; astro/maya hanno `animateOnMount`, snippet e preload; lupette è un'altra lista |
+| WidgetNoData / WidgetError | 2 / 1 | 19 / 7 | NoData; errore → AlertBanner `variant="error"` | |
+| Spinner / CircularProgressIndicator | 2 / 2 | 4 / 2 | CircularLoader (`value` per il progresso) | |
+| InfoBox | 1 | 2 | AlertBanner | |
+| ToolTipTextField | 1 | 5 | SimpleTextField `state="error"` + `hint` | il messaggio passa da tooltip a testo sotto |
+| IndeterminateCheckbox | 1 | 1 | Checkbox `indeterminate` | |
+| RadioGroup / RadioButton (copie) | 2 | 6 / 4 | RadioGroup | `legend` → `label`, `options` → `items`, `checkedValue` → `value`; padding persi |
+| MeltDatePicker | 4 | 9 | DatePickerTextField | `date` → `selectedDate`, `minValue`/`maxValue` → `min`/`max` |
+| StackedBarChart / SimpleBarChart / BarChart (wrapper chart.js) | 3 | 7 | BarChart (`stacked`, `horizontal`) | colori dei dataset → `color`, flag di tick e griglia → `options` |
+| file morti (0 import) | | 0 | cancellare | Loader (15 app), NotAuthorized (15), SideCreator (5), JobHeader (3), HeaderMenu (2), Tooltip (2), HeadersSelectorDrawer (2), AlertBanner (1), InfiniteTable (1), LocalFilterEditor; e le copie non usate di Divider (5 app), Subtitle (13), UserAvatar (3), LinkButton (3), BoxMenu (2) |
+
+**Sostituibili con una perdita** (gruppo B, da chiedere): ConfirmOrCancelDialog (9 app, 89 file), AlertDialog (4, 25), ConfirmDialog (1, 4) → Dialog + ConfirmOrCancelButtons `confirmVariant="danger"`: si perdono la grande icona di allerta e i bottoni a tutta larghezza impilati; default da scrivere (`Sei sicuro?`, `Elimina`, `Annulla`); extra `persistent`, `disableConfirm`, `maxWidth`, `description: string[]`. Divider (10 app, 46 file): **trappola**, il default locale `rgb(var(--global-background-color-500))` punta a una variabile che nessuna app definisce, quindi i 16 `<Divider />` senza colore oggi sono spaziatori invisibili e con la v5 diventerebbero linee. ThemeSwitch (9 app, 12 file) → Switch + `toggleMode` + `rememberAppearance`: si perdono la maniglia sole/luna e il tooltip "Tema"; in **tutte le 20 app** c'è anche `/api/setTheme` (cookie) + `%theme%` in `app.html` + sostituzione in `hooks.server.ts`, che `appearanceScript` rende inutili (stessa chiave `theme` di localStorage). DateRangePicker (6, 6) → DatePickerTextField `range`: in ganymede e h24 si perdono Applica/Cancella e i due mesi. TabToggleSwitch (3, 4) → TabSwitcher con `href` (perso il preload al passaggio). ButtonGroup (1 uso) → ToggleList o TabSwitcher `segmented`. BoxMenu (4, 8) → BoxList (callback per voce → una sola). OptionMenu/OptionSelector/SimpleOptionMenu (3 app) → MenuOrDrawerOptions. LinkButton (copia con `<div>` cliccabile, 3 app) → Button `buttonType="text"`. HoverableTooltip (2, 4) → Tooltip, che non è interattivo (dove il contenuto si clicca, Menu). PasswordTextfield (1) → SimpleTextField `type="password"` senza occhio. TimePickerTextField (stramoniumai) → TimePickerTextField.
+
+**Senza equivalente v5** (gruppo C): **PageTitle** (21 app, **594 file**, 19 varianti: `title`/`subtitle`/`description`, link "Indietro" con `prependVisible`/`prependRoute`, snippet in coda, `titleSize`): il pezzo più grande non coperto, candidato a un `PageHeader` della libreria. Card (3 app, 35 file, ~20 prop di stile + snippet), Subtitle (usato solo da epass e new-vigipass, 31 file), VerticalDraggableList (3 app, 17; "solo su richiesta"), ColorInvertedSelector (5, 6; "solo su richiesta"), Expandible/CollapsableDivider (2+2), Code (astro).
+
+**Contratto diverso, restano** (gruppo D): PeriodPicker (4 app, 77 file, JSON diverso, già deciso), DashboardShaper copiato in 5 app (`componentName`, `widgetCells`; DashboardAddButton e WidgetAddButton assorbiti dal catalogo, DashboardEditor tiene dati e permessi), fork di lupette con paraglide (LocalPaginatedTable, LocalFilters, LocalSearchBar, LocalMobileFilterEditor: modello `Filter[]` della v4), PaginatedTable copiata in epass (fetcher diverso).
+
+**Logica dell'app, restano**: ApplicationLogo (17 app), WidgetTitle/WidgetSettings/Widget (il reset zoom di WidgetTitle diventa inutile: i grafici v5 lo hanno), TipTapEditor (11), JobStatusViewer (7), ColoredChip (3, colori arbitrari: Chip v5 ha varianti fisse), form/tabelle/autocomplete di dominio (fetch e FilterBuilder), media e documenti, schermate di job e import, UI una tantum (AnimatedCheck, SuggestionDialog…), utility (CopyTextButton, ClampedSpan, Stepper, NumberPicker…), campi del form builder di epass/new-vigipass.
+
+### Piano dei componenti locali (2026-10-16, dopo le risposte dell'utente)
+
+Regola (decisione "Funzioni delle copie locali"): nessuna funzione si perde; si porta nella libreria ciò che ha senso, il resto resta come wrapper locale della libreria, riusato nell'app. Scelte di Claude (delegate dall'utente: "portare nella libreria ciò che ha più senso"), da elencare a fine lavoro:
+
+**Componenti nuovi nella libreria** (decisi): `PageHeader` (PageTitle, 21 app), `ConfirmDialog` (ConfirmOrCancelDialog, AlertDialog, ConfirmDialog, 14 app), `ModeSwitch` (ThemeSwitch e toggle nei layout, 20 app). Prima di progettarli: le varianti delle copie nelle app (19 di PageTitle), con un subagente.
+
+**Funzioni nuove nella libreria** (non esistevano nella v4 della libreria: senza domanda, da elencare):
+1. DatePickerTextField `range`: due mesi (`months`) e piè con Applica/Cancella, per DateRangePicker di ganymede e h24.
+2. SimpleTextField: bottone a occhio per mostrare la password (`type="password"`), per PasswordTextfield (quantum) e i login.
+3. Tooltip interattivo (resta aperto con puntatore o focus sopra, contenuto cliccabile), per HoverableTooltip (maya, stramoniumai).
+4. Azione del toast con `href` (link, che SvelteKit precarica), per `action.urlToPreload` del Toaster locale (astro, cbam, maya).
+5. `onclick` per voce in `BoxListItem`, per BoxMenu (4 app; oggi BoxList ha solo `onboxClick`).
+6. ConfirmOrCancelButtons `direction` (`row`/`column`, default automatico da container query), per `columnDirection` (5 app).
+Da valutare quando si fa BoxList: `animateOnMount` di astro/maya (animazione d'ingresso: aspetto o funzione?).
+
+**Sostituzioni senza perdite** (codemod): TabToggleSwitch → TabSwitcher con `href` (link: il precaricamento al passaggio c'è già se il `<body>` ha `data-sveltekit-preload-data`, default del template); ButtonGroup → ToggleList; LinkButton copiato (`<div>` cliccabile) → Button `buttonType="text"` o LinkButton con `href` se naviga; OptionMenu/OptionSelector/SimpleOptionMenu → MenuOrDrawerOptions (se aggiungono un attivatore fisso usato in più punti, wrapper locale); TimePickerTextField copiato → quello della libreria; più tutto il gruppo A.
+
+**Restano nell'app** (nessun equivalente o contratto diverso): Card, Subtitle (epass, new-vigipass), VerticalDraggableList, ColorInvertedSelector, Expandible/CollapsableDivider, Code, e il gruppo D; mufasa: la riga in più di UserAvatar diventa un wrapper di DescriptiveAvatar se lo snippet non basta.
+
+**Meccanismo del codemod** (da progettare): regole per componenti **locali** (abbinati per nome del file, con le varianti delle copie: callback Svelte 4, `{ detail }`, prop rinominate), nello stesso formato delle regole dei componenti dove si può; `setup` toglie `/api/setTheme`, `%theme%` e la sostituzione in `hooks.server.ts`.
+
+**Ordine**: (1) commit; (2) PageHeader, ConfirmDialog, ModeSwitch con il processo dei componenti; (3) funzioni 1–6; (4) regole e codemod dei componenti locali, gruppo A compreso; (5) prova a mano su tatum con `next` (tatum ha PageTitle, ConfirmOrCancelButtons, ConfirmOrCancelDialog, ThemeSwitch, Toaster, BoxMenu, UserAvatar).
+
 ## Proposte nate dall'analisi (non confermate)
 
 | # | Proposta | Nota |
 |---|---|---|
 | P220 | `ManualStep` con un campo `kind`: `review` (comportamento o aspetto cambiato: si guarda, di solito nulla da scrivere) o `edit` (codice da cambiare); la lista dei punti rimasti mostra prima gli `edit` per file e raggruppa le `review` per componente, con le pagine da guardare | parte di P218 (regole leggibili dalla macchina), si classificano i 228 passi esistenti |
 | P221 | Regole **v3 → v4** minime, solo per i nomi v3 trovati da `analyze` nelle 10 app v3 (elenco "Unknown props"), così lo strumento porta una app v3 direttamente alla v5 | completa P216; senza, quelle prop restano errori di svelte-check da risolvere a mano |
+| P223 | **Gruppo A** dell'indagine del 2026-10-16: il codemod sostituisce le copie locali con la libreria (Toaster e le sue ~2.060 chiamate, ConfirmOrCancelButtons, UserAvatar, BoxList, WidgetNoData/WidgetError, Spinner, InfoBox, ToolTipTextField, IndeterminateCheckbox, RadioGroup, MeltDatePicker, wrapper dei grafici) e cancella i file morti; le piccole perdite si elencano | rientra nella decisione dell'utente del 2026-10-16, da mostrare |
+| P224 | Divider: i `<Divider />` locali senza colore oggi sono invisibili (variabile mai definita); con la v5 diventano linee | **approvata il 2026-10-16**: diventano linee |
+| P225 | Dialog di conferma (ConfirmOrCancelDialog, AlertDialog, ConfirmDialog: 14 app, ~118 file): un componente **`ConfirmDialog`** nella libreria (titolo, testo, icona, conferma `danger`) invece di Dialog + bottoni riscritti in ogni app | **approvata il 2026-10-16** (decisione "ConfirmDialog nella libreria") |
+| P226 | PageTitle (21 app, 594 file): un componente **`PageHeader`** nella libreria (titolo, sottotitolo, link indietro, azioni) su cui il codemod porta PageTitle | **approvata il 2026-10-16** (decisione "PageHeader nella libreria") |
+| P227 | Tema: ThemeSwitch (9 app) e `/api/setTheme` + `%theme%` + `hooks.server.ts` (20 app) → `appearanceScript` + `rememberAppearance` + uno switch della libreria | **approvata il 2026-10-16**: `ModeSwitch` nella libreria (sole/luna) |
+| P228 | **Gruppo B** restante (DateRangePicker, TabToggleSwitch, ButtonGroup, BoxMenu, Option*, LinkButton copiato, HoverableTooltip, PasswordTextfield, TimePickerTextField copiato): si sostituiscono con la libreria e le perdite si elencano | **non approvata**: sostituita dalla decisione "Funzioni delle copie locali" del 2026-10-16 (niente perdite: libreria o wrapper locale) |
 

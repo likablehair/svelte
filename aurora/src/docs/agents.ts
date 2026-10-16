@@ -77,7 +77,7 @@ validate_usage      checks a .svelte file or code against the specs`
 	{
 		title: 'Migrating from v4',
 		blocks: [
-			`In an app still on ${PACKAGE} 4.x, or being migrated, the server adds the \`migration_analyze\`, \`migration_setup\`, \`migration_codemod\` and \`migration_rules\` tools and the \`migrate-app\` prompt, and \`init\` adds the \`aurora-migrate\` skill, which takes the agent through the phases. The specs it shows are those of v5, the target. The tools need the migration package (\`setup\` adds it):`,
+			`In an app still on ${PACKAGE} 4.x, or being migrated, the server adds the \`migration_analyze\`, \`migration_setup\`, \`migration_codemod\`, \`migration_next\`, \`migration_status\` and \`migration_rules\` tools and the \`migrate-app\` prompt, and \`init\` adds the \`aurora-migrate\` skill, which takes the agent through the phases. The specs it shows are those of v5, the target. The tools need the migration package (\`setup\` adds it):`,
 			{ lang: 'sh', source: 'npm i -D @likable-hair/svelte-migrate' },
 			'`setup` of the migration adds both packages to the dev dependencies and runs `init` itself; nothing is ever committed. The app counts as being migrated while `@likable-hair/svelte-migrate` is among its dependencies, so the tools stay available after v5 is installed. When the migration is over, remove it and run `npx svelte-mcp init` again: the migration skill goes away.'
 		]

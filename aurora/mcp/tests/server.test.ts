@@ -87,7 +87,7 @@ describe('MCP server on a v4 app', async () => {
 	test('adds the migration tools and prompt', async () => {
 		const { tools } = await client.listTools();
 		expect(tools.map((t) => t.name)).toEqual(
-			expect.arrayContaining(['migration_analyze', 'migration_setup', 'migration_codemod', 'migration_rules'])
+			expect.arrayContaining(['migration_analyze', 'migration_setup', 'migration_codemod', 'migration_next', 'migration_status', 'migration_rules'])
 		);
 		const { prompts } = await client.listPrompts();
 		expect(prompts.map((p) => p.name)).toContain('migrate-app');

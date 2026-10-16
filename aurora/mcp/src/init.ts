@@ -93,7 +93,7 @@ export function agentsBlock(hasMigration: boolean) {
 		'',
 		`- Follow the \`${DESIGN_SKILL}\` skill (in \`.agents/skills/\` or \`.claude/skills/\`).`,
 		`- Get component props, snippets, CSS variables, examples, tokens and themes from the \`${SERVER_NAME}\` MCP server (\`${MCP_PACKAGE}\`), not from memory; check new code with its \`validate_usage\` tool.`,
-		'- Use the library components directly (no local wrappers), and style them only through their CSS variables and the `--global-*` tokens.',
+		'- Use the library components directly and style them only through their CSS variables and the `--global-*` tokens. A local wrapper only for a feature the library lacks, reused across the app; repeated UI goes in an app component, not in one page.',
 		...(hasMigration
 			? ['', `The app is being migrated from ${PACKAGE} v4 to v5: follow the \`${MIGRATE_SKILL}\` skill and the \`migration_*\` tools. When it is over, remove \`@likable-hair/svelte-migrate\` from the dev dependencies and run init again.`]
 			: []),

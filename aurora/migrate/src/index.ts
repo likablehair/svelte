@@ -1,7 +1,8 @@
 export { migrateSkill, setupAgents } from './agents.ts';
 export { analyze } from './analyze.ts';
 export { codemod } from './codemod.ts';
-export { codemodReport, markdownReport, summaryTable } from './report.ts';
+export { migrationBase, remaining, svelteCheck } from './remaining.ts';
+export { codemodReport, markdownReport, nextReport, remainingReport, summaryTable } from './report.ts';
 export { loadRules } from './rules.ts';
 export { currentBranch, setup } from './setup.ts';
 export type * from './types.ts';

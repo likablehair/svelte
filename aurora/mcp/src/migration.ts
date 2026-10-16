@@ -26,6 +26,9 @@ export interface MigrateModule {
 	codemod(dir: string, index: RuleIndex, options?: { write?: boolean }): { files: unknown[] };
 	codemodReport(result: unknown): string;
 	currentBranch(dir: string): string;
+	remaining(dir: string, index: RuleIndex): unknown;
+	nextReport(result: unknown, file?: string): string;
+	remainingReport(result: unknown): string;
 }
 
 let loaded: Promise<MigrateModule | undefined> | undefined;

@@ -2,6 +2,7 @@ import { basename, dirname } from 'node:path';
 import type { Analysis } from './analyze.ts';
 import type { CodemodChange, CodemodResult, CodemodSkip } from './codemod.ts';
 import type { Finding } from './match.ts';
+import type { ErrorPoint, Remaining, ReviewPoint } from './remaining.ts';
 
 export const appLabel = (dir: string) =>
 	basename(dir) === 'frontend' ? basename(dirname(dir)) : basename(dir);
@@ -357,5 +358,138 @@ export function codemodReport(r: CodemodResult): string {
 	const perFile = new Map<string, number>();
 	for (const c of r.changes) perFile.set(c.file, (perFile.get(c.file) ?? 0) + 1);
 	out.push('## Files', '', table(['file', 'changes'], [...r.files.map((f) => [f.rel, perFile.get(f.rel) ?? 0]), ...r.deleted.map((f) => [f, 'deleted'])]), '');
+	return out.join('\n');
+}
+
+const KIND_LABEL: Record<ReviewPoint['kind'], string> = {
+	manual: 'changed',
+	check: 'done, to check',
+	'not-done': 'not done',
+	default: 'new default'
+};
+
+const lineList = (lines: number[], max = 8) =>
+	lines.length > max ? `${lines.slice(0, max).join(', ')} … +${lines.length - max}` : lines.join(', ');
+
+function errorGroups(errors: ErrorPoint[]) {
+	const groups = new Map<string, { point: ErrorPoint; lines: number[] }>();
+	for (const e of errors) {
+		const key = e.explanations.length
+			? `${e.component}|${e.name}|${e.explanations.map((x) => x.id).join(',')}|${e.via?.tag ?? ''}`
+			: `${e.line}|${e.message}`;
+		const group = groups.get(key);
+		if (group) {
+			if (!group.lines.includes(e.line)) group.lines.push(e.line);
+		} else groups.set(key, { point: e, lines: [e.line] });
+	}
+	return [...groups.values()];
+}
+
+function errorsMarkdown(errors: ErrorPoint[]): string[] {
+	const out: string[] = [];
+	for (const { point, lines } of errorGroups(errors)) {
+		const what = [point.component, point.name && `\`${point.name}\``, point.via && `on \`<${point.via.tag}>\``].filter(Boolean).join(' ');
+		out.push(`- **line ${lineList(lines)}**${what ? ` · ${what}` : ''}: ${short(point.message.split('\n')[0], 220)}`);
+		for (const x of point.explanations) out.push(`  - ${x.text} \`${x.id}\``);
+		if (!point.explanations.length && !point.hint) out.push('  - No migration rule matches: app code, often a consequence of another error in this file.');
+		if (point.hint) out.push(`  - ${point.hint}`);
+	}
+	return out;
+}
+
+function reviewMarkdown(points: ReviewPoint[]): string[] {
+	return points.map(
+		(p) => `- line ${lineList(p.lines)} · ${KIND_LABEL[p.kind]}${p.component ? ` · ${p.component}` : ''}: ${p.title}${p.text && p.text !== p.title ? ` ${short(p.text, 400)}` : ''} \`${p.id}\``
+	);
+}
+
+function pagesMarkdown(r: Remaining): string[] {
+	const out: string[] = [];
+	if (r.layouts.length)
+		out.push(
+			'Layouts (every page under them):',
+			'',
+			table(['route', 'file', 'changed files', 'components to look at'], r.layouts.map((p) => [p.route, p.file, p.touched.length, p.components.join(', ')])),
+			''
+		);
+	if (r.pages.length)
+		out.push(
+			table(['page', 'changed files', 'components to look at', 'file'], r.pages.map((p) => [p.route, p.touched.length, p.components.join(', '), p.file])),
+			''
+		);
+	if (r.global.length) out.push(`Changed files no page imports (app shell, config, or loaded in a way the tool cannot follow): ${r.global.map((f) => `\`${f}\``).join(', ')}`, '');
+	return out;
+}
+
+function summaryLine(r: Remaining) {
+	const errorFiles = r.files.filter((f) => f.errors.length).length;
+	const reviewPoints = r.files.reduce((sum, f) => sum + f.review.length, 0);
+	return [
+		r.check.ran ? `svelte-check: **${r.check.errors} errors** in ${errorFiles} files` : `svelte-check did not run: ${r.check.error ?? 'unknown error'}`,
+		`${reviewPoints} points to look at in ${r.files.filter((f) => f.review.length).length} files`,
+		`${r.pages.length} pages to try`
+	].join(' · ');
+}
+
+export function remainingReport(r: Remaining): string {
+	const out: string[] = [`# Remaining points: ${appLabel(r.dir)}`, '', `\`${r.dir}\`${r.base ? ` · v4 code read from commit \`${r.base.slice(0, 10)}\`` : ''}`, '', summaryLine(r), ''];
+	if (!r.base) out.push('The v4 code could not be read from git (no repository or no branch base): only the svelte-check errors are listed.', '');
+	if (r.files.length)
+		out.push(
+			'## Files',
+			'',
+			'Errors first (fix them in this order: components before the pages that use them), then the files with only points to look at. `next` shows one file with the details.',
+			'',
+			table(
+				['file', 'errors', 'to look at', 'components'],
+				r.files.map((f) => [
+					f.file,
+					f.errors.length || '',
+					f.review.length || '',
+					[...new Set([...f.errors.map((e) => e.component), ...f.review.map((p) => p.component)].filter(Boolean))].join(', ')
+				])
+			),
+			''
+		);
+	out.push('## Pages to try', '', 'Pages that use the changed files, with the components whose behaviour or look changed there. The apps have no tests: open each page, in light and dark, desktop and phone.', '', ...pagesMarkdown(r));
+	if (r.general.length)
+		out.push(
+			'## Changed for every use (per component)',
+			'',
+			table(['component', 'step', 'what changed', 'uses', 'files'], r.general.map((g) => [g.component, g.id, short(g.summary, 240), g.usages, g.files])),
+			''
+		);
+	if (r.appSteps.length)
+		out.push('## App steps', '', table(['step', 'what', 'needed'], r.appSteps.map((s) => [s.id, short(s.summary, 240), s.needed === null ? 'look' : 'yes'])), '');
+	if (r.dropped.length) {
+		out.push('## Look dropped with the wrappers', '', 'Put any of it back as CSS variables in the app CSS only if the page really needs it.', '');
+		for (const w of r.dropped) out.push(`- **${basename(w.wrapper, '.svelte')}** (${w.target ?? '?'}): ${w.dropped.map((d) => `\`${short(d, 90)}\``).join(', ')}`);
+		out.push('');
+	}
+	return out.join('\n');
+}
+
+export function nextReport(r: Remaining, file?: string): string {
+	const out: string[] = [`# Next: ${appLabel(r.dir)}`, '', summaryLine(r), ''];
+	const target = file ? r.files.find((f) => f.file === file || f.file.endsWith(`/${file}`)) : r.files.find((f) => f.errors.length);
+	if (file && !target) {
+		out.push(`Nothing left in \`${file}\`.`);
+		return out.join('\n');
+	}
+	if (!r.check.ran) out.push(`svelte-check did not run (${r.check.error ?? 'unknown error'}): install the app dependencies and run it again.`, '');
+	if (target) {
+		out.push(`## ${target.file}`, '');
+		if (target.errors.length) out.push(`### Errors (${target.errors.length})`, '', ...errorsMarkdown(target.errors), '');
+		if (target.review.length)
+			out.push('### To look at in this file', '', 'Behaviour or look changed, or done by the tool with a warning: read them while you are in the file; most need no code.', '', ...reviewMarkdown(target.review), '');
+		const others = r.files.filter((f) => f.errors.length && f !== target);
+		if (others.length)
+			out.push('### Then', '', ...others.slice(0, 10).map((f) => `- ${f.file}: ${f.errors.length} errors`), ...(others.length > 10 ? [`- … ${others.length - 10} more files`] : []), '');
+		out.push('Run `next` again after the changes: svelte-check runs again and the list updates.');
+		return out.join('\n');
+	}
+	out.push('No svelte-check errors left. What is left is to look: the points below and the pages.', '');
+	for (const f of r.files.filter((f) => f.review.length)) out.push(`### ${f.file}`, '', ...reviewMarkdown(f.review), '');
+	out.push('## Pages to try', '', ...pagesMarkdown(r));
 	return out.join('\n');
 }

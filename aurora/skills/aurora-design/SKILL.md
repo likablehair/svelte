@@ -65,7 +65,7 @@ The facts come from the `aurora` MCP server, which reads the version installed i
 - Words of the user's job, one term per concept, sentence case, short. Errors say what happened and how to fix it, never blame. Write in the app's language (`setDefaultLocale`), with the library texts left as they are.
 
 **Look and style**
-- Library components used directly, no local wrappers. Page CSS uses only tokens (`get_tokens`): no hex, rgb or named colors, no new shadows or radii. Component variations go through their CSS variables (`get_component` → CSS variables). Motion only to explain a change, with the token durations.
+- Library components used directly. A local wrapper only when the app needs something the library does not do (a feature, not a look), and then one wrapper reused everywhere in the app, never a copy per page. Repeated UI becomes an app component that the pages use, not markup written in one page: pages written by hand drift apart. Page CSS uses only tokens (`get_tokens`): no hex, rgb or named colors, no new shadows or radii. Component variations go through their CSS variables (`get_component` → CSS variables). Motion only to explain a change, with the token durations.
 - A different look is a theme, not page CSS: `reference/themes.md`.
 
 ## Which component

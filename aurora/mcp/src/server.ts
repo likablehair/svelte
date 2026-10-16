@@ -307,7 +307,7 @@ function registerMigration(server: McpServer, context: ServerContext) {
 		{
 			title: 'Apply the mechanical changes',
 			description:
-				'Renames components, props, events, snippets and CSS variables, removes { detail }, turns MDI names into @mdi/js imports, dissolves the Standard* wrappers into the library components (meaning and layout kept, look dropped and listed in the report). Runs on the branch made by migration_setup; dryRun writes nothing. Can be run again. Never commits.',
+				'Renames components, props, events, snippets and CSS variables, removes { detail }, turns MDI names into @mdi/js imports, dissolves the Standard* and LabelAnd* app components into the library components (meaning and layout kept, look dropped and listed in the report). Runs on the branch made by migration_setup; dryRun writes nothing. Can be run again. Never commits.',
 			inputSchema: { dir: appDir, dryRun: z.boolean().optional(), branch: z.string().optional() },
 			annotations: { destructiveHint: true, idempotentHint: true, openWorldHint: false }
 		},
@@ -321,6 +321,30 @@ function registerMigration(server: McpServer, context: ServerContext) {
 				const result = m.codemod(path, m.loadRules(), { write: !dryRun });
 				return `${m.codemodReport(result)}\n${dryRun ? 'Dry run: nothing was written.' : `${result.files.length} files written. Nothing was committed.`}`;
 			})
+	);
+
+	server.registerTool(
+		'migration_next',
+		{
+			title: 'Next remaining point of the migration',
+			description:
+				'After migration_codemod: runs svelte-check in the app and returns the next file to fix, each error explained by the migration rule behind it, plus what to look at in the same file. With no errors left, returns what to look at and the pages to try. Call it again after each file. Read-only (svelte-kit sync aside).',
+			inputSchema: { dir: appDir, file: z.string().optional().describe('Show this file instead of the next one') },
+			annotations: { readOnlyHint: true, openWorldHint: false }
+		},
+		async ({ dir, file }) => run((m) => m.nextReport(m.remaining(target(dir), m.loadRules()), file))
+	);
+
+	server.registerTool(
+		'migration_status',
+		{
+			title: 'Remaining points of the whole app',
+			description:
+				'Overview after migration_codemod: files with svelte-check errors and points to look at, pages to try (pages that use the changed files), changes per component, app steps, look dropped with the wrappers. Read-only.',
+			inputSchema: { dir: appDir },
+			annotations: { readOnlyHint: true, openWorldHint: false }
+		},
+		async ({ dir }) => run((m) => m.remainingReport(m.remaining(target(dir), m.loadRules())))
 	);
 
 	server.registerTool(
@@ -346,7 +370,7 @@ function registerMigration(server: McpServer, context: ServerContext) {
 					role: 'user',
 					content: {
 						type: 'text',
-						text: `Migrate this app from ${PACKAGE} v4 to v5. Follow the ${MIGRATE_SKILL} skill: migration_analyze, then migration_setup (I will run the install), migration_codemod, then the remaining points file by file with get_component and validate_usage, and svelte-check at the end. Do not commit.`
+						text: `Migrate this app from ${PACKAGE} v4 to v5. Follow the ${MIGRATE_SKILL} skill: migration_analyze, then migration_setup (I will run the install), migration_codemod, then migration_next file by file (with migration_rules, get_component and validate_usage), until no errors are left; then show me the pages to try. Do not commit.`
 					}
 				}
 			]

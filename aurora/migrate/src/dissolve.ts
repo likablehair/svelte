@@ -6,7 +6,7 @@ import type { RuleIndex } from './rules.ts';
 import type { Node } from './svelte.ts';
 
 const LIB = '@likable-hair/svelte';
-const WRAPPER = /^Standard[A-Z]\w*\.svelte$/;
+const WRAPPERS = [/^Standard[A-Z]\w*\.svelte$/, /^LabelAnd[A-Z]\w*\.svelte$/];
 const LAYOUT_VAR = /-(?:(?:min|max)-)?width$|-margin(?:-(?:top|right|bottom|left))?$|-display$|-flex(?:-(?:grow|shrink|basis))?$|-align-self$/;
 const TRIVIAL = new Set(['undefined', 'null', 'false', "''", '""', '``']);
 
@@ -71,6 +71,7 @@ export interface WrapperPlan {
 	dropped: string[];
 	children: boolean;
 	blockers: string[];
+	inherited?: WrapperPlan;
 }
 
 export interface WrapperSummary {
@@ -130,7 +131,7 @@ function describe(node: Node, text: string) {
 	return open.replace(/\s+/g, ' ').slice(0, 90);
 }
 
-export function planWrapper(path: string, rel: string, text: string, index: RuleIndex): WrapperPlan {
+export function planWrapper(path: string, rel: string, text: string, index: RuleIndex, inherited?: WrapperPlan): WrapperPlan {
 	const plan: WrapperPlan = {
 		path,
 		rel,
@@ -142,7 +143,8 @@ export function planWrapper(path: string, rel: string, text: string, index: Rule
 		ownStyles: new Set(),
 		dropped: [],
 		children: false,
-		blockers: []
+		blockers: [],
+		inherited
 	};
 	const ast = parseSvelte(text);
 	if (!ast) {
@@ -267,12 +269,29 @@ export function planWrapper(path: string, rel: string, text: string, index: Rule
 	const onPath = new Set<Node>();
 	for (let node: Node | undefined = element; node; node = parents.get(node)) onPath.add(node);
 
+	const api = index.rules.v5.components[plan.target];
+	const accepts = (name: string) => !!api && (api.props.includes(name) || (api.native && (name === 'id' || name === 'name')));
+	const ownLabel = (node: Node) => {
+		if (node.type !== 'RegularElement' || node.name !== 'label' || !accepts('label')) return false;
+		const content = (node.fragment.nodes as Node[]).filter((n) => n.type !== 'Comment' && !(n.type === 'Text' && !n.data.trim()));
+		if (content.length !== 1 || content[0].type !== 'ExpressionTag') return false;
+		const refs = references(content[0].expression, tracked);
+		if (refs.length !== 1 || !byLocal.has(refs[0].name)) return false;
+		sinks.get(byLocal.get(refs[0].name)!)!.push({ forward: { to: 'label', bind: false } });
+		for (const attr of node.attributes as Node[])
+			if (attr.type === 'Attribute' && attr.name === 'for') sink(attr, (name) => (accepts(name) ? { forward: { to: name, bind: false } } : { look: true }));
+			else sink(attr, { look: true });
+		plan.dropped.push(`${describe(node, text)} (the component draws its own \`label\`)`);
+		return true;
+	};
+
 	const walk = (nodes: Node[], zone: 'path' | 'covered', where: string) => {
 		for (const node of nodes) {
 			if (node.type === 'Text' || node.type === 'Comment') {
 				if (zone === 'path' && node.type === 'Text' && node.data.trim()) plan.dropped.push(`text "${node.data.trim().slice(0, 40)}"`);
 				continue;
 			}
+			if (zone === 'path' && !onPath.has(node) && ownLabel(node)) continue;
 			if (zone === 'covered' || !onPath.has(node)) {
 				if (zone === 'path') plan.dropped.push(describe(node, text));
 				sink(node, covered(where));
@@ -502,6 +521,19 @@ interface Rewrite {
 	notes: { kind: string; name: string; to?: string; note?: string }[];
 }
 
+function carried(plan: WrapperPlan, name: string, index: RuleIndex): WrapperProp | undefined {
+	if (!plan.rest) return undefined;
+	const inner = plan.inherited?.props.get(name);
+	if (inner) {
+		const h = inner.handling;
+		return h.kind === 'children' || (h.kind === 'forward' && h.to === name) ? undefined : inner;
+	}
+	const recipe = RECIPES[plan.target]?.[name];
+	const api = index.rules.v5.components[plan.target];
+	if (!recipe?.to || recipe.to === name || !api || api.props.includes(name)) return undefined;
+	return { name, local: name, handling: { kind: 'recipe', recipe } };
+}
+
 function rewriteUsage(text: string, usage: Node, plan: WrapperPlan, index: RuleIndex): Rewrite | string {
 	const out: Rewrite = { attrs: [], added: [], notes: [] };
 	const attrs = usage.attributes as Node[];
@@ -522,7 +554,7 @@ function rewriteUsage(text: string, usage: Node, plan: WrapperPlan, index: RuleI
 			}
 			continue;
 		}
-		const prop = plan.props.get(name);
+		const prop = plan.props.get(name) ?? carried(plan, name, index);
 		if (!prop) {
 			if (lateNames.has(name)) {
 				out.attrs.push({ node: attr, text: null });
@@ -692,9 +724,10 @@ function rewriteFile(
 	plans: Map<string, WrapperPlan>,
 	index: RuleIndex,
 	result: DissolveResult,
-	counts: Map<string, { usages: number; dissolved: number }>
+	counts: Map<string, { usages: number; dissolved: number }>,
+	spreadFrom: Map<string, WrapperPlan>
 ): string {
-	if (!text.includes('Standard')) return text;
+	if (![...plans.values()].some((plan) => text.includes(plan.name))) return text;
 	const ast = parseSvelte(text);
 	if (!ast) return text;
 	const programs = [ast.instance?.content, ast.module?.content].filter(Boolean) as Node[];
@@ -764,6 +797,7 @@ function rewriteFile(
 					} else edit.replace(node.start, node.end, next);
 				}
 				insertAttrs(text, edit, usage, rewrite.added);
+				if ((usage.attributes as Node[]).some((a) => a.type === 'SpreadAttribute')) spreadFrom.set(path, plan);
 				count.dissolved++;
 				done++;
 				result.changes.push({ file: rel, line: line(usage), wrapper: plan.name, kind: 'wrapper-dissolved', name: plan.name, to: plan.target });
@@ -813,14 +847,24 @@ const IMPORT_SOURCE = /(?:from\s+|import\s*\(\s*|import\s+)['"]([^'"]+)['"]/g;
 export function dissolve(dir: string, index: RuleIndex, texts: Map<string, string>): DissolveResult {
 	const result: DissolveResult = { texts: new Map(texts), deleted: [], wrappers: [], changes: [], skipped: [] };
 	const plans = new Map<string, WrapperPlan>();
-	for (const [path, text] of texts) if (WRAPPER.test(basename(path))) plans.set(path, planWrapper(path, relative(dir, path), text, index));
-	if (!plans.size) return result;
-	const counts = new Map([...plans.keys()].map((p) => [p, { usages: 0, dissolved: 0 }]));
-	for (const [path, text] of texts) {
-		if (!path.endsWith('.svelte')) continue;
-		const next = rewriteFile(dir, path, relative(dir, path), text, plans, index, result, counts);
-		if (next !== text) result.texts.set(path, next);
+	const counts = new Map<string, { usages: number; dissolved: number }>();
+	const spreadFrom = new Map<string, WrapperPlan>();
+	for (const pattern of WRAPPERS) {
+		const pass = new Map<string, WrapperPlan>();
+		for (const [path, text] of result.texts)
+			if (pattern.test(basename(path))) pass.set(path, planWrapper(path, relative(dir, path), text, index, spreadFrom.get(path)));
+		if (!pass.size) continue;
+		for (const [path, plan] of pass) {
+			plans.set(path, plan);
+			counts.set(path, { usages: 0, dissolved: 0 });
+		}
+		for (const [path, text] of result.texts) {
+			if (!path.endsWith('.svelte')) continue;
+			const next = rewriteFile(dir, path, relative(dir, path), text, pass, index, result, counts, spreadFrom);
+			if (next !== text) result.texts.set(path, next);
+		}
 	}
+	if (!plans.size) return result;
 	const deleted = new Set<string>();
 	for (let changed = true; changed; ) {
 		changed = false;
