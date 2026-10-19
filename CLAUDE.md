@@ -14,7 +14,7 @@ Other projects in the repo:
 - `adonis-filters/`: `@likable-hair/adonis-filters`, prototype of the one `FilterModifierApplier` for the AdonisJS backends (applies the `FilterBuilder` JSON to Lucid queries of AdonisJS 5, 6 and 7). Its dev dependencies (Lucid, AdonisJS) are installed with the rest by `pnpm install`.
 - `skills/`: the `aurora-design` agent skill shipped with the library.
 
-The previous library (v4.3.2) lives on the **`4.x` branch**: it is the reference for component behaviour and gets maintenance fixes only, for the apps not migrated yet. Read it with `git show 4.x:src/lib/<path>` or `git worktree add ../svelte-v4 4.x`. `design/AUDIT.md` lists its known bugs.
+The previous library (v4.3.2) lives on the **`v4` branch**: it is the reference for component behaviour and gets maintenance fixes only, for the apps not migrated yet. Read it with `git show v4:src/lib/<path>` or `git worktree add ../svelte-v4 v4`. `design/AUDIT.md` lists its known bugs.
 
 ## Commands
 

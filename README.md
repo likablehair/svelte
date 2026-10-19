@@ -2,7 +2,7 @@
 
 This repository holds the component library used by Likablehair's web apps: buttons, form fields, tables, dialogs, menus, charts and everything else an app screen is made of. Version 5, called **Aurora**, is a full rewrite for Svelte 5 with a new look, themes and dark mode.
 
-The previous version (4.x) lives on the **`4.x` branch**. It only gets small fixes, for the apps that have not moved to version 5 yet.
+The previous version (4.x) lives on the **`v4` branch**. It only gets small fixes, for the apps that have not moved to version 5 yet.
 
 ## What is in this repository
 

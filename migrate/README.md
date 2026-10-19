@@ -41,4 +41,4 @@ After the codemod the strict v5 types make `svelte-check` flag every use that is
 
 ## Rules
 
-The rules live in `migrations/v4-to-v5/*.ts` of the library repository. `pnpm migrate:rules` compiles them, with the v4 and v5 export lists and the v5 API of every component, into `rules/v4-to-v5.json`, which the tool reads; a test fails when the JSON is out of date. The v4 side (export list, color palette of `main.css`, and the v4 `FilterBuilder` that the tests compare with) comes from `v4/`, a copy of v4.3.2 (the v4 sources live on the `4.x` branch).
+The rules live in `migrations/v4-to-v5/*.ts` of the library repository. `pnpm migrate:rules` compiles them, with the v4 and v5 export lists and the v5 API of every component, into `rules/v4-to-v5.json`, which the tool reads; a test fails when the JSON is out of date. The v4 side (export list, color palette of `main.css`, and the v4 `FilterBuilder` that the tests compare with) comes from `v4/`, a copy of v4.3.2 (the v4 sources live on the `v4` branch).
