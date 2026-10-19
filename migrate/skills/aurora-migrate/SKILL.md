@@ -7,7 +7,7 @@ description: Migrates a Svelte app from @likable-hair/svelte v4 (or v3) to v5 "L
 
 v5 is a rewrite: components, props, callbacks, icons, tokens and CSS changed. The rules are known to the migration tool, so you do not need to know the whole library: follow the phases, and read a component's specs only when a remaining point needs it.
 
-Tools: the `aurora` MCP server (`migration_analyze`, `migration_setup`, `migration_codemod`, `migration_next`, `migration_status`, `migration_rules`, plus `get_component`, `get_example`, `validate_usage`). Without MCP, the same phases are commands: `npx @likable-hair/svelte-migrate analyze|setup|codemod|next|status <app-dir>`.
+Tools: the `aurora` MCP server (`migration_analyze`, `migration_setup`, `migration_codemod`, `migration_next`, `migration_status`, `migration_rules`, plus `get_component`, `get_example`, `validate_usage`). Without MCP, the same phases are commands: `npx @likable-hair/svelte-migrate analyze|setup|codemod|next|status <app-dir>`, or `node <library repository>/migrate/src/cli.ts analyze|setup|codemod|next|status <app-dir>` from a clone of the library repository while the package is not published.
 
 ## Ground rules
 
