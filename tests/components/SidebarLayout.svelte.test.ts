@@ -161,14 +161,14 @@ describe('SidebarLayout', () => {
 		expect(toggle.getBoundingClientRect().right).toBeGreaterThan(sidebar.right - 20);
 	});
 
-	test('narrow, the logo turns into the toggle button under the pointer and with the keyboard focus', async () => {
+	test('narrow, the logo turns into the toggle button while the pointer is on the sidebar and with the keyboard focus', async () => {
 		const screen = await render(SidebarLayout, { options, logoSnippet: stateSnippet('logo') });
 		const toggle = screen.getByRole('button', { name: 'Sidebar' }).element();
 		const logo = screen.container.querySelector('.aurora-sidebar-layout-logo')!;
 		await userEvent.hover(screen.getByRole('main'));
 		await expect.poll(() => getComputedStyle(toggle).opacity).toBe('0');
 		expect(getComputedStyle(logo).opacity).toBe('1');
-		await page.elementLocator(screen.container.querySelector('.aurora-sidebar-layout-top')!).hover();
+		await userEvent.hover(screen.getByRole('link', { name: 'Clients' }));
 		await expect.poll(() => getComputedStyle(toggle).opacity).toBe('1');
 		await expect.poll(() => getComputedStyle(logo).opacity).toBe('0');
 		await userEvent.hover(screen.getByRole('main'));

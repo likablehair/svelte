@@ -1,5 +1,5 @@
 <!-- @component Collapsible sidebar
-The default `expandOn="toggle"`: the button at the top of the sidebar widens and narrows it, pushing the content. Narrow, the logo turns into that button under the pointer, and a click on an empty spot of the rail widens the sidebar too. Narrow, the menu shows only icons, with tooltips and the children of a parent in a menu. Make the window narrower than 1024px to get the menu button and the drawer. In an app `currentPath` is `page.url.pathname`; here the links only change `path`. -->
+The default `expandOn="toggle"`: the button at the top of the sidebar widens and narrows it, pushing the content. Narrow, the logo turns into that button while the pointer is on the sidebar, and a click on an empty spot of the rail widens the sidebar too. Narrow, the menu shows only icons, with tooltips and the children of a parent in a menu. Make the window narrower than 1024px to get the menu button and the drawer. In an app `currentPath` is `page.url.pathname`; here the links only change `path`. -->
 <script lang="ts">
 	import {
 		mdiAccountMultipleOutline,

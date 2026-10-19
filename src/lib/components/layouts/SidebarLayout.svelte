@@ -1,5 +1,5 @@
 <!-- @component
-Page shell of an app: a sidebar on the left (logo, menu, user), a bar at the top and the content. The window scrolls: the bar and the sidebar stay in place. On desktop the sidebar is a narrow rail of icons that widens according to `expandOn`: `toggle` with a button at the top of the sidebar, next to the logo (while the sidebar is narrow the logo turns into the button under the pointer or the keyboard focus, and a click on an empty spot of the rail widens it too), pushing the content (default); `hover` and `click` over the content; `none` only through `sidebarExpanded` (`sidebarExpanded` with `none` keeps it always wide). Up to 1024px wide (the `mAndDown` breakpoint) the sidebar moves into a `Drawer` opened by a menu button in the bar, which closes when an option is chosen or `currentPath` changes. The menu is a `HierarchyMenu` drawn from `options` (pass `currentPath={page.url.pathname}` to select the option of the page), or `menuSnippet`; when it is taller than the window it scrolls by itself to show the selected option. The bar shows the menu button on mobile, then `headerSnippet`; with `sidebarSnippet` the toggle button of `toggle` stays in the bar. A "Skip to content" link appears on the first Tab. The state is exposed as `data-expand-on` and `data-expanded` on the root.
+Page shell of an app: a sidebar on the left (logo, menu, user), a bar at the top and the content. The window scrolls: the bar and the sidebar stay in place. On desktop the sidebar is a narrow rail of icons that widens according to `expandOn`: `toggle` with a button at the top of the sidebar, next to the logo (while the sidebar is narrow the logo turns into the button as soon as the pointer is on the sidebar or the button has the keyboard focus, and a click on an empty spot of the rail widens it too), pushing the content (default); `hover` and `click` over the content; `none` only through `sidebarExpanded` (`sidebarExpanded` with `none` keeps it always wide). Up to 1024px wide (the `mAndDown` breakpoint) the sidebar moves into a `Drawer` opened by a menu button in the bar, which closes when an option is chosen or `currentPath` changes. The menu is a `HierarchyMenu` drawn from `options` (pass `currentPath={page.url.pathname}` to select the option of the page), or `menuSnippet`; when it is taller than the window it scrolls by itself to show the selected option. The bar shows the menu button on mobile, then `headerSnippet`; with `sidebarSnippet` the toggle button of `toggle` stays in the bar. A "Skip to content" link appears on the first Tab. The state is exposed as `data-expand-on` and `data-expanded` on the root.
 -->
 <script lang="ts">
 	import '../../css/tokens.css';
@@ -497,12 +497,12 @@ Page shell of an app: a sidebar on the left (logo, menu, user), a bar at the top
 				opacity: 0;
 			}
 
-			.aurora-sidebar-layout:not([data-expanded]) .aurora-sidebar-layout-top[data-logo]:hover :global(.aurora-sidebar-layout-dock),
+			.aurora-sidebar-layout:not([data-expanded]) .aurora-sidebar-layout-sidebar:hover .aurora-sidebar-layout-top[data-logo] :global(.aurora-sidebar-layout-dock),
 			.aurora-sidebar-layout:not([data-expanded]) .aurora-sidebar-layout-top[data-logo] :global(.aurora-sidebar-layout-dock:focus-visible) {
 				opacity: 1;
 			}
 
-			.aurora-sidebar-layout:not([data-expanded]) .aurora-sidebar-layout-top[data-logo]:hover .aurora-sidebar-layout-logo,
+			.aurora-sidebar-layout:not([data-expanded]) .aurora-sidebar-layout-sidebar:hover .aurora-sidebar-layout-top[data-logo] .aurora-sidebar-layout-logo,
 			.aurora-sidebar-layout:not([data-expanded]) .aurora-sidebar-layout-top[data-logo]:has(:global(.aurora-sidebar-layout-dock:focus-visible)) .aurora-sidebar-layout-logo {
 				opacity: 0;
 			}
