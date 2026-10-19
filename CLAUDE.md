@@ -11,6 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Other projects in the repo:
 - `migrate/`: `@likable-hair/svelte-migrate`, the v4 → v5 migration tool (`analyze`, `setup`, `codemod`, `next`, `status`). Rules in `migrations/v4-to-v5/`, compiled into `migrate/rules/v4-to-v5.json`. `migrate/v4/` is a frozen copy of the v4 files the tool and the tests read.
 - `mcp/`: `@likable-hair/svelte-mcp`, the MCP server for coding agents (component specs, `validate_usage`, `migration_*` tools).
+- `adonis-filters/`: `@likable-hair/adonis-filters`, prototype of the one `FilterModifierApplier` for the AdonisJS backends (applies the `FilterBuilder` JSON to Lucid queries of AdonisJS 5, 6 and 7). Its dev dependencies (Lucid, AdonisJS) live in its own `node_modules`: `npm install --prefix adonis-filters` before `npm run check` and the `node` tests.
 - `skills/`: the `aurora-design` agent skill shipped with the library.
 
 The previous library (v4.3.2) lives on the **`4.x` branch**: it is the reference for component behaviour and gets maintenance fixes only, for the apps not migrated yet. Read it with `git show 4.x:src/lib/<path>` or `git worktree add ../svelte-v4 4.x`. `design/AUDIT.md` lists its known bugs.
@@ -20,7 +21,7 @@ The previous library (v4.3.2) lives on the **`4.x` branch**: it is the reference
 All from the repository root.
 
 - `npx vite dev --port 5180`: docs site (the skill assumes this port; `npm run dev` uses Vite's default).
-- `npm run check`: svelte-kit sync, svelte-check, then `tsc` for `migrate/` and `mcp/` (baseline: 0 errors, 0 warnings).
+- `npm run check`: svelte-kit sync, svelte-check, then `tsc` for `migrate/`, `mcp/` and `adonis-filters/` (baseline: 0 errors, 0 warnings).
 - Tests: Vitest in browser mode (Chromium and Firefox) for components, a `node` project for utilities, rules, the migration tool and the MCP; Playwright for the visual test of every docs example. Run only the tests of what you touched (see "Regola dei test" in the skill): the full `npm run test` and `npm run test:visual` are slow and memory-hungry.
 - `npm run package`: svelte-package, `dist/spec.json` for the MCP, publint.
 - `npm run migrate -- <command> <app-dir>`: the migration tool; `npm run migrate:rules` after changing a rule, `npm run migrate:compat` to regenerate `src/lib/css/v4-compat.css`.

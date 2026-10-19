@@ -37,7 +37,7 @@ export default defineConfig({
 			{
 				test: {
 					name: 'node',
-					include: ['tests/node/**/*.test.ts', 'migrate/tests/**/*.test.ts', 'mcp/tests/**/*.test.ts'],
+					include: ['tests/node/**/*.test.ts', 'migrate/tests/**/*.test.ts', 'mcp/tests/**/*.test.ts', 'adonis-filters/tests/**/*.test.ts'],
 					environment: 'node',
 					css: { include: [/\.css(\?|$)/] },
 					expect: { requireAssertions: true }
