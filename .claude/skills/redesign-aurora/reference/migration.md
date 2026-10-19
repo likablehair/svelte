@@ -223,7 +223,7 @@ Analisi della trascrizione della sessione aperta in tatum (subagente; report com
 | P242 | aspetto: SidebarLayout **toglie** (non rinomina) le variabili di colore v4 che usano `--global-color-background-*` e `content-padding="0px"`; `local/PageTitle.ts` conserva lo spazio sotto il titolo (16px, come i 20px di ConfirmOrCancelButtons); segnalare `bg-[rgb(var(--global-color-background-200))]` e simili con il consiglio `surface` + `border`; nella skill, fase 5: screenshot chiaro/scuro delle pagine da provare se l'app gira | i tre difetti visti dall'utente |
 | P243 | il rapporto del codemod non elenca "done, to check" in file che il codemod stesso ha cancellato | 21 su 91 in tatum |
 | P244 | `local/ThemeSwitch.ts`: `appearanceScript` (o il passo di `setup`) legge una volta il vecchio cookie `theme` di `/api/setTheme`, così chi aveva scelto il tema non lo perde; altrimenti dirlo nella regola | oggi la regola dice "users keep it", non vero per tatum |
-| P245 | testi delle regole senza nomi di altre app (DataTable, global, Filters): gli agenti di ogni app li leggono | permesso dalla regola sui riferimenti (sono app della libreria), solo pulizia |
+| P245 | testi delle regole senza nomi di altre app (DataTable, global, Filters): gli agenti di ogni app li leggono | **approvata e fatta il 2026-10-19** ("toglili"), anche in `MIGRATION.md` |
 
 ## Laboratorio su addibox (2026-10-19, dopo P236–P244)
 

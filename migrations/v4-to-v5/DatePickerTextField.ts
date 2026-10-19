@@ -342,7 +342,7 @@ export default {
 			id: 'date-picker-text-field-wrappers',
 			kind: 'edit',
 			summary:
-				'Several apps wrap the field (`StandardDatePickerTextfield` in addibox, contattorapido, new-vigipass, stramoniumai); some wrappers forward only a few props (new-vigipass drops `menuOpened`, `ondayClick` and the rest).',
+				'Several apps wrap the field (usually `StandardDatePickerTextfield`); some wrappers forward only a few props (for example they drop `menuOpened`, `ondayClick` and the rest).',
 			action:
 				'Migrate the wrapper first: type its props as `ComponentProps<typeof DatePickerTextField>` and spread `{...rest}` on the field, set `locale="it"` inside the wrapper when the app has no `setDefaultLocale("it")` (the Italian texts come with it: drop the Italian `invalidText`, `startLabel`, `endLabel`, `openLabel`, `closeLabel` the wrapper passed only to translate), and rename what it forwards (`menuOpened` → `open`, `type` → `range`, `oninput` → `onchange`). Then migrate its call sites with the same rules, since they pass the v4 names.',
 			scope: 'app'

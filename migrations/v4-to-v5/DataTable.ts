@@ -239,7 +239,7 @@ const manual: ManualStep[] = [
 		id: 'data-table-wrappers',
 		kind: 'edit',
 		summary:
-			'Many apps wrap the v4 tables (`StandardPaginatedTable`, `<Entity>PaginatedTable`, a `PaginatedTable` with `fetcher` in evote and epass, `LocalPaginatedTable` in lupette) mostly to repeat the same fetch, the same defaults (`lang="it"`, `editFilterMode`) and the same column drawer.',
+			'Many apps wrap the v4 tables (`StandardPaginatedTable`, `<Entity>PaginatedTable`, a local `PaginatedTable` with `fetcher`, `LocalPaginatedTable`) mostly to repeat the same fetch, the same defaults (`lang="it"`, `editFilterMode`) and the same column drawer.',
 		action:
 			'Migrate the wrapper once to `DataTable` with a `loader`, then check whether it still adds anything: set `setDefaultLocale(\'it\')` in the root layout instead of `lang`, and use `columnManager` instead of the copied drawer. For rows already in memory (LocalPaginatedTable) use `Table` with `Paginator`: DataTable always asks the server.',
 		scope: 'app'

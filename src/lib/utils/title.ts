@@ -10,7 +10,7 @@ export interface TitleContext {
 
 /**
  * Lets every `PageHeader` rendered inside the component that calls it write the title of the browser tab, in the
- * format of the app: `setTitleTemplate('{title} · Tatum')` turns a page titled "Users" into "Users · Tatum". Call it
+ * format of the app: `setTitleTemplate('{title} · My App')` turns a page titled "Users" into "Users · My App". Call it
  * while a component initializes, like `setContext`, usually in the root `+layout.svelte` next to the `<title>` the
  * pages without a `PageHeader` keep: when a page with a `PageHeader` is left for one without, that title comes back.
  * A function receives the title and returns the whole text. Only a `PageHeader` with `headingLevel` 1 writes it;
