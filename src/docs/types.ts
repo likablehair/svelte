@@ -71,6 +71,7 @@ export interface ComponentDoc extends ComponentEntry {
 	methods: MethodDoc[];
 	cssVars: CssVarDoc[];
 	cssDefaultsOnly: CssDefault[];
+	uses: string[];
 	types: TypeDoc[];
 }
 

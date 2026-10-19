@@ -202,13 +202,26 @@ describe('codemod: props, snippets, CSS variables', () => {
 		const { read, result } = run({
 			'src/A.svelte': svelte(
 				"\timport { Avatar } from '@likable-hair/svelte';",
-				'<Avatar --avatar-width="32px" --avatar-height="32px" />\n<Avatar --avatar-width="32px" --avatar-height="40px" />'
+				'<Avatar --avatar-width="50px" --avatar-height="50px" />\n<Avatar --avatar-width="50px" --avatar-height="60px" />'
 			)
 		});
 		const out = read('src/A.svelte');
-		expect(out).toContain('<Avatar --avatar-size="32px" />');
-		expect(out).toContain('<Avatar --avatar-size="32px" --avatar-height="40px" />');
+		expect(out).toContain('<Avatar --avatar-size="50px" />');
+		expect(out).toContain('<Avatar --avatar-size="50px" --avatar-height="60px" />');
 		expect(result.skipped.find((s) => s.name === '--avatar-height')?.reason).toContain('another value');
+	});
+
+	test('a style prop whose value is one of the sizes becomes the size prop', () => {
+		const { read, result } = run({
+			'src/A.svelte': svelte(
+				"\timport { Avatar } from '@likable-hair/svelte';",
+				'<Avatar --avatar-width="32px" --avatar-height="32px" />\n<Avatar --avatar-width="40px" />\n<Avatar size="lg" --avatar-width="32px" />\n<Avatar --avatar-width="32px" --avatar-height="40px" />'
+			)
+		});
+		const out = read('src/A.svelte');
+		expect(out).toContain('<Avatar size="sm" />\n<Avatar />\n<Avatar size="lg" --avatar-size="32px" />');
+		expect(out).toContain('<Avatar size="sm" --avatar-height="40px" />');
+		expect(result.skipped.filter((s) => s.name === '--avatar-height')).toHaveLength(1);
 	});
 
 	test('renames a variable everywhere the app writes or reads it', () => {
@@ -1067,3 +1080,113 @@ describe('codemod: local copies', () => {
 	});
 });
 
+describe('codemod: CSS variables v5 does not have', () => {
+	test('removes from the app stylesheets the v4 variables the rules drop, and flags the others', () => {
+		const css = [
+			':root {',
+			'  --button-default-hover-color: white;',
+			'  --chip-default-color: white;',
+			'  --paginator-default-page-button-hover-color: white;',
+			'  --color-inverted-selector-default-selected-color: white;',
+			'  --my-app-gap: 4px;',
+			'  --button-default-text-color: white;',
+			'}',
+			'.x { color: var(--chip-default-color); }',
+			''
+		].join('\n');
+		const { read, result } = run({ 'src/app.css': css });
+		const out = read('src/app.css');
+		expect(out).not.toContain('--button-default-hover-color');
+		expect(out).toContain('--button-default-primary-text-color: white;');
+		expect(out).toContain('--my-app-gap: 4px;');
+		expect(out).toContain(':root {\n  --chip-default-color: white;');
+		const removed = result.changes.find((c) => c.name === '--button-default-hover-color')!;
+		expect(removed).toMatchObject({ kind: 'css-var-removed', check: true });
+		const flagged = result.skipped.filter((s) => s.kind === 'css-var-unknown').map((s) => s.name);
+		expect(flagged).toEqual(['--chip-default-color', '--paginator-default-page-button-hover-color', '--color-inverted-selector-default-selected-color']);
+		expect(result.skipped.find((s) => s.name === '--chip-default-color')!.reason).toContain('--chip-default-selected-color');
+	});
+
+	test('the v4 button shadow goes to every variant and state, unless the block sets the hover one', () => {
+		const { read } = run({
+			'src/app.css': ':root {\n  --button-default-box-shadow: none !important;\n}\n.flat {\n  --button-default-box-shadow: none;\n  --button-default-hover-box-shadow: 0 1px 2px black\n}\n'
+		});
+		const out = read('src/app.css');
+		expect(out).toContain(
+			[
+				':root {',
+				'  --button-default-primary-box-shadow: none !important;',
+				'  --button-default-secondary-box-shadow: none !important;',
+				'  --button-default-danger-box-shadow: none !important;',
+				'  --button-default-gradient-box-shadow: none !important;',
+				'  --button-default-primary-hover-box-shadow: none !important;',
+				'  --button-default-secondary-hover-box-shadow: none !important;',
+				'  --button-default-danger-hover-box-shadow: none !important;',
+				'  --button-default-gradient-hover-box-shadow: none !important;',
+				'}'
+			].join('\n')
+		);
+		const flat = out.slice(out.indexOf('.flat'));
+		expect(flat).not.toContain('--button-default-primary-hover-box-shadow: none');
+		expect(flat).toContain('--button-default-primary-hover-box-shadow: 0 1px 2px black;\n  --button-default-secondary-hover-box-shadow: 0 1px 2px black;');
+	});
+
+	test('a style prop with the value of the v5 default goes, unless the app sets that default', () => {
+		const { read, result } = run({
+			'src/A.svelte': svelte(
+				"\timport { SimpleTextField, Autocomplete } from '@likable-hair/svelte';",
+				'<SimpleTextField --simple-textfield-width="100%" />\n<SimpleTextField --simple-text-field-width="50%" />\n<Autocomplete --autocomplete-default-width="100%" />'
+			),
+			'src/B.svelte': svelte("\timport { Autocomplete } from '@likable-hair/svelte';", '<Autocomplete --autocomplete-width="100%" />'),
+			'src/app.css': ':root {\n  --autocomplete-default-width: 300px;\n}\n'
+		});
+		expect(read('src/A.svelte')).toContain('<SimpleTextField />\n<SimpleTextField --simple-text-field-width="50%" />\n<Autocomplete --autocomplete-default-width="100%" />');
+		expect(read('src/B.svelte')).toContain('<Autocomplete --autocomplete-width="100%" />');
+		expect(result.changes.find((c) => c.name === '--simple-textfield-width')?.note).toContain('v5 default');
+	});
+
+	test('IconsDropdown loses the color v4 set on the inner Dropdown', () => {
+		const { read } = run({
+			'src/A.svelte': svelte(
+				"\timport { IconsDropdown } from '@likable-hair/svelte';",
+				'<IconsDropdown items={[]} --autocomplete-selected-item-color="white" />'
+			)
+		});
+		expect(read('src/A.svelte')).toContain('<IconsDropdown items={[]} />');
+	});
+});
+
+describe('codemod: local copies with a variant', () => {
+	const userAvatar = svelte(
+		"\timport { Avatar, DescriptiveAvatar } from '@likable-hair/svelte'\n\tlet { username, description = '', showTitleAndDescription = true } = $props()",
+		'{#if showTitleAndDescription}\n\t<DescriptiveAvatar title={username} subtitle={description} />\n{:else}\n\t<Avatar text={username.substring(0, 2)} />\n{/if}'
+	);
+
+	test('a use with the literal value of the variant gets its component, the others the main one', () => {
+		const { read, result } = run({
+			'src/lib/components/common/UserAvatar.svelte': userAvatar,
+			'src/A.svelte': svelte(
+				"\timport UserAvatar from '$lib/components/common/UserAvatar.svelte'",
+				'<UserAvatar username={name} description={mail} showTitleAndDescription={false} --avatar-width="32px" --avatar-height="32px" --user-avatar-font-size="3rem" />\n<UserAvatar username={name} description={mail} />'
+			)
+		});
+		const out = read('src/A.svelte');
+		expect(out).toContain("import { Avatar, DescriptiveAvatar } from '@likable-hair/svelte'");
+		expect(out).toContain('<Avatar name={name} size="sm" />');
+		expect(out).toContain('<DescriptiveAvatar title={name} subtitle={mail} />');
+		expect(result.deleted).toContain('src/lib/components/common/UserAvatar.svelte');
+	});
+
+	test('when every use is the variant only its component is imported', () => {
+		const { read } = run({
+			'src/lib/components/common/UserAvatar.svelte': userAvatar,
+			'src/A.svelte': svelte(
+				"\timport UserAvatar from '$lib/components/common/UserAvatar.svelte'",
+				'<UserAvatar username="Mario Rossi" showTitleAndDescription={false} />'
+			)
+		});
+		const out = read('src/A.svelte');
+		expect(out).toContain("import { Avatar } from '@likable-hair/svelte'");
+		expect(out).toContain('<Avatar name="Mario Rossi" />');
+	});
+});

@@ -39,6 +39,19 @@ export function listComponents(): ComponentEntry[] {
 	return entries.sort((a, b) => a.name.localeCompare(b.name));
 }
 
+export function libraryExports(): string[] {
+	return [
+		...new Set(
+			[...lib['/src/lib/index.ts'].matchAll(/export\s+(?:type\s+)?\{([^}]+)\}/g)].flatMap((m) =>
+				m[1]
+					.split(',')
+					.map((part) => part.trim().replace(/^type\s+/, '').split(/\s+as\s+/).pop()!)
+					.filter(Boolean)
+			)
+		)
+	].sort();
+}
+
 export function getComponentDoc(slug: string): ComponentDoc | undefined {
 	const entry = listComponents().find((c) => c.slug === slug);
 	if (!entry) return undefined;
@@ -171,6 +184,24 @@ export function getComponentDoc(slug: string): ComponentDoc | undefined {
 			.map((path) => parse(lib[path], { modern: true }).css?.content.styles ?? '')
 	].join('\n');
 	const instance = instanceVars(styles, prefix);
+	const byFile = new Map(listComponents().map((c) => [`/src/lib/${c.file}`, c.name]));
+	const resolve = (from: string, path: string) => {
+		const parts = from.split('/').slice(0, -1);
+		for (const segment of path.split('/')) {
+			if (segment === '..') parts.pop();
+			else if (segment !== '.') parts.push(segment);
+		}
+		return parts.join('/');
+	};
+	const uses = [
+		...new Set(
+			[`/src/lib/${entry.file}`, ...Object.keys(lib).filter((path) => path.startsWith(partsDir) && path.endsWith('.svelte'))].flatMap((path) =>
+				[...lib[path].matchAll(/import\s+(\w+)\s+from\s+['"](\.{1,2}\/[^'"]+\.svelte)['"]/g)]
+					.map((m) => byFile.get(resolve(path, m[2])))
+					.filter((name): name is string => !!name && name !== entry.name)
+			)
+		)
+	].sort();
 	const cssVars: CssVarDoc[] = instance.map(({ name, fallback }) => {
 		const inherits = fallback.match(new RegExp(`^var\\((${prefix}[\\w-]+)`))?.[1];
 		return {
@@ -213,6 +244,7 @@ export function getComponentDoc(slug: string): ComponentDoc | undefined {
 		methods,
 		cssVars,
 		cssDefaultsOnly,
+		uses,
 		types
 	};
 }

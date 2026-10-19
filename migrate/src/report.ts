@@ -415,7 +415,7 @@ function errorsMarkdown(errors: ErrorPoint[]): string[] {
 
 function reviewMarkdown(points: ReviewPoint[]): string[] {
 	return points.map(
-		(p) => `- line ${lineList(p.lines)} · ${pointLabel(p)}${p.component ? ` · ${p.component}` : ''}: ${p.title}${p.text && p.text !== p.title ? ` ${short(p.text, 400)}` : ''} \`${p.id}\``
+		(p) => `- line ${lineList(p.lines)} · ${pointLabel(p)}${p.component ? ` · ${p.component}` : ''}: ${p.title}${p.text && p.text !== p.title ? ` ${p.text}` : ''} \`${p.id}\``
 	);
 }
 
@@ -474,10 +474,10 @@ function reviewByComponentMarkdown(groups: ComponentReview[]): string[] {
 		if (g.pages.length) out.push(`Pages: ${g.pages.slice(0, 12).join(', ')}${g.pages.length > 12 ? ` … +${g.pages.length - 12}` : ''}`, '');
 		for (const { point: p, where } of g.points)
 			out.push(
-				`- ${p.kind === 'manual' ? '' : `${KIND_LABEL[p.kind]}: `}${p.title}${p.text && p.text !== p.title ? ` ${short(p.text, 400)}` : ''} \`${p.id}\``,
+				`- ${p.kind === 'manual' ? '' : `${KIND_LABEL[p.kind]}: `}${p.title}${p.text && p.text !== p.title ? ` ${p.text}` : ''} \`${p.id}\``,
 				`  - ${whereList(where)}`
 			);
-		for (const s of g.general) out.push(`- every use (${s.usages} in ${s.files} files): ${s.summary} ${short(s.action, 400)} \`${s.id}\``);
+		for (const s of g.general) out.push(`- every use (${s.usages} in ${s.files} files): ${s.summary} ${s.action} \`${s.id}\``);
 		out.push('');
 	}
 	return out;
@@ -629,7 +629,7 @@ export function nextReport(r: Remaining, file?: string): string {
 			'',
 			'## To write',
 			'',
-			'The tool reads these from the v4 code. A point leaves as soon as its use no longer has what triggered it (the v4 prop, event or snippet), has the prop that settles it (a name, a label) or is gone; the points it cannot verify stay listed after they are done: go through them once.',
+			'The tool reads these from the v4 code. A point leaves as soon as its use no longer has what triggered it (the v4 prop, event or snippet), has the prop that settles it (a name, a label), is gone, or one of its alternatives is done; the points it cannot verify stay listed after they are done: go through them once.',
 			''
 		);
 		for (const f of edits) out.push(`### ${f.file}`, '', ...reviewMarkdown(toWrite(f)), '');

@@ -399,6 +399,43 @@ describe('remaining: steps with unless', () => {
 	});
 });
 
+describe('remaining: alternative points and CSS variables v5 does not have', () => {
+	const table = svelte(
+		"\timport { PaginatedTable } from '@likable-hair/svelte'\n\tlet rows = $state([])\n\tfunction load() {}",
+		'<PaginatedTable {rows} onpaginationChange={load} onfiltersChange={load} />'
+	);
+	const ids = (dir: string) =>
+		remaining(dir, rules, { check: () => ({ ran: true, diagnostics: [] }) })
+			.files.flatMap((f) => f.review)
+			.map((p) => p.id)
+			.filter((id) => id.startsWith('data-table-query') || id.startsWith('data-table-loader'));
+
+	test('both ways to load a table are listed until one is done, then neither', () => {
+		const { dir, read } = app({ 'src/routes/+page.svelte': table });
+		prepareBranch(dir, 'aurora-v5');
+		codemod(dir, rules, { write: true });
+		const current = read('src/routes/+page.svelte');
+		expect(ids(dir).sort()).toEqual(['data-table-loader', 'data-table-query']);
+		writeFileSync(join(dir, 'src/routes/+page.svelte'), current.replace(/ onfiltersChange=\{load\}/, ''));
+		expect(ids(dir)).toEqual([]);
+		writeFileSync(join(dir, 'src/routes/+page.svelte'), current.replace(/<DataTable[^>]*\/>/, '<DataTable {rows} loader={load} />'));
+		expect(ids(dir)).toEqual([]);
+	});
+
+	test('a v4 variable of the app stylesheet is a point to write until it leaves the file', () => {
+		const { dir, read } = app({ 'src/app.css': ':root {\n  --chip-default-color: white;\n}\n' });
+		prepareBranch(dir, 'aurora-v5');
+		codemod(dir, rules, { write: true });
+		const points = () =>
+			remaining(dir, rules, { check: () => ({ ran: true, diagnostics: [] }) })
+				.files.flatMap((f) => f.review)
+				.filter((p) => p.title === '--chip-default-color');
+		expect(points()).toMatchObject([{ todo: 'edit', kind: 'not-done', file: 'src/app.css' }]);
+		writeFileSync(join(dir, 'src/app.css'), read('src/app.css').replace('  --chip-default-color: white;\n', ''));
+		expect(points()).toEqual([]);
+	});
+});
+
 describe('remaining: points the current code closes', () => {
 	const check = () => ({ ran: true, diagnostics: [] });
 

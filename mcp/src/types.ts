@@ -35,6 +35,7 @@ export interface ComponentSpec {
 	methods: { name: string; signature: string; description?: string }[];
 	cssVars: CssVar[];
 	cssDefaultsOnly: { name: string; value: string }[];
+	uses?: string[];
 	types: { name: string; declaration: string; description?: string }[];
 	examples: Example[];
 	markdown: string;
@@ -73,4 +74,5 @@ export interface Spec {
 	styling: string;
 	search: SearchEntry[];
 	patterns?: PatternSpec[];
+	exports?: string[];
 }

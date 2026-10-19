@@ -375,7 +375,7 @@ New, optional: `label`, `state`, `name`, `id`, `icon`, `loading`, `drawerSearch`
 
 | v4 | v5 |
 |---|---|
-| `--avatar-width`, `--avatar-height` | `--avatar-size` (one value) |
+| `--avatar-width`, `--avatar-height` | `--avatar-size` (one value); the codemod writes `size` when the value is one of the sizes (`32px` → `size="sm"`, `40px` is the default) |
 | `--avatar-background-color`, `--avatar-text-color` | `--avatar-background`, `--avatar-color` |
 | `--avatar-text-size`, `--avatar-text-weight` | `--avatar-font-size`, `--avatar-font-weight` |
 | `--avatar-min-width`, `-max-width`, `-min-height`, `-max-height` | removed |
@@ -452,7 +452,7 @@ New, optional: per box `description`, `icon`, `color` (`primary` or 1–6), `dis
 
 Unchanged: `--button-width`, `-min-width`, `-max-width`, `-height` (now border-box), `-padding` (ignored on icon-only buttons), `-color`, `-hover-color`, `-border-radius`, `-box-shadow`, `-hover-box-shadow`, `-font-size`, `-font-weight`.
 
-Defaults are now per variant and size: `--button-default-background-color` → `--button-default-primary-background`, `--button-default-color` → `--button-default-primary-color`, `--button-default-hover-background-color` → `--button-default-primary-hover-background`, `--button-default-text-hover-background-color` → `--button-default-primary-text-hover-background`, `--button-default-box-shadow` → `--button-default-primary-box-shadow` (likewise for `secondary`, `danger`, `gradient`); `--button-default-padding`, `-border-radius`, `-height`, `-font-size` are the `md` values (`-sm-*`, `-lg-*` for the others). The v4 focus, active, disabled and icon defaults are removed.
+Defaults are now per variant and size: `--button-default-background-color` → `--button-default-primary-background`, `--button-default-color` → `--button-default-primary-color`, `--button-default-hover-background-color` → `--button-default-primary-hover-background`, `--button-default-text-hover-background-color` → `--button-default-primary-text-hover-background`, `--button-default-box-shadow` → `--button-default-primary-box-shadow` (likewise for `secondary`, `danger`, `gradient`; v4 had no hover shadow, so in app stylesheets the codemod writes the v4 value on every variant, normal and `-hover-box-shadow`); `--button-default-padding`, `-border-radius`, `-height`, `-font-size` are the `md` values (`-sm-*`, `-lg-*` for the others). The v4 focus, active, disabled, hover-color and icon defaults are removed (the codemod deletes them from the app stylesheets).
 
 New, optional: `variant`, `size`, `appendIcon`, `iconSnippet`, `loadingSnippet`, `href` (renders an `<a>`; with `target`, `rel`, `download`), `data-variant` / `data-size` / `data-shape` / `data-loading`.
 
@@ -1375,7 +1375,7 @@ New, optional: `title`.
 - **Callback**: `onchange(e)` receives `{ select, unselect, selection }` directly (`e.detail.selection[0].value` → `e.selection[0].value`); picking another icon also reports the replaced one in `unselect`.
 - **Look**: the button shows the chosen icon in a gradient tile and is as tall as a Button of the same `size`; the list is a grid of tiles (`columns`, default the number of options up to 5) instead of a 60px column. The four arrows move through the grid.
 - `width`, `minWidth`, `menuWidth` → `--icons-dropdown-width`, `--icons-dropdown-min-width`, `--icons-dropdown-menu-width` (the menu now fits the grid; drop `menuWidth`).
-- The v4 overrides on the inner Dropdown (`--button-width="auto"`, `--button-padding`, `--autocomplete-selected-item-color`) no longer fit: the codemod removes the first two; use `--icons-dropdown-option-selected-color` / `-background` for the third.
+- The v4 overrides on the inner Dropdown (`--button-width="auto"`, `--button-padding`, `--autocomplete-selected-item-color`) no longer fit: the codemod removes them; use `--icons-dropdown-option-selected-color` / `-background` only if the theme look does not fit.
 - `values` defaults to `undefined` (v4 `[]`). The selected icon is in the server render (v4 showed an empty button until hydration).
 - `clearable` (still off by default) shows a separate "Clear selection" button, hidden while `disabled`.
 
@@ -1703,7 +1703,7 @@ New, optional: `label`, `hint`, `state`, `bind:select`, snippets `labelSnippet`,
 ### SidebarLayout
 
 - **Renamed and merged**: `UnstableDividedSideBarLayout`, `CollapsibleSideBarLayout` and `StableDividedSideBarLayout` → `SidebarLayout` (`import { SidebarLayout } from '@likable-hair/svelte'`). `expandOn` picks the behaviour: `toggle` (default, the v4 Collapsible), `hover` or `click` (the v4 Unstable, whose default was `hover`: add `expandOn="hover"`), `none` with `sidebarExpanded` (the v4 Stable).
-- **The window scrolls**: the bar and the sidebar stay in place and the content is in a `<main>` next to the sidebar. Remove the box the app put around the content to scroll it (`calc(100dvw - 52px)` × `calc(100dvh - 50px)` with `overflow-auto`) and the `<main>` inside it; code that scrolled that box uses `window`. `--...-content-padding-left` and `-padding-top` are gone (the grid places the content).
+- **The window scrolls**: the bar and the sidebar stay in place and the content is in a `<main>` next to the sidebar. Remove the box the app put around the content to scroll it (`calc(100dvw - 52px)` × `calc(100dvh - 50px)` with `overflow-auto`) and the `<main>` inside it; code that scrolled that box uses `window`. That box also clipped content wider than the screen: on phones the page now scrolls sideways unless the flex and grid children holding tables or long text get `min-width: 0`. `--...-content-padding-left` and `-padding-top` are gone (the grid places the content).
 - **Bar**: on mobile it always starts with the library menu button. On desktop, with `toggle`, the button that widens the sidebar sits at the top of the sidebar, next to the logo (narrow, the logo turns into it while the pointer is on the sidebar, and a click on an empty spot of the rail widens the sidebar); with `sidebarSnippet` it stays in the bar. Both buttons have a name and `aria-expanded`. `innerMenuSnippet` → `headerSnippet`, the content of the bar. The v4 `headerSnippet` replaced the whole bar, so the apps copied the hamburger and the dock icon by hand: delete them and keep the rest. `toggleSnippet({ toggle, ... })` replaces the toggle when needed. Stable's `menuSnippet` was the bar: it goes to `headerSnippet`.
 - **Menu**: `options` are drawn with [HierarchyMenu](#hierarchymenu) (v4 Unstable: ColorInvertedSelector), with nesting, links, badges and, while the sidebar is narrow, tooltips and a menu with the children of a parent. `selectedIndex` → `selected` (the `name`); better, give the options `href` and pass `currentPath={page.url.pathname}`, and delete the `goto` chain in `onmenuSelect`. Apps that drew HierarchyMenu in `menuSnippet` can pass the options to the layout. Unstable `prependSnippet` / `optionSnippet` removed: icons and `badge` come from the options, anything else is a HierarchyMenu in `menuSnippet`.
 - **Expanding**: with `hover` and `click` the sidebar widens over the content (v4 pushed the whole page) and keyboard focus widens it too; with `click`, choosing an option, a click outside or Escape narrows it (v4 reopened it after a choice). With `toggle` it pushes the content as in v4; on mobile `sidebarExpanded` is no longer forced to `false`.
@@ -1712,7 +1712,7 @@ New, optional: `label`, `hint`, `state`, `bind:select`, snippets `labelSnippet`,
 - Snippets get `{ hamburgerVisible, sidebarExpanded, collapsed }`: `collapsed` replaces `!sidebarExpanded && !hamburgerVisible`. The placeholder texts ("logo", "Menu", "Content", "Sidebar") are gone.
 - `class`: `container` unchanged, `header` → `sidebar` (it was the sidebar element), `mainSection` → `content`, `overlay` removed; `header` is now the bar, `drawer` the drawer panel.
 - **Defaults**: rail 4rem and wide sidebar 18rem (Collapsible: 300px), bar 3.5rem (Collapsible: 48px), sticky bar with a translucent background and a bottom border, sidebar with background and border on desktop too (Unstable had none).
-- Style props of the v4 inner ColorInvertedSelector on the layout (`--color-inverted-selector-*`) have no effect: drop them, or set `--hierarchy-menu-option-selected-*` for a solid selected option. The Collapsible style props with the wrong prefix (`--collapsible-side-bar-layout-drawer-background-color`, `-header-menu-padding`) never worked: drop them, do not map them.
+- Style props of the v4 inner ColorInvertedSelector on the layout (`--color-inverted-selector-*`) have no effect: drop them, or set `--hierarchy-menu-option-selected-*` for a solid selected option. The Collapsible style props with the wrong prefix (`--collapsible-side-bar-layout-drawer-background-color`, `-header-menu-padding`) never worked: the codemod removes them.
 
 | v4 (`--unstable-divided-side-bar-layout-*`, `--collapsible-divided-side-bar-layout-*`) | v5 |
 |---|---|
@@ -2043,7 +2043,7 @@ Many apps keep their own copies of components in `src/lib/components` (a `PageTi
 | `ConfirmOrCancelButtons` | [ConfirmOrCancelButtons](#confirmorcancelbuttons) | `onConfirmClick` / `confirm` → `onconfirmClick`, `columnDirection` → `direction="column"` |
 | `Toaster` (melt-ui) | [Toaster](#toaster) | `addErrorToast({ data: { ... } })` → `addErrorToast({ ... })`, `closeDelay` → `duration`, `showLoading` → `loading`, `action.handler` → `action.onclick`, `action.urlToPreload` → `action.href`; also in `.ts` files |
 | `Divider` | [Divider](#divider) | its props become CSS variables (`color` → `--divider-color`, ...); dividers without a color become visible lines |
-| `UserAvatar` | [DescriptiveAvatar](#descriptiveavatar) | `username` → `title`, `description` → `subtitle`, `showTitleAndDescription={false}` → `compact` |
+| `UserAvatar` | [DescriptiveAvatar](#descriptiveavatar), or [Avatar](#avatar) with `showTitleAndDescription={false}` | `username` → `title`, `description` → `subtitle`; without title and description (the copy drew a bare `Avatar`): `<Avatar name={username} />` |
 | `BoxList`, `BoxMenu` | [BoxList](#boxlist) | `redirectUrl` / `url` → `href` and `onClick` → `onclick` in the boxes, `gap` → `--box-list-gap`, `event.detail.box` → `event.box` |
 | `WidgetNoData`, `WidgetError`, `InfoBox` | [NoData](#nodata), [AlertBanner](#alertbanner) | `type` → `variant`, `message` → `description` |
 | `Spinner`, `CircularProgressIndicator` | [CircularLoader](#circularloader) | `progress` → `value` |

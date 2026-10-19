@@ -4,6 +4,7 @@ import {
 	getThemeSources,
 	getThemes,
 	getTokens,
+	libraryExports,
 	listComponents
 } from '../src/docs/api.server.ts';
 import { componentMarkdown, PACKAGE, tokensMarkdown } from '../src/docs/markdown.ts';
@@ -29,6 +30,7 @@ export function specSources(version: string) {
 		themes: getThemeSources(),
 		styling: stylingMarkdown(),
 		patterns: getPatterns(),
+		exports: libraryExports(),
 		search: expandIndex(searchIndex()).map(({ kind, label, description, href, context, text }) => ({
 			kind,
 			label,

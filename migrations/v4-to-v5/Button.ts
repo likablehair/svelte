@@ -36,8 +36,29 @@ export default {
 				from: '--button-default-text-hover-background-color',
 				to: '--button-default-primary-text-hover-background'
 			},
-			{ from: '--button-default-box-shadow', to: '--button-default-primary-box-shadow' },
-			{ from: '--button-default-hover-box-shadow', to: '--button-default-primary-hover-box-shadow' },
+			{
+				from: '--button-default-box-shadow',
+				to: '--button-default-primary-box-shadow',
+				also: [
+					'--button-default-secondary-box-shadow',
+					'--button-default-danger-box-shadow',
+					'--button-default-gradient-box-shadow',
+					'--button-default-primary-hover-box-shadow',
+					'--button-default-secondary-hover-box-shadow',
+					'--button-default-danger-hover-box-shadow',
+					'--button-default-gradient-hover-box-shadow'
+				],
+				note: 'v4 gave every button this shadow and no hover shadow; v5 has one per variant and state, with a glow on hover. In app stylesheets the value goes to every variant, normal and hover (unless the same block sets `--button-default-hover-box-shadow`); on a tag only the primary one is renamed.'
+			},
+			{
+				from: '--button-default-hover-box-shadow',
+				to: '--button-default-primary-hover-box-shadow',
+				also: [
+					'--button-default-secondary-hover-box-shadow',
+					'--button-default-danger-hover-box-shadow',
+					'--button-default-gradient-hover-box-shadow'
+				]
+			},
 			{ from: '--button-default-text-color', to: '--button-default-primary-text-color' },
 			{ from: '--icon-size', to: '--button-icon-size', note: 'Only when set on a Button.' }
 		],
@@ -138,7 +159,8 @@ export default {
 				'--button-default-align-items'
 			].map((name) => ({
 				name,
-				note: 'v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override.'
+				note: 'v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.',
+				drop: true
 			}))
 		]
 	},

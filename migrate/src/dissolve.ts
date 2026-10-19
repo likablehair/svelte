@@ -957,6 +957,19 @@ function rewriteUsage(text: string, usage: Node, plan: WrapperPlan, index: RuleI
 			out.notes.push({ kind: 'wrapper-default', name: prop.name, to: `${h.to}=${literal}`, note: 'default of the wrapper' });
 		}
 	}
+	if (/^LabelAnd/.test(plan.name)) {
+		const literal = (name: string) => {
+			const attr = attrs.find((a) => a.type === 'Attribute' && a.name === name);
+			const value = attr && literalOf(attr);
+			return attr && typeof value === 'string' ? { attr, value: value.trim().toLowerCase() } : undefined;
+		};
+		const label = literal('label');
+		const placeholder = literal('placeholder');
+		if (label && placeholder && label.value === placeholder.value && !out.attrs.some((a) => a.node === placeholder.attr)) {
+			out.attrs.push({ node: placeholder.attr, text: null });
+			out.notes.push({ kind: 'wrapper-placeholder', name: 'placeholder', note: 'same text as `label`, which v5 shows above the field: removed' });
+		}
+	}
 	if (spread) {
 		const special = [...plan.props.values()].filter((p) => p.handling.kind !== 'forward' && p.handling.kind !== 'children').map((p) => p.name);
 		if (special.length)

@@ -20,6 +20,14 @@ describe('validate_usage', () => {
 		expect(validateUsage(spec, code)).toEqual([]);
 	});
 
+	test('accepts the CSS variables of the library components drawn inside, and exported classes', () => {
+		const code = `<script lang="ts">\n\timport { ActivableButton, DescriptiveAvatar, FilterBuilder } from '@likable-hair/svelte';\n\tconst builder = new FilterBuilder();\n</script>\n\n<ActivableButton --button-padding="4px">B</ActivableButton>\n<DescriptiveAvatar title="Mario Rossi" --avatar-size="32px" />\n`;
+		expect(validateUsage(spec, code)).toEqual([]);
+		expect(validateUsage({ ...spec, exports: undefined }, code)).toEqual([]);
+		const v4 = `<script lang="ts">\n\timport { PaginatedTable } from '@likable-hair/svelte';\n</script>\n\n<PaginatedTable />\n`;
+		expect(validateUsage({ ...spec, exports: undefined }, v4).map((i) => i.message)).toEqual([expect.stringContaining('PaginatedTable is not a documented component')]);
+	});
+
 	test('finds unknown props, binds, snippets and CSS variables', () => {
 		const code = file(
 			'Paginator',

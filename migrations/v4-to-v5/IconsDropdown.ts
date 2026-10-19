@@ -52,6 +52,11 @@ export default {
 				drop: true
 			},
 			{
+				name: '--autocomplete-selected-item-color',
+				note: 'v4 override on the inner Dropdown; it does not reach the v5 tiles, whose colors come from the theme: removed. Use `--icons-dropdown-option-selected-color` and `--icons-dropdown-option-selected-background` only if the theme look does not fit.',
+				drop: true
+			},
+			{
 				name: '--button-padding',
 				note: 'v4 override on the inner Dropdown button, tuned around the tile; it would now replace the padding of the v5 button. Use `--icons-dropdown-padding` only if the default padding does not fit.',
 				drop: true
@@ -80,6 +85,7 @@ export default {
 		{
 			id: 'icons-dropdown-css-vars',
 			kind: 'edit',
+			automatic: true,
 			summary: '`--autocomplete-selected-item-color`, a v4 override on the inner Dropdown, does not reach the tiles.',
 			action:
 				'Replace `--autocomplete-selected-item-color` with `--icons-dropdown-option-selected-color` and `--icons-dropdown-option-selected-background`, or drop it to keep the theme look.',

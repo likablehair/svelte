@@ -24,11 +24,13 @@ export default {
 			{
 				from: '--avatar-width',
 				to: '--avatar-size',
-				note: 'The avatar is always square: one size for width and height. Use a `size` (`xs` 24, `sm` 32, `md` 40, `lg` 56, `xl` 80) when the v4 value is one of those, else `--avatar-size`. If `--avatar-height` is also set, keep one of the two (`avatar-size`).'
+				toProp: { prop: 'size', values: { '24px': 'xs', '32px': 'sm', '40px': null, '56px': 'lg', '80px': 'xl' } },
+				note: 'The avatar is always square: one size for width and height. A v4 value that is one of the sizes (`xs` 24, `sm` 32, `md` 40, `lg` 56, `xl` 80, in px) becomes `size`, any other `--avatar-size`. If `--avatar-height` is also set, keep one of the two (`avatar-size`).'
 			},
 			{
 				from: '--avatar-height',
 				to: '--avatar-size',
+				toProp: { prop: 'size', values: { '24px': 'xs', '32px': 'sm', '40px': null, '56px': 'lg', '80px': 'xl' } },
 				note: 'See `--avatar-width`: keep one of the two.'
 			},
 			{ from: '--avatar-background-color', to: '--avatar-background' },

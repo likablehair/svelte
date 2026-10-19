@@ -12,6 +12,7 @@ export interface ComponentApi {
 	snippets: string[];
 	native: boolean;
 	cssVars: string[];
+	cssValues?: Record<string, string>;
 }
 
 export interface CompiledRules {

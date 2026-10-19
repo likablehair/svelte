@@ -65,6 +65,9 @@ export function walk(node: unknown, visit: (node: Node) => void) {
 	}
 }
 
+export const attrLiteral = (attr: Pick<Attr, 'boolean' | 'text' | 'expression'>): string | undefined =>
+	attr.boolean ? 'true' : attr.text !== undefined ? attr.text : attr.expression?.type === 'Literal' ? String(attr.expression.value) : undefined;
+
 function attrValue(value: unknown): Pick<Attr, 'boolean' | 'text' | 'expression'> {
 	if (value === true) return { boolean: true };
 	const parts = (Array.isArray(value) ? value : [value]) as Node[];

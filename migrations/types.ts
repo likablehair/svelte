@@ -5,6 +5,8 @@ export interface Rename {
 	scoped?: true;
 	note?: string;
 	dropWhen?: { match: string; note: string };
+	toProp?: { prop: string; values: Record<string, string | null> };
+	also?: string[];
 }
 
 export interface Removal {
@@ -155,6 +157,8 @@ export interface ManualStep {
 	unless?: ManualTrigger;
 	scope?: 'usage' | 'app';
 	automatic?: true;
+	done?: { has: ManualTrigger; lacks?: ManualTrigger };
+	alternatives?: string[];
 }
 
 export interface ComponentMigration {
@@ -232,8 +236,15 @@ export interface OperatorsRule {
 	note?: string;
 }
 
+export interface LocalVariant extends Omit<ComponentMigration, 'from'> {
+	name: string;
+	when: { prop: string; value: string };
+	summary: string;
+}
+
 export interface LocalMigration extends ComponentMigration {
 	files: string[];
+	variants?: LocalVariant[];
 	contains?: string[];
 	excludes?: string[];
 	exports?: Rename[];

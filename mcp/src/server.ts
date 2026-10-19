@@ -296,7 +296,7 @@ function registerMigration(server: McpServer, context: ServerContext) {
 				return [
 					`Branch: ${result.branch}`,
 					...(changes.length ? changes.map((c) => `- ${c}`) : ['Nothing to change.']),
-					'Packages were not installed: ask the user to run the install command of the app.',
+					'Packages were not installed: ask the user to run the install command of the app, then to restart its dev server with `vite dev --force` if it is running (Vite keeps serving the v4 package it had pre-bundled).',
 					'Nothing was committed.'
 				].join('\n');
 			})

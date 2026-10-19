@@ -184,7 +184,9 @@ const manual: ManualStep[] = [
 			'v4 split one query in three callbacks (`onpaginationChange`, `onfiltersChange`, `onsort`) whose bodies were almost the same (load the page with `{ page, perPage, filtersBuilder }`), never reset the page and dropped the search from the builder of a page change. v5 has one `onquerychange(query)` with `{ page, pageSize, sort, search, filterValue, builder }`, the page already back to 1 after a change of filters, search, sorting or page size.',
 		action:
 			'Replace the handlers with one `onquerychange={(query) => load(query)}` that calls the service with `query.page`, `query.pageSize` and `query.builder`, then sets `rows`, `total` and `loading`; delete `page = 1` resets and the `filtersBuilder` kept in the page. Better, replace the whole thing with a `loader` (see `data-table-loader`).',
-		when: { events: ['onpaginationChange', 'onfiltersChange', 'onsort', 'onfetchData'] }
+		when: { events: ['onpaginationChange', 'onfiltersChange', 'onsort', 'onfetchData'] },
+		done: { has: { events: ['onquerychange'] }, lacks: { events: ['onfiltersChange'] } },
+		alternatives: ['data-table-loader']
 	},
 	{
 		id: 'data-table-loader',
@@ -193,7 +195,8 @@ const manual: ManualStep[] = [
 			'With `loader={(query) => service.list(...)}` returning `{ rows, total }` the table loads by itself: loading state, aborted outdated requests, error with "Retry", page past the end, `reload()` after a create or delete. The first page from the `load` of SvelteKit goes in `rows` and `total`, so it is not loaded twice.',
 		action:
 			'Write `loader={async ({ page, pageSize, builder, signal }) => { const res = await service.list({ page, perPage: pageSize, filtersBuilder: builder }, { signal }); return { rows: res.data, total: res.meta.total }; }}` (or `pageCount: res.meta.lastPage`), pass `rows={data.rows}` and `total={data.total}` from `load`, and delete the handlers, `loading` and `maxPage` state. Call `table.reload()` (with `bind:this={table}`) where the page reloaded the list after saving.',
-		when: { events: ['onpaginationChange', 'onfiltersChange', 'onfetchData'] }
+		when: { events: ['onpaginationChange', 'onfiltersChange', 'onfetchData'] },
+		done: { has: { props: ['loader'] } }
 	},
 	{
 		id: 'data-table-filters',

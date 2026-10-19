@@ -92,7 +92,7 @@ const shellManual: ManualStep[] = [
 		summary:
 			'The window scrolls the page: the bar and the sidebar stay in place by themselves and the content is in a `<main>` that takes the remaining width. v5 apps do not need their own scroll box.',
 		action:
-			'Remove the wrapper the app put around the content to scroll it (a div with `calc(100dvw - 52px)` width, `calc(100dvh - 50px)` height and `overflow-auto`) and the extra `<main>` inside it: render the page content directly. Code that scrolled that box (`bind:this` to a global scroller, `scrollTo` on it) must use `window` instead. Full-height pages can use `calc(100dvh - var(--sidebar-layout-header-height, 3.5rem))`.',
+			'Remove the wrapper the app put around the content to scroll it (a div with `calc(100dvw - 52px)` width, `calc(100dvh - 50px)` height and `overflow-auto`) and the extra `<main>` inside it: render the page content directly. Code that scrolled that box (`bind:this` to a global scroller, `scrollTo` on it) must use `window` instead. Full-height pages can use `calc(100dvh - var(--sidebar-layout-header-height, 3.5rem))`. The old box also clipped content wider than the screen; without it the page scrolls sideways on phones: give `min-width: 0` (`min-w-0`) to the flex and grid children that hold tables or long text, and check the pages at phone width.',
 		when: { snippets: ['children'], contains: ['calc\\(100d?vh\\s*-\\s*\\d+px\\)'] },
 		scope: 'usage'
 	},
@@ -267,11 +267,13 @@ const collapsible = {
 			]),
 			{
 				name: '--collapsible-side-bar-layout-drawer-background-color',
-				note: 'Wrong prefix in the apps: v4 never read it. Drop it, do not map it (it would change the look).'
+				note: 'Wrong prefix in the apps: v4 never read it. Removed, not mapped (it would change the look).',
+				drop: true
 			},
 			{
 				name: '--collapsible-side-bar-layout-header-menu-padding',
-				note: 'Wrong prefix in the apps: v4 never read it. Drop it, do not map it (it would change the look).'
+				note: 'Wrong prefix in the apps: v4 never read it. Removed, not mapped (it would change the look).',
+				drop: true
 			}
 		]
 	},

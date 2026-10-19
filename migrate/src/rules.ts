@@ -32,6 +32,17 @@ export function localRuleFor(index: RuleIndex, path: string, text: string | unde
 		.find((rule) => text !== undefined && (rule.contains ?? []).every((needle) => text.includes(needle)) && !(rule.excludes ?? []).some((needle) => text.includes(needle)));
 }
 
+export interface VariantRef {
+	name: string;
+	when: { prop: string; value: string };
+}
+
+export function variantRule(index: RuleIndex, rule: ComponentMigration | undefined, attrs: { name: string; value: string | undefined }[]): ComponentMigration | undefined {
+	const variants = (rule as { variants?: VariantRef[] } | undefined)?.variants;
+	const found = variants?.find((v) => attrs.some((a) => a.name === v.when.prop && a.value === v.when.value));
+	return found && index.byV4.get(`${LOCAL_PREFIX}${found.name}`);
+}
+
 export function indexRules(rules: CompiledRules): RuleIndex {
 	const cssVars = new Map<string, CssVarRule>();
 	for (const rule of rules.components) {
@@ -75,7 +86,10 @@ export function loadRules(file: URL | string = new URL('../rules/v4-to-v5.json',
 export function componentRules(index: RuleIndex, name: string): string {
 	const wanted = name.trim().toLowerCase();
 	const rules = index.rules.components.filter(
-		(rule) => rule.from.toLowerCase() === wanted || rule.to.toLowerCase() === wanted
+		(rule) =>
+			rule.from.toLowerCase() === wanted ||
+			rule.from.toLowerCase() === `${LOCAL_PREFIX}${wanted}` ||
+			rule.to.toLowerCase() === wanted
 	);
 	if (!rules.length) {
 		const names = [...new Set(index.rules.components.map((r) => r.from))].sort();

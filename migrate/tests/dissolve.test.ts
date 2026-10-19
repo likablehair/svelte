@@ -394,7 +394,7 @@ describe('dissolve: wrappers', () => {
 			)
 		});
 		const page = read('src/routes/+page.svelte');
-		expect(page).toContain('<SimpleTextField --simple-text-field-default-width="100%" bind:value={v} hint="Required" />');
+		expect(page).toContain('<SimpleTextField bind:value={v} hint="Required" />');
 		expect(page).toContain('<StandardAddButton />');
 		const textfield = result.wrappers.find((w) => w.file.endsWith('StandardTextfield.svelte'))!;
 		expect(textfield.dropped.join(' ')).toContain('restProps.hint');
@@ -521,6 +521,20 @@ describe('dissolve: LabelAnd* components', () => {
 		expect(read('src/routes/+page.svelte')).toContain(
 			`<SimpleTextField label="Email" name="email" type="email" bind:value={mail} state={wrong ? 'error' : undefined} hint="Required" />`
 		);
+	});
+
+	test('a placeholder with the text of the label goes, since v5 shows the label above the field', () => {
+		const { read, result } = run({
+			[`${W}/LabelAndTextfield.svelte`]: labelAndTextfield('SimpleTextField'),
+			'src/routes/+page.svelte': svelte(
+				"\timport LabelAndTextfield from '$lib/components/common/LabelAndTextfield.svelte'\n\tlet a = $state(''), b = $state('')",
+				'<LabelAndTextfield label="Email" placeholder="email" bind:value={a} />\n<LabelAndTextfield label="Nome" placeholder="Mario" bind:value={b} />'
+			)
+		});
+		const page = read('src/routes/+page.svelte');
+		expect(page).toContain('<SimpleTextField label="Email" bind:value={a} />');
+		expect(page).toContain('<SimpleTextField label="Nome" placeholder="Mario" bind:value={b} />');
+		expect(result.changes.find((c) => c.kind === 'wrapper-placeholder')?.note).toContain('same text as `label`');
 	});
 
 	test('LabelAndCheckbox becomes Checkbox with label, and the id of the <label for> reaches the checkbox', () => {

@@ -10,7 +10,7 @@ import { RECIPES } from './dissolve.ts';
 import { Lines, listFiles } from './files.ts';
 import type { RuleIndex } from './rules.ts';
 import { scanSvelte, walk, type ComponentNode, type ImportRecord, type Node, type SvelteFile } from './svelte.ts';
-import type { ComponentMigration } from './types.ts';
+import type { ComponentMigration, ManualStep } from './types.ts';
 
 import { LOCAL_PREFIX } from './compile.ts';
 
@@ -732,22 +732,40 @@ function reviewFromBase(env: Env, snapshot: string, current: (rel: string) => st
 		const keys = destructuredKeys(text, text.indexOf('{', found.index + found[0].length - 1), found.index + found[0].length);
 		return !!keys && keys.every((k) => v5.includes(k));
 	};
+	const unknownCss = new Set(result.skipped.filter((s) => s.kind === 'css-var-unknown').map((s) => `${s.file}:${s.name}`));
+	const closed = new Map<string, Set<string>>();
+	const pending: { f: (typeof analysis.findings)[number]; step?: ManualStep; rule?: ComponentMigration; usageKey?: string }[] = [];
 	for (const f of analysis.findings) {
 		if (f.effort !== 'manual') continue;
+		if (f.kind === 'css-var-removed' && unknownCss.has(`${f.file}:${f.name}`)) continue;
 		const rule = env.index.byV4.get(f.component ?? '');
 		const step = f.kind === 'manual' ? (rule?.manual ?? (f.id.startsWith('global-') ? env.index.rules.global.manual : undefined))?.find((s) => s.id === f.id) : undefined;
 		const trigger = todoOf(f) === 'edit' ? findingTrigger(f, step) : undefined;
-		if (step?.unless || trigger) {
+		let usageKey: string | undefined;
+		let done = false;
+		if (step?.unless || step?.done || step?.alternatives || trigger) {
 			const mapped = mapLine(f.file, f.line);
 			const tags = [f.component, v5Name(f.component)].filter((t): t is string => !!t);
 			const usage = mapped === undefined ? undefined : currentUsage(f.file, mapped, tags);
-			if (usage === 'gone') {
-				if (trigger) continue;
-			} else if (usage) {
-				if (step?.unless && unlessMet(step.unless, usage, rule)) continue;
-				if (trigger && !triggerPresent(trigger, usage, rule, (name) => env.index.cssVars.get(name)?.to)) continue;
+			if (usage === 'gone') done = !!trigger;
+			else if (usage) {
+				usageKey = `${f.file}:${usage.start}`;
+				done =
+					!!(step?.unless && unlessMet(step.unless, usage, rule)) ||
+					!!(trigger && !triggerPresent(trigger, usage, rule, (name) => env.index.cssVars.get(name)?.to)) ||
+					!!(step?.done && unlessMet(step.done.has, usage) && !unlessMet(step.done.lacks, usage));
 			}
 		}
+		if (done) {
+			if (usageKey && step) closed.set(usageKey, new Set([...(closed.get(usageKey) ?? []), step.id]));
+			continue;
+		}
+		pending.push({ f, step, rule, usageKey });
+	}
+	for (const { f, step, rule, usageKey } of pending) {
+		const ids = usageKey ? closed.get(usageKey) : undefined;
+		const alternatives = step ? [...(step.alternatives ?? []), ...(rule?.manual ?? []).filter((s) => s.alternatives?.includes(step.id)).map((s) => s.id)] : [];
+		if (ids && alternatives.some((id) => ids.has(id))) continue;
 		add(
 			{
 				file: f.file,
@@ -766,6 +784,7 @@ function reviewFromBase(env: Env, snapshot: string, current: (rel: string) => st
 	for (const s of result.skipped) {
 		const mapped = s.kind === 'snippet-parameters' ? mapLine(s.file, s.line) : undefined;
 		if (mapped !== undefined && snippetParamsDone(s.file, s.id, mapped)) continue;
+		if (s.kind === 'css-var-unknown' && !new RegExp(`(?<![\\w-])${s.name}(?![\\w-])`).test(current(s.file) ?? '')) continue;
 		add({ file: s.file, kind: 'not-done', todo: 'edit', id: s.id, component: owner(s.id), title: s.name, text: s.reason }, s.line);
 	}
 	for (const d of result.defaults)

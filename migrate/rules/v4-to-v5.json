@@ -480,7 +480,11 @@
 					"--activable-button-hover-background",
 					"--activable-button-hover-border-color",
 					"--activable-button-hover-color"
-				]
+				],
+				"cssValues": {
+					"--activable-button-default-dot-size": "7px",
+					"--activable-button-dot-size": "7px"
+				}
 			},
 			"AlertBanner": {
 				"slug": "alert-banner",
@@ -582,7 +586,33 @@
 					"--alert-banner-title-font-size",
 					"--alert-banner-title-font-weight",
 					"--alert-banner-width"
-				]
+				],
+				"cssValues": {
+					"--alert-banner-box-shadow": "0 0 #0000",
+					"--alert-banner-close-icon-size": "18px",
+					"--alert-banner-close-size": "28px",
+					"--alert-banner-default-box-shadow": "0 0 #0000",
+					"--alert-banner-default-close-icon-size": "18px",
+					"--alert-banner-default-close-size": "28px",
+					"--alert-banner-default-description-font-size": "13px",
+					"--alert-banner-default-gap": "12px",
+					"--alert-banner-default-icon-box-size": "28px",
+					"--alert-banner-default-icon-size": "16px",
+					"--alert-banner-default-line-height": "1.45",
+					"--alert-banner-default-padding": "12px 14px",
+					"--alert-banner-default-title-font-size": "14px",
+					"--alert-banner-default-title-font-weight": "600",
+					"--alert-banner-default-width": "100%",
+					"--alert-banner-description-font-size": "13px",
+					"--alert-banner-gap": "12px",
+					"--alert-banner-icon-box-size": "28px",
+					"--alert-banner-icon-size": "16px",
+					"--alert-banner-line-height": "1.45",
+					"--alert-banner-padding": "12px 14px",
+					"--alert-banner-title-font-size": "14px",
+					"--alert-banner-title-font-weight": "600",
+					"--alert-banner-width": "100%"
+				}
 			},
 			"AsyncAutocomplete": {
 				"slug": "async-autocomplete",
@@ -688,7 +718,19 @@
 					"--async-autocomplete-skeleton-line-border-radius",
 					"--async-autocomplete-skeleton-line-height",
 					"--async-autocomplete-skeleton-row-gap"
-				]
+				],
+				"cssValues": {
+					"--async-autocomplete-default-skeleton-avatar-size": "24px",
+					"--async-autocomplete-default-skeleton-duration": "1.6s",
+					"--async-autocomplete-default-skeleton-gap": "12px",
+					"--async-autocomplete-default-skeleton-line-height": "10px",
+					"--async-autocomplete-default-skeleton-row-gap": "10px",
+					"--async-autocomplete-skeleton-avatar-size": "24px",
+					"--async-autocomplete-skeleton-duration": "1.6s",
+					"--async-autocomplete-skeleton-gap": "12px",
+					"--async-autocomplete-skeleton-line-height": "10px",
+					"--async-autocomplete-skeleton-row-gap": "10px"
+				}
 			},
 			"Autocomplete": {
 				"slug": "autocomplete",
@@ -893,7 +935,63 @@
 					"--autocomplete-status-padding",
 					"--autocomplete-success-color",
 					"--autocomplete-width"
-				]
+				],
+				"cssValues": {
+					"--autocomplete-chip-gap": "6px",
+					"--autocomplete-counter-font-size": "12px",
+					"--autocomplete-counter-font-weight": "500",
+					"--autocomplete-default-chip-gap": "6px",
+					"--autocomplete-default-counter-font-size": "12px",
+					"--autocomplete-default-counter-font-weight": "500",
+					"--autocomplete-default-drawer-gap": "10px",
+					"--autocomplete-default-drawer-option-font-size": "15px",
+					"--autocomplete-default-drawer-option-padding": "11px 12px",
+					"--autocomplete-default-drawer-size": "85dvh",
+					"--autocomplete-default-end-padding": "6px",
+					"--autocomplete-default-gap": "6px",
+					"--autocomplete-default-icon-size": "18px",
+					"--autocomplete-default-input-min-width": "60px",
+					"--autocomplete-default-input-padding": "0 6px",
+					"--autocomplete-default-match-font-weight": "700",
+					"--autocomplete-default-max-width": "none",
+					"--autocomplete-default-menu-max-height": "300px",
+					"--autocomplete-default-option-font-size": "13px",
+					"--autocomplete-default-option-gap": "8px",
+					"--autocomplete-default-option-icon-size": "17px",
+					"--autocomplete-default-option-padding": "7px 10px",
+					"--autocomplete-default-option-spacing": "1px",
+					"--autocomplete-default-padding": "4px 6px",
+					"--autocomplete-default-spinner-border-width": "2px",
+					"--autocomplete-default-spinner-size": "16px",
+					"--autocomplete-default-start-padding": "6px",
+					"--autocomplete-default-status-font-size": "13px",
+					"--autocomplete-default-status-padding": "9px 10px",
+					"--autocomplete-default-width": "100%",
+					"--autocomplete-drawer-gap": "10px",
+					"--autocomplete-drawer-option-font-size": "15px",
+					"--autocomplete-drawer-option-padding": "11px 12px",
+					"--autocomplete-drawer-size": "85dvh",
+					"--autocomplete-end-padding": "6px",
+					"--autocomplete-gap": "6px",
+					"--autocomplete-icon-size": "18px",
+					"--autocomplete-input-min-width": "60px",
+					"--autocomplete-input-padding": "0 6px",
+					"--autocomplete-match-font-weight": "700",
+					"--autocomplete-max-width": "none",
+					"--autocomplete-menu-max-height": "300px",
+					"--autocomplete-option-font-size": "13px",
+					"--autocomplete-option-gap": "8px",
+					"--autocomplete-option-icon-size": "17px",
+					"--autocomplete-option-padding": "7px 10px",
+					"--autocomplete-option-spacing": "1px",
+					"--autocomplete-padding": "4px 6px",
+					"--autocomplete-spinner-border-width": "2px",
+					"--autocomplete-spinner-size": "16px",
+					"--autocomplete-start-padding": "6px",
+					"--autocomplete-status-font-size": "13px",
+					"--autocomplete-status-padding": "9px 10px",
+					"--autocomplete-width": "100%"
+				}
 			},
 			"Avatar": {
 				"slug": "avatar",
@@ -982,7 +1080,30 @@
 					"--avatar-status-border-width",
 					"--avatar-status-color",
 					"--avatar-status-size"
-				]
+				],
+				"cssValues": {
+					"--avatar-border": "none",
+					"--avatar-default-border-radius": "50%",
+					"--avatar-default-font-scale": "0.38",
+					"--avatar-default-font-weight": "600",
+					"--avatar-default-icon-scale": "0.6",
+					"--avatar-default-lg-size": "56px",
+					"--avatar-default-ring-gap": "2px",
+					"--avatar-default-ring-width": "2px",
+					"--avatar-default-size": "40px",
+					"--avatar-default-sm-size": "32px",
+					"--avatar-default-square-border-radius": "30%",
+					"--avatar-default-status-border-width": "2px",
+					"--avatar-default-status-size": "28%",
+					"--avatar-default-xl-size": "80px",
+					"--avatar-default-xs-size": "24px",
+					"--avatar-font-weight": "600",
+					"--avatar-gap-width": "0px",
+					"--avatar-icon-scale": "0.6",
+					"--avatar-ring-width": "2px",
+					"--avatar-status-border-width": "2px",
+					"--avatar-status-size": "28%"
+				}
 			},
 			"AvatarGroup": {
 				"slug": "avatar-group",
@@ -1027,7 +1148,16 @@
 					"--avatar-group-default-xs-overlap",
 					"--avatar-group-gap-width",
 					"--avatar-group-overlap"
-				]
+				],
+				"cssValues": {
+					"--avatar-group-default-gap-width": "2px",
+					"--avatar-group-default-lg-overlap": "9px",
+					"--avatar-group-default-overlap": "6px",
+					"--avatar-group-default-sm-overlap": "5px",
+					"--avatar-group-default-xl-overlap": "12px",
+					"--avatar-group-default-xs-overlap": "4px",
+					"--avatar-group-gap-width": "2px"
+				}
 			},
 			"BarChart": {
 				"slug": "bar-chart",
@@ -1149,7 +1279,47 @@
 					"--bar-chart-tooltip-value-font-size",
 					"--bar-chart-width",
 					"--bar-chart-zoom-color"
-				]
+				],
+				"cssValues": {
+					"--bar-chart-axis-size": "2rem",
+					"--bar-chart-default-axis-size": "2rem",
+					"--bar-chart-default-gap": "12px",
+					"--bar-chart-default-height": "16rem",
+					"--bar-chart-default-legend-font-size": "12.5px",
+					"--bar-chart-default-legend-gap": "16px",
+					"--bar-chart-default-legend-hidden-opacity": "0.45",
+					"--bar-chart-default-legend-min-width": "180px",
+					"--bar-chart-default-legend-swatch-radius": "2px",
+					"--bar-chart-default-legend-swatch-size": "8px",
+					"--bar-chart-default-line-width": "2px",
+					"--bar-chart-default-min-width": "12rem",
+					"--bar-chart-default-row-height": "2.5rem",
+					"--bar-chart-default-tick-font-size": "11px",
+					"--bar-chart-default-tooltip-label-font-size": "12px",
+					"--bar-chart-default-tooltip-min-width": "auto",
+					"--bar-chart-default-tooltip-padding": "8px 12px",
+					"--bar-chart-default-tooltip-title-font-size": "10.5px",
+					"--bar-chart-default-tooltip-value-font-size": "13px",
+					"--bar-chart-default-width": "100%",
+					"--bar-chart-gap": "12px",
+					"--bar-chart-height": "16rem",
+					"--bar-chart-legend-font-size": "12.5px",
+					"--bar-chart-legend-gap": "16px",
+					"--bar-chart-legend-hidden-opacity": "0.45",
+					"--bar-chart-legend-min-width": "180px",
+					"--bar-chart-legend-swatch-radius": "2px",
+					"--bar-chart-legend-swatch-size": "8px",
+					"--bar-chart-line-width": "2px",
+					"--bar-chart-min-width": "12rem",
+					"--bar-chart-row-height": "2.5rem",
+					"--bar-chart-tick-font-size": "11px",
+					"--bar-chart-tooltip-label-font-size": "12px",
+					"--bar-chart-tooltip-min-width": "auto",
+					"--bar-chart-tooltip-padding": "8px 12px",
+					"--bar-chart-tooltip-title-font-size": "10.5px",
+					"--bar-chart-tooltip-value-font-size": "13px",
+					"--bar-chart-width": "100%"
+				}
 			},
 			"BoxList": {
 				"slug": "box-list",
@@ -1256,7 +1426,49 @@
 					"--box-list-label-font-weight",
 					"--box-list-min-width",
 					"--box-list-text-gap"
-				]
+				],
+				"cssValues": {
+					"--box-list-box-border-width": "1px",
+					"--box-list-box-gap": "12px",
+					"--box-list-box-hover-lift": "2px",
+					"--box-list-box-padding-x": "14px",
+					"--box-list-box-padding-y": "12px",
+					"--box-list-box-shadow": "none",
+					"--box-list-default-box-border-width": "1px",
+					"--box-list-default-box-gap": "12px",
+					"--box-list-default-box-hover-border-tint": "45%",
+					"--box-list-default-box-hover-lift": "2px",
+					"--box-list-default-box-hover-shadow-shape": "0 18px 36px -22px",
+					"--box-list-default-box-hover-shadow-tint": "70%",
+					"--box-list-default-box-padding-x": "14px",
+					"--box-list-default-box-padding-y": "12px",
+					"--box-list-default-box-shadow": "none",
+					"--box-list-default-description-font-size": "12.5px",
+					"--box-list-default-disabled-opacity": "0.5",
+					"--box-list-default-gap": "12px",
+					"--box-list-default-glow-reach": "60%",
+					"--box-list-default-glow-size": "140% 110%",
+					"--box-list-default-glow-tint": "12%",
+					"--box-list-default-icon-gap": "10px",
+					"--box-list-default-icon-hover-shadow-shape": "0 6px 18px -4px",
+					"--box-list-default-icon-hover-shadow-tint": "60%",
+					"--box-list-default-icon-size": "19px",
+					"--box-list-default-icon-tile-size": "34px",
+					"--box-list-default-label-font-size": "14px",
+					"--box-list-default-label-font-weight": "600",
+					"--box-list-default-min-width": "240px",
+					"--box-list-default-text-gap": "2px",
+					"--box-list-description-font-size": "12.5px",
+					"--box-list-disabled-opacity": "0.5",
+					"--box-list-gap": "12px",
+					"--box-list-icon-gap": "10px",
+					"--box-list-icon-size": "19px",
+					"--box-list-icon-tile-size": "34px",
+					"--box-list-label-font-size": "14px",
+					"--box-list-label-font-weight": "600",
+					"--box-list-min-width": "240px",
+					"--box-list-text-gap": "2px"
+				}
 			},
 			"Button": {
 				"slug": "button",
@@ -1388,7 +1600,48 @@
 					"--button-padding",
 					"--button-spinner-border-width",
 					"--button-width"
-				]
+				],
+				"cssValues": {
+					"--button-active-transform": "scale(0.97)",
+					"--button-default-active-transform": "scale(0.97)",
+					"--button-default-danger-border-color": "transparent",
+					"--button-default-danger-hover-filter": "brightness(1.06)",
+					"--button-default-disabled-filter": "saturate(0.3)",
+					"--button-default-disabled-opacity": "0.4",
+					"--button-default-font-family": "inherit",
+					"--button-default-font-size": "13.5px",
+					"--button-default-font-weight": "500",
+					"--button-default-gap": "7px",
+					"--button-default-gradient-animation-duration": "6s",
+					"--button-default-gradient-border-color": "transparent",
+					"--button-default-gradient-hover-filter": "none",
+					"--button-default-height": "34px",
+					"--button-default-icon-size": "16px",
+					"--button-default-letter-spacing": "-0.005em",
+					"--button-default-lg-font-size": "14.5px",
+					"--button-default-lg-height": "40px",
+					"--button-default-lg-padding": "0 18px",
+					"--button-default-padding": "0 14px",
+					"--button-default-primary-border-color": "transparent",
+					"--button-default-primary-hover-filter": "brightness(1.06)",
+					"--button-default-secondary-hover-filter": "none",
+					"--button-default-sm-font-size": "12.5px",
+					"--button-default-sm-height": "28px",
+					"--button-default-sm-padding": "0 10px",
+					"--button-default-spinner-border-width": "2px",
+					"--button-default-width": "auto",
+					"--button-disabled-filter": "saturate(0.3)",
+					"--button-disabled-opacity": "0.4",
+					"--button-font-family": "inherit",
+					"--button-font-weight": "500",
+					"--button-gap": "7px",
+					"--button-icon-size": "16px",
+					"--button-letter-spacing": "-0.005em",
+					"--button-max-width": "none",
+					"--button-min-width": "auto",
+					"--button-spinner-border-width": "2px",
+					"--button-width": "auto"
+				}
 			},
 			"Calendar": {
 				"slug": "calendar",
@@ -1526,7 +1779,51 @@
 					"--calendar-weekday-padding",
 					"--calendar-weekday-text-transform",
 					"--calendar-width"
-				]
+				],
+				"cssValues": {
+					"--calendar-day-background": "transparent",
+					"--calendar-day-height": "32px",
+					"--calendar-day-width": "100%",
+					"--calendar-default-day-background": "transparent",
+					"--calendar-default-day-height": "32px",
+					"--calendar-default-day-width": "100%",
+					"--calendar-default-disabled-day-opacity": "0.35",
+					"--calendar-default-font-size": "13px",
+					"--calendar-default-grid-cell-min-height": "64px",
+					"--calendar-default-grid-cell-padding": "6px",
+					"--calendar-default-grid-day-font-size": "12px",
+					"--calendar-default-grid-day-size": "24px",
+					"--calendar-default-grid-weekday-padding": "10px",
+					"--calendar-default-outside-day-opacity": "0.5",
+					"--calendar-default-row-gap": "2px",
+					"--calendar-default-selected-day-font-weight": "600",
+					"--calendar-default-today-background": "transparent",
+					"--calendar-default-today-color": "inherit",
+					"--calendar-default-today-dot-size": "4px",
+					"--calendar-default-weekday-font-size": "10.5px",
+					"--calendar-default-weekday-font-weight": "600",
+					"--calendar-default-weekday-letter-spacing": "0.08em",
+					"--calendar-default-weekday-padding": "6px 0",
+					"--calendar-default-weekday-text-transform": "uppercase",
+					"--calendar-default-width": "100%",
+					"--calendar-disabled-day-opacity": "0.35",
+					"--calendar-font-size": "13px",
+					"--calendar-grid-cell-min-height": "64px",
+					"--calendar-grid-cell-padding": "6px",
+					"--calendar-grid-day-font-size": "12px",
+					"--calendar-grid-day-size": "24px",
+					"--calendar-outside-day-opacity": "0.5",
+					"--calendar-row-gap": "2px",
+					"--calendar-selected-day-font-weight": "600",
+					"--calendar-today-background": "transparent",
+					"--calendar-today-color": "inherit",
+					"--calendar-today-dot-size": "4px",
+					"--calendar-weekday-font-size": "10.5px",
+					"--calendar-weekday-font-weight": "600",
+					"--calendar-weekday-letter-spacing": "0.08em",
+					"--calendar-weekday-text-transform": "uppercase",
+					"--calendar-width": "100%"
+				}
 			},
 			"Checkbox": {
 				"slug": "checkbox",
@@ -1600,7 +1897,29 @@
 					"--checkbox-mark-color",
 					"--checkbox-mark-thickness",
 					"--checkbox-size"
-				]
+				],
+				"cssValues": {
+					"--checkbox-border-width": "1.5px",
+					"--checkbox-box-shadow": "0 0 #0000",
+					"--checkbox-checked-border-color": "transparent",
+					"--checkbox-default-border-width": "1.5px",
+					"--checkbox-default-box-shadow": "0 0 #0000",
+					"--checkbox-default-checked-border-color": "transparent",
+					"--checkbox-default-disabled-opacity": "0.4",
+					"--checkbox-default-gap": "10px",
+					"--checkbox-default-label-font-size": "14px",
+					"--checkbox-default-label-font-weight": "400",
+					"--checkbox-default-label-line-height": "1.5",
+					"--checkbox-default-mark-thickness": "2px",
+					"--checkbox-default-size": "18px",
+					"--checkbox-disabled-opacity": "0.4",
+					"--checkbox-gap": "10px",
+					"--checkbox-label-font-size": "14px",
+					"--checkbox-label-font-weight": "400",
+					"--checkbox-label-line-height": "1.5",
+					"--checkbox-mark-thickness": "2px",
+					"--checkbox-size": "18px"
+				}
 			},
 			"Chip": {
 				"slug": "chip",
@@ -1741,7 +2060,54 @@
 					"--chip-selected-box-shadow",
 					"--chip-selected-color",
 					"--chip-selected-hover-border-color"
-				]
+				],
+				"cssValues": {
+					"--chip-close-color": "color-mix(in oklab, currentColor 70%, transparent)",
+					"--chip-close-focus-ring-offset": "0px",
+					"--chip-close-hover-background": "color-mix(in oklab, currentColor 14%, transparent)",
+					"--chip-close-hover-color": "currentColor",
+					"--chip-close-icon-size": "14px",
+					"--chip-close-margin-end": "4px",
+					"--chip-close-size": "18px",
+					"--chip-default-accent-box-shadow": "0 0 #0000",
+					"--chip-default-close-color": "color-mix(in oklab, currentColor 70%, transparent)",
+					"--chip-default-close-focus-ring-offset": "0px",
+					"--chip-default-close-hover-background": "color-mix(in oklab, currentColor 14%, transparent)",
+					"--chip-default-close-hover-color": "currentColor",
+					"--chip-default-close-icon-size": "14px",
+					"--chip-default-close-margin-end": "4px",
+					"--chip-default-close-size": "18px",
+					"--chip-default-disabled-opacity": "0.4",
+					"--chip-default-error-border-color": "transparent",
+					"--chip-default-error-box-shadow": "0 0 #0000",
+					"--chip-default-filled-border-color": "transparent",
+					"--chip-default-filled-hover-border-color": "transparent",
+					"--chip-default-font-family": "inherit",
+					"--chip-default-font-size": "12.5px",
+					"--chip-default-font-weight": "500",
+					"--chip-default-gap": "6px",
+					"--chip-default-height": "26px",
+					"--chip-default-hover-transform": "translateY(-1px)",
+					"--chip-default-icon-size": "15px",
+					"--chip-default-max-width": "100%",
+					"--chip-default-neutral-box-shadow": "0 0 #0000",
+					"--chip-default-padding": "0 10px",
+					"--chip-default-primary-box-shadow": "0 0 #0000",
+					"--chip-default-sm-font-size": "12px",
+					"--chip-default-sm-height": "22px",
+					"--chip-default-sm-icon-size": "14px",
+					"--chip-default-sm-padding": "0 8px",
+					"--chip-default-success-border-color": "transparent",
+					"--chip-default-success-box-shadow": "0 0 #0000",
+					"--chip-default-warning-border-color": "transparent",
+					"--chip-default-warning-box-shadow": "0 0 #0000",
+					"--chip-disabled-opacity": "0.4",
+					"--chip-font-family": "inherit",
+					"--chip-font-weight": "500",
+					"--chip-gap": "6px",
+					"--chip-hover-transform": "translateY(-1px)",
+					"--chip-max-width": "100%"
+				}
 			},
 			"CircularLoader": {
 				"slug": "circular-loader",
@@ -1784,7 +2150,19 @@
 					"--circular-loader-thickness",
 					"--circular-loader-track-color",
 					"--circular-loader-value-duration"
-				]
+				],
+				"cssValues": {
+					"--circular-loader-content-font-size": "20cqi",
+					"--circular-loader-content-font-weight": "500",
+					"--circular-loader-default-content-font-size": "20cqi",
+					"--circular-loader-default-content-font-weight": "500",
+					"--circular-loader-default-duration": "0.9s",
+					"--circular-loader-default-size": "32px",
+					"--circular-loader-default-thickness": "10cqi",
+					"--circular-loader-duration": "0.9s",
+					"--circular-loader-size": "32px",
+					"--circular-loader-thickness": "10cqi"
+				}
 			},
 			"ColumnManager": {
 				"slug": "column-manager",
@@ -1946,7 +2324,53 @@
 					"--column-manager-type-icon-color",
 					"--column-manager-type-icon-size",
 					"--column-manager-width"
-				]
+				],
+				"cssValues": {
+					"--column-manager-add-size": "28px",
+					"--column-manager-backdrop-filter": "none",
+					"--column-manager-button-disabled-opacity": "0.4",
+					"--column-manager-button-size": "26px",
+					"--column-manager-card-gap": "10px",
+					"--column-manager-card-padding": "8px",
+					"--column-manager-count-font-size": "12px",
+					"--column-manager-default-add-size": "28px",
+					"--column-manager-default-backdrop-filter": "none",
+					"--column-manager-default-button-disabled-opacity": "0.4",
+					"--column-manager-default-button-size": "26px",
+					"--column-manager-default-card-gap": "10px",
+					"--column-manager-default-card-padding": "8px",
+					"--column-manager-default-count-font-size": "12px",
+					"--column-manager-default-description-font-size": "11.5px",
+					"--column-manager-default-empty-font-size": "12.5px",
+					"--column-manager-default-item-font-size": "13px",
+					"--column-manager-default-item-font-weight": "500",
+					"--column-manager-default-item-gap": "4px",
+					"--column-manager-default-item-padding": "5px 6px 5px 4px",
+					"--column-manager-default-mark-font-weight": "600",
+					"--column-manager-default-section-font-size": "11px",
+					"--column-manager-default-section-hint-font-size": "11.5px",
+					"--column-manager-default-section-margin": "14px 0 6px",
+					"--column-manager-default-sheet-max-height": "90dvh",
+					"--column-manager-default-tag-font-size": "10px",
+					"--column-manager-default-tag-padding": "1px 5px",
+					"--column-manager-default-type-icon-size": "24px",
+					"--column-manager-default-width": "372px",
+					"--column-manager-description-font-size": "11.5px",
+					"--column-manager-empty-font-size": "12.5px",
+					"--column-manager-item-font-size": "13px",
+					"--column-manager-item-font-weight": "500",
+					"--column-manager-item-gap": "4px",
+					"--column-manager-item-padding": "5px 6px 5px 4px",
+					"--column-manager-mark-font-weight": "600",
+					"--column-manager-section-font-size": "11px",
+					"--column-manager-section-hint-font-size": "11.5px",
+					"--column-manager-section-margin": "14px 0 6px",
+					"--column-manager-sheet-max-height": "90dvh",
+					"--column-manager-tag-font-size": "10px",
+					"--column-manager-tag-padding": "1px 5px",
+					"--column-manager-type-icon-size": "24px",
+					"--column-manager-width": "372px"
+				}
 			},
 			"ConfirmDialog": {
 				"slug": "confirm-dialog",
@@ -2021,7 +2445,23 @@
 					"--confirm-dialog-icon-size",
 					"--confirm-dialog-max-width",
 					"--confirm-dialog-paragraph-gap"
-				]
+				],
+				"cssValues": {
+					"--confirm-dialog-content-gap": "16px",
+					"--confirm-dialog-default-content-gap": "16px",
+					"--confirm-dialog-default-icon-gap": "16px",
+					"--confirm-dialog-default-icon-glyph-size": "20px",
+					"--confirm-dialog-default-icon-ring-width": "6px",
+					"--confirm-dialog-default-icon-size": "40px",
+					"--confirm-dialog-default-max-width": "420px",
+					"--confirm-dialog-default-paragraph-gap": "8px",
+					"--confirm-dialog-icon-gap": "16px",
+					"--confirm-dialog-icon-glyph-size": "20px",
+					"--confirm-dialog-icon-ring-width": "6px",
+					"--confirm-dialog-icon-size": "40px",
+					"--confirm-dialog-max-width": "420px",
+					"--confirm-dialog-paragraph-gap": "8px"
+				}
 			},
 			"ConfirmOrCancelButtons": {
 				"slug": "confirm-or-cancel-buttons",
@@ -2073,7 +2513,19 @@
 					"--confirm-or-cancel-buttons-default-margin-top",
 					"--confirm-or-cancel-buttons-gap",
 					"--confirm-or-cancel-buttons-margin-top"
-				]
+				],
+				"cssValues": {
+					"--confirm-or-cancel-buttons-actions-gap": "8px",
+					"--confirm-or-cancel-buttons-content-font-size": "13px",
+					"--confirm-or-cancel-buttons-content-gap": "6px",
+					"--confirm-or-cancel-buttons-default-actions-gap": "8px",
+					"--confirm-or-cancel-buttons-default-content-font-size": "13px",
+					"--confirm-or-cancel-buttons-default-content-gap": "6px",
+					"--confirm-or-cancel-buttons-default-gap": "12px",
+					"--confirm-or-cancel-buttons-default-margin-top": "0px",
+					"--confirm-or-cancel-buttons-gap": "12px",
+					"--confirm-or-cancel-buttons-margin-top": "0px"
+				}
 			},
 			"CountriesAutocomplete": {
 				"slug": "countries-autocomplete",
@@ -2158,7 +2610,11 @@
 					"--countries-autocomplete-dial-code-color",
 					"--countries-autocomplete-dial-code-font-family",
 					"--countries-autocomplete-dial-code-font-size"
-				]
+				],
+				"cssValues": {
+					"--countries-autocomplete-default-dial-code-font-size": "11px",
+					"--countries-autocomplete-dial-code-font-size": "11px"
+				}
 			},
 			"DashboardShaper": {
 				"slug": "dashboard-shaper",
@@ -2343,7 +2799,55 @@
 					"--dashboard-shaper-target-background",
 					"--dashboard-shaper-target-border-color",
 					"--dashboard-shaper-widget-border-radius"
-				]
+				],
+				"cssValues": {
+					"--dashboard-shaper-block-font-size": "12.5px",
+					"--dashboard-shaper-catalog-width": "640px",
+					"--dashboard-shaper-control-icon-size": "16px",
+					"--dashboard-shaper-control-size": "26px",
+					"--dashboard-shaper-default-block-font-size": "12.5px",
+					"--dashboard-shaper-default-catalog-width": "640px",
+					"--dashboard-shaper-default-control-icon-size": "16px",
+					"--dashboard-shaper-default-control-size": "26px",
+					"--dashboard-shaper-default-dragging-opacity": "0.88",
+					"--dashboard-shaper-default-gap": "10px",
+					"--dashboard-shaper-default-item-description-font-size": "12.5px",
+					"--dashboard-shaper-default-item-gap": "14px",
+					"--dashboard-shaper-default-item-icon-size": "40px",
+					"--dashboard-shaper-default-item-padding": "14px",
+					"--dashboard-shaper-default-item-title-font-size": "14px",
+					"--dashboard-shaper-default-item-title-font-weight": "600",
+					"--dashboard-shaper-default-min-height": "0",
+					"--dashboard-shaper-default-name-font-size": "13px",
+					"--dashboard-shaper-default-resize-size": "20px",
+					"--dashboard-shaper-default-row-height": "200px",
+					"--dashboard-shaper-default-schema-gap": "6px",
+					"--dashboard-shaper-default-schema-row-height": "56px",
+					"--dashboard-shaper-default-size-font-size": "12px",
+					"--dashboard-shaper-default-slot-background": "transparent",
+					"--dashboard-shaper-default-slot-border-width": "1.5px",
+					"--dashboard-shaper-default-slot-font-size": "13px",
+					"--dashboard-shaper-default-slot-font-weight": "500",
+					"--dashboard-shaper-dragging-opacity": "0.88",
+					"--dashboard-shaper-gap": "10px",
+					"--dashboard-shaper-item-description-font-size": "12.5px",
+					"--dashboard-shaper-item-gap": "14px",
+					"--dashboard-shaper-item-icon-size": "40px",
+					"--dashboard-shaper-item-padding": "14px",
+					"--dashboard-shaper-item-title-font-size": "14px",
+					"--dashboard-shaper-item-title-font-weight": "600",
+					"--dashboard-shaper-min-height": "0",
+					"--dashboard-shaper-name-font-size": "13px",
+					"--dashboard-shaper-resize-size": "20px",
+					"--dashboard-shaper-row-height": "200px",
+					"--dashboard-shaper-schema-gap": "6px",
+					"--dashboard-shaper-schema-row-height": "56px",
+					"--dashboard-shaper-size-font-size": "12px",
+					"--dashboard-shaper-slot-background": "transparent",
+					"--dashboard-shaper-slot-border-width": "1.5px",
+					"--dashboard-shaper-slot-font-size": "13px",
+					"--dashboard-shaper-slot-font-weight": "500"
+				}
 			},
 			"DataTable": {
 				"slug": "data-table",
@@ -2515,7 +3019,33 @@
 					"--data-table-toolbar-gap",
 					"--data-table-toolbar-padding",
 					"--data-table-width"
-				]
+				],
+				"cssValues": {
+					"--data-table-control-height": "28px",
+					"--data-table-default-control-height": "28px",
+					"--data-table-default-font-size": "13.5px",
+					"--data-table-default-footer-font-size": "12.5px",
+					"--data-table-default-footer-padding": "10px 14px",
+					"--data-table-default-message-padding": "12px 14px",
+					"--data-table-default-search-width": "240px",
+					"--data-table-default-selection-offset": "16px",
+					"--data-table-default-selection-padding": "6px 6px 6px 14px",
+					"--data-table-default-toolbar-background": "transparent",
+					"--data-table-default-toolbar-gap": "8px",
+					"--data-table-default-toolbar-padding": "10px 12px",
+					"--data-table-default-width": "100%",
+					"--data-table-font-size": "13.5px",
+					"--data-table-footer-font-size": "12.5px",
+					"--data-table-footer-padding": "10px 14px",
+					"--data-table-message-padding": "12px 14px",
+					"--data-table-search-width": "240px",
+					"--data-table-selection-offset": "16px",
+					"--data-table-selection-padding": "6px 6px 6px 14px",
+					"--data-table-toolbar-background": "transparent",
+					"--data-table-toolbar-gap": "8px",
+					"--data-table-toolbar-padding": "10px 12px",
+					"--data-table-width": "100%"
+				}
 			},
 			"DatePicker": {
 				"slug": "date-picker",
@@ -2622,7 +3152,27 @@
 					"--date-picker-title-hover-background",
 					"--date-picker-title-letter-spacing",
 					"--date-picker-width"
-				]
+				],
+				"cssValues": {
+					"--date-picker-default-footer-padding-top": "12px",
+					"--date-picker-default-gap": "12px",
+					"--date-picker-default-month-width": "254px",
+					"--date-picker-default-months-gap": "24px",
+					"--date-picker-default-padding": "12px",
+					"--date-picker-default-title-font-size": "16px",
+					"--date-picker-default-title-font-weight": "600",
+					"--date-picker-default-title-letter-spacing": "-0.02em",
+					"--date-picker-default-width": "280px",
+					"--date-picker-footer-padding-top": "12px",
+					"--date-picker-gap": "12px",
+					"--date-picker-month-width": "254px",
+					"--date-picker-months-gap": "24px",
+					"--date-picker-padding": "12px",
+					"--date-picker-title-font-size": "16px",
+					"--date-picker-title-font-weight": "600",
+					"--date-picker-title-letter-spacing": "-0.02em",
+					"--date-picker-width": "280px"
+				}
 			},
 			"DatePickerTextField": {
 				"slug": "date-picker-text-field",
@@ -2795,7 +3345,25 @@
 					"--date-picker-text-field-separator-color",
 					"--date-picker-text-field-success-color",
 					"--date-picker-text-field-width"
-				]
+				],
+				"cssValues": {
+					"--date-picker-text-field-default-font-weight": "400",
+					"--date-picker-text-field-default-format-font-size": "11px",
+					"--date-picker-text-field-default-format-padding": "2px 6px",
+					"--date-picker-text-field-default-gap": "6px",
+					"--date-picker-text-field-default-icon-size": "18px",
+					"--date-picker-text-field-default-max-width": "none",
+					"--date-picker-text-field-default-outer-gap": "8px",
+					"--date-picker-text-field-default-width": "100%",
+					"--date-picker-text-field-font-weight": "400",
+					"--date-picker-text-field-format-font-size": "11px",
+					"--date-picker-text-field-format-padding": "2px 6px",
+					"--date-picker-text-field-gap": "6px",
+					"--date-picker-text-field-icon-size": "18px",
+					"--date-picker-text-field-max-width": "none",
+					"--date-picker-text-field-outer-gap": "8px",
+					"--date-picker-text-field-width": "100%"
+				}
 			},
 			"DateTimePickerTextField": {
 				"slug": "date-time-picker-text-field",
@@ -2963,7 +3531,29 @@
 					"--date-time-picker-text-field-placeholder-color",
 					"--date-time-picker-text-field-success-color",
 					"--date-time-picker-text-field-width"
-				]
+				],
+				"cssValues": {
+					"--date-time-picker-text-field-default-font-weight": "400",
+					"--date-time-picker-text-field-default-format-font-size": "11px",
+					"--date-time-picker-text-field-default-format-padding": "2px 6px",
+					"--date-time-picker-text-field-default-gap": "6px",
+					"--date-time-picker-text-field-default-icon-size": "18px",
+					"--date-time-picker-text-field-default-max-width": "none",
+					"--date-time-picker-text-field-default-outer-gap": "8px",
+					"--date-time-picker-text-field-default-panel-gap": "8px",
+					"--date-time-picker-text-field-default-panel-padding": "4px",
+					"--date-time-picker-text-field-default-width": "100%",
+					"--date-time-picker-text-field-font-weight": "400",
+					"--date-time-picker-text-field-format-font-size": "11px",
+					"--date-time-picker-text-field-format-padding": "2px 6px",
+					"--date-time-picker-text-field-gap": "6px",
+					"--date-time-picker-text-field-icon-size": "18px",
+					"--date-time-picker-text-field-max-width": "none",
+					"--date-time-picker-text-field-outer-gap": "8px",
+					"--date-time-picker-text-field-panel-gap": "8px",
+					"--date-time-picker-text-field-panel-padding": "4px",
+					"--date-time-picker-text-field-width": "100%"
+				}
 			},
 			"DescriptiveAvatar": {
 				"slug": "descriptive-avatar",
@@ -3049,7 +3639,27 @@
 					"--descriptive-avatar-title-color",
 					"--descriptive-avatar-title-font-size",
 					"--descriptive-avatar-title-font-weight"
-				]
+				],
+				"cssValues": {
+					"--descriptive-avatar-background": "transparent",
+					"--descriptive-avatar-cursor": "auto",
+					"--descriptive-avatar-default-disabled-opacity": "0.5",
+					"--descriptive-avatar-default-image-gap": "12px",
+					"--descriptive-avatar-default-interactive-column-padding": "16px",
+					"--descriptive-avatar-default-interactive-compact-padding": "4px",
+					"--descriptive-avatar-default-interactive-padding": "8px 14px 8px 8px",
+					"--descriptive-avatar-default-interactive-reverse-padding": "8px 8px 8px 14px",
+					"--descriptive-avatar-default-subtitle-font-size": "12.5px",
+					"--descriptive-avatar-default-text-gap": "2px",
+					"--descriptive-avatar-default-title-font-size": "14px",
+					"--descriptive-avatar-default-title-font-weight": "600",
+					"--descriptive-avatar-disabled-opacity": "0.5",
+					"--descriptive-avatar-image-gap": "12px",
+					"--descriptive-avatar-subtitle-font-size": "12.5px",
+					"--descriptive-avatar-text-gap": "2px",
+					"--descriptive-avatar-title-font-size": "14px",
+					"--descriptive-avatar-title-font-weight": "600"
+				}
 			},
 			"Dialog": {
 				"slug": "dialog",
@@ -3157,7 +3767,53 @@
 					"--dialog-transition-x",
 					"--dialog-transition-y",
 					"--dialog-width"
-				]
+				],
+				"cssValues": {
+					"--dialog-actions-gap": "10px",
+					"--dialog-actions-justify-content": "flex-end",
+					"--dialog-actions-margin-top": "22px",
+					"--dialog-actions-padding": "0",
+					"--dialog-body-font-size": "14px",
+					"--dialog-body-line-height": "1.5",
+					"--dialog-default-actions-gap": "10px",
+					"--dialog-default-actions-justify-content": "flex-end",
+					"--dialog-default-actions-margin-top": "22px",
+					"--dialog-default-actions-padding": "0",
+					"--dialog-default-body-font-size": "14px",
+					"--dialog-default-body-line-height": "1.5",
+					"--dialog-default-header-gap": "12px",
+					"--dialog-default-header-margin-bottom": "6px",
+					"--dialog-default-header-padding": "0",
+					"--dialog-default-height": "auto",
+					"--dialog-default-inset": "16px",
+					"--dialog-default-max-height": "100%",
+					"--dialog-default-max-width": "440px",
+					"--dialog-default-padding": "20px",
+					"--dialog-default-title-font-size": "21px",
+					"--dialog-default-title-font-weight": "700",
+					"--dialog-default-title-letter-spacing": "-0.02em",
+					"--dialog-default-title-line-height": "1.25",
+					"--dialog-default-transition-scale": "0.96",
+					"--dialog-default-transition-x": "0px",
+					"--dialog-default-transition-y": "16px",
+					"--dialog-default-width": "100%",
+					"--dialog-header-gap": "12px",
+					"--dialog-header-margin-bottom": "6px",
+					"--dialog-header-padding": "0",
+					"--dialog-height": "auto",
+					"--dialog-inset": "16px",
+					"--dialog-max-height": "100%",
+					"--dialog-max-width": "440px",
+					"--dialog-padding": "20px",
+					"--dialog-title-font-size": "21px",
+					"--dialog-title-font-weight": "700",
+					"--dialog-title-letter-spacing": "-0.02em",
+					"--dialog-title-line-height": "1.25",
+					"--dialog-transition-scale": "0.96",
+					"--dialog-transition-x": "0px",
+					"--dialog-transition-y": "16px",
+					"--dialog-width": "100%"
+				}
 			},
 			"Divider": {
 				"slug": "divider",
@@ -3210,7 +3866,27 @@
 					"--divider-spacing",
 					"--divider-vertical-min-height",
 					"--divider-weight"
-				]
+				],
+				"cssValues": {
+					"--divider-default-gap": "14px",
+					"--divider-default-label-font-family": "inherit",
+					"--divider-default-label-font-size": "11.5px",
+					"--divider-default-label-font-weight": "500",
+					"--divider-default-label-letter-spacing": "0.14em",
+					"--divider-default-label-text-transform": "uppercase",
+					"--divider-default-spacing": "10px",
+					"--divider-default-vertical-min-height": "1em",
+					"--divider-default-weight": "1px",
+					"--divider-gap": "14px",
+					"--divider-label-font-family": "inherit",
+					"--divider-label-font-size": "11.5px",
+					"--divider-label-font-weight": "500",
+					"--divider-label-letter-spacing": "0.14em",
+					"--divider-label-text-transform": "uppercase",
+					"--divider-spacing": "10px",
+					"--divider-vertical-min-height": "1em",
+					"--divider-weight": "1px"
+				}
 			},
 			"DotsLoader": {
 				"slug": "dots-loader",
@@ -3243,7 +3919,17 @@
 					"--dots-loader-duration",
 					"--dots-loader-gap",
 					"--dots-loader-size"
-				]
+				],
+				"cssValues": {
+					"--dots-loader-default-dim-opacity": "0.25",
+					"--dots-loader-default-duration": "1.2s",
+					"--dots-loader-default-gap": "6px",
+					"--dots-loader-default-size": "9px",
+					"--dots-loader-dim-opacity": "0.25",
+					"--dots-loader-duration": "1.2s",
+					"--dots-loader-gap": "6px",
+					"--dots-loader-size": "9px"
+				}
 			},
 			"Drawer": {
 				"slug": "drawer",
@@ -3358,7 +4044,55 @@
 					"--drawer-title-font-weight",
 					"--drawer-title-letter-spacing",
 					"--drawer-title-line-height"
-				]
+				],
+				"cssValues": {
+					"--drawer-actions-gap": "10px",
+					"--drawer-actions-justify-content": "flex-end",
+					"--drawer-actions-margin-top": "14px",
+					"--drawer-actions-padding": "0 6px",
+					"--drawer-body-font-size": "14px",
+					"--drawer-body-line-height": "1.5",
+					"--drawer-default-actions-gap": "10px",
+					"--drawer-default-actions-justify-content": "flex-end",
+					"--drawer-default-actions-margin-top": "14px",
+					"--drawer-default-actions-padding": "0 6px",
+					"--drawer-default-body-font-size": "14px",
+					"--drawer-default-body-line-height": "1.5",
+					"--drawer-default-handle-height": "5px",
+					"--drawer-default-handle-margin": "-18px 0 4px",
+					"--drawer-default-handle-padding": "8px 0",
+					"--drawer-default-handle-width": "38px",
+					"--drawer-default-header-gap": "12px",
+					"--drawer-default-header-margin-bottom": "14px",
+					"--drawer-default-header-padding": "0 6px",
+					"--drawer-default-left-border-radius": "0",
+					"--drawer-default-margin": "0",
+					"--drawer-default-max-size": "100%",
+					"--drawer-default-overflow": "auto",
+					"--drawer-default-padding": "18px 12px",
+					"--drawer-default-right-border-radius": "0",
+					"--drawer-default-size": "20rem",
+					"--drawer-default-title-font-size": "16px",
+					"--drawer-default-title-font-weight": "600",
+					"--drawer-default-title-letter-spacing": "-0.01em",
+					"--drawer-default-title-line-height": "1.3",
+					"--drawer-handle-height": "5px",
+					"--drawer-handle-margin": "-18px 0 4px",
+					"--drawer-handle-padding": "8px 0",
+					"--drawer-handle-width": "38px",
+					"--drawer-header-gap": "12px",
+					"--drawer-header-margin-bottom": "14px",
+					"--drawer-header-padding": "0 6px",
+					"--drawer-margin": "0",
+					"--drawer-max-size": "100%",
+					"--drawer-overflow": "auto",
+					"--drawer-padding": "18px 12px",
+					"--drawer-size": "20rem",
+					"--drawer-title-font-size": "16px",
+					"--drawer-title-font-weight": "600",
+					"--drawer-title-letter-spacing": "-0.01em",
+					"--drawer-title-line-height": "1.3"
+				}
 			},
 			"Dropdown": {
 				"slug": "dropdown",
@@ -3452,7 +4186,37 @@
 					"--dropdown-min-width",
 					"--dropdown-placeholder-color",
 					"--dropdown-width"
-				]
+				],
+				"cssValues": {
+					"--dropdown-chevron-color": "color-mix(in oklab, currentColor 70%, transparent)",
+					"--dropdown-chevron-size": "18px",
+					"--dropdown-clear-color": "color-mix(in oklab, currentColor 70%, transparent)",
+					"--dropdown-clear-hover-background": "color-mix(in oklab, currentColor 12%, transparent)",
+					"--dropdown-clear-hover-color": "currentColor",
+					"--dropdown-clear-icon-size": "16px",
+					"--dropdown-clear-size": "22px",
+					"--dropdown-default-chevron-color": "color-mix(in oklab, currentColor 70%, transparent)",
+					"--dropdown-default-chevron-size": "18px",
+					"--dropdown-default-clear-color": "color-mix(in oklab, currentColor 70%, transparent)",
+					"--dropdown-default-clear-hover-background": "color-mix(in oklab, currentColor 12%, transparent)",
+					"--dropdown-default-clear-hover-color": "currentColor",
+					"--dropdown-default-clear-icon-size": "16px",
+					"--dropdown-default-clear-size": "22px",
+					"--dropdown-default-label-color": "color-mix(in oklab, currentColor 70%, transparent)",
+					"--dropdown-default-label-font-weight": "400",
+					"--dropdown-default-max-width": "100%",
+					"--dropdown-default-menu-min-width": "220px",
+					"--dropdown-default-min-width": "0",
+					"--dropdown-default-placeholder-color": "color-mix(in oklab, currentColor 70%, transparent)",
+					"--dropdown-default-width": "fit-content",
+					"--dropdown-label-color": "color-mix(in oklab, currentColor 70%, transparent)",
+					"--dropdown-label-font-weight": "400",
+					"--dropdown-max-width": "100%",
+					"--dropdown-menu-min-width": "220px",
+					"--dropdown-min-width": "0",
+					"--dropdown-placeholder-color": "color-mix(in oklab, currentColor 70%, transparent)",
+					"--dropdown-width": "fit-content"
+				}
 			},
 			"FileInput": {
 				"slug": "file-input",
@@ -3586,7 +4350,36 @@
 					"--file-input-title-font-size",
 					"--file-input-title-font-weight",
 					"--file-input-width"
-				]
+				],
+				"cssValues": {
+					"--file-input-border-style": "dashed",
+					"--file-input-border-width": "1.5px",
+					"--file-input-browse-font-weight": "500",
+					"--file-input-default-border-style": "dashed",
+					"--file-input-default-border-width": "1.5px",
+					"--file-input-default-browse-font-weight": "500",
+					"--file-input-default-compact-icon-box-size": "36px",
+					"--file-input-default-compact-icon-size": "20px",
+					"--file-input-default-compact-inner-gap": "12px",
+					"--file-input-default-compact-padding": "10px 14px",
+					"--file-input-default-gap": "6px",
+					"--file-input-default-height": "auto",
+					"--file-input-default-icon-box-size": "48px",
+					"--file-input-default-icon-hover-lift": "-3px",
+					"--file-input-default-icon-size": "26px",
+					"--file-input-default-inner-gap": "4px",
+					"--file-input-default-padding": "24px",
+					"--file-input-default-text-font-size": "12.5px",
+					"--file-input-default-title-font-size": "14px",
+					"--file-input-default-title-font-weight": "600",
+					"--file-input-default-width": "100%",
+					"--file-input-height": "auto",
+					"--file-input-icon-hover-lift": "-3px",
+					"--file-input-text-font-size": "12.5px",
+					"--file-input-title-font-size": "14px",
+					"--file-input-title-font-weight": "600",
+					"--file-input-width": "100%"
+				}
 			},
 			"FileInputList": {
 				"slug": "file-input-list",
@@ -3711,7 +4504,41 @@
 					"--file-input-list-progress-height",
 					"--file-input-list-status-icon-size",
 					"--file-input-list-width"
-				]
+				],
+				"cssValues": {
+					"--file-input-list-card-icon-size": "36px",
+					"--file-input-list-card-media-height": "96px",
+					"--file-input-list-card-min-width": "140px",
+					"--file-input-list-default-card-icon-size": "36px",
+					"--file-input-list-default-card-media-height": "96px",
+					"--file-input-list-default-card-min-width": "140px",
+					"--file-input-list-default-details-font-size": "11.5px",
+					"--file-input-list-default-empty-font-size": "13px",
+					"--file-input-list-default-gap": "8px",
+					"--file-input-list-default-height": "auto",
+					"--file-input-list-default-icon-box-size": "32px",
+					"--file-input-list-default-icon-size": "20px",
+					"--file-input-list-default-item-gap": "10px",
+					"--file-input-list-default-item-padding": "8px 10px",
+					"--file-input-list-default-name-font-size": "13.5px",
+					"--file-input-list-default-name-font-weight": "500",
+					"--file-input-list-default-progress-height": "4px",
+					"--file-input-list-default-status-icon-size": "20px",
+					"--file-input-list-default-width": "100%",
+					"--file-input-list-details-font-size": "11.5px",
+					"--file-input-list-empty-font-size": "13px",
+					"--file-input-list-gap": "8px",
+					"--file-input-list-height": "auto",
+					"--file-input-list-icon-box-size": "32px",
+					"--file-input-list-icon-size": "20px",
+					"--file-input-list-item-gap": "10px",
+					"--file-input-list-item-padding": "8px 10px",
+					"--file-input-list-name-font-size": "13.5px",
+					"--file-input-list-name-font-weight": "500",
+					"--file-input-list-progress-height": "4px",
+					"--file-input-list-status-icon-size": "20px",
+					"--file-input-list-width": "100%"
+				}
 			},
 			"FilterEditor": {
 				"slug": "filter-editor",
@@ -3775,7 +4602,19 @@
 					"--filter-editor-title-font-size",
 					"--filter-editor-title-font-weight",
 					"--filter-editor-width"
-				]
+				],
+				"cssValues": {
+					"--filter-editor-default-gap": "12px",
+					"--filter-editor-default-padding": "12px",
+					"--filter-editor-default-title-font-size": "14px",
+					"--filter-editor-default-title-font-weight": "600",
+					"--filter-editor-default-width": "320px",
+					"--filter-editor-gap": "12px",
+					"--filter-editor-padding": "12px",
+					"--filter-editor-title-font-size": "14px",
+					"--filter-editor-title-font-weight": "600",
+					"--filter-editor-width": "320px"
+				}
 			},
 			"Filters": {
 				"slug": "filters",
@@ -3891,7 +4730,25 @@
 					"--filters-pill-value-color",
 					"--filters-pill-value-max-width",
 					"--filters-width"
-				]
+				],
+				"cssValues": {
+					"--filters-default-gap": "8px",
+					"--filters-default-group-padding": "14px",
+					"--filters-default-panel-padding": "16px",
+					"--filters-default-panel-width": "880px",
+					"--filters-default-pill-font-size": "13px",
+					"--filters-default-pill-height": "30px",
+					"--filters-field-list-max-height": "320px",
+					"--filters-field-list-width": "260px",
+					"--filters-gap": "8px",
+					"--filters-group-padding": "14px",
+					"--filters-panel-padding": "16px",
+					"--filters-panel-width": "880px",
+					"--filters-pill-font-size": "13px",
+					"--filters-pill-height": "30px",
+					"--filters-pill-value-max-width": "220px",
+					"--filters-width": "100%"
+				}
 			},
 			"FlagIcon": {
 				"slug": "flag-icon",
@@ -3917,7 +4774,11 @@
 					"--flag-icon-default-box-shadow",
 					"--flag-icon-default-size",
 					"--flag-icon-size"
-				]
+				],
+				"cssValues": {
+					"--flag-icon-default-size": "1.2em",
+					"--flag-icon-size": "1.2em"
+				}
 			},
 			"GlobalSearchTextField": {
 				"slug": "global-search-text-field",
@@ -4025,7 +4886,35 @@
 					"--global-search-text-field-option-icon-color",
 					"--global-search-text-field-padding",
 					"--global-search-text-field-width"
-				]
+				],
+				"cssValues": {
+					"--global-search-text-field-box-font-size": "15px",
+					"--global-search-text-field-box-height": "52px",
+					"--global-search-text-field-default-box-font-size": "15px",
+					"--global-search-text-field-default-box-height": "52px",
+					"--global-search-text-field-default-dialog-max-height": "min(560px, 80dvh)",
+					"--global-search-text-field-default-dialog-top": "12dvh",
+					"--global-search-text-field-default-dialog-width": "560px",
+					"--global-search-text-field-default-font-size": "13px",
+					"--global-search-text-field-default-group-font-size": "10.5px",
+					"--global-search-text-field-default-height": "32px",
+					"--global-search-text-field-default-icon-size": "16px",
+					"--global-search-text-field-default-kbd-font-size": "11px",
+					"--global-search-text-field-default-max-width": "220px",
+					"--global-search-text-field-default-padding": "0 6px 0 10px",
+					"--global-search-text-field-default-width": "100%",
+					"--global-search-text-field-dialog-max-height": "min(560px, 80dvh)",
+					"--global-search-text-field-dialog-top": "12dvh",
+					"--global-search-text-field-dialog-width": "560px",
+					"--global-search-text-field-font-size": "13px",
+					"--global-search-text-field-group-font-size": "10.5px",
+					"--global-search-text-field-height": "32px",
+					"--global-search-text-field-icon-size": "16px",
+					"--global-search-text-field-kbd-font-size": "11px",
+					"--global-search-text-field-max-width": "220px",
+					"--global-search-text-field-padding": "0 6px 0 10px",
+					"--global-search-text-field-width": "100%"
+				}
 			},
 			"HierarchyMenu": {
 				"slug": "hierarchy-menu",
@@ -4163,7 +5052,63 @@
 					"--hierarchy-menu-option-selected-color",
 					"--hierarchy-menu-option-selected-font-weight",
 					"--hierarchy-menu-width"
-				]
+				],
+				"cssValues": {
+					"--hierarchy-menu-badge-font-size": "11px",
+					"--hierarchy-menu-badge-padding": "1px 7px",
+					"--hierarchy-menu-caret-size": "16px",
+					"--hierarchy-menu-child-font-size": "13px",
+					"--hierarchy-menu-child-height": "34px",
+					"--hierarchy-menu-children-indent": "12px",
+					"--hierarchy-menu-children-offset": "21px",
+					"--hierarchy-menu-default-badge-font-size": "11px",
+					"--hierarchy-menu-default-badge-padding": "1px 7px",
+					"--hierarchy-menu-default-caret-size": "16px",
+					"--hierarchy-menu-default-child-font-size": "13px",
+					"--hierarchy-menu-default-child-height": "34px",
+					"--hierarchy-menu-default-children-indent": "12px",
+					"--hierarchy-menu-default-children-offset": "21px",
+					"--hierarchy-menu-default-disabled-opacity": "0.45",
+					"--hierarchy-menu-default-dot-size": "7px",
+					"--hierarchy-menu-default-flyout-min-width": "200px",
+					"--hierarchy-menu-default-flyout-padding": "6px",
+					"--hierarchy-menu-default-flyout-title-font-size": "11px",
+					"--hierarchy-menu-default-font-family": "inherit",
+					"--hierarchy-menu-default-gap": "2px",
+					"--hierarchy-menu-default-icon-color": "currentColor",
+					"--hierarchy-menu-default-icon-size": "18px",
+					"--hierarchy-menu-default-indicator-inset": "9px",
+					"--hierarchy-menu-default-indicator-offset": "-10px",
+					"--hierarchy-menu-default-indicator-width": "3px",
+					"--hierarchy-menu-default-option-background": "transparent",
+					"--hierarchy-menu-default-option-font-size": "14px",
+					"--hierarchy-menu-default-option-font-weight": "500",
+					"--hierarchy-menu-default-option-gap": "10px",
+					"--hierarchy-menu-default-option-height": "38px",
+					"--hierarchy-menu-default-option-padding": "0 13px",
+					"--hierarchy-menu-default-option-selected-font-weight": "500",
+					"--hierarchy-menu-default-width": "100%",
+					"--hierarchy-menu-disabled-opacity": "0.45",
+					"--hierarchy-menu-dot-size": "7px",
+					"--hierarchy-menu-flyout-min-width": "200px",
+					"--hierarchy-menu-flyout-padding": "6px",
+					"--hierarchy-menu-flyout-title-font-size": "11px",
+					"--hierarchy-menu-font-family": "inherit",
+					"--hierarchy-menu-gap": "2px",
+					"--hierarchy-menu-icon-color": "currentColor",
+					"--hierarchy-menu-icon-size": "18px",
+					"--hierarchy-menu-indicator-inset": "9px",
+					"--hierarchy-menu-indicator-offset": "-10px",
+					"--hierarchy-menu-indicator-width": "3px",
+					"--hierarchy-menu-option-background": "transparent",
+					"--hierarchy-menu-option-font-size": "14px",
+					"--hierarchy-menu-option-font-weight": "500",
+					"--hierarchy-menu-option-gap": "10px",
+					"--hierarchy-menu-option-height": "38px",
+					"--hierarchy-menu-option-padding": "0 13px",
+					"--hierarchy-menu-option-selected-font-weight": "500",
+					"--hierarchy-menu-width": "100%"
+				}
 			},
 			"HorizontalStackedProgress": {
 				"slug": "horizontal-stacked-progress",
@@ -4259,7 +5204,51 @@
 					"--horizontal-stacked-progress-value-font-family",
 					"--horizontal-stacked-progress-value-font-size",
 					"--horizontal-stacked-progress-width"
-				]
+				],
+				"cssValues": {
+					"--horizontal-stacked-progress-default-dot-border-radius": "2px",
+					"--horizontal-stacked-progress-default-dot-size": "8px",
+					"--horizontal-stacked-progress-default-gap": "3px",
+					"--horizontal-stacked-progress-default-header-gap": "8px",
+					"--horizontal-stacked-progress-default-height": "12px",
+					"--horizontal-stacked-progress-default-hover-filter": "brightness(1.2)",
+					"--horizontal-stacked-progress-default-hover-scale": "1.3",
+					"--horizontal-stacked-progress-default-label-font-size": "13px",
+					"--horizontal-stacked-progress-default-label-font-weight": "600",
+					"--horizontal-stacked-progress-default-legend-font-size": "12.5px",
+					"--horizontal-stacked-progress-default-legend-gap": "6px 16px",
+					"--horizontal-stacked-progress-default-legend-margin-top": "12px",
+					"--horizontal-stacked-progress-default-legend-value-font-weight": "500",
+					"--horizontal-stacked-progress-default-segment-border-radius": "3px",
+					"--horizontal-stacked-progress-default-segment-label-font-size": "12px",
+					"--horizontal-stacked-progress-default-segment-label-font-weight": "400",
+					"--horizontal-stacked-progress-default-segment-label-gap": "8px",
+					"--horizontal-stacked-progress-default-segment-value-font-size": "16px",
+					"--horizontal-stacked-progress-default-segment-value-font-weight": "700",
+					"--horizontal-stacked-progress-default-value-font-size": "13px",
+					"--horizontal-stacked-progress-default-width": "100%",
+					"--horizontal-stacked-progress-dot-border-radius": "2px",
+					"--horizontal-stacked-progress-dot-size": "8px",
+					"--horizontal-stacked-progress-gap": "3px",
+					"--horizontal-stacked-progress-header-gap": "8px",
+					"--horizontal-stacked-progress-height": "12px",
+					"--horizontal-stacked-progress-hover-filter": "brightness(1.2)",
+					"--horizontal-stacked-progress-hover-scale": "1.3",
+					"--horizontal-stacked-progress-label-font-size": "13px",
+					"--horizontal-stacked-progress-label-font-weight": "600",
+					"--horizontal-stacked-progress-legend-font-size": "12.5px",
+					"--horizontal-stacked-progress-legend-gap": "6px 16px",
+					"--horizontal-stacked-progress-legend-margin-top": "12px",
+					"--horizontal-stacked-progress-legend-value-font-weight": "500",
+					"--horizontal-stacked-progress-segment-border-radius": "3px",
+					"--horizontal-stacked-progress-segment-label-font-size": "12px",
+					"--horizontal-stacked-progress-segment-label-font-weight": "400",
+					"--horizontal-stacked-progress-segment-label-gap": "8px",
+					"--horizontal-stacked-progress-segment-value-font-size": "16px",
+					"--horizontal-stacked-progress-segment-value-font-weight": "700",
+					"--horizontal-stacked-progress-value-font-size": "13px",
+					"--horizontal-stacked-progress-width": "100%"
+				}
 			},
 			"Icon": {
 				"slug": "icon",
@@ -4281,7 +5270,13 @@
 					"--icon-default-color",
 					"--icon-default-size",
 					"--icon-size"
-				]
+				],
+				"cssValues": {
+					"--icon-color": "currentColor",
+					"--icon-default-color": "currentColor",
+					"--icon-default-size": "1em",
+					"--icon-size": "1em"
+				}
 			},
 			"IconsDropdown": {
 				"slug": "icons-dropdown",
@@ -4411,7 +5406,46 @@
 					"--icons-dropdown-value-icon-size",
 					"--icons-dropdown-value-size",
 					"--icons-dropdown-width"
-				]
+				],
+				"cssValues": {
+					"--icons-dropdown-counter-font-size": "12px",
+					"--icons-dropdown-default-counter-font-size": "12px",
+					"--icons-dropdown-default-drawer-menu-gap": "8px",
+					"--icons-dropdown-default-drawer-option-size": "44px",
+					"--icons-dropdown-default-gap": "4px",
+					"--icons-dropdown-default-lg-padding": "0 8px 0 4px",
+					"--icons-dropdown-default-lg-value-icon-size": "18px",
+					"--icons-dropdown-default-lg-value-size": "30px",
+					"--icons-dropdown-default-menu-gap": "4px",
+					"--icons-dropdown-default-menu-width": "auto",
+					"--icons-dropdown-default-min-width": "0",
+					"--icons-dropdown-default-option-highlighted-border-color": "transparent",
+					"--icons-dropdown-default-option-highlighted-transform": "translateY(-2px)",
+					"--icons-dropdown-default-option-icon-size": "18px",
+					"--icons-dropdown-default-option-size": "36px",
+					"--icons-dropdown-default-padding": "0 6px 0 3px",
+					"--icons-dropdown-default-placeholder-indent": "7px",
+					"--icons-dropdown-default-sm-padding": "0 4px 0 3px",
+					"--icons-dropdown-default-sm-value-icon-size": "14px",
+					"--icons-dropdown-default-sm-value-size": "20px",
+					"--icons-dropdown-default-value-gap": "3px",
+					"--icons-dropdown-default-value-icon-size": "16px",
+					"--icons-dropdown-default-value-size": "26px",
+					"--icons-dropdown-default-width": "fit-content",
+					"--icons-dropdown-drawer-menu-gap": "8px",
+					"--icons-dropdown-drawer-option-size": "44px",
+					"--icons-dropdown-gap": "4px",
+					"--icons-dropdown-menu-gap": "4px",
+					"--icons-dropdown-menu-width": "auto",
+					"--icons-dropdown-min-width": "0",
+					"--icons-dropdown-option-highlighted-border-color": "transparent",
+					"--icons-dropdown-option-highlighted-transform": "translateY(-2px)",
+					"--icons-dropdown-option-icon-size": "18px",
+					"--icons-dropdown-option-size": "36px",
+					"--icons-dropdown-placeholder-indent": "7px",
+					"--icons-dropdown-value-gap": "3px",
+					"--icons-dropdown-width": "fit-content"
+				}
 			},
 			"LineChart": {
 				"slug": "line-chart",
@@ -4533,7 +5567,45 @@
 					"--line-chart-tooltip-value-font-size",
 					"--line-chart-width",
 					"--line-chart-zoom-color"
-				]
+				],
+				"cssValues": {
+					"--line-chart-default-gap": "12px",
+					"--line-chart-default-glow-blur": "10px",
+					"--line-chart-default-height": "16rem",
+					"--line-chart-default-legend-font-size": "12.5px",
+					"--line-chart-default-legend-gap": "16px",
+					"--line-chart-default-legend-hidden-opacity": "0.45",
+					"--line-chart-default-legend-min-width": "180px",
+					"--line-chart-default-legend-swatch-radius": "2px",
+					"--line-chart-default-legend-swatch-size": "8px",
+					"--line-chart-default-line-width": "3px",
+					"--line-chart-default-min-width": "12rem",
+					"--line-chart-default-tick-font-size": "11px",
+					"--line-chart-default-tooltip-label-font-size": "12px",
+					"--line-chart-default-tooltip-min-width": "auto",
+					"--line-chart-default-tooltip-padding": "8px 12px",
+					"--line-chart-default-tooltip-title-font-size": "10.5px",
+					"--line-chart-default-tooltip-value-font-size": "13px",
+					"--line-chart-default-width": "100%",
+					"--line-chart-gap": "12px",
+					"--line-chart-glow-blur": "10px",
+					"--line-chart-height": "16rem",
+					"--line-chart-legend-font-size": "12.5px",
+					"--line-chart-legend-gap": "16px",
+					"--line-chart-legend-hidden-opacity": "0.45",
+					"--line-chart-legend-min-width": "180px",
+					"--line-chart-legend-swatch-radius": "2px",
+					"--line-chart-legend-swatch-size": "8px",
+					"--line-chart-line-width": "3px",
+					"--line-chart-min-width": "12rem",
+					"--line-chart-tick-font-size": "11px",
+					"--line-chart-tooltip-label-font-size": "12px",
+					"--line-chart-tooltip-min-width": "auto",
+					"--line-chart-tooltip-padding": "8px 12px",
+					"--line-chart-tooltip-title-font-size": "10.5px",
+					"--line-chart-tooltip-value-font-size": "13px",
+					"--line-chart-width": "100%"
+				}
 			},
 			"LinkButton": {
 				"slug": "link-button",
@@ -4605,7 +5677,37 @@
 					"--link-button-underline-offset",
 					"--link-button-underline-opacity",
 					"--link-button-underline-scale"
-				]
+				],
+				"cssValues": {
+					"--link-button-background": "transparent",
+					"--link-button-default-background": "transparent",
+					"--link-button-default-disabled-opacity": "0.4",
+					"--link-button-default-font-size": "inherit",
+					"--link-button-default-font-weight": "500",
+					"--link-button-default-gap": "6px",
+					"--link-button-default-hover-background": "transparent",
+					"--link-button-default-icon-shift": "3px",
+					"--link-button-default-icon-size": "1.15em",
+					"--link-button-default-line-height": "inherit",
+					"--link-button-default-padding": "0",
+					"--link-button-default-underline-height": "2px",
+					"--link-button-default-underline-offset": "3px",
+					"--link-button-default-underline-opacity": "0.6",
+					"--link-button-default-underline-scale": "0.2",
+					"--link-button-disabled-opacity": "0.4",
+					"--link-button-font-size": "inherit",
+					"--link-button-font-weight": "500",
+					"--link-button-gap": "6px",
+					"--link-button-hover-background": "transparent",
+					"--link-button-icon-shift": "3px",
+					"--link-button-icon-size": "1.15em",
+					"--link-button-line-height": "inherit",
+					"--link-button-padding": "0",
+					"--link-button-underline-height": "2px",
+					"--link-button-underline-offset": "3px",
+					"--link-button-underline-opacity": "0.6",
+					"--link-button-underline-scale": "0.2"
+				}
 			},
 			"MediaQuery": {
 				"slug": "media-query",
@@ -4618,7 +5720,8 @@
 					"defaultSnippet"
 				],
 				"native": false,
-				"cssVars": []
+				"cssVars": [],
+				"cssValues": {}
 			},
 			"Menu": {
 				"slug": "menu",
@@ -4683,7 +5786,29 @@
 					"--menu-transition-distance",
 					"--menu-transition-scale",
 					"--menu-width"
-				]
+				],
+				"cssValues": {
+					"--menu-backdrop-filter": "blur(24px)",
+					"--menu-default-backdrop-filter": "blur(24px)",
+					"--menu-default-height": "auto",
+					"--menu-default-max-height": "calc(100dvh - 16px)",
+					"--menu-default-max-width": "calc(100vw - 16px)",
+					"--menu-default-min-width": "0",
+					"--menu-default-overflow": "auto",
+					"--menu-default-padding": "4px",
+					"--menu-default-transition-distance": "6px",
+					"--menu-default-transition-scale": "0.98",
+					"--menu-default-width": "auto",
+					"--menu-height": "auto",
+					"--menu-max-height": "calc(100dvh - 16px)",
+					"--menu-max-width": "calc(100vw - 16px)",
+					"--menu-min-width": "0",
+					"--menu-overflow": "auto",
+					"--menu-padding": "4px",
+					"--menu-transition-distance": "6px",
+					"--menu-transition-scale": "0.98",
+					"--menu-width": "auto"
+				}
 			},
 			"MenuOrDrawer": {
 				"slug": "menu-or-drawer",
@@ -4714,7 +5839,8 @@
 					"children"
 				],
 				"native": false,
-				"cssVars": []
+				"cssVars": [],
+				"cssValues": {}
 			},
 			"MenuOrDrawerOptions": {
 				"slug": "menu-or-drawer-options",
@@ -4801,7 +5927,29 @@
 					"--menu-or-drawer-options-shortcut-color",
 					"--menu-or-drawer-options-shortcut-font-family",
 					"--menu-or-drawer-options-shortcut-font-size"
-				]
+				],
+				"cssValues": {
+					"--menu-or-drawer-options-default-description-font-size": "11.5px",
+					"--menu-or-drawer-options-default-disabled-opacity": "0.4",
+					"--menu-or-drawer-options-default-divider-margin": "4px 6px",
+					"--menu-or-drawer-options-default-drawer-icon-size": "20px",
+					"--menu-or-drawer-options-default-drawer-item-font-size": "15px",
+					"--menu-or-drawer-options-default-drawer-item-padding": "12px 12px",
+					"--menu-or-drawer-options-default-gap": "1px",
+					"--menu-or-drawer-options-default-icon-size": "17px",
+					"--menu-or-drawer-options-default-item-font-size": "13px",
+					"--menu-or-drawer-options-default-item-gap": "8px",
+					"--menu-or-drawer-options-default-item-padding": "7px 10px",
+					"--menu-or-drawer-options-default-min-width": "180px",
+					"--menu-or-drawer-options-default-shortcut-font-size": "11px",
+					"--menu-or-drawer-options-description-font-size": "11.5px",
+					"--menu-or-drawer-options-disabled-opacity": "0.4",
+					"--menu-or-drawer-options-divider-margin": "4px 6px",
+					"--menu-or-drawer-options-gap": "1px",
+					"--menu-or-drawer-options-item-gap": "8px",
+					"--menu-or-drawer-options-min-width": "180px",
+					"--menu-or-drawer-options-shortcut-font-size": "11px"
+				}
 			},
 			"ModeSwitch": {
 				"slug": "mode-switch",
@@ -4882,7 +6030,23 @@
 					"--mode-switch-selected-background",
 					"--mode-switch-selected-box-shadow",
 					"--mode-switch-selected-color"
-				]
+				],
+				"cssValues": {
+					"--mode-switch-box-shadow": "none",
+					"--mode-switch-default-box-shadow": "none",
+					"--mode-switch-default-gap": "4px",
+					"--mode-switch-default-hover-background": "transparent",
+					"--mode-switch-default-icon-size": "16px",
+					"--mode-switch-default-option-height": "30px",
+					"--mode-switch-default-option-width": "34px",
+					"--mode-switch-default-padding": "4px",
+					"--mode-switch-default-sm-icon-size": "14px",
+					"--mode-switch-default-sm-option-height": "24px",
+					"--mode-switch-default-sm-option-width": "28px",
+					"--mode-switch-default-sm-padding": "3px",
+					"--mode-switch-gap": "4px",
+					"--mode-switch-hover-background": "transparent"
+				}
 			},
 			"MonthSelector": {
 				"slug": "month-selector",
@@ -4951,7 +6115,27 @@
 					"--month-selector-selected-box-shadow",
 					"--month-selector-selected-color",
 					"--month-selector-width"
-				]
+				],
+				"cssValues": {
+					"--month-selector-background": "transparent",
+					"--month-selector-columns": "3",
+					"--month-selector-default-background": "transparent",
+					"--month-selector-default-columns": "3",
+					"--month-selector-default-disabled-opacity": "0.35",
+					"--month-selector-default-font-size": "14px",
+					"--month-selector-default-font-weight": "500",
+					"--month-selector-default-gap": "6px",
+					"--month-selector-default-height": "auto",
+					"--month-selector-default-padding": "8px 0",
+					"--month-selector-default-width": "100%",
+					"--month-selector-disabled-opacity": "0.35",
+					"--month-selector-font-size": "14px",
+					"--month-selector-font-weight": "500",
+					"--month-selector-gap": "6px",
+					"--month-selector-height": "auto",
+					"--month-selector-padding": "8px 0",
+					"--month-selector-width": "100%"
+				}
 			},
 			"NoData": {
 				"slug": "no-data",
@@ -5027,7 +6211,31 @@
 					"--no-data-title-font-family",
 					"--no-data-title-font-size",
 					"--no-data-title-font-weight"
-				]
+				],
+				"cssValues": {
+					"--no-data-default-actions-gap": "18px",
+					"--no-data-default-description-font-size": "13px",
+					"--no-data-default-gap": "18px",
+					"--no-data-default-height": "auto",
+					"--no-data-default-icon-box-size": "96px",
+					"--no-data-default-icon-size": "40px",
+					"--no-data-default-max-width": "320px",
+					"--no-data-default-min-height": "200px",
+					"--no-data-default-padding": "10px",
+					"--no-data-default-sm-actions-gap": "12px",
+					"--no-data-default-sm-description-font-size": "12px",
+					"--no-data-default-sm-gap": "8px",
+					"--no-data-default-sm-icon-size": "32px",
+					"--no-data-default-sm-min-height": "120px",
+					"--no-data-default-sm-title-font-size": "13px",
+					"--no-data-default-sm-title-font-weight": "500",
+					"--no-data-default-title-font-size": "19px",
+					"--no-data-default-title-font-weight": "600",
+					"--no-data-height": "auto",
+					"--no-data-icon-box-size": "96px",
+					"--no-data-max-width": "320px",
+					"--no-data-padding": "10px"
+				}
 			},
 			"PageHeader": {
 				"slug": "page-header",
@@ -5122,7 +6330,41 @@
 					"--page-header-title-font-size",
 					"--page-header-title-font-weight",
 					"--page-header-title-line-height"
-				]
+				],
+				"cssValues": {
+					"--page-header-actions-gap": "8px",
+					"--page-header-back-font-size": "13px",
+					"--page-header-back-font-weight": "500",
+					"--page-header-back-gap": "6px",
+					"--page-header-back-icon-shift": "-3px",
+					"--page-header-back-icon-size": "18px",
+					"--page-header-default-actions-gap": "8px",
+					"--page-header-default-back-font-size": "13px",
+					"--page-header-default-back-font-weight": "500",
+					"--page-header-default-back-gap": "6px",
+					"--page-header-default-back-icon-shift": "-3px",
+					"--page-header-default-back-icon-size": "18px",
+					"--page-header-default-description-font-size": "13px",
+					"--page-header-default-gap": "10px",
+					"--page-header-default-main-gap": "12px 16px",
+					"--page-header-default-margin-bottom": "0px",
+					"--page-header-default-sm-description-font-size": "12px",
+					"--page-header-default-sm-subtitle-font-size": "13px",
+					"--page-header-default-sm-title-font-size": "19px",
+					"--page-header-default-subtitle-font-size": "14px",
+					"--page-header-default-text-gap": "4px",
+					"--page-header-default-text-min-width": "16rem",
+					"--page-header-default-title-font-size": "26px",
+					"--page-header-default-title-font-weight": "600",
+					"--page-header-default-title-line-height": "1.2",
+					"--page-header-gap": "10px",
+					"--page-header-main-gap": "12px 16px",
+					"--page-header-margin-bottom": "0px",
+					"--page-header-text-gap": "4px",
+					"--page-header-text-min-width": "16rem",
+					"--page-header-title-font-weight": "600",
+					"--page-header-title-line-height": "1.2"
+				}
 			},
 			"Paginator": {
 				"slug": "paginator",
@@ -5223,7 +6465,31 @@
 					"--paginator-icon-size",
 					"--paginator-status-color",
 					"--paginator-status-padding"
-				]
+				],
+				"cssValues": {
+					"--paginator-button-background": "transparent",
+					"--paginator-button-font-weight": "400",
+					"--paginator-button-padding": "0 8px",
+					"--paginator-button-size": "30px",
+					"--paginator-current-font-weight": "600",
+					"--paginator-default-button-background": "transparent",
+					"--paginator-default-button-font-weight": "400",
+					"--paginator-default-button-padding": "0 8px",
+					"--paginator-default-button-size": "30px",
+					"--paginator-default-current-font-weight": "600",
+					"--paginator-default-disabled-opacity": "0.4",
+					"--paginator-default-ellipsis-padding": "0 4px",
+					"--paginator-default-font-size": "13px",
+					"--paginator-default-gap": "4px",
+					"--paginator-default-icon-size": "16px",
+					"--paginator-default-status-padding": "0 8px",
+					"--paginator-disabled-opacity": "0.4",
+					"--paginator-ellipsis-padding": "0 4px",
+					"--paginator-font-size": "13px",
+					"--paginator-gap": "4px",
+					"--paginator-icon-size": "16px",
+					"--paginator-status-padding": "0 8px"
+				}
 			},
 			"PeriodPicker": {
 				"slug": "period-picker",
@@ -5313,7 +6579,29 @@
 					"--period-picker-padding",
 					"--period-picker-placeholder-color",
 					"--period-picker-width"
-				]
+				],
+				"cssValues": {
+					"--period-picker-border-width": "1px",
+					"--period-picker-dates-font-size": "12px",
+					"--period-picker-default-border-width": "1px",
+					"--period-picker-default-dates-font-size": "12px",
+					"--period-picker-default-disabled-opacity": "0.5",
+					"--period-picker-default-font-size": "13px",
+					"--period-picker-default-height": "36px",
+					"--period-picker-default-icon-size": "16px",
+					"--period-picker-default-label-font-weight": "600",
+					"--period-picker-default-min-width": "300px",
+					"--period-picker-default-padding": "3px",
+					"--period-picker-default-width": "auto",
+					"--period-picker-disabled-opacity": "0.5",
+					"--period-picker-font-size": "13px",
+					"--period-picker-height": "36px",
+					"--period-picker-icon-size": "16px",
+					"--period-picker-label-font-weight": "600",
+					"--period-picker-min-width": "300px",
+					"--period-picker-padding": "3px",
+					"--period-picker-width": "auto"
+				}
 			},
 			"PeriodSelector": {
 				"slug": "period-selector",
@@ -5423,7 +6711,52 @@
 					"--period-selector-presets-width",
 					"--period-selector-rolling-summary-color",
 					"--period-selector-width"
-				]
+				],
+				"cssValues": {
+					"--period-selector-background": "transparent",
+					"--period-selector-default-arrow-size": "28px",
+					"--period-selector-default-background": "transparent",
+					"--period-selector-default-duration-font-size": "12px",
+					"--period-selector-default-field-font-size": "12.5px",
+					"--period-selector-default-field-height": "32px",
+					"--period-selector-default-field-padding-x": "10px",
+					"--period-selector-default-field-width": "100%",
+					"--period-selector-default-font-size": "13px",
+					"--period-selector-default-footer-padding": "10px 16px 12px",
+					"--period-selector-default-footer-row-height": "28px",
+					"--period-selector-default-group-gap": "6px",
+					"--period-selector-default-max-width": "100%",
+					"--period-selector-default-min-height": "0",
+					"--period-selector-default-month-title-font-size": "14px",
+					"--period-selector-default-month-width": "252px",
+					"--period-selector-default-months-gap": "24px",
+					"--period-selector-default-months-padding": "12px 16px 8px",
+					"--period-selector-default-preset-days-font-size": "10.5px",
+					"--period-selector-default-preset-font-size": "13px",
+					"--period-selector-default-preset-padding": "7px 10px",
+					"--period-selector-default-presets-padding": "8px",
+					"--period-selector-default-presets-width": "176px",
+					"--period-selector-default-width": "auto",
+					"--period-selector-duration-font-size": "12px",
+					"--period-selector-field-font-size": "12.5px",
+					"--period-selector-field-height": "32px",
+					"--period-selector-field-padding-x": "10px",
+					"--period-selector-field-width": "100%",
+					"--period-selector-font-size": "13px",
+					"--period-selector-footer-padding": "10px 16px 12px",
+					"--period-selector-max-width": "100%",
+					"--period-selector-min-height": "0",
+					"--period-selector-month-title-font-size": "14px",
+					"--period-selector-month-width": "252px",
+					"--period-selector-months-gap": "24px",
+					"--period-selector-months-padding": "12px 16px 8px",
+					"--period-selector-preset-days-font-size": "10.5px",
+					"--period-selector-preset-font-size": "13px",
+					"--period-selector-preset-padding": "7px 10px",
+					"--period-selector-presets-padding": "8px",
+					"--period-selector-presets-width": "176px",
+					"--period-selector-width": "auto"
+				}
 			},
 			"PieChart": {
 				"slug": "pie-chart",
@@ -5534,7 +6867,47 @@
 					"--pie-chart-tooltip-value-font-family",
 					"--pie-chart-tooltip-value-font-size",
 					"--pie-chart-width"
-				]
+				],
+				"cssValues": {
+					"--pie-chart-center-font-size": "28px",
+					"--pie-chart-center-label-font-size": "11px",
+					"--pie-chart-cutout": "72%",
+					"--pie-chart-default-center-font-size": "28px",
+					"--pie-chart-default-center-label-font-size": "11px",
+					"--pie-chart-default-cutout": "72%",
+					"--pie-chart-default-gap": "24px",
+					"--pie-chart-default-height": "14rem",
+					"--pie-chart-default-legend-font-size": "13px",
+					"--pie-chart-default-legend-gap": "16px",
+					"--pie-chart-default-legend-hidden-opacity": "0.45",
+					"--pie-chart-default-legend-min-width": "180px",
+					"--pie-chart-default-legend-swatch-radius": "3px",
+					"--pie-chart-default-legend-swatch-size": "10px",
+					"--pie-chart-default-min-width": "12rem",
+					"--pie-chart-default-slice-border-width": "2px",
+					"--pie-chart-default-tooltip-label-font-size": "12px",
+					"--pie-chart-default-tooltip-min-width": "auto",
+					"--pie-chart-default-tooltip-padding": "8px 12px",
+					"--pie-chart-default-tooltip-title-font-size": "10.5px",
+					"--pie-chart-default-tooltip-value-font-size": "13px",
+					"--pie-chart-default-width": "100%",
+					"--pie-chart-gap": "24px",
+					"--pie-chart-height": "14rem",
+					"--pie-chart-legend-font-size": "13px",
+					"--pie-chart-legend-gap": "16px",
+					"--pie-chart-legend-hidden-opacity": "0.45",
+					"--pie-chart-legend-min-width": "180px",
+					"--pie-chart-legend-swatch-radius": "3px",
+					"--pie-chart-legend-swatch-size": "10px",
+					"--pie-chart-min-width": "12rem",
+					"--pie-chart-slice-border-width": "2px",
+					"--pie-chart-tooltip-label-font-size": "12px",
+					"--pie-chart-tooltip-min-width": "auto",
+					"--pie-chart-tooltip-padding": "8px 12px",
+					"--pie-chart-tooltip-title-font-size": "10.5px",
+					"--pie-chart-tooltip-value-font-size": "13px",
+					"--pie-chart-width": "100%"
+				}
 			},
 			"ProgressBar": {
 				"slug": "progress-bar",
@@ -5609,7 +6982,29 @@
 					"--progress-bar-value-font-family",
 					"--progress-bar-value-font-size",
 					"--progress-bar-width"
-				]
+				],
+				"cssValues": {
+					"--progress-bar-default-gap": "8px",
+					"--progress-bar-default-height": "8px",
+					"--progress-bar-default-indeterminate-duration": "1.4s",
+					"--progress-bar-default-indeterminate-width": "35%",
+					"--progress-bar-default-label-font-size": "13px",
+					"--progress-bar-default-label-font-weight": "600",
+					"--progress-bar-default-shimmer-duration": "1.8s",
+					"--progress-bar-default-success-fill-box-shadow": "0 0 #0000",
+					"--progress-bar-default-value-font-size": "13px",
+					"--progress-bar-default-warning-fill-box-shadow": "0 0 #0000",
+					"--progress-bar-default-width": "100%",
+					"--progress-bar-gap": "8px",
+					"--progress-bar-height": "8px",
+					"--progress-bar-indeterminate-duration": "1.4s",
+					"--progress-bar-indeterminate-width": "35%",
+					"--progress-bar-label-font-size": "13px",
+					"--progress-bar-label-font-weight": "600",
+					"--progress-bar-shimmer-duration": "1.8s",
+					"--progress-bar-value-font-size": "13px",
+					"--progress-bar-width": "100%"
+				}
 			},
 			"RadioButton": {
 				"slug": "radio-button",
@@ -5707,7 +7102,35 @@
 					"--radio-button-label-font-weight",
 					"--radio-button-label-line-height",
 					"--radio-button-size"
-				]
+				],
+				"cssValues": {
+					"--radio-button-border-width": "1.5px",
+					"--radio-button-box-shadow": "0 0 #0000",
+					"--radio-button-card-box-shadow": "0 0 #0000",
+					"--radio-button-card-padding": "12px 14px",
+					"--radio-button-checked-border-color": "transparent",
+					"--radio-button-default-border-width": "1.5px",
+					"--radio-button-default-box-shadow": "0 0 #0000",
+					"--radio-button-default-card-box-shadow": "0 0 #0000",
+					"--radio-button-default-card-padding": "12px 14px",
+					"--radio-button-default-checked-border-color": "transparent",
+					"--radio-button-default-description-font-size": "12px",
+					"--radio-button-default-disabled-opacity": "0.4",
+					"--radio-button-default-dot-size": "8px",
+					"--radio-button-default-gap": "10px",
+					"--radio-button-default-label-font-size": "14px",
+					"--radio-button-default-label-font-weight": "400",
+					"--radio-button-default-label-line-height": "1.5",
+					"--radio-button-default-size": "18px",
+					"--radio-button-description-font-size": "12px",
+					"--radio-button-disabled-opacity": "0.4",
+					"--radio-button-dot-size": "8px",
+					"--radio-button-gap": "10px",
+					"--radio-button-label-font-size": "14px",
+					"--radio-button-label-font-weight": "400",
+					"--radio-button-label-line-height": "1.5",
+					"--radio-button-size": "18px"
+				}
 			},
 			"RadioGroup": {
 				"slug": "radio-group",
@@ -5770,7 +7193,17 @@
 					"--radio-group-label-font-size",
 					"--radio-group-label-font-weight",
 					"--radio-group-success-color"
-				]
+				],
+				"cssValues": {
+					"--radio-group-card-min-width": "150px",
+					"--radio-group-default-card-min-width": "150px",
+					"--radio-group-default-gap": "10px",
+					"--radio-group-default-horizontal-items-gap": "10px 20px",
+					"--radio-group-default-icon-size": "18px",
+					"--radio-group-default-items-gap": "10px",
+					"--radio-group-gap": "10px",
+					"--radio-group-icon-size": "18px"
+				}
 			},
 			"SearchBar": {
 				"slug": "search-bar",
@@ -5846,7 +7279,23 @@
 					"--search-bar-ring-color",
 					"--search-bar-ring-width",
 					"--search-bar-width"
-				]
+				],
+				"cssValues": {
+					"--search-bar-default-gap": "8px",
+					"--search-bar-default-height": "40px",
+					"--search-bar-default-icon-size": "18px",
+					"--search-bar-default-line-height": "1.5",
+					"--search-bar-default-max-width": "none",
+					"--search-bar-default-padding": "0 6px 0 12px",
+					"--search-bar-default-width": "100%",
+					"--search-bar-gap": "8px",
+					"--search-bar-height": "40px",
+					"--search-bar-icon-size": "18px",
+					"--search-bar-line-height": "1.5",
+					"--search-bar-max-width": "none",
+					"--search-bar-padding": "0 6px 0 12px",
+					"--search-bar-width": "100%"
+				}
 			},
 			"Select": {
 				"slug": "select",
@@ -5994,7 +7443,39 @@
 					"--select-placeholder-color",
 					"--select-success-color",
 					"--select-width"
-				]
+				],
+				"cssValues": {
+					"--select-default-font-weight": "400",
+					"--select-default-gap": "6px",
+					"--select-default-icon-size": "18px",
+					"--select-default-max-width": "none",
+					"--select-default-option-font-size": "13px",
+					"--select-default-option-gap": "8px",
+					"--select-default-option-icon-size": "17px",
+					"--select-default-option-padding": "7px 10px",
+					"--select-default-option-spacing": "1px",
+					"--select-default-picker-backdrop-filter": "blur(24px)",
+					"--select-default-picker-max-height": "300px",
+					"--select-default-picker-offset": "6px",
+					"--select-default-picker-padding": "4px",
+					"--select-default-picker-transition-distance": "6px",
+					"--select-default-width": "100%",
+					"--select-font-weight": "400",
+					"--select-gap": "6px",
+					"--select-icon-size": "18px",
+					"--select-max-width": "none",
+					"--select-option-font-size": "13px",
+					"--select-option-gap": "8px",
+					"--select-option-icon-size": "17px",
+					"--select-option-padding": "7px 10px",
+					"--select-option-spacing": "1px",
+					"--select-picker-backdrop-filter": "blur(24px)",
+					"--select-picker-max-height": "300px",
+					"--select-picker-offset": "6px",
+					"--select-picker-padding": "4px",
+					"--select-picker-transition-distance": "6px",
+					"--select-width": "100%"
+				}
 			},
 			"SidebarLayout": {
 				"slug": "sidebar-layout",
@@ -6098,7 +7579,39 @@
 					"--sidebar-layout-sidebar-width",
 					"--sidebar-layout-skip-background",
 					"--sidebar-layout-skip-color"
-				]
+				],
+				"cssValues": {
+					"--sidebar-layout-content-padding": "1rem 2rem",
+					"--sidebar-layout-default-content-padding": "1rem 2rem",
+					"--sidebar-layout-default-dock-background": "transparent",
+					"--sidebar-layout-default-dock-border-color": "transparent",
+					"--sidebar-layout-default-drawer-padding": "0 0 14px",
+					"--sidebar-layout-default-drawer-width": "18rem",
+					"--sidebar-layout-default-header-backdrop-filter": "blur(16px)",
+					"--sidebar-layout-default-header-gap": "12px",
+					"--sidebar-layout-default-header-height": "3.5rem",
+					"--sidebar-layout-default-header-padding": "0 2rem",
+					"--sidebar-layout-default-header-position": "sticky",
+					"--sidebar-layout-default-sidebar-expanded-width": "18rem",
+					"--sidebar-layout-default-sidebar-gap": "8px",
+					"--sidebar-layout-default-sidebar-inline-padding": "10px",
+					"--sidebar-layout-default-sidebar-padding": "0 0 14px",
+					"--sidebar-layout-default-sidebar-width": "4rem",
+					"--sidebar-layout-dock-background": "transparent",
+					"--sidebar-layout-dock-border-color": "transparent",
+					"--sidebar-layout-drawer-padding": "0 0 14px",
+					"--sidebar-layout-drawer-width": "18rem",
+					"--sidebar-layout-header-backdrop-filter": "blur(16px)",
+					"--sidebar-layout-header-gap": "12px",
+					"--sidebar-layout-header-height": "3.5rem",
+					"--sidebar-layout-header-padding": "0 2rem",
+					"--sidebar-layout-header-position": "sticky",
+					"--sidebar-layout-sidebar-expanded-width": "18rem",
+					"--sidebar-layout-sidebar-gap": "8px",
+					"--sidebar-layout-sidebar-inline-padding": "10px",
+					"--sidebar-layout-sidebar-padding": "0 0 14px",
+					"--sidebar-layout-sidebar-width": "4rem"
+				}
 			},
 			"SimpleTextField": {
 				"slug": "simple-text-field",
@@ -6215,7 +7728,21 @@
 					"--simple-text-field-reveal-hover-color",
 					"--simple-text-field-success-color",
 					"--simple-text-field-width"
-				]
+				],
+				"cssValues": {
+					"--simple-text-field-default-font-weight": "400",
+					"--simple-text-field-default-gap": "6px",
+					"--simple-text-field-default-icon-size": "18px",
+					"--simple-text-field-default-max-width": "none",
+					"--simple-text-field-default-outer-gap": "8px",
+					"--simple-text-field-default-width": "100%",
+					"--simple-text-field-font-weight": "400",
+					"--simple-text-field-gap": "6px",
+					"--simple-text-field-icon-size": "18px",
+					"--simple-text-field-max-width": "none",
+					"--simple-text-field-outer-gap": "8px",
+					"--simple-text-field-width": "100%"
+				}
 			},
 			"Skeleton": {
 				"slug": "skeleton",
@@ -6257,7 +7784,25 @@
 					"--skeleton-min-height",
 					"--skeleton-size",
 					"--skeleton-width"
-				]
+				],
+				"cssValues": {
+					"--skeleton-default-duration": "1.6s",
+					"--skeleton-default-height": "100%",
+					"--skeleton-default-last-line-width": "60%",
+					"--skeleton-default-line-gap": "0.65em",
+					"--skeleton-default-line-height": "0.75em",
+					"--skeleton-default-min-height": "1em",
+					"--skeleton-default-size": "40px",
+					"--skeleton-default-width": "100%",
+					"--skeleton-duration": "1.6s",
+					"--skeleton-height": "100%",
+					"--skeleton-last-line-width": "60%",
+					"--skeleton-line-gap": "0.65em",
+					"--skeleton-line-height": "0.75em",
+					"--skeleton-min-height": "1em",
+					"--skeleton-size": "40px",
+					"--skeleton-width": "100%"
+				}
 			},
 			"Switch": {
 				"slug": "switch",
@@ -6343,7 +7888,29 @@
 					"--switch-thumb-size",
 					"--switch-translate-x",
 					"--switch-width"
-				]
+				],
+				"cssValues": {
+					"--switch-box-shadow": "0 0 #0000",
+					"--switch-checked-border-color": "transparent",
+					"--switch-default-box-shadow": "0 0 #0000",
+					"--switch-default-checked-border-color": "transparent",
+					"--switch-default-disabled-opacity": "0.4",
+					"--switch-default-gap": "12px",
+					"--switch-default-height": "20px",
+					"--switch-default-label-font-size": "14px",
+					"--switch-default-label-font-weight": "400",
+					"--switch-default-label-line-height": "1.5",
+					"--switch-default-lg-height": "26px",
+					"--switch-default-lg-thumb-size": "22px",
+					"--switch-default-lg-width": "46px",
+					"--switch-default-thumb-size": "16px",
+					"--switch-default-width": "36px",
+					"--switch-disabled-opacity": "0.4",
+					"--switch-gap": "12px",
+					"--switch-label-font-size": "14px",
+					"--switch-label-font-weight": "400",
+					"--switch-label-line-height": "1.5"
+				}
 			},
 			"Table": {
 				"slug": "table",
@@ -6544,7 +8111,63 @@
 					"--table-separator-color",
 					"--table-sort-icon-size",
 					"--table-width"
-				]
+				],
+				"cssValues": {
+					"--table-actions-gap": "4px",
+					"--table-boolean-icon-size": "18px",
+					"--table-card-gap": "8px",
+					"--table-card-label-font-size": "12px",
+					"--table-card-padding": "12px 14px",
+					"--table-card-title-font-weight": "600",
+					"--table-cell-padding": "9px 12px",
+					"--table-control-size": "40px",
+					"--table-date-font-size": "13px",
+					"--table-default-actions-gap": "4px",
+					"--table-default-boolean-icon-size": "18px",
+					"--table-default-card-gap": "8px",
+					"--table-default-card-label-font-size": "12px",
+					"--table-default-card-padding": "12px 14px",
+					"--table-default-card-title-font-weight": "600",
+					"--table-default-cell-padding": "9px 12px",
+					"--table-default-control-size": "40px",
+					"--table-default-date-font-size": "13px",
+					"--table-default-detail-padding": "16px 16px 16px 52px",
+					"--table-default-expand-icon-size": "20px",
+					"--table-default-font-size": "13.5px",
+					"--table-default-footer-font-weight": "600",
+					"--table-default-header-font-size": "11px",
+					"--table-default-header-font-weight": "500",
+					"--table-default-header-letter-spacing": "0.06em",
+					"--table-default-header-padding": "8px 12px",
+					"--table-default-header-text-transform": "uppercase",
+					"--table-default-info-icon-size": "14px",
+					"--table-default-loading-opacity": "0.55",
+					"--table-default-max-height": "none",
+					"--table-default-number-font-size": "13px",
+					"--table-default-progress-height": "2px",
+					"--table-default-resizer-width": "2px",
+					"--table-default-row-background": "transparent",
+					"--table-default-sort-icon-size": "14px",
+					"--table-default-width": "100%",
+					"--table-detail-padding": "16px 16px 16px 52px",
+					"--table-expand-icon-size": "20px",
+					"--table-font-size": "13.5px",
+					"--table-footer-font-weight": "600",
+					"--table-header-font-size": "11px",
+					"--table-header-font-weight": "500",
+					"--table-header-letter-spacing": "0.06em",
+					"--table-header-padding": "8px 12px",
+					"--table-header-text-transform": "uppercase",
+					"--table-info-icon-size": "14px",
+					"--table-loading-opacity": "0.55",
+					"--table-max-height": "none",
+					"--table-number-font-size": "13px",
+					"--table-progress-height": "2px",
+					"--table-resizer-width": "2px",
+					"--table-row-background": "transparent",
+					"--table-sort-icon-size": "14px",
+					"--table-width": "100%"
+				}
 			},
 			"TabSwitcher": {
 				"slug": "tab-switcher",
@@ -6667,7 +8290,40 @@
 					"--tab-switcher-padding",
 					"--tab-switcher-selected-color",
 					"--tab-switcher-width"
-				]
+				],
+				"cssValues": {
+					"--tab-switcher-append-gap": "8px",
+					"--tab-switcher-badge-font-size": "10.5px",
+					"--tab-switcher-badge-padding": "1px 6px",
+					"--tab-switcher-default-append-gap": "8px",
+					"--tab-switcher-default-badge-font-size": "10.5px",
+					"--tab-switcher-default-badge-padding": "1px 6px",
+					"--tab-switcher-default-disabled-opacity": "0.4",
+					"--tab-switcher-default-font-family": "inherit",
+					"--tab-switcher-default-font-weight": "500",
+					"--tab-switcher-default-icon-gap": "6px",
+					"--tab-switcher-default-icon-size": "16px",
+					"--tab-switcher-default-list-padding": "3px",
+					"--tab-switcher-default-segmented-font-size": "13px",
+					"--tab-switcher-default-segmented-gap": "0px",
+					"--tab-switcher-default-segmented-padding": "5px 12px",
+					"--tab-switcher-default-underline-font-size": "14px",
+					"--tab-switcher-default-underline-gap": "22px",
+					"--tab-switcher-default-underline-indicator-border-color": "transparent",
+					"--tab-switcher-default-underline-indicator-border-radius": "2px",
+					"--tab-switcher-default-underline-indicator-border-width": "0px",
+					"--tab-switcher-default-underline-indicator-height": "2px",
+					"--tab-switcher-default-underline-padding": "8px 0 10px",
+					"--tab-switcher-default-width": "100%",
+					"--tab-switcher-disabled-opacity": "0.4",
+					"--tab-switcher-font-family": "inherit",
+					"--tab-switcher-font-weight": "500",
+					"--tab-switcher-icon-gap": "6px",
+					"--tab-switcher-icon-size": "16px",
+					"--tab-switcher-indicator-height": "2px",
+					"--tab-switcher-list-padding": "3px",
+					"--tab-switcher-width": "100%"
+				}
 			},
 			"Textarea": {
 				"slug": "textarea",
@@ -6784,7 +8440,33 @@
 					"--textarea-resize",
 					"--textarea-success-color",
 					"--textarea-width"
-				]
+				],
+				"cssValues": {
+					"--textarea-counter-font-size": "11px",
+					"--textarea-default-counter-font-size": "11px",
+					"--textarea-default-font-family": "inherit",
+					"--textarea-default-font-weight": "400",
+					"--textarea-default-gap": "6px",
+					"--textarea-default-height": "auto",
+					"--textarea-default-icon-size": "18px",
+					"--textarea-default-line-height": "1.55",
+					"--textarea-default-max-height": "none",
+					"--textarea-default-max-width": "none",
+					"--textarea-default-min-height": "1lh",
+					"--textarea-default-resize": "vertical",
+					"--textarea-default-width": "100%",
+					"--textarea-font-family": "inherit",
+					"--textarea-font-weight": "400",
+					"--textarea-gap": "6px",
+					"--textarea-height": "auto",
+					"--textarea-icon-size": "18px",
+					"--textarea-line-height": "1.55",
+					"--textarea-max-height": "none",
+					"--textarea-max-width": "none",
+					"--textarea-min-height": "1lh",
+					"--textarea-resize": "vertical",
+					"--textarea-width": "100%"
+				}
 			},
 			"Timeline": {
 				"slug": "timeline",
@@ -6892,7 +8574,49 @@
 					"--timeline-title-font-size",
 					"--timeline-title-font-weight",
 					"--timeline-width"
-				]
+				],
+				"cssValues": {
+					"--timeline-card-padding-x": "14px",
+					"--timeline-card-padding-y": "12px",
+					"--timeline-card-shadow": "none",
+					"--timeline-content-gap": "8px",
+					"--timeline-default-card-padding-x": "14px",
+					"--timeline-default-card-padding-y": "12px",
+					"--timeline-default-card-shadow": "none",
+					"--timeline-default-content-gap": "8px",
+					"--timeline-default-description-font-size": "13px",
+					"--timeline-default-done-marker-glow-size": "14px",
+					"--timeline-default-done-marker-ring-width": "4px",
+					"--timeline-default-first-line-height": "18px",
+					"--timeline-default-group-spacing": "18px",
+					"--timeline-default-icon-marker-size": "24px",
+					"--timeline-default-item-spacing": "22px",
+					"--timeline-default-line-width": "2px",
+					"--timeline-default-marker-border-width": "2px",
+					"--timeline-default-marker-icon-size": "14px",
+					"--timeline-default-marker-size": "12px",
+					"--timeline-default-rail-width": "24px",
+					"--timeline-default-time-font-size": "11px",
+					"--timeline-default-title-font-size": "14px",
+					"--timeline-default-title-font-weight": "600",
+					"--timeline-default-width": "100%",
+					"--timeline-description-font-size": "13px",
+					"--timeline-done-marker-glow-size": "14px",
+					"--timeline-done-marker-ring-width": "4px",
+					"--timeline-first-line-height": "18px",
+					"--timeline-group-spacing": "18px",
+					"--timeline-icon-marker-size": "24px",
+					"--timeline-item-spacing": "22px",
+					"--timeline-line-width": "2px",
+					"--timeline-marker-border-width": "2px",
+					"--timeline-marker-icon-size": "14px",
+					"--timeline-marker-size": "12px",
+					"--timeline-rail-width": "24px",
+					"--timeline-time-font-size": "11px",
+					"--timeline-title-font-size": "14px",
+					"--timeline-title-font-weight": "600",
+					"--timeline-width": "100%"
+				}
 			},
 			"TimePicker": {
 				"slug": "time-picker",
@@ -6986,7 +8710,35 @@
 					"--time-picker-padding",
 					"--time-picker-scrollbar-width",
 					"--time-picker-width"
-				]
+				],
+				"cssValues": {
+					"--time-picker-column-gap": "2px",
+					"--time-picker-column-height": "224px",
+					"--time-picker-column-width": "60px",
+					"--time-picker-default-column-gap": "2px",
+					"--time-picker-default-column-height": "224px",
+					"--time-picker-default-column-width": "60px",
+					"--time-picker-default-disabled-opacity": "0.5",
+					"--time-picker-default-gap": "4px",
+					"--time-picker-default-option-background": "transparent",
+					"--time-picker-default-option-disabled-opacity": "0.35",
+					"--time-picker-default-option-font-size": "14px",
+					"--time-picker-default-option-font-weight": "500",
+					"--time-picker-default-option-padding": "6px 0",
+					"--time-picker-default-padding": "8px",
+					"--time-picker-default-scrollbar-width": "none",
+					"--time-picker-default-width": "auto",
+					"--time-picker-disabled-opacity": "0.5",
+					"--time-picker-gap": "4px",
+					"--time-picker-option-background": "transparent",
+					"--time-picker-option-disabled-opacity": "0.35",
+					"--time-picker-option-font-size": "14px",
+					"--time-picker-option-font-weight": "500",
+					"--time-picker-option-padding": "6px 0",
+					"--time-picker-padding": "8px",
+					"--time-picker-scrollbar-width": "none",
+					"--time-picker-width": "auto"
+				}
 			},
 			"TimePickerTextField": {
 				"slug": "time-picker-text-field",
@@ -7135,7 +8887,25 @@
 					"--time-picker-text-field-placeholder-color",
 					"--time-picker-text-field-success-color",
 					"--time-picker-text-field-width"
-				]
+				],
+				"cssValues": {
+					"--time-picker-text-field-default-font-weight": "400",
+					"--time-picker-text-field-default-format-font-size": "11px",
+					"--time-picker-text-field-default-format-padding": "2px 6px",
+					"--time-picker-text-field-default-gap": "6px",
+					"--time-picker-text-field-default-icon-size": "18px",
+					"--time-picker-text-field-default-max-width": "none",
+					"--time-picker-text-field-default-outer-gap": "8px",
+					"--time-picker-text-field-default-width": "100%",
+					"--time-picker-text-field-font-weight": "400",
+					"--time-picker-text-field-format-font-size": "11px",
+					"--time-picker-text-field-format-padding": "2px 6px",
+					"--time-picker-text-field-gap": "6px",
+					"--time-picker-text-field-icon-size": "18px",
+					"--time-picker-text-field-max-width": "none",
+					"--time-picker-text-field-outer-gap": "8px",
+					"--time-picker-text-field-width": "100%"
+				}
 			},
 			"Toaster": {
 				"slug": "toaster",
@@ -7158,7 +8928,8 @@
 					"toastSnippet"
 				],
 				"native": false,
-				"cssVars": []
+				"cssVars": [],
+				"cssValues": {}
 			},
 			"ToggleList": {
 				"slug": "toggle-list",
@@ -7200,7 +8971,17 @@
 					"--toggle-list-height",
 					"--toggle-list-max-width",
 					"--toggle-list-width"
-				]
+				],
+				"cssValues": {
+					"--toggle-list-default-gap": "8px",
+					"--toggle-list-default-height": "auto",
+					"--toggle-list-default-max-width": "none",
+					"--toggle-list-default-width": "auto",
+					"--toggle-list-gap": "8px",
+					"--toggle-list-height": "auto",
+					"--toggle-list-max-width": "none",
+					"--toggle-list-width": "auto"
+				}
 			},
 			"Tooltip": {
 				"slug": "tooltip",
@@ -7277,7 +9058,28 @@
 					"--tooltip-text-color",
 					"--tooltip-title-font-weight",
 					"--tooltip-transition-distance"
-				]
+				],
+				"cssValues": {
+					"--tooltip-arrow-size": "8px",
+					"--tooltip-default-arrow-size": "8px",
+					"--tooltip-default-border-color": "transparent",
+					"--tooltip-default-border-width": "0px",
+					"--tooltip-default-font-size": "12px",
+					"--tooltip-default-font-weight": "500",
+					"--tooltip-default-line-height": "1.4",
+					"--tooltip-default-max-width": "280px",
+					"--tooltip-default-padding": "6px 10px",
+					"--tooltip-default-rich-font-weight": "400",
+					"--tooltip-default-rich-max-width": "240px",
+					"--tooltip-default-rich-padding": "12px",
+					"--tooltip-default-text-color": "inherit",
+					"--tooltip-default-title-font-weight": "600",
+					"--tooltip-default-transition-distance": "4px",
+					"--tooltip-font-size": "12px",
+					"--tooltip-line-height": "1.4",
+					"--tooltip-title-font-weight": "600",
+					"--tooltip-transition-distance": "4px"
+				}
 			},
 			"YearPickerTextField": {
 				"slug": "year-picker-text-field",
@@ -7410,7 +9212,25 @@
 					"--year-picker-text-field-placeholder-color",
 					"--year-picker-text-field-success-color",
 					"--year-picker-text-field-width"
-				]
+				],
+				"cssValues": {
+					"--year-picker-text-field-default-font-weight": "400",
+					"--year-picker-text-field-default-gap": "6px",
+					"--year-picker-text-field-default-icon-size": "18px",
+					"--year-picker-text-field-default-max-width": "none",
+					"--year-picker-text-field-default-menu-padding": "8px",
+					"--year-picker-text-field-default-menu-width": "300px",
+					"--year-picker-text-field-default-outer-gap": "8px",
+					"--year-picker-text-field-default-width": "100%",
+					"--year-picker-text-field-font-weight": "400",
+					"--year-picker-text-field-gap": "6px",
+					"--year-picker-text-field-icon-size": "18px",
+					"--year-picker-text-field-max-width": "none",
+					"--year-picker-text-field-menu-padding": "8px",
+					"--year-picker-text-field-menu-width": "300px",
+					"--year-picker-text-field-outer-gap": "8px",
+					"--year-picker-text-field-width": "100%"
+				}
 			},
 			"YearSelector": {
 				"slug": "year-selector",
@@ -7482,7 +9302,29 @@
 					"--year-selector-selected-box-shadow",
 					"--year-selector-selected-color",
 					"--year-selector-width"
-				]
+				],
+				"cssValues": {
+					"--year-selector-background": "transparent",
+					"--year-selector-columns": "4",
+					"--year-selector-default-background": "transparent",
+					"--year-selector-default-columns": "4",
+					"--year-selector-default-disabled-opacity": "0.35",
+					"--year-selector-default-font-size": "14px",
+					"--year-selector-default-font-weight": "500",
+					"--year-selector-default-gap": "6px",
+					"--year-selector-default-height": "auto",
+					"--year-selector-default-max-height": "240px",
+					"--year-selector-default-padding": "8px 0",
+					"--year-selector-default-width": "100%",
+					"--year-selector-disabled-opacity": "0.35",
+					"--year-selector-font-size": "14px",
+					"--year-selector-font-weight": "500",
+					"--year-selector-gap": "6px",
+					"--year-selector-height": "auto",
+					"--year-selector-max-height": "240px",
+					"--year-selector-padding": "8px 0",
+					"--year-selector-width": "100%"
+				}
 			}
 		}
 	},
@@ -9357,11 +11199,31 @@
 					{
 						"from": "--avatar-width",
 						"to": "--avatar-size",
-						"note": "The avatar is always square: one size for width and height. Use a `size` (`xs` 24, `sm` 32, `md` 40, `lg` 56, `xl` 80) when the v4 value is one of those, else `--avatar-size`. If `--avatar-height` is also set, keep one of the two (`avatar-size`)."
+						"toProp": {
+							"prop": "size",
+							"values": {
+								"24px": "xs",
+								"32px": "sm",
+								"40px": null,
+								"56px": "lg",
+								"80px": "xl"
+							}
+						},
+						"note": "The avatar is always square: one size for width and height. A v4 value that is one of the sizes (`xs` 24, `sm` 32, `md` 40, `lg` 56, `xl` 80, in px) becomes `size`, any other `--avatar-size`. If `--avatar-height` is also set, keep one of the two (`avatar-size`)."
 					},
 					{
 						"from": "--avatar-height",
 						"to": "--avatar-size",
+						"toProp": {
+							"prop": "size",
+							"values": {
+								"24px": "xs",
+								"32px": "sm",
+								"40px": null,
+								"56px": "lg",
+								"80px": "xl"
+							}
+						},
 						"note": "See `--avatar-width`: keep one of the two."
 					},
 					{
@@ -9822,11 +11684,26 @@
 					},
 					{
 						"from": "--button-default-box-shadow",
-						"to": "--button-default-primary-box-shadow"
+						"to": "--button-default-primary-box-shadow",
+						"also": [
+							"--button-default-secondary-box-shadow",
+							"--button-default-danger-box-shadow",
+							"--button-default-gradient-box-shadow",
+							"--button-default-primary-hover-box-shadow",
+							"--button-default-secondary-hover-box-shadow",
+							"--button-default-danger-hover-box-shadow",
+							"--button-default-gradient-hover-box-shadow"
+						],
+						"note": "v4 gave every button this shadow and no hover shadow; v5 has one per variant and state, with a glow on hover. In app stylesheets the value goes to every variant, normal and hover (unless the same block sets `--button-default-hover-box-shadow`); on a tag only the primary one is renamed."
 					},
 					{
 						"from": "--button-default-hover-box-shadow",
-						"to": "--button-default-primary-hover-box-shadow"
+						"to": "--button-default-primary-hover-box-shadow",
+						"also": [
+							"--button-default-secondary-hover-box-shadow",
+							"--button-default-danger-hover-box-shadow",
+							"--button-default-gradient-hover-box-shadow"
+						]
 					},
 					{
 						"from": "--button-default-text-color",
@@ -9923,123 +11800,153 @@
 					},
 					{
 						"name": "--button-default-focus-background-color",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-focus-color",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-focus-box-shadow",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-active-background-color",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-active-color",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-active-box-shadow",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-disabled-background-color",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-disabled-color",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-icon-color",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-icon-active-color",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-icon-focus-color",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-icon-border-radius",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-text-background-color",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-text-active-background-color",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-text-active-color",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-text-focus-background-color",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-text-focus-color",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-text-hover-color",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-text-font-weight",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-hover-color",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-max-height",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-min-height",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-max-width",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-min-width",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-box-sizing",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-text-align",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-cursor",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-display",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-justify-content",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					},
 					{
 						"name": "--button-default-align-items",
-						"note": "v4 default with no v5 counterpart. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): pick the matching one, or drop the override."
+						"note": "v4 default with no v5 counterpart, removed. Defaults are per variant and size now (`--button-default-{variant}-*`, `--button-default-{size}-*`): set the matching one only if the Aurora look does not fit.",
+						"drop": true
 					}
 				]
 			},
@@ -11291,11 +13198,13 @@
 					},
 					{
 						"name": "--collapsible-side-bar-layout-drawer-background-color",
-						"note": "Wrong prefix in the apps: v4 never read it. Drop it, do not map it (it would change the look)."
+						"note": "Wrong prefix in the apps: v4 never read it. Removed, not mapped (it would change the look).",
+						"drop": true
 					},
 					{
 						"name": "--collapsible-side-bar-layout-header-menu-padding",
-						"note": "Wrong prefix in the apps: v4 never read it. Drop it, do not map it (it would change the look)."
+						"note": "Wrong prefix in the apps: v4 never read it. Removed, not mapped (it would change the look).",
+						"drop": true
 					}
 				]
 			},
@@ -11304,7 +13213,7 @@
 					"id": "sidebar-layout-scroll",
 					"kind": "edit",
 					"summary": "The window scrolls the page: the bar and the sidebar stay in place by themselves and the content is in a `<main>` that takes the remaining width. v5 apps do not need their own scroll box.",
-					"action": "Remove the wrapper the app put around the content to scroll it (a div with `calc(100dvw - 52px)` width, `calc(100dvh - 50px)` height and `overflow-auto`) and the extra `<main>` inside it: render the page content directly. Code that scrolled that box (`bind:this` to a global scroller, `scrollTo` on it) must use `window` instead. Full-height pages can use `calc(100dvh - var(--sidebar-layout-header-height, 3.5rem))`.",
+					"action": "Remove the wrapper the app put around the content to scroll it (a div with `calc(100dvw - 52px)` width, `calc(100dvh - 50px)` height and `overflow-auto`) and the extra `<main>` inside it: render the page content directly. Code that scrolled that box (`bind:this` to a global scroller, `scrollTo` on it) must use `window` instead. Full-height pages can use `calc(100dvh - var(--sidebar-layout-header-height, 3.5rem))`. The old box also clipped content wider than the screen; without it the page scrolls sideways on phones: give `min-width: 0` (`min-w-0`) to the flex and grid children that hold tables or long text, and check the pages at phone width.",
 					"when": {
 						"snippets": [
 							"children"
@@ -15252,7 +17161,22 @@
 							"onsort",
 							"onfetchData"
 						]
-					}
+					},
+					"done": {
+						"has": {
+							"events": [
+								"onquerychange"
+							]
+						},
+						"lacks": {
+							"events": [
+								"onfiltersChange"
+							]
+						}
+					},
+					"alternatives": [
+						"data-table-loader"
+					]
 				},
 				{
 					"id": "data-table-loader",
@@ -15265,6 +17189,13 @@
 							"onfiltersChange",
 							"onfetchData"
 						]
+					},
+					"done": {
+						"has": {
+							"props": [
+								"loader"
+							]
+						}
 					}
 				},
 				{
@@ -16410,7 +18341,22 @@
 							"onsort",
 							"onfetchData"
 						]
-					}
+					},
+					"done": {
+						"has": {
+							"events": [
+								"onquerychange"
+							]
+						},
+						"lacks": {
+							"events": [
+								"onfiltersChange"
+							]
+						}
+					},
+					"alternatives": [
+						"data-table-loader"
+					]
 				},
 				{
 					"id": "data-table-loader",
@@ -16423,6 +18369,13 @@
 							"onfiltersChange",
 							"onfetchData"
 						]
+					},
+					"done": {
+						"has": {
+							"props": [
+								"loader"
+							]
+						}
 					}
 				},
 				{
@@ -18423,6 +20376,11 @@
 						"drop": true
 					},
 					{
+						"name": "--autocomplete-selected-item-color",
+						"note": "v4 override on the inner Dropdown; it does not reach the v5 tiles, whose colors come from the theme: removed. Use `--icons-dropdown-option-selected-color` and `--icons-dropdown-option-selected-background` only if the theme look does not fit.",
+						"drop": true
+					},
+					{
 						"name": "--button-padding",
 						"note": "v4 override on the inner Dropdown button, tuned around the tile; it would now replace the padding of the v5 button. Use `--icons-dropdown-padding` only if the default padding does not fit.",
 						"drop": true
@@ -18456,6 +20414,7 @@
 				{
 					"id": "icons-dropdown-css-vars",
 					"kind": "edit",
+					"automatic": true,
 					"summary": "`--autocomplete-selected-item-color`, a v4 override on the inner Dropdown, does not reach the tiles.",
 					"action": "Replace `--autocomplete-selected-item-color` with `--icons-dropdown-option-selected-color` and `--icons-dropdown-option-selected-background`, or drop it to keep the theme look.",
 					"when": {
@@ -20589,14 +22548,99 @@
 					}
 				]
 			},
+			"cssVars": {
+				"removed": [
+					{
+						"name": "--user-avatar-font-size",
+						"note": "Never had an effect (the copy did not read it): removed.",
+						"drop": true
+					}
+				]
+			},
 			"manual": [
 				{
 					"id": "user-avatar-look",
 					"kind": "review",
 					"summary": "Avatar colors per person (from the name) and Aurora texts; one size, `--avatar-size`, instead of width and height.",
-					"action": "Check the user menu and the sidebar footer: `--avatar-width`/`--avatar-height` became `--avatar-size`; `--user-avatar-font-size` never had an effect and can be removed."
+					"action": "Check the user menu and the sidebar footer: `--avatar-width`/`--avatar-height` became `size` or `--avatar-size`."
+				}
+			],
+			"variants": [
+				{
+					"name": "UserAvatarCompact",
+					"when": {
+						"prop": "showTitleAndDescription",
+						"value": "false"
+					}
 				}
 			]
+		},
+		{
+			"to": "Avatar",
+			"summary": "The local `UserAvatar` copy with `showTitleAndDescription={false}` drew only a library `Avatar` with the initials: it becomes `Avatar` with `name`.",
+			"props": {
+				"renamed": [
+					{
+						"from": "username",
+						"to": "name",
+						"note": "Initials of the first and last word (\"Mario Rossi\" → \"MR\"; the copy took the first two letters, \"MA\"), color of the person and accessible name."
+					}
+				],
+				"removed": [
+					{
+						"name": "showTitleAndDescription",
+						"note": "The variant without title and description is `Avatar`.",
+						"drop": true
+					},
+					{
+						"name": "description",
+						"note": "Not shown without the title (v4 too): removed.",
+						"drop": true
+					},
+					{
+						"name": "direction",
+						"note": "Layout of the title and description, not shown: removed.",
+						"drop": true
+					},
+					{
+						"name": "reverse",
+						"note": "Layout of the title and description, not shown: removed.",
+						"drop": true
+					},
+					{
+						"name": "cursor",
+						"note": "Not shown without the title: removed.",
+						"drop": true
+					},
+					{
+						"name": "solanaPublicKey",
+						"note": "Not shown without the title: removed.",
+						"drop": true
+					},
+					{
+						"name": "onclick",
+						"note": "The copy did not pass it to the avatar without the title. `Avatar` is not a button: wrap it in a `<button>` or `<a>` if it must react, or use `DescriptiveAvatar compact` with `onclick`."
+					}
+				]
+			},
+			"cssVars": {
+				"removed": [
+					{
+						"name": "--user-avatar-font-size",
+						"note": "Never had an effect (the copy did not read it): removed.",
+						"drop": true
+					}
+				]
+			},
+			"manual": [
+				{
+					"id": "user-avatar-compact-look",
+					"kind": "review",
+					"summary": "A round avatar with the initials and the color of the person, as the copy drew it; `src`, when given, now shows the picture (some copies ignored it without the title).",
+					"action": "Check the user menu and the bar: `--avatar-width`/`--avatar-height` became `size` (`xs` 24, `sm` 32, `md` 40, `lg` 56, `xl` 80) or `--avatar-size`."
+				}
+			],
+			"from": "local/UserAvatarCompact"
 		},
 		{
 			"from": "local/WidgetError",
@@ -22372,7 +24416,22 @@
 							"onsort",
 							"onfetchData"
 						]
-					}
+					},
+					"done": {
+						"has": {
+							"events": [
+								"onquerychange"
+							]
+						},
+						"lacks": {
+							"events": [
+								"onfiltersChange"
+							]
+						}
+					},
+					"alternatives": [
+						"data-table-loader"
+					]
 				},
 				{
 					"id": "data-table-loader",
@@ -22385,6 +24444,13 @@
 							"onfiltersChange",
 							"onfetchData"
 						]
+					},
+					"done": {
+						"has": {
+							"props": [
+								"loader"
+							]
+						}
 					}
 				},
 				{
@@ -25079,7 +27145,7 @@
 					"id": "sidebar-layout-scroll",
 					"kind": "edit",
 					"summary": "The window scrolls the page: the bar and the sidebar stay in place by themselves and the content is in a `<main>` that takes the remaining width. v5 apps do not need their own scroll box.",
-					"action": "Remove the wrapper the app put around the content to scroll it (a div with `calc(100dvw - 52px)` width, `calc(100dvh - 50px)` height and `overflow-auto`) and the extra `<main>` inside it: render the page content directly. Code that scrolled that box (`bind:this` to a global scroller, `scrollTo` on it) must use `window` instead. Full-height pages can use `calc(100dvh - var(--sidebar-layout-header-height, 3.5rem))`.",
+					"action": "Remove the wrapper the app put around the content to scroll it (a div with `calc(100dvw - 52px)` width, `calc(100dvh - 50px)` height and `overflow-auto`) and the extra `<main>` inside it: render the page content directly. Code that scrolled that box (`bind:this` to a global scroller, `scrollTo` on it) must use `window` instead. Full-height pages can use `calc(100dvh - var(--sidebar-layout-header-height, 3.5rem))`. The old box also clipped content wider than the screen; without it the page scrolls sideways on phones: give `min-width: 0` (`min-w-0`) to the flex and grid children that hold tables or long text, and check the pages at phone width.",
 					"when": {
 						"snippets": [
 							"children"
@@ -26114,7 +28180,7 @@
 					"id": "sidebar-layout-scroll",
 					"kind": "edit",
 					"summary": "The window scrolls the page: the bar and the sidebar stay in place by themselves and the content is in a `<main>` that takes the remaining width. v5 apps do not need their own scroll box.",
-					"action": "Remove the wrapper the app put around the content to scroll it (a div with `calc(100dvw - 52px)` width, `calc(100dvh - 50px)` height and `overflow-auto`) and the extra `<main>` inside it: render the page content directly. Code that scrolled that box (`bind:this` to a global scroller, `scrollTo` on it) must use `window` instead. Full-height pages can use `calc(100dvh - var(--sidebar-layout-header-height, 3.5rem))`.",
+					"action": "Remove the wrapper the app put around the content to scroll it (a div with `calc(100dvw - 52px)` width, `calc(100dvh - 50px)` height and `overflow-auto`) and the extra `<main>` inside it: render the page content directly. Code that scrolled that box (`bind:this` to a global scroller, `scrollTo` on it) must use `window` instead. Full-height pages can use `calc(100dvh - var(--sidebar-layout-header-height, 3.5rem))`. The old box also clipped content wider than the screen; without it the page scrolls sideways on phones: give `min-width: 0` (`min-w-0`) to the flex and grid children that hold tables or long text, and check the pages at phone width.",
 					"when": {
 						"snippets": [
 							"children"

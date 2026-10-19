@@ -65,14 +65,24 @@ function knownNames(component: ComponentSpec) {
 	]);
 }
 
-function cssNames(component: ComponentSpec) {
-	return new Set(component.cssVars.flatMap((v) => [v.name, ...v.defaults.map((d) => d.name)]));
+function cssNames(spec: Spec, component: ComponentSpec) {
+	const names = new Set<string>();
+	const seen = new Set<string>();
+	const add = (current: ComponentSpec | undefined) => {
+		if (!current || seen.has(current.name)) return;
+		seen.add(current.name);
+		for (const v of current.cssVars) for (const name of [v.name, ...v.defaults.map((d) => d.name)]) names.add(name);
+		for (const d of current.cssDefaultsOnly ?? []) names.add(d.name);
+		for (const name of [...(current.uses ?? []), ...(current.inherits ? [current.inherits.name] : [])]) add(findComponent(spec, name));
+	};
+	add(component);
+	return names;
 }
 
-function checkComponent(code: string, node: Node, component: ComponentSpec, issues: Issue[]) {
+function checkComponent(spec: Spec, code: string, node: Node, component: ComponentSpec, issues: Issue[]) {
 	const names = knownNames(component);
 	const bindable = new Set(component.props.filter((p) => p.bindable).map((p) => p.name));
-	const css = cssNames(component);
+	const css = cssNames(spec, component);
 	const native = component.htmlElement;
 	const at = (n: Node) => lineOf(code, n.start);
 	const add = (level: Issue['level'], n: Node, message: string) =>
@@ -127,8 +137,11 @@ export function validateUsage(spec: Spec, code: string, filename = 'Component.sv
 	}
 	const issues: Issue[] = [];
 	const imports = libraryImports(ast.instance);
-	for (const imported of imports.values()) {
-		if (/^[A-Z]/.test(imported) && !findComponent(spec, imported) && !isKnownExport(spec, imported)) {
+	const tags = new Set<string>();
+	walk(ast.fragment, (node) => void (node.type === 'Component' && tags.add(node.name)));
+	for (const [local, imported] of imports) {
+		const exported = spec.exports ? spec.exports.includes(imported) : !tags.has(local);
+		if (/^[A-Z]/.test(imported) && !findComponent(spec, imported) && !isKnownExport(spec, imported) && !exported) {
 			issues.push({ level: 'warning', line: 1, message: `${imported} is not a documented component of ${PACKAGE} ${spec.version} (a v4 name?).` });
 		}
 	}
@@ -137,7 +150,7 @@ export function validateUsage(spec: Spec, code: string, filename = 'Component.sv
 		const imported = imports.get(node.name);
 		if (!imported) return;
 		const component = findComponent(spec, imported);
-		if (component) checkComponent(code, node, component, issues);
+		if (component) checkComponent(spec, code, node, component, issues);
 	});
 	const css = ast.css ? code.slice(ast.css.content.start, ast.css.content.end) : '';
 	css.split('\n').forEach((text, index) => {

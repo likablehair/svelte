@@ -28,7 +28,10 @@ export function compileRules(sources: RuleSources): CompiledRules {
 	].map((m) => m[1]);
 	const components = [
 		...sources.components.flat(),
-		...(sources.local ?? []).map((rule) => ({ ...rule, from: `${LOCAL_PREFIX}${rule.from}` }))
+		...(sources.local ?? []).flatMap(({ variants, ...rule }) => [
+			{ ...rule, from: `${LOCAL_PREFIX}${rule.from}`, ...(variants ? { variants: variants.map(({ name, when }) => ({ name, when })) } : {}) },
+			...(variants ?? []).map(({ name, when, ...variant }) => ({ ...variant, from: `${LOCAL_PREFIX}${name}` }))
+		])
 	].sort((a, b) => a.from.localeCompare(b.from) || a.to.localeCompare(b.to));
 	return JSON.parse(
 		JSON.stringify({

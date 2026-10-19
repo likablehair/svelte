@@ -127,6 +127,11 @@ async function runSetup(options: Options) {
 	console.log(`Branch: ${result.branch}`);
 	console.log(changes.length ? changes.map((c) => `- ${c}`).join('\n') : 'Nothing to change.');
 	if (result.install) console.log(`Installed with \`${result.install}\`.`);
+	console.log(
+		result.install
+			? 'If the dev server of the app is running, restart it with `vite dev --force`: Vite keeps serving the v4 package it had pre-bundled.'
+			: 'After the install, restart the dev server of the app with `vite dev --force` if it is running: Vite keeps serving the v4 package it had pre-bundled.'
+	);
 	console.log('Nothing was committed.');
 }
 

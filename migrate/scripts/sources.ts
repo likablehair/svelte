@@ -44,7 +44,18 @@ function componentApi(slug: string, file: string): ComponentApi {
 				...doc.cssVars.flatMap((v) => [v.name, ...v.defaults.map((d) => d.name)]),
 				...doc.cssDefaultsOnly.map((d) => d.name)
 			])
-		].sort()
+		].sort(),
+		cssValues: Object.fromEntries(
+			[
+				...doc.cssVars.flatMap((v) => v.defaults.map((d): [string, string] => [d.name, d.value])),
+				...doc.cssDefaultsOnly.map((d): [string, string] => [d.name, d.value]),
+				...doc.cssVars.flatMap((v): [string, string][] =>
+					v.defaults.length === 1 ? [[v.name, v.defaults[0].value]] : !v.defaults.length && v.fallback ? [[v.name, v.fallback]] : []
+				)
+			]
+				.filter(([, value]) => !value.includes('var('))
+				.sort(([a], [b]) => a.localeCompare(b))
+		)
 	};
 }
 

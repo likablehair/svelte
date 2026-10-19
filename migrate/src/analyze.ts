@@ -3,8 +3,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { basename, dirname, join, posix, relative, resolve } from 'node:path';
 import { Lines, listFiles } from './files.ts';
 import { matchUsage, todoOf, type Effort, type Finding, type Usage } from './match.ts';
-import { localRuleFor, type RuleIndex } from './rules.ts';
-import { scanSvelte, type Attr, type ImportRecord, type SvelteFile } from './svelte.ts';
+import { localRuleFor, variantRule, type RuleIndex } from './rules.ts';
+import { attrLiteral, scanSvelte, type Attr, type ImportRecord, type SvelteFile } from './svelte.ts';
 import type { AppDefault, ManualStep } from './types.ts';
 
 const LIB = '@likable-hair/svelte';
@@ -429,7 +429,8 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 		if (usage.via) entry.via++;
 		else entry.usages++;
 		componentFiles.get(usage.component)!.add(usage.file);
-		const rule = index.byV4.get(usage.component);
+		const base = index.byV4.get(usage.component);
+		const rule = variantRule(index, base, usage.attrs.map((a) => ({ name: a.name, value: attrLiteral(a) }))) ?? base;
 		if (!rule) {
 			if (!usage.via)
 				findings.push({

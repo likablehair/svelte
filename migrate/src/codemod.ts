@@ -5,10 +5,10 @@ import { attrExpression, attrText, Editor, isReference, visit } from './ast.ts';
 import { readAliases } from './analyze.ts';
 import { dissolve, resolveImport, type WrapperSummary } from './dissolve.ts';
 import { Lines, listFiles } from './files.ts';
-import { localRuleFor, type RuleIndex } from './rules.ts';
+import { localRuleFor, variantRule, type RuleIndex } from './rules.ts';
 import { pageUrl, parentPage } from './routes.ts';
 import { scanSvelte, type Node } from './svelte.ts';
-import type { ChildIcon, Collect, ComponentApi, OperatorsRule, ComponentMigration, ItemRules, Removal, SnippetChange, Unpack, Unwrap, ValueChange, LocalMigration, ManualTrigger, NestedRule, PairsRule, ParameterRule, ParentRoute } from './types.ts';
+import type { ChildIcon, Collect, ComponentApi, OperatorsRule, ComponentMigration, ItemRules, Removal, SnippetChange, Unpack, Unwrap, ValueChange, LocalMigration, ManualTrigger, NestedRule, PairsRule, ParameterRule, ParentRoute, Rename } from './types.ts';
 
 const LIB = '@likable-hair/svelte';
 const MDI = '@mdi/js';
@@ -109,6 +109,35 @@ interface CssRename {
 	to: string;
 	component: string;
 	note?: string;
+	toProp?: Rename['toProp'];
+	also?: string[];
+}
+
+interface CssDrop {
+	component: string;
+	note: string;
+}
+
+export const v5CssVars = (index: RuleIndex) => new Set(Object.values(index.rules.v5.components).flatMap((c) => c.cssVars));
+
+export const v4CssPrefixes = (index: RuleIndex) =>
+	[...index.v4Components]
+		.map((name) => `--${name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}-`)
+		.sort((a, b) => b.length - a.length);
+
+export function cssDrops(index: RuleIndex, renames: Map<string, CssRename>, v5Vars: Set<string>): Map<string, CssDrop> {
+	const kept = new Set<string>();
+	const out = new Map<string, CssDrop>();
+	for (const rule of index.rules.components) {
+		for (const r of rule.cssVars?.renamed ?? []) kept.add(r.from);
+		for (const r of rule.cssVars?.changed ?? []) kept.add(r.name);
+		for (const r of rule.cssVars?.removed ?? []) {
+			if (!r.drop) kept.add(r.name);
+			else if (!out.has(r.name)) out.set(r.name, { component: rule.from, note: r.note });
+		}
+	}
+	for (const name of out.keys()) if (kept.has(name) || renames.has(name) || v5Vars.has(name)) out.delete(name);
+	return out;
 }
 
 export function cssRenames(index: RuleIndex): Map<string, CssRename> {
@@ -117,7 +146,7 @@ export function cssRenames(index: RuleIndex): Map<string, CssRename> {
 		for (const r of rule.cssVars?.renamed ?? []) {
 			if (r.scoped) continue;
 			const list = byName.get(r.from) ?? [];
-			list.push({ to: r.to, component: rule.from, note: r.note });
+			list.push({ to: r.to, component: rule.from, note: r.note, toProp: r.toProp, also: r.also });
 			byName.set(r.from, list);
 		}
 	const out = new Map<string, CssRename>();
@@ -157,6 +186,11 @@ interface Context {
 	passThrough?: (source: string) => PassThrough | undefined;
 	scope?: Map<string, string>;
 	passed?: Set<string> | null;
+	variants: Map<Node, string>;
+	declared: Map<string, number>;
+	drops: Map<string, CssDrop>;
+	v4Prefixes: string[];
+	v5Vars: Set<string>;
 }
 
 interface PassThrough {
@@ -279,6 +313,20 @@ function libraryImports(programs: Node[], index: RuleIndex): LibImport[] {
 	return out;
 }
 
+function renameTag(ctx: Context, node: Node, local: string, to: string) {
+	ctx.edit.replace(node.start + 1, node.start + 1 + local.length, to);
+	const close = ctx.text.lastIndexOf(`</${local}`, node.end);
+	if (close > node.start && ctx.text.slice(node.end - 2, node.end) !== '/>') ctx.edit.replace(close + 2, close + 2 + local.length, to);
+}
+
+const nodeLiteral = (attr: Node): string | undefined => {
+	if (attr.value === true) return 'true';
+	const text = attrText(attr);
+	if (text !== undefined) return text;
+	const expression = attrExpression(attr);
+	return expression?.type === 'Literal' ? String(expression.value) : undefined;
+};
+
 function renameReferences(roots: unknown[], local: string, to: string, ctx: Context, store = false) {
 	const seen = new Set<number>();
 	const target = store ? `$${local}` : local;
@@ -399,13 +447,27 @@ function replaceLocalImports(roots: unknown[], programs: Node[], ctx: Context, s
 		for (const spec of decl.specifiers as Node[]) {
 			if (spec.type === 'ImportDefaultSpecifier' && !typeOnly) {
 				const local = spec.local.name as string;
+				const tags: Node[] = [];
+				for (const root of roots) visit(root, (node) => void (node.type === 'Component' && node.name === local && tags.push(node)));
+				for (const node of tags) {
+					const variant = variantRule(ctx.index, rule, (node.attributes as Node[]).filter((a) => a.type === 'Attribute').map((a) => ({ name: a.name, value: nodeLiteral(a) })));
+					if (!variant) continue;
+					const name = taken.get(variant.to) ?? variant.to;
+					if (!taken.has(variant.to)) {
+						named.push(variant.to);
+						taken.set(variant.to, variant.to);
+					}
+					renameTag(ctx, node, local, name);
+					ctx.variants.set(node, variant.from);
+				}
+				scope.set(local, rule.from);
+				if (tags.every((node) => ctx.variants.has(node)) && !ctx.references.get(local)) continue;
 				const name = taken.get(rule.to) ?? rule.to;
 				if (!taken.has(rule.to)) {
 					named.push(rule.to);
 					taken.set(rule.to, rule.to);
 				}
 				if (local !== name) renameReferences(roots, local, name, ctx);
-				scope.set(local, rule.from);
 				continue;
 			}
 			const imported = spec.type === 'ImportSpecifier' ? ((spec.imported.name ?? spec.imported.value) as string) : undefined;
@@ -2058,14 +2120,52 @@ function importIcons(ctx: Context, program: Node | undefined, scriptStart?: numb
 	ctx.edit.insert(at, `${at ? '\n\n' : ''}<script${lang}>\n\t${line}\n</script>${at ? '' : '\n\n'}`);
 }
 
+function declarationEnd(text: string, from: number, end: number): { value: [number, number]; end: number; semicolon: boolean } {
+	let depth = 0;
+	let i = from;
+	for (; i < end; i++) {
+		const c = text[i];
+		if (c === '(') depth++;
+		else if (c === ')') depth--;
+		else if (depth <= 0 && (c === ';' || c === '}')) break;
+	}
+	const semicolon = text[i] === ';';
+	return { value: [from, i], end: semicolon ? i + 1 : i, semicolon };
+}
+
+function removeDeclaration(ctx: Context, pos: number, end: number) {
+	const lineStart = ctx.text.lastIndexOf('\n', pos - 1) + 1;
+	const lineEnd = ctx.text.indexOf('\n', end);
+	const alone = !ctx.text.slice(lineStart, pos).trim() && !ctx.text.slice(end, lineEnd === -1 ? ctx.text.length : lineEnd).trim();
+	if (alone && lineEnd !== -1) return ctx.edit.replace(lineStart, lineEnd + 1, '');
+	const after = /^[ \t]*/.exec(ctx.text.slice(end))![0].length;
+	return ctx.edit.replace(pos, end + after, '');
+}
+
+function cssReason(ctx: Context, name: string): string {
+	const rule = ctx.index.cssVars.get(name);
+	if (rule?.kind === 'removed')
+		return `not a v5 variable, so it has no effect: ${rule.note}${rule.replacement ? ` Instead: \`${rule.replacement}\`.` : ''} Remove it, or move the value there only if the Aurora look does not fit.`;
+	return 'not a v5 variable and no rule maps it, so it has no effect: remove it, or move the value to the v5 variable of the same part (`component <Name>` lists them) only if the Aurora look does not fit.';
+}
+
 function renameCssText(ctx: Context, start: number, end: number) {
 	const text = ctx.text.slice(start, end);
+	const declarations = [...text.matchAll(/(?<![\w-])(--[A-Za-z0-9_-]+)\s*:/g)].map((m) => ({ name: m[1], at: m.index!, colon: m.index! + m[0].length }));
+	const blockOf = (at: number) => {
+		const open = Math.max(text.lastIndexOf('{', at), text.lastIndexOf('}', at));
+		const close = text.indexOf('}', at);
+		return [open + 1, close === -1 ? text.length : close];
+	};
 	for (const m of text.matchAll(/--[A-Za-z0-9_-]+/g)) {
 		const name = m[0];
-		const rename = ctx.css.get(name);
-		if (!rename) continue;
+		const previous = text[m.index! - 1];
+		if (previous && /[\w-]/.test(previous)) continue;
 		const pos = start + m.index!;
-		if (ctx.edit.replace(pos, pos + name.length, rename.to))
+		const declaration = declarations.find((d) => d.at === m.index);
+		const rename = ctx.css.get(name);
+		if (rename) {
+			if (!ctx.edit.replace(pos, pos + name.length, rename.to)) continue;
 			changed(ctx, pos, {
 				kind: 'css-var-renamed',
 				id: `${rename.component}/cssVars.renamed/${name}`,
@@ -2073,6 +2173,43 @@ function renameCssText(ctx: Context, start: number, end: number) {
 				to: rename.to,
 				note: rename.note,
 				check: !!rename.note
+			});
+			if (!declaration || !rename.also?.length) continue;
+			const [blockStart, blockEnd] = blockOf(m.index!);
+			const inBlock = declarations.filter((d) => d.at >= blockStart && d.at < blockEnd && d !== declaration).map((d) => d.name);
+			const targets = rename.also.filter(
+				(target) =>
+					!inBlock.some((other) => {
+						const claim = ctx.css.get(other);
+						return other === target || claim?.to === target || (!!claim?.also?.includes(target) && claim.also.length < rename.also!.length);
+					})
+			);
+			if (!targets.length) continue;
+			const decl = declarationEnd(text, declaration.colon, blockEnd);
+			const raw = text.slice(...decl.value);
+			const value = raw.trim();
+			const lineStart = text.lastIndexOf('\n', m.index!) + 1;
+			const indent = /^[ \t]*/.exec(text.slice(lineStart))![0];
+			const glue = lineStart === 0 || text.slice(lineStart, m.index!).trim() ? ' ' : `\n${indent}`;
+			const at = decl.semicolon ? decl.end : decl.value[0] + raw.trimEnd().length;
+			ctx.edit.insert(start + at, `${decl.semicolon ? '' : ';'}${targets.map((t) => `${glue}${t}: ${value};`).join('')}`);
+			continue;
+		}
+		if (!declaration || ctx.v5Vars.has(name) || name.startsWith('--global-')) continue;
+		const drop = ctx.drops.get(name);
+		if (drop) {
+			const decl = declarationEnd(text, declaration.colon, blockOf(m.index!)[1]);
+			if (removeDeclaration(ctx, pos, start + decl.end))
+				changed(ctx, pos, { kind: 'css-var-removed', id: `${drop.component}/cssVars.removed/${name}`, name, note: drop.note, check: true });
+			continue;
+		}
+		const listed = ctx.index.cssVars.get(name);
+		if (listed?.kind === 'removed' || ctx.v4Prefixes.some((prefix) => name.startsWith(prefix)))
+			skip(ctx, pos, {
+				kind: 'css-var-unknown',
+				id: listed ? `${listed.component}/cssVars.removed/${name}` : 'css/unknown',
+				name,
+				reason: cssReason(ctx, name)
 			});
 	}
 }
@@ -2083,12 +2220,24 @@ interface StyleRename {
 	note?: string;
 	drop?: boolean;
 	dropWhen?: { match: string; note: string };
+	toProp?: Rename['toProp'];
 }
 
 const valueOf = (ctx: Context, attr: Node) =>
 	attr.value === true ? '' : ctx.text.slice(attr.start + (attr.type === 'StyleDirective' ? 6 : 0) + attr.name.length, attr.end);
 
-function renameStyles(ctx: Context, node: Node, lookup: (name: string) => StyleRename | undefined) {
+function sameAsDefault(ctx: Context, api: ComponentApi | undefined, name: string, attr: Node) {
+	const prefix = api && `--${api.slug}-`;
+	const library = api?.cssValues?.[name];
+	const value = attr.type === 'Attribute' ? attrText(attr) : undefined;
+	if (!prefix || !library || value === undefined || !name.startsWith(prefix) || !/-(?:min-|max-)?(?:width|height)$/.test(name)) return false;
+	const normal = (v: string) => v.trim().replace(/\s+/g, ' ').toLowerCase();
+	if (normal(value) !== normal(library)) return false;
+	if (name.startsWith(`${prefix}default-`)) return (ctx.declared.get(name) ?? 0) <= 1;
+	return !ctx.declared.get(`${prefix}default-${name.slice(prefix.length)}`);
+}
+
+function renameStyles(ctx: Context, node: Node, lookup: (name: string) => StyleRename | undefined, api?: ComponentApi) {
 	const present = new Map<string, Node>();
 	for (const attr of node.attributes as Node[])
 		if ((attr.type === 'Attribute' || attr.type === 'StyleDirective') && attr.name.startsWith('--'))
@@ -2100,6 +2249,18 @@ function renameStyles(ctx: Context, node: Node, lookup: (name: string) => StyleR
 		}
 		if ((attr.type !== 'Attribute' && attr.type !== 'StyleDirective') || !attr.name.startsWith('--')) continue;
 		const rename = lookup(attr.name);
+		const final = rename && !rename.drop ? rename.to : attr.name;
+		if (!rename?.drop && sameAsDefault(ctx, api, final, attr)) {
+			if (removeAttr(ctx, attr))
+				changed(ctx, attr.start, {
+					kind: 'css-var-removed',
+					id: rename?.id ?? `${api!.slug}/cssVars.default/${final}`,
+					name: attr.name,
+					note: `Same value as the v5 default of \`${final}\`: removed.`,
+					check: false
+				});
+			continue;
+		}
 		if (!rename) continue;
 		const dropWhen = rename.dropWhen && new RegExp(rename.dropWhen.match).test(valueOf(ctx, attr)) ? rename.dropWhen : undefined;
 		if (rename.drop || dropWhen) {
@@ -2108,6 +2269,30 @@ function renameStyles(ctx: Context, node: Node, lookup: (name: string) => StyleR
 		}
 		const at = attr.start + (attr.type === 'StyleDirective' ? 6 : 0);
 		const other = present.get(`${attr.type}:${rename.to}`);
+		const literal = attr.type === 'Attribute' ? attrText(attr)?.trim() : undefined;
+		const toProp = rename.toProp;
+		if (
+			toProp &&
+			(!other || other === attr) &&
+			literal !== undefined &&
+			literal in toProp.values &&
+			api?.props.includes(toProp.prop) &&
+			!(node.attributes as Node[]).some((a) => a.name === toProp.prop)
+		) {
+			const prop = toProp.values[literal];
+			const done = prop === null ? removeAttr(ctx, attr) : ctx.edit.replace(attr.start, attr.end, `${toProp.prop}="${prop}"`);
+			if (done) {
+				present.set(`${attr.type}:${rename.to}`, attr);
+				changed(ctx, attr.start, {
+					kind: 'css-var-renamed',
+					id: rename.id,
+					name: attr.name,
+					to: prop === null ? `${toProp.prop} (default)` : `${toProp.prop}="${prop}"`,
+					check: false
+				});
+			}
+			continue;
+		}
 		if (other && other !== attr) {
 			if (valueOf(ctx, other) === valueOf(ctx, attr) && removeAttr(ctx, attr))
 				changed(ctx, attr.start, { kind: 'css-var-renamed', id: rename.id, name: attr.name, to: rename.to, note: `Same value as \`${rename.to}\`, which is already set: removed.`, check: false });
@@ -2147,7 +2332,7 @@ function transformSvelte(ctx: Context) {
 	const usages: { node: Node; v4: string }[] = [];
 	visit(ast.fragment, (node) => {
 		if (node.type !== 'Component') return;
-		const v4 = scope.get(node.name);
+		const v4 = ctx.variants.get(node) ?? scope.get(node.name);
 		if (v4) usages.push({ node, v4 });
 	});
 
@@ -2219,18 +2404,18 @@ function transformSvelte(ctx: Context) {
 
 	const global = (name: string): StyleRename | undefined => {
 		const r = ctx.css.get(name);
-		return r && { to: r.to, id: `${r.component}/cssVars.renamed/${name}`, note: r.note };
+		return r && { to: r.to, id: `${r.component}/cssVars.renamed/${name}`, note: r.note, toProp: r.toProp };
 	};
 	visit(ast.fragment, (node) => {
 		if (!Array.isArray(node.attributes)) return;
-		const v4 = node.type === 'Component' ? scope.get(node.name) : undefined;
+		const v4 = node.type === 'Component' ? (ctx.variants.get(node) ?? scope.get(node.name)) : undefined;
 		const rule = v4 ? ctx.index.byV4.get(v4) : undefined;
 		renameStyles(ctx, node, (name) => {
 			const own = rule?.cssVars?.renamed?.find((x) => x.from === name);
 			const dropped = rule?.cssVars?.removed?.find((x) => x.name === name && x.drop);
 			if (dropped) return { to: '', id: `${v4}/cssVars.removed/${name}`, note: dropped.note, drop: true };
-			return own ? { to: own.to, id: `${v4}/cssVars.renamed/${name}`, note: own.note, dropWhen: own.dropWhen } : global(name);
-		});
+			return own ? { to: own.to, id: `${v4}/cssVars.renamed/${name}`, note: own.note, dropWhen: own.dropWhen, toProp: own.toProp } : global(name);
+		}, rule ? ctx.index.rules.v5.components[rule.to] : undefined);
 	});
 
 	iconLiterals(ctx, roots, libraryRanges);
@@ -2384,6 +2569,9 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 	dir = resolve(dir);
 	const available = mdiNames(dir);
 	const css = cssRenames(index);
+	const v5Vars = v5CssVars(index);
+	const drops = cssDrops(index, css, v5Vars);
+	const v4Prefixes = v4CssPrefixes(index);
 	const typescript = existsSync(join(dir, 'tsconfig.json'));
 	const paths = existsSync(join(dir, 'src')) ? listFiles(join(dir, 'src')) : [];
 	const texts = new Map(paths.map((path) => [path, readFileSync(path, 'utf8')]));
@@ -2439,6 +2627,15 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 		}
 	}
 	const pages = new Set(paths.map((path) => pageUrl(relative(dir, path))).filter((url) => url !== undefined));
+	const targets = new Map<string, Set<string>>();
+	for (const rule of index.rules.components)
+		for (const r of rule.cssVars?.renamed ?? []) targets.set(r.from, new Set([...(targets.get(r.from) ?? []), r.to, ...(r.also ?? [])]));
+	const declared = new Map<string, number>();
+	for (const [path, text] of texts) {
+		if (dissolved.deleted.includes(path)) continue;
+		for (const m of (dissolved.texts.get(path) ?? text).matchAll(/(?<![\w-])(--[A-Za-z0-9_-]+)\s*[:=]/g))
+			for (const name of new Set([m[1], ...(targets.get(m[1]) ?? [])])) declared.set(name, (declared.get(name) ?? 0) + 1);
+	}
 
 	for (const path of paths) {
 		const original = texts.get(path)!;
@@ -2477,6 +2674,11 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 				return target && rule && target !== path ? { path: target, rule } : undefined;
 			},
 			localUsages,
+			variants: new Map(),
+			declared,
+			drops,
+			v4Prefixes,
+			v5Vars,
 			passed: passed.has(path) ? passed.get(path)! : new Set(),
 			passThrough: (from) => {
 				const target = resolveSource(dir, path, from, aliases);
