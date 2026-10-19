@@ -47,7 +47,7 @@ Questo file è corto di proposito (si carica a ogni lavoro nel repo): regole, de
 ## Ripartenza dopo un `/clear`
 
 1. Leggi "Stato" in fondo: l'ultima voce "Prossimo" dice da dove riprendere.
-2. Il dev server delle docs gira su http://localhost:5180; se non risponde: `npx vite dev --port 5180` dalla radice, in background.
+2. Il dev server delle docs gira su http://localhost:5180; se non risponde: `pnpm dev --port 5180` dalla radice, in background.
 3. Segui "Processo per un componente" e la "Regola dei test". Per leggere componenti v4 grandi usa un subagente.
 4. A componente finito, con la skill aggiornata, sul "procedi" suggerisci `/clear` prima del successivo (non puoi lanciarlo tu). La conversazione lunga rallenta ogni risposta: meglio ripartire spesso.
 5. Leggi "Team, account e modo di lavorare": vale per chiunque usi la skill.
@@ -75,7 +75,7 @@ Cose che non stanno nel codice e che finora sapeva solo l'utente (2026-10-09). L
   - la config sta in `vite.config.ts` (non esiste `svelte.config.js`);
   - nome `@likable-hair/svelte`, versione `5.0.0`, `"private": true`;
   - 0 dipendenze runtime oltre a quelle approvate, `"sideEffects": ["**/*.css"]`.
-- Comandi, **dalla radice**: `npm run dev` (o `npx vite dev --port 5180`), `npm run check`, `npm run package`.
+- Comandi, **dalla radice**: `pnpm dev --port 5180`, `pnpm check`, `pnpm package`. Il repo è un **workspace pnpm** (radice, `migrate/`, `mcp/`, `adonis-filters/`, dal 2026-10-19): un solo `pnpm install` installa tutto; la versione di pnpm sta in `packageManager` del `package.json`.
 - Riferimenti:
   - `design/components-prototype.html`: il target visivo ("Likable Aurora UI"). Ogni card ha il percorso del componente v4 in `<div class="path">simple/buttons/Button.svelte</div>`, quindi un grep sul percorso porta alla sezione giusta.
   - `design/AUDIT.md`: bug e debolezze della v4 da non ripetere.
@@ -114,6 +114,7 @@ Una riga per argomento; la voce completa, con data e motivazioni, è in `referen
 - **La v5 alla radice** (2026-10-16, utente: "in questo branch. poi prima di mergiare in master, creo un nuovo branch con la v4. oppure crealo direttamente tu"): nel branch `aurora-v5` il contenuto di `aurora/` passa alla radice e la v4 esce dalla radice; la v4 resta nel branch **`4.x`**, creato da `master` (4.3.2), per le correzioni alle app ancora sulla v4 finché non sono migrate. Poi `aurora-v5` si unisce in `master`.
 - Partire minimali: dipendenze solo quando servono (runtime: `flag-icons`, dal 2026-10-13 `@tanstack/virtual-core` per la virtualizzazione delle righe, dal 2026-10-14 `chart.js` e `chartjs-plugin-zoom` per i grafici). Le tre task (componenti, docs, temi) procedono insieme.
 - **Niente pubblicazione da noi** (2026-10-16, utente: "non pubblicare nulla, noi ora facciamo solo codice. poi il capo pubblica npm"): non si pubblica niente (né la v5 né `svelte-migrate`/`svelte-mcp`), i pacchetti restano `"private": true`; pubblica il capo su npm (dove sta la v4). Pipeline e Changesets si decidono col capo quando pubblica.
+- **Il repo usa pnpm** (2026-10-19, utente: "il prossimo step è mettere pnpm ovunque"): workspace pnpm (radice, `migrate/`, `mcp/`, `adonis-filters/`), `pnpm-lock.yaml`, `packageManager: pnpm@11.5.1`, comandi `pnpm …`; si pubblica con `pnpm publish`. I testi per le app (docs, `MIGRATION.md`, messaggi dello strumento, config degli agenti con `npx`) restano neutri: 7 app v4 su 11 usano npm. Changesets e pipeline restano per quando pubblica il capo.
 - **Cambiare logica e API è approvato** (dal capo, 2026-10-09), ma ogni cambio che rompe chi migra va in `MIGRATION.md` e nelle regole `migrations/v4-to-v5/` (aggiunte opzionali: una riga).
 - **Parità con la v4**: ogni capacità v4 ha un equivalente o è scartata con l'ok dell'utente.
 - Tutto ciò che sta nel repo è in **inglese**, salvo la skill (in italiano). Testi di default dei componenti in inglese (nei filtri la lingua viene da `locale`).
@@ -247,7 +248,7 @@ Le nuove proposte vanno in una tabella `| # | Proposta | Nota |`, numerate dal p
 - **`FilterModifierApplier` unico**: oggi è copiato nei backend di 20 app in 6 varianti diverse (`reference/filters-backends.md`); trovare il modo di averne uno solo (pacchetto condiviso per Adonis/Lucid, versionato insieme a `FilterBuilder`), così niente copia-incolla e si risolvono insieme varianti rotte (E/E'), `kind` mancanti e whitelist di sicurezza. **Prototipo fatto il 2026-10-19** (`adonis-filters/`); restano pubblicazione e adozione nelle app.
 
 **Segnalati dall'utente il 2026-10-19** (da fare, non ancora studiati):
-- **pnpm dentro la libreria** (**è il prossimo passo**, vedi "Prossimo" in fondo): il repo (radice, `migrate/`, `mcp/`, `adonis-filters/`) passa da npm a pnpm (lockfile, script, comandi in `CLAUDE.md`, README e skill); va con la pipeline di rilascio (Changesets, workspace pnpm).
+- **pnpm dentro la libreria**: fatto il 2026-10-19 (decisione "Il repo usa pnpm"); restano Changesets e pipeline, con il capo.
 - **Test che girano su Linux ma non sul Mac del capo**: vanno rivisti, tolti o gestiti meglio (da capire quali falliscono e perché: baseline visive fatte su Linux, tempi, font, limite delle schede in `vite.config.ts`…); chiedere al capo l'output dei test che falliscono.
 
 Il Toast, chiesto il 2026-10-08, è fatto il 2026-10-09.
@@ -282,17 +283,17 @@ Il Toast, chiesto il 2026-10-08, è fatto il 2026-10-09.
 La suite intera (~4.000 test in due browser, ~2 minuti) e il test visivo intero (~1.000 screenshot, ~5 minuti) non si lanciano dopo ogni modifica. Ogni browser apre al massimo una scheda ogni 4 GB di RAM (`pagesPerBrowser` in `vite.config.ts`, 4 su 16 GB; `VITEST_MAX_WORKERS=n` lo cambia): senza limite la suite riempiva RAM e swap (vedi `traps.md`). Dalla radice:
 
 - **Durante il lavoro**, solo i test di ciò che hai toccato:
-  - un componente: il **suo file di test** e quelli dei componenti che lo usano direttamente (`npx vitest run --project components tests/components/<C>.test.ts tests/components/<D>.test.ts`);
-  - una utility: `npx vitest run --project node tests/node/<x>.test.ts`;
-  - lo strumento di migrazione: `npx vitest run --project node migrate/tests` (e `npm run migrate:rules` se cambia una regola);
-  - un pezzo condiviso di cui non sai chi lo usa: `npm run test:related -- <file sorgente>` (Vitest esegue i test che lo importano). Attenzione: i test che importano dall'indice `#lib` risultano collegati a tutto, quindi `test:related` su un componente lancia più file del necessario (Divider: 20 file su 86); per un componente il file diretto è meglio.
-- **Test visivo**: solo gli esempi toccati, `npx playwright test -g "<slug>"`; baseline nuove o cambiate solo per quelli, `npx playwright test -g "<slug>" --update-snapshots=all` (senza `=all` riscrive solo quelle sopra soglia, vedi `traps.md`), poi guardare le immagini. Mai `test:visual:update` su tutto.
-- **`npx svelte-check --threshold error`**: una volta alla fine del giro di modifiche.
-- **Suite intera (`npm run test`) e visivo intero (`npm run test:visual`)**, solo:
+  - un componente: il **suo file di test** e quelli dei componenti che lo usano direttamente (`pnpm exec vitest run --project components tests/components/<C>.test.ts tests/components/<D>.test.ts`);
+  - una utility: `pnpm exec vitest run --project node tests/node/<x>.test.ts`;
+  - lo strumento di migrazione: `pnpm exec vitest run --project node migrate/tests` (e `pnpm migrate:rules` se cambia una regola);
+  - un pezzo condiviso di cui non sai chi lo usa: `pnpm test:related <file sorgente>` (Vitest esegue i test che lo importano). Attenzione: i test che importano dall'indice `#lib` risultano collegati a tutto, quindi `test:related` su un componente lancia più file del necessario (Divider: 20 file su 86); per un componente il file diretto è meglio.
+- **Test visivo**: solo gli esempi toccati, `pnpm exec playwright test -g "<slug>"`; baseline nuove o cambiate solo per quelli, `pnpm exec playwright test -g "<slug>" --update-snapshots=all` (senza `=all` riscrive solo quelle sopra soglia, vedi `traps.md`), poi guardare le immagini. Mai `test:visual:update` su tutto.
+- **`pnpm exec svelte-check --threshold error`**: una volta alla fine del giro di modifiche.
+- **Suite intera (`pnpm test`) e visivo intero (`pnpm test:visual`)**, solo:
   - prima di un commit chiesto dall'utente;
   - se si toccano fondamenta usate da tutti: `tokens.css`, la riga dei layer, `floating.ts`, `Menu`, `modal.ts`, `Button`, `SimpleTextField`, `api.server.ts` delle docs;
   - se l'utente lo chiede.
-- **`npm run package`**: solo se cambiano export o struttura dei file del pacchetto, o prima di un commit.
+- **`pnpm package`**: solo se cambiano export o struttura dei file del pacchetto, o prima di un commit.
 - Mai suite e visivo in parallelo. La regola vale anche per i subagenti: va scritta nel loro prompt.
 
 ## Convenzioni essenziali (elenco completo in `reference/conventions.md`)
@@ -310,7 +311,7 @@ La suite intera (~4.000 test in due browser, ~2 minuti) e il test visivo intero 
 ## Trappole più frequenti (elenco completo in `reference/traps.md`)
 
 - `cp`, `rm`, `mv` (e `ps`) sono alias interattivi: `command cp -f`, `command rm`, `command mv -f`, altrimenti il comando resta fermo.
-- I comandi npm si lanciano **dalla radice** (dal 2026-10-16; prima stavano in `aurora/`). Niente Prettier né ESLint: non lanciarli.
+- I comandi pnpm si lanciano **dalla radice** (dal 2026-10-16; prima stavano in `aurora/`). `pnpm <script> -- <arg>` passa anche il `--` allo script: scrivere `pnpm migrate analyze <app>`, senza `--`. Niente Prettier né ESLint: non lanciarli.
 - `sed -i` a volte non viene visto dal watcher di Vite: usare Edit/Python o fare `touch`.
 - SvelteKit 3: niente `$lib` (si usa `#lib/...` in docs e test, percorsi relativi in `src/lib`); `$app/environment` deprecato, usare `import.meta.env.DEV`.
 - Un `<dialog>` modale rende inerti anche i popover aperti fuori da lui: un popover che deve funzionare con un modale aperto va messo dentro il `<dialog>`.
@@ -402,8 +403,7 @@ La suite intera (~4.000 test in due browser, ~2 minuti) e il test visivo intero 
 - **2026-10-19, seconda migrazione di tatum da zero** (richiesta dell'utente; `reference/migration.md`): tatum su `master` pulito, `analyze` e `setup` da Claude, fasi 3–5 da un subagente con la sola skill `aurora-migrate`: ~26 minuti, errori 27 → 0, nessun difetto di aspetto della prima, 9 domande per l'utente al posto dei cambi fatti senza chiedere; proposte P255–P259. In tatum (branch `aurora-v5`, nulla committato) il risultato nuovo sostituisce il primo.
 - **2026-10-19, P255–P260 fatti** (dettagli, misure e scelte senza domanda in `history.md`): variabili v4 tolte o segnalate nei fogli dell'app, ombra dei bottoni su tutte le varianti, `size` dell'avatar, larghezze uguali al default tolte, `placeholder` uguali alla `label` tolti, punti alternativi delle tabelle, UserAvatar senza titolo → `Avatar` (varianti delle copie locali), `validate` senza falsi errori (`uses` ed `exports` nella spec), testi interi in `next`, `rules` delle copie locali, riavvio del dev server e controlli della fase 5. Laboratorio tatum: codice finale con 0 punti da scrivere; codemod a secco sulle 10 altre app v4 senza crash. 868 test `node`, `npm run check` 0/0; suite intera 4.420 verde, visivo 1.072 (1 instabile sotto carico, verde da solo 12/12: `line-chart/04-many-points` classic dark), package ok; scelte senza domanda approvate dall'utente ("va bene"); commit e push su `origin aurora-v5`. I 44 link spuri creati per errore in tatum (`traps.md`) tolti da Claude il 2026-10-19.
 - **2026-10-19, prototipo `@likable-hair/adonis-filters`** (decisione "`FilterModifierApplier` unico"; dettagli e scelte senza domanda in `history.md`): `adonis-filters/` con applier a tipo strutturale, un solo gruppo `where`, tutti i `kind`, JSON controllato (400), `raw` solo per i cast JSON della v5, whitelist facoltative, `legacyLike`; build ESM + CJS; 22 test `node`, contratto uguale a `FilterBuilder` controllato da `tsc`, verificato su Lucid 18, 21 e 22 (tipi e SQL); `npm run check` 0/0. Scelte senza domanda approvate dall'utente; commit su `aurora-v5` (push non chiesto).
-- **Prossimo, da fare insieme nello stesso giro** (2026-10-19, utente: "toglili tu i link da tatum. quando hai fatto poi il prossimo step è mettere pnpm ovunque"), in quest'ordine:
-  1. **Togliere da tatum i 44 link spuri**: fatto il 2026-10-19 (44 link simbolici che puntavano alla cartella madre, cancellati solo i link; in `git status` di tatum spariti `backend/backend` e `common/common`, il resto invariato; nulla committato in tatum).
-  2. **pnpm ovunque nel repo della libreria** (punto "pnpm dentro la libreria" di "Da fare"): workspace pnpm con radice, `migrate/`, `mcp/` e `adonis-filters/` (un solo `pnpm install` installa anche le devDependency di `adonis-filters`), `pnpm-lock.yaml` al posto dei `package-lock.json`, script e comandi (`npm run …` → `pnpm …`) in `package.json`, `CLAUDE.md`, README (radice e pacchetti), skill (questo file, `reference/`, `aurora-migrate`, `aurora-design`) e pagine delle docs che dicono `npm`. Prima un commit dello stato attuale se c'è qualcosa da salvare; alla fine `pnpm check`, suite intera, visivo intero e `pnpm package` verdi prima del commit (push solo se chiesto). Changesets e pipeline di rilascio **no**: restano per quando pubblica il capo. Cosa lo strumento di migrazione fa nelle app (che usano già il loro gestore) non cambia, salvo dove il repo dà per scontato npm.
+- **2026-10-19, link spuri di tatum tolti e pnpm nel repo** (richiesta dell'utente; dettagli e scelte senza domanda in `history.md`): 44 link tolti da tatum (solo i link, nulla committato in tatum); workspace pnpm con `pnpm import` (versioni identiche ai `package-lock.json`), `.npmrc` → `pnpm-workspace.yaml`, `mcp` → `svelte-migrate` come `workspace:^` con i sorgenti presi per primi, comandi `pnpm …` in `CLAUDE.md`, README, skill, Playwright e build dell'MCP. `pnpm check` 0/0, suite intera 4.442 verde, visivo 1.072, package ok; commit su `aurora-v5` (push non chiesto).
+- **Prossimo** (dal 2026-10-19): nessun lavoro in corso. Aperti: test che falliscono sul Mac del capo (serve il suo output), Changesets e pipeline col capo, workflow della CI (`.github/workflows/test.yml` è ancora quello della v4, con npm e Node 14/16), P245; in tatum il lavoro della migrazione da far guardare e committare all'utente.
 - **Prossimo** (prima del 2026-10-19): **lo strumento è chiuso** (decisione "P255–P260 approvate, poi lo strumento si chiude"; P245, pulizia dei testi, resta in sospeso). In tatum tutto è deciso e fatto, nulla committato: da far guardare e committare all'utente. Il resto della migrazione di ogni app lo fa l'agente con `next`.
 - **Prossimo**, in quest'ordine ((a)–(c) committati in `60917e9`, (d) P233 committato in `1977b07`; (e) pubblicazione: decisa il 2026-10-16, non la facciamo noi): P234 e P235 committati; v5 alla radice committata; P104 fatto e committato il 2026-10-19 (`fbc7340`, push fatto). P56 e il bottone della sidebar in cima alla sidebar fatti, committati e mandati su `origin aurora-v5` il 2026-10-19; in tatum c'è il `.tgz` nuovo (install fatto, server di sviluppo riavviato, nulla committato in tatum). **Prima del merge in `master`**: push di `4.x` e `aurora-v5` (da chiedere) e workflow della CI da rifare con la pipeline. Pilota e pipeline restano fermi (decisioni "Niente pilota" e "Niente pubblicazione da noi"). Attenzione: `setup` ora aggiunge alle app `@likable-hair/svelte-migrate` e `@likable-hair/svelte-mcp` (non pubblicati: rilanciato su tatum l'install fallirebbe senza `.tgz`) e scrive i file degli agenti (`.mcp.json`, `.claude/skills`, `AGENTS.md`…).

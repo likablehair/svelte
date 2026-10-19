@@ -266,7 +266,7 @@ Serve per misurare lo strumento su un'app senza toccarla. Tutto nello scratchpad
 3. Rifare i link di `svelte` e `@likable-hair/svelte` verso quelli di tatum (`readlink -f`), come farebbe l'install della v5.
 4. `node <repo>/migrate/src/cli.ts codemod .`, poi `status .` (svelte-check su addibox ~25 s). Per raggruppare gli errori: uno script che chiama `remaining(dir, loadRules())` e conta per `explanations[0].id` o, se manca, per codice TypeScript.
 
-Il `.tgz` di tatum è del 2026-10-19 mattina: per misurare cambi della libreria rifarlo con `npm run package` + `npm pack`.
+Il `.tgz` di tatum è del 2026-10-19 mattina: per misurare cambi della libreria rifarlo con `pnpm package` + `pnpm pack`.
 
 ## Seconda migrazione di tatum da zero (2026-10-19, dopo P236–P254)
 

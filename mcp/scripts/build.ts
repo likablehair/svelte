@@ -9,5 +9,5 @@ rmSync(path('../dist'), { recursive: true, force: true });
 rmSync(path('../bundled'), { recursive: true, force: true });
 run('node', ['scripts/build-spec.ts', 'mcp/bundled/spec.json']);
 if (existsSync(path('../../skills'))) cpSync(path('../../skills'), path('../bundled/skills'), { recursive: true });
-run('npx', ['tsc', '-p', 'mcp']);
+run('pnpm', ['exec', 'tsc', '-p', 'mcp']);
 console.log('mcp/dist and mcp/bundled ready.');

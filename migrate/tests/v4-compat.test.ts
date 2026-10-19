@@ -19,7 +19,7 @@ const lightness = (rgb: [number, number, number]) => toOklab(rgb)[0];
 const STEPS = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
 
 describe('v4-compat.css', () => {
-	test('is up to date with the v4 palette and the tokens (run `npm run migrate:compat`)', () => {
+	test('is up to date with the v4 palette and the tokens (run `pnpm migrate:compat`)', () => {
 		expect(readFileSync(V4_COMPAT_CSS, 'utf8') === buildV4Compat(main, tokens)).toBe(true);
 	});
 

@@ -63,7 +63,7 @@ export function loadSpec(app: AppInfo): LoadedSpec {
 	const bundled = join(bundledDir(), 'spec.json');
 	if (!existsSync(bundled)) {
 		throw new Error(
-			`No component specs: ${PACKAGE} in ${app.dir} has no dist/spec.json and this package has no bundled copy (run "npm run mcp:build" in the library repository).`
+			`No component specs: ${PACKAGE} in ${app.dir} has no dist/spec.json and this package has no bundled copy (run "pnpm mcp:build" in the library repository).`
 		);
 	}
 	return { spec: readJson(bundled), source: 'bundled', path: bundled };

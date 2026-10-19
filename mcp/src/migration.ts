@@ -37,11 +37,12 @@ let loaded: Promise<MigrateModule | undefined> | undefined;
 
 export function loadMigrate(): Promise<MigrateModule | undefined> {
 	loaded ??= (async () => {
+		const sibling = new URL('../../migrate/src/index.ts', import.meta.url);
+		if (existsSync(sibling)) return (await import(sibling.href)) as MigrateModule;
 		try {
 			return (await import(MIGRATE_PACKAGE)) as MigrateModule;
 		} catch {
-			const sibling = new URL('../../migrate/src/index.ts', import.meta.url);
-			return existsSync(sibling) ? ((await import(sibling.href)) as MigrateModule) : undefined;
+			return undefined;
 		}
 	})();
 	return loaded;

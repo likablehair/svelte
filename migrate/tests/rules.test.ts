@@ -8,7 +8,7 @@ const sources = ruleSources();
 const compiled = compileRules(sources);
 
 describe('compiled rules', () => {
-	test('rules/v4-to-v5.json is up to date with migrations/v4-to-v5 (run `npm run migrate:rules`)', () => {
+	test('rules/v4-to-v5.json is up to date with migrations/v4-to-v5 (run `pnpm migrate:rules`)', () => {
 		const file = readFileSync(new URL('../rules/v4-to-v5.json', import.meta.url), 'utf8');
 		expect(file === serializeRules(compiled)).toBe(true);
 	});

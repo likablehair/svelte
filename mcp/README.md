@@ -10,8 +10,8 @@ MCP server and `init` command that give coding agents (Claude Code, Codex, Curso
 From the root of the library repository:
 
 ```sh
-npm run mcp                         # run the server from source for the current directory
-npm run mcp:build                   # dist/ and bundled/ (spec.json and the aurora-design skill)
-npx vitest run --project node mcp/tests
-npx @modelcontextprotocol/inspector node mcp/dist/cli.js   # try the tools by hand
+pnpm mcp                          # run the server from source for the current directory
+pnpm mcp:build                    # dist/ and bundled/ (spec.json and the aurora-design skill)
+pnpm exec vitest run --project node mcp/tests
+pnpm dlx @modelcontextprotocol/inspector node mcp/dist/cli.js   # try the tools by hand
 ```

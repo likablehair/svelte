@@ -146,15 +146,17 @@ The assistant still asks you when a change of behaviour is not decided by the mi
 
 ## For people working on the library
 
+The repository uses [pnpm](https://pnpm.io) (the version is in `packageManager` of `package.json`) as a workspace: the library at the root, plus `migrate/`, `mcp/` and `adonis-filters/`.
+
 ```sh
-npm install
-npx playwright install chromium firefox   # once, for the tests
-npx vite dev --port 5180                  # documentation site
-npm run check                             # type check
-npm run package                           # build the library into dist/
-npm run test                              # all automatic tests (slow)
-npm run test:visual                       # screenshot comparison of the examples (slow)
-npm run migrate -- <step> <app>           # the migration tool, from the sources
+pnpm install                                   # all four packages
+pnpm exec playwright install chromium firefox  # once, for the tests
+pnpm dev --port 5180                           # documentation site
+pnpm check                                     # type check
+pnpm package                                   # build the library into dist/
+pnpm test                                      # all automatic tests (slow)
+pnpm test:visual                               # screenshot comparison of the examples (slow)
+pnpm migrate <step> <app>                      # the migration tool, from the sources
 ```
 
 The full test runs are slow and use a lot of memory: during work, run only the tests of what you changed. Decisions, process and current state of the work are in `.claude/skills/redesign-aurora/` (in Italian). `CLAUDE.md` is the starting point for an AI assistant working on this repository.

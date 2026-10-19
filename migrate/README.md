@@ -7,18 +7,18 @@ Tooling to move an app from `@likable-hair/svelte` v4 (or v3) to v5. It knows th
 From the root of the library repository, while the package is not published:
 
 ```sh
-npm run migrate -- analyze <app-dir>                       # Markdown report on stdout
-npm run migrate -- analyze <app-dir> --md report.md --json report.json
-npm run migrate -- analyze ~/projects/*/frontend --md reports/ --summary   # one row per app
+pnpm migrate analyze <app-dir>                       # Markdown report on stdout
+pnpm migrate analyze <app-dir> --md report.md --json report.json
+pnpm migrate analyze ~/projects/*/frontend --md reports/ --summary   # one row per app
 ```
 
 `analyze` is read-only: it never writes inside the app.
 
-`setup <app-dir>` and `codemod <app-dir>` change the app (see `npm run migrate -- --help`); neither commits. After the codemod, `next <app-dir>` gives the remaining points one file at a time and `status <app-dir>` the whole list (both read-only, see below). `setup` also adds this package and `@likable-hair/svelte-mcp` to the dev dependencies and configures the coding agents of the app (MCP server, `aurora-design` and `aurora-migrate` skills, `AGENTS.md`).
+`setup <app-dir>` and `codemod <app-dir>` change the app (see `pnpm migrate --help`); neither commits. After the codemod, `next <app-dir>` gives the remaining points one file at a time and `status <app-dir>` the whole list (both read-only, see below). `setup` also adds this package and `@likable-hair/svelte-mcp` to the dev dependencies and configures the coding agents of the app (MCP server, `aurora-design` and `aurora-migrate` skills, `AGENTS.md`).
 
 ## With a coding agent
 
-The same phases are tools of the `aurora` MCP server (`@likable-hair/svelte-mcp`): `migration_analyze`, `migration_setup` (does not install), `migration_codemod`, `migration_next`, `migration_status`, `migration_rules`, available while the app is on v4 or declares this package. `skills/aurora-migrate` is the skill that takes the agent through them; `init` copies it into the app. `npm run migrate:build` builds `dist/` for publishing.
+The same phases are tools of the `aurora` MCP server (`@likable-hair/svelte-mcp`): `migration_analyze`, `migration_setup` (does not install), `migration_codemod`, `migration_next`, `migration_status`, `migration_rules`, available while the app is on v4 or declares this package. `skills/aurora-migrate` is the skill that takes the agent through them; `init` copies it into the app. `pnpm migrate:build` builds `dist/` for publishing.
 
 ## What the report says
 
@@ -41,4 +41,4 @@ After the codemod the strict v5 types make `svelte-check` flag every use that is
 
 ## Rules
 
-The rules live in `migrations/v4-to-v5/*.ts` of the library repository. `npm run migrate:rules` compiles them, with the v4 and v5 export lists and the v5 API of every component, into `rules/v4-to-v5.json`, which the tool reads; a test fails when the JSON is out of date. The v4 side (export list, color palette of `main.css`, and the v4 `FilterBuilder` that the tests compare with) comes from `v4/`, a copy of v4.3.2 (the v4 sources live on the `4.x` branch).
+The rules live in `migrations/v4-to-v5/*.ts` of the library repository. `pnpm migrate:rules` compiles them, with the v4 and v5 export lists and the v5 API of every component, into `rules/v4-to-v5.json`, which the tool reads; a test fails when the JSON is out of date. The v4 side (export list, color palette of `main.css`, and the v4 `FilterBuilder` that the tests compare with) comes from `v4/`, a copy of v4.3.2 (the v4 sources live on the `4.x` branch).

@@ -10,7 +10,7 @@ export default defineConfig({
 	use: { baseURL: 'http://localhost:5181', reducedMotion: 'reduce' },
 	projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 900 } } }],
 	webServer: {
-		command: 'npx vite dev --port 5181 --strictPort',
+		command: 'pnpm exec vite dev --port 5181 --strictPort',
 		url: 'http://localhost:5181',
 		reuseExistingServer: !process.env.CI
 	}

@@ -23,6 +23,6 @@
 		"zod": "^4.6.5"
 	},
 	"optionalDependencies": {
-		"@likable-hair/svelte-migrate": "^0.1.0"
+		"@likable-hair/svelte-migrate": "workspace:^"
 	}
 }
