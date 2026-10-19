@@ -22,13 +22,17 @@ export function completeFilters(tree: FilterGroup, fields: FilterField[]): Filte
 
 export function searchBuilder(search: string, columns: string[] | undefined): FilterBuilder {
 	const builder = new FilterBuilder();
-	if (!search || !columns?.length) return builder;
-	const pattern = `%${escapeLike(search)}%`;
-	return builder.where((group) => {
-		columns.forEach((column, index) =>
-			index ? group.orWhere(column, 'ilike', pattern) : group.where(column, 'ilike', pattern)
-		);
-	});
+	const words = search.trim().split(/\s+/).filter(Boolean);
+	if (!words.length || !columns?.length) return builder;
+	for (const word of words) {
+		const pattern = `%${escapeLike(word)}%`;
+		builder.where((group) => {
+			columns.forEach((column, index) =>
+				index ? group.orWhere(column, 'ilike', pattern) : group.where(column, 'ilike', pattern)
+			);
+		});
+	}
+	return builder;
 }
 
 export interface FilterQueryOptions {

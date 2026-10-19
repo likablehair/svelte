@@ -84,7 +84,7 @@ const shellManual: ManualStep[] = [
 		id: 'sidebar-layout-header',
 		kind: 'edit',
 		summary:
-			'The bar always keeps the library toggle button (menu button on mobile, sidebar button on desktop) and `headerSnippet` is what comes after it. In v4 `headerSnippet` replaced the whole bar, so every app copied the hamburger and the dock icon by hand.',
+			'The library draws the toggle buttons (the menu button in the bar on mobile, the sidebar button at the top of the sidebar on desktop) and `headerSnippet` is the rest of the bar. In v4 `headerSnippet` replaced the whole bar, so every app copied the hamburger and the dock icon by hand.',
 		action:
 			'In `headerSnippet` delete the hand-made toggles (the `mdi-menu` icon that set `drawerOpened`, the `mdi-dock-left` icon that set `sidebarExpanded`, and the `MediaQuery` around them) and keep only the rest (theme switch, avatar, tenant pill, actions). A spacer that pushed them to the right is still needed (`<div style="flex: 1"></div>`). Use `toggleSnippet` only if the toggle must look different.',
 		when: { snippets: ['headerSnippet'] }
@@ -111,7 +111,7 @@ const unstable = {
 				v5: "'toggle'",
 				keepV4: 'expandOn="hover"',
 				behaviour: true,
-				note: 'v5 widens the sidebar with a button in the bar by default. With `hover` and `click` it now widens over the content instead of pushing it; with `click` choosing an option narrows it again (v4 reopened it).'
+				note: 'v5 widens the sidebar with a button at the top of the sidebar by default (or a click on an empty spot of the narrow rail). With `hover` and `click` it now widens over the content instead of pushing it; with `click` choosing an option narrows it again (v4 reopened it).'
 			}
 		],
 		types: [

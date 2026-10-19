@@ -1,5 +1,5 @@
 <!-- @component
-Page shell of an app: a sidebar on the left (logo, menu, user), a bar at the top and the content. The window scrolls: the bar and the sidebar stay in place. On desktop the sidebar is a narrow rail of icons that widens according to `expandOn`: `toggle` with a button in the bar, pushing the content (default); `hover` and `click` over the content; `none` only through `sidebarExpanded` (`sidebarExpanded` with `none` keeps it always wide). Up to 1024px wide (the `mAndDown` breakpoint) the sidebar moves into a `Drawer` opened by a menu button in the bar, which closes when an option is chosen or `currentPath` changes. The menu is a `HierarchyMenu` drawn from `options` (pass `currentPath={page.url.pathname}` to select the option of the page), or `menuSnippet`; when it is taller than the window it scrolls by itself to show the selected option. The bar shows the toggle button, then `headerSnippet`. A "Skip to content" link appears on the first Tab. The state is exposed as `data-expand-on` and `data-expanded` on the root.
+Page shell of an app: a sidebar on the left (logo, menu, user), a bar at the top and the content. The window scrolls: the bar and the sidebar stay in place. On desktop the sidebar is a narrow rail of icons that widens according to `expandOn`: `toggle` with a button at the top of the sidebar, next to the logo (while the sidebar is narrow the logo turns into the button under the pointer or the keyboard focus, and a click on an empty spot of the rail widens it too), pushing the content (default); `hover` and `click` over the content; `none` only through `sidebarExpanded` (`sidebarExpanded` with `none` keeps it always wide). Up to 1024px wide (the `mAndDown` breakpoint) the sidebar moves into a `Drawer` opened by a menu button in the bar, which closes when an option is chosen or `currentPath` changes. The menu is a `HierarchyMenu` drawn from `options` (pass `currentPath={page.url.pathname}` to select the option of the page), or `menuSnippet`; when it is taller than the window it scrolls by itself to show the selected option. The bar shows the menu button on mobile, then `headerSnippet`; with `sidebarSnippet` the toggle button of `toggle` stays in the bar. A "Skip to content" link appears on the first Tab. The state is exposed as `data-expand-on` and `data-expanded` on the root.
 -->
 <script lang="ts">
 	import '../../css/tokens.css';
@@ -19,7 +19,7 @@ Page shell of an app: a sidebar on the left (logo, menu, user), a bar at the top
 		'M20 4H4A2 2 0 0 0 2 6V18A2 2 0 0 0 4 20H20A2 2 0 0 0 22 18V6A2 2 0 0 0 20 4M20 18H9V6H20Z';
 
 	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
-		/** How the sidebar widens on desktop: `toggle` with a button in the bar, pushing the content; `hover` while the pointer or the keyboard focus is on it, over the content; `click` with a click on the rail (not on an option), over the content, until a click outside, Escape or the choice of an option; `none` only through `sidebarExpanded`. */
+		/** How the sidebar widens on desktop: `toggle` with a button at the top of the sidebar, or a click on an empty spot of the narrow rail, pushing the content; `hover` while the pointer or the keyboard focus is on it, over the content; `click` with a click on the rail (not on an option), over the content, until a click outside, Escape or the choice of an option; `none` only through `sidebarExpanded`. */
 		expandOn?: 'toggle' | 'hover' | 'click' | 'none';
 		/** Whether the sidebar is wide on desktop. `undefined` counts as narrow. It has no effect on the mobile drawer. */
 		sidebarExpanded?: boolean;
@@ -57,9 +57,9 @@ Page shell of an app: a sidebar on the left (logo, menu, user), a bar at the top
 		sidebarLayoutElement?: HTMLDivElement;
 		/** Content of the page, inside `<main>`. */
 		children?: Snippet;
-		/** Content of the bar after the toggle button: search, account, actions. `hamburgerVisible` is true on mobile, `collapsed` while the desktop sidebar is narrow. */
+		/** Content of the bar (after the menu button on mobile): search, account, actions. `hamburgerVisible` is true on mobile, `collapsed` while the desktop sidebar is narrow. */
 		headerSnippet?: Snippet<[{ hamburgerVisible: boolean; sidebarExpanded: boolean; collapsed: boolean }]>;
-		/** Replaces the toggle button of the bar. `toggle` opens the drawer on mobile and widens the sidebar on desktop. */
+		/** Replaces the buttons that open the mobile drawer and widen the sidebar, in the bar (the sidebar then has no toggle button). `toggle` opens the drawer on mobile and widens the sidebar on desktop. */
 		toggleSnippet?: Snippet<[{ toggle: () => void; hamburgerVisible: boolean; sidebarExpanded: boolean; drawerOpened: boolean }]>;
 		/** Replaces the whole content of the sidebar and of the drawer (logo, menu and user). In the drawer `hamburgerVisible` is true. */
 		sidebarSnippet?: Snippet<[{ hamburgerVisible: boolean; sidebarExpanded: boolean; collapsed: boolean }]>;
@@ -108,6 +108,8 @@ Page shell of an app: a sidebar on the left (logo, menu, user), a bar at the top
 	let desktop = $derived({ hamburgerVisible: false, sidebarExpanded: expanded, collapsed: !expanded });
 	let header = $derived(mobile ? { hamburgerVisible: true, sidebarExpanded: expanded, collapsed: false } : desktop);
 	const drawer = { hamburgerVisible: true, sidebarExpanded: true, collapsed: false };
+
+	let dockInSidebar = $derived(expandOn === 'toggle' && !toggleSnippet && !sidebarSnippet);
 
 	let matched = $derived(currentPath === undefined ? undefined : optionOfPath(options, currentPath));
 
@@ -192,7 +194,7 @@ Page shell of an app: a sidebar on the left (logo, menu, user), a bar at the top
 	}
 
 	function onclick(event: MouseEvent) {
-		if (expandOn !== 'click' || expanded || mobile) return;
+		if ((expandOn !== 'click' && expandOn !== 'toggle') || expanded || mobile) return;
 		if ((event.target as HTMLElement).closest('a, button, input, select, textarea, [tabindex]')) return;
 		setExpanded(true);
 	}
@@ -216,12 +218,32 @@ Page shell of an app: a sidebar on the left (logo, menu, user), a bar at the top
 	});
 </script>
 
+{#snippet dockButton()}
+	<Button
+		buttonType="icon"
+		variant="secondary"
+		icon={DOCK_ICON}
+		class="aurora-sidebar-layout-dock"
+		aria-label={sidebarLabel ?? texts.sidebar}
+		aria-expanded={expanded}
+		onclick={() => setExpanded(!expanded)}
+	/>
+{/snippet}
+
 {#snippet sidebarContent(state: { hamburgerVisible: boolean; sidebarExpanded: boolean; collapsed: boolean })}
 	{#if sidebarSnippet}
 		{@render sidebarSnippet(state)}
 	{:else}
-		{#if logoSnippet}
-			<div class="aurora-sidebar-layout-logo">{@render logoSnippet(state)}</div>
+		{@const dock = dockInSidebar && !state.hamburgerVisible}
+		{#if logoSnippet || dock}
+			<div class="aurora-sidebar-layout-top" data-logo={logoSnippet ? '' : undefined}>
+				{#if logoSnippet}
+					<div class="aurora-sidebar-layout-logo">{@render logoSnippet(state)}</div>
+				{/if}
+				{#if dock}
+					{@render dockButton()}
+				{/if}
+			</div>
 		{/if}
 		<div class="aurora-sidebar-layout-menu" {@attach reveal}>
 			{#if menuSnippet}
@@ -281,16 +303,8 @@ Page shell of an app: a sidebar on the left (logo, menu, user), a bar at the top
 				aria-expanded={!!drawerOpened}
 				onclick={() => setDrawer(!drawerOpened)}
 			/>
-			{#if expandOn === 'toggle'}
-				<Button
-					buttonType="icon"
-					variant="secondary"
-					icon={DOCK_ICON}
-					class="aurora-sidebar-layout-dock"
-					aria-label={sidebarLabel ?? texts.sidebar}
-					aria-expanded={expanded}
-					onclick={() => setExpanded(!expanded)}
-				/>
+			{#if expandOn === 'toggle' && sidebarSnippet}
+				{@render dockButton()}
 			{/if}
 		{/if}
 		{#if headerSnippet}
@@ -409,13 +423,91 @@ Page shell of an app: a sidebar on the left (logo, menu, user), a bar at the top
 			);
 		}
 
-		.aurora-sidebar-layout-logo {
-			display: flex;
-			align-items: center;
-			min-height: var(--sidebar-layout-header-height, var(--sidebar-layout-default-header-height));
+		.aurora-sidebar-layout[data-expand-on='toggle']:not([data-expanded]) .aurora-sidebar-layout-sidebar {
+			cursor: e-resize;
 		}
 
-		.aurora-sidebar-layout-logo,
+		.aurora-sidebar-layout-top {
+			position: relative;
+			display: flex;
+			flex-shrink: 0;
+			align-items: center;
+			gap: 8px;
+			min-width: 0;
+			min-height: var(--sidebar-layout-header-height, var(--sidebar-layout-default-header-height));
+			padding-inline: var(--_inline);
+		}
+
+		.aurora-sidebar-layout-logo {
+			display: flex;
+			flex: 1;
+			align-items: center;
+			min-width: 0;
+			transition: opacity var(--global-duration-fast) var(--_easing);
+		}
+
+		.aurora-sidebar-layout :global(.aurora-sidebar-layout-dock) {
+			--button-background: var(
+				--sidebar-layout-dock-background,
+				var(--sidebar-layout-default-dock-background)
+			);
+			--button-border-color: var(
+				--sidebar-layout-dock-border-color,
+				var(--sidebar-layout-default-dock-border-color)
+			);
+			--button-color: var(--sidebar-layout-dock-color, var(--sidebar-layout-default-dock-color));
+			--button-hover-background: var(
+				--sidebar-layout-dock-hover-background,
+				var(--sidebar-layout-default-dock-hover-background)
+			);
+			--button-hover-color: var(
+				--sidebar-layout-dock-hover-color,
+				var(--sidebar-layout-default-dock-hover-color)
+			);
+			--button-box-shadow: none;
+			--button-hover-box-shadow: none;
+			flex: none;
+			cursor: pointer;
+		}
+
+		.aurora-sidebar-layout-top :global(.aurora-sidebar-layout-dock) {
+			margin-inline-start: auto;
+			transition: opacity var(--global-duration-fast) var(--_easing);
+		}
+
+		.aurora-sidebar-layout:not([data-expanded]) .aurora-sidebar-layout-top :global(.aurora-sidebar-layout-dock) {
+			margin-inline: auto;
+		}
+
+		.aurora-sidebar-layout:not([data-expanded]) .aurora-sidebar-layout-top[data-logo] :global(.aurora-sidebar-layout-dock) {
+			position: absolute;
+			inset-inline: 0;
+		}
+
+		.aurora-sidebar-layout:not([data-expanded]) .aurora-sidebar-layout-top[data-logo] .aurora-sidebar-layout-logo {
+			opacity: 0;
+		}
+
+		@media (hover: hover) {
+			.aurora-sidebar-layout:not([data-expanded]) .aurora-sidebar-layout-top[data-logo] .aurora-sidebar-layout-logo {
+				opacity: 1;
+			}
+
+			.aurora-sidebar-layout:not([data-expanded]) .aurora-sidebar-layout-top[data-logo] :global(.aurora-sidebar-layout-dock) {
+				opacity: 0;
+			}
+
+			.aurora-sidebar-layout:not([data-expanded]) .aurora-sidebar-layout-top[data-logo]:hover :global(.aurora-sidebar-layout-dock),
+			.aurora-sidebar-layout:not([data-expanded]) .aurora-sidebar-layout-top[data-logo] :global(.aurora-sidebar-layout-dock:focus-visible) {
+				opacity: 1;
+			}
+
+			.aurora-sidebar-layout:not([data-expanded]) .aurora-sidebar-layout-top[data-logo]:hover .aurora-sidebar-layout-logo,
+			.aurora-sidebar-layout:not([data-expanded]) .aurora-sidebar-layout-top[data-logo]:has(:global(.aurora-sidebar-layout-dock:focus-visible)) .aurora-sidebar-layout-logo {
+				opacity: 0;
+			}
+		}
+
 		.aurora-sidebar-layout-user {
 			flex-shrink: 0;
 			min-width: 0;

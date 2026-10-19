@@ -38,7 +38,11 @@ const selectionNote =
 const shared = {
 	renamed: [
 		{ from: 'totalElements', to: 'total', note: 'Number of rows of the whole result; the table computes the pages from it and `pageSize`.' },
-		{ from: 'searchBarColumns', to: 'searchColumns', note: 'Same `ilike` OR group in the query; setting it also shows the search field.' },
+		{
+			from: 'searchBarColumns',
+			to: 'searchColumns',
+			note: 'The search is now word by word: "mario rossi" finds a row with Mario in one column and Rossi in another (v4 looked for the whole text in each column). The query has one `ilike` OR group per word, joined with AND; one word gives the same group as v4. Setting it also shows the search field.'
+		},
 		{ from: 'selectedItems', to: 'selected' },
 		{
 			from: 'actionsForSelectedItems',

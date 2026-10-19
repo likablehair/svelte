@@ -149,6 +149,67 @@ describe('SidebarLayout', () => {
 		await expect.element(screen.getByRole('navigation')).not.toHaveAttribute('data-icons-only');
 	});
 
+	test('the toggle button sits at the top of the sidebar, after the logo, and not in the bar', async () => {
+		const screen = await render(SidebarLayout, { options, logoSnippet: stateSnippet('logo'), sidebarExpanded: true });
+		const toggle = screen.getByRole('button', { name: 'Sidebar' }).element();
+		const top = screen.container.querySelector('.aurora-sidebar-layout-sidebar > .aurora-sidebar-layout-top')!;
+		expect(top.contains(toggle)).toBe(true);
+		expect(top.firstElementChild?.querySelector('.app-logo')).not.toBeNull();
+		expect(toggle.previousElementSibling?.classList).toContain('aurora-sidebar-layout-logo');
+		expect(screen.container.querySelector('header')!.contains(toggle)).toBe(false);
+		const sidebar = screen.container.querySelector('.aurora-sidebar-layout-sidebar')!.getBoundingClientRect();
+		expect(toggle.getBoundingClientRect().right).toBeGreaterThan(sidebar.right - 20);
+	});
+
+	test('narrow, the logo turns into the toggle button under the pointer and with the keyboard focus', async () => {
+		const screen = await render(SidebarLayout, { options, logoSnippet: stateSnippet('logo') });
+		const toggle = screen.getByRole('button', { name: 'Sidebar' }).element();
+		const logo = screen.container.querySelector('.aurora-sidebar-layout-logo')!;
+		await userEvent.hover(screen.getByRole('main'));
+		await expect.poll(() => getComputedStyle(toggle).opacity).toBe('0');
+		expect(getComputedStyle(logo).opacity).toBe('1');
+		await page.elementLocator(screen.container.querySelector('.aurora-sidebar-layout-top')!).hover();
+		await expect.poll(() => getComputedStyle(toggle).opacity).toBe('1');
+		await expect.poll(() => getComputedStyle(logo).opacity).toBe('0');
+		await userEvent.hover(screen.getByRole('main'));
+		await expect.poll(() => getComputedStyle(toggle).opacity).toBe('0');
+		await userEvent.keyboard('{Tab}{Tab}');
+		expect(document.activeElement).toBe(toggle);
+		await expect.poll(() => getComputedStyle(toggle).opacity).toBe('1');
+	});
+
+	test('narrow, a click on an empty spot of the rail widens the sidebar; wide, it does not narrow it', async () => {
+		const props = bound();
+		const onsidebarToggle = vi.fn();
+		const screen = await render(SidebarLayout, {
+			options,
+			onsidebarToggle,
+			get sidebarExpanded() {
+				return props.sidebarExpanded;
+			},
+			set sidebarExpanded(value) {
+				props.sidebarExpanded = value;
+			}
+		});
+		const { sidebar } = parts(screen.container);
+		expect(getComputedStyle(sidebar).cursor).toBe('e-resize');
+		const empty = { position: { x: 20, y: sidebar.getBoundingClientRect().height - 40 } };
+		await page.elementLocator(sidebar).click(empty);
+		expect(props.sidebarExpanded).toBe(true);
+		expect(onsidebarToggle).toHaveBeenCalledWith({ expanded: true });
+		expect(getComputedStyle(sidebar).cursor).not.toBe('e-resize');
+		await page.elementLocator(sidebar).click(empty);
+		expect(props.sidebarExpanded).toBe(true);
+		expect(onsidebarToggle).toHaveBeenCalledOnce();
+	});
+
+	test('with sidebarSnippet the toggle button stays in the bar', async () => {
+		const screen = await render(SidebarLayout, { options, sidebarSnippet: stateSnippet('sidebar') });
+		const toggle = screen.getByRole('button', { name: 'Sidebar' }).element();
+		expect(screen.container.querySelector('header')!.contains(toggle)).toBe(true);
+		expect(screen.container.querySelector('.aurora-sidebar-layout-top')).toBeNull();
+	});
+
 	test('expandOn="hover" widens over the content with the pointer and the keyboard focus', async () => {
 		const screen = await render(SidebarLayout, { options, expandOn: 'hover', children: text('Body') });
 		const { root, sidebar, main } = parts(screen.container);

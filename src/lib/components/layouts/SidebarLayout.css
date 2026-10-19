@@ -16,6 +16,12 @@
 		--sidebar-layout-default-sidebar-overlay-background: var(--global-color-surface-pop);
 		--sidebar-layout-default-sidebar-overlay-box-shadow: var(--global-shadow-lg);
 
+		--sidebar-layout-default-dock-background: transparent;
+		--sidebar-layout-default-dock-border-color: transparent;
+		--sidebar-layout-default-dock-color: var(--global-color-text-2);
+		--sidebar-layout-default-dock-hover-background: var(--global-color-surface-2);
+		--sidebar-layout-default-dock-hover-color: var(--global-color-text);
+
 		--sidebar-layout-default-header-height: 3.5rem;
 		--sidebar-layout-default-header-position: sticky;
 		--sidebar-layout-default-header-padding: 0 2rem;

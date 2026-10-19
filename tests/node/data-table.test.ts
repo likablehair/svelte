@@ -23,6 +23,34 @@ describe('searchBuilder', () => {
 		expect(searchBuilder('', ['name']).toJson().modifiers).toEqual([]);
 		expect(searchBuilder('luca', undefined).toJson().modifiers).toEqual([]);
 		expect(searchBuilder('luca', []).toJson().modifiers).toEqual([]);
+		expect(searchBuilder('   ', ['name']).toJson().modifiers).toEqual([]);
+	});
+
+	test('v4 bug: the search is word by word, one AND group per word, each word in any column', () => {
+		const modifiers = searchBuilder('  mario   rossi ', ['first', 'last']).toJson().modifiers as any[];
+		expect(modifiers).toHaveLength(2);
+		expect(modifiers.map((group) => [group.kind, group.logicalOperator])).toEqual([
+			['grouped', 'and'],
+			['grouped', 'and']
+		]);
+		expect(modifiers.map((group) => group.children.map((child: any) => [child.key, child.value, child.logicalOperator]))).toEqual([
+			[
+				['first', '%mario%', 'and'],
+				['last', '%mario%', 'or']
+			],
+			[
+				['first', '%rossi%', 'and'],
+				['last', '%rossi%', 'or']
+			]
+		]);
+	});
+
+	test('one word gives the same query as before, a single group', () => {
+		expect(searchBuilder('luca', ['first', 'last']).toJson().modifiers).toEqual(
+			new FilterBuilder()
+				.where((group) => group.where('first', 'ilike', '%luca%').orWhere('last', 'ilike', '%luca%'))
+				.toJson().modifiers
+		);
 	});
 
 	test('is one OR group of ilike, one per column, with LIKE wildcards escaped', () => {

@@ -88,7 +88,7 @@ export interface DataTableQuery {
 	search: string;
 	/** Tree of the filters (the `value` of `Filters`), with complete conditions only. */
 	filterValue: FilterGroup;
-	/** The whole query for the backend: filters, search (an `ilike` group on `searchColumns`) and sorting. Send `builder.toJson()` together with `page` and `pageSize`. */
+	/** The whole query for the backend: filters, search (one `ilike` group on `searchColumns` per word) and sorting. Send `builder.toJson()` together with `page` and `pageSize`. */
 	builder: FilterBuilder;
 }
 
