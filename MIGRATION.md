@@ -863,6 +863,8 @@ Defaults: `--drawer-default-space` → `--drawer-default-size`, `--drawer-defaul
 
 New, optional: `title`, `titleSnippet`, `closable`, `closeLabel`, `closeSnippet`, `locale` (language of the texts), `actionsSnippet` (fixed footer), `bind:drawerElement`, `class` object, `data-position`.
 
+New by default: a bottom drawer (`position="bottom"`) has a handle at the top, and dragging it or the header down closes the drawer. `persistent` drawers have none; `handle={false}` removes it.
+
 ### Dropdown
 
 - `menuOpened` → `open`; `menuAnchor` → `placement` (default `bottom-start`, so a menu wider than the button is left-aligned).

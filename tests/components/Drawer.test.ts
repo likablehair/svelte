@@ -269,6 +269,141 @@ describe('Drawer', () => {
 	});
 });
 
+function handleOf(drawer: { element(): Element }) {
+	return drawer.element().querySelector<HTMLElement>('.aurora-drawer-handle');
+}
+
+function pointer(target: EventTarget, type: string, clientY: number) {
+	target.dispatchEvent(
+		new PointerEvent(type, {
+			bubbles: true,
+			cancelable: true,
+			pointerId: 1,
+			isPrimary: true,
+			button: 0,
+			pointerType: 'touch',
+			clientY
+		})
+	);
+}
+
+async function drag(from: Element, distances: number[], gap: number, release = true) {
+	const box = from.getBoundingClientRect();
+	const y = box.top + box.height / 2;
+	pointer(from, 'pointerdown', y);
+	for (const distance of distances) {
+		await pause(gap);
+		pointer(from, 'pointermove', y + distance);
+	}
+	if (!release) return () => pointer(from, 'pointerup', y + distances.at(-1)!);
+	await pause(gap);
+	pointer(from, 'pointerup', y + distances.at(-1)!);
+}
+
+describe('Drawer handle', () => {
+	test('a bottom drawer has a handle first in the panel; other sides, persistent and handle={false} have none', async () => {
+		const { drawer } = await openHarness({ position: 'bottom', style: instant });
+		const handle = handleOf(drawer)!;
+		expect(handle).not.toBeNull();
+		expect(handle.getAttribute('aria-hidden')).toBe('true');
+		expect(panelOf(drawer).firstElementChild).toBe(handle);
+		await expect.element(drawer).toHaveAttribute('data-handle', '');
+		const bar = getComputedStyle(handle, '::before');
+		expect([bar.width, bar.height]).toEqual(['38px', '5px']);
+		for (const props of [
+			{ position: 'left' },
+			{ position: 'top' },
+			{ position: 'bottom', persistent: true },
+			{ position: 'bottom', handle: false }
+		] as const) {
+			const screen = await render(Drawer, { open: true, title: 'Sheet', ...props });
+			const element = screen.getByRole('dialog', { name: 'Sheet' });
+			await expect.element(element).toBeVisible();
+			expect(handleOf(element)).toBeNull();
+			await expect.element(element).not.toHaveAttribute('data-handle');
+			await screen.unmount();
+		}
+	});
+
+	test('dragging the handle down past a quarter of the panel closes it, with the pointer event', async () => {
+		const onclose = vi.fn();
+		const { drawer, state } = await openHarness({ position: 'bottom', style: instant, onclose });
+		await drag(handleOf(drawer)!, [20, 60, 100], 150);
+		await expect.element(state).toHaveTextContent('closed');
+		expect(onclose).toHaveBeenCalledOnce();
+		expect(onclose.mock.calls[0][0]).toBeInstanceOf(PointerEvent);
+		expect(onclose.mock.calls[0][0].type).toBe('pointerup');
+	});
+
+	test('a shorter, slow drag springs back; data-dragging only while dragging', async () => {
+		const { drawer, state } = await openHarness({ position: 'bottom', style: instant });
+		const panel = panelOf(drawer) as HTMLElement;
+		const release = (await drag(handleOf(drawer)!, [10, 30], 150, false))!;
+		await expect.element(drawer).toHaveAttribute('data-dragging', '');
+		expect(panel.style.translate).toBe('0px 30px');
+		await pause(150);
+		release();
+		await expect.element(drawer).not.toHaveAttribute('data-dragging');
+		expect(panel.style.translate).toBe('');
+		await expect.element(state).toHaveTextContent('open');
+	});
+
+	test('a quick flick closes it even when short', async () => {
+		const { drawer, state } = await openHarness({ position: 'bottom', style: instant });
+		await drag(handleOf(drawer)!, [10, 40], 16);
+		await expect.element(state).toHaveTextContent('closed');
+	});
+
+	test('the header drags too, its buttons do not', async () => {
+		const { screen, opener, drawer, state } = await openHarness({
+			position: 'bottom',
+			closable: true,
+			style: instant
+		});
+		await drag(drawer.element().querySelector('.aurora-drawer-title')!, [40, 120], 150);
+		await expect.element(state).toHaveTextContent('closed');
+		await opener.click();
+		const again = screen.getByRole('dialog');
+		const close = again.getByRole('button', { name: 'Close' }).element();
+		await drag(close, [40, 120], 150, false);
+		await expect.element(again).not.toHaveAttribute('data-dragging');
+		expect((panelOf(again) as HTMLElement).style.translate).toBe('');
+		await expect.element(state).toHaveTextContent('open');
+	});
+
+	test('persistent with handle shows it but only springs back, with resistance', async () => {
+		const { drawer, state } = await openHarness({
+			position: 'bottom',
+			persistent: true,
+			handle: true,
+			style: instant
+		});
+		const panel = panelOf(drawer) as HTMLElement;
+		const release = (await drag(handleOf(drawer)!, [100, 200], 150, false))!;
+		expect(panel.style.translate).toBe('0px 50px');
+		release();
+		expect(panel.style.translate).toBe('');
+		await expect.element(state).toHaveTextContent('open');
+	});
+
+	test('class.handle and the handle variables reach the handle', async () => {
+		const screen = await render(Drawer, {
+			open: true,
+			position: 'bottom',
+			title: 'Sheet',
+			class: { handle: 'app-handle' },
+			style: '--drawer-handle-width: 60px; --drawer-handle-background: rgb(255, 0, 0)'
+		});
+		const drawer = screen.getByRole('dialog');
+		await expect.element(drawer).toBeVisible();
+		const handle = handleOf(drawer)!;
+		expect(handle.classList).toContain('app-handle');
+		const bar = getComputedStyle(handle, '::before');
+		expect(bar.width).toBe('60px');
+		expect(bar.backgroundColor).toBe('rgb(255, 0, 0)');
+	});
+});
+
 describe('Drawer texts', () => {
 	test('follow locale, and closeLabel wins', async () => {
 		const props = { open: true, title: 'Cliente', closable: true, locale: 'it' };

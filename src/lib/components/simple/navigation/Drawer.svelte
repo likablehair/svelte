@@ -1,5 +1,5 @@
 <!-- @component
-Panel that slides in from a side of the screen (`position`), modal and on the browser's top layer (`<dialog>` with `showModal()`): it needs no z-index, the page behind is inert and does not scroll, focus stays inside and goes back where it was on close. It closes on Escape (only the topmost one, and not while a menu inside it is open), on a click on the backdrop, with the close button, with `close` from a snippet and with a `<form method="dialog">`; `persistent` blocks Escape and the backdrop. The content is mounted only while open. Every part is optional: `title` (which also names the drawer for screen readers), `closable`, the body (`children`, which scrolls) and `actionsSnippet`, pinned at the bottom. The side is exposed as `data-position`; while closing, the `<dialog>` gets `data-closing`.
+Panel that slides in from a side of the screen (`position`), modal and on the browser's top layer (`<dialog>` with `showModal()`): it needs no z-index, the page behind is inert and does not scroll, focus stays inside and goes back where it was on close. It closes on Escape (only the topmost one, and not while a menu inside it is open), on a click on the backdrop, with the close button, with `close` from a snippet and with a `<form method="dialog">`; `persistent` blocks Escape and the backdrop. The content is mounted only while open. Every part is optional: `title` (which also names the drawer for screen readers), `closable`, the body (`children`, which scrolls) and `actionsSnippet`, pinned at the bottom. A bottom drawer (a bottom sheet) has a handle at the top: dragging it, or the header, down closes the drawer, while a short drag springs back (`handle`). The side is exposed as `data-position`; while closing, the `<dialog>` gets `data-closing`, while dragged `data-dragging`, and with the handle `data-handle`.
 -->
 <script lang="ts">
 	import '../../../css/tokens.css';
@@ -8,6 +8,7 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 	import type { HTMLDialogAttributes } from 'svelte/elements';
 	import Button from '../buttons/Button.svelte';
 	import { CLOSE_ICON, leave, modal } from '../dialogs/modal.js';
+	import { sheetDrag } from './sheet.js';
 	import ToastList from '../notifiers/ToastList.svelte';
 	import { inheritedLocale } from '../../../utils/locale.js';
 	import { libraryTexts } from '../../../utils/texts.js';
@@ -22,6 +23,8 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 		position?: 'left' | 'right' | 'top' | 'bottom';
 		/** Keeps the drawer open on Escape and on a click on the backdrop. The close button, `close` from a snippet and a `<form method="dialog">` still close it. */
 		persistent?: boolean;
+		/** Shows a handle at the top of a bottom drawer: dragging it, or the header (not its buttons), down past a quarter of the panel (at least 48px, at most 160px), or with a flick, closes the drawer; a shorter drag springs back. Defaults to `true` with `position="bottom"`, `false` when `persistent` (with both, the drawer only springs back). The other sides have no handle. */
+		handle?: boolean;
 		/** Title in the header. It also names the drawer for screen readers: without it, pass `aria-label`. */
 		title?: string;
 		/** Shows a close button in the header. */
@@ -30,7 +33,7 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 		closeLabel?: string;
 		/** BCP 47 locale of the texts: `it` and `en` are built in, other languages fall back to English. Defaults to the one set with `setDefaultLocale`, else `en`. */
 		locale?: string;
-		/** Called when the drawer closes itself (Escape, backdrop, close button, `close` from a snippet, `<form method="dialog">`), with the event that caused it. Not called when `open` is set to `false` from outside. */
+		/** Called when the drawer closes itself (Escape, backdrop, close button, drag on the handle, `close` from a snippet, `<form method="dialog">`), with the event that caused it. Not called when `open` is set to `false` from outside. */
 		onclose?: (event: Event) => void;
 		/** The `<dialog>` element. */
 		drawerElement?: HTMLDialogElement;
@@ -39,6 +42,7 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 			drawer?: string;
 			backdrop?: string;
 			panel?: string;
+			handle?: string;
 			header?: string;
 			title?: string;
 			body?: string;
@@ -58,6 +62,7 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 		open = $bindable(),
 		position = 'left',
 		persistent = false,
+		handle,
 		title,
 		closable = false,
 		closeLabel,
@@ -83,6 +88,7 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 
 	let hasTitle = $derived(!!title || !!titleSnippet);
 	let hasHeader = $derived(hasTitle || closable || !!closeSnippet);
+	let hasHandle = $derived(position === 'bottom' && (handle ?? !persistent));
 
 	function close(event: Event) {
 		if (!open) return;
@@ -101,12 +107,19 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 		{...rest}
 		class={['aurora-drawer', clazz.drawer]}
 		data-position={position}
+		data-handle={hasHandle ? '' : undefined}
 		bind:this={() => drawerNode, (node) => (drawerNode = drawerElement = node)}
 		{@attach modal({ persistent: () => persistent, dismiss: close })}
 		out:leave
 	>
 		<div class={['aurora-drawer-backdrop', clazz.backdrop]} data-backdrop></div>
-		<div class={['aurora-drawer-panel', clazz.panel]}>
+		<div
+			class={['aurora-drawer-panel', clazz.panel]}
+			{@attach hasHandle && sheetDrag({ persistent: () => persistent, dismiss: close })}
+		>
+			{#if hasHandle}
+				<div class={['aurora-drawer-handle', clazz.handle]} aria-hidden="true"></div>
+			{/if}
 			{#if hasHeader}
 				<header class={['aurora-drawer-header', clazz.header]}>
 					{#if hasTitle}
@@ -251,6 +264,51 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 
 		.aurora-drawer[data-closing] .aurora-drawer-panel {
 			animation: slide-out var(--_duration) var(--_easing) forwards;
+		}
+
+		.aurora-drawer[data-handle] .aurora-drawer-panel {
+			transition: translate var(--_duration) var(--_easing);
+		}
+
+		.aurora-drawer[data-handle] .aurora-drawer-header {
+			touch-action: none;
+		}
+
+		.aurora-drawer[data-dragging] {
+			cursor: grabbing;
+			user-select: none;
+		}
+
+		.aurora-drawer[data-dragging] .aurora-drawer-panel {
+			transition: none;
+		}
+
+		.aurora-drawer-handle {
+			flex: none;
+			display: flex;
+			justify-content: center;
+			margin: var(--drawer-handle-margin, var(--drawer-default-handle-margin));
+			padding: var(--drawer-handle-padding, var(--drawer-default-handle-padding));
+			touch-action: none;
+			user-select: none;
+		}
+
+		.aurora-drawer-handle::before {
+			content: '';
+			width: var(--drawer-handle-width, var(--drawer-default-handle-width));
+			height: var(--drawer-handle-height, var(--drawer-default-handle-height));
+			border-radius: var(--drawer-handle-border-radius, var(--drawer-default-handle-border-radius));
+			background: var(--drawer-handle-background, var(--drawer-default-handle-background));
+		}
+
+		@media (hover: hover) {
+			.aurora-drawer-handle {
+				cursor: grab;
+			}
+
+			.aurora-drawer[data-dragging] .aurora-drawer-handle {
+				cursor: grabbing;
+			}
 		}
 
 		.aurora-drawer-header {

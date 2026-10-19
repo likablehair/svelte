@@ -18,6 +18,12 @@
 		--drawer-default-overflow: auto;
 		--drawer-default-backdrop-background: var(--global-color-overlay);
 		--drawer-default-backdrop-filter: blur(var(--global-overlay-blur));
+		--drawer-default-handle-width: 38px;
+		--drawer-default-handle-height: 5px;
+		--drawer-default-handle-border-radius: var(--global-radius-full);
+		--drawer-default-handle-background: var(--global-color-border-strong);
+		--drawer-default-handle-margin: -18px 0 4px;
+		--drawer-default-handle-padding: 8px 0;
 		--drawer-default-header-gap: 12px;
 		--drawer-default-header-padding: 0 6px;
 		--drawer-default-header-margin-bottom: 14px;
