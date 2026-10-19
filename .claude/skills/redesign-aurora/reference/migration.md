@@ -224,3 +224,46 @@ Analisi della trascrizione della sessione aperta in tatum (subagente; report com
 | P243 | il rapporto del codemod non elenca "done, to check" in file che il codemod stesso ha cancellato | 21 su 91 in tatum |
 | P244 | `local/ThemeSwitch.ts`: `appearanceScript` (o il passo di `setup`) legge una volta il vecchio cookie `theme` di `/api/setTheme`, così chi aveva scelto il tema non lo perde; altrimenti dirlo nella regola | oggi la regola dice "users keep it", non vero per tatum |
 | P245 | testi delle regole senza nomi di altre app (DataTable, global, Filters): gli agenti di ogni app li leggono | permesso dalla regola sui riferimenti (sono app della libreria), solo pulizia |
+
+## Laboratorio su addibox (2026-10-19, dopo P236–P244)
+
+Domanda dell'utente: le migliorie fatte guardando tatum bastano per addibox? Misurato come per tatum, su una copia (nulla toccato in addibox, branch `2.2.0` pulito): codice di `HEAD` in un repo git nello scratchpad, `node_modules` di addibox collegati uno per uno tranne `svelte`, `@likable-hair/svelte` (v5) e `@mdi/js`, presi dall'install di tatum; `setup --no-install` vero, `codemod`, `status`. Una seconda copia con i `node_modules` v4 dà la **base**: addibox ha già **324 errori di svelte-check sulla v4**.
+
+- **Bug trovato e corretto**: `dissolve.ts` risolveva solo `$lib/` e i percorsi relativi, non gli alias dell'app (addibox: `"@/*": "./src/lib/*"`): i wrapper importati con `@/…` non venivano sciolti e poi venivano cancellati come inutilizzati (93 import rotti). Ora `resolveImport` riceve gli alias di `readAliases`.
+- **Dopo la correzione**: codemod 6.043 cambi in 472 file, 32 file cancellati, 239 "non fatto"; svelte-check **1.376 errori** (205 c'erano già, 1.171 nuovi), **513 spiegati e 658 no**; 376 punti da scrivere in 186 file, 2.146 da guardare, 133 pagine. Su tatum quasi tutti gli errori avevano la regola giusta: addibox ha forme di codice che tatum non aveva.
+- **Cause dei non spiegati**:
+  - tipi generici delle tabelle: `ComponentProps<typeof DataTable<Account, {}>>` (la v4 aveva due parametri, la v5 uno) dà "no signatures for which the type argument list is applicable" e le Props diventano `never`: 180 errori a catena in 13 file; `DataTable` usato come tipo senza parametro ("requires 1 type argument"): 45;
+  - StandardButton sciolto con `style` scritto come espressione (`cond ? 'icon' : 'primary'`): finisce in `variant`, dove `'icon'` non esiste (va in `buttonType`): 64;
+  - tipo v4 `Header` rimasto sulle colonne già convertite (`key` non esiste in `Header`): 18;
+  - `implicit any` (7006/7031): 299, quasi tutti conseguenza di snippet rinominati o rimossi passati attraverso componenti dell'app (P246; 127 errori di snippet già spiegati);
+  - casi singoli: snippet con tipo sbagliato attraverso `DocumentItemsEditor`, chiavi con il punto (`'company.businessName'`) nelle colonne di Table, StandardSelect con `Option`.
+- **Conclusione**: le migliorie servono anche ad addibox, ma non bastano; prima di migrarlo servono le proposte P246 e P248–P251, poi una nuova misura.
+
+| # | Proposta | Nota |
+|---|---|---|
+Dopo P248–P250 (approvate e fatte il 2026-10-19): 207 errori della v4 tenuti a parte, 1.092 della migrazione, 626 senza spiegazione; spariti i `never` e i `variant` `'icon'`; restano soprattutto la copia locale dei tipi v4 delle colonne (`src/lib/types/headers.ts`, ~210), le prop v4 destrutturate nei componenti dell'app (60, P252) e gli `implicit any` degli snippet (250, P246).
+
+Dopo P246 e P252 (fatti il 2026-10-19, con i wrapper a più tag e a catena): 1.059 errori della migrazione, **530 senza spiegazione**. Restano il tipo locale delle colonne (~165, P251, lo fa l'agente), gli `implicit any` dei `modify` dei filtri v4 e delle callback di `headersToShow` (170), gli alias di tipo delle prop della libreria (76, P253), gli snippet di azioni con `{#if index !== -1}` (~17, P254).
+
+Dopo P247, P253, P254 (fatti il 2026-10-19): 1.075 errori della migrazione, 544 senza spiegazione (con P254 da solo 1.051 e 530). Tatum: 0 punti da scrivere. Lo strumento è finito: quello che resta su addibox (tipo locale delle colonne, `implicit any` dei `modify` dei filtri v4 e delle callback di `headersToShow`, wrapper con logica come `StandardPaginatedTable`) lo fa l'agente.
+
+| # | Proposta | Nota |
+|---|---|---|
+| P253 | Il codemod rinomina le chiavi anche attraverso un alias locale: `type T = ComponentProps<typeof DataTable<Account>>`, poi `T['headers']`, `Omit<T, 'headers'>`, `Parameters<NonNullable<T['onpaginationChange']>>` (come P239 fa con `ComponentProps<typeof X>['k']`); `next` spiega quelli che restano | 76 errori su addibox; alias in 9 app v4 su 11 (addibox 20 file, stramoniumai 11, le altre 1–2) **Approvata e fatta il 2026-10-19**: su addibox gli errori salgono (1.051 → 1.075) perché, con le chiavi giuste, TypeScript controlla le colonne v4 dei wrapper con logica (lavoro dell'agente, P251) |
+| P254 | Negli snippet delle azioni (`appendSnippet` → `actionsSnippet`, `rowAppendSnippet`) il codemod toglie le guardie della cella d'intestazione v4 (`{#if index !== -1}` → contenuto, `{#if item && index != -1}` → `{#if item}`, il ramo `index === -1` via) quando `index` serve solo lì, così i parametri si riscrivono | ~17 "non fatto" su addibox; `index … -1` in file di 10 app v4 su 11 (addibox 39, stramoniumai 13, cbam 11) **Approvata e fatta il 2026-10-19** (1.059 → 1.051 errori su addibox) |
+
+| P248 | Errori già presenti prima della migrazione: `setup` (o il primo `next`) registra gli errori di svelte-check del codice v4 e `next`/`status` li mostrano a parte ("c'erano già"), fuori dal criterio di fine | addibox: 324 errori sulla v4, 205 ancora lì dopo il codemod |
+| P249 | Generici delle tabelle: il codemod toglie i parametri di tipo in più (`typeof PaginatedTable<Item, Filters>` → `typeof DataTable<Item>`) e dà il parametro della riga a `DataTable` usato come tipo | ~225 errori a catena su addibox |
+| P250 | Scioglimento di StandardButton: `style` scritto come espressione con `'icon'`/`'text'` non va copiato in `variant`; si divide in `buttonType` + `variant` quando i valori sono letterali in un ternario, altrimenti "non fatto" | 64 errori |
+| P251 | Tipo v4 `Header` (e simili delle tabelle) → `TableColumn` dove le colonne sono state convertite | 18 errori |
+
+### Come rifare il laboratorio (2026-10-19)
+
+Serve per misurare lo strumento su un'app senza toccarla. Tutto nello scratchpad della sessione:
+
+1. `git -C <app> archive HEAD frontend | tar -x -C <lab>`; in `<lab>/frontend/node_modules` un link per ogni voce dei `node_modules` dell'app (anche `.bin`), ma `svelte` e `@likable-hair/svelte` prima a quelli dell'app (v4), `@mdi/js` a quello di tatum (`readlink -f ~/Documents/progetti/tatum/frontend/node_modules/@mdi/js`).
+2. In `<lab>/frontend`: `.gitignore` con `node_modules` e `.svelte-kit`, `git init -b master`, commit; `node <repo>/migrate/src/cli.ts setup . --no-install --package ~/Documents/progetti/tatum/frontend/vendor/likable-hair-svelte-5.0.0.tgz` (registra gli errori v4, P248), commit.
+3. Rifare i link di `svelte` e `@likable-hair/svelte` verso quelli di tatum (`readlink -f`), come farebbe l'install della v5.
+4. `node <repo>/migrate/src/cli.ts codemod .`, poi `status .` (svelte-check su addibox ~25 s). Per raggruppare gli errori: uno script che chiama `remaining(dir, loadRules())` e conta per `explanations[0].id` o, se manca, per codice TypeScript.
+
+Il `.tgz` di tatum è del 2026-10-19 mattina: per misurare cambi della libreria rifarlo con `npm run package` + `npm pack`.

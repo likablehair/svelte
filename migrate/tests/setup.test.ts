@@ -1,12 +1,12 @@
 import { execFileSync } from 'node:child_process';
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, test } from 'vitest';
 import { analyze } from '../src/analyze.ts';
 import { loadRules } from '../src/rules.ts';
-import { dropThemePlaceholder, prepareBranch, setHtmlLang, setup, updateAppCss, updatePackageJson, updateTailwindConfig, updateTitleTemplate } from '../src/setup.ts';
+import { dropThemePlaceholder, prepareBranch, requireInstalled, setHtmlLang, setup, updateAppCss, updatePackageJson, updateTailwindConfig, updateTitleTemplate } from '../src/setup.ts';
 
 const fixture = fileURLToPath(new URL('./fixtures/app-v4', import.meta.url));
 const dirs: string[] = [];
@@ -107,6 +107,57 @@ describe('setup: Svelte, Tailwind 3 and the buttons margin', () => {
 		expect(css).toContain(':root {\n\t--confirm-or-cancel-buttons-default-margin-top: 20px;\n}\n');
 		updateAppCss(dir, '@layer reset, theme;', false, true);
 		expect(readFileSync(join(dir, 'src/app.css'), 'utf8')).toBe(css);
+	});
+
+	test('the app defaults of the rules of the components the app uses join the same block', () => {
+		const dir = copyApp();
+		mkdirSync(join(dir, 'src/lib/components/common'), { recursive: true });
+		writeFileSync(
+			join(dir, 'src/lib/components/common/PageTitle.svelte'),
+			'<script lang="ts">\n\tlet { title } = $props();\n</script>\n\n<h1 class="mb-4">{title}</h1>\n'
+		);
+		writeFileSync(
+			join(dir, 'src/routes/+page.svelte'),
+			"<script lang=\"ts\">\n\timport PageTitle from '$lib/components/common/PageTitle.svelte';\n</script>\n\n<PageTitle title=\"Home\" />\n"
+		);
+		const analysis = analyze(dir, loadRules());
+		expect(analysis.appDefaults.map((d) => d.cssVar)).toEqual(['--page-header-default-margin-bottom']);
+		updateAppCss(dir, '@layer reset, theme;', false, true, analysis.appDefaults);
+		expect(readFileSync(join(dir, 'src/app.css'), 'utf8')).toContain(
+			':root {\n\t--confirm-or-cancel-buttons-default-margin-top: 20px;\n\t--page-header-default-margin-bottom: 16px;\n}\n'
+		);
+	});
+});
+
+describe('setup: installed version', () => {
+	function workspace(declared: string, installed?: string) {
+		const root = mkdtempSync(join(tmpdir(), 'migrate-installed-'));
+		dirs.push(root);
+		const app = join(root, 'frontend');
+		mkdirSync(app);
+		writeFileSync(join(root, 'pnpm-lock.yaml'), '');
+		writeFileSync(join(app, 'package.json'), JSON.stringify({ dependencies: { '@likable-hair/svelte': declared } }));
+		if (installed) {
+			const lib = join(root, 'node_modules/@likable-hair/svelte');
+			mkdirSync(lib, { recursive: true });
+			writeFileSync(join(lib, 'package.json'), JSON.stringify({ version: installed }));
+		}
+		return { root, app };
+	}
+
+	test('stops while v4 is still installed, and says where to install', () => {
+		const { root, app } = workspace('file:./vendor/likable-hair-svelte-5.0.0.tgz', '4.3.1');
+		expect(() => requireInstalled(app)).toThrow(`4.3.1 is still installed in ${app}`);
+		expect(() => requireInstalled(app)).toThrow(`Run \`pnpm install\` in ${root} (the root of the workspace)`);
+	});
+
+	test('stops before setup and when nothing is installed', () => {
+		expect(() => requireInstalled(workspace('^4.3.1', '4.3.1').app)).toThrow('run setup first');
+		expect(() => requireInstalled(workspace('^5.0.0').app)).toThrow('is not installed');
+	});
+
+	test('goes on with v5 installed in the workspace root', () => {
+		expect(() => requireInstalled(workspace('^5.0.0', '5.0.0').app)).not.toThrow();
 	});
 });
 

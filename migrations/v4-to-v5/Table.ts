@@ -118,6 +118,7 @@ const rule = {
 			{
 				name: 'onrowClick',
 				to: 'onrowclick',
+				href: { prop: 'rowHref', param: 'detail.item' },
 				argument: { 'detail.item': '', detail: '' },
 				type: '(row: Row, event: MouseEvent | KeyboardEvent)',
 				note: 'The row is the first argument, the native event the second. With it the rows are focusable and react to Enter and Space; clicks on buttons, links and fields inside the row no longer reach it. When the click opens a page, prefer `rowHref`: see `table-row-links`.'

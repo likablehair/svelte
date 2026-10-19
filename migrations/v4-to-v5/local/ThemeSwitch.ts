@@ -31,7 +31,7 @@ export default {
 			summary:
 				'Three icons in a pill (light, system, dark) instead of a two-state switch: about 120px wide (100px with `size="sm"`) against 40px.',
 			action:
-				'In a top bar use `size="sm"`; at the bottom of a sidebar `tooltipPlacement="top"`; to offer only light and dark, as the copy did, `system={false}`. The saved choice keeps the `theme` key of localStorage, so users keep it.'
+				'In a top bar use `size="sm"`; at the bottom of a sidebar `tooltipPlacement="top"`; to offer only light and dark, as the copy did, `system={false}`. ModeSwitch saves the choice in localStorage (key `theme`). The copies saved it in an httpOnly cookie through `/api/setTheme`, which the browser cannot read: users who had chosen light or dark get the mode of their system once and choose again.'
 		}
 	]
 } satisfies LocalMigration;

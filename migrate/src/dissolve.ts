@@ -1,6 +1,7 @@
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { parse } from 'svelte/compiler';
 import { attrExpression, attrText, Editor, isReference, visit } from './ast.ts';
+import { readAliases } from './analyze.ts';
 import { Lines } from './files.ts';
 import type { RuleIndex } from './rules.ts';
 import type { Node } from './svelte.ts';
@@ -612,9 +613,9 @@ function finish(
 	return plan;
 }
 
-export function resolveImport(dir: string, from: string, source: string): string | undefined {
-	if (source.startsWith('$lib/')) return join(dir, 'src/lib', source.slice(5));
+export function resolveImport(dir: string, from: string, source: string, aliases: [string, string][] = [['$lib', 'src/lib']]): string | undefined {
 	if (source.startsWith('.')) return resolve(dirname(from), source);
+	for (const [alias, target] of aliases) if (source.startsWith(`${alias}/`)) return join(dir, target, source.slice(alias.length));
 	return undefined;
 }
 
@@ -650,6 +651,38 @@ function mapExpression(text: string, expression: Node, values: Record<string, st
 		pos = node.end;
 	}
 	return out + text.slice(pos, expression.end);
+}
+
+function mapWithExtras(text: string, expression: Node, values: Record<string, string>, extra: Record<string, string>, fallback: (prop: string) => string | undefined): string[] | undefined {
+	const literals: Node[] = [];
+	const pure = (node: Node): boolean => {
+		if (node.type === 'Literal' && typeof node.value === 'string' && node.value in values) return !!literals.push(node);
+		return node.type === 'ConditionalExpression' && pure(node.consequent) && pure(node.alternate);
+	};
+	if (expression.type !== 'ConditionalExpression' || !pure(expression)) return undefined;
+	const extras = new Map<string, Record<string, string>>();
+	for (const node of literals) {
+		const attr = extra[node.value];
+		if (!attr) continue;
+		const parsed = /^([\w-]+)="([^"]*)"$/.exec(attr);
+		if (!parsed) return undefined;
+		extras.set(parsed[1], { ...extras.get(parsed[1]), [node.value]: parsed[2] });
+	}
+	if (!extras.size) return undefined;
+	const substitute = (pick: (literal: string) => string | undefined) => {
+		let out = '';
+		let pos = expression.start;
+		for (const node of [...literals].sort((a, b) => a.start - b.start)) {
+			const value = pick(node.value);
+			if (value === undefined) return undefined;
+			out += text.slice(pos, node.start) + `'${value}'`;
+			pos = node.end;
+		}
+		return out + text.slice(pos, expression.end);
+	};
+	const parts = [substitute((literal) => values[literal])];
+	for (const [prop, byLiteral] of extras) parts.push(`${prop}={${substitute((literal) => byLiteral[literal] ?? fallback(prop))}}`);
+	return parts.every((part) => part && !part.includes('={undefined}')) ? (parts as string[]) : undefined;
 }
 
 function v5Default(index: RuleIndex, target: string, prop: string) {
@@ -758,7 +791,7 @@ function relabel(text: string, root: Node, keys: Record<string, string>, scope: 
 interface Rewrite {
 	attrs: { node: Node; text: string | null }[];
 	added: string[];
-	notes: { kind: string; name: string; to?: string; note?: string }[];
+	notes: { kind: string; name: string; to?: string; note?: string; byHand?: boolean }[];
 }
 
 function carried(plan: WrapperPlan, name: string, index: RuleIndex): WrapperProp | undefined {
@@ -870,6 +903,13 @@ function rewriteUsage(text: string, usage: Node, plan: WrapperPlan, index: RuleI
 				out.notes.push({ kind: 'wrapper-prop', name, to: to });
 				continue;
 			}
+			const split = mapWithExtras(text, expression, r.values, r.extra ?? {}, (prop) => v5Default(index, plan.target, prop));
+			if (split) {
+				const [main, ...extras] = split;
+				out.attrs.push({ node: attr, text: [`${to}={${main}}`, ...extras].join(' ') });
+				out.notes.push({ kind: 'wrapper-prop', name, to: [to, ...extras.map((e) => e.split('=')[0])].join(' + ') });
+				continue;
+			}
 			const same = Object.keys(r.values).filter((k) => r.values![k] === k && !r.extra?.[k]);
 			const other = Object.keys(r.values).filter((k) => !same.includes(k));
 			if (!same.length) return `\`${name}={${src(text, expression)}}\`: only literal values can be mapped`;
@@ -878,6 +918,7 @@ function rewriteUsage(text: string, usage: Node, plan: WrapperPlan, index: RuleI
 				kind: 'wrapper-value',
 				name,
 				to: to,
+				byHand: other.length > 0,
 				note: `${same.map((v) => `'${v}'`).join(', ')} stay the same${other.length ? `; ${other.map((v) => `'${v}' → ${[r.values![v] !== v ? `'${r.values![v]}'` : '', r.extra?.[v] ?? ''].filter(Boolean).join(' + ')}`).join(', ')} must be mapped by hand (svelte-check flags them)` : ''}`
 			});
 			continue;
@@ -1036,7 +1077,8 @@ function rewriteFile(
 	index: RuleIndex,
 	result: DissolveResult,
 	counts: Map<string, { usages: number; dissolved: number }>,
-	spreadFrom: Map<string, WrapperPlan>
+	spreadFrom: Map<string, WrapperPlan>,
+	aliases: [string, string][]
 ): string {
 	if (![...plans.values()].some((plan) => text.includes(plan.name))) return text;
 	const ast = parseSvelte(text);
@@ -1057,7 +1099,7 @@ function rewriteFile(
 	for (const program of programs)
 		for (const statement of program.body as Node[]) {
 			if (statement.type !== 'ImportDeclaration' || statement.specifiers.length !== 1 || statement.specifiers[0].type !== 'ImportDefaultSpecifier') continue;
-			const target = resolveImport(dir, path, statement.source.value);
+			const target = resolveImport(dir, path, statement.source.value, aliases);
 			const plan = target ? plans.get(target) : undefined;
 			if (!plan) continue;
 			const local = statement.specifiers[0].local.name as string;
@@ -1120,7 +1162,9 @@ function rewriteFile(
 			dissolvedUsages.add(usage);
 			done++;
 			result.changes.push({ file: rel, line: line(usage), wrapper: plan.name, kind: 'wrapper-dissolved', name: plan.name, to: plan.target });
-			for (const note of rewrite.notes) result.changes.push({ file: rel, line: line(usage), wrapper: plan.name, ...note });
+			for (const { byHand, ...note } of rewrite.notes)
+				if (byHand) result.skipped.push({ file: rel, line: line(usage), wrapper: plan.name, ...note, reason: `\`${note.name}={${'…'}}\` became \`${note.to}\`: ${note.note}` });
+				else result.changes.push({ file: rel, line: line(usage), wrapper: plan.name, ...note });
 		}
 		if (!usages.length && !others.length && !typeRefs.length) {
 			const [a, b] = removeRange(text, statement);
@@ -1166,6 +1210,7 @@ const IMPORT_SOURCE = /(?:from\s+|import\s*\(\s*|import\s+)['"]([^'"]+)['"]/g;
 
 export function dissolve(dir: string, index: RuleIndex, texts: Map<string, string>): DissolveResult {
 	const result: DissolveResult = { texts: new Map(texts), deleted: [], wrappers: [], changes: [], skipped: [] };
+	const aliases = readAliases(dir);
 	const plans = new Map<string, WrapperPlan>();
 	const counts = new Map<string, { usages: number; dissolved: number }>();
 	const spreadFrom = new Map<string, WrapperPlan>();
@@ -1180,7 +1225,7 @@ export function dissolve(dir: string, index: RuleIndex, texts: Map<string, strin
 		}
 		for (const [path, text] of result.texts) {
 			if (!path.endsWith('.svelte')) continue;
-			const next = rewriteFile(dir, path, relative(dir, path), text, pass, index, result, counts, spreadFrom);
+			const next = rewriteFile(dir, path, relative(dir, path), text, pass, index, result, counts, spreadFrom, aliases);
 			if (next !== text) result.texts.set(path, next);
 		}
 	}
@@ -1194,7 +1239,7 @@ export function dissolve(dir: string, index: RuleIndex, texts: Map<string, strin
 				if (file === path || deleted.has(file) || !/\.(svelte|ts|js)$/.test(file)) return false;
 				for (const match of text.matchAll(IMPORT_SOURCE)) {
 					const source = match[1].replace(/\?.*$/, '');
-					if (resolveImport(dir, file, source) === path) return true;
+					if (resolveImport(dir, file, source, aliases) === path) return true;
 				}
 				return false;
 			});

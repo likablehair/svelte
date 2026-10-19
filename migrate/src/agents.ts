@@ -28,6 +28,12 @@ export async function setupAgents(dir: string): Promise<string[]> {
 	const mcp = await loadMcp();
 	if (!mcp) return [`Coding agents not configured: run \`npx ${MCP_PACKAGE} init\` in the app.`];
 	const app = mcp.appInfo(dir);
-	const result = mcp.init(app, mcp.loadSpec(app).spec.version, { migrateSkill: migrateSkill() });
+	let version: string;
+	try {
+		version = mcp.loadSpec(app).spec.version;
+	} catch (error) {
+		return [`Coding agents not configured (${(error as Error).message}): run \`npx ${MCP_PACKAGE} init\` in the app after the install.`];
+	}
+	const result = mcp.init(app, version, { migrateSkill: migrateSkill() });
 	return [...result.changes.map((c) => `Agents: ${c}`), ...result.notes.map((n) => `Agents: ${n}`)];
 }

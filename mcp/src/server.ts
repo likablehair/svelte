@@ -16,7 +16,7 @@ import {
 	theme
 } from './docs.ts';
 import { DESIGN_SKILL, init, installedSkillVersion, MCP_PACKAGE, MIGRATE_SKILL } from './init.ts';
-import { componentRules, loadMigrate, migrateSkillDir, missingMigrate } from './migration.ts';
+import { loadMigrate, migrateSkillDir, missingMigrate } from './migration.ts';
 import { type AppInfo, appInfo, type LoadedSpec, PACKAGE } from './spec.ts';
 import { formatIssues, validateUsage } from './validate.ts';
 
@@ -270,7 +270,7 @@ function registerMigration(server: McpServer, context: ServerContext) {
 		{
 			title: 'Prepare the app for v5',
 			description:
-				'Creates the migration branch (the repository must be clean), puts v5 in package.json, prepares the main CSS (layers, fonts, v4-compat.css) and the locale. Does not install packages (tell the user to run the install) and never commits.',
+				'Creates the migration branch (the repository must be clean), puts v5 in package.json, prepares the main CSS (layers, fonts, v4-compat.css) and the locale. Does not install packages (tell the user to run the install, from the root of the workspace if the app is in one: migration_codemod, migration_next and migration_status stop until v5 is installed) and never commits.',
 			inputSchema: {
 				dir: appDir,
 				branch: z.string().optional(),
@@ -318,6 +318,7 @@ function registerMigration(server: McpServer, context: ServerContext) {
 				if (!dryRun && m.currentBranch(path) !== wanted) {
 					throw new Error(`The app is not on "${wanted}": run migration_setup first.`);
 				}
+				if (!dryRun) m.requireInstalled?.(path);
 				const result = m.codemod(path, m.loadRules(), { write: !dryRun });
 				return `${m.codemodReport(result)}\n${dryRun ? 'Dry run: nothing was written.' : `${result.files.length} files written. Nothing was committed.`}`;
 			})
@@ -332,7 +333,12 @@ function registerMigration(server: McpServer, context: ServerContext) {
 			inputSchema: { dir: appDir, file: z.string().optional().describe('Show this file instead of the next one') },
 			annotations: { readOnlyHint: true, openWorldHint: false }
 		},
-		async ({ dir, file }) => run((m) => m.nextReport(m.remaining(target(dir), m.loadRules()), file))
+		async ({ dir, file }) =>
+			run((m) => {
+				const path = target(dir);
+				m.requireInstalled?.(path);
+				return m.nextReport(m.remaining(path, m.loadRules()), file);
+			})
 	);
 
 	server.registerTool(
@@ -344,7 +350,12 @@ function registerMigration(server: McpServer, context: ServerContext) {
 			inputSchema: { dir: appDir },
 			annotations: { readOnlyHint: true, openWorldHint: false }
 		},
-		async ({ dir }) => run((m) => m.remainingReport(m.remaining(target(dir), m.loadRules())))
+		async ({ dir }) =>
+			run((m) => {
+				const path = target(dir);
+				m.requireInstalled?.(path);
+				return m.remainingReport(m.remaining(path, m.loadRules()));
+			})
 	);
 
 	server.registerTool(
@@ -355,7 +366,7 @@ function registerMigration(server: McpServer, context: ServerContext) {
 			inputSchema: { name: z.string() },
 			annotations: { readOnlyHint: true, openWorldHint: false }
 		},
-		async ({ name }) => run((m) => componentRules(m.loadRules(), name))
+		async ({ name }) => run((m) => m.componentRules(m.loadRules(), name))
 	);
 
 	server.registerPrompt(

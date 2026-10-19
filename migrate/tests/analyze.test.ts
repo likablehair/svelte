@@ -7,6 +7,7 @@ import { analyze } from '../src/analyze.ts';
 import { literalStrings, matchUsage, unlessMet, type Usage } from '../src/match.ts';
 import { markdownReport, summaryTable } from '../src/report.ts';
 import { loadRules } from '../src/rules.ts';
+import { scanSvelte } from '../src/svelte.ts';
 
 const index = loadRules();
 const fixture = (name: string) => fileURLToPath(new URL(`./fixtures/${name}`, import.meta.url));
@@ -233,5 +234,25 @@ describe('analyze: manual steps with unless', () => {
 		expect(result.findings.find((f) => f.id === 'flag-icon-title')).toMatchObject({ todo: 'review', file: 'src/routes/+page.svelte' });
 		expect(result.general.map((s) => s.id)).not.toContain('flag-icon-title');
 		expect(match('FlagIcon', ['title']).findings.map((f) => f.id)).not.toContain('flag-icon-title');
+	});
+});
+
+describe('analyze: callback members that v5 does not pass', () => {
+	const checkbox = (text: string) => {
+		const node = scanSvelte(text).components.find((c) => c.tag === 'Checkbox')!;
+		const usage: Usage = { component: 'Checkbox', file: 'src/routes/+page.svelte', line: node.line, attrs: node.attrs, snippets: [], slots: [], children: false, defaults: true, text };
+		const rule = index.byV4.get('Checkbox')!;
+		const { findings } = matchUsage(usage, rule, index.rules.v5.components[rule.to]);
+		return Object.fromEntries(findings.filter((f) => f.id === 'Checkbox/events.changed/onchange' || f.id === 'checkbox-shift-key').map((f) => [f.id, f.effort]));
+	};
+
+	test('Checkbox onchange needs code only where the v4 handler reads shiftKeyPressed', () => {
+		expect(checkbox('<Checkbox on:change={() => (seen = true)} />')).toEqual({ 'Checkbox/events.changed/onchange': 'check' });
+		expect(checkbox('<script>\n\tfunction pick() {}\n</script>\n<Checkbox on:change={pick} />')).toEqual({ 'Checkbox/events.changed/onchange': 'check' });
+		expect(checkbox('<Checkbox on:change={(e) => range(e.detail.shiftKeyPressed)} />')).toEqual({ 'Checkbox/events.changed/onchange': 'manual', 'checkbox-shift-key': 'manual' });
+		expect(checkbox('<script>\n\tfunction pick(e) { if (e.detail.shiftKeyPressed) range() }\n</script>\n<Checkbox on:change={pick} />')).toEqual({
+			'Checkbox/events.changed/onchange': 'manual',
+			'checkbox-shift-key': 'manual'
+		});
 	});
 });

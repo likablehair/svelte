@@ -1,10 +1,10 @@
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { parse } from 'svelte/compiler';
 import { analyze, readAliases, scriptImports, type AppStep, type GeneralStep, type Wrapper } from './analyze.ts';
-import { todoOf, unlessMet, type Todo } from './match.ts';
+import { findingTrigger, todoOf, triggerPresent, unlessMet, type Todo } from './match.ts';
 import { codemod } from './codemod.ts';
 import { RECIPES } from './dissolve.ts';
 import { Lines, listFiles } from './files.ts';
@@ -71,7 +71,8 @@ export interface Page {
 export interface Remaining {
 	dir: string;
 	base?: string;
-	check: { ran: boolean; errors: number; error?: string };
+	check: { ran: boolean; errors: number; error?: string; before?: number };
+	before: Diagnostic[];
 	files: RemainingFile[];
 	general: GeneralStep[];
 	appSteps: AppStep[];
@@ -84,6 +85,7 @@ export interface Remaining {
 export interface RemainingOptions {
 	check?: (dir: string) => CheckResult;
 	base?: string;
+	baseline?: Diagnostic[] | null;
 }
 
 const tryGit = (dir: string, args: string[]) => {
@@ -129,6 +131,32 @@ export function svelteCheck(dir: string): CheckResult {
 	if (!/\bCOMPLETED\b/.test(run.stdout ?? ''))
 		return { ran: false, diagnostics, error: `${run.stderr ?? ''}${run.stdout ?? ''}`.trim().split('\n').slice(-3).join(' ') };
 	return { ran: true, diagnostics };
+}
+
+function baselinePath(dir: string): string | undefined {
+	const path = tryGit(dir, ['rev-parse', '--git-path', 'svelte-migrate/baseline.json']);
+	return path ? resolve(dir, path) : undefined;
+}
+
+export function readBaseline(dir: string, base: string | undefined): Diagnostic[] | undefined {
+	const path = baselinePath(dir);
+	if (!base || !path || !existsSync(path)) return undefined;
+	try {
+		const data = JSON.parse(readFileSync(path, 'utf8')) as { base: string; diagnostics: Diagnostic[] };
+		return data.base === base ? data.diagnostics : undefined;
+	} catch {
+		return undefined;
+	}
+}
+
+export function recordBaseline(dir: string, base: string, check: (dir: string) => CheckResult = svelteCheck): CheckResult {
+	const path = baselinePath(dir);
+	if (!path) return { ran: false, diagnostics: [], error: 'not a git repository' };
+	const result = check(dir);
+	if (!result.ran) return result;
+	mkdirSync(dirname(path), { recursive: true });
+	writeFileSync(path, JSON.stringify({ base, diagnostics: result.diagnostics }));
+	return result;
 }
 
 export function migrationBase(dir: string): string | undefined {
@@ -341,6 +369,71 @@ interface Env {
 	aliases: [string, string][];
 	wrappers: Map<string, Wrapper>;
 	baseComponents: Map<string, Set<string>>;
+	spec?: InstalledSpec | null;
+}
+
+interface InstalledSpec {
+	components: { name: string; props: { name: string; type: string }[] }[];
+}
+
+function installedSpec(env: Env): InstalledSpec | undefined {
+	if (env.spec !== undefined) return env.spec ?? undefined;
+	env.spec = null;
+	for (let current = env.dir; ; ) {
+		const path = join(current, 'node_modules', LIB, 'dist', 'spec.json');
+		if (existsSync(path)) {
+			try {
+				env.spec = JSON.parse(readFileSync(path, 'utf8'));
+			} catch {}
+			break;
+		}
+		const parent = dirname(current);
+		if (parent === current) break;
+		current = parent;
+	}
+	return env.spec ?? undefined;
+}
+
+const PROPS_MEMBER = String.raw`ComponentProps\s*<\s*typeof\s+([\w$]+)(?:<[^<>]*>)?\s*>\s*\[\s*['"](\w+)['"]\s*\]`;
+
+function propsMemberType(env: Env, info: FileInfo, d: Diagnostic, names: string[]): { component: string; name: string; explanation: Explanation } | undefined {
+	if (!/\bundefined\b/.test(d.message)) return undefined;
+	const line = info.text.split('\n')[d.line - 1] ?? '';
+	const found =
+		new RegExp(PROPS_MEMBER).exec(line) ??
+		[...names, ...[...d.message.matchAll(/'([\w$]+)'/g)].map((m) => m[1])].map((n) => new RegExp(`\\b${n.replace(/\$/g, '\\$')}\\s*\\??\\s*:\\s*${PROPS_MEMBER}`).exec(info.text)).find((m) => !!m);
+	if (!found) return undefined;
+	const [, local, key] = found;
+	const component = info.libLocals.get(local) ?? local;
+	const raw = installedSpec(env)?.components.find((c) => c.name === component)?.props.find((p) => p.name === key)?.type;
+	const type = raw?.replace(/<([A-Z]\w*)>/g, (all, name) => (env.index.v5Exports.has(name) ? all : ''));
+	const exported = [...new Set(type?.match(/\b[A-Z]\w*\b/g) ?? [])].filter((name) => env.index.v5Exports.has(name));
+	const use = type
+		? `Type it with \`${type}\`${exported.length ? ` (\`import type { ${exported.join(', ')} } from '${LIB}'\`)` : ''}, or wrap it in \`NonNullable<…>\`.`
+		: 'Wrap it in `NonNullable<…>`.';
+	return {
+		component,
+		name: key,
+		explanation: { id: `${component}/types/${key}`, text: `\`ComponentProps<typeof ${local}>['${key}']\` is the type of an optional prop, so it includes \`undefined\`. ${use}` }
+	};
+}
+
+function destructuredProp(env: Env, info: FileInfo, d: Diagnostic): Pick<ErrorPoint, 'component' | 'name' | 'explanations' | 'hint'> | undefined {
+	const prop = /^Property '([\w$]+)' does not exist on type '.*\bProps'/s.exec(d.message)?.[1];
+	if (!prop) return undefined;
+	const locals = [...info.text.matchAll(/ComponentProps\s*<\s*typeof\s+([\w$]+)/g)].map((m) => m[1]);
+	for (const local of new Set(locals)) {
+		const component = info.libLocals.get(local);
+		const rule = component ? rulesFor(env, component, info.rel).find((r) => ruleEntries(r, prop).length) : undefined;
+		if (!component || !rule) continue;
+		return {
+			component,
+			name: prop,
+			explanations: unique(ruleEntries(rule, prop)),
+			hint: `\`${prop}\` is read from the props of this component, which are typed with the props of ${component}: use the v5 name in the destructuring, in this file and in the pages that pass it, or drop it.`
+		};
+	}
+	return undefined;
 }
 
 function resolveModule(env: Env, from: string, source: string, exists: (path: string) => boolean): string | undefined {
@@ -451,6 +544,18 @@ function explain(env: Env, info: FileInfo, d: Diagnostic): ErrorPoint {
 			point.explanations = unique(found.flatMap((f) => ruleEntries(f.rule, f.name)));
 		}
 	}
+	if (!point.explanations.length && spot.script) {
+		const typed = propsMemberType(env, info, d, names);
+		if (typed) {
+			point.component = typed.component;
+			point.name = typed.name;
+			point.explanations = [typed.explanation];
+		}
+	}
+	if (!point.explanations.length && spot.script) {
+		const destructured = destructuredProp(env, info, d);
+		if (destructured) Object.assign(point, destructured);
+	}
 	if (!point.explanations.length && names.includes('detail')) {
 		point.name = 'detail';
 		point.explanations = [
@@ -465,6 +570,33 @@ function explain(env: Env, info: FileInfo, d: Diagnostic): ErrorPoint {
 	const hint = HINTS[String(d.code)];
 	if (hint) point.hint = point.hint ? `${point.hint} ${hint}` : hint;
 	return point;
+}
+
+function chainWrappers(env: Env) {
+	const paths = existsSync(join(env.dir, 'src')) ? listFiles(join(env.dir, 'src')).filter((path) => path.endsWith('.svelte')) : [];
+	const candidates = paths.flatMap((path) => {
+		const rel = relative(env.dir, path);
+		if (env.wrappers.has(rel)) return [];
+		const scan = scanSvelte(readFileSync(path, 'utf8'));
+		if (scan.error || !scan.restProp) return [];
+		const tags = new Map<string, string>();
+		for (const record of scan.imports) {
+			const target = record.imported === 'default' && record.source.endsWith('.svelte') ? resolveModule(env, path, record.source, existsSync) : undefined;
+			if (target) tags.set(record.local, relative(env.dir, target));
+		}
+		const spread = scan.components.filter((c) => tags.has(c.tag) && c.attrs.some((a) => a.kind === 'spread' && a.expression?.type === 'Identifier' && a.expression.name === scan.restProp));
+		return spread.length ? [{ rel, targets: [...new Set(spread.map((c) => tags.get(c.tag)!))] }] : [];
+	});
+	for (let found = true; found; ) {
+		found = false;
+		for (const { rel, targets } of candidates) {
+			if (env.wrappers.has(rel)) continue;
+			const inner = targets.map((target) => env.wrappers.get(target));
+			if (inner.some((w) => !w) || new Set(inner.map((w) => w!.component)).size !== 1) continue;
+			env.wrappers.set(rel, { ...inner[0]!, file: rel, kind: 'logic', forwarded: {}, rest: true, importers: 0, usages: 0 });
+			found = true;
+		}
+	}
 }
 
 interface Graph {
@@ -569,28 +701,52 @@ function reviewFromBase(env: Env, snapshot: string, current: (rel: string) => st
 	const v5Name = (v4?: string) =>
 		!v4 ? undefined : (env.index.byV4.get(v4)?.to ?? (env.index.rules.v5.components[v4] || env.index.v4Components.has(v4) ? v4 : undefined));
 	const owner = (id: string) => targets.get(id) ?? v5Name(id.split('/').slice(0, id.startsWith(LOCAL_PREFIX) ? 2 : 1).join('/'));
-	const scans = new Map<string, { scan: SvelteFile; lines: Lines } | undefined>();
-	const currentUsage = (rel: string, line: number, tags: string[]): ComponentNode | undefined => {
+	const scans = new Map<string, { scan: SvelteFile; lines: Lines; text: string } | undefined>();
+	const currentUsage = (rel: string, line: number, tags: string[]): (ComponentNode & { source: string }) | 'gone' | undefined => {
 		if (!scans.has(rel)) {
 			const text = rel.endsWith('.svelte') ? current(rel) : undefined;
-			scans.set(rel, text === undefined ? undefined : { scan: scanSvelte(text), lines: new Lines(text) });
+			scans.set(rel, text === undefined ? undefined : { scan: scanSvelte(text), lines: new Lines(text), text });
 		}
 		const found = scans.get(rel);
 		if (!found) return undefined;
 		const names = new Set([...tags, ...found.scan.imports.filter((i) => tags.includes(i.imported)).map((i) => i.local)]);
-		return found.scan.components
-			.filter((c) => names.has(c.tag) && c.line <= line && found.lines.at(c.end) >= line)
-			.sort((a, b) => b.start - a.start)[0];
+		const uses = found.scan.components.filter((c) => names.has(c.tag));
+		if (!uses.length) return 'gone';
+		const before = uses.filter((c) => c.line <= line).sort((a, b) => b.start - a.start);
+		const use = before.find((c) => found.lines.at(c.end) >= line) ?? before[0];
+		return use && { ...use, source: found.text.slice(use.start, use.end) };
+	};
+	const snippetParamsDone = (rel: string, id: string, line: number) => {
+		const [v4, name] = id.split('/snippets.parameters/');
+		const rule = env.index.byV4.get(v4);
+		const change = rule?.snippets?.parameters?.find((p) => p.name === name);
+		const text = current(rel);
+		const v5 = change && destructuredKeys(change.v5, change.v5.indexOf('{'));
+		if (!v5 || text === undefined) return false;
+		const names = [name, ...(rule?.snippets?.renamed ?? []).filter((r) => r.from === name).map((r) => r.to)];
+		const lines = new Lines(text);
+		const found = [...text.matchAll(new RegExp(`\\{#snippet\\s+(?:${names.join('|')})\\s*\\(`, 'g'))].sort(
+			(a, b) => Math.abs(lines.at(a.index) - line) - Math.abs(lines.at(b.index) - line)
+		)[0];
+		if (!found) return true;
+		const keys = destructuredKeys(text, text.indexOf('{', found.index + found[0].length - 1), found.index + found[0].length);
+		return !!keys && keys.every((k) => v5.includes(k));
 	};
 	for (const f of analysis.findings) {
 		if (f.effort !== 'manual') continue;
 		const rule = env.index.byV4.get(f.component ?? '');
-		const step = f.kind === 'manual' ? rule?.manual?.find((s) => s.id === f.id) : undefined;
-		if (step?.unless) {
+		const step = f.kind === 'manual' ? (rule?.manual ?? (f.id.startsWith('global-') ? env.index.rules.global.manual : undefined))?.find((s) => s.id === f.id) : undefined;
+		const trigger = todoOf(f) === 'edit' ? findingTrigger(f, step) : undefined;
+		if (step?.unless || trigger) {
 			const mapped = mapLine(f.file, f.line);
 			const tags = [f.component, v5Name(f.component)].filter((t): t is string => !!t);
 			const usage = mapped === undefined ? undefined : currentUsage(f.file, mapped, tags);
-			if (usage && unlessMet(step.unless, usage, rule)) continue;
+			if (usage === 'gone') {
+				if (trigger) continue;
+			} else if (usage) {
+				if (step?.unless && unlessMet(step.unless, usage, rule)) continue;
+				if (trigger && !triggerPresent(trigger, usage, rule, (name) => env.index.cssVars.get(name)?.to)) continue;
+			}
 		}
 		add(
 			{
@@ -607,7 +763,11 @@ function reviewFromBase(env: Env, snapshot: string, current: (rel: string) => st
 	}
 	for (const c of result.changes)
 		if (c.check) add({ file: c.file, kind: 'check', todo: 'review', id: c.id, component: owner(c.id), title: `${c.name}${c.to ? ` → ${c.to}` : ''}`, text: c.note }, c.line);
-	for (const s of result.skipped) add({ file: s.file, kind: 'not-done', todo: 'edit', id: s.id, component: owner(s.id), title: s.name, text: s.reason }, s.line);
+	for (const s of result.skipped) {
+		const mapped = s.kind === 'snippet-parameters' ? mapLine(s.file, s.line) : undefined;
+		if (mapped !== undefined && snippetParamsDone(s.file, s.id, mapped)) continue;
+		add({ file: s.file, kind: 'not-done', todo: 'edit', id: s.id, component: owner(s.id), title: s.name, text: s.reason }, s.line);
+	}
 	for (const d of result.defaults)
 		add({ file: d.file, kind: 'default', todo: 'review', id: `${d.component}/defaults/${d.name}`, component: v5Name(d.component), title: `${d.name}: ${d.v4} → ${d.v5} (${d.kind})`, text: d.note }, d.line);
 	const review = new Map<string, ReviewPoint[]>();
@@ -639,7 +799,8 @@ export function remaining(dir: string, index: RuleIndex, options: RemainingOptio
 	dir = resolve(dir);
 	const env: Env = { dir, index, aliases: readAliases(dir), wrappers: new Map(), baseComponents: new Map() };
 	for (const wrapper of analyze(dir, index).wrappers) env.wrappers.set(wrapper.file, wrapper);
-	const out: Remaining = { dir, check: { ran: false, errors: 0 }, files: [], general: [], appSteps: [], dropped: [], pages: [], layouts: [], global: [] };
+	chainWrappers(env);
+	const out: Remaining = { dir, check: { ran: false, errors: 0 }, before: [], files: [], general: [], appSteps: [], dropped: [], pages: [], layouts: [], global: [] };
 	const current = (rel: string) => {
 		try {
 			return readFileSync(join(dir, rel), 'utf8');
@@ -667,10 +828,22 @@ export function remaining(dir: string, index: RuleIndex, options: RemainingOptio
 	}
 
 	const check = (options.check ?? svelteCheck)(dir);
-	out.check = { ran: check.ran, errors: check.diagnostics.length, error: check.error };
+	const baseline = options.baseline !== undefined ? options.baseline : readBaseline(dir, base);
+	const key = (d: Diagnostic) => `${d.file}\n${d.code ?? ''}\n${d.message.replace(/\s+/g, ' ')}`;
+	const left = new Map<string, number>();
+	for (const d of baseline ?? []) left.set(key(d), (left.get(key(d)) ?? 0) + 1);
+	const diagnostics: Diagnostic[] = [];
+	for (const d of check.diagnostics) {
+		const k = key(d);
+		if (left.get(k)) {
+			left.set(k, left.get(k)! - 1);
+			out.before.push(d);
+		} else diagnostics.push(d);
+	}
+	out.check = { ran: check.ran, errors: diagnostics.length, error: check.error, ...(baseline ? { before: out.before.length } : {}) };
 	const errors = new Map<string, ErrorPoint[]>();
 	const infos = new Map<string, FileInfo | undefined>();
-	for (const d of check.diagnostics) {
+	for (const d of diagnostics) {
 		if (!infos.has(d.file)) infos.set(d.file, fileInfo(env, d.file));
 		const info = infos.get(d.file);
 		const point = info ? explain(env, info, d) : { ...d, explanations: [] };
@@ -689,4 +862,28 @@ export function remaining(dir: string, index: RuleIndex, options: RemainingOptio
 
 	if (base) Object.assign(out, pagesToLookAt(env, touchedFiles(dir, base), review));
 	return out;
+}
+
+function destructuredKeys(text: string, open: number, from = open): string[] | undefined {
+	if (open < 0 || text.slice(from, open).trim()) return undefined;
+	const keys: string[] = [];
+	let depth = 0;
+	let part = '';
+	for (let i = open + 1; i < text.length; i++) {
+		const ch = text[i];
+		if ('{[(<'.includes(ch)) depth++;
+		else if ('}])>'.includes(ch) && !(ch === '>' && text[i - 1] === '=')) {
+			if (depth === 0) {
+				if (part.trim()) keys.push(part.trim());
+				return keys.some((k) => k.startsWith('...')) ? undefined : keys.map((k) => k.split(/[?:=]/)[0].trim());
+			}
+			depth--;
+		} else if ((ch === ',' || ch === ';') && depth === 0) {
+			if (part.trim()) keys.push(part.trim());
+			part = '';
+			continue;
+		}
+		if (depth === 0) part += ch;
+	}
+	return undefined;
 }

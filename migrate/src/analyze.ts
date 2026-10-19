@@ -5,7 +5,7 @@ import { Lines, listFiles } from './files.ts';
 import { matchUsage, todoOf, type Effort, type Finding, type Usage } from './match.ts';
 import { localRuleFor, type RuleIndex } from './rules.ts';
 import { scanSvelte, type Attr, type ImportRecord, type SvelteFile } from './svelte.ts';
-import type { ManualStep } from './types.ts';
+import type { AppDefault, ManualStep } from './types.ts';
 
 const LIB = '@likable-hair/svelte';
 
@@ -82,6 +82,7 @@ export interface Analysis {
 	language: { guess: 'it' | 'en' | null; it: number; en: number };
 	styleProps: number;
 	droppedDependencies: string[];
+	appDefaults: AppDefault[];
 	totals: {
 		auto: number;
 		check: number;
@@ -120,16 +121,16 @@ const LOCKFILES: [string, string][] = [
 	['package-lock.json', 'npm']
 ];
 
-function lockfileManager(dir: string) {
+export function lockfile(dir: string): { manager: string; dir: string } {
 	for (let current = dir, depth = 0; depth < 4; depth++) {
 		const found = LOCKFILES.find(([file]) => existsSync(join(current, file)));
-		if (found) return found[1];
+		if (found) return { manager: found[1], dir: current };
 		if (existsSync(join(current, '.git'))) break;
 		const parent = dirname(current);
 		if (parent === current) break;
 		current = parent;
 	}
-	return 'unknown';
+	return { manager: 'unknown', dir };
 }
 
 function paraglideRuntime(dir: string, deps: Record<string, string>): string | undefined {
@@ -147,7 +148,7 @@ function appInfo(dir: string): AppInfo {
 	const pkg = readJson(join(dir, 'package.json')) ?? {};
 	const deps = { ...pkg.devDependencies, ...pkg.dependencies } as Record<string, string>;
 	const installed = (name: string) => readJson(join(dir, 'node_modules', name, 'package.json'))?.version;
-	const packageManager = lockfileManager(dir);
+	const packageManager = lockfile(dir).manager;
 	let git: AppInfo['git'] = { clean: null };
 	try {
 		const status = execFileSync('git', ['-C', dir, 'status', '--porcelain', '--', '.'], {
@@ -548,7 +549,9 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 					snippets: node.snippets,
 					slots: node.slots,
 					children: node.children,
-					defaults: true
+					defaults: true,
+					text: file.text,
+					source: file.text.slice(node.start, node.end)
 				});
 				continue;
 			}
@@ -576,7 +579,8 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 				snippets: wrapper.rest ? node.snippets.filter((s) => !calls.declared.has(s)) : [],
 				slots: [],
 				children: false,
-				defaults: false
+				defaults: false,
+				text: file.text
 			});
 		}
 		usageRanges.set(file.rel, ranges);
@@ -588,6 +592,8 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 	const detail = { handlers: 0, elsewhere: 0, files: 0 };
 	const tokens = { uses: 0, overrides: 0, rgbVar: 0, files: 0 };
 	const tokenPattern = new RegExp(index.rules.global.tokens.find, 'g');
+	const boxStep = index.rules.global.manual.find((step: ManualStep) => step.id === 'global-background-boxes');
+	let boxes = 0;
 	const inRanges = (ranges: [number, number][] | undefined, offset: number) =>
 		!!ranges?.some(([start, end]) => offset >= start && offset < end);
 
@@ -617,6 +623,20 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 		tokens.overrides += count(file.text, /--global-color-(?:light|dark)-[a-z]+-\d+\s*:/g);
 		tokens.rgbVar += count(file.text, /rgba?\(\s*var\(\s*--global-color-/g);
 		if (uses) tokens.files++;
+
+		for (const m of file.text.matchAll(/bg-\[rgba?\(var\(--global-color-background-\d+\)[^\]]*\]|background(?:-color)?\s*:\s*rgba?\(\s*var\(\s*--global-color-background-\d+[^;"'}]*/g)) {
+			boxes++;
+			findings.push({
+				effort: 'manual',
+				kind: 'manual',
+				id: 'global-background-boxes',
+				name: m[0],
+				note: boxStep?.summary,
+				todo: 'review',
+				file: file.rel,
+				line: file.lines.at(m.index!)
+			});
+		}
 
 		for (const m of file.text.matchAll(/(--[a-z][a-z0-9-]*)\s*:|var\(\s*(--[a-z][a-z0-9-]*)/g)) {
 			const name = m[1] ?? m[2];
@@ -698,6 +718,7 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 			const n = allText(/:global\(/g, css);
 			return { needed: n > 0 ? null : false, signal: `${n} :global( selectors to review` };
 		},
+		'global-background-boxes': () => ({ needed: boxes > 0, signal: `${boxes} boxes` }),
 		'global-color-tokens': () => ({
 			needed: null,
 			signal: `${tokens.uses} uses, ${tokens.overrides} overrides: covered by v4-compat.css until cleanup`
@@ -794,6 +815,7 @@ export function analyze(dir: string, index: RuleIndex): Analysis {
 		findings,
 		general: generalSteps,
 		appSteps,
+		appDefaults: index.rules.components.flatMap((rule) => ((components[rule.from]?.usages ?? 0) + (components[rule.from]?.via ?? 0) > 0 ? (rule.appDefaults ?? []) : [])),
 		wrappers: [...wrappers.values()].sort((a, b) => b.importers - a.importers || a.file.localeCompare(b.file)),
 		unknown,
 		icons,

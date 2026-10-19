@@ -8,9 +8,25 @@ import type {
 	SnippetChange
 } from '../types.js';
 
+const pageBackground = {
+	match: '--global-color-background-',
+	note: 'Its value read a v4 background token, which `v4-compat.css` maps to the page background of Aurora: the sidebar and the bar would lose their tone and border. Removed: the layout has its own background and border.'
+};
+
+const dropWhen: Record<string, Rename['dropWhen']> = {
+	'sidebar-background': pageBackground,
+	'sidebar-border': pageBackground,
+	'header-background': pageBackground,
+	'header-border': pageBackground,
+	'content-padding': {
+		match: '^=["\']?\\s*0(px)?\\s*["\']?$',
+		note: 'v4 apps set it to 0 and padded the content in their own scroll box, which goes away (`sidebar-layout-scroll`): removed, so the content gets the padding of the layout.'
+	}
+};
+
 const both = (prefix: string, pairs: [string, string, string?][]): Rename[] =>
 	pairs.flatMap(([from, to, note]) => [
-		{ from: `--${prefix}-${from}`, to: `--sidebar-layout-${to}`, note },
+		{ from: `--${prefix}-${from}`, to: `--sidebar-layout-${to}`, note, ...(dropWhen[to] ? { dropWhen: dropWhen[to] } : {}) },
 		{ from: `--${prefix}-default-${from}`, to: `--sidebar-layout-default-${to}`, note }
 	]);
 
@@ -77,7 +93,7 @@ const shellManual: ManualStep[] = [
 			'The window scrolls the page: the bar and the sidebar stay in place by themselves and the content is in a `<main>` that takes the remaining width. v5 apps do not need their own scroll box.',
 		action:
 			'Remove the wrapper the app put around the content to scroll it (a div with `calc(100dvw - 52px)` width, `calc(100dvh - 50px)` height and `overflow-auto`) and the extra `<main>` inside it: render the page content directly. Code that scrolled that box (`bind:this` to a global scroller, `scrollTo` on it) must use `window` instead. Full-height pages can use `calc(100dvh - var(--sidebar-layout-header-height, 3.5rem))`.',
-		when: { snippets: ['children'] },
+		when: { snippets: ['children'], contains: ['calc\\(100d?vh\\s*-\\s*\\d+px\\)'] },
 		scope: 'usage'
 	},
 	{
@@ -87,7 +103,7 @@ const shellManual: ManualStep[] = [
 			'The library draws the toggle buttons (the menu button in the bar on mobile, the sidebar button at the top of the sidebar on desktop) and `headerSnippet` is the rest of the bar. In v4 `headerSnippet` replaced the whole bar, so every app copied the hamburger and the dock icon by hand.',
 		action:
 			'In `headerSnippet` delete the hand-made toggles (the `mdi-menu` icon that set `drawerOpened`, the `mdi-dock-left` icon that set `sidebarExpanded`, and the `MediaQuery` around them) and keep only the rest (theme switch, avatar, tenant pill, actions). A spacer that pushed them to the right is still needed (`<div style="flex: 1"></div>`). Use `toggleSnippet` only if the toggle must look different.',
-		when: { snippets: ['headerSnippet'] }
+		when: { snippets: ['headerSnippet'], contains: ['mdi-menu(?![\\w-])', 'mdi-dock-left(?![\\w-])', '\\bmdiMenu\\b', '\\bmdiDockLeft\\b'] }
 	},
 	{
 		id: 'sidebar-layout-links',
@@ -96,7 +112,8 @@ const shellManual: ManualStep[] = [
 			'The menu drawn from `options` is a HierarchyMenu: options with `href` are links, `currentPath` selects the option of the page and closes the mobile drawer when the page changes.',
 		action:
 			'Give each option its route as `href`, pass `currentPath={page.url.pathname}` (from `$app/state`), and delete the `goto` chain in `onmenuSelect` / `onoptionClick`, the code that derives the selection from the URL and the code that sets `drawerOpened = false` after a click or a navigation. Where the app drew its own HierarchyMenu in `menuSnippet` only to get nesting or icons-only, pass the options to the layout instead.',
-		when: { events: ['onmenuSelect'], props: ['options', 'selectedIndex'], snippets: ['menuSnippet'] }
+		when: { events: ['onmenuSelect'], props: ['options', 'selectedIndex'], snippets: ['menuSnippet'] },
+		unless: { props: ['currentPath'] }
 	}
 ];
 

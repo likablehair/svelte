@@ -6,8 +6,8 @@ import { analyze } from './analyze.ts';
 import { codemod } from './codemod.ts';
 import { remaining } from './remaining.ts';
 import { appLabel, codemodReport, markdownReport, nextReport, remainingReport, summaryTable } from './report.ts';
-import { loadRules } from './rules.ts';
-import { currentBranch, setup } from './setup.ts';
+import { componentRules, loadRules } from './rules.ts';
+import { currentBranch, requireInstalled, setup } from './setup.ts';
 
 const USAGE = `Usage:
   svelte-migrate analyze <app-dir...> [--md <file|dir>] [--json <file|dir>] [--summary]
@@ -15,6 +15,7 @@ const USAGE = `Usage:
   svelte-migrate codemod <app-dir> [--dry-run] [--md <file>] [--branch <name>]
   svelte-migrate next <app-dir> [--file <path>]
   svelte-migrate status <app-dir> [--md <file>]
+  svelte-migrate rules <Component>
 
   analyze     Read-only report of what the v4 → v5 migration needs in each app.
   --md        Write the Markdown report to a file (one app) or a directory (one file per app).
@@ -22,7 +23,8 @@ const USAGE = `Usage:
   --summary   Print one table row per app instead of the full reports.
 
   setup       Prepare the app: checks that its repository is clean, creates the branch
-              (default aurora-v5), puts v5 in package.json (a .tgz is copied into vendor/),
+              (default aurora-v5), records the svelte-check errors the v4 code already has
+              (in the git folder: next lists them apart), puts v5 in package.json (a .tgz is copied into vendor/),
               adds @mdi/js and the packages that came with v4, raises svelte to 5.29, installs;
               in the main CSS adds the cascade layer order, the library Tailwind CSS, the library
               fonts, v4-compat.css and the v4 space above ConfirmOrCancelButtons, moves element
@@ -40,7 +42,8 @@ const USAGE = `Usage:
               snippet parameters in the v5 shape; the Standard* wrappers dissolved into the library components
               (meaning and layout kept, look dropped and listed), wrappers nobody imports any more
               deleted. Running it again changes nothing. Prints what it did, what to check and
-              what is left by hand. --dry-run writes nothing. Never commits.
+              what is left by hand. --dry-run writes nothing. Never commits. Like next and status,
+              it stops while v5 is not installed (run the install from the workspace root).
 
   next        The remaining points, one file at a time: runs svelte-check in the app and
               explains each error with the migration rule behind it (what changed, what to
@@ -54,7 +57,10 @@ const USAGE = `Usage:
   status      The same data for the whole app: files with errors, points to write and to
               look at, components to look at, pages to try (pages that use the changed
               files), changes per component, app steps, look dropped with the wrappers.
-              Read-only.`;
+              Read-only.
+
+  rules       The whole v4 → v5 rule of a component, by its v4 or v5 name: renames, removed
+              props, changed defaults, steps. The v5 API is \`npx svelte-mcp component <Name>\`.`;
 
 interface Options {
 	command?: string;
@@ -130,6 +136,7 @@ function runCodemod(options: Options) {
 		const branch = currentBranch(dir);
 		if (branch !== options.branch)
 			throw new Error(`${dir} is on "${branch}", not on "${options.branch}": run setup first (or pass --branch).`);
+		requireInstalled(dir);
 	}
 	const result = codemod(dir, loadRules(), { write: !options.dryRun });
 	const report = codemodReport(result);
@@ -139,14 +146,21 @@ function runCodemod(options: Options) {
 }
 
 function runNext(options: Options) {
-	const result = remaining(resolve(options.dirs[0]), loadRules());
-	process.stdout.write(`${nextReport(result, options.file)}\n`);
+	const dir = resolve(options.dirs[0]);
+	requireInstalled(dir);
+	process.stdout.write(`${nextReport(remaining(dir, loadRules()), options.file)}\n`);
 }
 
 function runStatus(options: Options) {
-	const report = remainingReport(remaining(resolve(options.dirs[0]), loadRules()));
+	const dir = resolve(options.dirs[0]);
+	requireInstalled(dir);
+	const report = remainingReport(remaining(dir, loadRules()));
 	if (options.md) writeFileSync(options.md, report);
 	else process.stdout.write(`${report}\n`);
+}
+
+function runRules(options: Options) {
+	console.log(componentRules(loadRules(), options.dirs.join(' ')));
 }
 
 const options = parseArgs(process.argv.slice(2));
@@ -155,7 +169,8 @@ const commands: Record<string, (options: Options) => void | Promise<void>> = {
 	setup: runSetup,
 	codemod: runCodemod,
 	next: runNext,
-	status: runStatus
+	status: runStatus,
+	rules: runRules
 };
 if (!options?.command || !commands[options.command] || !options.dirs.length) {
 	console.log(USAGE);

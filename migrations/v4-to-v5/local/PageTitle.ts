@@ -5,6 +5,13 @@ export default {
 	to: 'PageHeader',
 	files: ['PageTitle.svelte'],
 	summary: 'The local `PageTitle` copy becomes `PageHeader` of the library.',
+	appDefaults: [
+		{
+			cssVar: '--page-header-default-margin-bottom',
+			value: '16px',
+			note: 'the space the PageTitle copies left under the title'
+		}
+	],
 	props: {
 		renamed: [
 			{

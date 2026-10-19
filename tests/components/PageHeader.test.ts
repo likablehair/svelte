@@ -269,6 +269,17 @@ describe('PageHeader', () => {
 		);
 	});
 
+	test('has no space below it by default; the instance variable and the app default add it', async () => {
+		const screen = await render(PageHeader, { title: 'Clients' });
+		const header = root(screen.container);
+		expect(getComputedStyle(header).marginBottom).toBe('0px');
+		document.documentElement.style.setProperty('--page-header-default-margin-bottom', '16px');
+		expect(getComputedStyle(header).marginBottom).toBe('16px');
+		screen.container.style.setProperty('--page-header-margin-bottom', '4px');
+		expect(getComputedStyle(header).marginBottom).toBe('4px');
+		document.documentElement.style.removeProperty('--page-header-default-margin-bottom');
+	});
+
 	describe('tab title', () => {
 		afterEach(() => {
 			document.title = '';

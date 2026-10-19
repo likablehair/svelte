@@ -7,8 +7,8 @@ import { dissolve, resolveImport, type WrapperSummary } from './dissolve.ts';
 import { Lines, listFiles } from './files.ts';
 import { localRuleFor, type RuleIndex } from './rules.ts';
 import { pageUrl, parentPage } from './routes.ts';
-import type { Node } from './svelte.ts';
-import type { Collect, ComponentApi, ComponentMigration, ItemRules, Removal, SnippetChange, Unpack, Unwrap, ValueChange, LocalMigration, ManualTrigger, NestedRule, PairsRule, ParameterRule, ParentRoute } from './types.ts';
+import { scanSvelte, type Node } from './svelte.ts';
+import type { ChildIcon, Collect, ComponentApi, OperatorsRule, ComponentMigration, ItemRules, Removal, SnippetChange, Unpack, Unwrap, ValueChange, LocalMigration, ManualTrigger, NestedRule, PairsRule, ParameterRule, ParentRoute } from './types.ts';
 
 const LIB = '@likable-hair/svelte';
 const MDI = '@mdi/js';
@@ -154,6 +154,58 @@ interface Context {
 	instance?: Node;
 	localUsages: Map<string, number>;
 	parent?: string;
+	passThrough?: (source: string) => PassThrough | undefined;
+	scope?: Map<string, string>;
+	passed?: Set<string> | null;
+}
+
+interface PassThrough {
+	v4: string;
+	declared: Set<string>;
+	forwarded: Record<string, string>;
+	snippets: Record<string, string>;
+}
+
+function passThroughOf(text: string, index: RuleIndex, inner: (source: string) => PassThrough | undefined): PassThrough | undefined {
+	const scan = scanSvelte(text);
+	if (scan.error || !scan.restProp) return undefined;
+	const lib = new Map(scan.imports.filter((i) => i.source === LIB).map((i) => [i.local, i.imported]));
+	const app = new Map(scan.imports.filter((i) => i.imported === 'default' && i.source.endsWith('.svelte')).map((i) => [i.local, i.source]));
+	const targetOf = (tag: string): { v4: string; inner?: PassThrough } | undefined => {
+		const name = lib.get(tag);
+		const v4 = name ? (index.byV4.get(name)?.from ?? index.rules.components.find((r) => r.to === name)?.from) : undefined;
+		if (v4) return { v4 };
+		const source = app.get(tag);
+		const through = source ? inner(source) : undefined;
+		return through && { v4: through.v4, inner: through };
+	};
+	const nodes = scan.components.flatMap((node) => {
+		const target = targetOf(node.tag);
+		const spread = node.attrs.some((a) => a.kind === 'spread' && a.expression?.type === 'Identifier' && a.expression.name === scan.restProp);
+		return target && spread ? [{ node, ...target }] : [];
+	});
+	if (!nodes.length || new Set(nodes.map((n) => index.byV4.get(n.v4)?.to)).size !== 1) return undefined;
+	const declared = new Set(scan.declaredProps);
+	const forwarded: Record<string, string> = {};
+	const snippets: Record<string, string> = {};
+	const conflicts = new Set<string>();
+	const record = (map: Record<string, string>, from: string, to: string | undefined) => {
+		if (to === undefined || (map[from] !== undefined && map[from] !== to)) conflicts.add(from);
+		else map[from] = to;
+	};
+	for (const { node, inner } of nodes)
+		for (const attr of node.attrs) {
+			if (attr.expression?.type !== 'Identifier' || !declared.has(attr.expression.name)) continue;
+			const event = /^on[a-z]/.test(attr.name);
+			if (!event && !/Snippet$/.test(attr.name)) continue;
+			const to = !inner?.declared.has(attr.name) ? attr.name : (event ? inner.forwarded : inner.snippets)[attr.name];
+			record(event ? forwarded : snippets, attr.expression.name, to);
+		}
+	for (const name of conflicts) {
+		delete forwarded[name];
+		delete snippets[name];
+	}
+	return { v4: nodes[0].v4, declared, forwarded, snippets };
 }
 
 const lineOf = (ctx: Context, pos: number) => ctx.lines.at(Math.max(0, pos - ctx.offset));
@@ -285,6 +337,21 @@ function renameImports(roots: unknown[], programs: Node[], ctx: Context): Map<st
 		}
 		if (!to || !record.spec) continue;
 		const existing = taken.get(to);
+		if (existing && existing !== record.local && record.local === record.imported && !store) {
+			const specifiers = record.decl.specifiers as Node[];
+			const index = specifiers.indexOf(record.spec);
+			const [start, end] =
+				specifiers.length === 1
+					? [record.decl.start, record.decl.end]
+					: index < specifiers.length - 1
+						? [record.spec.start, specifiers[index + 1].start]
+						: [specifiers[index - 1].end, record.spec.end];
+			if (ctx.edit.replace(start, end, '')) {
+				renameReferences(roots, record.local, existing, ctx);
+				changed(ctx, record.spec.start, { kind: 'component-renamed', id: `imports/renamed/${record.imported}`, name: record.imported, to, note: `${to} was already imported: one import for both.`, check: false });
+			}
+			continue;
+		}
 		if (existing && existing !== record.local) {
 			skip(ctx, record.spec.start, {
 				kind: 'import-renamed',
@@ -424,7 +491,7 @@ function propertyRange(ctx: Context, list: Node[], index: number): [number, numb
 	return [node.start, node.end];
 }
 
-type ObjectRules = Pick<ItemRules, 'keys' | 'values' | 'drop' | 'nested' | 'pairs' | 'parameters' | 'rewrite' | 'byHand' | 'note'>;
+type ObjectRules = Pick<ItemRules, 'keys' | 'values' | 'drop' | 'nested' | 'pairs' | 'parameters' | 'rewrite' | 'byHand' | 'operators' | 'note'>;
 
 const TIME_TOKENS = /[Hhms]/;
 
@@ -508,16 +575,48 @@ function editParameters(ctx: Context, property: Node, rule: ParameterRule, id: s
 	}
 }
 
+function editOperators(ctx: Context, object: Node, rule: OperatorsRule, id: string, remove: Set<number>): Set<string> {
+	const properties = object.properties as Node[];
+	const find = (key: string) => properties.findIndex((p) => keyName(p) === key);
+	const at = { type: find(rule.type), mode: find(rule.mode), advanced: find(rule.advanced) };
+	if (at.mode < 0) return new Set();
+	const literal = (index: number) => {
+		const value = index < 0 ? undefined : (properties[index].value as Node);
+		return value?.type === 'Literal' ? value.value : undefined;
+	};
+	const type = literal(at.type);
+	const mode = literal(at.mode);
+	const advanced = at.advanced < 0 ? false : literal(at.advanced);
+	const mode_ = properties[at.mode];
+	const fail = (reason: string) => {
+		skip(ctx, mode_.start, { kind: 'item-operators', id, name: source(ctx, mode_).slice(0, 120), reason: `${reason}${rule.note ? ` (${rule.note})` : ''}` });
+		return new Set([rule.mode, rule.advanced]);
+	};
+	if (typeof type !== 'string' || typeof mode !== 'string' || typeof advanced !== 'boolean') return fail('`type`, `mode` or `advanced` is not written here: set `operators` by hand');
+	const operator = rule.map[type]?.[mode];
+	if (!operator) return fail(`\`${type}\` with \`${mode}\` needs a choice: set \`operators\` by hand`);
+	const q = ctx.text[(mode_.value as Node).start] === "'" ? "'" : '"';
+	const extra = rule.extra?.[`${type}.${mode}`];
+	const text = `${advanced ? `defaultOperator: ${q}${operator}${q}` : `operators: [${q}${operator}${q}]`}${extra ? `, ${extra}` : ''}`;
+	if (!ctx.edit.replace(mode_.start, mode_.end, text)) return new Set();
+	if (at.advanced >= 0) remove.add(at.advanced);
+	changed(ctx, mode_.start, { kind: 'item-operators', id, name: `${type} ${mode}${advanced ? ' (advanced)' : ''}`, to: text, check: false });
+	return new Set([rule.mode, rule.advanced]);
+}
+
 function editObject(ctx: Context, object: Node, calls: ObjectRules, prefix: string, id: string) {
 	const properties = object.properties as Node[];
 	const present = new Set(properties.map(keyName));
+	const remove = new Set<number>();
+	const dropped = new Map<number, string>();
+	const handled = !prefix && calls.operators ? editOperators(ctx, object, calls.operators, id, remove) : new Set<string>();
 	properties.forEach((property, index) => {
 		const key = keyName(property);
-		if (!key) return;
+		if (!key || handled.has(key)) return;
 		const path = prefix ? `${prefix}.${key}` : key;
 		if (calls.drop?.includes(path)) {
-			const [start, end] = propertyRange(ctx, properties, index);
-			if (ctx.edit.replace(start, end, '')) changed(ctx, property.start, { kind: 'call-key-dropped', id, name: path, note: calls.note, check: true });
+			remove.add(index);
+			dropped.set(index, path);
 			return;
 		}
 		const rewrite = calls.rewrite?.find((r) => r.key === path && new RegExp(r.match).test(source(ctx, property.value)));
@@ -563,6 +662,24 @@ function editObject(ctx: Context, object: Node, calls: ObjectRules, prefix: stri
 		}
 		if (value.type === 'ObjectExpression') editObject(ctx, value, calls, path, id);
 	});
+	const indexes = [...remove].sort((a, b) => a - b);
+	for (let i = 0; i < indexes.length; ) {
+		let j = i;
+		while (j + 1 < indexes.length && indexes[j + 1] === indexes[j] + 1) j++;
+		const [first, last] = [indexes[i], indexes[j]];
+		const [start, end] =
+			last < properties.length - 1
+				? [properties[first].start, properties[last + 1].start]
+				: first > 0
+					? [properties[first - 1].end, properties[last].end]
+					: [properties[first].start, properties[last].end];
+		if (ctx.edit.replace(start, end, ''))
+			for (let k = first; k <= last; k++) {
+				const path = dropped.get(k);
+				if (path) changed(ctx, properties[k].start, { kind: 'call-key-dropped', id, name: path, note: calls.note, check: true });
+			}
+		i = j + 1;
+	}
 }
 
 function editItems(ctx: Context, expression: Node, rules: ObjectRules, id: string, declarations: Map<string, Node>, seen: Set<Node>, depth = 0): boolean {
@@ -580,7 +697,7 @@ function editItems(ctx: Context, expression: Node, rules: ObjectRules, id: strin
 		case 'LogicalExpression':
 			return editItems(ctx, expression.right, rules, id, declarations, seen, depth + 1);
 		case 'CallExpression':
-			if (expression.callee.type === 'Identifier' && /^\$(state|derived)$/.test(expression.callee.name) && expression.arguments[0])
+			if (expression.callee.type === 'Identifier' && /^\$(state|derived|bindable)$/.test(expression.callee.name) && expression.arguments[0])
 				return editItems(ctx, expression.arguments[0], rules, id, declarations, seen, depth + 1);
 			return false;
 		case 'TSAsExpression':
@@ -625,11 +742,12 @@ function transformItems(ctx: Context, usages: { node: Node; v4: string }[], inst
 			const attr = (node.attributes as Node[]).find((a) => (a.type === 'Attribute' || a.type === 'BindDirective') && a.name === items.prop);
 			const expression = attr && (attr.type === 'BindDirective' ? attr.expression : attrExpression(attr));
 			if (!attr || !expression) continue;
-			const what = `(${[...(items.keys ?? []).map((k) => `${k.from} → ${k.to}`), ...(items.drop ?? []).map((d) => `${d} removed`)].join(', ')})${items.note ? `. ${items.note}` : ''}`;
+			const what = `(${[...(items.keys ?? []).map((k) => `${k.from} → ${k.to}`), ...(items.operators ? [`${items.operators.mode} and ${items.operators.advanced} → operators`] : []), ...(items.drop ?? []).map((d) => `${d} removed`)].join(', ')})${items.note ? `. ${items.note}` : ''}`;
 			const id = `${v4}/items/${items.prop}`;
 			const done = editItems(ctx, expression, items, id, declarations, seen);
 			const prop = expression.type === 'Identifier' && props.has(expression.name) ? expression.name : undefined;
-			if (prop && !reported.has(prop)) {
+			const nobodyPasses = done && declarations.has(prop ?? '') && ctx.passed !== null && !ctx.passed?.has(prop!);
+			if (prop && !reported.has(prop) && !nobodyPasses) {
 				reported.add(prop);
 				skip(ctx, attr.start, {
 					kind: 'item-keys',
@@ -642,19 +760,72 @@ function transformItems(ctx: Context, usages: { node: Node; v4: string }[], inst
 	}
 }
 
+function memberRename(rule: ComponentMigration, name: string) {
+	const to =
+		rule.props?.renamed?.find((r) => r.from === name)?.to ??
+		rule.props?.inverted?.find((r) => r.from === name)?.to ??
+		rule.snippets?.renamed?.find((r) => r.from === name)?.to ??
+		rule.events?.changed?.find((r) => r.name === name)?.to;
+	return to && to !== name && !to.includes(':') ? to : undefined;
+}
+
 function retypeMembers(ctx: Context, ast: Node, scope: Map<string, string>) {
+	const rename = (rules: ComponentMigration[], at: number, name: string) => {
+		const targets = new Set(rules.map((rule) => memberRename(rule, name)));
+		const to = targets.size === 1 ? [...targets][0] : undefined;
+		if (to && ctx.edit.replace(at, at + name.length, to))
+			changed(ctx, at, { kind: 'type-member', id: `${rules[0].from}/types/${name}`, name, to, check: false });
+	};
+	const before = (pos: number, size: number) => ctx.text.slice(Math.max(0, pos - size), pos);
+	const found = new Map<Node, ComponentMigration[]>();
 	visit(ast, (node) => {
-		if (node.type !== 'TSTypeQuery' || node.exprName?.type !== 'Identifier') return;
-		const rule = ctx.index.byV4.get(scope.get(node.exprName.name) ?? '');
-		if (!rule || !('files' in rule)) return;
-		const member = /^(?:<[^<>]*>)?\s*>\s*\[\s*(['"])(\w+)\1\s*\]/.exec(ctx.text.slice(node.end));
-		if (!member) return;
-		const name = member[2];
-		const to = rule.props?.renamed?.find((r) => r.from === name)?.to ?? rule.snippets?.renamed?.find((r) => r.from === name)?.to;
-		if (!to || to === name) return;
-		const at = node.end + member.index + member[0].lastIndexOf(name);
-		if (ctx.edit.replace(at, at + name.length, to))
-			changed(ctx, at, { kind: 'type-member', id: `${rule.from}/types/${name}`, name, to, check: false });
+		const query = node.type === 'TSTypeQuery' && node.exprName?.type === 'Identifier';
+		const reference = node.type === 'TSTypeReference' && node.typeName?.type === 'Identifier';
+		if ((!query && !reference) || !/\bComponentProps\s*<\s*$/.test(before(node.start, 40))) return;
+		const local = (query ? node.exprName.name : node.typeName.name) as string;
+		const name = scope.get(local);
+		if (!name) return;
+		const own = ctx.index.byV4.get(name);
+		const to = own?.to ?? (ctx.index.rules.v5.components[name] ? name : undefined);
+		if (!to) return;
+		const rules = own ? [own] : ctx.index.rules.components.filter((rule) => rule.to === to && !('files' in rule));
+		if (reference && ctx.edit.insert(node.start, 'typeof '))
+			changed(ctx, node.start, { kind: 'type-typeof', id: `${rules[0]?.from ?? to}/types/typeof`, name: local, to: `typeof ${local}`, check: false });
+		const args = (node.typeArguments?.params ?? []) as Node[];
+		const max = ctx.index.rules.v5.components[to]?.generics;
+		if (max !== undefined && args.length > max) {
+			const [start, end] = max === 0 ? [node.typeArguments.start, node.typeArguments.end] : [args[max - 1].end, args[args.length - 1].end];
+			if (ctx.edit.replace(start, end, ''))
+				changed(ctx, start, { kind: 'type-arguments', id: `${rules[0]?.from ?? to}/types/generics`, name: source(ctx, node.typeArguments), to: max ? `${max} type argument${max > 1 ? 's' : ''}` : 'none', note: `${to} takes ${max} type argument${max === 1 ? '' : 's'} in v5.`, check: false });
+		}
+		if (!rules.length) return;
+		found.set(node, rules);
+		const after = ctx.text.slice(node.end);
+		const member = /^\s*>\s*\[\s*(['"])(\w+)\1\s*\]/.exec(after);
+		if (member) {
+			rename(rules, node.end + member.index + member[0].lastIndexOf(member[2]), member[2]);
+			return;
+		}
+		if (!/\b(?:Omit|Pick)\s*<\s*ComponentProps\s*<\s*$/.test(before(node.start, 60))) return;
+		const keys = /^\s*>\s*,\s*((?:(['"])\w+\2\s*\|?\s*)+)>/.exec(after);
+		if (!keys) return;
+		const start = node.end + keys[0].indexOf(keys[1]);
+		for (const key of keys[1].matchAll(/(['"])(\w+)\1/g)) rename(rules, start + key.index + 1, key[2]);
+	});
+	const aliases = new Map<string, ComponentMigration[]>();
+	visit(ast, (node) => {
+		const type = node.type === 'TSTypeAliasDeclaration' ? node.typeAnnotation : undefined;
+		const rules = type?.type === 'TSTypeReference' && type.typeName?.name === 'ComponentProps' ? found.get(type.typeArguments?.params?.[0]) : undefined;
+		if (rules) aliases.set(node.id.name, rules);
+	});
+	if (!aliases.size) return;
+	const aliasOf = (n: Node | undefined) => (n?.type === 'TSTypeReference' && n.typeName?.type === 'Identifier' && !n.typeArguments ? aliases.get(n.typeName.name) : undefined);
+	const literals = (n: Node | undefined): Node[] =>
+		n?.type === 'TSLiteralType' && typeof n.literal.value === 'string' ? [n.literal] : n?.type === 'TSUnionType' ? (n.types as Node[]).flatMap(literals) : [];
+	visit(ast, (node) => {
+		const [target, keys] = node.type === 'TSIndexedAccessType' ? [node.objectType, node.indexType] : node.type === 'TSTypeReference' && /^(Omit|Pick)$/.test(node.typeName?.name ?? '') ? (node.typeArguments?.params ?? []) : [];
+		const rules = aliasOf(target);
+		if (rules) for (const literal of literals(keys)) rename(rules, literal.start + 1, literal.value);
 	});
 }
 
@@ -1114,6 +1285,7 @@ function transformUsage(
 	const unwrapped = (p.unwrap ?? []).map((u) => unwrapProp(ctx, node, u, id)).every(Boolean);
 	for (const c of p.collect ?? []) collectProps(ctx, node, c, present, id);
 	for (const u of p.unpack ?? []) unpackProp(ctx, node, u, p.values, present, id);
+	if (p.childIcon) childIconProp(ctx, node, p.childIcon, present, id);
 
 	for (const attr of attrs) {
 		if (attr === routed) continue;
@@ -1407,6 +1579,32 @@ function unwrapProp(ctx: Context, node: Node, rule: Unwrap, id: (path: string) =
 	return true;
 }
 
+function snippetsThrough(ctx: Context, node: Node, through: PassThrough, rule: ComponentMigration) {
+	const id = (path: string) => `${through.v4}/${path}`;
+	const blocks = ((node.fragment?.nodes ?? []) as Node[]).filter((c) => c.type === 'SnippetBlock');
+	const present = new Set<string>([...(node.attributes as Node[]).map((a) => a.name as string), ...blocks.map((c) => c.expression.name as string)]);
+	const renamed = (name: string) => rule.snippets?.renamed?.find((x) => x.from === name);
+	const rename = (pos: number, name: string, to: string, note: string | undefined, edit: () => boolean) => {
+		if (present.has(to) || !edit()) return;
+		present.add(to);
+		changed(ctx, pos, { kind: 'snippet-renamed', id: id(`snippets.renamed/${name}`), name, to, note, check: !!note });
+	};
+	for (const attr of node.attributes as Node[]) {
+		if (attr.type !== 'Attribute' || through.declared.has(attr.name)) continue;
+		const r = renamed(attr.name);
+		if (r) rename(attr.start, attr.name, r.to, r.note, () => renameAttr(ctx, attr, r.to, undefined));
+	}
+	for (const child of blocks) {
+		const name = child.expression.name as string;
+		const key = through.declared.has(name) ? through.snippets[name] : name;
+		if (!key) continue;
+		const r = renamed(key);
+		if (r && !through.declared.has(name)) rename(child.start, name, r.to, r.note, () => ctx.edit.replace(child.expression.start, child.expression.end, r.to));
+		const change = rule.snippets?.parameters?.find((x) => x.name === (r?.to ?? key) && x.params);
+		if (change) rewriteSnippetParams(ctx, child, change, !rule.props?.unwrap?.length, id(`snippets.parameters/${change.name}`));
+	}
+}
+
 function rewriteSnippetParams(ctx: Context, snippet: Node, change: SnippetChange, unwrapped: boolean, id: string) {
 	const pattern = (snippet.parameters as Node[] | undefined)?.[0];
 	if (!pattern) return;
@@ -1426,7 +1624,13 @@ function rewriteSnippetParams(ctx: Context, snippet: Node, change: SnippetChange
 		});
 		return hit;
 	};
-	for (const [key, { local }] of locals) if (change.params![key] === null && used(local)) return fail(`\`${key}\` is gone and the snippet uses it`);
+	const guards: HeaderGuards[] = [];
+	for (const [key, { local }] of locals) {
+		if (change.params![key] !== null || !used(local)) continue;
+		const plan = headerGuards(ctx, snippet.body, local);
+		if (!plan) return fail(`\`${key}\` is gone and the snippet uses it`);
+		guards.push(plan);
+	}
 	const members = (change.members ?? []).filter((m) => locals.has(m.param));
 	if (members.some((m) => m.to === null) && !unwrapped) return fail('the rows were not converted, so the members stay as they are');
 	if (pattern.typeAnnotation) return fail('the parameter has a type: rename it by hand');
@@ -1437,6 +1641,16 @@ function rewriteSnippetParams(ctx: Context, snippet: Node, change: SnippetChange
 		return [to !== undefined && to !== key ? `${to}: ${source(ctx, property.value)}` : source(ctx, property)];
 	});
 	if (!ctx.edit.replace(pattern.start, pattern.end, `{ ${kept.join(', ')} }`)) return;
+	for (const plan of guards) for (const [start, end, text] of plan.edits) ctx.edit.replace(start, end, text);
+	const header = guards.flatMap((g) => g.header);
+	if (header.length)
+		changed(ctx, snippet.start, {
+			kind: 'snippet-parameters',
+			id,
+			name: change.name,
+			note: `The v4 branch for the header cell (\`index\` -1) was removed with its content: ${header.map((h) => `\`${h.slice(0, 80)}\``).join(', ')}. The column header is drawn by the library now.`,
+			check: true
+		});
 	for (const m of members) {
 		const local = locals.get(m.param)!.local;
 		visit(snippet.body, (n) => {
@@ -1446,6 +1660,80 @@ function rewriteSnippetParams(ctx: Context, snippet: Node, change: SnippetChange
 		});
 	}
 	changed(ctx, snippet.start, { kind: 'snippet-parameters', id, name: change.name, to: change.v5, note: change.note, check: false });
+}
+
+interface HeaderGuards {
+	edits: [number, number, string][];
+	header: string[];
+}
+
+function headerGuards(ctx: Context, body: Node, local: string): HeaderGuards | undefined {
+	const isLocal = (n: Node) => n.type === 'Identifier' && n.name === local;
+	const minusOne = (n: Node) =>
+		(n.type === 'UnaryExpression' && n.operator === '-' && n.argument.type === 'Literal' && n.argument.value === 1) || (n.type === 'Literal' && n.value === -1);
+	const zero = (n: Node) => n.type === 'Literal' && n.value === 0;
+	const compare = (n: Node, ops: string[], flipped: string[], value: (n: Node) => boolean) =>
+		n.type === 'BinaryExpression' &&
+		((ops.includes(n.operator) && isLocal(n.left) && value(n.right)) || (flipped.includes(n.operator) && value(n.left) && isLocal(n.right)));
+	const row = (n: Node) => compare(n, ['!==', '!=', '>'], ['!==', '!=', '<'], minusOne) || compare(n, ['>='], ['<='], zero);
+	const headerCell = (n: Node) => compare(n, ['===', '=='], ['===', '=='], minusOne) || compare(n, ['<'], ['>'], zero);
+	const and = (n: Node): Node[] => (n.type === 'LogicalExpression' && n.operator === '&&' ? [...and(n.left), ...and(n.right)] : [n]);
+	const mentions = (n: Node) => {
+		let hit = false;
+		visit(n, (c) => {
+			if (isLocal(c)) hit = true;
+		});
+		return hit;
+	};
+	const span = (fragment: Node | null | undefined) => {
+		const nodes = ((fragment?.nodes ?? []) as Node[]).filter((c) => !(c.type === 'Text' && !c.data.trim()));
+		return nodes.length ? ([nodes[0].start, nodes[nodes.length - 1].end] as const) : undefined;
+	};
+	const wrap = (n: Node) => (/^(LogicalExpression|ConditionalExpression|AssignmentExpression|SequenceExpression)$/.test(n.type) && n.operator !== '&&' ? `(${source(ctx, n)})` : source(ctx, n));
+	const plan: HeaderGuards = { edits: [], header: [] };
+	const covered: [number, number][] = [];
+	let failed = false;
+	visit(body, (n) => {
+		if (failed || n.type !== 'IfBlock' || !mentions(n.test)) return;
+		if (n.elseif) return void (failed = true);
+		const alternate = n.alternate as Node | null;
+		const elseIf = (alternate?.nodes as Node[] | undefined)?.find((c) => c.type === 'IfBlock' && c.elseif);
+		const ops = and(n.test);
+		if (ops.length === 1 && headerCell(ops[0])) {
+			const cell = span(n.consequent);
+			if (cell) plan.header.push(ctx.text.slice(cell[0], cell[1]).replace(/\s+/g, ' '));
+			covered.push([n.start, elseIf ? elseIf.test.start : (span(alternate)?.[0] ?? n.end)]);
+			if (elseIf) plan.edits.push([n.start, elseIf.test.start, '{#if ']);
+			else {
+				const kept = span(alternate);
+				if (!kept) plan.edits.push([n.start, n.end, '']);
+				else plan.edits.push([n.start, kept[0], ''], [kept[1], n.end, '']);
+				if (kept) covered.push([kept[1], n.end]);
+			}
+			return false;
+		}
+		const guard = ops.filter(row);
+		if (!guard.length || ops.some((op) => !guard.includes(op) && mentions(op))) return void (failed = true);
+		for (const op of guard) covered.push([op.start, op.end]);
+		const rest = ops.filter((op) => !guard.includes(op));
+		if (rest.length) {
+			plan.edits.push([n.test.start, n.test.end, rest.map(wrap).join(' && ')]);
+			return;
+		}
+		if (elseIf) return void (failed = true);
+		const kept = span(n.consequent);
+		if (!kept) plan.edits.push([n.start, n.end, '']);
+		else plan.edits.push([n.start, kept[0], ''], [kept[1], n.end, '']);
+		const cell = span(alternate);
+		if (cell) plan.header.push(ctx.text.slice(cell[0], cell[1]).replace(/\s+/g, ' '));
+		if (alternate && kept) covered.push([kept[1], n.end]);
+	});
+	if (failed) return undefined;
+	let outside = false;
+	visit(body, (n, parent, key) => {
+		if (isLocal(n) && isReference(n, parent, key) && !covered.some(([a, b]) => n.start >= a && n.end <= b)) outside = true;
+	});
+	return outside ? undefined : plan;
 }
 
 function dropClosingHandler(ctx: Context, node: Node, attr: Node, rule: Removal, id: string) {
@@ -1536,10 +1824,87 @@ function unpackProp(ctx: Context, node: Node, rule: Unpack, values: ValueChange[
 	changed(ctx, attr.start, { kind: 'prop-unpacked', id: id(`props.unpack/${rule.from}`), name: rule.from, to: moved.join(', '), note: rule.note, check: moved.some((m) => m.endsWith(' removed')) });
 }
 
+function childIconProp(ctx: Context, node: Node, rule: ChildIcon, present: Map<string, Node>, id: (path: string) => string) {
+	if (present.has(rule.to)) return;
+	const nodes = (node.fragment?.nodes ?? []) as Node[];
+	const children = nodes.filter((n) => !(n.type === 'Text' && !n.data.trim()));
+	const child = children.length === 1 ? children[0] : undefined;
+	if (child?.type !== 'Component' || ctx.scope?.get(child.name) !== 'Icon') return;
+	const attrs = child.attributes as Node[];
+	if (attrs.length !== 1 || attrs[0].type !== 'Attribute') return;
+	const attr = attrs[0];
+	const text = attrText(attr);
+	const expression = attrExpression(attr);
+	const value =
+		attr.name === 'path'
+			? expression
+				? source(ctx, expression)
+				: text !== undefined
+					? JSON.stringify(text)
+					: undefined
+			: attr.name === 'name'
+				? expression
+					? source(ctx, expression)
+					: text !== undefined
+						? iconIdentifier(ctx, text, attr.start)
+						: undefined
+				: undefined;
+	if (!value) return;
+	const own = node.attributes as Node[];
+	const at = own.length ? Math.max(...own.map((a) => a.end)) : node.start + 1 + node.name.length;
+	if (!ctx.edit.replace(nodes[0].start, nodes[nodes.length - 1].end, '')) return;
+	ctx.edit.insert(at, ` ${rule.to}={${value}}`);
+	if (attr.name === 'name' && !expression) ctx.icons.add(value);
+	present.set(rule.to, child);
+	changed(ctx, child.start, { kind: 'child-icon', id: id('props.childIcon'), name: 'Icon', to: rule.to, note: rule.note, check: !!rule.note });
+}
+
 function eventMapping(ctx: Context, rule: ComponentMigration | undefined, name: string) {
 	const ev = rule?.events?.changed?.find((e) => e.name === name);
 	const mapping: Mapping = ev?.argument ?? ctx.index.rules.global.callbacks.argument;
 	return { ev, mapping };
+}
+
+function eventToHref(ctx: Context, attr: Node, href: { prop: string; param: string }, functions: Map<string, Node>, id: string, name: string): boolean {
+	const expression = attrExpression(attr);
+	let fn: Node | undefined;
+	let named: string | undefined;
+	if (expression?.type === 'ArrowFunctionExpression' || expression?.type === 'FunctionExpression') fn = expression;
+	else if (expression?.type === 'Identifier' && functions.has(expression.name) && ctx.references.get(expression.name) === 1) {
+		fn = functions.get(expression.name);
+		named = expression.name;
+	}
+	if (!fn || (fn.params as Node[]).length !== 1 || fn.params[0].type !== 'Identifier') return false;
+	const param = fn.params[0].name as string;
+	let body = fn.body as Node;
+	if (body.type === 'BlockStatement') {
+		if ((body.body as Node[]).length !== 1 || body.body[0].type !== 'ExpressionStatement') return false;
+		body = body.body[0].expression;
+	}
+	if (body.type === 'AwaitExpression') body = body.argument;
+	if (body.type !== 'CallExpression' || body.callee.type !== 'Identifier' || body.callee.name !== 'goto' || (body.arguments as Node[]).length !== 1) return false;
+	const original = source(ctx, body.arguments[0]);
+	if (/\brow\b/.test(original)) return false;
+	const chain = href.param.split('.').map((part) => `\\??\\.${part}`).join('');
+	const url = original.replace(new RegExp(`\\b${param}${chain}\\b`, 'g'), 'row');
+	if (url === original || new RegExp(`\\b${param}\\b`).test(url)) return false;
+	if (!ctx.edit.replace(attr.start, attr.end, `${href.prop}={(row) => ${url}}`)) return false;
+	const statement = named ? ((ctx.instance?.body ?? []) as Node[]).find((s) => s.start <= fn.start && fn.end <= s.end) : undefined;
+	if (statement && (statement.type === 'FunctionDeclaration' || (statement.type === 'VariableDeclaration' && (statement.declarations as Node[]).length === 1))) {
+		let start = statement.start;
+		while (start > 0 && /[ \t]/.test(ctx.text[start - 1])) start--;
+		const end = ctx.text[statement.end] === '\n' ? statement.end + 1 : statement.end;
+		ctx.edit.replace(start, end, '');
+	}
+	changed(ctx, attr.start, {
+		kind: 'event-to-href',
+		id,
+		name,
+		to: href.prop,
+		note: `The handler only opened a page: the row is now a link (Ctrl-click and middle click open a new tab, SvelteKit preloads it)${named ? `, and \`${named}\` was deleted` : ''}.`,
+		check: true
+	});
+	return true;
 }
 
 function transformEvent(
@@ -1556,6 +1921,7 @@ function transformEvent(
 	const name = key ?? (attr.name as string);
 	if (rule?.events?.removed?.some((e) => e.name === name)) return;
 	const { ev, mapping } = eventMapping(ctx, rule, name);
+	if (ev?.href && attr.type === 'Attribute' && !present.has(ev.href.prop) && eventToHref(ctx, attr, ev.href, functions, `${v4}/events.changed/${name}`, name)) return;
 	const expression = attrExpression(attr);
 	const id = `${v4}/events.${ev ? 'changed' : 'argument'}/${name}`;
 	const report = (pos: number, reason: string) => skip(ctx, pos, { kind: 'event-argument', id, name, reason });
@@ -1716,6 +2082,7 @@ interface StyleRename {
 	id: string;
 	note?: string;
 	drop?: boolean;
+	dropWhen?: { match: string; note: string };
 }
 
 const valueOf = (ctx: Context, attr: Node) =>
@@ -1734,8 +2101,9 @@ function renameStyles(ctx: Context, node: Node, lookup: (name: string) => StyleR
 		if ((attr.type !== 'Attribute' && attr.type !== 'StyleDirective') || !attr.name.startsWith('--')) continue;
 		const rename = lookup(attr.name);
 		if (!rename) continue;
-		if (rename.drop) {
-			if (removeAttr(ctx, attr)) changed(ctx, attr.start, { kind: 'css-var-removed', id: rename.id, name: attr.name, note: rename.note, check: false });
+		const dropWhen = rename.dropWhen && new RegExp(rename.dropWhen.match).test(valueOf(ctx, attr)) ? rename.dropWhen : undefined;
+		if (rename.drop || dropWhen) {
+			if (removeAttr(ctx, attr)) changed(ctx, attr.start, { kind: 'css-var-removed', id: rename.id, name: attr.name, note: dropWhen?.note ?? rename.note, check: !!dropWhen });
 			continue;
 		}
 		const at = attr.start + (attr.type === 'StyleDirective' ? 6 : 0);
@@ -1773,6 +2141,7 @@ function transformSvelte(ctx: Context) {
 	transformCalls(ctx, roots, localCallNames(programs, ctx));
 	transformCallResults(ctx, roots, localCallNames(programs, ctx));
 	const scope = renameImports(roots, programs, ctx);
+	ctx.scope = scope;
 	const functions = functionsByName(ast.instance ? [ast.instance.content] : []);
 
 	const usages: { node: Node; v4: string }[] = [];
@@ -1782,7 +2151,34 @@ function transformSvelte(ctx: Context) {
 		if (v4) usages.push({ node, v4 });
 	});
 
+	const appImports = new Map<string, string>();
+	for (const program of programs)
+		for (const decl of program.body as Node[])
+			if (decl.type === 'ImportDeclaration' && /\.svelte$/.test(decl.source.value))
+				for (const spec of decl.specifiers as Node[]) if (spec.type === 'ImportDefaultSpecifier') appImports.set(spec.local.name, decl.source.value);
+	const via: { node: Node; through: PassThrough; events: { attr: Node; key: string }[] }[] = [];
+	visit(ast.fragment, (node) => {
+		if (node.type !== 'Component' || scope.has(node.name)) return;
+		const source = appImports.get(node.name);
+		const through = source ? ctx.passThrough?.(source) : undefined;
+		if (!through) return;
+		const events = (node.attributes as Node[]).flatMap((attr) => {
+			if (attr.type !== 'Attribute' || !/^on[a-z]/.test(attr.name)) return [];
+			const key = through.declared.has(attr.name) ? through.forwarded[attr.name] : attr.name;
+			return key ? [{ attr, key }] : [];
+		});
+		via.push({ node, through, events });
+	});
+
 	const handlerUses = new Map<string, HandlerUse[]>();
+	for (const { through, events } of via)
+		for (const { attr, key } of events) {
+			const expression = attrExpression(attr);
+			if (expression?.type !== 'Identifier') continue;
+			const list = handlerUses.get(expression.name) ?? [];
+			list.push({ attr, mapping: eventMapping(ctx, ctx.index.byV4.get(through.v4), key).mapping });
+			handlerUses.set(expression.name, list);
+		}
 	for (const { node, v4 } of usages)
 		for (const attr of node.attributes as Node[]) {
 			const directive = attr.type === 'OnDirective';
@@ -1802,6 +2198,17 @@ function transformSvelte(ctx: Context) {
 	retypeMembers(ctx, ast, scope);
 
 	const done = new Set<Node>();
+	for (const { node, through, events } of via) {
+		const rule = ctx.index.byV4.get(through.v4);
+		if (!rule) continue;
+		const present = new Map((node.attributes as Node[]).map((a) => [a.name as string, a]));
+		for (const { attr, key } of events) {
+			const ev = rule.events?.changed?.find((e) => e.name === key);
+			if (through.declared.has(attr.name)) for (const name of [ev?.to, ev?.href?.prop]) if (name) present.set(name, attr);
+			transformEvent(ctx, attr, through.v4, rule, present, functions, handlerUses, done, key);
+		}
+		snippetsThrough(ctx, node, through, rule);
+	}
 	const libraryRanges: [number, number][] = [];
 	for (const { node, v4 } of usages) {
 		for (const attr of node.attributes as Node[]) libraryRanges.push([attr.start, attr.end]);
@@ -1822,7 +2229,7 @@ function transformSvelte(ctx: Context) {
 			const own = rule?.cssVars?.renamed?.find((x) => x.from === name);
 			const dropped = rule?.cssVars?.removed?.find((x) => x.name === name && x.drop);
 			if (dropped) return { to: '', id: `${v4}/cssVars.removed/${name}`, note: dropped.note, drop: true };
-			return own ? { to: own.to, id: `${v4}/cssVars.renamed/${name}`, note: own.note } : global(name);
+			return own ? { to: own.to, id: `${v4}/cssVars.renamed/${name}`, note: own.note, dropWhen: own.dropWhen } : global(name);
 		});
 	});
 
@@ -1881,7 +2288,56 @@ function unusedCopies(dir: string, paths: string[], copies: string[], text: (pat
 	return unused;
 }
 
-function themeLeftovers(dir: string, paths: string[], text: (path: string) => string, result: CodemodResult): string[] {
+function dropThemeChunk(text: string): { text: string; line: number } | undefined {
+	let ast: Node;
+	try {
+		ast = parse(`${SCRIPT_OPEN}${text}${SCRIPT_CLOSE}`, { modern: true }) as unknown as Node;
+	} catch {
+		return undefined;
+	}
+	const offset = SCRIPT_OPEN.length;
+	const onlyTheme = (fn: Node) => {
+		const html = fn.params[0]?.type === 'ObjectPattern' ? (fn.params[0].properties as Node[]).find((p) => keyName(p) === 'html')?.value?.name : undefined;
+		if (!html) return false;
+		const replaces = (node: Node | undefined) =>
+			node?.type === 'CallExpression' &&
+			node.callee.type === 'MemberExpression' &&
+			node.callee.object.type === 'Identifier' &&
+			node.callee.object.name === html &&
+			node.callee.property.name === 'replace' &&
+			node.arguments[0]?.type === 'Literal' &&
+			node.arguments[0].value === '%theme%';
+		if (fn.body.type !== 'BlockStatement') return replaces(fn.body);
+		const [first, second, ...rest] = fn.body.body as Node[];
+		return (
+			!rest.length &&
+			first?.type === 'ExpressionStatement' &&
+			first.expression.type === 'AssignmentExpression' &&
+			first.expression.left.name === html &&
+			replaces(first.expression.right) &&
+			second?.type === 'ReturnStatement' &&
+			second.argument?.name === html
+		);
+	};
+	let found: { start: number; end: number; line: number } | undefined;
+	visit(ast.instance?.content, (node) => {
+		if (found || node.type !== 'CallExpression' || (node.arguments as Node[]).length !== 2 || node.arguments[1].type !== 'ObjectExpression') return;
+		const properties = node.arguments[1].properties as Node[];
+		const index = properties.findIndex((p) => keyName(p) === 'transformPageChunk');
+		const value = properties[index]?.value;
+		if (!value || !/Function/.test(value.type) || !onlyTheme(value)) return;
+		const line = text.slice(0, properties[index].start - offset).split('\n').length;
+		if (properties.length === 1) found = { start: node.arguments[0].end, end: node.end - 1, line };
+		else {
+			const next = properties[index + 1];
+			found = next ? { start: properties[index].start, end: next.start, line } : { start: properties[index - 1].end, end: properties[index].end, line };
+		}
+	});
+	if (!found) return undefined;
+	return { text: text.slice(0, found.start - offset) + text.slice(found.end - offset), line: found.line };
+}
+
+function themeLeftovers(dir: string, paths: string[], text: (path: string) => string, result: CodemodResult, outputs: Map<string, string>): string[] {
 	const html = existsSync(join(dir, 'src/app.html')) ? readFileSync(join(dir, 'src/app.html'), 'utf8') : '';
 	if (!html || html.includes('%theme%')) return [];
 	const out: string[] = [];
@@ -1900,7 +2356,19 @@ function themeLeftovers(dir: string, paths: string[], text: (path: string) => st
 					reason: 'the light/dark choice is kept by rememberAppearance(): replace this toggle with ModeSwitch and remove the call; the endpoint goes when nothing calls it'
 				});
 	const hooks = paths.find((path) => /src[\\/]hooks\.server\.(ts|js)$/.test(path));
-	if (hooks && text(hooks).includes('%theme%'))
+	const dropped = hooks && text(hooks).includes('%theme%') ? dropThemeChunk(text(hooks)) : undefined;
+	if (hooks && dropped && !dropped.text.includes('%theme%')) {
+		outputs.set(hooks, dropped.text);
+		result.changes.push({
+			file: relative(dir, hooks),
+			line: dropped.line,
+			kind: 'theme-cookie',
+			id: 'local/ThemeSwitch/hooks',
+			name: '%theme%',
+			note: 'app.html no longer has %theme%: its replacement, which read the `theme` cookie, was removed. The mode is now saved in localStorage by ModeSwitch: users who had chosen light or dark choose again once.',
+			check: false
+		});
+	} else if (hooks && text(hooks).includes('%theme%'))
 		result.skipped.push({
 			file: relative(dir, hooks),
 			line: text(hooks).slice(0, text(hooks).indexOf('%theme%')).split('\n').length,
@@ -1940,6 +2408,36 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 	const importsCopy = (text: string) => [...copyNames].some((name) => text.includes(name));
 	const localUsages = new Map<string, number>();
 	const outputs = new Map<string, string>();
+	const passed = new Map<string, Set<string> | null>();
+	for (const path of paths) {
+		if (!path.endsWith('.svelte') || dissolved.deleted.includes(path)) continue;
+		const scan = scanSvelte(dissolved.texts.get(path) ?? texts.get(path)!);
+		if (scan.error) continue;
+		const targets = new Map(
+			scan.imports
+				.filter((i) => i.imported === 'default' && i.source.endsWith('.svelte'))
+				.map((i) => [i.local, resolveSource(dir, path, i.source, aliases)])
+		);
+		for (const node of scan.components) {
+			const target = targets.get(node.tag);
+			if (!target) continue;
+			if (node.attrs.some((a) => a.kind === 'spread')) passed.set(target, null);
+			else if (passed.get(target) !== null) passed.set(target, new Set([...(passed.get(target) ?? []), ...node.attrs.map((a) => a.name)]));
+		}
+	}
+	const passThroughs = new Map<string, PassThrough>();
+	for (let round = 0, found = true; found && round < 5; round++) {
+		found = false;
+		for (const path of paths) {
+			if (!path.endsWith('.svelte') || dissolved.deleted.includes(path) || copies.has(path) || passThroughs.has(path)) continue;
+			const inner = (source: string) => {
+				const target = resolveSource(dir, path, source, aliases);
+				return target && target !== path ? passThroughs.get(target) : undefined;
+			};
+			const through = passThroughOf(dissolved.texts.get(path) ?? texts.get(path)!, index, inner);
+			if (through) passThroughs.set(path, through), (found = true);
+		}
+	}
 	const pages = new Set(paths.map((path) => pageUrl(relative(dir, path))).filter((url) => url !== undefined));
 
 	for (const path of paths) {
@@ -1979,6 +2477,11 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 				return target && rule && target !== path ? { path: target, rule } : undefined;
 			},
 			localUsages,
+			passed: passed.has(path) ? passed.get(path)! : new Set(),
+			passThrough: (from) => {
+				const target = resolveSource(dir, path, from, aliases);
+				return target && target !== path ? passThroughs.get(target) : undefined;
+			},
 			lets: new Set(),
 			parent: parentPage(rel, pages)
 		};
@@ -1994,7 +2497,7 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 
 	const unused = unusedCopies(dir, paths, [...copies.keys()], (path) => outputs.get(path) ?? dissolved.texts.get(path) ?? texts.get(path)!, new Set(dissolved.deleted), aliases);
 	const finalText = (path: string) => (unused.has(path) || dissolved.deleted.includes(path) ? '' : (outputs.get(path) ?? dissolved.texts.get(path) ?? texts.get(path) ?? ''));
-	for (const path of themeLeftovers(dir, paths, finalText, result)) unused.add(path);
+	for (const path of themeLeftovers(dir, paths, finalText, result, outputs)) unused.add(path);
 	const dead = new Set(index.rules.global.deadFiles ?? []);
 	const candidates = paths.filter(
 		(path) => dead.has(basename(path)) && /[\\/]src[\\/]lib[\\/]components[\\/]/.test(path) && !copies.has(path) && !unused.has(path)
@@ -2025,6 +2528,10 @@ export function codemod(dir: string, index: RuleIndex, options: CodemodOptions =
 		if (options.write) writeFileSync(path, after);
 	}
 	result.deleted.sort();
+	const gone = new Set(result.deleted);
+	result.changes = result.changes.filter((c) => !c.check || !gone.has(c.file));
+	result.skipped = result.skipped.filter((s) => !gone.has(s.file));
+	result.defaults = result.defaults.filter((d) => !gone.has(d.file));
 	if (!available && result.changes.some((c) => c.kind === 'icon-literal'))
 		result.skipped.push({ file: 'package.json', line: 1, kind: 'icon-unknown', id: 'icons/unknown', name: MDI, reason: '@mdi/js is not installed: icon names were not checked' });
 	return result;

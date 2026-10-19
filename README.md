@@ -107,7 +107,7 @@ The migration happens in four steps. Run them inside the app folder:
 | 1. Analyze | `npx @likable-hair/svelte-migrate analyze .` | Writes a report of what will change. Touches nothing. |
 | 2. Setup | `npx @likable-hair/svelte-migrate setup .` | Creates a new branch, installs version 5, prepares styles, fonts, language, theme and the AI assistant. |
 | 3. Codemod | `npx @likable-hair/svelte-migrate codemod .` | Rewrites the code automatically: new names, new icons, old local copies of components replaced by the library ones. |
-| 4. Next | `npx @likable-hair/svelte-migrate next .` | Shows what is left to fix by hand, one file at a time, with an explanation for each point. Repeat until nothing is left. |
+| 4. Next | `npx @likable-hair/svelte-migrate next .` | Shows what is left to fix by hand, one file at a time, with an explanation for each point. Repeat until no errors are left and every point to write has been done once. |
 
 At the end, `next` lists the **pages to try** in the browser and the things that **look or behave differently**, so you know what to check.
 
@@ -119,7 +119,7 @@ At the end, `next` lists the **pages to try** in the browser and the things that
 
 ### Letting an AI assistant do the migration
 
-The tool does the mechanical part (steps 1 to 3). What `next` lists afterwards needs judgment, and an AI assistant such as Claude Code can do it by itself: it fixes one file at a time, runs `next` again, and stops when nothing is left. **What stays with you**: trying the pages it lists at the end, and committing.
+The tool does the mechanical part (steps 1 to 3). What `next` lists afterwards needs judgment, and an AI assistant such as Claude Code can do it by itself: it fixes one file at a time, runs `next` again, and stops when no errors are left and it has gone through every point to write (the ones the tool cannot verify stay listed after they are done). **What stays with you**: trying the pages it lists at the end, and committing.
 
 1. Do steps 1 and 2 yourself (analyze and setup). Setup also gives the assistant the migration instructions and access to the tool.
 2. Open the assistant in the app folder.

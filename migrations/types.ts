@@ -4,6 +4,7 @@ export interface Rename {
 	native?: true;
 	scoped?: true;
 	note?: string;
+	dropWhen?: { match: string; note: string };
 }
 
 export interface Removal {
@@ -62,6 +63,11 @@ export interface Collect {
 	note?: string;
 }
 
+export interface ChildIcon {
+	to: string;
+	note?: string;
+}
+
 export interface Unpack {
 	from: string;
 	keys: { key: string; to: string }[];
@@ -83,6 +89,7 @@ export interface PropRules {
 	removed?: Removal[];
 	changed?: Changed[];
 	toCssVar?: PropToCssVar[];
+	childIcon?: ChildIcon;
 	defaults?: DefaultChange[];
 	values?: ValueChange[];
 	types?: TypeChange[];
@@ -98,6 +105,7 @@ export interface PropRules {
 export interface EventChange {
 	name: string;
 	to?: string;
+	href?: { prop: string; param: string };
 	argument?: Record<string, string | null>;
 	type?: string;
 	note?: string;
@@ -134,6 +142,8 @@ export interface ManualTrigger {
 	events?: string[];
 	snippets?: string[];
 	cssVars?: string[];
+	reads?: string[];
+	contains?: string[];
 }
 
 export interface ManualStep {
@@ -157,6 +167,13 @@ export interface ComponentMigration {
 	manual?: ManualStep[];
 	items?: ItemRules[];
 	added?: string[];
+	appDefaults?: AppDefault[];
+}
+
+export interface AppDefault {
+	cssVar: string;
+	value: string;
+	note: string;
 }
 
 export interface CallRules {
@@ -202,6 +219,16 @@ export interface ItemRules {
 	parameters?: ParameterRule[];
 	rewrite?: { key: string; match: string; to: string; value: string }[];
 	byHand?: { key: string; note: string }[];
+	operators?: OperatorsRule;
+	note?: string;
+}
+
+export interface OperatorsRule {
+	type: string;
+	mode: string;
+	advanced: string;
+	map: Record<string, Record<string, string | null>>;
+	extra?: Record<string, string>;
 	note?: string;
 }
 

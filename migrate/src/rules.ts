@@ -71,3 +71,15 @@ export function indexRules(rules: CompiledRules): RuleIndex {
 export function loadRules(file: URL | string = new URL('../rules/v4-to-v5.json', import.meta.url)) {
 	return indexRules(JSON.parse(readFileSync(file, 'utf8')) as CompiledRules);
 }
+
+export function componentRules(index: RuleIndex, name: string): string {
+	const wanted = name.trim().toLowerCase();
+	const rules = index.rules.components.filter(
+		(rule) => rule.from.toLowerCase() === wanted || rule.to.toLowerCase() === wanted
+	);
+	if (!rules.length) {
+		const names = [...new Set(index.rules.components.map((r) => r.from))].sort();
+		return `No migration rule for "${name}". v4 components with rules: ${names.join(', ')}`;
+	}
+	return rules.map((rule) => `## ${rule.from} → ${rule.to}\n\n\`\`\`json\n${JSON.stringify(rule, null, 2)}\n\`\`\``).join('\n\n');
+}

@@ -1,4 +1,30 @@
-import type { ComponentMigration, Removal } from '../types.js';
+import type { ComponentMigration, ItemRules, Removal } from '../types.js';
+
+export const filterFieldItems = {
+	keys: [{ from: 'tabName', to: 'category' }],
+	operators: {
+		type: 'type',
+		mode: 'mode',
+		advanced: 'advanced',
+		map: {
+			string: { equal: 'is', contains: 'contains', like: 'contains', ilike: 'contains' },
+			number: { equal: 'eq', greater: 'gt', lower: 'lt', between: 'between' },
+			date: { equal: 'is', between: 'between', lower: 'before', greater: null },
+			select: { equal: 'in', different: 'notIn' },
+			bool: { equal: 'isTrue' }
+		},
+		extra: { 'string.like': 'caseSensitive: true' },
+		note: 'date `greater`: `after` is now after the whole chosen day, `onOrAfter` keeps including it (see `filters-modes`)'
+	},
+	drop: ['iconColor', 'betweenModeSingleTextField', 'hidden'],
+	byHand: [
+		{ key: 'value', note: 'an initial condition: write it in `filterValue` with `createFilters([filterCondition(...)])` (see `data-table-filters`)' },
+		{ key: 'active', note: 'an initial condition: write it in `filterValue` with `createFilters([filterCondition(...)])` (see `data-table-filters`)' },
+		{ key: 'modify', note: 'custom query logic: see `filters-modify`' },
+		{ key: 'description', note: 'on a `bool` field the v4 checkbox text: `trueLabel` when it names the true state, otherwise drop it' }
+	],
+	note: 'each v4 `Filter` becomes a `FilterField`: see `filters-definitions` and `filters-modes`'
+} satisfies Omit<ItemRules, 'prop'>;
 
 const both = (
 	name: string,
@@ -97,7 +123,8 @@ export default {
 			},
 			{
 				name: 'editFilterMode',
-				note: 'Both modes are replaced by one UI: "+ Add filter" opens the field list and then the card of one condition (like one-edit), the "Filters" button opens a panel with every condition in rows (instead of the multi-edit dialog of cards). Drop it.'
+				note: 'Both modes are replaced by one UI: "+ Add filter" opens the field list and then the card of one condition (like one-edit), the "Filters" button opens a panel with every condition in rows (instead of the multi-edit dialog of cards).',
+				drop: true
 			},
 			{
 				name: 'drawerSpace',
@@ -287,7 +314,7 @@ export default {
 			kind: 'edit',
 			summary: 'v4 `mode` values become v5 operator names, per type.',
 			action:
-				'string: `equal` → `is`; `contains` → `contains`; `like` → `like`, `ilike` → `ilike` (same JSON as v4: the value is sent without `%`). On backends that add `%` themselves (variants A–E, see `global-filter-backends`) v4 like/ilike behaved as "contains": prefer `contains` (it sends `ilike "%v%"` with `%` and `_` escaped, same results there); on epass / new-vigipass (no automatic `%`) v4 ilike was a case-insensitive equality: keep `ilike`. number: `equal` → `eq`, `greater` → `gt`, `lower` → `lt`, `between` → `between` (open ends as in v4). date: `equal` → `is` (whole local day, same JSON), `between` → `between` (whole days, same JSON), `lower` → `before` (< start of the day: same results as v4), `greater` → `after`, which is now after the **whole** chosen day (v4 compared the raw midnight value, so the chosen day was included for timestamp columns): use `onOrAfter` to keep including it. Add `dateOnly: true` to fields on `date` columns (no time): the query then compares `yyyy-MM-dd` strings. select: `equal` → `in` (one value: `where(column, "=", v)`; several: `whereIn`; v4 sent a group of `orWhere`), `different` → `notIn` (`<>` or `notWhereIn`). bool `equal` → `isTrue`.',
+				'string: `equal` → `is`; `contains` → `contains`; `ilike` → `contains`; `like` → `contains` with `caseSensitive: true` on the field. `contains` sends `ilike "%v%"` (`like` with `caseSensitive`) with `%` and `_` escaped: the same results as v4 on the backends that wrapped like/ilike values in `%` themselves (see `global-filter-backends`); the backends that did not get the updated `FilterModifierApplier` anyway. number: `equal` → `eq`, `greater` → `gt`, `lower` → `lt`, `between` → `between` (open ends as in v4). date: `equal` → `is` (whole local day, same JSON), `between` → `between` (whole days, same JSON), `lower` → `before` (< start of the day: same results as v4), `greater` → `after`, which is now after the **whole** chosen day (v4 compared the raw midnight value, so the chosen day was included for timestamp columns): use `onOrAfter` to keep including it. Add `dateOnly: true` to fields on `date` columns (no time): the query then compares `yyyy-MM-dd` strings. select: `equal` → `in` (one value: `where(column, "=", v)`; several: `whereIn`; v4 sent a group of `orWhere`), `different` → `notIn` (`<>` or `notWhereIn`). bool `equal` → `isTrue`.',
 			when: { props: ['filters'] }
 		},
 		{

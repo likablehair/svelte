@@ -13,10 +13,24 @@ const locals = import.meta.glob<LocalMigration>('/migrations/v4-to-v5/local/*.ts
 	eager: true
 });
 
-function componentApi(slug: string): ComponentApi {
+function genericsOf(file: string): number {
+	const list = /generics="([^"]*)"/.exec(readFileSync(new URL(`../../src/lib/${file}`, import.meta.url), 'utf8'))?.[1];
+	if (!list?.trim()) return 0;
+	let depth = 0;
+	let count = 1;
+	for (const char of list) {
+		if ('<({['.includes(char)) depth++;
+		else if ('>)}]'.includes(char)) depth--;
+		else if (char === ',' && depth === 0) count++;
+	}
+	return count;
+}
+
+function componentApi(slug: string, file: string): ComponentApi {
 	const doc = getComponentDoc(slug)!;
 	return {
 		slug,
+		generics: genericsOf(file),
 		props: doc.props.map((p) => p.name),
 		bindable: doc.props.filter((p) => p.bindable).map((p) => p.name),
 		defaults: Object.fromEntries(
@@ -44,6 +58,6 @@ export function ruleSources(): RuleSources {
 		local: Object.values(locals),
 		v4Index: read('../v4/index.ts'),
 		v5Index: read('../../src/lib/index.ts'),
-		v5Components: Object.fromEntries(listComponents().map((c) => [c.name, componentApi(c.slug)]))
+		v5Components: Object.fromEntries(listComponents().map((c) => [c.name, componentApi(c.slug, c.file)]))
 	};
 }

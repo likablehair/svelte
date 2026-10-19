@@ -410,6 +410,7 @@
 		"components": {
 			"ActivableButton": {
 				"slug": "activable-button",
+				"generics": 0,
 				"props": [
 					"active",
 					"dot",
@@ -483,6 +484,7 @@
 			},
 			"AlertBanner": {
 				"slug": "alert-banner",
+				"generics": 0,
 				"props": [
 					"variant",
 					"title",
@@ -584,6 +586,7 @@
 			},
 			"AsyncAutocomplete": {
 				"slug": "async-autocomplete",
+				"generics": 1,
 				"props": [
 					"searcher",
 					"items",
@@ -689,6 +692,7 @@
 			},
 			"Autocomplete": {
 				"slug": "autocomplete",
+				"generics": 1,
 				"props": [
 					"values",
 					"items",
@@ -893,6 +897,7 @@
 			},
 			"Avatar": {
 				"slug": "avatar",
+				"generics": 0,
 				"props": [
 					"src",
 					"name",
@@ -981,6 +986,7 @@
 			},
 			"AvatarGroup": {
 				"slug": "avatar-group",
+				"generics": 0,
 				"props": [
 					"avatars",
 					"maxVisible",
@@ -1025,6 +1031,7 @@
 			},
 			"BarChart": {
 				"slug": "bar-chart",
+				"generics": 0,
 				"props": [
 					"data",
 					"label",
@@ -1146,6 +1153,7 @@
 			},
 			"BoxList": {
 				"slug": "box-list",
+				"generics": 1,
 				"props": [
 					"boxes",
 					"class",
@@ -1252,6 +1260,7 @@
 			},
 			"Button": {
 				"slug": "button",
+				"generics": 0,
 				"props": [
 					"buttonType",
 					"variant",
@@ -1383,6 +1392,7 @@
 			},
 			"Calendar": {
 				"slug": "calendar",
+				"generics": 0,
 				"props": [
 					"selectedDate",
 					"selectedDateTo",
@@ -1520,6 +1530,7 @@
 			},
 			"Checkbox": {
 				"slug": "checkbox",
+				"generics": 0,
 				"props": [
 					"checked",
 					"indeterminate",
@@ -1593,6 +1604,7 @@
 			},
 			"Chip": {
 				"slug": "chip",
+				"generics": 0,
 				"props": [
 					"variant",
 					"size",
@@ -1733,6 +1745,7 @@
 			},
 			"CircularLoader": {
 				"slug": "circular-loader",
+				"generics": 0,
 				"props": [
 					"value",
 					"total",
@@ -1775,6 +1788,7 @@
 			},
 			"ColumnManager": {
 				"slug": "column-manager",
+				"generics": 1,
 				"props": [
 					"open",
 					"columns",
@@ -1936,6 +1950,7 @@
 			},
 			"ConfirmDialog": {
 				"slug": "confirm-dialog",
+				"generics": 0,
 				"props": [
 					"title",
 					"description",
@@ -2010,6 +2025,7 @@
 			},
 			"ConfirmOrCancelButtons": {
 				"slug": "confirm-or-cancel-buttons",
+				"generics": 0,
 				"props": [
 					"loading",
 					"confirmText",
@@ -2061,6 +2077,7 @@
 			},
 			"CountriesAutocomplete": {
 				"slug": "countries-autocomplete",
+				"generics": 0,
 				"props": [
 					"locale",
 					"items",
@@ -2145,6 +2162,7 @@
 			},
 			"DashboardShaper": {
 				"slug": "dashboard-shaper",
+				"generics": 2,
 				"props": [
 					"widgets",
 					"catalog",
@@ -2329,6 +2347,7 @@
 			},
 			"DataTable": {
 				"slug": "data-table",
+				"generics": 1,
 				"props": [
 					"rows",
 					"loader",
@@ -2500,6 +2519,7 @@
 			},
 			"DatePicker": {
 				"slug": "date-picker",
+				"generics": 0,
 				"props": [
 					"view",
 					"months",
@@ -2606,6 +2626,7 @@
 			},
 			"DatePickerTextField": {
 				"slug": "date-picker-text-field",
+				"generics": 0,
 				"props": [
 					"selectedDate",
 					"selectedDateTo",
@@ -2778,6 +2799,7 @@
 			},
 			"DateTimePickerTextField": {
 				"slug": "date-time-picker-text-field",
+				"generics": 0,
 				"props": [
 					"value",
 					"open",
@@ -2945,6 +2967,7 @@
 			},
 			"DescriptiveAvatar": {
 				"slug": "descriptive-avatar",
+				"generics": 0,
 				"props": [
 					"title",
 					"subtitle",
@@ -3030,6 +3053,7 @@
 			},
 			"Dialog": {
 				"slug": "dialog",
+				"generics": 0,
 				"props": [
 					"open",
 					"persistent",
@@ -3137,6 +3161,7 @@
 			},
 			"Divider": {
 				"slug": "divider",
+				"generics": 0,
 				"props": [
 					"variant",
 					"orientation",
@@ -3189,6 +3214,7 @@
 			},
 			"DotsLoader": {
 				"slug": "dots-loader",
+				"generics": 0,
 				"props": [
 					"label",
 					"locale",
@@ -3221,6 +3247,7 @@
 			},
 			"Drawer": {
 				"slug": "drawer",
+				"generics": 0,
 				"props": [
 					"open",
 					"position",
@@ -3335,6 +3362,7 @@
 			},
 			"Dropdown": {
 				"slug": "dropdown",
+				"generics": 1,
 				"props": [
 					"items",
 					"values",
@@ -3428,6 +3456,7 @@
 			},
 			"FileInput": {
 				"slug": "file-input",
+				"generics": 0,
 				"props": [
 					"files",
 					"accept",
@@ -3561,6 +3590,7 @@
 			},
 			"FileInputList": {
 				"slug": "file-input-list",
+				"generics": 0,
 				"props": [
 					"view",
 					"compact",
@@ -3685,6 +3715,7 @@
 			},
 			"FilterEditor": {
 				"slug": "filter-editor",
+				"generics": 0,
 				"props": [
 					"field",
 					"condition",
@@ -3748,6 +3779,7 @@
 			},
 			"Filters": {
 				"slug": "filters",
+				"generics": 0,
 				"props": [
 					"fields",
 					"value",
@@ -3863,6 +3895,7 @@
 			},
 			"FlagIcon": {
 				"slug": "flag-icon",
+				"generics": 0,
 				"props": [
 					"alpha2",
 					"square",
@@ -3888,6 +3921,7 @@
 			},
 			"GlobalSearchTextField": {
 				"slug": "global-search-text-field",
+				"generics": 1,
 				"props": [
 					"searcher",
 					"open",
@@ -3995,6 +4029,7 @@
 			},
 			"HierarchyMenu": {
 				"slug": "hierarchy-menu",
+				"generics": 0,
 				"props": [
 					"options",
 					"selected",
@@ -4132,6 +4167,7 @@
 			},
 			"HorizontalStackedProgress": {
 				"slug": "horizontal-stacked-progress",
+				"generics": 0,
 				"props": [
 					"progresses",
 					"total",
@@ -4227,6 +4263,7 @@
 			},
 			"Icon": {
 				"slug": "icon",
+				"generics": 0,
 				"props": [
 					"path",
 					"title",
@@ -4248,6 +4285,7 @@
 			},
 			"IconsDropdown": {
 				"slug": "icons-dropdown",
+				"generics": 1,
 				"props": [
 					"items",
 					"values",
@@ -4377,6 +4415,7 @@
 			},
 			"LineChart": {
 				"slug": "line-chart",
+				"generics": 0,
 				"props": [
 					"data",
 					"label",
@@ -4498,6 +4537,7 @@
 			},
 			"LinkButton": {
 				"slug": "link-button",
+				"generics": 0,
 				"props": [
 					"href",
 					"target",
@@ -4569,6 +4609,7 @@
 			},
 			"MediaQuery": {
 				"slug": "media-query",
+				"generics": 0,
 				"props": [],
 				"bindable": [],
 				"defaults": {},
@@ -4581,6 +4622,7 @@
 			},
 			"Menu": {
 				"slug": "menu",
+				"generics": 0,
 				"props": [
 					"open",
 					"activator",
@@ -4645,6 +4687,7 @@
 			},
 			"MenuOrDrawer": {
 				"slug": "menu-or-drawer",
+				"generics": 0,
 				"props": [
 					"open",
 					"activator",
@@ -4675,6 +4718,7 @@
 			},
 			"MenuOrDrawerOptions": {
 				"slug": "menu-or-drawer-options",
+				"generics": 1,
 				"props": [
 					"options",
 					"aria-label",
@@ -4761,6 +4805,7 @@
 			},
 			"ModeSwitch": {
 				"slug": "mode-switch",
+				"generics": 0,
 				"props": [
 					"label",
 					"lightLabel",
@@ -4841,6 +4886,7 @@
 			},
 			"MonthSelector": {
 				"slug": "month-selector",
+				"generics": 0,
 				"props": [
 					"selectedMonth",
 					"year",
@@ -4909,6 +4955,7 @@
 			},
 			"NoData": {
 				"slug": "no-data",
+				"generics": 0,
 				"props": [
 					"title",
 					"description",
@@ -4984,6 +5031,7 @@
 			},
 			"PageHeader": {
 				"slug": "page-header",
+				"generics": 0,
 				"props": [
 					"title",
 					"subtitle",
@@ -5044,6 +5092,7 @@
 					"--page-header-default-focus-ring-width",
 					"--page-header-default-gap",
 					"--page-header-default-main-gap",
+					"--page-header-default-margin-bottom",
 					"--page-header-default-sm-description-font-size",
 					"--page-header-default-sm-subtitle-font-size",
 					"--page-header-default-sm-title-font-size",
@@ -5063,6 +5112,7 @@
 					"--page-header-focus-ring-width",
 					"--page-header-gap",
 					"--page-header-main-gap",
+					"--page-header-margin-bottom",
 					"--page-header-subtitle-color",
 					"--page-header-subtitle-font-size",
 					"--page-header-text-gap",
@@ -5076,6 +5126,7 @@
 			},
 			"Paginator": {
 				"slug": "paginator",
+				"generics": 0,
 				"props": [
 					"page",
 					"pageCount",
@@ -5176,6 +5227,7 @@
 			},
 			"PeriodPicker": {
 				"slug": "period-picker",
+				"generics": 1,
 				"props": [
 					"timespanSettings",
 					"quickSelectOptions",
@@ -5265,6 +5317,7 @@
 			},
 			"PeriodSelector": {
 				"slug": "period-selector",
+				"generics": 1,
 				"props": [
 					"timespanSettings",
 					"quickSelectOptions",
@@ -5374,6 +5427,7 @@
 			},
 			"PieChart": {
 				"slug": "pie-chart",
+				"generics": 0,
 				"props": [
 					"data",
 					"label",
@@ -5484,6 +5538,7 @@
 			},
 			"ProgressBar": {
 				"slug": "progress-bar",
+				"generics": 0,
 				"props": [
 					"value",
 					"total",
@@ -5558,6 +5613,7 @@
 			},
 			"RadioButton": {
 				"slug": "radio-button",
+				"generics": 0,
 				"props": [
 					"value",
 					"group",
@@ -5655,6 +5711,7 @@
 			},
 			"RadioGroup": {
 				"slug": "radio-group",
+				"generics": 1,
 				"props": [
 					"items",
 					"value",
@@ -5717,6 +5774,7 @@
 			},
 			"SearchBar": {
 				"slug": "search-bar",
+				"generics": 0,
 				"props": [
 					"value",
 					"label",
@@ -5792,6 +5850,7 @@
 			},
 			"Select": {
 				"slug": "select",
+				"generics": 1,
 				"props": [
 					"items",
 					"value",
@@ -5939,6 +5998,7 @@
 			},
 			"SidebarLayout": {
 				"slug": "sidebar-layout",
+				"generics": 0,
 				"props": [
 					"expandOn",
 					"sidebarExpanded",
@@ -6042,6 +6102,7 @@
 			},
 			"SimpleTextField": {
 				"slug": "simple-text-field",
+				"generics": 0,
 				"props": [
 					"value",
 					"type",
@@ -6158,6 +6219,7 @@
 			},
 			"Skeleton": {
 				"slug": "skeleton",
+				"generics": 0,
 				"props": [
 					"shape",
 					"lines",
@@ -6199,6 +6261,7 @@
 			},
 			"Switch": {
 				"slug": "switch",
+				"generics": 0,
 				"props": [
 					"checked",
 					"size",
@@ -6284,6 +6347,7 @@
 			},
 			"Table": {
 				"slug": "table",
+				"generics": 1,
 				"props": [
 					"rows",
 					"columns",
@@ -6484,6 +6548,7 @@
 			},
 			"TabSwitcher": {
 				"slug": "tab-switcher",
+				"generics": 0,
 				"props": [
 					"tabs",
 					"selected",
@@ -6606,6 +6671,7 @@
 			},
 			"Textarea": {
 				"slug": "textarea",
+				"generics": 0,
 				"props": [
 					"value",
 					"label",
@@ -6722,6 +6788,7 @@
 			},
 			"Timeline": {
 				"slug": "timeline",
+				"generics": 1,
 				"props": [
 					"items",
 					"alternate",
@@ -6829,6 +6896,7 @@
 			},
 			"TimePicker": {
 				"slug": "time-picker",
+				"generics": 0,
 				"props": [
 					"value",
 					"locale",
@@ -6922,6 +6990,7 @@
 			},
 			"TimePickerTextField": {
 				"slug": "time-picker-text-field",
+				"generics": 0,
 				"props": [
 					"value",
 					"open",
@@ -7070,6 +7139,7 @@
 			},
 			"Toaster": {
 				"slug": "toaster",
+				"generics": 0,
 				"props": [
 					"position",
 					"limit",
@@ -7092,6 +7162,7 @@
 			},
 			"ToggleList": {
 				"slug": "toggle-list",
+				"generics": 1,
 				"props": [
 					"items",
 					"values",
@@ -7133,6 +7204,7 @@
 			},
 			"Tooltip": {
 				"slug": "tooltip",
+				"generics": 0,
 				"props": [
 					"activator",
 					"open",
@@ -7209,6 +7281,7 @@
 			},
 			"YearPickerTextField": {
 				"slug": "year-picker-text-field",
+				"generics": 0,
 				"props": [
 					"selectedYear",
 					"open",
@@ -7341,6 +7414,7 @@
 			},
 			"YearSelector": {
 				"slug": "year-selector",
+				"generics": 0,
 				"props": [
 					"selectedYear",
 					"min",
@@ -7825,6 +7899,12 @@
 				"action": "While migrating, import `@likable-hair/svelte/v4-compat.css` after the other imports of the app CSS (the migration tool does it): v4 names map to the Aurora colors and app overrides keep working and set the v5 brand colors. To finish, find `tokens.find` in app CSS and style attributes; replace each use following `tokens.mappings` by the role the color plays there (not by step number), and `rgb(var(...))` following `tokens.usage`. Remove `--global-color-light-*` / `--global-color-dark-*` overrides: set the v5 tokens with `light-dark()` instead, or use the `classic` theme."
 			},
 			{
+				"id": "global-background-boxes",
+				"kind": "review",
+				"summary": "A v4 background tone fills a box (`bg-[rgb(var(--global-color-background-200))]`, `background: rgb(var(--global-color-background-100))`): `v4-compat.css` maps these tones to the page background of Aurora, so the box no longer stands out.",
+				"action": "Give the box the surface color and a border: `background: var(--global-color-surface)` and `border: 1px solid var(--global-color-border)` (Tailwind: `bg-[var(--global-color-surface)] border border-[var(--global-color-border)]`), or use a library component that draws its own card."
+			},
+			{
 				"id": "global-dark-mode",
 				"kind": "edit",
 				"summary": "Dark mode follows `color-scheme` and `data-mode` on `<html>`; `.dark` / `.light` classes do nothing. `setup` calls `rememberAppearance()` and `appearanceScript()` in the root layout (same `theme` key of v4, no flash) and changes Tailwind 3 `darkMode: 'class'`; the codemod renames `toggleTheme()` to `toggleMode()`.",
@@ -7945,9 +8025,54 @@
 			"from": "ActivableButton",
 			"to": "ActivableButton",
 			"props": {
+				"unpack": [
+					{
+						"from": "buttonProps",
+						"keys": [
+							{
+								"key": "disabled",
+								"to": "disabled"
+							},
+							{
+								"key": "loading",
+								"to": "loading"
+							},
+							{
+								"key": "type",
+								"to": "type"
+							},
+							{
+								"key": "href",
+								"to": "href"
+							},
+							{
+								"key": "target",
+								"to": "target"
+							},
+							{
+								"key": "rel",
+								"to": "rel"
+							},
+							{
+								"key": "download",
+								"to": "download"
+							}
+						],
+						"drop": [
+							"variant",
+							"buttonType"
+						],
+						"note": "the other keys (`onclick`, `icon`, `size`) stay in `buttonProps`: move them as the removal of `buttonProps` says"
+					}
+				],
+				"childIcon": {
+					"to": "icon",
+					"note": "The only child was an `<Icon>`: it is now the `icon` prop, which gives a square icon-only button. Give it an `aria-label`: an icon-only button needs an accessible name."
+				},
 				"removed": [
 					{
 						"name": "buttonProps",
+						"replacement": "direct props (`disabled`, `loading`, …)",
 						"note": "Spread its keys as direct props on ActivableButton: `buttonProps={{ disabled, loading: saving }}` → `disabled loading={saving}`. Drop `variant` and `buttonType` (not accepted: the look is fixed), and apply the Button rules to the rest (`icon` takes an SVG path, ...). An `onclick` inside `buttonProps` replaced the toggle in v4 (`active` never flipped): move it to the `onclick` prop and check that flipping `active` is wanted."
 					}
 				]
@@ -8035,7 +8160,7 @@
 					"id": "activable-button-dot",
 					"kind": "review",
 					"summary": "A button with text and no `icon` shows a state dot before the text; icon-only buttons take `icon` instead of an `<Icon>` child.",
-					"action": "Where the children are only `<Icon name=\"mdi-...\">`, remove the child, pass `icon={mdi...}` (SVG path) and an `aria-label`, which gives a square icon-only button: otherwise the dot shows next to the icon and the button has no accessible name. Pass `dot={false}` where a text button should not show the dot."
+					"action": "The codemod turns an `<Icon>` only child into `icon` (a square icon-only button): give those buttons an `aria-label`. Where the children mix an `<Icon>` with text, the dot shows next to them: move the icon to `icon`. Pass `dot={false}` where a text button should not show the dot."
 				},
 				{
 					"id": "activable-button-append-snippet",
@@ -10448,6 +10573,9 @@
 					"when": {
 						"events": [
 							"onchange"
+						],
+						"reads": [
+							"shiftKeyPressed"
 						]
 					}
 				},
@@ -11010,7 +11138,11 @@
 					},
 					{
 						"from": "--collapsible-divided-side-bar-layout-side-bar-border",
-						"to": "--sidebar-layout-sidebar-border"
+						"to": "--sidebar-layout-sidebar-border",
+						"dropWhen": {
+							"match": "--global-color-background-",
+							"note": "Its value read a v4 background token, which `v4-compat.css` maps to the page background of Aurora: the sidebar and the bar would lose their tone and border. Removed: the layout has its own background and border."
+						}
 					},
 					{
 						"from": "--collapsible-divided-side-bar-layout-default-side-bar-border",
@@ -11028,7 +11160,11 @@
 					},
 					{
 						"from": "--collapsible-divided-side-bar-layout-content-padding",
-						"to": "--sidebar-layout-content-padding"
+						"to": "--sidebar-layout-content-padding",
+						"dropWhen": {
+							"match": "^=[\"']?\\s*0(px)?\\s*[\"']?$",
+							"note": "v4 apps set it to 0 and padded the content in their own scroll box, which goes away (`sidebar-layout-scroll`): removed, so the content gets the padding of the layout."
+						}
 					},
 					{
 						"from": "--collapsible-divided-side-bar-layout-default-content-padding",
@@ -11054,7 +11190,11 @@
 					},
 					{
 						"from": "--collapsible-divided-side-bar-layout-header-menu-border",
-						"to": "--sidebar-layout-header-border"
+						"to": "--sidebar-layout-header-border",
+						"dropWhen": {
+							"match": "--global-color-background-",
+							"note": "Its value read a v4 background token, which `v4-compat.css` maps to the page background of Aurora: the sidebar and the bar would lose their tone and border. Removed: the layout has its own background and border."
+						}
 					},
 					{
 						"from": "--collapsible-divided-side-bar-layout-default-header-menu-border",
@@ -11079,7 +11219,11 @@
 					{
 						"from": "--collapsible-divided-side-bar-layout-inner-header-menu-background-color",
 						"to": "--sidebar-layout-header-background",
-						"note": "A full color now (v4 read an RGB triplet in the default and drew it at 50%)."
+						"note": "A full color now (v4 read an RGB triplet in the default and drew it at 50%).",
+						"dropWhen": {
+							"match": "--global-color-background-",
+							"note": "Its value read a v4 background token, which `v4-compat.css` maps to the page background of Aurora: the sidebar and the bar would lose their tone and border. Removed: the layout has its own background and border."
+						}
 					},
 					{
 						"from": "--collapsible-divided-side-bar-layout-default-inner-header-menu-background-color",
@@ -11097,7 +11241,11 @@
 					{
 						"from": "--collapsible-divided-side-bar-layout-background-color",
 						"to": "--sidebar-layout-sidebar-background",
-						"note": "Background of the sidebar (v4: the same variable)."
+						"note": "Background of the sidebar (v4: the same variable).",
+						"dropWhen": {
+							"match": "--global-color-background-",
+							"note": "Its value read a v4 background token, which `v4-compat.css` maps to the page background of Aurora: the sidebar and the bar would lose their tone and border. Removed: the layout has its own background and border."
+						}
 					},
 					{
 						"from": "--collapsible-divided-side-bar-layout-default-background-color",
@@ -11160,6 +11308,9 @@
 					"when": {
 						"snippets": [
 							"children"
+						],
+						"contains": [
+							"calc\\(100d?vh\\s*-\\s*\\d+px\\)"
 						]
 					},
 					"scope": "usage"
@@ -11172,6 +11323,12 @@
 					"when": {
 						"snippets": [
 							"headerSnippet"
+						],
+						"contains": [
+							"mdi-menu(?![\\w-])",
+							"mdi-dock-left(?![\\w-])",
+							"\\bmdiMenu\\b",
+							"\\bmdiDockLeft\\b"
 						]
 					}
 				},
@@ -11190,6 +11347,11 @@
 						],
 						"snippets": [
 							"menuSnippet"
+						]
+					},
+					"unless": {
+						"props": [
+							"currentPath"
 						]
 					}
 				},
@@ -14153,7 +14315,8 @@
 					},
 					{
 						"name": "editFilterMode",
-						"note": "One way of editing filters: pills plus the \"Filters\" panel. Drop it."
+						"note": "One way of editing filters: pills plus the \"Filters\" panel.",
+						"drop": true
 					},
 					{
 						"name": "showActiveFilters",
@@ -14306,6 +14469,10 @@
 					{
 						"name": "onrowClick",
 						"to": "onrowclick",
+						"href": {
+							"prop": "rowHref",
+							"param": "detail.item"
+						},
 						"argument": {
 							"detail.item": "",
 							"detail": ""
@@ -14960,6 +15127,75 @@
 						}
 					],
 					"note": "each header becomes a column: `value` → `key`, `type: { key, params }` → a flat `type` (`string` → none, `number`, `date` or `datetime`, `boolean`, `custom`), `params.nullText` → `empty`, `locked` → `required`, `sortModify` → `sort` with `{ builder, direction }`; `icon` and `checkbox` columns are gone (use a `cell` snippet), `data` is gone"
+				},
+				{
+					"prop": "filters",
+					"keys": [
+						{
+							"from": "tabName",
+							"to": "category"
+						}
+					],
+					"operators": {
+						"type": "type",
+						"mode": "mode",
+						"advanced": "advanced",
+						"map": {
+							"string": {
+								"equal": "is",
+								"contains": "contains",
+								"like": "contains",
+								"ilike": "contains"
+							},
+							"number": {
+								"equal": "eq",
+								"greater": "gt",
+								"lower": "lt",
+								"between": "between"
+							},
+							"date": {
+								"equal": "is",
+								"between": "between",
+								"lower": "before",
+								"greater": null
+							},
+							"select": {
+								"equal": "in",
+								"different": "notIn"
+							},
+							"bool": {
+								"equal": "isTrue"
+							}
+						},
+						"extra": {
+							"string.like": "caseSensitive: true"
+						},
+						"note": "date `greater`: `after` is now after the whole chosen day, `onOrAfter` keeps including it (see `filters-modes`)"
+					},
+					"drop": [
+						"iconColor",
+						"betweenModeSingleTextField",
+						"hidden"
+					],
+					"byHand": [
+						{
+							"key": "value",
+							"note": "an initial condition: write it in `filterValue` with `createFilters([filterCondition(...)])` (see `data-table-filters`)"
+						},
+						{
+							"key": "active",
+							"note": "an initial condition: write it in `filterValue` with `createFilters([filterCondition(...)])` (see `data-table-filters`)"
+						},
+						{
+							"key": "modify",
+							"note": "custom query logic: see `filters-modify`"
+						},
+						{
+							"key": "description",
+							"note": "on a `bool` field the v4 checkbox text: `trueLabel` when it names the true state, otherwise drop it"
+						}
+					],
+					"note": "each v4 `Filter` becomes a `FilterField`: see `filters-definitions` and `filters-modes`"
 				}
 			],
 			"manual": [
@@ -15034,8 +15270,9 @@
 				{
 					"id": "data-table-filters",
 					"kind": "edit",
+					"automatic": true,
 					"summary": "`filters` (v4 `Filter[]`, definition and value together) becomes `filterFields` (`FilterField[]`, definitions only) plus `bind:filterValue` (the tree of conditions, as the `value` of Filters).",
-					"action": "Convert each `Filter` to a `FilterField` as the Filters rule says (`filters-fields`); where the page read the active values from `filters`, read `filterValue` (or `query.filterValue`) instead. Initial conditions go in `filterValue={createFilters([filterCondition(...)])}`.",
+					"action": "The codemod converts each `Filter` written in the file to a `FilterField` as the Filters rule says (`filters-definitions`, `filters-modes`: `mode` and `advanced` → `operators` or `defaultOperator`, `tabName` → `category`, dead keys dropped) and lists what it could not convert (a `value` or `active`, `modify`, a date `greater`, filters built in another file). Where the page read the active values from `filters`, read `filterValue` (or `query.filterValue`) instead. Initial conditions go in `filterValue={createFilters([filterCondition(...)])}`.",
 					"when": {
 						"props": [
 							"filters"
@@ -15276,7 +15513,8 @@
 					},
 					{
 						"name": "editFilterMode",
-						"note": "One way of editing filters: pills plus the \"Filters\" panel. Drop it."
+						"note": "One way of editing filters: pills plus the \"Filters\" panel.",
+						"drop": true
 					},
 					{
 						"name": "showActiveFilters",
@@ -15392,6 +15630,10 @@
 					{
 						"name": "onrowClick",
 						"to": "onrowclick",
+						"href": {
+							"prop": "rowHref",
+							"param": "detail.item"
+						},
 						"argument": {
 							"detail.item": "",
 							"detail": ""
@@ -16043,6 +16285,75 @@
 						}
 					],
 					"note": "each header becomes a column: `value` → `key`, `type: { key, params }` → a flat `type` (`string` → none, `number`, `date` or `datetime`, `boolean`, `custom`), `params.nullText` → `empty`, `locked` → `required`, `sortModify` → `sort` with `{ builder, direction }`; `icon` and `checkbox` columns are gone (use a `cell` snippet), `data` is gone"
+				},
+				{
+					"prop": "filters",
+					"keys": [
+						{
+							"from": "tabName",
+							"to": "category"
+						}
+					],
+					"operators": {
+						"type": "type",
+						"mode": "mode",
+						"advanced": "advanced",
+						"map": {
+							"string": {
+								"equal": "is",
+								"contains": "contains",
+								"like": "contains",
+								"ilike": "contains"
+							},
+							"number": {
+								"equal": "eq",
+								"greater": "gt",
+								"lower": "lt",
+								"between": "between"
+							},
+							"date": {
+								"equal": "is",
+								"between": "between",
+								"lower": "before",
+								"greater": null
+							},
+							"select": {
+								"equal": "in",
+								"different": "notIn"
+							},
+							"bool": {
+								"equal": "isTrue"
+							}
+						},
+						"extra": {
+							"string.like": "caseSensitive: true"
+						},
+						"note": "date `greater`: `after` is now after the whole chosen day, `onOrAfter` keeps including it (see `filters-modes`)"
+					},
+					"drop": [
+						"iconColor",
+						"betweenModeSingleTextField",
+						"hidden"
+					],
+					"byHand": [
+						{
+							"key": "value",
+							"note": "an initial condition: write it in `filterValue` with `createFilters([filterCondition(...)])` (see `data-table-filters`)"
+						},
+						{
+							"key": "active",
+							"note": "an initial condition: write it in `filterValue` with `createFilters([filterCondition(...)])` (see `data-table-filters`)"
+						},
+						{
+							"key": "modify",
+							"note": "custom query logic: see `filters-modify`"
+						},
+						{
+							"key": "description",
+							"note": "on a `bool` field the v4 checkbox text: `trueLabel` when it names the true state, otherwise drop it"
+						}
+					],
+					"note": "each v4 `Filter` becomes a `FilterField`: see `filters-definitions` and `filters-modes`"
 				}
 			],
 			"manual": [
@@ -16117,8 +16428,9 @@
 				{
 					"id": "data-table-filters",
 					"kind": "edit",
+					"automatic": true,
 					"summary": "`filters` (v4 `Filter[]`, definition and value together) becomes `filterFields` (`FilterField[]`, definitions only) plus `bind:filterValue` (the tree of conditions, as the `value` of Filters).",
-					"action": "Convert each `Filter` to a `FilterField` as the Filters rule says (`filters-fields`); where the page read the active values from `filters`, read `filterValue` (or `query.filterValue`) instead. Initial conditions go in `filterValue={createFilters([filterCondition(...)])}`.",
+					"action": "The codemod converts each `Filter` written in the file to a `FilterField` as the Filters rule says (`filters-definitions`, `filters-modes`: `mode` and `advanced` → `operators` or `defaultOperator`, `tabName` → `category`, dead keys dropped) and lists what it could not convert (a `value` or `active`, `modify`, a date `greater`, filters built in another file). Where the page read the active values from `filters`, read `filterValue` (or `query.filterValue`) instead. Initial conditions go in `filterValue={createFilters([filterCondition(...)])}`.",
 					"when": {
 						"props": [
 							"filters"
@@ -16630,7 +16942,8 @@
 					},
 					{
 						"name": "editFilterMode",
-						"note": "v4 only changed the margin (5% in one-edit). The card has its own padding (`--filter-editor-padding`). Drop it."
+						"note": "v4 only changed the margin (5% in one-edit). The card has its own padding (`--filter-editor-padding`).",
+						"drop": true
 					},
 					{
 						"name": "mobile",
@@ -16831,7 +17144,8 @@
 					},
 					{
 						"name": "editFilterMode",
-						"note": "Both modes are replaced by one UI: \"+ Add filter\" opens the field list and then the card of one condition (like one-edit), the \"Filters\" button opens a panel with every condition in rows (instead of the multi-edit dialog of cards). Drop it."
+						"note": "Both modes are replaced by one UI: \"+ Add filter\" opens the field list and then the card of one condition (like one-edit), the \"Filters\" button opens a panel with every condition in rows (instead of the multi-edit dialog of cards).",
+						"drop": true
 					},
 					{
 						"name": "drawerSpace",
@@ -17099,7 +17413,7 @@
 					"id": "filters-modes",
 					"kind": "edit",
 					"summary": "v4 `mode` values become v5 operator names, per type.",
-					"action": "string: `equal` → `is`; `contains` → `contains`; `like` → `like`, `ilike` → `ilike` (same JSON as v4: the value is sent without `%`). On backends that add `%` themselves (variants A–E, see `global-filter-backends`) v4 like/ilike behaved as \"contains\": prefer `contains` (it sends `ilike \"%v%\"` with `%` and `_` escaped, same results there); on epass / new-vigipass (no automatic `%`) v4 ilike was a case-insensitive equality: keep `ilike`. number: `equal` → `eq`, `greater` → `gt`, `lower` → `lt`, `between` → `between` (open ends as in v4). date: `equal` → `is` (whole local day, same JSON), `between` → `between` (whole days, same JSON), `lower` → `before` (< start of the day: same results as v4), `greater` → `after`, which is now after the **whole** chosen day (v4 compared the raw midnight value, so the chosen day was included for timestamp columns): use `onOrAfter` to keep including it. Add `dateOnly: true` to fields on `date` columns (no time): the query then compares `yyyy-MM-dd` strings. select: `equal` → `in` (one value: `where(column, \"=\", v)`; several: `whereIn`; v4 sent a group of `orWhere`), `different` → `notIn` (`<>` or `notWhereIn`). bool `equal` → `isTrue`.",
+					"action": "string: `equal` → `is`; `contains` → `contains`; `ilike` → `contains`; `like` → `contains` with `caseSensitive: true` on the field. `contains` sends `ilike \"%v%\"` (`like` with `caseSensitive`) with `%` and `_` escaped: the same results as v4 on the backends that wrapped like/ilike values in `%` themselves (see `global-filter-backends`); the backends that did not get the updated `FilterModifierApplier` anyway. number: `equal` → `eq`, `greater` → `gt`, `lower` → `lt`, `between` → `between` (open ends as in v4). date: `equal` → `is` (whole local day, same JSON), `between` → `between` (whole days, same JSON), `lower` → `before` (< start of the day: same results as v4), `greater` → `after`, which is now after the **whole** chosen day (v4 compared the raw midnight value, so the chosen day was included for timestamp columns): use `onOrAfter` to keep including it. Add `dateOnly: true` to fields on `date` columns (no time): the query then compares `yyyy-MM-dd` strings. select: `equal` → `in` (one value: `where(column, \"=\", v)`; several: `whereIn`; v4 sent a group of `orWhere`), `different` → `notIn` (`<>` or `notWhereIn`). bool `equal` → `isTrue`.",
 					"when": {
 						"props": [
 							"filters"
@@ -18101,6 +18415,20 @@
 					}
 				]
 			},
+			"cssVars": {
+				"removed": [
+					{
+						"name": "--button-width",
+						"note": "v4 override on the inner Dropdown button; it has no effect on the v5 button.",
+						"drop": true
+					},
+					{
+						"name": "--button-padding",
+						"note": "v4 override on the inner Dropdown button, tuned around the tile; it would now replace the padding of the v5 button. Use `--icons-dropdown-padding` only if the default padding does not fit.",
+						"drop": true
+					}
+				]
+			},
 			"manual": [
 				{
 					"id": "icons-dropdown-items",
@@ -18111,6 +18439,11 @@
 						"props": [
 							"items",
 							"values"
+						]
+					},
+					"unless": {
+						"props": [
+							"label"
 						]
 					}
 				},
@@ -18123,12 +18456,10 @@
 				{
 					"id": "icons-dropdown-css-vars",
 					"kind": "edit",
-					"summary": "The v4 overrides on the inner Dropdown no longer fit: `--button-padding` now replaces the padding tuned around the tile, `--button-width` has no effect on this button, and `--autocomplete-selected-item-color` does not reach the tiles.",
-					"action": "Remove `--button-width` and `--button-padding` from the IconsDropdown (use `--icons-dropdown-padding` only if the default padding does not fit). Replace `--autocomplete-selected-item-color` with `--icons-dropdown-option-selected-color` and `--icons-dropdown-option-selected-background`, or drop it to keep the theme look.",
+					"summary": "`--autocomplete-selected-item-color`, a v4 override on the inner Dropdown, does not reach the tiles.",
+					"action": "Replace `--autocomplete-selected-item-color` with `--icons-dropdown-option-selected-color` and `--icons-dropdown-option-selected-background`, or drop it to keep the theme look.",
 					"when": {
 						"cssVars": [
-							"--button-width",
-							"--button-padding",
 							"--autocomplete-selected-item-color"
 						]
 					}
@@ -19549,6 +19880,13 @@
 				"PageTitle.svelte"
 			],
 			"summary": "The local `PageTitle` copy becomes `PageHeader` of the library.",
+			"appDefaults": [
+				{
+					"cssVar": "--page-header-default-margin-bottom",
+					"value": "16px",
+					"note": "the space the PageTitle copies left under the title"
+				}
+			],
 			"props": {
 				"renamed": [
 					{
@@ -20025,7 +20363,7 @@
 					"id": "theme-switch-look",
 					"kind": "review",
 					"summary": "Three icons in a pill (light, system, dark) instead of a two-state switch: about 120px wide (100px with `size=\"sm\"`) against 40px.",
-					"action": "In a top bar use `size=\"sm\"`; at the bottom of a sidebar `tooltipPlacement=\"top\"`; to offer only light and dark, as the copy did, `system={false}`. The saved choice keeps the `theme` key of localStorage, so users keep it."
+					"action": "In a top bar use `size=\"sm\"`; at the bottom of a sidebar `tooltipPlacement=\"top\"`; to offer only light and dark, as the copy did, `system={false}`. ModeSwitch saves the choice in localStorage (key `theme`). The copies saved it in an httpOnly cookie through `/api/setTheme`, which the browser cannot read: users who had chosen light or dark get the mode of their system once and choose again."
 				}
 			]
 		},
@@ -21195,7 +21533,8 @@
 					},
 					{
 						"name": "editFilterMode",
-						"note": "One way of editing filters: pills plus the \"Filters\" panel. Drop it."
+						"note": "One way of editing filters: pills plus the \"Filters\" panel.",
+						"drop": true
 					},
 					{
 						"name": "showActiveFilters",
@@ -21286,6 +21625,10 @@
 					{
 						"name": "onrowClick",
 						"to": "onrowclick",
+						"href": {
+							"prop": "rowHref",
+							"param": "detail.item"
+						},
 						"argument": {
 							"detail.item": "",
 							"detail": ""
@@ -21904,6 +22247,75 @@
 						}
 					],
 					"note": "each header becomes a column: `value` → `key`, `type: { key, params }` → a flat `type` (`string` → none, `number`, `date` or `datetime`, `boolean`, `custom`), `params.nullText` → `empty`, `locked` → `required`, `sortModify` → `sort` with `{ builder, direction }`; `icon` and `checkbox` columns are gone (use a `cell` snippet), `data` is gone"
+				},
+				{
+					"prop": "filters",
+					"keys": [
+						{
+							"from": "tabName",
+							"to": "category"
+						}
+					],
+					"operators": {
+						"type": "type",
+						"mode": "mode",
+						"advanced": "advanced",
+						"map": {
+							"string": {
+								"equal": "is",
+								"contains": "contains",
+								"like": "contains",
+								"ilike": "contains"
+							},
+							"number": {
+								"equal": "eq",
+								"greater": "gt",
+								"lower": "lt",
+								"between": "between"
+							},
+							"date": {
+								"equal": "is",
+								"between": "between",
+								"lower": "before",
+								"greater": null
+							},
+							"select": {
+								"equal": "in",
+								"different": "notIn"
+							},
+							"bool": {
+								"equal": "isTrue"
+							}
+						},
+						"extra": {
+							"string.like": "caseSensitive: true"
+						},
+						"note": "date `greater`: `after` is now after the whole chosen day, `onOrAfter` keeps including it (see `filters-modes`)"
+					},
+					"drop": [
+						"iconColor",
+						"betweenModeSingleTextField",
+						"hidden"
+					],
+					"byHand": [
+						{
+							"key": "value",
+							"note": "an initial condition: write it in `filterValue` with `createFilters([filterCondition(...)])` (see `data-table-filters`)"
+						},
+						{
+							"key": "active",
+							"note": "an initial condition: write it in `filterValue` with `createFilters([filterCondition(...)])` (see `data-table-filters`)"
+						},
+						{
+							"key": "modify",
+							"note": "custom query logic: see `filters-modify`"
+						},
+						{
+							"key": "description",
+							"note": "on a `bool` field the v4 checkbox text: `trueLabel` when it names the true state, otherwise drop it"
+						}
+					],
+					"note": "each v4 `Filter` becomes a `FilterField`: see `filters-definitions` and `filters-modes`"
 				}
 			],
 			"manual": [
@@ -21978,8 +22390,9 @@
 				{
 					"id": "data-table-filters",
 					"kind": "edit",
+					"automatic": true,
 					"summary": "`filters` (v4 `Filter[]`, definition and value together) becomes `filterFields` (`FilterField[]`, definitions only) plus `bind:filterValue` (the tree of conditions, as the `value` of Filters).",
-					"action": "Convert each `Filter` to a `FilterField` as the Filters rule says (`filters-fields`); where the page read the active values from `filters`, read `filterValue` (or `query.filterValue`) instead. Initial conditions go in `filterValue={createFilters([filterCondition(...)])}`.",
+					"action": "The codemod converts each `Filter` written in the file to a `FilterField` as the Filters rule says (`filters-definitions`, `filters-modes`: `mode` and `advanced` → `operators` or `defaultOperator`, `tabName` → `category`, dead keys dropped) and lists what it could not convert (a `value` or `active`, `modify`, a date `greater`, filters built in another file). Where the page read the active values from `filters`, read `filterValue` (or `query.filterValue`) instead. Initial conditions go in `filterValue={createFilters([filterCondition(...)])}`.",
 					"when": {
 						"props": [
 							"filters"
@@ -23354,6 +23767,10 @@
 					{
 						"name": "onrowClick",
 						"to": "onrowclick",
+						"href": {
+							"prop": "rowHref",
+							"param": "detail.item"
+						},
 						"argument": {
 							"detail.item": "",
 							"detail": ""
@@ -24558,7 +24975,11 @@
 					},
 					{
 						"from": "--stable-divided-side-bar-layout-side-bar-background-color",
-						"to": "--sidebar-layout-sidebar-background"
+						"to": "--sidebar-layout-sidebar-background",
+						"dropWhen": {
+							"match": "--global-color-background-",
+							"note": "Its value read a v4 background token, which `v4-compat.css` maps to the page background of Aurora: the sidebar and the bar would lose their tone and border. Removed: the layout has its own background and border."
+						}
 					},
 					{
 						"from": "--stable-divided-side-bar-layout-default-side-bar-background-color",
@@ -24576,7 +24997,11 @@
 					},
 					{
 						"from": "--stable-divided-side-bar-layout-content-padding",
-						"to": "--sidebar-layout-content-padding"
+						"to": "--sidebar-layout-content-padding",
+						"dropWhen": {
+							"match": "^=[\"']?\\s*0(px)?\\s*[\"']?$",
+							"note": "v4 apps set it to 0 and padded the content in their own scroll box, which goes away (`sidebar-layout-scroll`): removed, so the content gets the padding of the layout."
+						}
 					},
 					{
 						"from": "--stable-divided-side-bar-layout-default-content-padding",
@@ -24600,7 +25025,11 @@
 					},
 					{
 						"from": "--stable-divided-side-bar-layout-inner-header-menu-background-color",
-						"to": "--sidebar-layout-header-background"
+						"to": "--sidebar-layout-header-background",
+						"dropWhen": {
+							"match": "--global-color-background-",
+							"note": "Its value read a v4 background token, which `v4-compat.css` maps to the page background of Aurora: the sidebar and the bar would lose their tone and border. Removed: the layout has its own background and border."
+						}
 					},
 					{
 						"from": "--stable-divided-side-bar-layout-default-inner-header-menu-background-color",
@@ -24654,6 +25083,9 @@
 					"when": {
 						"snippets": [
 							"children"
+						],
+						"contains": [
+							"calc\\(100d?vh\\s*-\\s*\\d+px\\)"
 						]
 					},
 					"scope": "usage"
@@ -24666,6 +25098,12 @@
 					"when": {
 						"snippets": [
 							"headerSnippet"
+						],
+						"contains": [
+							"mdi-menu(?![\\w-])",
+							"mdi-dock-left(?![\\w-])",
+							"\\bmdiMenu\\b",
+							"\\bmdiDockLeft\\b"
 						]
 					}
 				},
@@ -24684,6 +25122,11 @@
 						],
 						"snippets": [
 							"menuSnippet"
+						]
+					},
+					"unless": {
+						"props": [
+							"currentPath"
 						]
 					}
 				},
@@ -25535,7 +25978,11 @@
 					},
 					{
 						"from": "--unstable-divided-side-bar-layout-side-bar-border",
-						"to": "--sidebar-layout-sidebar-border"
+						"to": "--sidebar-layout-sidebar-border",
+						"dropWhen": {
+							"match": "--global-color-background-",
+							"note": "Its value read a v4 background token, which `v4-compat.css` maps to the page background of Aurora: the sidebar and the bar would lose their tone and border. Removed: the layout has its own background and border."
+						}
 					},
 					{
 						"from": "--unstable-divided-side-bar-layout-default-side-bar-border",
@@ -25553,7 +26000,11 @@
 					},
 					{
 						"from": "--unstable-divided-side-bar-layout-content-padding",
-						"to": "--sidebar-layout-content-padding"
+						"to": "--sidebar-layout-content-padding",
+						"dropWhen": {
+							"match": "^=[\"']?\\s*0(px)?\\s*[\"']?$",
+							"note": "v4 apps set it to 0 and padded the content in their own scroll box, which goes away (`sidebar-layout-scroll`): removed, so the content gets the padding of the layout."
+						}
 					},
 					{
 						"from": "--unstable-divided-side-bar-layout-default-content-padding",
@@ -25579,7 +26030,11 @@
 					},
 					{
 						"from": "--unstable-divided-side-bar-layout-header-menu-border",
-						"to": "--sidebar-layout-header-border"
+						"to": "--sidebar-layout-header-border",
+						"dropWhen": {
+							"match": "--global-color-background-",
+							"note": "Its value read a v4 background token, which `v4-compat.css` maps to the page background of Aurora: the sidebar and the bar would lose their tone and border. Removed: the layout has its own background and border."
+						}
 					},
 					{
 						"from": "--unstable-divided-side-bar-layout-default-header-menu-border",
@@ -25604,7 +26059,11 @@
 					{
 						"from": "--unstable-divided-side-bar-layout-inner-header-menu-background-color",
 						"to": "--sidebar-layout-header-background",
-						"note": "A full color now (v4 read an RGB triplet in the default and drew it at 50%)."
+						"note": "A full color now (v4 read an RGB triplet in the default and drew it at 50%).",
+						"dropWhen": {
+							"match": "--global-color-background-",
+							"note": "Its value read a v4 background token, which `v4-compat.css` maps to the page background of Aurora: the sidebar and the bar would lose their tone and border. Removed: the layout has its own background and border."
+						}
 					},
 					{
 						"from": "--unstable-divided-side-bar-layout-default-inner-header-menu-background-color",
@@ -25659,6 +26118,9 @@
 					"when": {
 						"snippets": [
 							"children"
+						],
+						"contains": [
+							"calc\\(100d?vh\\s*-\\s*\\d+px\\)"
 						]
 					},
 					"scope": "usage"
@@ -25671,6 +26133,12 @@
 					"when": {
 						"snippets": [
 							"headerSnippet"
+						],
+						"contains": [
+							"mdi-menu(?![\\w-])",
+							"mdi-dock-left(?![\\w-])",
+							"\\bmdiMenu\\b",
+							"\\bmdiDockLeft\\b"
 						]
 					}
 				},
@@ -25689,6 +26157,11 @@
 						],
 						"snippets": [
 							"menuSnippet"
+						]
+					},
+					"unless": {
+						"props": [
+							"currentPath"
 						]
 					}
 				},

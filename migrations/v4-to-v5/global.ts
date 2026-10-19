@@ -350,6 +350,14 @@ export default {
 				'While migrating, import `@likable-hair/svelte/v4-compat.css` after the other imports of the app CSS (the migration tool does it): v4 names map to the Aurora colors and app overrides keep working and set the v5 brand colors. To finish, find `tokens.find` in app CSS and style attributes; replace each use following `tokens.mappings` by the role the color plays there (not by step number), and `rgb(var(...))` following `tokens.usage`. Remove `--global-color-light-*` / `--global-color-dark-*` overrides: set the v5 tokens with `light-dark()` instead, or use the `classic` theme.'
 		},
 		{
+			id: 'global-background-boxes',
+			kind: 'review',
+			summary:
+				'A v4 background tone fills a box (`bg-[rgb(var(--global-color-background-200))]`, `background: rgb(var(--global-color-background-100))`): `v4-compat.css` maps these tones to the page background of Aurora, so the box no longer stands out.',
+			action:
+				'Give the box the surface color and a border: `background: var(--global-color-surface)` and `border: 1px solid var(--global-color-border)` (Tailwind: `bg-[var(--global-color-surface)] border border-[var(--global-color-border)]`), or use a library component that draws its own card.'
+		},
+		{
 			id: 'global-dark-mode',
 			kind: 'edit',
 			summary:

@@ -501,12 +501,32 @@ function pagesMarkdown(r: Remaining): string[] {
 	return out;
 }
 
+const NOT_MIGRATION = 'already there in the v4 code, before the migration: they are not part of it, leave them unless the user asks';
+
+function beforeMarkdown(r: Remaining): string[] {
+	if (!r.before.length) return [];
+	const byFile = new Map<string, number>();
+	for (const d of r.before) byFile.set(d.file, (byFile.get(d.file) ?? 0) + 1);
+	const files = [...byFile].sort((a, b) => b[1] - a[1]);
+	return [
+		`## Errors ${NOT_MIGRATION.split(':')[0]}`,
+		'',
+		`${r.before.length} svelte-check errors were ${NOT_MIGRATION}.`,
+		'',
+		table(['file', 'errors'], files.slice(0, 30).map(([file, n]) => [file, n])),
+		...(files.length > 30 ? ['', `… ${files.length - 30} more files`] : []),
+		''
+	];
+}
+
 function summaryLine(r: Remaining) {
 	const errorFiles = r.files.filter((f) => f.errors.length).length;
 	const edit = r.files.reduce((sum, f) => sum + toWrite(f).length, 0);
 	const look = r.files.reduce((sum, f) => sum + toLook(f).length, 0);
 	return [
-		r.check.ran ? `svelte-check: **${r.check.errors} errors** in ${errorFiles} files` : `svelte-check did not run: ${r.check.error ?? 'unknown error'}`,
+		r.check.ran
+			? `svelte-check: **${r.check.errors} errors** in ${errorFiles} files${r.check.before ? ` (plus ${r.check.before} already in the v4 code)` : ''}`
+			: `svelte-check did not run: ${r.check.error ?? 'unknown error'}`,
 		`**${edit} points to write** in ${r.files.filter((f) => toWrite(f).length).length} files`,
 		`${look} to look at for ${reviewByComponent(r).length} components`,
 		`${r.pages.length} pages to try`
@@ -516,6 +536,8 @@ function summaryLine(r: Remaining) {
 export function remainingReport(r: Remaining): string {
 	const out: string[] = [`# Remaining points: ${appLabel(r.dir)}`, '', `\`${r.dir}\`${r.base ? ` · v4 code read from commit \`${r.base.slice(0, 10)}\`` : ''}`, '', summaryLine(r), ''];
 	if (!r.base) out.push('The v4 code could not be read from git (no repository or no branch base): only the svelte-check errors are listed.', '');
+	if (r.check.ran && r.check.before === undefined && r.base)
+		out.push('The errors svelte-check already had in the v4 code are not known (`setup` records them before the install): they are counted with the others.', '');
 	if (r.files.length)
 		out.push(
 			'## Files',
@@ -547,6 +569,7 @@ export function remainingReport(r: Remaining): string {
 			),
 			''
 		);
+	out.push(...beforeMarkdown(r));
 	out.push('## Pages to try', '', 'Pages that use the changed files or the files with points, with the components whose behaviour or look changed there. The apps have no tests: open each page, in light and dark, desktop and phone.', '', ...pagesMarkdown(r));
 	if (r.general.length)
 		out.push(
@@ -570,6 +593,10 @@ export function remainingReport(r: Remaining): string {
 	return out.join('\n');
 }
 
+function noErrors(r: Remaining) {
+	return r.check.before ? `No errors from the migration left (the ${r.check.before} errors of svelte-check that were ${NOT_MIGRATION}).` : 'No svelte-check errors left.';
+}
+
 export function nextReport(r: Remaining, file?: string): string {
 	const out: string[] = [`# Next: ${appLabel(r.dir)}`, '', summaryLine(r), ''];
 	const target = file ? r.files.find((f) => f.file === file || f.file.endsWith(`/${file}`)) : r.files.find((f) => f.errors.length);
@@ -581,6 +608,9 @@ export function nextReport(r: Remaining, file?: string): string {
 	if (target) {
 		out.push(`## ${target.file}`, '');
 		if (target.errors.length) out.push(`### Errors (${target.errors.length})`, '', ...errorsMarkdown(target.errors), '');
+		const before = r.before.filter((d) => d.file === target.file);
+		if (before.length)
+			out.push(`### Errors ${NOT_MIGRATION.split(':')[0]} (${before.length})`, '', ...before.map((d) => `- line ${d.line}: ${d.message.replace(/\s+/g, ' ')}`), '');
 		const edit = toWrite(target);
 		const look = toLook(target);
 		if (edit.length) out.push('### To write in this file', '', 'Code to change: the tool could not do it.', '', ...reviewMarkdown(edit), '');
@@ -595,15 +625,15 @@ export function nextReport(r: Remaining, file?: string): string {
 	const edits = r.files.filter((f) => toWrite(f).length);
 	if (edits.length) {
 		out.push(
-			'No svelte-check errors left. First write what is below, file by file; then look at the points by component and try the pages.',
+			`${noErrors(r)} First write what is below, file by file; then look at the points by component and try the pages.`,
 			'',
 			'## To write',
 			'',
-			'The tool reads these from the v4 code, so most stay listed after they are done: go through them once. A point that a prop settles (a name, a label) leaves as soon as the use has that prop.',
+			'The tool reads these from the v4 code. A point leaves as soon as its use no longer has what triggered it (the v4 prop, event or snippet), has the prop that settles it (a name, a label) or is gone; the points it cannot verify stay listed after they are done: go through them once.',
 			''
 		);
 		for (const f of edits) out.push(`### ${f.file}`, '', ...reviewMarkdown(toWrite(f)), '');
-	} else out.push('No svelte-check errors and nothing to write. What is left is to look: the points by component and the pages.', '');
+	} else out.push(`${noErrors(r)} Nothing to write. What is left is to look: the points by component and the pages.`, '');
 	const groups = reviewByComponent(r);
 	if (groups.length)
 		out.push('## To look at, by component', '', 'Behaviour, look or defaults changed: open the pages of each component and check them; write code only where the page relied on the old behaviour.', '', ...reviewByComponentMarkdown(groups));

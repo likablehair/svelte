@@ -1,5 +1,5 @@
 <!-- @component
-Header of a page: an optional link back, the title as a heading (`h1` by default, `headingLevel` to change it), a subtitle, a description and the page actions on the right, which wrap under the text when there is no room. With `backHref` the back control is a native link (it can be opened in a new tab and SvelteKit preloads it); with only `back` it is a button that goes back in the browser history. `onback` runs before either and can stop it with `event.preventDefault()`, for example to save first. `size="sm"` is for headers inside a section or a panel. Once the root layout calls `setTitleTemplate`, a header with `headingLevel` 1 also writes the title of the browser tab in the format of the app (`documentTitle` changes or turns it off). Its size is exposed as `data-size` for app CSS.
+Header of a page: an optional link back, the title as a heading (`h1` by default, `headingLevel` to change it), a subtitle, a description and the page actions on the right, which wrap under the text when there is no room. With `backHref` the back control is a native link (it can be opened in a new tab and SvelteKit preloads it); with only `back` it is a button that goes back in the browser history. `onback` runs before either and can stop it with `event.preventDefault()`, for example to save first. `size="sm"` is for headers inside a section or a panel. Once the root layout calls `setTitleTemplate`, a header with `headingLevel` 1 also writes the title of the browser tab in the format of the app (`documentTitle` changes or turns it off). It has no space below it, like every component (the layout decides, for example with `gap`); `--page-header-margin-bottom` adds it, and setting `--page-header-default-margin-bottom` in the app CSS gives it to every instance. Its size is exposed as `data-size` for app CSS.
 -->
 <script lang="ts" module>
 	const ARROW_LEFT_ICON = 'M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z';
@@ -198,6 +198,7 @@ Header of a page: an optional link back, the title as a heading (`h1` by default
 			justify-items: start;
 			gap: var(--page-header-gap, var(--page-header-default-gap));
 			min-width: 0;
+			margin-block-end: var(--page-header-margin-bottom, var(--page-header-default-margin-bottom));
 		}
 
 		.aurora-page-header[data-size='sm'] {

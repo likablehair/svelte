@@ -1,10 +1,12 @@
 import { execFileSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { basename, join, relative, resolve } from 'node:path';
-import type { Analysis } from './analyze.ts';
+import { basename, dirname, join, relative, resolve } from 'node:path';
+import { lockfile, type Analysis } from './analyze.ts';
+import type { AppDefault } from './types.ts';
 import { addV4Compat, findAppCss, prepareAppCss, useLibraryFonts } from './css.ts';
 import { listFiles } from './files.ts';
 import { addAppearance, addDefaultLocale, addTitleTemplate, staticTitle } from './layout.ts';
+import { migrationBase, readBaseline, recordBaseline } from './remaining.ts';
 
 const LIB = '@likable-hair/svelte';
 const MDI = ['@mdi/js', '^7.4.47'] as const;
@@ -128,7 +130,7 @@ export function updatePackageJson(dir: string, analysis: Analysis, packageSpec?:
 	return changes;
 }
 
-export function updateAppCss(dir: string, layers: string, compat = false, buttonsMargin = false): string[] {
+export function updateAppCss(dir: string, layers: string, compat = false, buttonsMargin = false, appDefaults: AppDefault[] = []): string[] {
 	const files = listFiles(join(dir, 'src'))
 		.filter((path) => /\.(css|pcss|postcss)$/.test(path))
 		.map((path) => ({ rel: relative(dir, path), text: readFileSync(path, 'utf8') }));
@@ -148,15 +150,15 @@ export function updateAppCss(dir: string, layers: string, compat = false, button
 	const layered = prepareAppCss(file.text, layers);
 	const fonts = useLibraryFonts(layered.text, usedElsewhere);
 	const colors = compat ? addV4Compat(fonts.text) : { text: fonts.text, changes: [] };
-	const margin = buttonsMargin && !colors.text.includes(BUTTONS_MARGIN);
-	const text = margin ? `${colors.text.trimEnd()}\n\n:root {\n\t${BUTTONS_MARGIN}: 20px;\n}\n` : colors.text;
+	const defaults = [
+		...(buttonsMargin ? [{ cssVar: BUTTONS_MARGIN, value: '20px', note: 'the space v4 put above ConfirmOrCancelButtons' }] : []),
+		...appDefaults
+	].filter((d, i, all) => !colors.text.includes(d.cssVar) && all.findIndex((o) => o.cssVar === d.cssVar) === i);
+	const text = defaults.length
+		? `${colors.text.trimEnd()}\n\n:root {\n${defaults.map((d) => `\t${d.cssVar}: ${d.value};`).join('\n')}\n}\n`
+		: colors.text;
 	if (text !== file.text) writeFileSync(join(dir, rel), text);
-	return [
-		...layered.changes,
-		...fonts.changes,
-		...colors.changes,
-		...(margin ? [`${BUTTONS_MARGIN}: 20px (the space v4 put above ConfirmOrCancelButtons)`] : [])
-	].map((change) => `${rel}: ${change}`);
+	return [...layered.changes, ...fonts.changes, ...colors.changes, ...defaults.map((d) => `${d.cssVar}: ${d.value} (${d.note})`)].map((change) => `${rel}: ${change}`);
 }
 
 export function updateTailwindConfig(dir: string, tailwind: string | undefined): string[] {
@@ -288,12 +290,49 @@ export function installCommand(packageManager: string) {
 	return packageManager === 'unknown' ? 'npm' : packageManager;
 }
 
+export function installedVersion(dir: string, name = LIB): string | undefined {
+	for (let current = resolve(dir); ; ) {
+		const path = join(current, 'node_modules', name, 'package.json');
+		if (existsSync(path)) return JSON.parse(readFileSync(path, 'utf8')).version;
+		const parent = dirname(current);
+		if (parent === current) return undefined;
+		current = parent;
+	}
+}
+
+export function requireInstalled(dir: string) {
+	const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
+	const declared: string | undefined = pkg.dependencies?.[LIB] ?? pkg.devDependencies?.[LIB];
+	if (!declared) throw new Error(`${dir} does not depend on ${LIB}: run setup first.`);
+	if ((versionOf(declared)?.[0] ?? 5) < 5) throw new Error(`${dir} still asks for ${LIB} ${declared} in package.json: run setup first.`);
+	const installed = installedVersion(dir);
+	if ((versionOf(installed)?.[0] ?? 0) >= 5) return;
+	const root = lockfile(dir);
+	const where = root.dir === dir ? '' : ` in ${root.dir} (the root of the workspace)`;
+	throw new Error(
+		`${LIB} ${installed ? `${installed} is still installed` : 'is not installed'} in ${dir}, while package.json asks for v5 (${declared}): svelte-check and the types would be wrong. Run \`${installCommand(root.manager)} install\`${where} and try again.`
+	);
+}
+
+export function recordV4Errors(dir: string): string[] {
+	const base = migrationBase(dir);
+	if (!base || readBaseline(dir, base) || (versionOf(installedVersion(dir))?.[0] ?? 5) >= 5) return [];
+	const result = recordBaseline(dir, base);
+	return [
+		result.ran
+			? `svelte-check of the v4 code: ${result.diagnostics.length} errors, recorded in the git folder as already there before the migration (next and status list them apart)`
+			: `svelte-check of the v4 code did not run (${result.error}): errors already there before the migration will be mixed with the others`
+	];
+}
+
 export function setup(dir: string, analysis: Analysis, options: SetupOptions): SetupResult {
 	const branch = prepareBranch(dir, options.branch);
+	const baseline = recordV4Errors(dir);
 	const changes = updatePackageJson(dir, analysis, options.packageSpec);
 	const installNeeded = changes.length > 0;
+	changes.unshift(...baseline);
 	changes.push(
-		...updateAppCss(dir, options.layers, analysis.tokens.uses + analysis.tokens.overrides > 0, (analysis.components.ConfirmOrCancelButtons?.usages ?? 0) > 0),
+		...updateAppCss(dir, options.layers, analysis.tokens.uses + analysis.tokens.overrides > 0, (analysis.components.ConfirmOrCancelButtons?.usages ?? 0) > 0, analysis.appDefaults ?? []),
 		...updateTailwindConfig(dir, analysis.app.tailwind)
 	);
 	const locale = appLocale(analysis, options.locale);

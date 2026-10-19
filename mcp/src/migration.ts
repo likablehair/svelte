@@ -26,9 +26,11 @@ export interface MigrateModule {
 	codemod(dir: string, index: RuleIndex, options?: { write?: boolean }): { files: unknown[] };
 	codemodReport(result: unknown): string;
 	currentBranch(dir: string): string;
+	requireInstalled?(dir: string): void;
 	remaining(dir: string, index: RuleIndex): unknown;
 	nextReport(result: unknown, file?: string): string;
 	remainingReport(result: unknown): string;
+	componentRules(index: RuleIndex, name: string): string;
 }
 
 let loaded: Promise<MigrateModule | undefined> | undefined;
@@ -46,18 +48,6 @@ export function loadMigrate(): Promise<MigrateModule | undefined> {
 }
 
 export const missingMigrate = `The migration tool is not installed. Run \`npm i -D ${MIGRATE_PACKAGE}\` (or \`npx ${MIGRATE_PACKAGE} <command> .\`) and try again.`;
-
-export function componentRules(index: RuleIndex, name: string) {
-	const wanted = name.trim().toLowerCase();
-	const rules = index.rules.components.filter(
-		(rule) => rule.from.toLowerCase() === wanted || rule.to.toLowerCase() === wanted
-	);
-	if (!rules.length) {
-		const names = [...new Set(index.rules.components.map((r) => r.from))].sort();
-		return `No migration rule for "${name}". v4 components with rules: ${names.join(', ')}`;
-	}
-	return rules.map((rule) => `## ${rule.from} → ${rule.to}\n\n\`\`\`json\n${JSON.stringify(rule, null, 2)}\n\`\`\``).join('\n\n');
-}
 
 export function migrateSkillDir(appDir: string) {
 	const candidates = [

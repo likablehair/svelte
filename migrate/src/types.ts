@@ -4,6 +4,7 @@ export type * from '../../migrations/types.ts';
 
 export interface ComponentApi {
 	slug: string;
+	generics?: number;
 	props: string[];
 	bindable: string[];
 	defaults: Record<string, string>;

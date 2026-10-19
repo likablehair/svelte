@@ -44,6 +44,20 @@ export default {
 			}
 		]
 	},
+	cssVars: {
+		removed: [
+			{
+				name: '--button-width',
+				note: 'v4 override on the inner Dropdown button; it has no effect on the v5 button.',
+				drop: true
+			},
+			{
+				name: '--button-padding',
+				note: 'v4 override on the inner Dropdown button, tuned around the tile; it would now replace the padding of the v5 button. Use `--icons-dropdown-padding` only if the default padding does not fit.',
+				drop: true
+			}
+		]
+	},
 	manual: [
 		{
 			id: 'icons-dropdown-items',
@@ -52,7 +66,8 @@ export default {
 				'Every option needs a `label`, its accessible name, Tooltip and type-ahead text (v4 options had no text at all), and `icon` is an SVG path (v4: an MDI class name).',
 			action:
 				'Add a short `label` to each object in `items` and `values` (for example "Paragraph", "Heading 1", "Align left", in the language of the app) and apply the global icon transform to every `icon` (`"mdi-format-header-1"` → `mdiFormatHeader1` from `@mdi/js`). Also pass `label` to the component to name the button ("Text style", "Alignment"): without it screen readers hear "Select".',
-			when: { props: ['items', 'values'] }
+			when: { props: ['items', 'values'] },
+			unless: { props: ['label'] }
 		},
 		{
 			id: 'icons-dropdown-look',
@@ -65,11 +80,10 @@ export default {
 		{
 			id: 'icons-dropdown-css-vars',
 			kind: 'edit',
-			summary:
-				'The v4 overrides on the inner Dropdown no longer fit: `--button-padding` now replaces the padding tuned around the tile, `--button-width` has no effect on this button, and `--autocomplete-selected-item-color` does not reach the tiles.',
+			summary: '`--autocomplete-selected-item-color`, a v4 override on the inner Dropdown, does not reach the tiles.',
 			action:
-				'Remove `--button-width` and `--button-padding` from the IconsDropdown (use `--icons-dropdown-padding` only if the default padding does not fit). Replace `--autocomplete-selected-item-color` with `--icons-dropdown-option-selected-color` and `--icons-dropdown-option-selected-background`, or drop it to keep the theme look.',
-			when: { cssVars: ['--button-width', '--button-padding', '--autocomplete-selected-item-color'] }
+				'Replace `--autocomplete-selected-item-color` with `--icons-dropdown-option-selected-color` and `--icons-dropdown-option-selected-background`, or drop it to keep the theme look.',
+			when: { cssVars: ['--autocomplete-selected-item-color'] }
 		},
 		{
 			id: 'icons-dropdown-clear',

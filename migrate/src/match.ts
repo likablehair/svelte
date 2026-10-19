@@ -29,6 +29,8 @@ export interface Usage {
 	slots: string[];
 	children: boolean;
 	defaults: boolean;
+	text?: string;
+	source?: string;
 }
 
 export interface UsageMatch {
@@ -86,6 +88,55 @@ export function unlessMet(
 		) ??
 		withV4(trigger.cssVars, rule?.cssVars?.renamed).find((n) => has(['style'], n))
 	);
+}
+
+const TRIGGER_OF: Record<string, keyof ManualTrigger> = {
+	'prop-removed': 'props',
+	'event-removed': 'events',
+	'event-changed': 'events',
+	'snippet-removed': 'snippets',
+	'css-var-removed': 'cssVars'
+};
+
+export function findingTrigger(f: Finding, step?: ManualStep): ManualTrigger | undefined {
+	if (step) return step.when;
+	const key = TRIGGER_OF[f.kind];
+	return key ? { [key]: [f.name] } : undefined;
+}
+
+export function sourceContains(source: string | undefined, patterns: string[] | undefined) {
+	return !patterns || source === undefined || patterns.some((p) => new RegExp(p).test(source));
+}
+
+export function triggerPresent(
+	trigger: ManualTrigger,
+	usage: Pick<Usage, 'attrs' | 'snippets' | 'slots' | 'children' | 'source'>,
+	rule?: ComponentMigration,
+	cssRename?: (name: string) => string | undefined
+): boolean {
+	if (!sourceContains(usage.source, trigger.contains)) return false;
+	const both = (names: string[] | undefined, renamed: { from: string; to?: string }[] | undefined) =>
+		(names ?? []).flatMap((n) => [n, ...(renamed ?? []).filter((r) => r.from === n && r.to).map((r) => r.to!)]);
+	const events = both(trigger.events, rule?.events?.changed?.map((c) => ({ from: c.name, to: c.to })));
+	return !!unlessMet(
+		{
+			props: both(trigger.props, rule?.props?.renamed),
+			events: events.map((n) => n.replace(/^on:/, 'on')),
+			snippets: both(trigger.snippets, rule?.snippets?.renamed),
+			cssVars: both(trigger.cssVars, rule?.cssVars?.renamed).flatMap((n) => [n, cssRename?.(n)].filter((v): v is string => !!v))
+		},
+		usage,
+		rule
+	);
+}
+
+const word = (name: string) => new RegExp(`\\b${name.replace(/[$]/g, '\\$&')}\\b`);
+
+function handlerReads(attr: Attr, names: string[], text: string | undefined) {
+	const inline = /^(ArrowFunctionExpression|FunctionExpression)$/.test(attr.expression?.type ?? '');
+	if (!inline && text === undefined) return true;
+	const source = inline ? attr.source : text!;
+	return names.some((name) => word(name.split('.').pop()!).test(source));
 }
 
 export function matchUsage(
@@ -203,7 +254,8 @@ export function matchUsage(
 	for (const r of e.changed ?? []) {
 		const attr = events.get(r.name);
 		if (!attr) continue;
-		const lost = Object.values(r.argument ?? {}).some((v) => v === null);
+		const lostMembers = Object.entries(r.argument ?? {}).filter(([, v]) => v === null).map(([k]) => k);
+		const lost = lostMembers.length > 0 && handlerReads(attr, lostMembers, usage.text);
 		add(lost ? 'manual' : r.note ? 'check' : 'auto', 'event-changed', `events.changed/${r.name}`, r.name, attr.line, {
 			to: r.to,
 			note: r.note
@@ -281,6 +333,9 @@ export function matchUsage(
 				when.cssVars?.find((n) => cssVars.has(n)))
 			: rule.from;
 		if (!hit) continue;
+		const handler = when?.reads && (events.get(hit) ?? props.get(hit));
+		if (handler && !handlerReads(handler, when.reads!, usage.text)) continue;
+		if (!sourceContains(usage.source, when?.contains)) continue;
 		const line = props.get(hit)?.line ?? events.get(hit)?.line ?? cssVars.get(hit)?.line ?? snippets.get(hit) ?? usage.line;
 		findings.push({
 			effort: step.automatic ? 'auto' : 'manual',

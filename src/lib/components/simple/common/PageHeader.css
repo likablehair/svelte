@@ -3,6 +3,7 @@
 @layer global.base {
 	:root {
 		--page-header-default-gap: 10px;
+		--page-header-default-margin-bottom: 0px;
 		--page-header-default-main-gap: 12px 16px;
 		--page-header-default-text-min-width: 16rem;
 		--page-header-default-title-color: var(--global-color-text);

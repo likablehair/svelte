@@ -1,4 +1,5 @@
 import type { Changed, ComponentMigration, EventChange, ManualStep, Removal, Rename, SnippetChange } from '../types.js';
+import { filterFieldItems } from './Filters.js';
 import paginator from './Paginator.js';
 import { forwarded, innerCssVars } from './Table.js';
 
@@ -73,7 +74,7 @@ const shared = {
 			replacement: 'filterFields'
 		},
 		{ name: 'quickFiltersVisible', note: 'Pinned fields of `filterFields` are always in the bar.' },
-		{ name: 'editFilterMode', note: 'One way of editing filters: pills plus the "Filters" panel. Drop it.' },
+		{ name: 'editFilterMode', note: 'One way of editing filters: pills plus the "Filters" panel.', drop: true },
 		{
 			name: 'showActiveFilters',
 			note: 'Pass `filtersProps={{ showPills: false }}` to hide the pills.',
@@ -197,10 +198,11 @@ const manual: ManualStep[] = [
 	{
 		id: 'data-table-filters',
 		kind: 'edit',
+		automatic: true,
 		summary:
 			'`filters` (v4 `Filter[]`, definition and value together) becomes `filterFields` (`FilterField[]`, definitions only) plus `bind:filterValue` (the tree of conditions, as the `value` of Filters).',
 		action:
-			'Convert each `Filter` to a `FilterField` as the Filters rule says (`filters-fields`); where the page read the active values from `filters`, read `filterValue` (or `query.filterValue`) instead. Initial conditions go in `filterValue={createFilters([filterCondition(...)])}`.',
+			'The codemod converts each `Filter` written in the file to a `FilterField` as the Filters rule says (`filters-definitions`, `filters-modes`: `mode` and `advanced` → `operators` or `defaultOperator`, `tabName` → `category`, dead keys dropped) and lists what it could not convert (a `value` or `active`, `modify`, a date `greater`, filters built in another file). Where the page read the active values from `filters`, read `filterValue` (or `query.filterValue`) instead. Initial conditions go in `filterValue={createFilters([filterCondition(...)])}`.',
 		when: { props: ['filters'] }
 	},
 	{
@@ -351,7 +353,7 @@ const paginated = {
 	cssVars: {
 		removed: [...table.cssVars, ...innerCssVars(paginator.cssVars, 'Paginator'), ...quickActionsVars]
 	},
-	items: table.items,
+	items: [...table.items, { prop: 'filters', ...filterFieldItems }],
 	manual: [...table.manual, ...manual],
 	added
 } satisfies ComponentMigration;
@@ -693,7 +695,7 @@ const dynamic = {
 			...quickActionsVars
 		]
 	},
-	items: table.items,
+	items: [...table.items, { prop: 'filters', ...filterFieldItems }],
 	manual: [
 		...table.manual,
 		...manual,

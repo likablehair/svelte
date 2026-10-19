@@ -87,6 +87,19 @@ describe('dissolve: wrappers', () => {
 		expect(result.wrappers[0]).toMatchObject({ target: 'Checkbox', usages: 1, dissolved: 1, deleted: true });
 	});
 
+	test('a wrapper imported through an alias of the app is dissolved too', () => {
+		const { read, exists } = run({
+			'svelte.config.js': 'export default { kit: { alias: { "@/*": "./src/lib/*" } } };\n',
+			[`${W}/StandardCheckbox.svelte`]: checkbox,
+			'src/routes/+page.svelte': svelte(
+				"\timport StandardCheckbox from '@/components/common/StandardCheckbox.svelte'\n\tlet on = $state(false)",
+				'<StandardCheckbox bind:value={on} />'
+			)
+		});
+		expect(read('src/routes/+page.svelte')).toContain('<Checkbox bind:checked={on} />');
+		expect(exists(`${W}/StandardCheckbox.svelte`)).toBe(false);
+	});
+
 	test('keeps what the wrapper props mean and its layout, drops its look', () => {
 		const { read, result } = run({
 			[`${W}/StandardButton.svelte`]: button,
@@ -112,18 +125,19 @@ describe('dissolve: wrappers', () => {
 		expect(result.changes.some((c) => c.kind === 'wrapper-bind-one-way' && c.name === 'loading')).toBe(true);
 	});
 
-	test('maps the literals of an expression, or passes a variable through with a note', () => {
+	test('maps the literals of an expression, or passes a variable through and lists it as not done', () => {
 		const { read, result } = run({
 			[`${W}/StandardButton.svelte`]: button,
 			'src/routes/+page.svelte': svelte(
 				"\timport StandardButton from '$lib/components/common/StandardButton.svelte'\n\tlet { a, kind }: { a: boolean; kind: 'primary' | 'danger' } = $props()",
-				"<StandardButton style={a ? 'static' : 'danger'}>A</StandardButton>\n<StandardButton style={kind}>B</StandardButton>"
+				"<StandardButton style={a ? 'static' : 'danger'}>A</StandardButton>\n<StandardButton style={kind}>B</StandardButton>\n<StandardButton style={a ? 'icon' : 'primary'}>C</StandardButton>"
 			)
 		});
 		const page = read('src/routes/+page.svelte');
 		expect(page).toContain("variant={a ? 'secondary' : 'danger'}");
 		expect(page).toContain('variant={kind}');
-		expect(result.changes.find((c) => c.kind === 'wrapper-value')?.note).toContain("'static' → 'secondary'");
+		expect(page).toContain("variant={a ? 'secondary' : 'primary'} buttonType={a ? 'text' : 'default'}");
+		expect(result.skipped.find((s) => s.kind === 'wrapper-value')?.reason).toContain("'static' → 'secondary'");
 	});
 
 	test('an error flag becomes the state of the field', () => {

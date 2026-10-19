@@ -4,9 +4,22 @@ export default {
 	from: 'ActivableButton',
 	to: 'ActivableButton',
 	props: {
+		unpack: [
+			{
+				from: 'buttonProps',
+				keys: ['disabled', 'loading', 'type', 'href', 'target', 'rel', 'download'].map((key) => ({ key, to: key })),
+				drop: ['variant', 'buttonType'],
+				note: 'the other keys (`onclick`, `icon`, `size`) stay in `buttonProps`: move them as the removal of `buttonProps` says'
+			}
+		],
+		childIcon: {
+			to: 'icon',
+			note: 'The only child was an `<Icon>`: it is now the `icon` prop, which gives a square icon-only button. Give it an `aria-label`: an icon-only button needs an accessible name.'
+		},
 		removed: [
 			{
 				name: 'buttonProps',
+				replacement: 'direct props (`disabled`, `loading`, …)',
 				note: 'Spread its keys as direct props on ActivableButton: `buttonProps={{ disabled, loading: saving }}` → `disabled loading={saving}`. Drop `variant` and `buttonType` (not accepted: the look is fixed), and apply the Button rules to the rest (`icon` takes an SVG path, ...). An `onclick` inside `buttonProps` replaced the toggle in v4 (`active` never flipped): move it to the `onclick` prop and check that flipping `active` is wanted.'
 			}
 		]
@@ -78,7 +91,7 @@ export default {
 			summary:
 				'A button with text and no `icon` shows a state dot before the text; icon-only buttons take `icon` instead of an `<Icon>` child.',
 			action:
-				'Where the children are only `<Icon name="mdi-...">`, remove the child, pass `icon={mdi...}` (SVG path) and an `aria-label`, which gives a square icon-only button: otherwise the dot shows next to the icon and the button has no accessible name. Pass `dot={false}` where a text button should not show the dot.'
+				'The codemod turns an `<Icon>` only child into `icon` (a square icon-only button): give those buttons an `aria-label`. Where the children mix an `<Icon>` with text, the dot shows next to them: move the icon to `icon`. Pass `dot={false}` where a text button should not show the dot.'
 		},
 		{
 			id: 'activable-button-append-snippet',

@@ -53,6 +53,64 @@ describe('codemod: names', () => {
 		expect(out).toContain('<Tooltip activator={undefined} appearTimeout={0}><b>x</b></Tooltip>\n<Tooltip appearTimeout={0} />');
 	});
 
+	test('renames the prop keys read from ComponentProps, also in Omit and Pick', () => {
+		const { read } = run({
+			'src/A.svelte': svelte(
+				[
+					"\timport { PaginatedTable } from '@likable-hair/svelte';",
+					"\timport type { ComponentProps } from 'svelte';",
+					"\ttype Props = { headers?: ComponentProps<typeof PaginatedTable<Row>>['headers'] } & Omit<ComponentProps<typeof PaginatedTable>, 'items' | \"headers\" | 'class'>;",
+					"\ttype Picked = Pick<ComponentProps<typeof PaginatedTable>, 'rowsPerPage'>;",
+					"\tlet { headers, ...rest }: Props = $props();"
+				].join('\n'),
+				'<PaginatedTable {headers} {...rest} />'
+			)
+		});
+		const out = read('src/A.svelte');
+		expect(out).toContain("headers?: ComponentProps<typeof DataTable<Row>>['columns']");
+		expect(out).toContain("Omit<ComponentProps<typeof DataTable>, 'rows' | \"columns\" | 'class'>");
+		expect(out).toContain("Pick<ComponentProps<typeof DataTable>, 'pageSize'>");
+	});
+
+	test('ComponentProps of a table: typeof added where it was missing, type arguments v5 does not take removed', () => {
+		const { read } = run({
+			'src/A.svelte': svelte(
+				[
+					"\timport { PaginatedTable, DynamicTable } from '@likable-hair/svelte';",
+					"\timport type { ComponentProps } from 'svelte';",
+					"\ttype Table = ComponentProps<typeof PaginatedTable<Account, {}>>;",
+					"\ttype Rows = ComponentProps<DynamicTable>['rows'];",
+					"\ttype Headers = ComponentProps<DynamicTable>['headers'];"
+				].join('\n'),
+				'<PaginatedTable />\n<DynamicTable />'
+			)
+		});
+		const out = read('src/A.svelte');
+		expect(out).toContain('type Table = ComponentProps<typeof DataTable<Account>>;');
+		expect(out).toContain("type Rows = ComponentProps<typeof DataTable>['rows'];");
+		expect(out).toContain("type Headers = ComponentProps<typeof DataTable>['columns'];");
+		expect(out).toContain("import { DataTable } from '@likable-hair/svelte';");
+		expect(out).toContain('<DataTable />\n<DataTable pagination="infinite" />');
+	});
+
+	test('renames the keys read through a local alias of ComponentProps', () => {
+		const { read } = run({
+			'src/A.svelte': svelte(
+				[
+					"\timport { PaginatedTable } from '@likable-hair/svelte';",
+					"\timport type { ComponentProps } from 'svelte';",
+					'\ttype T = ComponentProps<typeof PaginatedTable<Account>>;',
+					"\ttype Props = Omit<T, 'items' | 'headers'> & { headers: T['headers']; change: Parameters<NonNullable<T['onpaginationChange']>>[0]; own: Other['headers'] };",
+					"\ttype Picked = Pick<T, 'rowsPerPage'>;"
+				].join('\n'),
+				'<PaginatedTable />'
+			)
+		});
+		const out = read('src/A.svelte');
+		expect(out).toContain("Omit<T, 'rows' | 'columns'> & { headers: T['columns']; change: Parameters<NonNullable<T['onquerychange']>>[0]; own: Other['headers'] }");
+		expect(out).toContain("Pick<T, 'pageSize'>");
+	});
+
 	test('keeps a local alias and renames only the imported name', () => {
 		const { read } = run({
 			'src/A.svelte': svelte("\timport { ToolTip as Tip } from '@likable-hair/svelte';", '<Tip />')
@@ -209,6 +267,63 @@ describe('codemod: v4 defaults', () => {
 });
 
 describe('codemod: callback arguments', () => {
+	test('drops detail on the callbacks an app component passes on to the library', () => {
+		const { read } = run({
+			'src/lib/RolesAutocomplete.svelte': svelte(
+				"\timport { Autocomplete } from '@likable-hair/svelte';\n\tlet { roles = [], onpick, ...rest } = $props();",
+				'<Autocomplete items={roles} onchange={onpick} {...rest} />'
+			),
+			'src/routes/+page.svelte': svelte(
+				"\timport RolesAutocomplete from '$lib/RolesAutocomplete.svelte';\n\tlet id = $state();\n\tfunction pick(e) { id = e.detail.selection[0]?.value }",
+				'<RolesAutocomplete onchange={(e) => (id = e.detail.selection[0]?.value)} />\n<RolesAutocomplete onpick={pick} />\n<RolesAutocomplete onblur={(e) => e.detail} />'
+			),
+			'svelte.config.js': "export default { kit: { alias: { $lib: 'src/lib' } } };\n"
+		});
+		const out = read('src/routes/+page.svelte');
+		expect(out).toContain('onchange={(e) => (id = e.selection[0]?.value)}');
+		expect(out).toContain('function pick(e) { id = e.selection[0]?.value }');
+		expect(out).toContain('<RolesAutocomplete onpick={pick} />');
+	});
+
+	test('renames the snippets an app component passes on to the library, with their parameters', () => {
+		const { read, result } = run({
+			'src/lib/RolesTable.svelte': svelte(
+				"\timport { EnhancedPaginatedTable, PaginatedTable } from '@likable-hair/svelte';\n\tlet { roles = [], columns = false, rowSnippet, ...rest } = $props();",
+				'{#if columns}\n\t<PaginatedTable items={roles} customSnippet={rowSnippet} {...rest} />\n{:else}\n\t<EnhancedPaginatedTable items={roles} customSnippet={rowSnippet} {...rest} />\n{/if}'
+			),
+			'src/routes/+page.svelte': svelte(
+				"\timport RolesTable from '$lib/RolesTable.svelte';",
+				[
+					'<RolesTable roles={[]}>',
+					'\t{#snippet filterAppendSnippet()}<a href="/new">New</a>{/snippet}',
+					'\t{#snippet appendSnippet({ item })}<b>{item.name}</b>{/snippet}',
+					'\t{#snippet rowSnippet({ header, item })}<i>{item[header.value]}</i>{/snippet}',
+					'</RolesTable>',
+					'<RolesTable>',
+					'\t{#snippet appendSnippet({ item, index })}{#if index !== -1}<b>{index}: {item.name}</b>{/if}{/snippet}',
+					'</RolesTable>'
+				].join('\n')
+			),
+			'src/lib/AdminRolesTable.svelte': svelte(
+				"\timport RolesTable from './RolesTable.svelte';\n\tlet { cell, ...rest } = $props();",
+				'<RolesTable rowSnippet={cell} {...rest} />'
+			),
+			'src/routes/admin/+page.svelte': svelte(
+				"\timport AdminRolesTable from '$lib/AdminRolesTable.svelte';",
+				'<AdminRolesTable>\n\t{#snippet filterAppendSnippet()}<a href="/new">New</a>{/snippet}\n\t{#snippet cell({ item })}{item.id}{/snippet}\n</AdminRolesTable>'
+			),
+			'svelte.config.js': "export default { kit: { alias: { $lib: 'src/lib' } } };\n"
+		});
+		expect(read('src/routes/admin/+page.svelte')).toContain('{#snippet toolbarSnippet()}<a href="/new">New</a>{/snippet}\n\t{#snippet cell({ row: item })}{item.id}{/snippet}');
+		const out = read('src/routes/+page.svelte');
+		expect(out).toContain('{#snippet toolbarSnippet()}<a href="/new">New</a>{/snippet}');
+		expect(out).toContain('{#snippet actionsSnippet({ row: item })}<b>{item.name}</b>{/snippet}');
+		expect(out).toContain('{#snippet rowSnippet({ column: header, row: item })}<i>{item[header.key]}</i>{/snippet}');
+		expect(out).toContain('{#snippet actionsSnippet({ item, index })}');
+		expect(result.skipped.some((s) => s.id === 'PaginatedTable/snippets.parameters/actionsSnippet' && s.reason.includes('`index` is gone'))).toBe(true);
+		expect(read('src/lib/RolesTable.svelte')).toContain('cellSnippet={rowSnippet}');
+	});
+
 	test('drops detail in inline handlers', () => {
 		const { read } = run({
 			'src/A.svelte': svelte(
@@ -359,16 +474,20 @@ describe('codemod: data of the props', () => {
 	});
 
 	test('the default of a prop is converted, and its users are left to do', () => {
+		const table = svelte(
+			"\timport { SimpleTable } from '@likable-hair/svelte';\n\tlet { headers = [{ label: 'A', value: 'a', type: { key: 'string' } }], other } = $props();",
+			'<SimpleTable {headers} items={[]} />\n<SimpleTable headers={other} items={[]} />'
+		);
 		const { read, result } = run({
-			'src/A.svelte': svelte(
-				"\timport { SimpleTable } from '@likable-hair/svelte';\n\tlet { headers = [{ label: 'A', value: 'a', type: { key: 'string' } }], other } = $props();",
-				'<SimpleTable {headers} items={[]} />\n<SimpleTable headers={other} items={[]} />'
-			)
+			'src/A.svelte': table,
+			'src/B.svelte': svelte("\timport A from './A.svelte';", "<A headers={[{ label: 'B', value: 'b' }]} />")
 		});
 		expect(read('src/A.svelte')).toContain("let { headers = [{ label: 'A', key: 'a' }], other } = $props();");
 		const reasons = result.skipped.filter((s) => s.kind === 'item-keys').map((s) => s.reason);
 		expect(reasons[0]).toContain('`headers` is a prop of this component (its default was converted)');
 		expect(reasons[1]).toContain('`other` is a prop of this component: rename');
+		const alone = run({ 'src/A.svelte': table }).result.skipped.filter((s) => s.kind === 'item-keys').map((s) => s.reason);
+		expect(alone).toEqual([expect.stringContaining('`other` is a prop of this component: rename')]);
 	});
 
 	test('pairs become objects', () => {
@@ -510,7 +629,7 @@ describe('codemod: rows and snippet parameters', () => {
 				[
 					'<SimpleTable headers={[]} items={[]}>',
 					'\t{#snippet customSnippet({ item, header })}{item[header.value]}{/snippet}',
-					'\t{#snippet actionsSnippet({ index, item })}{#if index === -1}x{:else}{item.id}{/if}{/snippet}',
+					'\t{#snippet actionsSnippet({ index, item })}{#if index === -1}x{:else}{index}: {item.id}{/if}{/snippet}',
 					'</SimpleTable>'
 				].join('\n')
 			)
@@ -519,6 +638,59 @@ describe('codemod: rows and snippet parameters', () => {
 		expect(out).toContain('{#snippet cellSnippet({ row: item, column: header })}{item[header.key]}{/snippet}');
 		expect(out).toContain('{#snippet actionsSnippet({ index, item })}');
 		expect(result.skipped.find((s) => s.kind === 'snippet-parameters')?.reason).toContain('`index` is gone');
+	});
+});
+
+describe('codemod: header cell guards in the actions snippets', () => {
+	test('drops the v4 checks on index -1 when index serves only there, keeping the other conditions', () => {
+		const { read, result } = run({
+			'src/A.svelte': svelte(
+				"\timport { PaginatedTable } from '@likable-hair/svelte';\n\tlet canManage = true;",
+				[
+					'<PaginatedTable>',
+					'\t{#snippet appendSnippet({ index, item })}',
+					'\t\t{#if index != -1 && item && canManage}',
+					'\t\t\t<button>{item.id}</button>',
+					'\t\t{/if}',
+					'\t\t{#if index == -1}',
+					'\t\t\t<span>Actions</span>',
+					'\t\t{:else}',
+					'\t\t\t<i>{item?.name}</i>',
+					'\t\t{/if}',
+					'\t\t{#if index !== -1}<b>x</b>{/if}',
+					'\t{/snippet}',
+					'</PaginatedTable>'
+				].join('\n')
+			)
+		});
+		const out = read('src/A.svelte');
+		expect(out).toContain('{#snippet actionsSnippet({ row: item })}');
+		expect(out).toContain('{#if item && canManage}');
+		expect(out).toContain('\t\t<i>{item?.name}</i>\n');
+		expect(out).not.toContain('Actions');
+		expect(out).toContain('\t\t<b>x</b>\n');
+		expect(result.skipped).toEqual([]);
+	});
+
+	test('leaves the snippet as it is when index is used in another way', () => {
+		const snippet = '{#snippet appendSnippet({ index, item })}{#if canManage || -1 !== index}<u>{item.id}</u>{/if}{/snippet}';
+		const { read, result } = run({
+			'src/A.svelte': svelte("\timport { PaginatedTable } from '@likable-hair/svelte';\n\tlet canManage = true;", `<PaginatedTable>\n\t${snippet}\n</PaginatedTable>`)
+		});
+		expect(read('src/A.svelte')).toContain('{#snippet actionsSnippet({ index, item })}{#if canManage || -1 !== index}');
+		expect(result.skipped.find((s) => s.kind === 'snippet-parameters')?.reason).toContain('`index` is gone');
+	});
+
+	test('notes the header cell content it drops', () => {
+		const { read, result } = run({
+			'src/A.svelte': svelte(
+				"\timport { PaginatedTable } from '@likable-hair/svelte';",
+				'<PaginatedTable>\n\t{#snippet appendSnippet({ index, item })}{#if index === -1}<span>Actions</span>{:else}{item.id}{/if}{/snippet}\n</PaginatedTable>'
+			)
+		});
+		expect(read('src/A.svelte')).toContain('{#snippet actionsSnippet({ row: item })}{item.id}{/snippet}');
+		expect(result.skipped).toEqual([]);
+		expect(result.changes.find((c) => c.kind === 'snippet-parameters' && c.check)?.note).toContain('<span>Actions</span>');
 	});
 });
 
@@ -617,6 +789,77 @@ describe('codemod: runs', () => {
 	});
 });
 
+describe('codemod: steps the rules decide', () => {
+	test('drops editFilterMode and the v4 button variables of IconsDropdown', () => {
+		const { read } = run({
+			'src/A.svelte': svelte(
+				"\timport { PaginatedTable, IconsDropdown } from '@likable-hair/svelte';",
+				'<PaginatedTable editFilterMode="one-edit" />\n<IconsDropdown --button-width="40px" --button-padding="2px" items={[]} />'
+			)
+		});
+		const out = read('src/A.svelte');
+		expect(out).toContain('<DataTable />');
+		expect(out).toContain('<IconsDropdown items={[]} />');
+	});
+
+	test('ActivableButton: buttonProps keys become props and an Icon only child becomes icon', () => {
+		const { read, result } = run({
+			'src/A.svelte': svelte(
+				"\timport { ActivableButton, Icon } from '@likable-hair/svelte';\n\timport { mdiCog } from '@mdi/js';\n\tlet busy = $state(false);",
+				[
+					'<ActivableButton buttonProps={{ disabled: busy, variant: "text" }}>\n\t<Icon name="mdi-plus" />\n</ActivableButton>',
+					'<ActivableButton><Icon path={mdiCog} /></ActivableButton>',
+					'<ActivableButton buttonProps={{ onclick: () => {} }}><Icon path={mdiCog} /> Bold</ActivableButton>'
+				].join('\n')
+			)
+		});
+		const out = read('src/A.svelte');
+		expect(out).toContain('<ActivableButton disabled={busy} icon={mdiPlus}></ActivableButton>');
+		expect(out).toContain('<ActivableButton icon={mdiCog}></ActivableButton>');
+		expect(out).toContain('<ActivableButton buttonProps={{ onclick: () => {} }}><Icon path={mdiCog} /> Bold</ActivableButton>');
+		expect(out).toMatch(/import \{ mdiCog, mdiPlus \} from '@mdi\/js'|import \{ mdiPlus \} from '@mdi\/js'/);
+		expect(result.changes.filter((c) => c.kind === 'child-icon')).toHaveLength(2);
+	});
+
+	test('each v4 Filter of a table becomes a FilterField', () => {
+		const { read, result } = run({
+			'src/A.svelte': svelte(
+				"\timport { PaginatedTable } from '@likable-hair/svelte';",
+				[
+					'<PaginatedTable filters={[',
+					"\t{ type: 'string', name: 'name', label: 'Name', mode: 'ilike', advanced: false, iconColor: 'red' },",
+					"\t{ type: 'string', name: 'code', label: 'Code', mode: 'like' },",
+					"\t{ type: 'number', name: 'age', label: 'Age', mode: 'greater', advanced: true, tabName: 'People' },",
+					"\t{ type: 'date', name: 'from', label: 'From', mode: 'greater' },",
+					"\t{ type: 'select', name: 'kind', label: 'Kind', mode: 'equal', items: [], value: 'a' }",
+					']} />'
+				].join('\n')
+			)
+		});
+		const out = read('src/A.svelte');
+		expect(out).toContain("{ type: 'string', name: 'name', label: 'Name', operators: ['contains'] }");
+		expect(out).toContain("{ type: 'string', name: 'code', label: 'Code', operators: ['contains'], caseSensitive: true }");
+		expect(out).toContain("{ type: 'number', name: 'age', label: 'Age', defaultOperator: 'gt', category: 'People' }");
+		expect(out).toContain("{ type: 'date', name: 'from', label: 'From', mode: 'greater' }");
+		expect(out).toContain("{ type: 'select', name: 'kind', label: 'Kind', operators: ['in'], items: [], value: 'a' }");
+		expect(result.skipped.map((s) => s.name)).toEqual(expect.arrayContaining([expect.stringContaining("mode: 'greater'"), expect.stringContaining("value: 'a'")]));
+	});
+
+	test('a row click that only opens a page becomes rowHref', () => {
+		const { read } = run({
+			'src/A.svelte': svelte(
+				"\timport { PaginatedTable } from '@likable-hair/svelte';\n\timport { goto } from '$app/navigation';\n\tfunction open(e) {\n\t\tgoto('/users/' + e.detail.item.id)\n\t}",
+				'<PaginatedTable onrowClick={open} />\n<PaginatedTable onrowClick={(e) => goto(`/roles/${e.detail.item.id}`)} />\n<PaginatedTable onrowClick={(e) => select(e.detail.item)} />'
+			)
+		});
+		const out = read('src/A.svelte');
+		expect(out).toContain("<DataTable rowHref={(row) => '/users/' + row.id} />");
+		expect(out).toContain('<DataTable rowHref={(row) => `/roles/${row.id}`} />');
+		expect(out).toContain('<DataTable onrowclick={(e) => select(e)} />');
+		expect(out).not.toContain('function open');
+	});
+});
+
 describe('codemod: local copies', () => {
 	const pageTitle = svelte(
 		"\timport { Icon } from '@likable-hair/svelte';\n\tlet { title, prependVisible = false, prependRoute = undefined, appendSnippet } = $props();",
@@ -646,6 +889,7 @@ describe('codemod: local copies', () => {
 		expect(result.locals).toEqual([
 			{ file: 'src/lib/components/common/PageTitle.svelte', from: 'local/PageTitle', to: 'PageHeader', usages: 2, deleted: true }
 		]);
+		expect(result.changes.filter((c) => c.check).map((c) => c.file)).not.toContain('src/lib/components/common/PageTitle.svelte');
 		expect(result.changes.filter((c) => c.kind === 'local-import').map((c) => c.file).sort()).toEqual([
 			'src/routes/+page.svelte',
 			'src/routes/b/+page.svelte'
@@ -775,7 +1019,7 @@ describe('codemod: local copies', () => {
 		);
 	});
 
-	test('the theme cookie leftovers: the endpoint goes when nothing calls it, the hooks replacement is reported', () => {
+	test('the theme cookie leftovers: the endpoint goes when nothing calls it, the hooks replacement goes', () => {
 		const themeSwitch = svelte("\tlet { value = false } = $props();\n\tfunction toggle() { fetch('/api/setTheme?dark=' + value); }", '<button onclick={toggle}>t</button>');
 		const { read, result } = run({
 			'src/app.html': '<html lang="it">\n<body>%sveltekit.body%</body>\n</html>\n',
@@ -786,6 +1030,14 @@ describe('codemod: local copies', () => {
 		});
 		expect(read('src/routes/+page.svelte')).toContain('<ModeSwitch />');
 		expect(result.deleted.sort()).toEqual(['src/lib/components/common/ThemeSwitch.svelte', 'src/routes/api/setTheme/+server.ts']);
+		expect(read('src/hooks.server.ts')).toBe('export const handle = async ({ event, resolve }) => resolve(event);\n');
+		expect(result.changes.find((c) => c.id === 'local/ThemeSwitch/hooks')?.file).toBe('src/hooks.server.ts');
+	});
+
+	test('a hooks replacement that does more than the theme is reported, not changed', () => {
+		const hooks = "export const handle = async ({ event, resolve }) => resolve(event, { transformPageChunk: ({ html }) => html.replace('%theme%', 'x').replace('%lang%', 'it') });\n";
+		const { read, result } = run({ 'src/app.html': '<html lang="it">\n<body>%sveltekit.body%</body>\n</html>\n', 'src/hooks.server.ts': hooks });
+		expect(read('src/hooks.server.ts')).toBe(hooks);
 		expect(result.skipped.find((s) => s.id === 'local/ThemeSwitch/hooks')?.file).toBe('src/hooks.server.ts');
 	});
 

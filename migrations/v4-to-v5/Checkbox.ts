@@ -86,7 +86,7 @@ export default {
 				'`onchange` no longer reports `shiftKeyPressed`; v4 tracked Shift with two global `window` listeners per checkbox.',
 			action:
 				'Where a handler reads `detail.shiftKeyPressed` (range selection), move that logic to `onclick` and read `event.shiftKey`. It is true for a Shift+click on the box and, in Chromium, for Shift+Space and a Shift+click on the label text; in Firefox Shift+Space gives `false` and a Shift+click on the label text does not toggle the box.',
-			when: { events: ['onchange'] }
+			when: { events: ['onchange'], reads: ['shiftKeyPressed'] }
 		},
 		{
 			id: 'checkbox-label-root',

@@ -35,7 +35,8 @@ export default {
 			},
 			{
 				name: 'editFilterMode',
-				note: 'v4 only changed the margin (5% in one-edit). The card has its own padding (`--filter-editor-padding`). Drop it.'
+				note: 'v4 only changed the margin (5% in one-edit). The card has its own padding (`--filter-editor-padding`).',
+				drop: true
 			},
 			{
 				name: 'mobile',
