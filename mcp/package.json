@@ -14,6 +14,9 @@
 		"dist",
 		"bundled"
 	],
+	"scripts": {
+		"prepack": "node scripts/build.ts"
+	},
 	"engines": {
 		"node": ">=20"
 	},

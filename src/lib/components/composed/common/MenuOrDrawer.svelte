@@ -9,7 +9,7 @@ Shows its content in a `Menu` anchored to `activator` on wide screens and in a b
 	import type { VirtualElement } from '../../simple/common/floating.js';
 	import { breakpoints } from '../../../utils/breakpoints.svelte.js';
 
-	interface Props {
+	export interface Props {
 		/** Whether the menu or the drawer is open. `undefined` counts as closed. */
 		open?: boolean;
 		/** What the menu is anchored to: usually the button that opens it, or any object with `getBoundingClientRect()`. The drawer ignores it. */

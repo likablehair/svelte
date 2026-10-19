@@ -6,14 +6,25 @@ The previous version (4.x) lives on the **`4.x` branch**. It only gets small fix
 
 ## What is in this repository
 
-There are three packages, plus the documentation site:
+There are four packages, plus the documentation site:
 
 | Package | What it is for |
 |---|---|
 | `@likable-hair/svelte` | **The library.** About 70 components, the themes and the styles. This is the package an app installs. |
 | `@likable-hair/svelte-migrate` | **The migration tool.** Moves an app from version 4 to version 5, doing most of the work by itself. |
 | `@likable-hair/svelte-mcp` | **The helper for AI coding assistants** (Claude Code, Codex, Cursor, Copilot). It gives them the exact description of every component, so they write correct code. |
+| `@likable-hair/adonis-filters` | **For the AdonisJS backends.** Applies the filters sent by the tables to the database queries; it replaces the `FilterModifierApplier` class copied into every backend. Its README says how to switch. |
 | Documentation site | One page per component, with live examples. Not published as a package. |
+
+## Start here: from this repository to a migrated app
+
+The whole path, in order. Each step links to its section below.
+
+1. **Install the repository.** You need Node 22.18 or later (24 is best) and pnpm (`npm install -g pnpm`: it then switches by itself to the version the repository asks for). From the root: `pnpm install`.
+2. **Publish the packages**, once: the apps install them from npm, so nothing below works before this. `pnpm login`, then `pnpm release --dry-run` to see what would happen, then `pnpm release` ([Publishing](#publishing)).
+3. **Migrate an app** (only apps on version 4): commit everything in the app, run the steps *analyze* and *setup* of the migration tool, then let an AI assistant do the rest ([Letting an AI assistant do the migration](#letting-an-ai-assistant-do-the-migration)). Some points it lists are for the backend, for example the dates of the period filters.
+4. **Try and commit.** Open the pages the migration lists at the end, in light and dark mode, on desktop and phone; then commit the app yourself. The tool and the assistant never commit.
+5. **After a change to the library**, `pnpm release patch` publishes a new version of the packages that changed, and the apps update with `npm update @likable-hair/svelte` (or `pnpm update`).
 
 ## Using the library in an app
 
@@ -78,8 +89,8 @@ The documentation site has the full list.
 From the root of this repository:
 
 ```sh
-npm install
-npx vite dev --port 5180
+pnpm install
+pnpm dev --port 5180
 ```
 
 Then open http://localhost:5180. You will find:
@@ -160,3 +171,17 @@ pnpm migrate <step> <app>                      # the migration tool, from the so
 ```
 
 The full test runs are slow and use a lot of memory: during work, run only the tests of what you changed. Decisions, process and current state of the work are in `.claude/skills/redesign-aurora/` (in Italian). `CLAUDE.md` is the starting point for an AI assistant working on this repository.
+
+The screenshots of `pnpm test:visual` are compared with reference images taken on Linux (`tests/visual/__screenshots__/linux/`): on macOS or Windows there are no reference images yet, so that command fails there. GitHub Actions runs the type check, the builds and `pnpm test` on every push to `master` and on every pull request to it (`.github/workflows/test.yml`).
+
+### Publishing
+
+One command publishes the packages, after `pnpm login` and with everything committed:
+
+```sh
+pnpm release --dry-run   # checks and builds everything, publishes nothing
+pnpm release             # publishes the versions written in the package.json files
+pnpm release patch       # or minor, major: raises the versions of the packages changed since their last release
+```
+
+It runs the type check and the tool tests, builds `@likable-hair/svelte`, `@likable-hair/svelte-migrate`, `@likable-hair/svelte-mcp` and `@likable-hair/adonis-filters`, publishes them to npm in this order (the MCP server depends on the migration tool) and skips the ones whose version is already there. Then it writes the notes in `CHANGELOG.md` (the commit subjects since the previous release of each package), commits, tags (`v5.0.1`, `svelte-migrate@0.1.1`…), pushes and creates the GitHub releases. `--only svelte,svelte-mcp` publishes only those packages (with a version bump, also when they did not change), `--tag next` publishes under another npm dist-tag, `--otp <code>` passes the code of the npm two-factor authentication, `pnpm release --help` lists everything. The packages stay `"private": true` in the repository, so a plain `pnpm publish` refuses them: only `pnpm release` publishes.

@@ -29,4 +29,4 @@ All from the repository root. The repository is a pnpm workspace (root, `migrate
 
 ## Releases
 
-Nothing is published from work sessions: the packages stay `"private": true` until the maintainer publishes them on npm. Publish with `pnpm publish` (or `pnpm pack`), not `npm publish`: pnpm turns the `workspace:^` dependency of `mcp/` on `migrate/` into the real version.
+Nothing is published from work sessions: the packages stay `"private": true` and only the maintainer publishes, with `pnpm release` (`scripts/release.ts`: checks, builds, publishes in dependency order, writes `CHANGELOG.md`, commits, tags, pushes, creates the GitHub releases; `pnpm release --help`). From a work session run it only with `--dry-run`. It packs with pnpm, which turns the `workspace:^` dependency of `mcp/` on `migrate/` into the real version.

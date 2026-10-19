@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "vite dev",
 		"prepare": "svelte-kit sync || echo ''",
-		"package": "svelte-kit sync && svelte-package && node scripts/build-spec.ts && publint",
+		"package": "svelte-kit sync && svelte-package && node scripts/build-spec.ts && node scripts/check-declarations.ts && publint",
 		"prepack": "pnpm run package",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && tsc -p migrate && tsc -p mcp --noEmit && tsc -p adonis-filters",
 		"test": "vitest run",
@@ -18,7 +18,8 @@
 		"migrate": "node migrate/src/cli.ts",
 		"migrate:build": "node migrate/scripts/build.ts",
 		"mcp": "node mcp/src/cli.ts",
-		"mcp:build": "node mcp/scripts/build.ts"
+		"mcp:build": "node mcp/scripts/build.ts",
+		"release": "node scripts/release.ts"
 	},
 	"files": [
 		"dist",

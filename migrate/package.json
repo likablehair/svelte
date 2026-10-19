@@ -15,6 +15,9 @@
 		"rules",
 		"skills"
 	],
+	"scripts": {
+		"prepack": "node scripts/build.ts"
+	},
 	"engines": {
 		"node": ">=20"
 	},

@@ -90,7 +90,9 @@ Misurato con `analyze` e `codemod --dry-run` (nulla scritto in addibox, branch `
 4. **addibox** (3–5 sessioni di Claude): setup e codemod in pochi minuti, poi i punti rimasti con `next`. Il grosso sono le tabelle: 8 DynamicTable + 5 via wrapper, 1 EnhancedPaginatedTable + 13 via StandardPaginatedTable, 1 PaginatedTable, 18 SimpleTable; scroll infinito, Paginator esterno a DynamicTable (16 pagine), colonne salvate sul backend. Poi DashboardShaper (5), PeriodPicker della libreria (5; addibox legge la forma v4 del JSON) e il backend di addibox per il periodo dinamico (passo `manual`, fuori da questo repo).
 5. **Prove dell'utente**: le app non hanno test; 114 pagine in chiaro e scuro, desktop e telefono (1–2 giorni).
 
-Totale stimato: circa una settimana di lavoro, ~2 giorni di preparazione (punti 1–3) e ~3 giorni per addibox (punti 4–5). Riferimento: tatum (28 file) è passato da 45 errori a 0 in una sessione. P56 e P104 sono funzioni della libreria e non bloccano.
+Totale stimato: circa una settimana di lavoro, ~2 giorni di preparazione (punti 1–3) e ~3 giorni per addibox (punti 4–5).
+
+**Stato al 2026-10-19** (domanda dell'utente: "abbiamo finito con tutto ciò che serve per migrare addibox?"): punto 1 fatto (gruppi (a)–(d), P233–P260, lo strumento è chiuso; il laboratorio su addibox dà ~1.050 errori dopo il codemod, quasi tutti spiegati da `next`, il resto, come P251, lo fa l'agente); punto 2 sostituito dalla seconda migrazione di tatum da zero (fasi 3–5 fatte da un subagente con la sola skill `aurora-migrate`); punto 3 pronto: `pnpm release` c'è, manca solo che il capo lo lanci (prima di allora `setup` in un'app funziona solo coi `.tgz`); restano i punti 4 (l'agente su addibox, con i passi per il backend che `next` elenca: periodi, filtri) e 5 (prove dell'utente). Riferimento: tatum (28 file) è passato da 45 errori a 0 in una sessione. P56 e P104 sono funzioni della libreria e non bloccano.
 
 ## Analisi del 2026-10-15 (`npm run migrate -- analyze`, sola lettura)
 

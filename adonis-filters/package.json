@@ -25,7 +25,8 @@
 		"node": ">=16"
 	},
 	"scripts": {
-		"build": "tsc -p tsconfig.build.json && tsc -p tsconfig.cjs.json && node scripts/cjs-package.ts"
+		"build": "tsc -p tsconfig.build.json && tsc -p tsconfig.cjs.json && node scripts/cjs-package.ts",
+		"prepack": "pnpm run build"
 	},
 	"devDependencies": {
 		"@adonisjs/core": "^7.5.0",
