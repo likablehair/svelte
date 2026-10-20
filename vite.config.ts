@@ -1,3 +1,4 @@
+import adapter from '@sveltejs/adapter-vercel';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { playwright } from '@vitest/browser-playwright';
@@ -12,7 +13,7 @@ const compilerOptions = {
 const pagesPerBrowser = Math.max(2, Math.min(availableParallelism() - 1, Math.round(totalmem() / 2 ** 32)));
 
 export default defineConfig({
-	plugins: [sveltekit({ compilerOptions })],
+	plugins: [sveltekit({ adapter: adapter(), compilerOptions })],
 	test: {
 		projects: [
 			{
