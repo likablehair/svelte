@@ -38,6 +38,20 @@ AGENTS.md                    block between <!-- aurora:start --> and <!-- aurora
 		]
 	},
 	{
+		title: 'Using the skills',
+		blocks: [
+			'The agent loads a skill by itself when the task matches it (UI work for `aurora-design`, migrating the app for `aurora-migrate`). In Claude Code a skill is also a slash command, and the prompts of the server are slash commands too:',
+			{
+				lang: 'text',
+				source: `/aurora-design               the design skill
+/aurora-migrate              the migration skill (apps being migrated)
+/mcp__aurora__design-page    the design-page prompt of the server
+/mcp__aurora__create-theme   the create-theme prompt
+/mcp__aurora__migrate-app    the migrate-app prompt (apps being migrated)`
+			}
+		]
+	},
+	{
 		title: 'Configure by hand',
 		blocks: [
 			'The server is a local stdio process started in the app folder. Claude Code (`.mcp.json`) and Cursor (`.cursor/mcp.json`):',
@@ -46,6 +60,23 @@ AGENTS.md                    block between <!-- aurora:start --> and <!-- aurora
 			{ lang: 'json', source: JSON.stringify({ servers: { aurora: { type: 'stdio', ...server } } }, null, 2) },
 			'Codex (`.codex/config.toml`, or `~/.codex/config.toml` for every project):',
 			{ lang: 'toml', source: `[mcp_servers.aurora]\ncommand = "npx"\nargs = ["-y", "${MCP_PACKAGE}"]` }
+		]
+	},
+	{
+		title: 'Monorepos',
+		blocks: [
+			'`init` writes the files next to the `package.json` of the app, and the server reads the library of the folder it starts in. When the agent runs in a parent folder (the root of a monorepo with the app in `frontend/`), it does not read the configuration in `frontend/`, and a server started at the root does not find the library of the app.',
+			'Run `init` in the app folder anyway, then link its skills into the root. Claude Code finds the skills of a subfolder only after it has worked on a file there, and never as slash commands; a link in the `.claude/skills` of the root makes them available from the start, and `init` keeps updating them:',
+			{
+				lang: 'sh',
+				source: 'mkdir -p .claude/skills\nln -s ../../frontend/.claude/skills/aurora-design .claude/skills/aurora-design\nln -s ../../frontend/.claude/skills/aurora-migrate .claude/skills/aurora-migrate   # apps being migrated'
+			},
+			'Then add the server to the configuration of the root, started in the app folder. Claude Code (`.mcp.json` of the root):',
+			{
+				lang: 'json',
+				source: JSON.stringify({ mcpServers: { aurora: { type: 'stdio', command: 'sh', args: ['-c', `cd frontend && npx -y ${MCP_PACKAGE}`] } } }, null, 2)
+			},
+			'The other agents take the same `command` and `args` in their file at the root. With more apps on the library, add one server per app, each with its own name (`aurora-admin`, `aurora-shop`).'
 		]
 	},
 	{
@@ -78,8 +109,9 @@ validate_usage      checks a .svelte file or code against the specs`
 		title: 'Migrating from v4',
 		blocks: [
 			`In an app still on ${PACKAGE} 4.x, or being migrated, the server adds the \`migration_analyze\`, \`migration_setup\`, \`migration_codemod\`, \`migration_next\`, \`migration_status\` and \`migration_rules\` tools and the \`migrate-app\` prompt, and \`init\` adds the \`aurora-migrate\` skill, which takes the agent through the phases. The specs it shows are those of v5, the target. The tools need the migration package (\`setup\` adds it):`,
-			{ lang: 'sh', source: 'npm i -D @likable-hair/svelte-migrate' },
-			'`setup` of the migration adds both packages to the dev dependencies and runs `init` itself; nothing is ever committed. The app counts as being migrated while `@likable-hair/svelte-migrate` is among its dependencies, so the tools stay available after v5 is installed. When the migration is over, remove it and run `npx svelte-mcp init` again: the migration skill goes away.'
+			{ lang: 'sh', source: `npm i -D @likable-hair/svelte-migrate ${MCP_PACKAGE}\nnpx svelte-mcp init` },
+			'This sets up only the agents (server, `aurora-design` and `aurora-migrate`) and leaves the app as it is. `init` copies the migration skill from the `node_modules` of the app: in a workspace that hoists the packages to the root (npm or Yarn workspaces) it does not find it and prints `Skill aurora-migrate not found: skipped`; copy `node_modules/@likable-hair/svelte-migrate/skills/aurora-migrate` of the root into `.claude/skills/` (or `.agents/skills/`) of the app by hand.',
+			'`setup` of the migration (`npx @likable-hair/svelte-migrate setup <app-dir>`) also adds both packages to the dev dependencies and runs `init` itself, but it starts the migration: new branch, v5 in `package.json`, install, changes to the CSS and the root layout. Nothing is ever committed. The app counts as being migrated while `@likable-hair/svelte-migrate` is among its dependencies, so the tools stay available after v5 is installed. When the migration is over, remove it and run `npx svelte-mcp init` again: the migration skill goes away.'
 		]
 	}
 ];
