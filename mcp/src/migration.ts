@@ -21,11 +21,10 @@ export interface MigrateModule {
 	setup(
 		dir: string,
 		analysis: Analysis,
-		options: { branch: string; install: boolean; layers: string; packageSpec?: string; locale?: string }
-	): { branch: string; changes: string[] };
+		options: { install: boolean; layers: string; packageSpec?: string; locale?: string }
+	): { changes: string[] };
 	codemod(dir: string, index: RuleIndex, options?: { write?: boolean }): { files: unknown[] };
 	codemodReport(result: unknown): string;
-	currentBranch(dir: string): string;
 	requireInstalled?(dir: string): void;
 	remaining(dir: string, index: RuleIndex): unknown;
 	nextReport(result: unknown, file?: string): string;

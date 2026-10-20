@@ -5,8 +5,9 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, test } from 'vitest';
 import { analyze } from '../src/analyze.ts';
+import { migrationBase, recordBase } from '../src/remaining.ts';
 import { loadRules } from '../src/rules.ts';
-import { dropThemePlaceholder, prepareBranch, requireInstalled, setHtmlLang, setup, updateAppCss, updatePackageJson, updateTailwindConfig, updateTitleTemplate } from '../src/setup.ts';
+import { dropThemePlaceholder, requireInstalled, setHtmlLang, setup, updateAppCss, updatePackageJson, updateTailwindConfig, updateTitleTemplate } from '../src/setup.ts';
 
 const fixture = fileURLToPath(new URL('./fixtures/app-v4', import.meta.url));
 const dirs: string[] = [];
@@ -161,36 +162,40 @@ describe('setup: installed version', () => {
 	});
 });
 
-describe('setup: branch', () => {
-	test('creates the branch from the main branch without committing', () => {
-		const dir = copyApp();
-		const git = gitRepo(dir);
-		expect(prepareBranch(dir, 'aurora-v5')).toBe('aurora-v5');
-		expect(git(['rev-parse', '--abbrev-ref', 'HEAD'])).toBe('aurora-v5');
-		expect(git(['rev-list', '--count', 'HEAD'])).toBe('1');
-		expect(prepareBranch(dir, 'aurora-v5')).toBe('aurora-v5');
-	});
-
-	test('refuses to start from a repository with uncommitted changes', () => {
-		const dir = copyApp();
-		gitRepo(dir);
-		writeFileSync(join(dir, 'new.txt'), 'x');
-		expect(() => prepareBranch(dir, 'aurora-v5')).toThrow(/uncommitted changes/);
-	});
-
-	test('on the migration branch the uncommitted changes are the migration: it goes on', () => {
-		const dir = copyApp();
-		gitRepo(dir);
-		prepareBranch(dir, 'aurora-v5');
-		writeFileSync(join(dir, 'new.txt'), 'x');
-		expect(prepareBranch(dir, 'aurora-v5')).toBe('aurora-v5');
-	});
-
-	test('refuses to start from a feature branch', () => {
+describe('setup: v4 code', () => {
+	test('records the v4 code as it is, on any branch, touching nothing', () => {
 		const dir = copyApp();
 		const git = gitRepo(dir);
 		git(['switch', '-q', '-c', 'feature']);
-		expect(() => prepareBranch(dir, 'aurora-v5')).toThrow(/is on "feature"/);
+		writeFileSync(join(dir, 'src/app.html'), '<html lang="it">changed</html>\n');
+		writeFileSync(join(dir, 'new.txt'), 'x');
+		git(['add', 'new.txt']);
+		writeFileSync(join(dir, 'untracked.txt'), 'y');
+		const status = git(['status', '--porcelain']);
+		const recorded = recordBase(dir)!;
+		expect(recorded.created).toBe(true);
+		expect(git(['rev-parse', '--abbrev-ref', 'HEAD'])).toBe('feature');
+		expect(git(['rev-list', '--count', 'HEAD'])).toBe('1');
+		expect(git(['status', '--porcelain'])).toBe(status);
+		expect(git(['show', `${recorded.base}:src/app.html`])).toBe('<html lang="it">changed</html>');
+		expect(git(['show', `${recorded.base}:untracked.txt`])).toBe('y');
+		expect(migrationBase(dir)).toBe(recorded.base);
+	});
+
+	test('a second run keeps the first recording', () => {
+		const dir = copyApp();
+		gitRepo(dir);
+		const first = recordBase(dir)!;
+		writeFileSync(join(dir, 'new.txt'), 'x');
+		expect(recordBase(dir)).toEqual({ base: first.base, created: false });
+	});
+
+	test('setup records it while package.json still asks for v4', () => {
+		const dir = copyApp();
+		gitRepo(dir);
+		const result = setup(dir, analyze(dir, loadRules()), { install: false, layers: '@layer reset, theme;' });
+		expect(result.changes[0]).toMatch(/^v4 code recorded in the git folder/);
+		expect(setup(dir, analyze(dir, loadRules()), { install: false, layers: '@layer reset, theme;' }).changes.some((c) => c.startsWith('v4 code recorded'))).toBe(false);
 	});
 });
 
@@ -234,7 +239,7 @@ describe('setup: paraglide', () => {
 		const dir = paraglideApp("paraglideVitePlugin({ project: './project.inlang', outdir: './src/paraglide' })\n");
 		const analysis = analyze(dir, loadRules());
 		expect(analysis.app).toMatchObject({ paraglide: '../paraglide/runtime', lang: undefined });
-		const result = setup(dir, analysis, { branch: 'aurora-v5', install: false, layers: '@layer reset, theme;' });
+		const result = setup(dir, analysis, { install: false, layers: '@layer reset, theme;' });
 		const layout = readFileSync(join(dir, 'src/routes/+layout.svelte'), 'utf8');
 		expect(layout).toContain("import { getLocale } from '../paraglide/runtime';");
 		expect(layout).toContain('setDefaultLocale(() => getLocale());');

@@ -7,12 +7,12 @@ import { codemod } from './codemod.ts';
 import { remaining } from './remaining.ts';
 import { appLabel, codemodReport, markdownReport, nextReport, remainingReport, summaryTable } from './report.ts';
 import { componentRules, loadRules } from './rules.ts';
-import { currentBranch, requireInstalled, setup } from './setup.ts';
+import { requireInstalled, setup } from './setup.ts';
 
 const USAGE = `Usage:
   svelte-migrate analyze <app-dir...> [--md <file|dir>] [--json <file|dir>] [--summary]
-  svelte-migrate setup <app-dir> [--package <version|file.tgz>] [--branch <name>] [--locale <code>] [--no-install]
-  svelte-migrate codemod <app-dir> [--dry-run] [--md <file>] [--branch <name>]
+  svelte-migrate setup <app-dir> [--package <version|file.tgz>] [--locale <code>] [--no-install]
+  svelte-migrate codemod <app-dir> [--dry-run] [--md <file>]
   svelte-migrate next <app-dir> [--file <path>]
   svelte-migrate status <app-dir> [--md <file>]
   svelte-migrate rules <Component>
@@ -22,9 +22,9 @@ const USAGE = `Usage:
   --json      Same for the JSON data.
   --summary   Print one table row per app instead of the full reports.
 
-  setup       Prepare the app: checks that its repository is clean, creates the branch
-              (default aurora-v5), records the svelte-check errors the v4 code already has
-              (in the git folder: next lists them apart), puts v5 in package.json (a .tgz is copied into vendor/),
+  setup       Prepare the app, on the current branch and with the changes already there:
+              records the v4 code as it is (in the git folder, for next) and the svelte-check
+              errors it already has (next lists them apart), puts v5 in package.json (a .tgz is copied into vendor/),
               adds @mdi/js and the packages that came with v4, raises svelte to 5.29, installs;
               in the main CSS adds the cascade layer order, the library Tailwind CSS, the library
               fonts, v4-compat.css and the v4 space above ConfirmOrCancelButtons, moves element
@@ -35,7 +35,7 @@ const USAGE = `Usage:
               aurora-design and aurora-migrate skills, AGENTS.md) with @likable-hair/svelte-mcp.
               Can be run again. Never commits.
 
-  codemod     The mechanical changes, on the branch made by setup: renamed components, props,
+  codemod     The mechanical changes, after setup: renamed components, props,
               events, snippets and CSS variables, callback arguments without \`detail\` (inline
               handlers and functions of the same file, with their types), MDI icon names turned
               into @mdi/js imports, data passed to props (table columns, options, items) and
@@ -48,8 +48,8 @@ const USAGE = `Usage:
   next        The remaining points, one file at a time: runs svelte-check in the app and
               explains each error with the migration rule behind it (what changed, what to
               write), then the points to write in the same file (code the tool could not
-              change). The v4 code is read from git (the commit the migration branch started
-              from), so nothing is written in the app. When no errors are left it lists the
+              change). The v4 code is the one setup recorded in the git folder, so nothing
+              is written in the app. When no errors are left it lists the
               points to write, file by file, then the points to look at (behaviour, look or
               defaults changed) grouped by component with their pages, and the pages to try.
               --file shows that file, with its points to look at, instead of the next one.
@@ -70,21 +70,19 @@ interface Options {
 	summary: boolean;
 	packageSpec?: string;
 	locale?: string;
-	branch: string;
 	install: boolean;
 	dryRun: boolean;
 	file?: string;
 }
 
 function parseArgs(argv: string[]): Options | undefined {
-	const options: Options = { dirs: [], summary: false, branch: 'aurora-v5', install: true, dryRun: false };
+	const options: Options = { dirs: [], summary: false, install: true, dryRun: false };
 	for (let i = 0; i < argv.length; i++) {
 		const arg = argv[i];
 		if (arg === '--md') options.md = argv[++i];
 		else if (arg === '--json') options.json = argv[++i];
 		else if (arg === '--summary') options.summary = true;
 		else if (arg === '--package') options.packageSpec = argv[++i];
-		else if (arg === '--branch') options.branch = argv[++i];
 		else if (arg === '--locale') options.locale = argv[++i];
 		else if (arg === '--no-install') options.install = false;
 		else if (arg === '--dry-run') options.dryRun = true;
@@ -124,7 +122,6 @@ async function runSetup(options: Options) {
 	const index = loadRules();
 	const result = setup(dir, analyze(dir, index), { ...options, layers: index.rules.global.layers.app });
 	const changes = [...result.changes, ...(await setupAgents(dir))];
-	console.log(`Branch: ${result.branch}`);
 	console.log(changes.length ? changes.map((c) => `- ${c}`).join('\n') : 'Nothing to change.');
 	if (result.install) console.log(`Installed with \`${result.install}\`.`);
 	console.log(
@@ -137,12 +134,7 @@ async function runSetup(options: Options) {
 
 function runCodemod(options: Options) {
 	const dir = resolve(options.dirs[0]);
-	if (!options.dryRun) {
-		const branch = currentBranch(dir);
-		if (branch !== options.branch)
-			throw new Error(`${dir} is on "${branch}", not on "${options.branch}": run setup first (or pass --branch).`);
-		requireInstalled(dir);
-	}
+	if (!options.dryRun) requireInstalled(dir);
 	const result = codemod(dir, loadRules(), { write: !options.dryRun });
 	const report = codemodReport(result);
 	if (options.md) writeFileSync(options.md, report);

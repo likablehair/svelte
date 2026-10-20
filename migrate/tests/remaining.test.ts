@@ -4,10 +4,9 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, describe, expect, test } from 'vitest';
 import { codemod } from '../src/codemod.ts';
-import { lineMap, messageNames, migrationBase, parseSvelteCheck, readBaseline, recordBaseline, remaining, type Diagnostic } from '../src/remaining.ts';
+import { lineMap, messageNames, migrationBase, parseSvelteCheck, readBaseline, recordBase, recordBaseline, remaining, type Diagnostic } from '../src/remaining.ts';
 import { nextReport, remainingReport } from '../src/report.ts';
 import { loadRules } from '../src/rules.ts';
-import { prepareBranch } from '../src/setup.ts';
 
 const rules = loadRules();
 const dirs: string[] = [];
@@ -109,17 +108,18 @@ describe('remaining: parsing', () => {
 describe('remaining: an app after the codemod', () => {
 	function migrated() {
 		const { dir, read } = app(V4);
-		prepareBranch(dir, 'aurora-v5');
+		recordBase(dir);
 		codemod(dir, rules, { write: true });
 		return { dir, read };
 	}
 
-	test('setup records the commit the migration started from', () => {
+	test('setup records the v4 code the migration started from', () => {
 		const { dir } = app(V4);
-		const head = execFileSync('git', ['-C', dir, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
-		prepareBranch(dir, 'aurora-v5');
-		expect(execFileSync('git', ['-C', dir, 'config', 'branch.aurora-v5.migrateBase'], { encoding: 'utf8' }).trim()).toBe(head);
-		expect(migrationBase(dir)).toBe(head);
+		const tree = (rev: string) => execFileSync('git', ['-C', dir, 'rev-parse', `${rev}^{tree}`], { encoding: 'utf8' }).trim();
+		const recorded = recordBase(dir)!;
+		expect(recorded.created).toBe(true);
+		expect(migrationBase(dir)).toBe(recorded.base);
+		expect(tree(recorded.base)).toBe(tree('HEAD'));
 	});
 
 	test('explains each svelte-check error with the rule of the v4 component', () => {
@@ -148,7 +148,7 @@ describe('remaining: an app after the codemod', () => {
 				'<NameField bind:value={name} error={wrong} />'
 			)
 		});
-		prepareBranch(dir, 'aurora-v5');
+		recordBase(dir);
 		codemod(dir, rules, { write: true });
 		const page = read('src/routes/users/+page.svelte');
 		const diagnostics = [at(page, 'error=', 'src/routes/users/+page.svelte', "Object literal may only specify known properties, but 'error' does not exist in type 'Props'.")];
@@ -243,7 +243,7 @@ describe('remaining: errors already in the v4 code', () => {
 
 	test('setup records them in the git folder, for the commit the migration started from', () => {
 		const { dir } = app(V4);
-		prepareBranch(dir, 'aurora-v5');
+		recordBase(dir);
 		const base = migrationBase(dir)!;
 		expect(recordBaseline(dir, base, () => ({ ran: true, diagnostics: [old] })).ran).toBe(true);
 		expect(readBaseline(dir, base)).toEqual([old]);
@@ -253,7 +253,7 @@ describe('remaining: errors already in the v4 code', () => {
 
 	test('next and status list them apart and they do not count as errors of the migration', () => {
 		const { dir } = app(V4);
-		prepareBranch(dir, 'aurora-v5');
+		recordBase(dir);
 		codemod(dir, rules, { write: true });
 		const moved = { ...old, line: 9 };
 		const result = remaining(dir, rules, { baseline: [old], check: () => ({ ran: true, diagnostics: [moved, fresh] }) });
@@ -271,7 +271,7 @@ describe('remaining: look', () => {
 	test('a box filled with a v4 background tone is a point to look at, with the surface and border advice', () => {
 		const page = svelte("\timport { Button } from '@likable-hair/svelte'", '<div class="rounded-md bg-[rgb(var(--global-color-background-200))] p-4"><Button>Save</Button></div>');
 		const { dir } = app({ 'src/routes/+page.svelte': page, 'src/app.css': '.card {\n\tbackground: rgb(var(--global-color-background-100));\n}\n' });
-		prepareBranch(dir, 'aurora-v5');
+		recordBase(dir);
 		codemod(dir, rules, { write: true });
 		const points = remaining(dir, rules, { check: () => ({ ran: true, diagnostics: [] }) })
 			.files.flatMap((f) => f.review.map((p) => ({ ...p, file: f.file })))
@@ -342,7 +342,7 @@ describe('remaining: steps with unless', () => {
 			'<Dialog bind:open={a}>\n\t<p>Edit</p>\n</Dialog>\n<Dialog bind:open={b}>\n\t<p>Delete</p>\n</Dialog>'
 		);
 		const { dir, read } = app({ 'src/routes/+page.svelte': page });
-		prepareBranch(dir, 'aurora-v5');
+		recordBase(dir);
 		codemod(dir, rules, { write: true });
 		const points = () =>
 			remaining(dir, rules, { check: () => ({ ran: true, diagnostics: [] }) })
@@ -358,7 +358,7 @@ describe('remaining: steps with unless', () => {
 	test('a point to write leaves next once the use no longer has what triggered it', () => {
 		const page = svelte("\timport { DatePicker } from '@likable-hair/svelte'", '<DatePicker selectableYears={[2025, 2026]} />\n<DatePicker selectableYears={[2027]} />');
 		const { dir, read } = app({ 'src/routes/+page.svelte': page });
-		prepareBranch(dir, 'aurora-v5');
+		recordBase(dir);
 		codemod(dir, rules, { write: true });
 		const points = () =>
 			remaining(dir, rules, { check: () => ({ ran: true, diagnostics: [] }) })
@@ -372,7 +372,7 @@ describe('remaining: steps with unless', () => {
 	test('a deleted trigger line still finds its use, and a use gone from the file takes its points away', () => {
 		const page = svelte("\timport { DatePicker } from '@likable-hair/svelte'", '<DatePicker\n\tlocale="it"\n\tselectableYears={[2025]}\n/>\n<p>between</p>\n<DatePicker selectableYears={[2027]} />');
 		const { dir, read } = app({ 'src/routes/+page.svelte': page });
-		prepareBranch(dir, 'aurora-v5');
+		recordBase(dir);
 		codemod(dir, rules, { write: true });
 		const points = () =>
 			remaining(dir, rules, { check: () => ({ ran: true, diagnostics: [] }) })
@@ -388,7 +388,7 @@ describe('remaining: steps with unless', () => {
 	test('a step for every use leaves out the files deleted since the v4 code', () => {
 		const dialog = svelte("\timport { Dialog } from '@likable-hair/svelte'\n\tlet open = $state(false)", '<Dialog bind:open title="Edit"><p>Edit</p></Dialog>');
 		const { dir } = app({ 'src/lib/components/OldDialog.svelte': dialog, 'src/routes/+page.svelte': dialog });
-		prepareBranch(dir, 'aurora-v5');
+		recordBase(dir);
 		codemod(dir, rules, { write: true });
 		const focus = () => remaining(dir, rules, { check: () => ({ ran: true, diagnostics: [] }) }).general.find((g) => g.id === 'dialog-initial-focus');
 		expect(focus()).toMatchObject({ usages: 2, files: 2 });
@@ -412,7 +412,7 @@ describe('remaining: alternative points and CSS variables v5 does not have', () 
 
 	test('both ways to load a table are listed until one is done, then neither', () => {
 		const { dir, read } = app({ 'src/routes/+page.svelte': table });
-		prepareBranch(dir, 'aurora-v5');
+		recordBase(dir);
 		codemod(dir, rules, { write: true });
 		const current = read('src/routes/+page.svelte');
 		expect(ids(dir).sort()).toEqual(['data-table-loader', 'data-table-query']);
@@ -424,7 +424,7 @@ describe('remaining: alternative points and CSS variables v5 does not have', () 
 
 	test('a v4 variable of the app stylesheet is a point to write until it leaves the file', () => {
 		const { dir, read } = app({ 'src/app.css': ':root {\n  --chip-default-color: white;\n}\n' });
-		prepareBranch(dir, 'aurora-v5');
+		recordBase(dir);
 		codemod(dir, rules, { write: true });
 		const points = () =>
 			remaining(dir, rules, { check: () => ({ ran: true, diagnostics: [] }) })
@@ -448,14 +448,14 @@ describe('remaining: points the current code closes', () => {
 				.filter((p) => p.id === 'sidebar-layout-scroll');
 		const wrapped = '<div style:height="calc(100dvh - 50px)" class="overflow-auto"><slot /></div>';
 		const { dir, read } = app({ 'src/routes/+layout.svelte': layout(wrapped) });
-		prepareBranch(dir, 'aurora-v5');
+		recordBase(dir);
 		codemod(dir, rules, { write: true });
 		expect(scroll(dir)).toHaveLength(1);
 		writeFileSync(join(dir, 'src/routes/+layout.svelte'), read('src/routes/+layout.svelte').replace(/<div style:height[^>]*>(.*)<\/div>/, '$1'));
 		expect(scroll(dir)).toEqual([]);
 
 		const plain = app({ 'src/routes/+layout.svelte': layout('<slot />') });
-		prepareBranch(plain.dir, 'aurora-v5');
+		recordBase(plain.dir);
 		codemod(plain.dir, rules, { write: true });
 		expect(scroll(plain.dir)).toEqual([]);
 	});
@@ -466,7 +466,7 @@ describe('remaining: points the current code closes', () => {
 			'<PaginatedTable>\n\t{#snippet appendSnippet({ index, item })}\n\t\t<span>{index}: {item?.id}</span>\n\t{/snippet}\n</PaginatedTable>'
 		);
 		const { dir, read } = app({ 'src/routes/+page.svelte': page });
-		prepareBranch(dir, 'aurora-v5');
+		recordBase(dir);
 		codemod(dir, rules, { write: true });
 		const notDone = () =>
 			remaining(dir, rules, { check })

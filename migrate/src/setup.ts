@@ -6,7 +6,7 @@ import type { AppDefault } from './types.ts';
 import { addV4Compat, findAppCss, prepareAppCss, useLibraryFonts } from './css.ts';
 import { listFiles } from './files.ts';
 import { addAppearance, addDefaultLocale, addTitleTemplate, staticTitle } from './layout.ts';
-import { migrationBase, readBaseline, recordBaseline } from './remaining.ts';
+import { migrationBase, readBaseline, recordBase, recordBaseline } from './remaining.ts';
 
 const LIB = '@likable-hair/svelte';
 const MDI = ['@mdi/js', '^7.4.47'] as const;
@@ -15,7 +15,6 @@ export const AGENT_TOOLS = [
 	['@likable-hair/svelte-migrate', `^${OWN_VERSION}`, 'the migration tools for coding agents, until the migration is over'],
 	['@likable-hair/svelte-mcp', `^${OWN_VERSION}`, 'MCP server and skills for coding agents']
 ] as const;
-const MAIN_BRANCHES = new Set(['master', 'main', 'develop', 'dev']);
 const SVELTE_MIN = [5, 29] as const;
 const TAILWIND_VARIANT_MIN = [3, 4, 1] as const;
 const TAILWIND_CONFIGS = ['tailwind.config.js', 'tailwind.config.mjs', 'tailwind.config.ts', 'tailwind.config.cjs'];
@@ -25,37 +24,14 @@ const BUTTONS_MARGIN = '--confirm-or-cancel-buttons-default-margin-top';
 
 export interface SetupOptions {
 	packageSpec?: string;
-	branch: string;
 	install: boolean;
 	layers: string;
 	locale?: string;
 }
 
 export interface SetupResult {
-	branch: string;
 	changes: string[];
 	install?: string;
-}
-
-const git = (dir: string, args: string[]) =>
-	execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
-
-export const currentBranch = (dir: string) => git(dir, ['rev-parse', '--abbrev-ref', 'HEAD']);
-
-export function prepareBranch(dir: string, branch: string): string {
-	const current = currentBranch(dir);
-	if (current === branch) return current;
-	const dirty = git(dir, ['status', '--porcelain']);
-	if (dirty)
-		throw new Error(
-			`The repository of ${dir} has uncommitted changes: commit or stash them first, so that the migration is the only change.`
-		);
-	if (!MAIN_BRANCHES.has(current))
-		throw new Error(`${dir} is on "${current}": switch to the main branch or pass --branch ${current} to keep working on it.`);
-	const base = git(dir, ['rev-parse', 'HEAD']);
-	git(dir, ['switch', '-c', branch]);
-	git(dir, ['config', `branch.${branch}.migrateBase`, base]);
-	return branch;
 }
 
 function indentOf(text: string) {
@@ -326,8 +302,13 @@ export function recordV4Errors(dir: string): string[] {
 }
 
 export function setup(dir: string, analysis: Analysis, options: SetupOptions): SetupResult {
-	const branch = prepareBranch(dir, options.branch);
-	const baseline = recordV4Errors(dir);
+	const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
+	const declared: string | undefined = pkg.dependencies?.[LIB] ?? pkg.devDependencies?.[LIB];
+	const recorded = (versionOf(declared)?.[0] ?? 5) < 5 ? recordBase(dir) : undefined;
+	const baseline = [
+		...(recorded?.created ? ['v4 code recorded in the git folder as it is now, uncommitted changes included (next compares with it); no branch, index or file touched'] : []),
+		...recordV4Errors(dir)
+	];
 	const changes = updatePackageJson(dir, analysis, options.packageSpec);
 	const installNeeded = changes.length > 0;
 	changes.unshift(...baseline);
@@ -344,5 +325,5 @@ export function setup(dir: string, analysis: Analysis, options: SetupOptions): S
 		install = `${installCommand(analysis.app.packageManager)} install`;
 		execFileSync(installCommand(analysis.app.packageManager), ['install'], { cwd: dir, stdio: 'inherit' });
 	}
-	return { branch, changes, install };
+	return { changes, install };
 }

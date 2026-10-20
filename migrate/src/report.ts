@@ -535,7 +535,7 @@ function summaryLine(r: Remaining) {
 
 export function remainingReport(r: Remaining): string {
 	const out: string[] = [`# Remaining points: ${appLabel(r.dir)}`, '', `\`${r.dir}\`${r.base ? ` · v4 code read from commit \`${r.base.slice(0, 10)}\`` : ''}`, '', summaryLine(r), ''];
-	if (!r.base) out.push('The v4 code could not be read from git (no repository or no branch base): only the svelte-check errors are listed.', '');
+	if (!r.base) out.push('The v4 code could not be read from git (no repository, or setup could not record it): only the svelte-check errors are listed.', '');
 	if (r.check.ran && r.check.before === undefined && r.base)
 		out.push('The errors svelte-check already had in the v4 code are not known (`setup` records them before the install): they are counted with the others.', '');
 	if (r.files.length)

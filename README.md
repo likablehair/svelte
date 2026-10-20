@@ -109,14 +109,14 @@ Version 5 changes many component names and options. The person migrating an app 
 
 Only apps on version 4 are migrated. Apps still on version 3 stay as they are.
 
-**Before starting**, the app must have no uncommitted changes. This way, every change you see afterwards comes from the migration.
+The migration works on the branch you are on and keeps the changes already there: which branch to use, and whether to commit or stash first, is up to you.
 
 The migration happens in four steps. Run them inside the app folder:
 
 | Step | Command | What it does |
 |---|---|---|
 | 1. Analyze | `npx @likable-hair/svelte-migrate analyze .` | Writes a report of what will change. Touches nothing. |
-| 2. Setup | `npx @likable-hair/svelte-migrate setup .` | Creates a new branch, installs version 5, prepares styles, fonts, language, theme and the AI assistant. |
+| 2. Setup | `npx @likable-hair/svelte-migrate setup .` | Installs version 5, prepares styles, fonts, language, theme and the AI assistant. |
 | 3. Codemod | `npx @likable-hair/svelte-migrate codemod .` | Rewrites the code automatically: new names, new icons, old local copies of components replaced by the library ones. |
 | 4. Next | `npx @likable-hair/svelte-migrate next .` | Shows what is left to fix by hand, one file at a time, with an explanation for each point. Repeat until no errors are left and every point to write has been done once. |
 

@@ -270,21 +270,19 @@ function registerMigration(server: McpServer, context: ServerContext) {
 		{
 			title: 'Prepare the app for v5',
 			description:
-				'Creates the migration branch (the repository must be clean), puts v5 in package.json, prepares the main CSS (layers, fonts, v4-compat.css) and the locale. Does not install packages (tell the user to run the install, from the root of the workspace if the app is in one: migration_codemod, migration_next and migration_status stop until v5 is installed) and never commits.',
+				'Works on the current branch and keeps the changes already there: records the v4 code as it is (in the git folder, for migration_next), puts v5 in package.json, prepares the main CSS (layers, fonts, v4-compat.css) and the locale. Does not install packages (tell the user to run the install, from the root of the workspace if the app is in one: migration_codemod, migration_next and migration_status stop until v5 is installed) and never commits.',
 			inputSchema: {
 				dir: appDir,
-				branch: z.string().optional(),
 				packageSpec: z.string().optional().describe('Version or path of a .tgz of the library'),
 				locale: z.string().optional()
 			},
 			annotations: { destructiveHint: true, idempotentHint: true, openWorldHint: false }
 		},
-		async ({ dir, branch, packageSpec, locale }) =>
+		async ({ dir, packageSpec, locale }) =>
 			run((m) => {
 				const path = target(dir);
 				const index = m.loadRules();
 				const result = m.setup(path, m.analyze(path, index), {
-					branch: branch ?? 'aurora-v5',
 					install: false,
 					layers: index.rules.global.layers.app,
 					packageSpec,
@@ -294,7 +292,6 @@ function registerMigration(server: McpServer, context: ServerContext) {
 				const agents = init(migrated, context.loaded.spec.version, { migrateSkill: migrateSkillDir(migrated.dir) });
 				const changes = [...result.changes, ...agents.changes.map((c) => `Agents: ${c}`)];
 				return [
-					`Branch: ${result.branch}`,
 					...(changes.length ? changes.map((c) => `- ${c}`) : ['Nothing to change.']),
 					'Packages were not installed: ask the user to run the install command of the app, then to restart its dev server with `vite dev --force` if it is running (Vite keeps serving the v4 package it had pre-bundled).',
 					'Nothing was committed.'
@@ -307,17 +304,13 @@ function registerMigration(server: McpServer, context: ServerContext) {
 		{
 			title: 'Apply the mechanical changes',
 			description:
-				'Renames components, props, events, snippets and CSS variables, removes { detail }, turns MDI names into @mdi/js imports, dissolves the Standard* and LabelAnd* app components into the library components (meaning and layout kept, look dropped and listed in the report). Runs on the branch made by migration_setup; dryRun writes nothing. Can be run again. Never commits.',
-			inputSchema: { dir: appDir, dryRun: z.boolean().optional(), branch: z.string().optional() },
+				'Renames components, props, events, snippets and CSS variables, removes { detail }, turns MDI names into @mdi/js imports, dissolves the Standard* and LabelAnd* app components into the library components (meaning and layout kept, look dropped and listed in the report). Runs after migration_setup; dryRun writes nothing. Can be run again. Never commits.',
+			inputSchema: { dir: appDir, dryRun: z.boolean().optional() },
 			annotations: { destructiveHint: true, idempotentHint: true, openWorldHint: false }
 		},
-		async ({ dir, dryRun, branch }) =>
+		async ({ dir, dryRun }) =>
 			run((m) => {
 				const path = target(dir);
-				const wanted = branch ?? 'aurora-v5';
-				if (!dryRun && m.currentBranch(path) !== wanted) {
-					throw new Error(`The app is not on "${wanted}": run migration_setup first.`);
-				}
 				if (!dryRun) m.requireInstalled?.(path);
 				const result = m.codemod(path, m.loadRules(), { write: !dryRun });
 				return `${m.codemodReport(result)}\n${dryRun ? 'Dry run: nothing was written.' : `${result.files.length} files written. Nothing was committed.`}`;

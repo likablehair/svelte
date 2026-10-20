@@ -159,7 +159,40 @@ export function recordBaseline(dir: string, base: string, check: (dir: string) =
 	return result;
 }
 
+const baseRef = (dir: string) => {
+	const prefix = tryGit(dir, ['rev-parse', '--show-prefix']);
+	return prefix === undefined ? undefined : `refs/svelte-migrate/${prefix}v4`;
+};
+
+export function recordBase(dir: string): { base: string; created: boolean } | undefined {
+	const ref = baseRef(dir);
+	const top = tryGit(dir, ['rev-parse', '--show-toplevel']);
+	if (!ref || !top) return undefined;
+	const saved = tryGit(dir, ['rev-parse', '--verify', '--quiet', `${ref}^{commit}`]);
+	if (saved) return { base: saved, created: false };
+	const scratch = mkdtempSync(join(tmpdir(), 'svelte-migrate-index-'));
+	try {
+		const who = { GIT_AUTHOR_NAME: 'svelte-migrate', GIT_AUTHOR_EMAIL: 'svelte-migrate@localhost', GIT_COMMITTER_NAME: 'svelte-migrate', GIT_COMMITTER_EMAIL: 'svelte-migrate@localhost' };
+		const env = { ...process.env, ...who, GIT_INDEX_FILE: join(scratch, 'index') };
+		const git = (args: string[]) => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8', env, stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+		const head = tryGit(dir, ['rev-parse', '--verify', '--quiet', 'HEAD^{commit}']);
+		if (head) git(['read-tree', head]);
+		git(['add', '--all', '--', '.']);
+		const tree = git(['write-tree']);
+		const base = git(['commit-tree', tree, ...(head ? ['-p', head] : []), '-m', 'v4 code before the migration (svelte-migrate setup)']);
+		git(['update-ref', ref, base]);
+		return { base, created: true };
+	} catch {
+		return undefined;
+	} finally {
+		rmSync(scratch, { recursive: true, force: true });
+	}
+}
+
 export function migrationBase(dir: string): string | undefined {
+	const ref = baseRef(dir);
+	const recorded = ref && tryGit(dir, ['rev-parse', '--verify', '--quiet', `${ref}^{commit}`]);
+	if (recorded) return recorded;
 	const branch = tryGit(dir, ['rev-parse', '--abbrev-ref', 'HEAD']);
 	if (!branch) return undefined;
 	const saved = tryGit(dir, ['config', '--get', `branch.${branch}.migrateBase`]);
