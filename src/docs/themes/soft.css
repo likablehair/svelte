@@ -1,0 +1,16 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.theme {
+	:root[data-theme='soft'] {
+		--global-color-bg: light-dark(#f7f4ff, #13111c);
+		--global-color-bg-2: light-dark(#efe9ff, #1b1828);
+		--global-color-primary: light-dark(#7c5cff, #a594ff);
+		--global-color-accent: light-dark(#ff7eb6, #ff9fcb);
+		--global-radius-scale: 2.2;
+		--global-shadow-md: 0 18px 40px -16px light-dark(rgb(124 92 255 / 0.35), rgb(0 0 0 / 0.7));
+		--global-shadow-lg: 0 40px 80px -24px light-dark(rgb(124 92 255 / 0.4), rgb(0 0 0 / 0.8));
+		--global-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
+		--global-duration: 0.35s;
+		--global-font-family-display: 'Nunito', ui-rounded, system-ui, sans-serif;
+	}
+}

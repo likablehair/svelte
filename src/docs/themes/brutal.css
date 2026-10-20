@@ -1,0 +1,29 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.theme {
+	:root[data-theme='brutal'] {
+		--global-color-bg: light-dark(#fff6e0, #141414);
+		--global-color-bg-2: light-dark(#ffe9b8, #1f1f1f);
+		--global-color-surface: light-dark(#ffffff, #262626);
+		--global-color-surface-solid: var(--global-color-surface);
+		--global-color-surface-pop: var(--global-color-surface);
+		--global-color-text: light-dark(#111111, #fafafa);
+		--global-color-border: var(--global-color-text);
+		--global-color-border-strong: var(--global-color-text);
+		--global-color-primary: light-dark(#ff4f00, #ff7a33);
+		--global-color-accent: light-dark(#00a693, #2de0c8);
+		--global-color-on-primary: #111111;
+		--global-gradient: linear-gradient(var(--global-color-primary), var(--global-color-primary));
+		--global-fill-gradient: var(--global-gradient);
+		--global-fill-primary: var(--global-gradient);
+		--global-color-primary-glow: transparent;
+		--global-radius-scale: 0;
+		--global-border-width: 2px;
+		--global-shadow-sm: 2px 2px 0 var(--global-color-text);
+		--global-shadow-md: 4px 4px 0 var(--global-color-text);
+		--global-shadow-lg: 8px 8px 0 var(--global-color-text);
+		--global-shadow-fill: 3px 3px 0 var(--global-color-text);
+		--global-focus-ring-color: var(--global-color-text);
+		--global-font-family-display: ui-monospace, 'Courier New', monospace;
+	}
+}

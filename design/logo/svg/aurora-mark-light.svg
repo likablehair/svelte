@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+<defs>
+  <linearGradient id="l" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1748c9"/><stop offset="1" stop-color="#2f6bff"/></linearGradient>
+  <linearGradient id="r" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0a7fbf"/><stop offset="1" stop-color="#21b0ec"/></linearGradient>
+  <linearGradient id="f" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0c2a7a"/><stop offset="1" stop-color="#163fa8"/></linearGradient>
+  <linearGradient id="s" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".35"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f)" clip-path="url(#c)"/>
+</svg>

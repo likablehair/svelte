@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logo Likable Aurora</title>
+<link rel="icon" href="svg/aurora-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root { --bg: #060a13; --text: #edf2fb; --text-2: #a3afc6; --text-3: #7a86a0; --line: rgba(255,255,255,.08); }
+* { box-sizing: border-box; margin: 0; }
+body { background: var(--bg); color: var(--text); font: 15px/1.6 Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 48px 16px 96px; display: grid; gap: 20px; }
+.panel { border: 1px solid var(--line); border-radius: 20px; padding: 32px; background: #0a1020; position: relative; overflow: hidden; }
+.panel.light { background: #f5f7fb; color: #0f172a; border-color: #e1e6ef; --text-2: #3d4a63; --text-3: #5f6b84; }
+.panel h2 { font: 500 11px "Geist Mono", monospace; letter-spacing: .16em; text-transform: uppercase; color: var(--text-3); margin-bottom: 24px; }
+.hero { display: grid; place-items: center; gap: 40px; padding: 88px 32px 64px; background: radial-gradient(60% 70% at 50% 35%, rgba(61,139,255,.18), transparent 70%), #070c18; }
+.hero .glow { position: absolute; width: 360px; height: 360px; left: 50%; top: 22%; translate: -50% -30%; background: radial-gradient(circle, rgba(95,212,255,.22), transparent 65%); filter: blur(40px); pointer-events: none; }
+.hero svg { position: relative; filter: drop-shadow(0 18px 40px rgba(36,89,255,.35)); }
+.lockup { display: flex; align-items: center; gap: calc(14px * var(--s)); }
+.lockup b { display: block; font: 800 calc(30px * var(--s))/1 "Bricolage Grotesque", sans-serif; letter-spacing: -.045em; }
+.lockup b span { font-weight: 400; }
+.lockup small { display: block; margin-top: calc(6px * var(--s)); font: calc(12px * var(--s)) "Geist Mono", monospace; color: var(--text-3); }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.center { display: grid; place-items: center; gap: 28px; min-height: 260px; }
+.sizes { display: flex; align-items: end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.sz { display: inline-flex; flex-direction: column; align-items: center; gap: 8px; }
+.sz small { font: 11px "Geist Mono", monospace; color: var(--text-3); }
+.monos { display: flex; gap: 20px; align-items: center; justify-content: center; flex-wrap: wrap; }
+.ink { width: 120px; height: 120px; border-radius: 16px; display: grid; place-items: center; }
+.icons { display: flex; gap: 28px; align-items: end; justify-content: center; flex-wrap: wrap; }
+.tab { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 10px 10px 0 0; background: #1b2336; font-size: 13px; color: var(--text-2); width: 240px; }
+.bar { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.03); }
+.bar .name { font: 800 17px "Bricolage Grotesque", sans-serif; letter-spacing: -.04em; }
+.bar .name span { font-weight: 400; }
+.chip { font: 11px "Geist Mono", monospace; color: var(--text-2); border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; }
+.search { margin-left: auto; font-size: 13px; color: var(--text-3); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; min-width: 0; }
+.story { color: var(--text-2); max-width: 720px; }
+.story b { color: var(--text); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="panel hero"><div class="glow"></div><svg viewBox="0 0 100 100" width="220" height="220" role="img" aria-label="Likable Aurora"><defs>
+  <linearGradient id="l_1" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1f4fe0"/><stop offset="1" stop-color="#3d8bff"/></linearGradient>
+  <linearGradient id="r_1" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#22a8f5"/><stop offset="1" stop-color="#6fdcff"/></linearGradient>
+  <linearGradient id="f_1" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9efff"/></linearGradient>
+  <linearGradient id="s_1" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".55"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_1"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_1)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_1)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_1)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_1)" clip-path="url(#c_1)"/></svg><div class="lockup" style="--s:1.3"><svg viewBox="0 0 100 100" width="57" height="57" aria-hidden="true"><defs>
+  <linearGradient id="l_2" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1f4fe0"/><stop offset="1" stop-color="#3d8bff"/></linearGradient>
+  <linearGradient id="r_2" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#22a8f5"/><stop offset="1" stop-color="#6fdcff"/></linearGradient>
+  <linearGradient id="f_2" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9efff"/></linearGradient>
+  <linearGradient id="s_2" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".55"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_2"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_2)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_2)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_2)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_2)" clip-path="url(#c_2)"/></svg><div><b>Likable <span>Aurora</span></b><small>@likable-hair/svelte</small></div></div></section>
+
+  <section class="panel"><h2>L'idea</h2>
+    <p class="story">Una <b>A</b> fatta da un unico <b>nastro di luce che si piega</b> in cima, come le cortine di un'aurora. La gamba sinistra sale, il nastro si ripiega e scende a destra; la piega in alto è il punto più luminoso. Tre toni del gradiente del prototipo (cobalto, azzurro, ghiaccio), forme piatte e taglienti, nessun effetto obbligatorio: regge a 16px e in un solo colore.</p>
+  </section>
+
+  <div class="two">
+    <section class="panel"><h2>Su scuro</h2><div class="center"><svg viewBox="0 0 100 100" width="140" height="140" aria-hidden="true"><defs>
+  <linearGradient id="l_3" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1f4fe0"/><stop offset="1" stop-color="#3d8bff"/></linearGradient>
+  <linearGradient id="r_3" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#22a8f5"/><stop offset="1" stop-color="#6fdcff"/></linearGradient>
+  <linearGradient id="f_3" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9efff"/></linearGradient>
+  <linearGradient id="s_3" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".55"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_3"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_3)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_3)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_3)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_3)" clip-path="url(#c_3)"/></svg><div class="lockup" style="--s:1"><svg viewBox="0 0 100 100" width="44" height="44" aria-hidden="true"><defs>
+  <linearGradient id="l_4" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1f4fe0"/><stop offset="1" stop-color="#3d8bff"/></linearGradient>
+  <linearGradient id="r_4" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#22a8f5"/><stop offset="1" stop-color="#6fdcff"/></linearGradient>
+  <linearGradient id="f_4" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9efff"/></linearGradient>
+  <linearGradient id="s_4" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".55"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_4"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_4)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_4)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_4)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_4)" clip-path="url(#c_4)"/></svg><div><b>Likable <span>Aurora</span></b><small>@likable-hair/svelte</small></div></div></div></section>
+    <section class="panel light"><h2>Su chiaro</h2><div class="center"><svg viewBox="0 0 100 100" width="140" height="140" aria-hidden="true"><defs>
+  <linearGradient id="l_5" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1748c9"/><stop offset="1" stop-color="#2f6bff"/></linearGradient>
+  <linearGradient id="r_5" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0a7fbf"/><stop offset="1" stop-color="#21b0ec"/></linearGradient>
+  <linearGradient id="f_5" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0c2a7a"/><stop offset="1" stop-color="#163fa8"/></linearGradient>
+  <linearGradient id="s_5" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".35"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_5"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_5)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_5)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_5)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_5)" clip-path="url(#c_5)"/></svg><div class="lockup" style="--s:1"><svg viewBox="0 0 100 100" width="44" height="44" aria-hidden="true"><defs>
+  <linearGradient id="l_6" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1748c9"/><stop offset="1" stop-color="#2f6bff"/></linearGradient>
+  <linearGradient id="r_6" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0a7fbf"/><stop offset="1" stop-color="#21b0ec"/></linearGradient>
+  <linearGradient id="f_6" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0c2a7a"/><stop offset="1" stop-color="#163fa8"/></linearGradient>
+  <linearGradient id="s_6" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".35"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_6"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_6)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_6)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_6)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_6)" clip-path="url(#c_6)"/></svg><div><b>Likable <span>Aurora</span></b><small>@likable-hair/svelte</small></div></div></div></section>
+  </div>
+
+  <section class="panel"><h2>Misure su scuro</h2><div class="sizes"><span class="sz"><svg viewBox="0 0 100 100" width="96" height="96" aria-hidden="true"><defs>
+  <linearGradient id="l_7" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1f4fe0"/><stop offset="1" stop-color="#3d8bff"/></linearGradient>
+  <linearGradient id="r_7" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#22a8f5"/><stop offset="1" stop-color="#6fdcff"/></linearGradient>
+  <linearGradient id="f_7" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9efff"/></linearGradient>
+  <linearGradient id="s_7" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".55"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_7"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_7)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_7)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_7)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_7)" clip-path="url(#c_7)"/></svg><small>96px</small></span><span class="sz"><svg viewBox="0 0 100 100" width="48" height="48" aria-hidden="true"><defs>
+  <linearGradient id="l_8" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1f4fe0"/><stop offset="1" stop-color="#3d8bff"/></linearGradient>
+  <linearGradient id="r_8" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#22a8f5"/><stop offset="1" stop-color="#6fdcff"/></linearGradient>
+  <linearGradient id="f_8" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9efff"/></linearGradient>
+  <linearGradient id="s_8" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".55"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_8"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_8)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_8)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_8)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_8)" clip-path="url(#c_8)"/></svg><small>48px</small></span><span class="sz"><svg viewBox="0 0 100 100" width="32" height="32" aria-hidden="true"><defs>
+  <linearGradient id="l_9" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1f4fe0"/><stop offset="1" stop-color="#3d8bff"/></linearGradient>
+  <linearGradient id="r_9" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#22a8f5"/><stop offset="1" stop-color="#6fdcff"/></linearGradient>
+  <linearGradient id="f_9" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9efff"/></linearGradient>
+  <linearGradient id="s_9" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".55"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_9"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_9)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_9)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_9)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_9)" clip-path="url(#c_9)"/></svg><small>32px</small></span><span class="sz"><svg viewBox="0 0 100 100" width="24" height="24" aria-hidden="true"><defs>
+  <linearGradient id="l_10" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1f4fe0"/><stop offset="1" stop-color="#3d8bff"/></linearGradient>
+  <linearGradient id="r_10" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#22a8f5"/><stop offset="1" stop-color="#6fdcff"/></linearGradient>
+  <linearGradient id="f_10" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9efff"/></linearGradient>
+  <linearGradient id="s_10" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".55"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_10"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_10)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_10)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_10)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_10)" clip-path="url(#c_10)"/></svg><small>24px</small></span><span class="sz"><svg viewBox="0 0 100 100" width="16" height="16" aria-hidden="true"><defs>
+  <linearGradient id="l_11" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1f4fe0"/><stop offset="1" stop-color="#3d8bff"/></linearGradient>
+  <linearGradient id="r_11" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#22a8f5"/><stop offset="1" stop-color="#6fdcff"/></linearGradient>
+  <linearGradient id="f_11" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9efff"/></linearGradient>
+  <linearGradient id="s_11" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".55"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_11"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_11)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_11)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_11)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_11)" clip-path="url(#c_11)"/></svg><small>16px</small></span></div></section>
+  <section class="panel light"><h2>Misure su chiaro</h2><div class="sizes"><span class="sz"><svg viewBox="0 0 100 100" width="96" height="96" aria-hidden="true"><defs>
+  <linearGradient id="l_12" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1748c9"/><stop offset="1" stop-color="#2f6bff"/></linearGradient>
+  <linearGradient id="r_12" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0a7fbf"/><stop offset="1" stop-color="#21b0ec"/></linearGradient>
+  <linearGradient id="f_12" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0c2a7a"/><stop offset="1" stop-color="#163fa8"/></linearGradient>
+  <linearGradient id="s_12" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".35"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_12"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_12)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_12)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_12)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_12)" clip-path="url(#c_12)"/></svg><small>96px</small></span><span class="sz"><svg viewBox="0 0 100 100" width="48" height="48" aria-hidden="true"><defs>
+  <linearGradient id="l_13" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1748c9"/><stop offset="1" stop-color="#2f6bff"/></linearGradient>
+  <linearGradient id="r_13" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0a7fbf"/><stop offset="1" stop-color="#21b0ec"/></linearGradient>
+  <linearGradient id="f_13" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0c2a7a"/><stop offset="1" stop-color="#163fa8"/></linearGradient>
+  <linearGradient id="s_13" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".35"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_13"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_13)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_13)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_13)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_13)" clip-path="url(#c_13)"/></svg><small>48px</small></span><span class="sz"><svg viewBox="0 0 100 100" width="32" height="32" aria-hidden="true"><defs>
+  <linearGradient id="l_14" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1748c9"/><stop offset="1" stop-color="#2f6bff"/></linearGradient>
+  <linearGradient id="r_14" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0a7fbf"/><stop offset="1" stop-color="#21b0ec"/></linearGradient>
+  <linearGradient id="f_14" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0c2a7a"/><stop offset="1" stop-color="#163fa8"/></linearGradient>
+  <linearGradient id="s_14" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".35"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_14"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_14)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_14)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_14)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_14)" clip-path="url(#c_14)"/></svg><small>32px</small></span><span class="sz"><svg viewBox="0 0 100 100" width="24" height="24" aria-hidden="true"><defs>
+  <linearGradient id="l_15" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1748c9"/><stop offset="1" stop-color="#2f6bff"/></linearGradient>
+  <linearGradient id="r_15" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0a7fbf"/><stop offset="1" stop-color="#21b0ec"/></linearGradient>
+  <linearGradient id="f_15" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0c2a7a"/><stop offset="1" stop-color="#163fa8"/></linearGradient>
+  <linearGradient id="s_15" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".35"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_15"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_15)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_15)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_15)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_15)" clip-path="url(#c_15)"/></svg><small>24px</small></span><span class="sz"><svg viewBox="0 0 100 100" width="16" height="16" aria-hidden="true"><defs>
+  <linearGradient id="l_16" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1748c9"/><stop offset="1" stop-color="#2f6bff"/></linearGradient>
+  <linearGradient id="r_16" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0a7fbf"/><stop offset="1" stop-color="#21b0ec"/></linearGradient>
+  <linearGradient id="f_16" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0c2a7a"/><stop offset="1" stop-color="#163fa8"/></linearGradient>
+  <linearGradient id="s_16" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".35"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_16"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_16)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_16)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_16)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_16)" clip-path="url(#c_16)"/></svg><small>16px</small></span></div></section>
+
+  <div class="two">
+    <section class="panel"><h2>Un solo colore</h2><div class="monos">
+      <div class="ink" style="background:#edf2fb;color:#060a13"><svg viewBox="0 0 100 100" width="72" height="72" aria-hidden="true"><defs>
+  <mask id="m_17"><rect width="100" height="100" fill="#fff"/><line x1="34" y1="86" x2="60" y2="14" stroke="#000" stroke-width="5"/></mask>
+  <clipPath id="c_17"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="currentColor" mask="url(#m_17)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="currentColor" mask="url(#m_17)"/></svg></div>
+      <div class="ink" style="background:#060a13;color:#edf2fb;border:1px solid var(--line)"><svg viewBox="0 0 100 100" width="72" height="72" aria-hidden="true"><defs>
+  <mask id="m_18"><rect width="100" height="100" fill="#fff"/><line x1="34" y1="86" x2="60" y2="14" stroke="#000" stroke-width="5"/></mask>
+  <clipPath id="c_18"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="currentColor" mask="url(#m_18)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="currentColor" mask="url(#m_18)"/></svg></div>
+      <div class="ink" style="background:linear-gradient(135deg,#2459ff,#3d8bff 50%,#5fd4ff);color:#fff"><svg viewBox="0 0 100 100" width="72" height="72" aria-hidden="true"><defs>
+  <mask id="m_19"><rect width="100" height="100" fill="#fff"/><line x1="34" y1="86" x2="60" y2="14" stroke="#000" stroke-width="5"/></mask>
+  <clipPath id="c_19"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="currentColor" mask="url(#m_19)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="currentColor" mask="url(#m_19)"/></svg></div>
+    </div></section>
+    <section class="panel"><h2>Icona e favicon</h2><div class="icons">
+      <svg viewBox="0 0 100 100" width="128" height="128" aria-hidden="true"><defs><linearGradient id="t_20" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0e1a33"/><stop offset="1" stop-color="#070c18"/></linearGradient></defs>
+<rect width="100" height="100" rx="24" fill="url(#t_20)"/>
+<g transform="translate(50 50) scale(.64) translate(-50 -50)">
+<defs>
+  <linearGradient id="l_20i" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1f4fe0"/><stop offset="1" stop-color="#3d8bff"/></linearGradient>
+  <linearGradient id="r_20i" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#22a8f5"/><stop offset="1" stop-color="#6fdcff"/></linearGradient>
+  <linearGradient id="f_20i" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9efff"/></linearGradient>
+  <linearGradient id="s_20i" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".55"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_20i"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_20i)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_20i)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_20i)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_20i)" clip-path="url(#c_20i)"/>
+</g></svg><svg viewBox="0 0 100 100" width="64" height="64" aria-hidden="true"><defs><linearGradient id="t_21" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0e1a33"/><stop offset="1" stop-color="#070c18"/></linearGradient></defs>
+<rect width="100" height="100" rx="24" fill="url(#t_21)"/>
+<g transform="translate(50 50) scale(.64) translate(-50 -50)">
+<defs>
+  <linearGradient id="l_21i" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1f4fe0"/><stop offset="1" stop-color="#3d8bff"/></linearGradient>
+  <linearGradient id="r_21i" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#22a8f5"/><stop offset="1" stop-color="#6fdcff"/></linearGradient>
+  <linearGradient id="f_21i" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9efff"/></linearGradient>
+  <linearGradient id="s_21i" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".55"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_21i"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_21i)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_21i)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_21i)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_21i)" clip-path="url(#c_21i)"/>
+</g></svg><svg viewBox="0 0 100 100" width="32" height="32" aria-hidden="true"><defs><linearGradient id="t_22" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0e1a33"/><stop offset="1" stop-color="#070c18"/></linearGradient></defs>
+<rect width="100" height="100" rx="24" fill="url(#t_22)"/>
+<g transform="translate(50 50) scale(.64) translate(-50 -50)">
+<defs>
+  <linearGradient id="l_22i" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1f4fe0"/><stop offset="1" stop-color="#3d8bff"/></linearGradient>
+  <linearGradient id="r_22i" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#22a8f5"/><stop offset="1" stop-color="#6fdcff"/></linearGradient>
+  <linearGradient id="f_22i" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9efff"/></linearGradient>
+  <linearGradient id="s_22i" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".55"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_22i"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_22i)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_22i)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_22i)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_22i)" clip-path="url(#c_22i)"/>
+</g></svg>
+      <div class="tab"><svg viewBox="0 0 100 100" width="16" height="16" aria-hidden="true"><defs><linearGradient id="t_23" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0e1a33"/><stop offset="1" stop-color="#070c18"/></linearGradient></defs>
+<rect width="100" height="100" rx="24" fill="url(#t_23)"/>
+<g transform="translate(50 50) scale(.64) translate(-50 -50)">
+<defs>
+  <linearGradient id="l_23i" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1f4fe0"/><stop offset="1" stop-color="#3d8bff"/></linearGradient>
+  <linearGradient id="r_23i" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#22a8f5"/><stop offset="1" stop-color="#6fdcff"/></linearGradient>
+  <linearGradient id="f_23i" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9efff"/></linearGradient>
+  <linearGradient id="s_23i" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".55"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_23i"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_23i)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_23i)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_23i)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_23i)" clip-path="url(#c_23i)"/>
+</g></svg>Likable Aurora · Docs</div>
+    </div></section>
+  </div>
+
+  <section class="panel"><h2>Nella barra delle docs</h2>
+    <div class="bar"><svg viewBox="0 0 100 100" width="26" height="26" aria-hidden="true"><defs>
+  <linearGradient id="l_24" x1="24" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1f4fe0"/><stop offset="1" stop-color="#3d8bff"/></linearGradient>
+  <linearGradient id="r_24" x1="76" y1="86" x2="50" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#22a8f5"/><stop offset="1" stop-color="#6fdcff"/></linearGradient>
+  <linearGradient id="f_24" x1="50" y1="14" x2="50" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9efff"/></linearGradient>
+  <linearGradient id="s_24" x1="55" y1="27.9" x2="67" y2="32.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#04102e" stop-opacity=".55"/><stop offset="1" stop-color="#04102e" stop-opacity="0"/></linearGradient>
+  <clipPath id="c_24"><polygon points="14,86 34,86 60,14 40,14"/></clipPath>
+</defs>
+<polygon points="14,86 34,86 60,14 40,14" fill="url(#l_24)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#r_24)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#s_24)"/>
+<polygon points="66,86 86,86 60,14 40,14" fill="url(#f_24)" clip-path="url(#c_24)"/></svg><span class="name">Likable <span>Aurora</span></span><span class="chip">v5.0.0</span><span class="search">Cerca… Ctrl K</span></div>
+  </section>
+</div>
+</body>
+</html>

@@ -1,0 +1,16 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.theme {
+	:root[data-theme='forest'] {
+		--global-color-bg: light-dark(#f6f3ea, #0f1410);
+		--global-color-bg-2: light-dark(#ece6d6, #151c16);
+		--global-color-surface-solid: light-dark(#fffdf7, #18211a);
+		--global-color-surface-pop: var(--global-color-surface-solid);
+		--global-color-text: light-dark(#1f2a1f, #e9efe4);
+		--global-color-text-2: light-dark(#4e5b4b, #a9b5a3);
+		--global-color-primary: light-dark(#2f7d4f, #5fbf86);
+		--global-color-accent: light-dark(#c2683a, #e08d5e);
+		--global-radius-scale: 1.4;
+		--global-font-family-display: 'Fraunces', ui-serif, Georgia, serif;
+	}
+}

@@ -1,12 +1,38 @@
-:root {
-  --global-search-text-field-default-ring-color: rgb(var(--global-color-contrast-200), .5); 
-  --global-search-text-field-default-hover-ring-color: rgb(var(--global-color-contrast-300));
-  --global-search-text-field-default-color: rgb(var(--global-color-contrast-600));
-  --global-search-text-field-default-width: 100%;
-  --global-search-text-field-default-max-width: 28rem;
-  --global-search-text-field-default-height: 2rem;
-  --global-search-text-field-default-background-color: rgb(var(--global-color-background-100));
-  --global-search-text-field-default-padding: 0rem 0.75rem 0rem 0.5rem;
-  --global-search-text-field-default-font-size: .875rem;
-  --global-search-text-field-default-border-radius: 9999px;
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--global-search-text-field-default-width: 100%;
+		--global-search-text-field-default-max-width: 220px;
+		--global-search-text-field-default-height: 32px;
+		--global-search-text-field-default-padding: 0 6px 0 10px;
+		--global-search-text-field-default-border-color: var(--global-input-border-color);
+		--global-search-text-field-default-hover-border-color: var(--global-input-hover-border-color);
+		--global-search-text-field-default-border-radius: var(--global-input-radius);
+		--global-search-text-field-default-background: var(--global-input-background);
+		--global-search-text-field-default-color: var(--global-input-placeholder-color);
+		--global-search-text-field-default-font-size: 13px;
+		--global-search-text-field-default-icon-color: var(--global-input-icon-color);
+		--global-search-text-field-default-icon-size: 16px;
+		--global-search-text-field-default-kbd-background: var(--global-color-surface-2);
+		--global-search-text-field-default-kbd-border-color: var(--global-color-border);
+		--global-search-text-field-default-kbd-color: var(--global-color-text-3);
+		--global-search-text-field-default-kbd-font-size: 11px;
+		--global-search-text-field-default-dialog-width: 560px;
+		--global-search-text-field-default-dialog-max-height: min(560px, 80dvh);
+		--global-search-text-field-default-dialog-top: 12dvh;
+		--global-search-text-field-default-divider-color: var(--global-color-border);
+		--global-search-text-field-default-box-height: 52px;
+		--global-search-text-field-default-box-font-size: 15px;
+		--global-search-text-field-default-box-icon-color: var(--global-color-primary);
+		--global-search-text-field-default-group-color: var(--global-color-text-3);
+		--global-search-text-field-default-group-font-size: 10.5px;
+		--global-search-text-field-default-option-active-background: var(--global-color-primary-soft);
+		--global-search-text-field-default-option-icon-background: var(--global-color-surface-2);
+		--global-search-text-field-default-option-icon-color: var(--global-color-text-2);
+		--global-search-text-field-default-option-active-icon-background: var(--global-color-primary);
+		--global-search-text-field-default-option-active-icon-color: var(--global-color-on-primary);
+		--global-search-text-field-default-mark-color: var(--global-color-primary);
+		--global-search-text-field-default-description-color: var(--global-color-text-3);
+	}
 }

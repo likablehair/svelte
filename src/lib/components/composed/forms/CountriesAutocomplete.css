@@ -1,0 +1,9 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--countries-autocomplete-default-dial-code-color: var(--global-color-text-3);
+		--countries-autocomplete-default-dial-code-font-family: var(--global-font-family-mono);
+		--countries-autocomplete-default-dial-code-font-size: 11px;
+	}
+}

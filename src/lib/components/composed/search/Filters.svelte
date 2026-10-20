@@ -1,1233 +1,626 @@
-<script lang="ts" module>
-  export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
-
-  export type LabelMapper = {
-    [label: string]: {extended?: string, short: string}
-  }
-</script>
-
+<!-- @component
+Filter bar for lists and tables. The app declares the filterable `fields` (text, number, date, options, yes/no or its own input; columns, joins, relations and custom queries are declared on the field), and the user adds the conditions one at a time: "Add filter" lists the fields (with a search when they are many), then a card asks for the operator of that field and the value. Each condition becomes a pill "field · operator · value": click it to edit, its × removes it. The "Filters" button shows how many conditions are active and opens a panel with every condition in rows ("Where … and …"), where `allowOr` lets the user switch to OR and `maxDepth` allows nested groups. `pinned` fields are always in the bar, and `presets` are chips that add ready-made conditions. Changes apply as soon as a condition is complete (after `applyDelay`); with `confirm` the card and the panel have Cancel and Apply. On screens up to 1024px wide the panel opens in a bottom sheet (`mobileDrawer`); when the bar is narrower than 640px (a phone, a side column) it is compact: the pills and "Clear" stay on one row that scrolls sideways, "Add filter" lives only in the panel or the sheet opened by "Filters", and next to a `prependSnippet` (for example a search) "Filters" shows only its icon and the count (`data-compact`). The conditions live in `value`, a plain JSON tree (see `createFilters`), and `onchange` receives it with the `FilterBuilder` of the query, built by `filtersToBuilder`. Every text can be translated with `labels`.
+-->
 <script lang="ts">
-  import './Filters.css'
-  import '../../../css/main.css'
-  import Drawer from '$lib/components/simple/navigation/Drawer.svelte';
-  import Menu from '$lib/components/simple/common/Menu.svelte';
-  import MediaQuery from '$lib/components/simple/common/MediaQuery.svelte';
-  import Button from '$lib/components/simple/buttons/Button.svelte';
-  import Icon from '$lib/components/simple/media/Icon.svelte';
-  import { type ComponentProps, type Snippet } from 'svelte';
-  import { ENGLISH_LABELS_MAPPER, isDateMode, isSelectMode, isStringMode, ITALIAN_LABELS_MAPPER, type DateMode, type Filter, type NumberMode, type SelectMode, type StringMode } from '$lib/utils/filters/filters';
-  import SelectableVerticalList from '$lib/components/simple/lists/SelectableVerticalList.svelte';
-  import Chip from '$lib/components/simple/navigation/Chip.svelte';
-  import type { Locale } from '$lib/components/simple/dates/utils';
-  import FilterEditor from './FilterEditor.svelte';
-  import MobileFilterEditor from './MobileFilterEditor.svelte';
-  import { fly } from 'svelte/transition';
-  import Dialog from '$lib/components/simple/dialogs/Dialog.svelte';
-  import Validator from '$lib/utils/filters/validator';
-  import ToolTip from '../common/ToolTip.svelte';
-  import { DateTime } from 'luxon';
-  import type { KeyboardEventHandler, MouseEventHandler } from 'svelte/elements';
-  import { TabSwitcher } from '$lib';
+	import '../../../css/tokens.css';
+	import { breakpoints } from '../../../utils/breakpoints.svelte.js';
+	import './Filters.css';
+	import { untrack, type Snippet } from 'svelte';
+	import { observeWidth } from '../../../utils/size.js';
+	import type FilterBuilder from '../../../utils/filters/builder.js';
+	import { filtersToBuilder } from '../../../utils/filters/convert.js';
+	import { filterLabels, type FilterLabelsInput } from '../../../utils/filters/labels.js';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import {
+		addFilterNode,
+		clearFilters,
+		countFilters,
+		createFilters,
+		fieldOperators,
+		filterCondition,
+		filterConditions,
+		findFilterNode,
+		isConditionComplete,
+		isFilterGroup,
+		pruneFilters,
+		removeFilterNode,
+		updateFilterNode,
+		type FilterCondition,
+		type FilterField,
+		type FilterGroup,
+		type FilterPreset,
+		type SavedFilter,
+		filterId
+	} from '../../../utils/filters/model.js';
+	import Button from '../../simple/buttons/Button.svelte';
+	import Menu from '../../simple/common/Menu.svelte';
+	import FilterEditor from './FilterEditor.svelte';
+	import FilterFieldList from './filters/FilterFieldList.svelte';
+	import FilterPills from './filters/FilterPills.svelte';
+	import FilterPresets from './filters/FilterPresets.svelte';
+	import FiltersPanel from './filters/FiltersPanel.svelte';
+	import SavedFilters from './filters/SavedFilters.svelte';
+	import { pointerPress } from './filters/pointer.svelte.js';
+	import { togglePreset } from './filters/presets.js';
+	import { readSaved, restoreSaved, writeSaved } from './filters/saved.js';
 
-  interface Props {
-    filters?: Filter[];
-    lang?: 'it' | 'en';
-    addFilterLabel?: string;
-    cancelFilterLabel?: string;
-    applyFilterLabel?: string;
-    showActiveFilters?: boolean;
-    filterTitleLabel?: string;
-    dateLocale?: Locale;
-    betweenSeparator?: string;
-    trueString?: string;
-    falseString?: string;
-    editFilterMode?: 'one-edit' | 'multi-edit';
-    labelsMapper?: LabelMapper;
-    drawerSpace?: string
-    multiEditTabs?: ComponentProps<typeof TabSwitcher>['tabs']
-    onaddFilterClick?: () => void
-    onapplyFilter?: () => void
-    onremoveAllFilters?: () => void
-    onremoveFilter?: (event: {
-      detail: {
-        filter: Filter
-      }
-    }) => void
-    customSnippet?: Snippet<[{
-      filter: Filter | undefined,
-      updateFunction: typeof updateFunction,
-      mAndDown: boolean
-    }]>
-    customChipSnippet?: Snippet<[{
-      filter: Filter
-    }]>
-    appendSnippet?: Snippet<[]>
-    contentSnippet?: Snippet<[{ 
-      mAndDown: boolean,
-      updateMultiFilterValues: typeof updateMultiFilterValues,
-      handleRemoveAllFilters: typeof handleRemoveAllFilters,
-      filters: Filter[]
-    }]>
-    onclick?: MouseEventHandler<HTMLDivElement>
-    onkeydown?: KeyboardEventHandler<HTMLDivElement>
-  }
+	const FILTER_ICON = 'M14,12V19.88C14.04,20.18 13.94,20.5 13.71,20.71C13.32,21.1 12.69,21.1 12.3,20.71L10.29,18.7C10.06,18.47 9.96,18.16 10,17.87V12H9.97L4.21,4.62C3.87,4.19 3.95,3.56 4.38,3.22C4.57,3.08 4.78,3 5,3V3H19V3C19.22,3 19.43,3.08 19.62,3.22C20.05,3.56 20.13,4.19 19.79,4.62L14.03,12H14Z';
+	const BOOKMARK_ICON =
+		'M17,18L12,15.82L7,18V5H17M17,3H7A2,2 0 0,0 5,5V21L12,18L19,21V5C19,3.89 18.1,3 17,3Z';
 
-  let {
-    filters = $bindable([]),
-    lang = 'en',
-    addFilterLabel = lang === 'en' ? "Filters" : "Filtri",
-    cancelFilterLabel = lang === 'en' ? "Cancel" : "Annulla",
-    applyFilterLabel = lang === 'en' ? "Apply filters" : "Applica filtri",
-    showActiveFilters = true,
-    filterTitleLabel = lang === 'en' ? "Filter by" : "Filtra per",
-    dateLocale = lang === 'en' ? 'en' : 'it',
-    betweenSeparator = lang === 'en' ? "and" : "e",
-    trueString = lang === 'en' ? "true" : "vero",
-    falseString = lang === 'en' ? "false" : "falso",
-    editFilterMode = 'one-edit',
-    labelsMapper = lang === 'en'
-      ? ENGLISH_LABELS_MAPPER
-      : ITALIAN_LABELS_MAPPER,
-    drawerSpace = '85vh',
-    multiEditTabs,
-    onaddFilterClick,
-    onapplyFilter,
-    onremoveAllFilters,
-    onremoveFilter,
-    customSnippet: customInternalSnippet,
-    customChipSnippet,
-    appendSnippet,
-    contentSnippet,
-    onclick: onclickInternal,
-    onkeydown,
-  }: Props = $props();
+	interface Props {
+		/** The fields the user can filter. */
+		fields: FilterField[];
+		/** The conditions: a tree of groups and conditions (see `createFilters`). Without it the component keeps its own; to clear them from the app pass `createFilters()`. */
+		value?: FilterGroup;
+		/** Lets the user combine the conditions with OR instead of AND. Turn it on only when the backend applies OR groups correctly. */
+		allowOr?: boolean;
+		/** How deep groups can be nested in the panel: `0` means no groups. With GET requests most backends read one level. */
+		maxDepth?: number;
+		/** The card and the panel work on a draft, with Cancel and Apply. Without it every complete change applies. */
+		confirm?: boolean;
+		/** Milliseconds between the last change and `onchange` (without `confirm`). */
+		applyDelay?: number;
+		/** Operators the fields without `operators` offer: `basic` (the essential ones), `standard` (default) or `all`. */
+		operatorSet?: 'basic' | 'standard' | 'all';
+		/** Own operator list per field type for the fields without `operators`, instead of `operatorSet` (for example `{ date: ['is', 'between', 'period'] }`). */
+		typeOperators?: Partial<Record<'string' | 'number' | 'date' | 'select' | 'bool' | 'custom', string[]>>;
+		/** Ready-made sets of conditions, shown as chips under the bar. */
+		presets?: FilterPreset[];
+		/** Shows "Saved filters": the user saves the current filters under a name and applies them later. On with `saved` or `savedKey` too. */
+		savable?: boolean;
+		/** The saved filters. Bind it (or use `onsavedchange`) to keep them in the backend. */
+		saved?: SavedFilter[];
+		/** Keeps the saved filters in the browser (`localStorage`) under this key. */
+		savedKey?: string;
+		/** Query the filters are added to in `onchange` (for example with the search and the sorting). */
+		builder?: FilterBuilder;
+		/** BCP 47 locale: the language of every text (`it` and `en` are built in, others fall back to English) and the format of dates and numbers. Defaults to the one set with `setDefaultLocale`, else `en`. */
+		locale?: string;
+		/** First day of the week for the periods `thisWeek`, `lastWeek` and `nextWeek`. Default 1 (Monday). */
+		weekStart?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+		/** Negative operators ("is not", "does not contain", ≠, "is none of", "not between") also keep the rows where the field is empty, which SQL leaves out. On by default; it sends `null` modifiers, so pass `false` for backends that do not know them (variants E and E'). A field's `negativesIncludeEmpty` wins. */
+		negativesIncludeEmpty?: boolean;
+		/** Texts to change (see `FilterLabels`), on top of those of `locale`: pass only what differs, or every text for a language the library does not have. */
+		labels?: FilterLabelsInput;
+		/** Shows a pill for each condition in the bar. */
+		showPills?: boolean;
+		/** On screens up to 1024px wide, every editor opens in a bottom sheet with all the conditions. */
+		mobileDrawer?: boolean;
+		/** Extra classes for each part. */
+		class?: { container?: string; bar?: string; pill?: string; panel?: string };
+		/** Content at the start of the bar (for example a search field). */
+		prependSnippet?: Snippet;
+		/** Content after the filter buttons. */
+		appendSnippet?: Snippet;
+		/** Content at the end of the bar, pushed to the right (for example "New" or "Export"). */
+		actionsSnippet?: Snippet;
+		/** Replaces the text of a pill (field, operator and value). The pill keeps its buttons. */
+		pillSnippet?: Snippet<[{ condition: FilterCondition; field: FilterField; operator: string; value: string }]>;
+		/** Input of the value for `custom` fields and operators with `input: 'custom'`. Call `setValue` with the new value. */
+		inputSnippet?: Snippet<
+			[{ field: FilterField; operator: string; value: unknown; setValue: (value: unknown) => void }]
+		>;
+		/** Called when the query changes: the tree (complete conditions only) and the `FilterBuilder` built from it. */
+		onchange?: (change: { value: FilterGroup; builder: FilterBuilder }) => void;
+		/** Called when the user removes complete conditions (× of a pill, Remove, Clear, a row of the panel, a preset turned off), for example to reset state of the app. */
+		onremove?: (change: { conditions: FilterCondition[] }) => void;
+		/** Called when the user saves or deletes saved filters, with the new list. */
+		onsavedchange?: (saved: SavedFilter[]) => void;
+		/** Called when the list of fields, a card or the panel opens, for example to load the options of a field. */
+		onopen?: (event: { view: 'fields' | 'editor' | 'panel'; field?: FilterField }) => void;
+	}
 
-  let open: boolean = $state(false),
-    mobileOpen: boolean = $state(false),
-    activator: HTMLElement | undefined = $state(),
-    localMultiEditTabs = $derived.by(() => {
-      return filters.some(f => !multiEditTabs?.find(tab => tab.name == f.tabName)) 
-        ? undefined 
-        : multiEditTabs
-    }),
-    selectedTab: ComponentProps<typeof TabSwitcher>['selected'] = $state(),
-    selectedTabFilters: Filter[] = $derived.by(() => {
-      return selectedTab
-        ? filters.filter(f => f.tabName == selectedTab)
-        : filters
-    })
+	let {
+		fields,
+		value = $bindable(),
+		allowOr = false,
+		maxDepth = 0,
+		confirm = false,
+		applyDelay = 300,
+		presets = [],
+		builder,
+		locale: localeProp,
+		weekStart = 1,
+		negativesIncludeEmpty = true,
+		labels: textOverrides,
+		showPills = true,
+		mobileDrawer = true,
+		class: clazz = {},
+		prependSnippet,
+		appendSnippet,
+		actionsSnippet,
+		pillSnippet,
+		inputSnippet,
+		onchange,
+		onremove,
+		onopen,
+		operatorSet = 'standard',
+		typeOperators,
+		savable = false,
+		saved = $bindable(),
+		savedKey,
+		onsavedchange
+	}: Props = $props();
 
-  function handleAddFilterClick() {
-    if(onaddFilterClick) {
-      onaddFilterClick()
-    }
-    open = true
-    mobileOpen = true
-  }
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
+	const uid = $props.id();
+	const panelId = `${uid}-panel`;
 
-  let filterOptions = $derived(filters.map((f) => {
-    return {
-      title: f.label,
-      name: f.name
-    }
-  }))
+	let own = $state(untrack(() => value ?? createFilters()));
+	let tree = $derived(value ?? own);
+	let texts = $derived(filterLabels(textOverrides, locale));
+	let drawerMode = $derived(mobileDrawer && breakpoints.mAndDown);
+	let byName = $derived(new Map(fields.map((field) => [field.name, field])));
+	let count = $derived(countFilters(tree, fields));
+	let removable = $derived(
+		filterConditions(tree).some((condition) => !condition.locked && !byName.get(condition.field)?.hidden)
+	);
 
-  let deletableFilterOptions = $derived(filters.map((f) => {
-    return {
-      title: f.label,
-      name: f.name,
-      appendIcon: f.active ? 'mdi-delete' : undefined
-    }
-  }))
+	let popupOpen = $state(false);
+	let popupMode = $state<'fields' | 'editor'>('fields');
+	let popupAnchor = $state<HTMLElement>();
+	let draft = $state<FilterCondition>();
+	let addButton = $state<HTMLButtonElement>();
+	let rootElement = $state<HTMLDivElement>();
+	let panelOpen = $state(false);
+	let panelDraft = $state<FilterGroup>();
+	let filtersButton = $state<HTMLButtonElement | HTMLAnchorElement>();
+	let barWidth = $state<number>();
+	let compact = $derived(barWidth !== undefined && barWidth < 640);
+	let iconOnly = $derived(compact && !!prependSnippet);
 
-  let selected: ArrayElement<NonNullable<ComponentProps<typeof SelectableVerticalList>['elements']>>['name'] | undefined = $state()
-  let focused: ArrayElement<NonNullable<ComponentProps<typeof SelectableVerticalList>['elements']>>['name'] | undefined = $state()
-  $effect(() => {
-    if(!!focused && !open) focused = undefined
-  })
+	let editingField = $derived(draft ? byName.get(draft.field) : undefined);
+	let editingExisting = $derived(!!draft && !!findFilterNode(tree, draft.id));
+	let pinned = $derived(fields.filter((field) => field.pinned && !field.hidden));
+	let pills = $derived(
+		tree.items.filter((node) => {
+			if (isFilterGroup(node)) return filterConditions(node).some((condition) => isComplete(condition));
+			const field = byName.get(node.field);
+			return !!field && !field.hidden && (isComplete(node) || node.id === draft?.id);
+		})
+	);
+	let pillRow = $derived(showPills && (pinned.length > 0 || pills.length > 0));
+	let returnTo: HTMLElement | undefined;
+	let operatorOptions = $derived({ set: operatorSet, byType: typeOperators });
+	let ownSaved = $state<SavedFilter[]>(untrack(() => saved ?? []));
+	let savedList = $derived(saved ?? ownSaved);
+	let showSaved = $derived(savable || saved !== undefined || !!savedKey);
+	let savedOpen = $state(false);
+	let savedButton = $state<HTMLButtonElement | HTMLAnchorElement>();
+	let saveName = $state('');
 
-  let filterOpened: 'edit' | 'new' = $state('new')
+	$effect(() => {
+		const key = savedKey;
+		if (!key) return;
+		untrack(() => {
+			const list = readSaved(key);
+			if (list) setSaved(list, false);
+		});
+	});
 
+	function setSaved(list: SavedFilter[], persist = true) {
+		ownSaved = list;
+		saved = list;
+		if (!persist) return;
+		if (savedKey) writeSaved(savedKey, list);
+		onsavedchange?.(list);
+	}
 
-  let filterOptionsListActivator: HTMLElement | undefined = $state()
-  let singleFilterActivator:  HTMLElement | undefined = $state()
-  let singleFilterMenuAnchor: 'right-center' | 'bottom-center' = $state('right-center')
-  let singleFilterMenuOpened: boolean = $state(false)
+	function saveCurrent() {
+		const name = saveName.trim();
+		if (!name) return;
+		const locked = filterConditions(tree).filter((condition) => condition.locked);
+		let value = dropIncomplete(tree);
+		for (const condition of locked) value = removeFilterNode(value, condition.id);
+		setSaved([...savedList, { id: filterId(), name, value: pruneFilters(value) }]);
+		saveName = '';
+	}
 
-  let selectedFilter : Filter | undefined = $state()
-  let selectedFilterIndex = $derived(filters.findIndex((f) => { return f.name === selected }))
-  $effect(() => {
-    selectedFilter = selected === undefined ? undefined : filters[selectedFilterIndex]
-  })
+	function applySaved(item: SavedFilter) {
+		commit(restoreSaved(item, tree, fields));
+		savedOpen = false;
+		(savedButton as HTMLElement | undefined)?.focus();
+	}
 
+	let lastQuery = untrack(() => query(tree));
+	let timer: ReturnType<typeof setTimeout> | undefined;
 
-  function handleFilterSelection(e: Parameters<NonNullable<ComponentProps<typeof SelectableVerticalList>['onselect']>>[0], mobile: boolean = false) {
-    if(mobile) {
-      selected = e.detail.element.name
-      singleFilterMenuOpened = true;
-    } else {
-      singleFilterActivator = filterOptionsListActivator
-      singleFilterMenuAnchor = 'right-center'
-      singleFilterMenuOpened = true;
-      selected = e.detail.element.name
-      filterOpened = 'new'
-    }
-    selectedTmpFilter = undefined
+	$effect(() => {
+		const current = query(tree);
+		untrack(() => {
+			clearTimeout(timer);
+			if (current === lastQuery) return;
+			const send = () => {
+				lastQuery = current;
+				onchange?.({ value: dropIncomplete(tree), builder: build(tree) });
+			};
+			if (confirm || applyDelay <= 0) send();
+			else timer = setTimeout(send, applyDelay);
+		});
+	});
 
-    let filter = filters.find(f => f.name === e.detail.element.name)
-    if(!!filter) {
-      if(filter.type === 'custom') {
-        customFilterApplyDisabled = filter.active === undefined || filter.active === false
-      }
-    }
-  }
+	$effect(() => () => clearTimeout(timer));
 
-  function handleCancelFilterClick() {
-    open = false
-    mobileOpen = false
-    singleFilterMenuOpened = false;
-  }
+	$effect(() => {
+		void pills;
+		void pinned;
+		untrack(() => {
+			if (!popupOpen) return;
+			const own =
+				popupMode === 'editor'
+					? rootElement?.querySelector<HTMLElement>('.aurora-filters-pill-main[aria-expanded="true"]')
+					: undefined;
+			if (own && own !== popupAnchor) popupAnchor = own;
+			else if (popupAnchor?.isConnected === false) popupAnchor = own ?? (addButton?.isConnected ? addButton : filtersButton);
+		});
+	});
 
-  function handleApplyFilterClick() {
-    if(!!selectedFilter && !!selectedTmpFilter) {
-      selectedFilter = {...selectedTmpFilter}
-      selectedFilter.active = true
-      filters[selectedFilterIndex] = selectedFilter
-      open = false
-      mobileOpen = false
-      singleFilterMenuOpened = false;
-      if(onapplyFilter) {
-        onapplyFilter()
-      }
-    }
-  }
+	const pointer = pointerPress();
 
-  let activeFilters = $derived(filters.filter((f) => f.active))
+	$effect(() => {
+		if (popupOpen) return;
+		untrack(() => {
+			if (!pointer.down || !draft) return releaseDraft();
+			const id = draft.id;
+			pointer.afterRelease(() => {
+				dropIfIncomplete(id);
+				if (!popupOpen && draft?.id === id) draft = undefined;
+			});
+		});
+	});
 
-  function handleRemoveFilter(filter: { name: string }) {
-    let filterIndex = filters.findIndex((f) => f.name === filter.name)
-    let filterName = filter.name
-    filters[filterIndex].active = false
-    if (tmpFilters[filterName]) {
-      tmpFilters[filterName].active = false
-    }
-    if(Object.keys(filters[filterIndex]).includes('value')) {
-      //@ts-ignore
-      filters[filterIndex].value = undefined
-      if(!!tmpFilters[filterName] && Object.keys(tmpFilters[filterName]).includes('value')) {
-        //@ts-ignore
-        tmpFilters[filterName].value = undefined
-      }
-    }
-    if(Object.keys(filters[filterIndex]).includes('from')) {
-      //@ts-ignore
-      filters[filterIndex].from = undefined
-      if(!!tmpFilters[filterName] && Object.keys(tmpFilters[filterName]).includes('from')) {
-        //@ts-ignore
-        tmpFilters[filterName].from = undefined
-      }
-    }
-    if(Object.keys(filters[filterIndex]).includes('to')) {
-      //@ts-ignore
-      filters[filterIndex].to = undefined
-      if(!!tmpFilters[filterName] && Object.keys(tmpFilters[filterName]).includes('to')) {
-        //@ts-ignore
-        tmpFilters[filterName].to = undefined
-      }
-    }
-    if(Object.keys(filters[filterIndex]).includes('values')) {
-      //@ts-ignore
-      filters[filterIndex].values = undefined
-      if(!!tmpFilters[filterName] && Object.keys(tmpFilters[filterName]).includes('values')) {
-        //@ts-ignore
-        tmpFilters[filterName].values = undefined
-      }
-    }
-    singleFilterMenuOpened = false
-    filters = [...filters];
-    if(onremoveFilter) {
-      onremoveFilter({
-        detail: {
-          filter: filters[filterIndex]
-        }
-      })
-    }
-  }
+	function releaseDraft() {
+		if (!draft) return;
+		dropIfIncomplete(draft.id);
+		draft = undefined;
+	}
 
-  let activeFiltersActivators: Record<string, HTMLElement> = $state({})
-  function handleActiveFilterClick(filter: { name: string, type: 'custom' | string }) {
-    singleFilterActivator = activeFiltersActivators[filter.name]
-    singleFilterMenuAnchor = 'bottom-center'
-    singleFilterMenuOpened = true;
-    mobileOpen=true
-    selected = filter.name
-    filterOpened = 'edit'
+	function dropIfIncomplete(id: string) {
+		const stored = findFilterNode(tree, id)?.node;
+		if (stored && !isFilterGroup(stored) && !stored.locked && !isComplete(stored))
+			commit(removeFilterNode(tree, id));
+	}
 
-    if(filter.type === 'custom') {
-      customFilterApplyDisabled = false
-    }
-  }
+	function build(current: FilterGroup) {
+		return filtersToBuilder(current, fields, { builder, weekStart, negativesIncludeEmpty });
+	}
 
-  function handleMobileBackTap() {
-    closeFilterMenu(0)
-  }
+	function query(current: FilterGroup) {
+		return JSON.stringify(build(current).toJson());
+	}
 
-  function closeFilterMenu(delay: number) {
-    setTimeout(() => {
-      singleFilterMenuOpened = false
-    }, delay)
-  }
+	function isComplete(condition: FilterCondition) {
+		return isConditionComplete(condition, byName.get(condition.field));
+	}
 
-  function handleDeleteIconClick(event: Parameters<NonNullable<ComponentProps<typeof SelectableVerticalList>['oniconClick']>>[0]) {
-    let filterIndex = event.detail.index
-    let name = filters[filterIndex].name
-    handleRemoveFilter({name})
-  }
+	function commit(next: FilterGroup) {
+		const kept = new Set(filterConditions(next).map((condition) => condition.id));
+		const removed = filterConditions(tree).filter(
+			(condition) => !kept.has(condition.id) && isComplete(condition)
+		);
+		own = next;
+		value = next;
+		if (removed.length) onremove?.({ conditions: removed });
+	}
 
-  function handleRemoveAllFilters(event?: Parameters<NonNullable<ComponentProps<typeof Icon>['onclick']>>[0]) {
-    if(!!event) event.stopPropagation()
-    for(let i = 0; i < filters.length; i += 1) {
-      filters[i].active = false
-      if(Object.keys(filters[i]).includes('value')) {
-        //@ts-ignore
-        filters[i].value = undefined
-      }
-      if(Object.keys(filters[i]).includes('from')) {
-        //@ts-ignore
-        filters[i].from = undefined
-      }
-      if(Object.keys(filters[i]).includes('to')) {
-        //@ts-ignore
-        filters[i].to = undefined
-      }
-      if(Object.keys(filters[i]).includes('values')) {
-        //@ts-ignore
-        filters[i].values = undefined
-      }
-      singleFilterMenuOpened = false
-    }
-    filters = filters
-    tmpFilters = {}
-    customToBeInitialized = true
-    if(onremoveAllFilters) {
-      onremoveAllFilters()
-    }
-  }
+	function newCondition(field: FilterField) {
+		return filterCondition(
+			field.name,
+			field.defaultOperator ?? fieldOperators(field, operatorOptions)[0]?.name ?? '',
+			field.defaultValue
+		);
+	}
 
-  function handleMultiEditApplyClick() {
-    open = false
-    mobileOpen = false
-    if(onapplyFilter) {
-      onapplyFilter()
-    }
-  }
+	function dropIncomplete(current: FilterGroup): FilterGroup {
+		let next = current;
+		for (const condition of filterConditions(current))
+			if (!condition.locked && !isComplete(condition)) next = removeFilterNode(next, condition.id);
+		return pruneFilters(next);
+	}
 
-  function handleMultiEditRemoveClick() {
-    handleRemoveAllFilters()
-    open = false
-    mobileOpen = false
-  }
+	function openFields(anchor: HTMLElement | undefined) {
+		if (drawerMode) return openPanel(true);
+		releaseDraft();
+		popupMode = 'fields';
+		popupAnchor = anchor;
+		returnTo = anchor;
+		popupOpen = true;
+		onopen?.({ view: 'fields' });
+	}
 
-  let selectedTmpFilter: Filter | undefined = $state()
+	function start(field: FilterField, anchor?: HTMLElement) {
+		if (drawerMode) {
+			const condition = newCondition(field);
+			if (confirm) panelDraft = addFilterNode(panelDraft ?? tree, condition);
+			else commit(addFilterNode(tree, condition));
+			if (!panelOpen) onopen?.({ view: 'panel' });
+			panelOpen = true;
+			return;
+		}
+		const condition = newCondition(field);
+		draft = condition;
+		if (!confirm && isConditionComplete(condition, field)) commit(addFilterNode(tree, condition));
+		popupMode = 'editor';
+		if (anchor) popupAnchor = returnTo = anchor;
+		popupOpen = true;
+		onopen?.({ view: 'editor', field });
+	}
 
-  let tmpFilters: {[filterName: string]: Filter} = $state({})
+	function edit(condition: FilterCondition, anchor: HTMLElement) {
+		if (condition.locked) return;
+		if (drawerMode) return openPanel();
+		draft = { ...condition };
+		popupMode = 'editor';
+		popupAnchor = returnTo = anchor;
+		popupOpen = true;
+		onopen?.({ view: 'editor', field: byName.get(condition.field) });
+	}
 
-  function handleApplyMultiFilterClick() {
-    for(let i = 0; i < filters.length; i += 1) {
-      if(!!filters[i] && !!tmpFilters[filters[i].name]) {
-        filters[i] = {...tmpFilters[filters[i].name]}
-        filters[i].active = filters[i].type !== 'custom' ? Validator.isValid(tmpFilters[filters[i].name]) : tmpFilters[filters[i].name].active
-      }
-    }
-    filters = filters
-    handleMultiEditApplyClick()
-  }
+	function change(condition: FilterCondition) {
+		draft = condition;
+		if (findFilterNode(tree, condition.id)) commit(updateFilterNode(tree, condition.id, condition));
+		else if (isComplete(condition)) commit(addFilterNode(tree, condition));
+	}
 
-  function updateMultiFilterValues(filterName: string, newValue: any, newValid: boolean, mode?: NumberMode | StringMode | SelectMode | DateMode) {
-    let filter = filters.find(f => f.name === filterName)
-    if(!filter) throw new Error('cannot find filter with name ' + filterName)
-    if(!tmpFilters[filterName]) tmpFilters[filterName] = {...filter}
-    let tmpFilter = tmpFilters[filterName]
-    if('mode' in tmpFilter && !!mode) {
-      if(tmpFilter.type == 'date' && isDateMode(mode)){
-        tmpFilter.mode = mode
-      }
-      else if(tmpFilter.type == 'number' && isDateMode(mode)){
-        tmpFilter.mode = mode
-      }
-      else if(tmpFilter.type == 'string' && isStringMode(mode)){
-        tmpFilter.mode = mode
-      }
-      else if(tmpFilter.type == 'select' && isSelectMode(mode)){
-        tmpFilter.mode = mode
-      }
-    }
-    if(tmpFilter.type == 'select') {
-      tmpFilter.values = newValue
-    } else if('mode' in tmpFilter && tmpFilter.mode == 'between') {
-      if(tmpFilter.type == 'date'){
-        if(newValue.from){
-          tmpFilter.from = DateTime.fromJSDate(newValue.from).setLocale('it-IT').startOf('day').toJSDate()
-        }
-        if(newValue.to){
-          tmpFilter.to = DateTime.fromJSDate(newValue.to).setLocale('it-IT').endOf('day').toJSDate()
-        }
-      }
-      else {
-        tmpFilter.from = newValue.from
-        tmpFilter.to = newValue.to
-      }
-    } else {
-      tmpFilter.value = newValue
-    }
-    tmpFilter.active = newValid
-  }
+	function apply(condition: FilterCondition) {
+		if (findFilterNode(tree, condition.id)) commit(updateFilterNode(tree, condition.id, condition));
+		else commit(addFilterNode(tree, condition));
+		popupOpen = false;
+		(returnTo?.isConnected ? returnTo : addButton?.isConnected ? addButton : filtersButton)?.focus();
+	}
 
-  let customToBeInitialized = true
-  $effect(() => {
-    if(customToBeInitialized && !!tmpFilters) initCustomTmpFilters()
-  })
+	function remove(id: string) {
+		commit(removeFilterNode(tree, id));
+		if (draft?.id === id) popupOpen = false;
+	}
 
-  function initCustomTmpFilters() {
-    let customFilters = filters.filter(f => f.type === 'custom')
-    for(const customFilter of customFilters) {
-      if(!tmpFilters[customFilter.name]) {
-        tmpFilters[customFilter.name] = { ...customFilter }
-      }
-    }
-    customToBeInitialized = false
-  }
+	function clear() {
+		commit(clearFilters(tree));
+		popupOpen = false;
+	}
 
-  let customFilterApplyDisabled: boolean = $state(true)
-  function updateFunction(filterName: string, newValue: any, newValid: boolean) {
-    let tmpFilter = tmpFilters[filterName]
-    if(!!tmpFilter && tmpFilter.type == 'custom') {
-      tmpFilter.value = newValue
-      tmpFilter.active = newValid
-      selectedTmpFilter = {...tmpFilter}
-      customFilterApplyDisabled = !newValid
-    }
-  }
+	function openPanel(addRow = false) {
+		popupOpen = false;
+		const withRow = addRow ? addFilterNode(tree, filterCondition('', '')) : tree;
+		if (confirm) panelDraft = withRow;
+		else if (addRow) commit(withRow);
+		panelOpen = true;
+		onopen?.({ view: 'panel' });
+	}
 
-  let moreItemsActivator: HTMLElement | undefined = $state()
+	function panelChange(next: FilterGroup) {
+		if (confirm) panelDraft = next;
+		else commit(next);
+	}
 
-  function onclick(event: MouseEvent & {
-    currentTarget: EventTarget & HTMLDivElement;
-  }, stopPropagation: boolean = false) {
-    if(stopPropagation){
-      event.stopPropagation()
-    }
-    if(onclickInternal) {
-      onclickInternal(event)
-    }
-  }
+	function closePanel(applyDraft: boolean) {
+		if (confirm && applyDraft && panelDraft) commit(dropIncomplete(panelDraft));
+		else if (!confirm) commit(dropIncomplete(tree));
+		panelDraft = undefined;
+		panelOpen = false;
+	}
+
+	$effect(() => {
+		if (panelOpen) return;
+		untrack(() => {
+			if (panelDraft) panelDraft = undefined;
+			const cleaned = dropIncomplete(tree);
+			if (!confirm && JSON.stringify(cleaned) !== JSON.stringify(tree)) commit(cleaned);
+		});
+	});
 </script>
 
-<MediaQuery>
-  {#snippet defaultSnippet({ mAndDown})}
-    <div class="filters-wrapper" class:mobile={mAndDown} style:--filter-dot-size={activeFilters.length > 0 ? '16px' : '0px'} style:--filter-dot-content={activeFilters.length > 0 ? `"${activeFilters.length}"` : '""'}>
-      <div class="filters-container" class:mobile={mAndDown} class:hidden={mAndDown && (!showActiveFilters || activeFilters.length == 0)}>
-        {#if showActiveFilters}
-          {#each activeFilters as filter}
-            <div
-              class="filter-slot"
-              bind:this={activeFiltersActivators[filter.name]}
-            >
-              <Chip
-                close
-                --chip-border-radius="4px"
-                --chip-default-gap="0px"
-                onclose={() => handleRemoveFilter(filter)}
-                onclick={() => handleActiveFilterClick(filter)}
-              >
-                {#if filter.type === 'custom'}
-                  {@render customChipSnippet?.({ filter })}
-                {:else}
-                  <div class="chip-content">
-                    <span class="truncate-text inline-truncated" style:max-width="160px">
-                      <b>{filter.label}</b>
-                    </span>
-                    {#if filter.type === "string" && filter.value != undefined}
-                      {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                      <span class="truncate-text inline-truncated">
-                        <b>{filter.value}</b>
-                      </span>
-                    {:else if filter.type === "date"}
-                      {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
-                        {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                        <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
-                        {betweenSeparator}
-                        <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
-                      {:else if filter.mode == 'between' && filter.from != undefined}
-                        {labelsMapper['greater'].extended || labelsMapper['greater'].short}
-                        <span class="truncate-text inline-truncated"><b>{filter.from?.toLocaleDateString(dateLocale)}</b></span>
-                      {:else if filter.mode == 'between' && filter.to != undefined}
-                        {labelsMapper['lower'].extended || labelsMapper['lower'].short}
-                        <span class="truncate-text inline-truncated"><b>{filter.to?.toLocaleDateString(dateLocale)}</b></span>
-                      {:else if filter.mode != 'between' && filter.value != undefined}
-                        {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                        <span class="truncate-text inline-truncated"><b>{filter.value?.toLocaleDateString(dateLocale)}</b></span>
-                      {/if}
-                    {:else if filter.type == "number"}
-                      {#if filter.mode == 'between' && filter.from != undefined && filter.to != undefined}
-                        {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                        <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
-                        {betweenSeparator}
-                        <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
-                      {:else if filter.mode == 'between' && filter.from != undefined}
-                        {labelsMapper['greater'].extended || labelsMapper['greater'].short}
-                        <span class="truncate-text inline-truncated"><b>{filter.from}</b></span>
-                      {:else if filter.mode == 'between' && filter.to != undefined}
-                        {labelsMapper['lower'].extended || labelsMapper['lower'].short}
-                        <span class="truncate-text inline-truncated"><b>{filter.to}</b></span>
-                      {:else if filter.mode != 'between' && filter.value != undefined}
-                        {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                        <span class="truncate-text inline-truncated"><b>{filter.value}</b></span>
-                      {/if}
-                    {:else if filter.type == 'select' && !!filter.values && filter.values.length > 0}
-                      {labelsMapper[filter.mode || ""].extended || labelsMapper[filter.mode || ""].short || filter.mode}
-                      <span class="truncate-text inline-truncated"><b>{filter.values[0].label}</b></span>
-                      {#if filter.values.length >= 2}
-                        <span class="more-items" bind:this={moreItemsActivator}>+{filter.values.length - 1}</span>
-                        <ToolTip activator={moreItemsActivator}>
-                          <div class="more-tooltip-content">
-                            <ul style:margin="0px">
-                              {#each filter.values as value}
-                                <li><div class="truncate-text">{value.label}</div></li>
-                              {/each}
-                            </ul>
-                          </div>
-                        </ToolTip>
-                      {/if}
-                    {:else if filter.type == 'bool' && filter.value !== undefined}
-                        <b>{filter.value ? trueString : falseString}</b>
-                    {/if}
-                  </div>
-                {/if}
-              </Chip>
-            </div>
-          {/each}
-        {/if}
-        {#if !mAndDown}
-          <div
-            class="filter-button"
-            bind:this={activator}
-          >
-            <Button
-              --button-color="var(--chip-color, var(--chip-default-color))"
-              --button-border-radius='var(--filters-button-border-radius, var(--filters-default-button-border-radius))'
-              --button-height="var(--filters-button-height, var(--filters-default-button-height))"
-              onclick={handleAddFilterClick}
-            >
-              <div class="filter-button-content">
-                <Icon name="mdi-filter"></Icon>
-                {addFilterLabel}
-                <div class="remove-filters" class:hidden={activeFilters.length <= 0}>
-                  <Icon 
-                    name="mdi-close-circle" 
-                    onclick={handleRemoveAllFilters} 
-                    --icon-hover-color="var(--chip-color, var(--chip-default-color))"
-                  ></Icon>
-                </div>
-              </div>
-            </Button>
+{#snippet pillList(showAdd: boolean)}
+		<FilterPills
+			{fields}
+			{pinned}
+			{pills}
+			logic={tree.logic}
+			{showPills}
+			labels={texts}
+			{locale}
+			pillClass={clazz.pill}
+			{pillSnippet}
+			editing={popupOpen ? draft?.id : undefined}
+			fieldsOpen={popupOpen && popupMode === 'fields'}
+			{panelOpen}
+			bind:addButton
+			onedit={edit}
+			onremove={remove}
+			onstart={start}
+			onopenpanel={() => openPanel()}
+			onopenfields={openFields}
+			{showAdd}
+		/>
+		{#if removable}
+			<Button buttonType="text" size="sm" onclick={clear}>{texts.clear}</Button>
+		{/if}
+{/snippet}
 
-          </div>
-        {/if}
-      </div>
-      {#if mAndDown}
-        <div
-          class="filter-button"
-          bind:this={activator}
-        >
-          <Button
-            --button-color="var(--chip-color, var(--chip-default-color))"
-            --button-hover-color="var(--chip-color, var(--chip-default-color))"
-            --button-border-radius="var(--filters-button-border-radius, var(--filters-default-button-border-radius))"
-            --button-height="var(--filters-button-height, var(--filters-default-button-height))"
-            onclick={handleAddFilterClick}
-          >
-            <div class="filter-button-content">
-              <Icon name="mdi-filter"></Icon>
-              {addFilterLabel}
-              <div class="remove-filters" class:hidden={activeFilters.length <= 0}>
-                <Icon 
-                  name="mdi-close-circle" 
-                  onclick={handleRemoveAllFilters}
-                  --icon-hover-color="var(--chip-color, var(--chip-default-color))"
-                ></Icon>
-              </div>
-            </div>
-          </Button>
+<div
+	class={['aurora-filters', clazz.container]}
+	bind:this={rootElement}
+	{@attach observeWidth((next) => (barWidth = Math.round(next)))}
+	data-count={count}
+	data-open={popupOpen || panelOpen || undefined}
+	data-compact={compact || undefined}
+>
+	<div class={['aurora-filters-bar', clazz.bar]}>
+		{@render prependSnippet?.()}
+		<Button
+			variant="secondary"
+			size="sm"
+			icon={FILTER_ICON}
+			bind:buttonElement={filtersButton}
+			aria-label={iconOnly ? (count ? `${texts.filters} (${count})` : texts.filters) : undefined}
+			aria-haspopup="dialog"
+			aria-expanded={panelOpen}
+			aria-controls={panelOpen && !drawerMode ? panelId : undefined}
+			onclick={() => (panelOpen ? closePanel(false) : openPanel())}
+		>
+			{#if !iconOnly}{texts.filters}{/if}
+			{#if count}<span class="aurora-filters-count">{count}</span>{/if}
+		</Button>
+		{#if showSaved}
+			<Button
+				variant="secondary"
+				size="sm"
+				icon={BOOKMARK_ICON}
+				bind:buttonElement={savedButton}
+				aria-label={iconOnly ? texts.savedFilters : undefined}
+				aria-haspopup="dialog"
+				aria-expanded={savedOpen}
+				onclick={() => (savedOpen = !savedOpen)}
+			>
+				{#if !iconOnly}{texts.savedFilters}{/if}
+			</Button>
+		{/if}
+		{#if !compact}{@render pillList(true)}{/if}
+		{@render appendSnippet?.()}
+		{#if actionsSnippet}
+			<div class="aurora-filters-actions">{@render actionsSnippet()}</div>
+		{/if}
+	</div>
+	{#if compact && (pillRow || removable)}
+		<div class="aurora-filters-row">{@render pillList(false)}</div>
+	{/if}
+	<FilterPresets {presets} {tree} labels={texts} ontoggle={(preset) => commit(togglePreset(tree, preset))} />
+</div>
 
-        </div>
-      {/if}
-      {@render appendSnippet?.()}
-    </div>
-    {#if mAndDown}
-      <Drawer
-        bind:open={mobileOpen}
-        position="bottom"
-        onclose={() => {closeFilterMenu(200)}}
-        _borderRadius="20px 20px 0px 0px"
-        _space={drawerSpace}
-      >
-        <div class="drawer-content" class:shortened-drawer-content={editFilterMode === 'one-edit' && !(!!selectedFilter && singleFilterMenuOpened)}>
-          {#if editFilterMode === 'one-edit'}
-            {#if !!selectedFilter && singleFilterMenuOpened}
-              <div
-                class="drawer-filter-detail"
-                style:height="100%"
-                in:fly|local={{delay: 100, duration: 100, x: 200}}
-                out:fly|local={{duration: 100, x: -200}}
-              >
-                <MobileFilterEditor
-                  bind:filter={selectedFilter}
-                  onbackClick={handleMobileBackTap}
-                  {lang}
-                  {labelsMapper}
-                  bind:tmpFilter={selectedTmpFilter}
-                >
-                  <!-- <div slot="title">
-                    <div class="mobile-title">
-                      {selectedFilter?.label}
-                    </div>
-                  </div> -->
-                  {#snippet customSnippet({ filter })}
-                    {@render customInternalSnippet?.({ filter, updateFunction, mAndDown})}
-                  {/snippet}
+<FiltersPanel
+	bind:open={panelOpen}
+	drawer={drawerMode}
+	group={(confirm ? panelDraft : tree) ?? tree}
+	{fields}
+	{maxDepth}
+	{allowOr}
+	{operatorOptions}
+	labels={texts}
+	{locale}
+	{inputSnippet}
+	{confirm}
+	{removable}
+	id={panelId}
+	activator={filtersButton}
+	panelClass={clazz.panel}
+	onchange={panelChange}
+	onclose={closePanel}
+/>
 
-                  {#snippet filterActionsSnippet({ applyFilterDisabled, filter })}
-                    <div class="btn">
-                      <Button
-                        --button-width="100%"
-                        --button-box-shadow="none"
-                        --button-height="30px"
-                        --button-padding="10px 0px 10px 0px"
-                        --button-border-radius="10px 10px 0px 0px"
-                        disabled={!filter || (filter.type === 'custom' ? customFilterApplyDisabled : applyFilterDisabled)}
-                        onclick={handleApplyFilterClick}
-                      >{applyFilterLabel}</Button>
-                    </div>
-                    <div class="btn">
-                      <Button
-                        --button-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
-                        --button-background-color="transparent"
-                        --button-focus-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
-                        --button-active-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
-                        --button-hover-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
-                        --button-focus-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
-                        --button-active-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
-                        --button-hover-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
-                        --button-hover-box-shadow="none"
-                        --button-box-shadow="none"
-                        --button-width="100%"
-                        --button-padding="10px 0px 10px 0px"      
-                        --button-border-radius="0px 0px 0px 0px"
-                        onclick={() => {mobileOpen = false; closeFilterMenu(200)}}
-                      >{cancelFilterLabel}</Button>
-                    </div>
-                  {/snippet}
-                </MobileFilterEditor>
-              </div>
-            {:else}
-              <div
-                class="drawer-filter-list"
-                style:margin-top="20px"
-                style:height="100%"
-                out:fly|local={{duration: 100, x: -200}}
-                in:fly|local={{duration: 100, x: 200, delay: 100}}
-              >
-                <SelectableVerticalList
-                  bind:selected
-                  bind:focused
-                  elements={deletableFilterOptions}
-                  --selectable-vertical-list-default-width="100%"
-                  --selectable-vertical-list-default-element-height="56px"
-                  --selectable-vertical-list-default-title-font-size="null"
-                  onselect={(e) => {handleFilterSelection(e, true)}}
-                  centered
-                  bicolor
-                  appendIconSize="18pt"
-                  oniconClick={handleDeleteIconClick}
-                  --icon-color="rgb(var(--global-color-error-400))"
-                ></SelectableVerticalList>
-              </div>
-            {/if}
-          {:else if editFilterMode === 'multi-edit'}
-            <div
-              class="drawer-multi-filter"
-              style:height="100%"
-            >
-              <div class="form-container" style:background-color={mAndDown ? 'transparent' : 'rgb(var(--global-color-background-100))'} style:width={mAndDown ? '100%' : '50vw'} style:box-sizing="border-box">
-                <div class="header" class:no-border={localMultiEditTabs?.length}>
-                  <div>{addFilterLabel}</div>
-                </div>
-                <TabSwitcher
-                  tabs={localMultiEditTabs}
-                  bind:selected={selectedTab}
-                ></TabSwitcher>
-                <div class="drawer-body" class:shortened-body-mobile={localMultiEditTabs?.length}>
-                  {#if contentSnippet}
-                    {@render contentSnippet({ mAndDown, updateMultiFilterValues, filters, handleRemoveAllFilters })}
-                  {:else}
-                    <div class="multi-filters-container" style:grid-template-columns={mAndDown ? '1fr' : '1fr 1fr'}>
-                      {#each selectedTabFilters as filter, i}
-                        <div class="filter">
-                          <div class="input">
-                            {#if filter.type !== 'custom'}
-                              <div class="card-title">
-                                {#if filter.icon}
-                                <span style:margin-right=2px>
-                                  <Icon name={filter.icon} --icon-color={filter.iconColor} --icon-size=15.5px />
-                                </span>
-                                {/if}
-                                {filter.label}
-                              </div>
-                            {/if}
-                            <div class="field">
-                              <FilterEditor
-                                filter={selectedTabFilters[i]}
-                                {lang}
-                                {labelsMapper}
-                                editFilterMode="multi-edit"
-                                bind:tmpFilter={tmpFilters[filter.name]}
-                                mobile={mAndDown}
-                                onchange={(e) => {
-                                  if(!!e.detail.filter)
-                                    selectedTabFilters[i] = e.detail.filter
-                                }}
-                              >
-                                {#snippet customSnippet({ filter })}
-                                  {@render customInternalSnippet?.({ filter, updateFunction, mAndDown })}
-                                {/snippet}
-                              </FilterEditor>
-                            </div>
-                          </div>
-                        </div>
-                      {/each}
-                    </div>
-                  {/if}
-                </div>
-                <div class="footer">
-                  <div class="actions">
-                    <Button
-                      --button-color="rgb(var(--global-color-contrast-900))"
-                      --button-background-color="transparent"
-                      --button-focus-background-color="rgb(var(--global-color-background-300, .5))"
-                      --button-active-background-color="rgb(var(--global-color-background-300, .5))"
-                      --button-hover-background-color="rgb(var(--global-color-background-300, .5))"
-                      --button-focus-color="rgb(var(--global-color-contrast-900))"
-                      --button-active-color="rgb(var(--global-color-contrast-900))"
-                      --button-hover-color="rgb(var(--global-color-contrast-900))"
-                      --button-hover-box-shadow="none"
-                      --button-box-shadow="none"
-                      --button-padding="12px 16px"
-                      onclick={handleCancelFilterClick}
-                    >
-                      {cancelFilterLabel}
-                    </Button>
-                    <Button
-                      --button-color="rgb(var(--global-color-contrast-900))"
-                      --button-background-color="transparent"
-                      --button-focus-background-color="rgb(var(--global-color-background-300, .5))"
-                      --button-active-background-color="rgb(var(--global-color-background-300, .5))"
-                      --button-hover-background-color="rgb(var(--global-color-background-300, .5))"
-                      --button-focus-color="rgb(var(--global-color-contrast-900))"
-                      --button-active-color="rgb(var(--global-color-contrast-900))"
-                      --button-hover-color="rgb(var(--global-color-contrast-900))"
-                      --button-hover-box-shadow="none"
-                      --button-box-shadow="none"
-                      --button-padding="12px 16px"
-                      onclick={handleMultiEditRemoveClick}
-                    >
-                      {lang == 'en' ? "Remove filters" : "Rimuovi filtri"}
-                    </Button>
-                    <Button
-                      --button-min-width="fit-content"
-                      --button-padding="12px 16px"
-                      onclick={handleApplyMultiFilterClick}
-                    >
-                      {applyFilterLabel}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          {/if}
-        </div>
-      </Drawer>
-    {:else}
-      {#if editFilterMode === 'one-edit'}
-        <Menu
-          bind:activator={activator}
-          bind:open={open}
-          closeOnClickOutside
-          _boxShadow="rgb(var(--global-color-grey-900), .5) 0px 2px 4px"
-          _height="fit-content"
-          _minWidth="10vw"
-          _maxHeight="var(--filters-one-edit-menu-max-height, var(--filters-default-one-edit-menu-max-height))"
-          _borderRadius="5px"
-          anchor="bottom"
-          openingId="select-filter"
-          flipOnOverflow
-        >
-          <div
-            style:background-color="rgb(var(--global-color-background-200))"
-            bind:this={filterOptionsListActivator}
-            onclick={e => onclick(e, true)}
-            {onkeydown}
-            role="presentation"
-            tabindex="-1"
-          >
-            <SelectableVerticalList
-              bind:selected
-              bind:focused
-              elements={filterOptions}
-              --selectable-vertical-list-default-width="100%"
-              --selectable-vertical-list-default-element-height="56px"
-              --selectable-vertical-list-default-title-font-size="null"
-              onselect={handleFilterSelection}
-            ></SelectableVerticalList>
-          </div>
-        </Menu>
+{#if !drawerMode}
+	<Menu bind:open={popupOpen} activator={popupAnchor} placement="bottom-start" class="aurora-filters-popup">
+		{#if popupMode === 'fields'}
+			<FilterFieldList
+				fields={fields.filter((field) => !field.hidden)}
+				labels={texts}
+				autofocus
+				onselect={(field) => start(field)}
+			/>
+		{:else if draft && editingField}
+			<FilterEditor
+				field={editingField}
+				bind:condition={() => draft!, (condition) => (draft = condition)}
+				{confirm}
+				{operatorSet}
+				{typeOperators}
+				removable={editingExisting}
+				labels={textOverrides}
+				{locale}
+				autofocus
+				{inputSnippet}
+				onchange={change}
+				onapply={apply}
+				oncancel={() => (popupOpen = false)}
+				onremove={() => draft && remove(draft.id)}
+				onclose={() => (popupOpen = false)}
+			/>
+		{/if}
+	</Menu>
+{/if}
 
-        <Menu
-          _width="350px"
-          _borderRadius="10px"
-          _boxShadow="rgb(var(--global-color-grey-900), .5) 0px 2px 4px"
-          _overflow="unset"
-          activator={singleFilterActivator}
-          bind:open={singleFilterMenuOpened}
-          anchor={singleFilterMenuAnchor}
-          closeOnClickOutside
-          flipOnOverflow
-          openingId={ filterOpened == 'edit' ? "select-filter" : ""}
-        >
-          <div
-            style:min-height="160px"
-            {onclick}
-            {onkeydown}
-            style:border-radius="10px"
-            style:overflow="auto"
-            style:height="100%"
-            style:background-color="rgb(var(--global-color-background-200))"
-            role="presentation"
-          >
-            <div class="filter-title">
-              {filterTitleLabel} {selectedFilter?.label}
-            </div>
-
-            {#if !!selectedFilter}
-              <FilterEditor
-                bind:filter={selectedFilter}
-                {lang}
-                {labelsMapper}
-                bind:tmpFilter={selectedTmpFilter}
-              >
-                {#snippet customSnippet({ filter })}
-                  {@render customInternalSnippet?.({ filter, updateFunction, mAndDown })}
-                {/snippet}
-                {#snippet filterActionsSnippet({ applyFilterDisabled, filter })}
-                  <div class="sub-filter-button">
-                    <Button
-                      --button-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
-                      --button-background-color="transparent"
-                      --button-focus-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
-                      --button-active-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
-                      --button-hover-background-color="var(--filters-button-cancel-background-color, var(--filters-button-cancel-default-background-color))"
-                      --button-focus-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
-                      --button-active-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
-                      --button-hover-color="var(--filters-button-cancel-color, var(--filters-button-cancel-default-color))"
-                      --button-hover-box-shadow="none"
-                      --button-box-shadow="none"
-                      --button-padding="12px 16px"
-                      onclick={handleCancelFilterClick}
-                    >
-                      {cancelFilterLabel}
-                    </Button>
-                    <Button
-                      --button-min-width="100px"
-                      onclick={handleApplyFilterClick}
-                      disabled={!filter || (filter.type === 'custom' ? customFilterApplyDisabled : applyFilterDisabled)}
-                    >
-                      {applyFilterLabel}
-
-                    </Button>
-                  </div>
-                {/snippet}
-              </FilterEditor>
-            {/if}
-          </div>
-        </Menu>
-      {:else if editFilterMode === 'multi-edit'}
-        <Dialog
-          bind:open={open}
-          _overlayOpacity="50%"
-          _overlayBackdropFilter="blur(4px)"
-        >
-          <div 
-            class="form-container" 
-            style:background-color={mAndDown ? 'transparent' : 'rgb(var(--global-color-background-100))'} 
-            style:width={mAndDown ? '100%' : '800px'} 
-            style:box-sizing="border-box"
-          >
-            <div class="header" class:no-border={localMultiEditTabs?.length}>
-              <div>{addFilterLabel}</div>
-            </div>
-            <TabSwitcher
-              tabs={localMultiEditTabs}
-              bind:selected={selectedTab}
-            ></TabSwitcher>
-            <div class="dialog-body" class:shortened-body={localMultiEditTabs?.length}>
-              {#if contentSnippet}
-                {@render contentSnippet({ mAndDown, updateMultiFilterValues, filters, handleRemoveAllFilters })}
-              {:else}
-                <div class="multi-filters-container" style:grid-template-columns={mAndDown ? '1fr' : '1fr 1fr'}>
-                  {#each selectedTabFilters as filter}
-                    {@const i = filters.findIndex(f => f.name === filter.name)}
-                    <div class="filter card" class:wide={filter.type === 'select' || filter.type === 'custom'}>
-                      <div class="input">
-                        {#if filter.type !== 'custom'}
-                          <div class="card-title">
-                            {#if filter.icon}
-                            <span style:margin-right=2px>
-                              <Icon name={filter.icon} --icon-color={filter.iconColor} --icon-size=15.5px />
-                            </span>
-                            {/if}
-                            {filter.label}
-                          </div>
-                        {/if}
-                        <div class="field">
-                          <FilterEditor
-                            filter={filters[i]}
-                            {lang}
-                            {labelsMapper}
-                            editFilterMode="multi-edit"
-                            bind:tmpFilter={tmpFilters[filter.name]}
-                            mobile={mAndDown}
-                            onchange={(e) => {
-                              if(!!e.detail.filter)
-                                filters[i] = e.detail.filter
-                            }}
-                          >
-                            {#snippet customSnippet({ filter })}
-                              {@render customInternalSnippet?.({ filter, updateFunction, mAndDown })}
-                            {/snippet}
-                          </FilterEditor>
-                        </div>
-                      </div>
-                    </div>
-                  {/each}
-                </div>
-              {/if}
-            </div>
-            <div class="dialog-footer">
-              <div class="actions" style:padding-bottom={mAndDown ? '20px' : undefined}>
-                <Button
-                  --button-color="rgb(var(--global-color-contrast-900))"
-                  --button-background-color="transparent"
-                  --button-focus-background-color="rgb(var(--global-color-background-200, .5))"
-                  --button-active-background-color="rgb(var(--global-color-background-200, .5))"
-                  --button-hover-background-color="rgb(var(--global-color-background-200, .5))"
-                  --button-focus-color="rgb(var(--global-color-contrast-900))"
-                  --button-active-color="rgb(var(--global-color-contrast-900))"
-                  --button-hover-color="rgb(var(--global-color-contrast-900))"
-                  --button-hover-box-shadow="none"
-                  --button-box-shadow="none"
-                  --button-padding="12px 16px"
-                  onclick={handleCancelFilterClick}
-                >
-                  {cancelFilterLabel}
-                </Button>
-                <Button
-                  --button-color="rgb(var(--global-color-contrast-900))"
-                  --button-background-color="transparent"
-                  --button-focus-background-color="rgb(var(--global-color-background-200, .5))"
-                  --button-active-background-color="rgb(var(--global-color-background-200, .5))"
-                  --button-hover-background-color="rgb(var(--global-color-background-200, .5))"
-                  --button-focus-color="rgb(var(--global-color-contrast-900))"
-                  --button-active-color="rgb(var(--global-color-contrast-900))"
-                  --button-hover-color="rgb(var(--global-color-contrast-900))"
-                  --button-hover-box-shadow="none"
-                  --button-box-shadow="none"
-                  --button-padding="12px 16px"
-                  onclick={handleMultiEditRemoveClick}
-                >
-                  {lang == 'en' ? "Remove filters" : "Rimuovi filtri"}
-                </Button>
-                <Button
-                  --button-min-width="fit-content"
-                  --button-padding="12px 16px"
-                  onclick={handleApplyMultiFilterClick}
-                >
-                  {applyFilterLabel}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </Dialog>
-      {/if}
-    {/if}
-  {/snippet}
-</MediaQuery>
-
+{#if showSaved}
+	<SavedFilters
+		bind:open={savedOpen}
+		bind:name={saveName}
+		activator={savedButton}
+		list={savedList}
+		{count}
+		labels={texts}
+		onapply={applySaved}
+		ondelete={(item) => setSaved(savedList.filter((other) => other.id !== item.id))}
+		onsave={saveCurrent}
+	/>
+{/if}
 
 <style>
-  * {
-    box-sizing: border-box;
-  }
+	@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
 
-  .sub-filter-button {
-    display: flex;
-    column-gap: 10px;
-    flex-direction: row;
-    align-items: start;
-    margin-top: 10px;
-  }
+	@layer global.components {
+		.aurora-filters {
+			display: flex;
+			flex-direction: column;
+			gap: var(--filters-gap, var(--filters-default-gap));
+			box-sizing: border-box;
+			width: var(--filters-width, 100%);
+			min-width: 0;
+		}
 
-  .filter-button-content {
-    display: flex;
-    gap: 10px
-  }
+		.aurora-filters-bar {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--filters-gap, var(--filters-default-gap));
+			min-width: 0;
+		}
 
-  .filter-button-content .remove-filters {
-    color: rgb(var(--global-color-primary-100));
-  }
+		.aurora-filters-count {
+			min-width: 18px;
+			height: 18px;
+			padding: 0 6px;
+			box-sizing: border-box;
+			border-radius: var(--global-radius-full);
+			background: var(--filters-count-background, var(--filters-default-count-background));
+			color: var(--filters-count-color, var(--filters-default-count-color));
+			font-size: 11px;
+			font-weight: 600;
+			line-height: 18px;
+		}
 
-  .filter-button-content .remove-filters:hover {
-    color: white;
-  }
+		.aurora-filters-actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: 8px;
+			margin-inline-start: auto;
+		}
 
-  .filter-button-content .remove-filters.hidden {
-    display: none;
-  }
+		.aurora-filters-row {
+			display: flex;
+			align-items: center;
+			gap: var(--filters-gap, var(--filters-default-gap));
+			overflow-x: auto;
+			scrollbar-width: none;
+			overscroll-behavior-x: contain;
+		}
 
-  .filter-button::before {
-    content: var(--filter-dot-content, '0');
-    text-align: center;
-    font-size: .5rem;
-    background-color: rgb(var(--global-color-background-500));
-    color: rgb(var(--global-color-contrast-700));
-    position: absolute;
-    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-    top: -16%;
-    right: -8%;
-    border-radius: 100px;
-    width: var(--filter-dot-size, 0px);
-    line-height: 16px;
-    height: var(--filter-dot-size, 0px);
-  }
+		.aurora-filters-row::-webkit-scrollbar {
+			display: none;
+		}
 
-  .filter-title{
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-    margin-left: 10px;
-  }
+		.aurora-filters-row > :global(*) {
+			flex: none;
+		}
 
-  .filter-slot {
-    flex-shrink: 0;
-    flex-grow: 0;
-  }
+		.aurora-filters[data-compact] :global(.aurora-filters-presets) {
+			flex-wrap: nowrap;
+			overflow-x: auto;
+			scrollbar-width: none;
+		}
 
-  .filters-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-  }
-
-  .filters-container.mobile {
-    flex-wrap: nowrap;
-    overflow: auto;
-  }
-
-  .filters-wrapper {
-    display: flex;
-    align-items: start;
-    gap: 8px;
-    max-width: 100%;
-    width: var(
-      --filters-wrapper-width,
-      var(--filters-default-wrapper-width)
-    )
-  }
-
-  .filter-button {
-    flex-shrink: 0;
-    flex-grow: 0;
-    height: fit-content;
-    position: relative;
-    line-height: var(--filters-button-height, var(--filters-default-button-height));
-  }
-
-  .drawer-content{
-    height: 100%;
-  }
-
-  .shortened-drawer-content{
-    height: calc(100% - 20px);
-  }
-
-  .more-items {
-    position: relative;
-    padding: 0px 4px;
-    border-radius: 8px;
-    margin-left: 2px;
-    background-color: rgb(var(--global-color-grey-50));
-    color: rgb(var(--global-color-primary-500));
-    font-weight: 800;
-    font-size: 11px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-  }
-
-  .more-tooltip-content {
-    max-width: 300px;
-    text-overflow: ellipsis;
-    width: fit-content;
-    border-radius: 6px;
-    padding: 12px;
-    text-align: middle;
-    background-color: rgb(var(--global-color-background-200));
-    color: rgb(var(--global-color-contrast-950), .7);
-  }
-
-  .more-tooltip-content ul {
-    list-style: none;
-    padding: 0;
-  }
-
-  .truncate-text {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-
-  .inline-truncated {
-    display: inline-block;
-    vertical-align: middle;
-    max-width: 240px;
-  }
-
-
-  .form-container {
-    border-radius: 10px;
-    box-shadow: 0 0 1px 1px rgb(var(--global-color-background-200));
-    height: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-
-  .multi-filters-container {
-    display: grid;
-    gap: 20px
-  }
-
-  .filter {
-    display: flex;
-    align-items: center;
-  }
-
-  .card {
-    background-color: var(--filters-card-background-color, var(--filters-default-card-background-color));
-    border-radius: var(--filters-card-border-radius, var(--filters-default-card-border-radius));
-    padding: var(--filters-card-padding, var(--filters-default-card-padding));
-    box-shadow: var(--filters-card-box-shadow, var(--filters-default-card-box-shadow));
-    border: var(--filters-card-border, var(--filters-default-card-border));
-    display: flex;
-    align-items: start;
-  }
-
-  .card:hover {
-    box-shadow: var(--filters-card-hover-box-shadow, var(--filters-default-card-hover-box-shadow));
-    transition: var(--filters-card-hover-transition, var(--filters-default-card-hover-transition));
-  }
-  .card-title {
-    font-weight: var(--filters-card-title-font-weight, var(--filters-default-card-title-font-weight));
-    font-size: var(--filters-card-title-font-size, var(--filters-default-card-title-font-size));
-    color: var(--filters-card-title-color, var(--filters-default-card-title-color));
-    margin-bottom: var(--filters-card-title-margin-bottom, var(--filters-default-card-title-margin-bottom));
-  }
-  .input {
-    width: 100%;
-  }
-
-  .footer {
-    margin-top: 20px;
-  }
-
-  .footer .actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-right: 20px;
-  }
-
-  .multi-filters-container .filter {
-    grid-column: auto;
-  }
-
-  .multi-filters-container .filter.wide {
-    grid-column: span 2;
-  }
-
-  .hidden {
-    display: none;
-  }
-
-  .header {
-    font-weight: 600;
-    font-size: 1.5rem;
-    padding: 16px;
-    height: 64px;
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid rgb(var(--global-color-background-200));
-  }
-
-  .no-border {
-    border: none;
-  }
-
-  .drawer-body {
-    padding: 16px;
-    overflow-y: scroll;
-    height: calc(89vh - 170px);
-    max-height: calc(89vh - 170px);
-  }
-
-  .dialog-body {
-    padding: 16px;
-    height: calc(90vh - 164px);
-    max-height: calc(90vh - 164px);
-    overflow-y: auto;
-  }
-
-  .shortened-body {
-    height: calc(90vh - 186px);
-    max-height: calc(90vh - 186px);
-  }
-
-  .shortened-body-mobile {
-    height: calc(83vh - 170px);
-    max-height: calc(83vh - 170px);
-  }
-
-  .dialog-footer {
-    height: 68px;
-    padding: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    border-top: 1px solid rgb(var(--global-color-background-200));
-  }
-
-  .chip-content {
-    display: flex;
-    align-items: center;
-    gap: 4px
-  }
+		.aurora-filters[data-compact] :global(.aurora-filters-presets > *) {
+			flex: none;
+		}
+	}
 </style>

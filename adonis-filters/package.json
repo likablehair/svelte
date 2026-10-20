@@ -1,0 +1,39 @@
+{
+	"name": "@likable-hair/adonis-filters",
+	"version": "0.1.0",
+	"private": true,
+	"description": "Applies the filters of @likable-hair/svelte (the FilterBuilder JSON) to AdonisJS Lucid queries",
+	"type": "module",
+	"main": "./dist/cjs/index.js",
+	"types": "./dist/cjs/index.d.ts",
+	"exports": {
+		".": {
+			"import": {
+				"types": "./dist/esm/index.d.ts",
+				"default": "./dist/esm/index.js"
+			},
+			"require": {
+				"types": "./dist/cjs/index.d.ts",
+				"default": "./dist/cjs/index.js"
+			}
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"engines": {
+		"node": ">=16"
+	},
+	"scripts": {
+		"build": "tsc -p tsconfig.build.json && tsc -p tsconfig.cjs.json && node scripts/cjs-package.ts",
+		"prepack": "pnpm run build"
+	},
+	"devDependencies": {
+		"@adonisjs/core": "^7.5.0",
+		"@adonisjs/lucid": "^22.4.2",
+		"@types/qs": "^6.15.1",
+		"luxon": "^3.7.2",
+		"pg": "^8.16.3",
+		"qs": "^6.14.0"
+	}
+}

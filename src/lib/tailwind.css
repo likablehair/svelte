@@ -1,0 +1,76 @@
+@theme inline {
+	--color-bg: var(--global-color-bg);
+	--color-bg-2: var(--global-color-bg-2);
+	--color-surface: var(--global-color-surface);
+	--color-surface-2: var(--global-color-surface-2);
+	--color-surface-3: var(--global-color-surface-3);
+	--color-surface-solid: var(--global-color-surface-solid);
+	--color-surface-pop: var(--global-color-surface-pop);
+	--color-border: var(--global-color-border);
+	--color-border-strong: var(--global-color-border-strong);
+	--color-text: var(--global-color-text);
+	--color-text-2: var(--global-color-text-2);
+	--color-text-3: var(--global-color-text-3);
+	--color-primary: var(--global-color-primary);
+	--color-primary-strong: var(--global-color-primary-strong);
+	--color-primary-soft: var(--global-color-primary-soft);
+	--color-primary-glow: var(--global-color-primary-glow);
+	--color-on-primary: var(--global-color-on-primary);
+	--color-accent: var(--global-color-accent);
+	--color-accent-soft: var(--global-color-accent-soft);
+	--color-success: var(--global-color-success);
+	--color-success-soft: var(--global-color-success-soft);
+	--color-on-success: var(--global-color-on-success);
+	--color-warning: var(--global-color-warning);
+	--color-warning-soft: var(--global-color-warning-soft);
+	--color-on-warning: var(--global-color-on-warning);
+	--color-error: var(--global-color-error);
+	--color-error-soft: var(--global-color-error-soft);
+	--color-error-glow: var(--global-color-error-glow);
+	--color-on-error: var(--global-color-on-error);
+	--color-overlay: var(--global-color-overlay);
+	--color-data-1: var(--global-color-data-1);
+	--color-data-2: var(--global-color-data-2);
+	--color-data-3: var(--global-color-data-3);
+	--color-data-4: var(--global-color-data-4);
+	--color-data-5: var(--global-color-data-5);
+	--color-data-6: var(--global-color-data-6);
+	--color-focus-ring: var(--global-focus-ring-color);
+
+	--radius-xs: var(--global-radius-xs);
+	--radius-sm: var(--global-radius-sm);
+	--radius-md: var(--global-radius-md);
+	--radius-lg: var(--global-radius-lg);
+	--radius-xl: var(--global-radius-xl);
+
+	--shadow-sm: var(--global-shadow-sm);
+	--shadow-md: var(--global-shadow-md);
+	--shadow-lg: var(--global-shadow-lg);
+	--shadow-fill: var(--global-shadow-fill);
+
+	--font-sans: var(--global-font-family);
+	--font-display: var(--global-font-family-display);
+	--font-mono: var(--global-font-family-mono);
+
+	--ease-spring: var(--global-ease-spring);
+}
+
+@utility bg-fill-primary {
+	background-image: var(--global-fill-primary);
+}
+
+@utility bg-fill-error {
+	background-image: var(--global-fill-error);
+}
+
+@utility bg-fill-gradient {
+	background-image: var(--global-fill-gradient);
+}
+
+@utility bg-gradient {
+	background-image: var(--global-gradient);
+}
+
+@utility bg-gradient-soft {
+	background-image: var(--global-gradient-soft);
+}

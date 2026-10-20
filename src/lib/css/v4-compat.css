@@ -1,0 +1,303 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--global-color-background-50: var(--global-color-light-background-50, 255, 255, 255);
+		--global-color-background-100: var(--global-color-light-background-100, 248, 250, 252);
+		--global-color-background-200: var(--global-color-light-background-200, 238, 242, 247);
+		--global-color-background-300: var(--global-color-light-background-300, 228, 233, 242);
+		--global-color-background-400: var(--global-color-light-background-400, 218, 223, 231);
+		--global-color-background-500: var(--global-color-light-background-500, 209, 214, 223);
+		--global-color-background-600: var(--global-color-light-background-600, 197, 203, 214);
+		--global-color-background-700: var(--global-color-light-background-700, 185, 192, 204);
+		--global-color-background-800: var(--global-color-light-background-800, 173, 181, 194);
+		--global-color-background-900: var(--global-color-light-background-900, 158, 167, 183);
+		--global-color-background-950: var(--global-color-light-background-950, 112, 123, 146);
+		--global-color-contrast-50: var(--global-color-light-contrast-50, 214, 219, 228);
+		--global-color-contrast-100: var(--global-color-light-contrast-100, 203, 209, 219);
+		--global-color-contrast-200: var(--global-color-light-contrast-200, 176, 184, 197);
+		--global-color-contrast-300: var(--global-color-light-contrast-300, 152, 161, 178);
+		--global-color-contrast-400: var(--global-color-light-contrast-400, 129, 139, 160);
+		--global-color-contrast-500: var(--global-color-light-contrast-500, 107, 118, 142);
+		--global-color-contrast-600: var(--global-color-light-contrast-600, 83, 95, 121);
+		--global-color-contrast-700: var(--global-color-light-contrast-700, 62, 74, 99);
+		--global-color-contrast-800: var(--global-color-light-contrast-800, 43, 54, 75);
+		--global-color-contrast-900: var(--global-color-light-contrast-900, 21, 30, 48);
+		--global-color-contrast-950: var(--global-color-light-contrast-950, 11, 20, 36);
+		--global-color-grey-50: var(--global-color-light-grey-50, 229, 235, 243);
+		--global-color-grey-100: var(--global-color-light-grey-100, 219, 224, 232);
+		--global-color-grey-200: var(--global-color-light-grey-200, 194, 200, 211);
+		--global-color-grey-300: var(--global-color-light-grey-300, 168, 176, 190);
+		--global-color-grey-400: var(--global-color-light-grey-400, 145, 154, 172);
+		--global-color-grey-500: var(--global-color-light-grey-500, 120, 131, 152);
+		--global-color-grey-600: var(--global-color-light-grey-600, 95, 107, 132);
+		--global-color-grey-700: var(--global-color-light-grey-700, 70, 83, 108);
+		--global-color-grey-800: var(--global-color-light-grey-800, 49, 61, 83);
+		--global-color-grey-900: var(--global-color-light-grey-900, 27, 37, 55);
+		--global-color-grey-950: var(--global-color-light-grey-950, 17, 26, 43);
+		--global-color-primary-50: var(--global-color-light-primary-50, 212, 226, 253);
+		--global-color-primary-100: var(--global-color-light-primary-100, 194, 213, 252);
+		--global-color-primary-200: var(--global-color-light-primary-200, 156, 187, 249);
+		--global-color-primary-300: var(--global-color-light-primary-300, 113, 156, 247);
+		--global-color-primary-400: var(--global-color-light-primary-400, 74, 127, 245);
+		--global-color-primary-500: var(--global-color-light-primary-500, 31, 90, 240);
+		--global-color-primary-600: var(--global-color-light-primary-600, 14, 69, 215);
+		--global-color-primary-700: var(--global-color-light-primary-700, 11, 56, 173);
+		--global-color-primary-800: var(--global-color-light-primary-800, 9, 43, 134);
+		--global-color-primary-900: var(--global-color-light-primary-900, 7, 30, 91);
+		--global-color-primary-950: var(--global-color-light-primary-950, 6, 25, 72);
+		--global-color-secondary-50: var(--global-color-light-secondary-50, 222, 235, 243);
+		--global-color-secondary-100: var(--global-color-light-secondary-100, 198, 220, 234);
+		--global-color-secondary-200: var(--global-color-light-secondary-200, 142, 187, 215);
+		--global-color-secondary-300: var(--global-color-light-secondary-300, 96, 159, 197);
+		--global-color-secondary-400: var(--global-color-light-secondary-400, 56, 138, 183);
+		--global-color-secondary-500: var(--global-color-light-secondary-500, 0, 119, 168);
+		--global-color-secondary-600: var(--global-color-light-secondary-600, 0, 103, 146);
+		--global-color-secondary-700: var(--global-color-light-secondary-700, 0, 75, 108);
+		--global-color-secondary-800: var(--global-color-light-secondary-800, 0, 48, 71);
+		--global-color-secondary-900: var(--global-color-light-secondary-900, 1, 21, 33);
+		--global-color-secondary-950: var(--global-color-light-secondary-950, 1, 8, 16);
+		--global-color-error-50: var(--global-color-light-error-50, 248, 230, 228);
+		--global-color-error-100: var(--global-color-light-error-100, 244, 210, 207);
+		--global-color-error-200: var(--global-color-light-error-200, 234, 168, 162);
+		--global-color-error-300: var(--global-color-light-error-300, 223, 120, 115);
+		--global-color-error-400: var(--global-color-light-error-400, 214, 82, 80);
+		--global-color-error-500: var(--global-color-light-error-500, 207, 47, 54);
+		--global-color-error-600: var(--global-color-light-error-600, 183, 32, 42);
+		--global-color-error-700: var(--global-color-light-error-700, 135, 22, 29);
+		--global-color-error-800: var(--global-color-light-error-800, 89, 13, 17);
+		--global-color-error-900: var(--global-color-light-error-900, 44, 5, 6);
+		--global-color-error-950: var(--global-color-light-error-950, 23, 2, 2);
+		--global-color-warning-50: var(--global-color-light-warning-50, 246, 238, 231);
+		--global-color-warning-100: var(--global-color-light-warning-100, 236, 221, 207);
+		--global-color-warning-200: var(--global-color-light-warning-200, 215, 185, 155);
+		--global-color-warning-300: var(--global-color-light-warning-300, 196, 152, 110);
+		--global-color-warning-400: var(--global-color-light-warning-400, 176, 122, 66);
+		--global-color-warning-500: var(--global-color-light-warning-500, 154, 91, 0);
+		--global-color-warning-600: var(--global-color-light-warning-600, 143, 84, 0);
+		--global-color-warning-700: var(--global-color-light-warning-700, 106, 61, 0);
+		--global-color-warning-800: var(--global-color-light-warning-800, 70, 39, 0);
+		--global-color-warning-900: var(--global-color-light-warning-900, 33, 15, 0);
+		--global-color-warning-950: var(--global-color-light-warning-950, 15, 5, 0);
+		--global-color-success-50: var(--global-color-light-success-50, 222, 233, 226);
+		--global-color-success-100: var(--global-color-light-success-100, 198, 219, 206);
+		--global-color-success-200: var(--global-color-light-success-200, 151, 188, 166);
+		--global-color-success-300: var(--global-color-light-success-300, 101, 159, 127);
+		--global-color-success-400: var(--global-color-light-success-400, 62, 139, 101);
+		--global-color-success-500: var(--global-color-light-success-500, 14, 122, 79);
+		--global-color-success-600: var(--global-color-light-success-600, 0, 107, 68);
+		--global-color-success-700: var(--global-color-light-success-700, 1, 78, 48);
+		--global-color-success-800: var(--global-color-light-success-800, 2, 50, 29);
+		--global-color-success-900: var(--global-color-light-success-900, 2, 22, 11);
+		--global-color-success-950: var(--global-color-light-success-950, 1, 9, 4);
+	}
+
+	@media (prefers-color-scheme: dark) {
+		:root:not([data-mode='light']) {
+			--global-color-background-50: var(--global-color-dark-background-50, 11, 18, 35);
+			--global-color-background-100: var(--global-color-dark-background-100, 19, 28, 49);
+			--global-color-background-200: var(--global-color-dark-background-200, 47, 51, 61);
+			--global-color-background-300: var(--global-color-dark-background-300, 66, 71, 85);
+			--global-color-background-400: var(--global-color-dark-background-400, 86, 94, 112);
+			--global-color-background-500: var(--global-color-dark-background-500, 105, 116, 138);
+			--global-color-background-600: var(--global-color-dark-background-600, 129, 141, 167);
+			--global-color-background-700: var(--global-color-dark-background-700, 153, 165, 189);
+			--global-color-background-800: var(--global-color-dark-background-800, 180, 190, 210);
+			--global-color-background-900: var(--global-color-dark-background-900, 206, 214, 229);
+			--global-color-background-950: var(--global-color-dark-background-950, 221, 228, 240);
+			--global-color-contrast-50: var(--global-color-dark-contrast-50, 97, 106, 126);
+			--global-color-contrast-100: var(--global-color-dark-contrast-100, 139, 151, 176);
+			--global-color-contrast-200: var(--global-color-dark-contrast-200, 153, 165, 189);
+			--global-color-contrast-300: var(--global-color-dark-contrast-300, 165, 177, 200);
+			--global-color-contrast-400: var(--global-color-dark-contrast-400, 177, 188, 208);
+			--global-color-contrast-500: var(--global-color-dark-contrast-500, 190, 199, 218);
+			--global-color-contrast-600: var(--global-color-dark-contrast-600, 200, 208, 224);
+			--global-color-contrast-700: var(--global-color-dark-contrast-700, 212, 219, 233);
+			--global-color-contrast-800: var(--global-color-dark-contrast-800, 221, 228, 240);
+			--global-color-contrast-900: var(--global-color-dark-contrast-900, 231, 236, 247);
+			--global-color-contrast-950: var(--global-color-dark-contrast-950, 237, 242, 251);
+			--global-color-grey-50: var(--global-color-dark-grey-50, 213, 220, 234);
+			--global-color-grey-100: var(--global-color-dark-grey-100, 201, 210, 226);
+			--global-color-grey-200: var(--global-color-dark-grey-200, 174, 185, 206);
+			--global-color-grey-300: var(--global-color-dark-grey-300, 148, 160, 184);
+			--global-color-grey-400: var(--global-color-dark-grey-400, 125, 137, 163);
+			--global-color-grey-500: var(--global-color-dark-grey-500, 104, 114, 136);
+			--global-color-grey-600: var(--global-color-dark-grey-600, 82, 89, 106);
+			--global-color-grey-700: var(--global-color-dark-grey-700, 60, 65, 77);
+			--global-color-grey-800: var(--global-color-dark-grey-800, 40, 43, 51);
+			--global-color-grey-900: var(--global-color-dark-grey-900, 12, 19, 36);
+			--global-color-grey-950: var(--global-color-dark-grey-950, 6, 10, 19);
+			--global-color-primary-50: var(--global-color-dark-primary-50, 222, 234, 255);
+			--global-color-primary-100: var(--global-color-dark-primary-100, 208, 225, 255);
+			--global-color-primary-200: var(--global-color-dark-primary-200, 178, 206, 255);
+			--global-color-primary-300: var(--global-color-dark-primary-300, 144, 185, 255);
+			--global-color-primary-400: var(--global-color-dark-primary-400, 113, 164, 255);
+			--global-color-primary-500: var(--global-color-dark-primary-500, 77, 141, 255);
+			--global-color-primary-600: var(--global-color-dark-primary-600, 55, 116, 225);
+			--global-color-primary-700: var(--global-color-dark-primary-700, 45, 94, 182);
+			--global-color-primary-800: var(--global-color-dark-primary-800, 35, 74, 142);
+			--global-color-primary-900: var(--global-color-dark-primary-900, 25, 51, 98);
+			--global-color-primary-950: var(--global-color-dark-primary-950, 21, 42, 78);
+			--global-color-secondary-50: var(--global-color-dark-secondary-50, 235, 249, 255);
+			--global-color-secondary-100: var(--global-color-dark-secondary-100, 220, 245, 255);
+			--global-color-secondary-200: var(--global-color-dark-secondary-200, 184, 234, 255);
+			--global-color-secondary-300: var(--global-color-dark-secondary-300, 152, 225, 255);
+			--global-color-secondary-400: var(--global-color-dark-secondary-400, 125, 218, 255);
+			--global-color-secondary-500: var(--global-color-dark-secondary-500, 95, 212, 255);
+			--global-color-secondary-600: var(--global-color-dark-secondary-600, 79, 185, 224);
+			--global-color-secondary-700: var(--global-color-dark-secondary-700, 58, 138, 167);
+			--global-color-secondary-800: var(--global-color-dark-secondary-800, 37, 92, 112);
+			--global-color-secondary-900: var(--global-color-dark-secondary-900, 17, 45, 56);
+			--global-color-secondary-950: var(--global-color-dark-secondary-950, 7, 24, 31);
+			--global-color-error-50: var(--global-color-dark-error-50, 255, 236, 234);
+			--global-color-error-100: var(--global-color-dark-error-100, 255, 220, 218);
+			--global-color-error-200: var(--global-color-dark-error-200, 255, 186, 183);
+			--global-color-error-300: var(--global-color-dark-error-300, 255, 148, 144);
+			--global-color-error-400: var(--global-color-dark-error-400, 255, 117, 116);
+			--global-color-error-500: var(--global-color-dark-error-500, 255, 90, 95);
+			--global-color-error-600: var(--global-color-dark-error-600, 226, 72, 79);
+			--global-color-error-700: var(--global-color-dark-error-700, 167, 52, 57);
+			--global-color-error-800: var(--global-color-dark-error-800, 112, 34, 36);
+			--global-color-error-900: var(--global-color-dark-error-900, 57, 15, 16);
+			--global-color-error-950: var(--global-color-dark-error-950, 31, 6, 6);
+			--global-color-warning-50: var(--global-color-dark-warning-50, 255, 250, 239);
+			--global-color-warning-100: var(--global-color-dark-warning-100, 254, 244, 223);
+			--global-color-warning-200: var(--global-color-dark-warning-200, 253, 231, 186);
+			--global-color-warning-300: var(--global-color-dark-warning-300, 251, 219, 152);
+			--global-color-warning-400: var(--global-color-dark-warning-400, 248, 208, 119);
+			--global-color-warning-500: var(--global-color-dark-warning-500, 245, 196, 81);
+			--global-color-warning-600: var(--global-color-dark-warning-600, 234, 181, 40);
+			--global-color-warning-700: var(--global-color-dark-warning-700, 175, 135, 30);
+			--global-color-warning-800: var(--global-color-dark-warning-800, 118, 91, 21);
+			--global-color-warning-900: var(--global-color-dark-warning-900, 58, 44, 11);
+			--global-color-warning-950: var(--global-color-dark-warning-950, 30, 22, 5);
+			--global-color-success-50: var(--global-color-dark-success-50, 233, 250, 240);
+			--global-color-success-100: var(--global-color-dark-success-100, 217, 246, 229);
+			--global-color-success-200: var(--global-color-dark-success-200, 183, 239, 207);
+			--global-color-success-300: var(--global-color-dark-success-300, 145, 231, 184);
+			--global-color-success-400: var(--global-color-dark-success-400, 110, 227, 168);
+			--global-color-success-500: var(--global-color-dark-success-500, 74, 222, 154);
+			--global-color-success-600: var(--global-color-dark-success-600, 55, 197, 134);
+			--global-color-success-700: var(--global-color-dark-success-700, 40, 145, 98);
+			--global-color-success-800: var(--global-color-dark-success-800, 27, 96, 65);
+			--global-color-success-900: var(--global-color-dark-success-900, 13, 48, 31);
+			--global-color-success-950: var(--global-color-dark-success-950, 6, 25, 15);
+		}
+	}
+
+	:root[data-mode='dark'] {
+		--global-color-background-50: var(--global-color-dark-background-50, 11, 18, 35);
+		--global-color-background-100: var(--global-color-dark-background-100, 19, 28, 49);
+		--global-color-background-200: var(--global-color-dark-background-200, 47, 51, 61);
+		--global-color-background-300: var(--global-color-dark-background-300, 66, 71, 85);
+		--global-color-background-400: var(--global-color-dark-background-400, 86, 94, 112);
+		--global-color-background-500: var(--global-color-dark-background-500, 105, 116, 138);
+		--global-color-background-600: var(--global-color-dark-background-600, 129, 141, 167);
+		--global-color-background-700: var(--global-color-dark-background-700, 153, 165, 189);
+		--global-color-background-800: var(--global-color-dark-background-800, 180, 190, 210);
+		--global-color-background-900: var(--global-color-dark-background-900, 206, 214, 229);
+		--global-color-background-950: var(--global-color-dark-background-950, 221, 228, 240);
+		--global-color-contrast-50: var(--global-color-dark-contrast-50, 97, 106, 126);
+		--global-color-contrast-100: var(--global-color-dark-contrast-100, 139, 151, 176);
+		--global-color-contrast-200: var(--global-color-dark-contrast-200, 153, 165, 189);
+		--global-color-contrast-300: var(--global-color-dark-contrast-300, 165, 177, 200);
+		--global-color-contrast-400: var(--global-color-dark-contrast-400, 177, 188, 208);
+		--global-color-contrast-500: var(--global-color-dark-contrast-500, 190, 199, 218);
+		--global-color-contrast-600: var(--global-color-dark-contrast-600, 200, 208, 224);
+		--global-color-contrast-700: var(--global-color-dark-contrast-700, 212, 219, 233);
+		--global-color-contrast-800: var(--global-color-dark-contrast-800, 221, 228, 240);
+		--global-color-contrast-900: var(--global-color-dark-contrast-900, 231, 236, 247);
+		--global-color-contrast-950: var(--global-color-dark-contrast-950, 237, 242, 251);
+		--global-color-grey-50: var(--global-color-dark-grey-50, 213, 220, 234);
+		--global-color-grey-100: var(--global-color-dark-grey-100, 201, 210, 226);
+		--global-color-grey-200: var(--global-color-dark-grey-200, 174, 185, 206);
+		--global-color-grey-300: var(--global-color-dark-grey-300, 148, 160, 184);
+		--global-color-grey-400: var(--global-color-dark-grey-400, 125, 137, 163);
+		--global-color-grey-500: var(--global-color-dark-grey-500, 104, 114, 136);
+		--global-color-grey-600: var(--global-color-dark-grey-600, 82, 89, 106);
+		--global-color-grey-700: var(--global-color-dark-grey-700, 60, 65, 77);
+		--global-color-grey-800: var(--global-color-dark-grey-800, 40, 43, 51);
+		--global-color-grey-900: var(--global-color-dark-grey-900, 12, 19, 36);
+		--global-color-grey-950: var(--global-color-dark-grey-950, 6, 10, 19);
+		--global-color-primary-50: var(--global-color-dark-primary-50, 222, 234, 255);
+		--global-color-primary-100: var(--global-color-dark-primary-100, 208, 225, 255);
+		--global-color-primary-200: var(--global-color-dark-primary-200, 178, 206, 255);
+		--global-color-primary-300: var(--global-color-dark-primary-300, 144, 185, 255);
+		--global-color-primary-400: var(--global-color-dark-primary-400, 113, 164, 255);
+		--global-color-primary-500: var(--global-color-dark-primary-500, 77, 141, 255);
+		--global-color-primary-600: var(--global-color-dark-primary-600, 55, 116, 225);
+		--global-color-primary-700: var(--global-color-dark-primary-700, 45, 94, 182);
+		--global-color-primary-800: var(--global-color-dark-primary-800, 35, 74, 142);
+		--global-color-primary-900: var(--global-color-dark-primary-900, 25, 51, 98);
+		--global-color-primary-950: var(--global-color-dark-primary-950, 21, 42, 78);
+		--global-color-secondary-50: var(--global-color-dark-secondary-50, 235, 249, 255);
+		--global-color-secondary-100: var(--global-color-dark-secondary-100, 220, 245, 255);
+		--global-color-secondary-200: var(--global-color-dark-secondary-200, 184, 234, 255);
+		--global-color-secondary-300: var(--global-color-dark-secondary-300, 152, 225, 255);
+		--global-color-secondary-400: var(--global-color-dark-secondary-400, 125, 218, 255);
+		--global-color-secondary-500: var(--global-color-dark-secondary-500, 95, 212, 255);
+		--global-color-secondary-600: var(--global-color-dark-secondary-600, 79, 185, 224);
+		--global-color-secondary-700: var(--global-color-dark-secondary-700, 58, 138, 167);
+		--global-color-secondary-800: var(--global-color-dark-secondary-800, 37, 92, 112);
+		--global-color-secondary-900: var(--global-color-dark-secondary-900, 17, 45, 56);
+		--global-color-secondary-950: var(--global-color-dark-secondary-950, 7, 24, 31);
+		--global-color-error-50: var(--global-color-dark-error-50, 255, 236, 234);
+		--global-color-error-100: var(--global-color-dark-error-100, 255, 220, 218);
+		--global-color-error-200: var(--global-color-dark-error-200, 255, 186, 183);
+		--global-color-error-300: var(--global-color-dark-error-300, 255, 148, 144);
+		--global-color-error-400: var(--global-color-dark-error-400, 255, 117, 116);
+		--global-color-error-500: var(--global-color-dark-error-500, 255, 90, 95);
+		--global-color-error-600: var(--global-color-dark-error-600, 226, 72, 79);
+		--global-color-error-700: var(--global-color-dark-error-700, 167, 52, 57);
+		--global-color-error-800: var(--global-color-dark-error-800, 112, 34, 36);
+		--global-color-error-900: var(--global-color-dark-error-900, 57, 15, 16);
+		--global-color-error-950: var(--global-color-dark-error-950, 31, 6, 6);
+		--global-color-warning-50: var(--global-color-dark-warning-50, 255, 250, 239);
+		--global-color-warning-100: var(--global-color-dark-warning-100, 254, 244, 223);
+		--global-color-warning-200: var(--global-color-dark-warning-200, 253, 231, 186);
+		--global-color-warning-300: var(--global-color-dark-warning-300, 251, 219, 152);
+		--global-color-warning-400: var(--global-color-dark-warning-400, 248, 208, 119);
+		--global-color-warning-500: var(--global-color-dark-warning-500, 245, 196, 81);
+		--global-color-warning-600: var(--global-color-dark-warning-600, 234, 181, 40);
+		--global-color-warning-700: var(--global-color-dark-warning-700, 175, 135, 30);
+		--global-color-warning-800: var(--global-color-dark-warning-800, 118, 91, 21);
+		--global-color-warning-900: var(--global-color-dark-warning-900, 58, 44, 11);
+		--global-color-warning-950: var(--global-color-dark-warning-950, 30, 22, 5);
+		--global-color-success-50: var(--global-color-dark-success-50, 233, 250, 240);
+		--global-color-success-100: var(--global-color-dark-success-100, 217, 246, 229);
+		--global-color-success-200: var(--global-color-dark-success-200, 183, 239, 207);
+		--global-color-success-300: var(--global-color-dark-success-300, 145, 231, 184);
+		--global-color-success-400: var(--global-color-dark-success-400, 110, 227, 168);
+		--global-color-success-500: var(--global-color-dark-success-500, 74, 222, 154);
+		--global-color-success-600: var(--global-color-dark-success-600, 55, 197, 134);
+		--global-color-success-700: var(--global-color-dark-success-700, 40, 145, 98);
+		--global-color-success-800: var(--global-color-dark-success-800, 27, 96, 65);
+		--global-color-success-900: var(--global-color-dark-success-900, 13, 48, 31);
+		--global-color-success-950: var(--global-color-dark-success-950, 6, 25, 15);
+	}
+}
+
+@layer global.theme {
+	:root:not([data-theme]) {
+		--global-color-primary: light-dark(
+			rgb(var(--global-color-light-primary-500, 31, 90, 240)),
+			rgb(var(--global-color-dark-primary-500, 77, 141, 255))
+		);
+		--global-color-accent: light-dark(
+			rgb(var(--global-color-light-secondary-500, 0, 119, 168)),
+			rgb(var(--global-color-dark-secondary-500, 95, 212, 255))
+		);
+		--global-color-error: light-dark(
+			rgb(var(--global-color-light-error-500, 207, 47, 54)),
+			rgb(var(--global-color-dark-error-500, 255, 90, 95))
+		);
+		--global-color-warning: light-dark(
+			rgb(var(--global-color-light-warning-500, 154, 91, 0)),
+			rgb(var(--global-color-dark-warning-500, 245, 196, 81))
+		);
+		--global-color-success: light-dark(
+			rgb(var(--global-color-light-success-500, 14, 122, 79)),
+			rgb(var(--global-color-dark-success-500, 74, 222, 154))
+		);
+	}
+}

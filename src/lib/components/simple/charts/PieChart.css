@@ -1,0 +1,42 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--pie-chart-default-width: 100%;
+		--pie-chart-default-min-width: 12rem;
+		--pie-chart-default-height: 14rem;
+		--pie-chart-default-gap: 24px;
+		--pie-chart-default-cutout: 72%;
+		--pie-chart-default-slice-border-color: var(--global-color-surface-solid);
+		--pie-chart-default-slice-border-width: 2px;
+		--pie-chart-default-center-color: var(--global-color-text);
+		--pie-chart-default-center-font-family: var(--global-font-family-display);
+		--pie-chart-default-center-font-size: 28px;
+		--pie-chart-default-center-label-color: var(--global-color-text-3);
+		--pie-chart-default-center-label-font-size: 11px;
+		--pie-chart-default-legend-gap: 16px;
+		--pie-chart-default-legend-color: var(--global-color-text-2);
+		--pie-chart-default-legend-hidden-opacity: 0.45;
+		--pie-chart-default-legend-detail-color: var(--global-color-text);
+		--pie-chart-default-legend-detail-font-family: var(--global-font-family-mono);
+		--pie-chart-default-legend-min-width: 180px;
+		--pie-chart-default-legend-font-size: 13px;
+		--pie-chart-default-legend-swatch-size: 10px;
+		--pie-chart-default-legend-swatch-radius: 3px;
+		--pie-chart-default-tooltip-background: var(--global-color-surface-pop);
+		--pie-chart-default-tooltip-border-color: var(--global-color-border-strong);
+		--pie-chart-default-tooltip-border-width: var(--global-border-width);
+		--pie-chart-default-tooltip-radius: var(--global-radius-lg);
+		--pie-chart-default-tooltip-shadow: var(--global-shadow-md);
+		--pie-chart-default-tooltip-padding: 8px 12px;
+		--pie-chart-default-tooltip-min-width: auto;
+		--pie-chart-default-tooltip-color: var(--global-color-text);
+		--pie-chart-default-tooltip-title-color: var(--global-color-text-3);
+		--pie-chart-default-tooltip-title-font-family: var(--global-font-family-mono);
+		--pie-chart-default-tooltip-title-font-size: 10.5px;
+		--pie-chart-default-tooltip-label-color: var(--global-color-text-2);
+		--pie-chart-default-tooltip-label-font-size: 12px;
+		--pie-chart-default-tooltip-value-font-family: var(--global-font-family-display);
+		--pie-chart-default-tooltip-value-font-size: 13px;
+	}
+}

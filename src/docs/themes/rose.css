@@ -1,0 +1,8 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.theme {
+	:root[data-theme='rose'] {
+		--global-color-primary: light-dark(#d6336c, #f06595);
+		--global-color-accent: light-dark(#ae3ec9, #da77f2);
+	}
+}

@@ -1,0 +1,45 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--timeline-default-width: 100%;
+		--timeline-default-item-spacing: 22px;
+		--timeline-default-rail-width: 24px;
+		--timeline-default-content-gap: 8px;
+		--timeline-default-first-line-height: 18px;
+		--timeline-default-line-width: 2px;
+		--timeline-default-line-color: linear-gradient(
+			var(--global-color-primary),
+			var(--global-color-accent),
+			var(--global-color-border)
+		);
+		--timeline-default-marker-size: 12px;
+		--timeline-default-icon-marker-size: 24px;
+		--timeline-default-marker-icon-size: 14px;
+		--timeline-default-marker-border-width: 2px;
+		--timeline-default-marker-color: var(--global-color-primary);
+		--timeline-default-marker-background: var(--global-color-bg-2);
+		--timeline-default-current-marker-color: var(--global-color-accent);
+		--timeline-default-done-marker-ring-width: 4px;
+		--timeline-default-done-marker-glow-size: 14px;
+		--timeline-default-success-marker-color: var(--global-color-success);
+		--timeline-default-warning-marker-color: var(--global-color-warning);
+		--timeline-default-error-marker-color: var(--global-color-error);
+		--timeline-default-neutral-marker-color: var(--global-color-text-3);
+		--timeline-default-time-color: var(--global-color-text-3);
+		--timeline-default-time-font-family: var(--global-font-family-mono);
+		--timeline-default-time-font-size: 11px;
+		--timeline-default-title-color: var(--global-color-text);
+		--timeline-default-title-font-size: 14px;
+		--timeline-default-title-font-weight: 600;
+		--timeline-default-description-color: var(--global-color-text-2);
+		--timeline-default-description-font-size: 13px;
+		--timeline-default-card-background: var(--global-color-surface);
+		--timeline-default-card-border: 1px solid var(--global-color-border);
+		--timeline-default-card-border-radius: var(--global-radius-lg);
+		--timeline-default-card-padding-y: 12px;
+		--timeline-default-card-padding-x: 14px;
+		--timeline-default-card-shadow: none;
+		--timeline-default-group-spacing: 18px;
+	}
+}

@@ -1,706 +1,1111 @@
-<script module lang="ts">
-  export type Item<Data = any> = {
-    value: string | number;
-    label?: string | number;
-    icon?: string
-    data?: Data;
-  };
-</script>
-
+<!-- @component
+Text field that searches a list of options (`items`) and picks one or, with `multiple`, more of them. Options are `Item` objects, `{ value: string | number; label?: string | number; icon?: string; data?: Data }`: `value` identifies the option, `label` is shown and searched (defaults to `value`), `icon` is an SVG path and `data` carries anything else. The selection lives in `values`, always an array, and shows as chips inside the field. `icon` adds an icon at the start of the field, and the item snippets add avatars, flags or extra text to the options. It follows the ARIA combobox pattern: focus stays in the input, the arrows move through the options, Enter picks the highlighted one (while typing, the first match is highlighted), Backspace on an empty field removes the last value and Escape closes the list. The list opens in a `Menu` as wide as the field; with `mobileDrawer`, on screens up to 1024px wide it opens in a bottom `Drawer` with its own search field. `loading` shows a spinner and a loading row, and a search without matches shows a "No results" row. With `name`, every selected value is submitted with the form. Its state is exposed as `data-state`, `data-disabled`, `data-open` and `data-loading` for app CSS.
+-->
 <script lang="ts" generics="Data">
-  import "../../../css/main.css";
-  import "./Autocomplete.css";
-  import { scrollInMenu } from "../common/scroller";
-  import Chip from "$lib/components/simple/navigation/Chip.svelte";
-  import Menu from "$lib/components/simple/common/Menu.svelte";
-  import { type ComponentProps, type Snippet } from "svelte";
-  import SimpleTextField from "./SimpleTextField.svelte";
-  import MenuOrDrawer from "$lib/components/composed/common/MenuOrDrawer.svelte";
-  import Drawer from "../navigation/Drawer.svelte";
-  import Icon from "../media/Icon.svelte";
+	import '../../../css/tokens.css';
+	import { breakpoints } from '../../../utils/breakpoints.svelte.js';
+	import './Autocomplete.css';
+	import { tick, untrack, type Snippet } from 'svelte';
+	import type { HTMLAttributes, HTMLInputAttributes } from 'svelte/elements';
+	import Menu from '../common/Menu.svelte';
+	import Tooltip from '../common/Tooltip.svelte';
+	import Icon from '../media/Icon.svelte';
+	import Chip from '../navigation/Chip.svelte';
+	import Drawer from '../navigation/Drawer.svelte';
+	import SimpleTextField from './SimpleTextField.svelte';
+	import type { Item } from './item.js';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import { libraryTexts } from '../../../utils/texts.js';
 
-  type ItemData = Item<Data>;
-  interface Props {
-    values?: ItemData[];
-    items?: ItemData[];
-    searchFunction?: (
-      item: ItemData,
-      searchText: string | undefined,
-    ) => boolean;
-    multiple?: boolean;
-    disabled?: boolean;
-    mandatory?: boolean;
-    placeholder?: string;
-    width?: string;
-    height?: string;
-    maxWidth?: string;
-    minWidth?: string;
-    openingId?: string;
-    searchText?: string;
-    maxVisibleChips?: number;
-    menuOpened?: boolean;
-    closeOnSelect?: boolean;
-    emptySearchTextOnMenuClose?: boolean;
-    menuBoxShadow?: string;
-    menuBorderRadius?: string;
-    mobileDrawer?: boolean;
-    menuWidth?: string | null;
-    menuAnchor?: ComponentProps<typeof Menu>['anchor']
-    menuStayInViewport?: ComponentProps<typeof Menu>['stayInViewport']
-    menuFlipOnOverflow?: ComponentProps<typeof Menu>['flipOnOverflow']
-    menuMaxHeight?: string
-    adaptInputWidth?: boolean
-    hint?: string
-    class?: {
-      activator?: string;
-      menu?: string;
-      simpleTextfield?: ComponentProps<typeof SimpleTextField>["class"];
-      hint?: string
-    };
-    selectionContainerSnippet?: Snippet<
-      [
-        {
-          values: ItemData[];
-          searchText: string | undefined;
-          disabled: boolean;
-          openMenu: () => void;
-          handleKeyDown: (event: KeyboardEvent) => void;
-          unselect: (item: ItemData) => void;
-          select: (item: ItemData) => void;
-        },
-      ]
-    >;
-    selectionSnippet?: Snippet<
-      [
-        {
-          selection: ItemData;
-          unselect: (item: ItemData) => void;
-        },
-      ]
-    >;
-    chipLabelSnippet?: Snippet<
-      [
-        {
-          selection: ItemData;
-        },
-      ]
-    >;
-    exceedCounterSnippet?: Snippet<
-      [
-        {
-          notVisibleChipNumber: number;
-          maxVisibleChips: number;
-          values: ItemData[];
-          searchText: string | undefined;
-          disabled: boolean;
-        },
-      ]
-    >;
-    menuSnippet?: Snippet<[]>;
-    itemLabelSnippet?: Snippet<
-      [
-        {
-          item: ItemData;
-        },
-      ]
-    >;
-    itemSnippet?: Snippet<
-      [
-        {
-          item: ItemData;
-          index: number;
-          selected: boolean;
-        },
-      ]
-    >;
-    hintSnippet?: Snippet<[{
-      hint?: string
-    }]>
-    onchange?: (event: {
-      detail: {
-        unselect: ItemData | undefined;
-        select: ItemData | undefined;
-        selection: ItemData[];
-      };
-    }) => void;
-    onfocus?: () => void;
-    onblur?: () => void;
-    onkeydown?: (e: KeyboardEvent) => void;
-    onclose?: ComponentProps<typeof Drawer>["onclose"];
-  }
+	const ALERT_ICON =
+		'M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z';
+	const SUCCESS_ICON =
+		'M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z';
+	const CHECK_ICON = 'M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z';
+	const SEARCH_ICON =
+		'M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z';
 
-  let {
-    values = $bindable(),
-    items = [],
-    searchFunction = undefined,
-    multiple = false,
-    disabled = false,
-    mandatory = false,
-    placeholder = "",
-    width = "auto",
-    height = "auto",
-    maxWidth = undefined,
-    minWidth = "200px",
-    openingId = $bindable("autocomplete-menu"),
-    searchText = $bindable(),
-    maxVisibleChips = undefined,
-    menuOpened = $bindable(false),
-    closeOnSelect = !multiple,
-    emptySearchTextOnMenuClose = true,
-    menuBoxShadow = "rgb(var(--global-color-background-300), .5) 0px 2px 4px",
-    menuBorderRadius = "5px",
-    mobileDrawer = false,
-    menuWidth = undefined,
-    menuAnchor = 'bottom-center',
-    class: clazz = {},
-    menuStayInViewport,
-    menuFlipOnOverflow = true,
-    menuMaxHeight = '300px',
-    adaptInputWidth = true,
-    hint,
-    selectionContainerSnippet,
-    selectionSnippet,
-    chipLabelSnippet,
-    exceedCounterSnippet,
-    menuSnippet,
-    itemLabelSnippet,
-    itemSnippet,
-    hintSnippet,
-    onchange,
-    onfocus,
-    onblur,
-    onkeydown,
-    onclose,
-  }: Props = $props();
+	interface Props
+		extends Omit<
+			HTMLInputAttributes,
+			| 'value'
+			| 'class'
+			| 'children'
+			| 'type'
+			| 'role'
+			| 'name'
+			| 'id'
+			| 'placeholder'
+			| 'disabled'
+			| 'readonly'
+			| 'multiple'
+			| 'onchange'
+		> {
+		/** Selected options. With single selection it holds at most one item. */
+		values?: Item<Data>[];
+		/** Options to choose from. */
+		items?: Item<Data>[];
+		/** Allows selecting more than one option. */
+		multiple?: boolean;
+		/** Text typed in the field. */
+		searchText?: string;
+		/** Whether the list is open. `undefined` counts as closed. */
+		open?: boolean;
+		/** Visible label above the field, linked to the input. In the mobile drawer it is the title. */
+		label?: string;
+		/** Text below the field. With `state` it becomes the error or success message. */
+		hint?: string;
+		/** Validation state: colors the border and the hint and shows an icon. `error` also sets `aria-invalid`. */
+		state?: 'error' | 'success';
+		/** Placeholder of the search input. */
+		placeholder?: string;
+		/** SVG path of an icon at the start of the field, for example a magnifier from `@mdi/js`. */
+		icon?: string;
+		/** Disables the field: the list does not open and the values cannot be removed. */
+		disabled?: boolean;
+		/** Prevents removing the last selected value. */
+		mandatory?: boolean;
+		/** Shows a spinner in the field and a loading row in place of the options, for example while results are fetched. */
+		loading?: boolean;
+		/** `id` of the input. Generated when missing, so the label always points to the input. */
+		id?: string;
+		/** Form field name: each selected `value` is submitted under this name. */
+		name?: string;
+		/** Shows at most this many chips, followed by a "+N" counter whose Tooltip lists the hidden values. */
+		maxVisibleChips?: number;
+		/** Replaces the default search, which matches the label ignoring case and accents. Called for each item while `searchText` is not empty. Return `true` for every item when the filtering happens elsewhere, for example on a server. */
+		searchFunction?: (item: Item<Data>, searchText: string) => boolean;
+		/** Closes the list after an option is selected. Defaults to `true` with single selection and to `false` with `multiple`. */
+		closeOnSelect?: boolean;
+		/** Empties `searchText` when the list closes. */
+		clearSearchOnClose?: boolean;
+		/** Side of the field the list opens on. It flips when there is not enough space. */
+		placement?:
+			| 'bottom-start'
+			| 'bottom'
+			| 'bottom-end'
+			| 'top-start'
+			| 'top'
+			| 'top-end'
+			| 'left-start'
+			| 'left'
+			| 'left-end'
+			| 'right-start'
+			| 'right'
+			| 'right-end';
+		/** On screens up to 1024px wide, opens the list in a bottom drawer with its own search field instead of a menu. */
+		mobileDrawer?: boolean;
+		/** Shows the search field at the top of the mobile drawer. Without it the list itself takes the focus and the keyboard, as with a trigger that cannot type. */
+		drawerSearch?: boolean;
+		/** Title of the mobile drawer. Defaults to `label`. */
+		drawerTitle?: string;
+		/** Lays the options out in a grid with this many columns, for example for icons: the left and right arrows move to the previous and next option, the up and down arrows to the one above and below. In a text field the left and right arrows keep moving the caret. The menu takes the width of the grid instead of the one of the field. */
+		columns?: number;
+		/** Text of the loading row. Defaults to "Loading…", in the language of `locale`. */
+		loadingText?: string;
+		/** Text shown when no option matches. Defaults to "No results", in the language of `locale`. */
+		noResultsText?: string;
+		/** Accessible name of the chip remove buttons, followed by the option label. Defaults to "Remove", in the language of `locale`. */
+		removeLabel?: string;
+		/** Accessible name of the close button of the mobile drawer. Defaults to "Close", in the language of `locale`. */
+		closeLabel?: string;
+		/** BCP 47 locale of the texts: `it` and `en` are built in, other languages fall back to English. Defaults to the one set with `setDefaultLocale`, else `en`. */
+		locale?: string;
+		/** The native `<input>` element. */
+		input?: HTMLInputElement;
+		/** Extra classes for each part. */
+		class?: {
+			container?: string;
+			label?: string;
+			field?: string;
+			input?: string;
+			chip?: string;
+			menu?: string;
+			option?: string;
+			hint?: string;
+		};
+		/** Called when an option is selected or removed, with the option added (`select`), the one removed (`unselect`, with single selection also the one replaced) and the new `selection`. */
+		onchange?: (change: {
+			select?: Item<Data>;
+			unselect?: Item<Data>;
+			selection: Item<Data>[];
+		}) => void;
+		/** Called whenever the list closes. */
+		onclose?: () => void;
+		/** Replaces the label content. It stays linked to the input. */
+		labelSnippet?: Snippet<[{ label: string | undefined }]>;
+		/** Replaces the hint below the field. */
+		hintSnippet?: Snippet<[{ hint: string | undefined }]>;
+		/** Replaces the icon shown for `state`. Render nothing to hide it. */
+		stateIconSnippet?: Snippet<[{ state: 'error' | 'success' }]>;
+		/** Replaces the whole field with a custom trigger, such as a button. Spread `attributes` on its focusable element and call `handleKeyDown` from its `onkeydown`, so it works as a combobox for keyboards and screen readers. */
+		selectionContainerSnippet?: Snippet<
+			[
+				{
+					values: Item<Data>[];
+					searchText: string | undefined;
+					disabled: boolean;
+					openMenu: () => void;
+					handleKeyDown: (event: KeyboardEvent) => void;
+					select: (item: Item<Data>) => void;
+					unselect: (item: Item<Data>) => void;
+					attributes: HTMLAttributes<HTMLElement>;
+				}
+			]
+		>;
+		/** Replaces each selected chip. */
+		selectionSnippet?: Snippet<[{ selection: Item<Data>; unselect: (item: Item<Data>) => void }]>;
+		/** Replaces the text inside each selected chip. */
+		chipLabelSnippet?: Snippet<[{ selection: Item<Data> }]>;
+		/** Replaces the icon of each selected chip (`item.icon`), for example with an avatar or a flag. */
+		chipIconSnippet?: Snippet<[{ selection: Item<Data> }]>;
+		/** Replaces the icon at the start of the field. */
+		iconSnippet?: Snippet;
+		/** Replaces the "+N" counter shown with `maxVisibleChips`. */
+		exceedCounterSnippet?: Snippet<
+			[
+				{
+					notVisibleChipNumber: number;
+					maxVisibleChips: number;
+					values: Item<Data>[];
+					searchText: string | undefined;
+					disabled: boolean;
+				}
+			]
+		>;
+		/** Replaces the content of each option (icon, label and check mark). The option keeps its click handling, role and state. */
+		itemSnippet?: Snippet<
+			[{ item: Item<Data>; index: number; selected: boolean; highlighted: boolean }]
+		>;
+		/** Replaces the label of each option, keeping its icon and check mark. */
+		itemLabelSnippet?: Snippet<[{ item: Item<Data> }]>;
+		/** Replaces the icon of each option (`item.icon`), for example with an avatar or a flag. */
+		itemIconSnippet?: Snippet<[{ item: Item<Data> }]>;
+		/** Content at the end of each option, before the check mark, for example a price or a code. */
+		itemAppendSnippet?: Snippet<[{ item: Item<Data>; selected: boolean }]>;
+		/** Replaces the content of the loading row. */
+		loadingSnippet?: Snippet;
+		/** Replaces the content of the row shown when no option matches. */
+		emptySnippet?: Snippet<[{ searchText: string | undefined }]>;
+	}
 
-  let focusedIndex: number | undefined = $state(undefined),
-    input: HTMLElement | undefined = $state(),
-    filteredItems: ItemData[] = $state(items),
-    notVisibleChipNumber = $derived(
-      Math.max(((values || []).length || 0) - (maxVisibleChips || 0), 0),
-    ),
-    menuProps: NonNullable<ComponentProps<typeof MenuOrDrawer>['menuProps']> = $state({
-      _width: "",
-      _height: "auto",
-      _maxHeight: menuMaxHeight,
-      _boxShadow: menuBoxShadow,
-      _borderRadius: menuBorderRadius,
-      anchor: menuAnchor,
-      closeOnClickOutside: true,
-      stayInViewport: menuStayInViewport,
-      flipOnOverflow: menuFlipOnOverflow,
-      refreshPosition: false,
-      openingId: "autocomplete-menu",
-      menuElement: undefined,
-    })
+	let {
+		values = $bindable(),
+		items = [],
+		multiple = false,
+		searchText = $bindable(),
+		open = $bindable(),
+		label,
+		hint,
+		state: validation,
+		placeholder,
+		icon,
+		disabled = false,
+		mandatory = false,
+		loading = false,
+		id,
+		name,
+		maxVisibleChips,
+		searchFunction,
+		closeOnSelect,
+		clearSearchOnClose = true,
+		placement = 'bottom-start',
+		mobileDrawer = false,
+		drawerSearch = true,
+		drawerTitle,
+		columns,
+		loadingText,
+		noResultsText,
+		removeLabel,
+		closeLabel,
+		locale: localeProp,
+		input = $bindable(),
+		class: clazz = {},
+		onchange,
+		onclose,
+		onfocus,
+		onclick,
+		oninput,
+		onkeydown,
+		labelSnippet,
+		hintSnippet,
+		stateIconSnippet,
+		selectionContainerSnippet,
+		selectionSnippet,
+		chipLabelSnippet,
+		chipIconSnippet,
+		iconSnippet,
+		exceedCounterSnippet,
+		itemSnippet,
+		itemLabelSnippet,
+		itemIconSnippet,
+		itemAppendSnippet,
+		loadingSnippet,
+		emptySnippet,
+		...rest
+	}: Props = $props();
 
-  $effect(() => {
-    menuProps._maxHeight = menuMaxHeight
-    menuProps._boxShadow = menuBoxShadow
-    menuProps._borderRadius = menuBorderRadius
-    menuProps.anchor = menuAnchor
-    menuProps.stayInViewport = menuStayInViewport
-    menuProps.flipOnOverflow = menuFlipOnOverflow
-  })
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
+	let texts = $derived(libraryTexts(locale).autocomplete);
 
-  function select(item: ItemData) {
-    if (disabled) return;
+	let inputNode = $state<HTMLInputElement>();
 
-    const alreadyPresent =
-      (values || []).findIndex((i) => i.value === item.value) !== -1;
+	const uid = $props.id();
+	let inputId = $derived(id ?? `${uid}-input`);
+	const labelId = `${uid}-label`;
+	const hintId = `${uid}-hint`;
+	const listboxId = `${uid}-listbox`;
+	const optionId = (index: number) => `${uid}-option-${index}`;
 
-    if (!alreadyPresent) {
-      if (multiple) values = [...(values || []), item];
-      else values = [item];
-      refreshMenuWidth();
+	let drawerMode = $derived(mobileDrawer && breakpoints.mAndDown);
 
-      if (onchange) {
-        onchange({
-          detail: {
-            unselect: undefined,
-            select: item,
-            selection: values,
-          },
-        });
-      }
-    }
+	let anchor = $state<HTMLDivElement>();
+	let highlighted = $state<number>();
 
-    if (!multiple && closeOnSelect) menuOpened = false;
-  }
+	const DIACRITICS = /\p{Diacritic}/gu;
+	const fold = (value: string) => value.normalize('NFD').replace(DIACRITICS, '').toLowerCase();
+	const text = (item: Item<Data>) => String(item.label ?? item.value);
 
-  function unselect(item: ItemData) {
-    if (disabled) return;
+	let selection = $derived(values ?? []);
+	let query = $derived(fold((searchText ?? '').trim()));
+	let options = $derived(
+		searchText
+			? items.filter((item) =>
+					searchFunction ? searchFunction(item, searchText ?? '') : fold(text(item)).includes(query)
+				)
+			: items
+	);
+	let active = $derived(
+		!loading && highlighted !== undefined && highlighted < options.length ? highlighted : undefined
+	);
+	let listboxShown = $derived(!!open && !loading && options.length > 0);
+	let visible = $derived(
+		maxVisibleChips === undefined ? selection : selection.slice(0, maxVisibleChips)
+	);
+	let hiddenCount = $derived(selection.length - visible.length);
+	let counterNode = $state<HTMLSpanElement>();
+	let removable = $derived(!disabled && !(mandatory && selection.length <= 1));
+	let hasLabel = $derived(!!label || !!labelSnippet);
+	let describedBy = $derived(hint || hintSnippet ? hintId : undefined);
+	let activeDescendant = $derived(
+		listboxShown && active !== undefined ? optionId(active) : undefined
+	);
 
-    if (!!values && values.length == 1 && mandatory) return;
-    values = (values || []).filter((i) => i.value != item.value);
-    refreshMenuWidth();
+	let attributes = $derived({
+		role: 'combobox',
+		'aria-haspopup': 'listbox',
+		'aria-expanded': !!open,
+		'aria-controls': listboxShown ? listboxId : undefined,
+		'aria-activedescendant': activeDescendant,
+		'aria-labelledby': hasLabel ? labelId : undefined,
+		'aria-describedby': describedBy,
+		'aria-invalid': validation === 'error' || undefined,
+		'aria-disabled': disabled || undefined
+	} satisfies HTMLAttributes<HTMLElement>);
 
-    if (onchange) {
-      onchange({
-        detail: {
-          unselect: item,
-          select: undefined,
-          selection: values || [],
-        },
-      });
-    }
-  }
+	function split(value: string): [string, string, string] | undefined {
+		if (!query) return;
+		let folded = '';
+		const starts: number[] = [];
+		const ends: number[] = [];
+		let index = 0;
+		for (const char of value) {
+			const part = fold(char);
+			for (let i = 0; i < part.length; i++) {
+				starts.push(index);
+				ends.push(index + char.length);
+			}
+			folded += part;
+			index += char.length;
+		}
+		const at = folded.indexOf(query);
+		if (at < 0) return;
+		const start = starts[at];
+		const end = ends[at + query.length - 1];
+		return [value.slice(0, start), value.slice(start, end), value.slice(end)];
+	}
 
-  function pop() {
-    if (!!values && values.length == 1 && mandatory) return;
-    let poppedElement = (values || []).pop();
-    values = [...(values || [])];
-    refreshMenuWidth();
+	const isSelected = (item: Item<Data>) => selection.some((value) => value.value === item.value);
 
-    if (onchange) {
-      onchange({
-        detail: {
-          unselect: poppedElement,
-          select: undefined,
-          selection: values,
-        },
-      });
-    }
-  }
+	function select(item: Item<Data>) {
+		if (disabled || isSelected(item)) return;
+		const replaced = multiple ? undefined : selection[0];
+		values = multiple ? [...selection, item] : [item];
+		onchange?.({ select: item, unselect: replaced, selection: values });
+		if (closeOnSelect ?? !multiple) open = false;
+	}
 
-  function toggle(item: ItemData) {
-    const alreadyPresent =
-      (values || []).findIndex((i) => i.value === item.value) != -1;
+	function unselect(item: Item<Data>) {
+		if (disabled || !isSelected(item)) return;
+		if (mandatory && selection.length <= 1) return;
+		values = selection.filter((value) => value.value !== item.value);
+		onchange?.({ unselect: item, selection: values });
+	}
 
-    if (alreadyPresent) unselect(item);
-    else select(item);
-  }
+	function toggle(item: Item<Data>) {
+		if (isSelected(item)) unselect(item);
+		else select(item);
+	}
 
-  function openMenu() {
-    refreshMenuWidth();
-    menuOpened = true;
-  }
+	function openMenu() {
+		if (disabled || open) return;
+		highlighted = query ? 0 : undefined;
+		open = true;
+	}
 
-  function refreshMenuWidth() {
-    setTimeout(() => {
-      if (menuWidth !== undefined && menuWidth != null) menuProps._width = menuWidth;
-      else if (!!menuProps.activator) menuProps._width = menuProps.activator.offsetWidth + "px";
+	let grid = $derived(columns !== undefined && columns > 1);
 
-      setTimeout(() => {
-        menuProps.refreshPosition = true;
-      }, 1);
-    }, 1);
-  }
+	function move(step: number) {
+		if (!options.length) return;
+		const last = options.length - 1;
+		const row = (index: number) => Math.floor(index / Math.abs(step));
+		if (active === undefined) highlighted = step > 0 ? 0 : last;
+		else if (active + step > last) highlighted = row(active) < row(last) ? last : active;
+		else highlighted = active + step < 0 ? active : active + step;
+		reveal(highlighted);
+	}
 
-  function handleTextFieldFocus() {
-    if (onfocus) {
-      onfocus();
-    }
+	async function reveal(index: number) {
+		await tick();
+		document.getElementById(optionId(index))?.scrollIntoView({ block: 'nearest' });
+	}
 
-    if (disabled) return;
-    focusedIndex = undefined;
-    openMenu();
-  }
+	let typed = '';
+	let typedAt = 0;
 
-  function handleTextFieldBlur() {
-    if (onblur) {
-      onblur();
-    }
-    // closeMenu()
-  }
+	function typeAhead(key: string, time: number) {
+		typed = time - typedAt > 500 ? key : typed + key;
+		typedAt = time;
+		const repeated = [...typed].every((char) => char === typed[0]);
+		const prefix = fold(repeated ? typed[0] : typed);
+		const start = active === undefined ? 0 : active + (repeated ? 1 : 0);
+		for (let step = 0; step < options.length; step++) {
+			const index = (start + step) % options.length;
+			if (fold(text(options[index])).startsWith(prefix)) {
+				openMenu();
+				highlighted = index;
+				reveal(index);
+				return;
+			}
+		}
+	}
 
-  function handleKeyDown(event: KeyboardEvent) {
-    if (onkeydown) {
-      onkeydown(event);
-    }
+	const typing = (event: KeyboardEvent) =>
+		event.target instanceof HTMLInputElement ||
+		event.target instanceof HTMLTextAreaElement ||
+		(event.target as HTMLElement | null)?.isContentEditable;
 
-    if (disabled) return;
+	function handleKeyDown(event: KeyboardEvent) {
+		if (disabled) return;
+		switch (event.key) {
+			case 'ArrowDown':
+			case 'ArrowUp': {
+				event.preventDefault();
+				const rowStep = grid ? (columns as number) : 1;
+				const step = event.key === 'ArrowDown' ? rowStep : -rowStep;
+				if (open) move(step);
+				else {
+					openMenu();
+					move(step);
+				}
+				break;
+			}
+			case 'ArrowLeft':
+			case 'ArrowRight': {
+				if (!grid || !open || typing(event)) break;
+				event.preventDefault();
+				const forward = (event.key === 'ArrowRight') !== !!anchor?.matches(':dir(rtl)');
+				move(forward ? 1 : -1);
+				break;
+			}
+			case 'Enter':
+				if (open && active !== undefined) {
+					event.preventDefault();
+					toggle(options[active]);
+				} else if (drawerMode && !open) {
+					event.preventDefault();
+					openMenu();
+				}
+				break;
+			case ' ':
+				if (!typing(event) && open && active !== undefined) {
+					event.preventDefault();
+					toggle(options[active]);
+				} else if (drawerMode && !open) {
+					event.preventDefault();
+					openMenu();
+				}
+				break;
+			case 'Backspace':
+				if (!searchText && selection.length) unselect(selection[selection.length - 1]);
+				break;
+			case 'Escape':
+				if (open) {
+					event.preventDefault();
+					open = false;
+				} else if (searchText) {
+					event.preventDefault();
+					searchText = '';
+				}
+				break;
+			case 'Tab':
+				if (!drawerMode) open = false;
+				break;
+			default:
+				if (
+					event.key.length === 1 &&
+					!event.ctrlKey &&
+					!event.metaKey &&
+					!event.altKey &&
+					!typing(event)
+				) {
+					event.preventDefault();
+					typeAhead(event.key, event.timeStamp);
+				}
+		}
+	}
 
-    if (
-      event.key == "ArrowDown" &&
-      (focusedIndex === undefined || focusedIndex < filteredItems.length - 1)
-    ) {
-      if (focusedIndex === undefined) focusedIndex = 0;
-      else focusedIndex += 1;
-    } else if (
-      event.key == "ArrowUp" &&
-      (focusedIndex === undefined || focusedIndex > 0)
-    ) {
-      if (focusedIndex === undefined) focusedIndex = filteredItems.length - 1;
-      else focusedIndex -= 1;
-    } else if (event.key == "Enter" && focusedIndex != undefined) {
-      toggle(filteredItems[focusedIndex]);
-    } else if (event.key == "Backspace" && searchText == "") {
-      pop();
-    } else if (event.key == "Escape" || event.key == "Tab") {
-      if(emptySearchTextOnMenuClose) searchText = "";
-      if (!!input) input.blur();
-      menuOpened = false;
-    }
+	function search(event: Event & { currentTarget: HTMLInputElement }) {
+		const typed = event.currentTarget.value.trim();
+		if (!drawerMode) openMenu();
+		highlighted = typed ? 0 : undefined;
+	}
 
-    if (focusedIndex !== undefined && !!menuProps.menuElement) {
-      let child = menuProps.menuElement.querySelector<HTMLElement>(
-        ".item-" + focusedIndex,
-      );
-
-      if (!!child) scrollInMenu(menuProps.menuElement, child, "instant");
-    }
-  }
-
-  function handleContainerClick() {
-    if (disabled) return;
-
-    if (!menuOpened) {
-      if (!!input) input.focus();
-
-      // had to timeout because it was catching click outside
-      setTimeout(() => {
-        openMenu();
-      }, 50);
-    }
-  }
-
-  $effect(() => {
-    if (searchText) {
-      focusedIndex = undefined;
-      filteredItems = items.filter((it) => {
-        if (searchFunction) return searchFunction(it, searchText);
-        else
-          return (
-            !!searchText &&
-            it.label
-              ?.toString()
-              .toLowerCase()
-              .includes(searchText.toLowerCase())
-          );
-      });
-    } else {
-      filteredItems = items;
-    }
-  });
-
-  $effect(() => {
-    if (!menuOpened && emptySearchTextOnMenuClose) {
-      setTimeout(() => {
-        if (!menuOpened && emptySearchTextOnMenuClose) searchText = undefined;
-      }, 10);
-    }
-  });
-
-  $effect(() => {
-    if (!!input && adaptInputWidth) {
-      if ((values || []).length !== 0) {
-        input.style.width =
-          Math.max(searchText?.length || placeholder?.length, 1) + "ch";
-      } else {
-        input.style.width = "";
-      }
-    }
-  });
+	let wasOpen = false;
+	$effect(() => {
+		const isOpen = !!open;
+		if (wasOpen && !isOpen) {
+			untrack(() => {
+				highlighted = undefined;
+				typed = '';
+				if (clearSearchOnClose && searchText) searchText = '';
+				onclose?.();
+			});
+		}
+		wasOpen = isOpen;
+	});
 </script>
 
-<svelte:window />
+{#snippet matchedLabel(item: Item<Data>)}
+	{@const parts = split(text(item))}
+	{#if parts}
+		{parts[0]}<mark class="aurora-autocomplete-match">{parts[1]}</mark>{parts[2]}
+	{:else}
+		{text(item)}
+	{/if}
+{/snippet}
+
+{#snippet list(focusable = false)}
+	{#if loading}
+		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+		<div
+			class="aurora-autocomplete-status"
+			role="status"
+			onmousedown={(event) => event.preventDefault()}
+		>
+			{#if loadingSnippet}
+				{@render loadingSnippet()}
+			{:else}
+				<span class="aurora-autocomplete-spinner" aria-hidden="true"></span>{loadingText ?? texts.loading}
+			{/if}
+		</div>
+	{:else if options.length === 0}
+		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+		<div
+			class="aurora-autocomplete-status"
+			role="status"
+			onmousedown={(event) => event.preventDefault()}
+		>
+			{#if emptySnippet}
+				{@render emptySnippet({ searchText })}
+			{:else}
+				{noResultsText ?? texts.noResults}
+			{/if}
+		</div>
+	{:else}
+		<!-- svelte-ignore a11y_autofocus -->
+		<div
+			id={listboxId}
+			role="listbox"
+			class="aurora-autocomplete-listbox"
+			aria-multiselectable={multiple || undefined}
+			data-columns={grid ? columns : undefined}
+			style:--_columns={grid ? columns : undefined}
+			aria-labelledby={hasLabel ? labelId : undefined}
+			aria-label={hasLabel ? undefined : placeholder}
+			aria-activedescendant={focusable ? activeDescendant : undefined}
+			tabindex={focusable ? 0 : -1}
+			autofocus={focusable}
+			onmousedown={(event) => event.preventDefault()}
+			onkeydown={focusable ? handleKeyDown : undefined}
+		>
+			{#each options as item, index (item.value)}
+				{@const selected = isSelected(item)}
+				<!-- svelte-ignore a11y_click_events_have_key_events -->
+				<div
+					id={optionId(index)}
+					role="option"
+					tabindex="-1"
+					aria-selected={selected}
+					class={['aurora-autocomplete-option', clazz.option]}
+					data-selected={selected || undefined}
+					data-highlighted={index === active || undefined}
+					onclick={() => toggle(item)}
+					onpointermove={() => (highlighted = index)}
+				>
+					{#if itemSnippet}
+						{@render itemSnippet({ item, index, selected, highlighted: index === active })}
+					{:else}
+						{#if itemIconSnippet}
+							{@render itemIconSnippet({ item })}
+						{:else if item.icon}
+							<Icon path={item.icon} />
+						{/if}
+						<span class="aurora-autocomplete-option-label">
+							{#if itemLabelSnippet}
+								{@render itemLabelSnippet({ item })}
+							{:else}
+								{@render matchedLabel(item)}
+							{/if}
+						</span>
+						{#if itemAppendSnippet}
+							{@render itemAppendSnippet({ item, selected })}
+						{/if}
+						{#if selected}
+							<Icon path={CHECK_ICON} class="aurora-autocomplete-check" />
+						{/if}
+					{/if}
+				</div>
+			{/each}
+		</div>
+	{/if}
+{/snippet}
 
 <div
-  bind:this={menuProps.activator}
-  style:width
-  style:max-width={maxWidth}
-  style:min-width={minWidth}
-  style:height
-  style:opacity={disabled ? "50%" : "100%"}
-  onclick={handleContainerClick}
-  onkeypress={handleContainerClick}
-  class={clazz.activator || ""}
-  role="button"
-  tabindex="0"
+	class={['aurora-autocomplete', clazz.container]}
+	data-state={validation}
+	data-disabled={disabled || undefined}
+	data-open={open || undefined}
+	data-loading={loading || undefined}
 >
-  {#if selectionContainerSnippet}
-    {@render selectionContainerSnippet({
-      values: values || [],
-      searchText,
-      disabled,
-      openMenu,
-      handleKeyDown,
-      unselect,
-      select,
-    })}
-  {:else}
-    <div class="selection-container">
-      {#each (values || []).slice(0, maxVisibleChips) as selection}
-        {#if selectionSnippet}
-          {@render selectionSnippet({ selection, unselect })}
-        {:else}
-          <div tabindex="-1">
-            <Chip
-              close={true}
-              prependIcon={selection.icon}
-              onclose={() => unselect(selection)}
-              --chip-default-border-radius="var(--autocomplete-border-radius, var(--autocomplete-default-border-radius))"
-              buttonTabIndex={-1}
-              truncateText
-            >
-              {#if chipLabelSnippet}
-                {@render chipLabelSnippet({ selection })}
-              {:else}
-                {selection.label}
-              {/if}
-            </Chip>
-          </div>
-        {/if}
-      {/each}
-      {#if maxVisibleChips !== undefined && notVisibleChipNumber > 0}
-        {#if exceedCounterSnippet}
-          {@render exceedCounterSnippet({
-            notVisibleChipNumber,
-            maxVisibleChips,
-            values: values || [],
-            searchText,
-            disabled,
-          })}
-        {:else}
-          <div class="not-visible-chip-number">+ {notVisibleChipNumber}</div>
-        {/if}
-      {/if}
-      
-      <input
-        class="autocomplete-input"
-        bind:value={searchText}
-        onfocus={handleTextFieldFocus}
-        onblur={handleTextFieldBlur}
-        onkeydown={handleKeyDown}
-        {disabled}
-        {placeholder}
-        bind:this={input}
-      />
-    </div>
-
-    {#if hintSnippet}
-      {@render hintSnippet({ hint })}
-    {:else}
-      <div class="{clazz?.hint || ''}">
-        {#if !!hint}
-          <span class="hint">{hint}</span>
-        {/if}
-      </div>
-    {/if}
-  {/if}
+	{#if hasLabel}
+		<label id={labelId} class={['aurora-autocomplete-label', clazz.label]} for={inputId}>
+			{#if labelSnippet}
+				{@render labelSnippet({ label })}
+			{:else}
+				{label}
+			{/if}
+		</label>
+	{/if}
+	<div class="aurora-autocomplete-anchor" bind:this={anchor}>
+		{#if selectionContainerSnippet}
+			{@render selectionContainerSnippet({
+				values: selection,
+				searchText,
+				disabled,
+				openMenu,
+				handleKeyDown,
+				select,
+				unselect,
+				attributes
+			})}
+		{:else}
+			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+			<div
+				class={['aurora-autocomplete-field', clazz.field]}
+				onmousedown={(event) => {
+					if (event.target !== inputNode) event.preventDefault();
+				}}
+				onclick={(event) => {
+					if (event.target === inputNode || (event.target as Element).closest('button')) return;
+					inputNode?.focus();
+					openMenu();
+				}}
+			>
+				{#if iconSnippet || icon}
+					<div class="aurora-autocomplete-start">
+						{#if iconSnippet}
+							{@render iconSnippet()}
+						{:else if icon}
+							<Icon path={icon} />
+						{/if}
+					</div>
+				{/if}
+				<div class="aurora-autocomplete-selection">
+					{#each visible as item (item.value)}
+						{#snippet chipIcon()}
+							{@render chipIconSnippet?.({ selection: item })}
+						{/snippet}
+						{#if selectionSnippet}
+							{@render selectionSnippet({ selection: item, unselect })}
+						{:else}
+							<Chip
+								variant="primary"
+								size="sm"
+								prependIcon={item.icon}
+								prependSnippet={chipIconSnippet ? chipIcon : undefined}
+								closable={removable}
+								closeLabel="{removeLabel ?? texts.remove} {text(item)}"
+								tabindex={-1}
+								onclose={() => unselect(item)}
+								class={clazz.chip}
+							>
+								{#if chipLabelSnippet}
+									{@render chipLabelSnippet({ selection: item })}
+								{:else}
+									{text(item)}
+								{/if}
+							</Chip>
+						{/if}
+					{/each}
+					{#if hiddenCount > 0 && maxVisibleChips !== undefined}
+						{#if exceedCounterSnippet}
+							{@render exceedCounterSnippet({
+								notVisibleChipNumber: hiddenCount,
+								maxVisibleChips,
+								values: selection,
+								searchText,
+								disabled
+							})}
+						{:else}
+							<span class="aurora-autocomplete-counter" bind:this={counterNode}>+{hiddenCount}</span>
+							<Tooltip activator={counterNode} text={selection.slice(maxVisibleChips).map(text).join(', ')} />
+						{/if}
+					{/if}
+					<input
+						autocomplete="off"
+						{...rest}
+						{...attributes}
+						bind:this={() => inputNode, (node) => (inputNode = input = node)}
+						bind:value={searchText}
+						id={inputId}
+						type="text"
+						aria-autocomplete="list"
+						aria-labelledby={undefined}
+						{placeholder}
+						{disabled}
+						readonly={drawerMode}
+						class={clazz.input}
+						onfocus={(event) => {
+							onfocus?.(event);
+							if (!drawerMode) openMenu();
+						}}
+						onclick={(event) => {
+							onclick?.(event);
+							openMenu();
+						}}
+						oninput={(event) => {
+							oninput?.(event);
+							search(event);
+						}}
+						onkeydown={(event) => {
+							onkeydown?.(event);
+							if (!event.defaultPrevented) handleKeyDown(event);
+						}}
+					/>
+				</div>
+				{#if loading || validation}
+					<div class="aurora-autocomplete-end">
+						{#if loading}
+							<span class="aurora-autocomplete-spinner" aria-hidden="true"></span>
+						{/if}
+						{#if validation && stateIconSnippet}
+							{@render stateIconSnippet({ state: validation })}
+						{:else if validation}
+							<Icon
+								path={validation === 'error' ? ALERT_ICON : SUCCESS_ICON}
+								class="aurora-autocomplete-state-icon"
+							/>
+						{/if}
+					</div>
+				{/if}
+			</div>
+		{/if}
+	</div>
+	{#if hintSnippet}
+		<div class={['aurora-autocomplete-hint', clazz.hint]} id={hintId}>
+			{@render hintSnippet({ hint })}
+		</div>
+	{:else if hint}
+		<div class={['aurora-autocomplete-hint', clazz.hint]} id={hintId}>{hint}</div>
+	{/if}
+	{#if name}
+		{#each selection as item (item.value)}
+			<input type="hidden" {name} value={item.value} />
+		{/each}
+	{/if}
 </div>
 
-{#key searchText}
-  {#if menuSnippet}
-    {@render menuSnippet()}
-  {:else if !mobileDrawer}
-    <Menu
-      {...menuProps}
-      bind:open={menuOpened}
-      bind:refreshPosition={menuProps.refreshPosition}
-      bind:menuElement={menuProps.menuElement}
-      bind:openingId={menuProps.openingId}
-    >
-      <ul
-        class={clazz.menu || ""}
-        style:background-color="rgb(var(--global-color-background-100))"
-      >
-        {#each filteredItems as item, index}
-          <li class="item-{index}">
-            {#if itemSnippet}
-              {@render itemSnippet({
-                item,
-                index,
-                selected:
-                  (values || []).findIndex((i) => {
-                    return i.value == item.value;
-                  }) != -1,
-              })}
-            {:else}
-              <div
-                class:selection-item={true}
-                class:focused={index == focusedIndex}
-                class:selected={(values || []).findIndex((i) => {
-                  return i.value == item.value;
-                }) != -1}
-                onclick={() => toggle(item)}
-                onkeypress={() => toggle(item)}
-                role="button"
-                tabindex="0"
-              >
-                {#if itemLabelSnippet}
-                  {@render itemLabelSnippet({ item })}
-                {:else}
-                  {#if item.icon}
-                    <Icon name={item.icon}/>
-                  {/if}
-                  {item.label}
-                {/if}
-              </div>
-            {/if}
-          </li>
-        {/each}
-      </ul>
-    </Menu>
-  {:else}
-    <MenuOrDrawer
-      bind:menuProps
-      drawerProps={{
-        onclose
-      }}
-      bind:open={menuOpened}
-    >
-      <ul
-        class={clazz.menu || ""}
-        style:background-color="rgb(var(--global-color-background-100))"
-      >
-        {#each filteredItems as item, index}
-          <li class="item-{index}">
-            {#if itemSnippet}
-              {@render itemSnippet({
-                item,
-                index,
-                selected:
-                  (values || []).findIndex((i) => {
-                    return i.value == item.value;
-                  }) != -1,
-              })}
-            {:else}
-              <div
-                class:selection-item={true}
-                class:focused={index == focusedIndex}
-                class:selected={(values || []).findIndex((i) => {
-                  return i.value == item.value;
-                }) != -1}
-                onclick={() => toggle(item)}
-                onkeypress={() => toggle(item)}
-                role="button"
-                tabindex="0"
-              >
-                {#if itemLabelSnippet}
-                  {@render itemLabelSnippet({ item })}
-                {:else}
-                  {item.label}
-                {/if}
-              </div>
-            {/if}
-          </li>
-        {/each}
-      </ul>
-    </MenuOrDrawer>
-  {/if}
-{/key}
+{#if drawerMode}
+	<Drawer
+		bind:open
+		position="bottom"
+		title={drawerTitle ?? label}
+		aria-label={(drawerTitle ?? label) ? undefined : placeholder}
+		closable
+		closeLabel={closeLabel ?? texts.close}
+		class={{
+			drawer: drawerSearch
+				? 'aurora-autocomplete-drawer'
+				: 'aurora-autocomplete-drawer aurora-autocomplete-drawer-fit',
+			body: 'aurora-autocomplete-drawer-body'
+		}}
+	>
+		{#if drawerSearch}
+			<!-- svelte-ignore a11y_autofocus -->
+			<SimpleTextField
+				bind:value={searchText}
+				{placeholder}
+				prependInnerIcon={SEARCH_ICON}
+				role="combobox"
+				aria-expanded="true"
+				aria-controls={listboxShown ? listboxId : undefined}
+				aria-activedescendant={activeDescendant}
+				aria-autocomplete="list"
+				aria-label={label ?? placeholder}
+				autocomplete="off"
+				autofocus
+				oninput={search}
+				onkeydown={(event) => {
+					if (event.key !== 'Backspace') handleKeyDown(event);
+				}}
+			/>
+		{/if}
+		<div class="aurora-autocomplete-scroll">{@render list(!drawerSearch)}</div>
+	</Drawer>
+{:else}
+	<Menu
+		bind:open
+		activator={anchor}
+		{placement}
+		matchActivatorWidth={!grid}
+		class={['aurora-autocomplete-menu', clazz.menu]}
+	>
+		{@render list()}
+	</Menu>
+{/if}
 
 <style>
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
+	@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
 
-  .selection-container {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 5px;
-    border: var(--autocomplete-border, var(--autocomplete-default-border));
-    background-color: var(
-      --autocomplete-background-color,
-      var(--autocomplete-default-background-color)
-    );
-    border-radius: var(
-      --autocomplete-border-radius,
-      var(--autocomplete-default-border-radius)
-    );
-    padding: var(--autocomplete-padding, var(--autocomplete-default-padding));
-    min-height: var(
-      --autocomplete-min-height,
-      var(--autocomplete-default-min-height)
-    );
-    transition: all 0.1s;
-  }
+	@layer global.components {
+		.aurora-autocomplete {
+			--_border: var(--autocomplete-border-color, var(--autocomplete-default-border-color));
+			--_hover-border: var(
+				--autocomplete-hover-border-color,
+				var(--autocomplete-default-hover-border-color)
+			);
+			--_focus-border: var(
+				--autocomplete-focus-border-color,
+				var(--autocomplete-default-focus-border-color)
+			);
+			--_ring: var(--autocomplete-focus-ring-color, var(--autocomplete-default-focus-ring-color));
+			--_hint: var(--autocomplete-hint-color, var(--autocomplete-default-hint-color));
+			--icon-size: var(--autocomplete-icon-size, var(--autocomplete-default-icon-size));
 
-  .selection-container:focus-within {
-    border: var(
-      --autocomplete-focus-border,
-      var(
-        --autocomplete-default-focus-border,
-        var(--autocomplete-border, var(--autocomplete-default-border))
-      )
-    );
-    box-shadow: var(
-      --autocomplete-focus-box-shadow,
-      var(--autocomplete-default-focus-box-shadow)
-    );
-  }
+			display: flex;
+			flex-direction: column;
+			gap: var(--autocomplete-gap, var(--autocomplete-default-gap));
+			box-sizing: border-box;
+			width: var(--autocomplete-width, var(--autocomplete-default-width));
+			max-width: var(--autocomplete-max-width, var(--autocomplete-default-max-width));
+			min-width: 0;
+		}
 
-  .selection-item {
-    padding: 10px;
-    max-width: var(
-      --autocomplete-options-max-width,
-      var(--autocomplete-default-options-max-width)
-    );
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-  }
+		.aurora-autocomplete[data-state='error'] {
+			--_border: var(--autocomplete-error-color, var(--autocomplete-default-error-color));
+			--_hover-border: var(--_border);
+			--_focus-border: var(--_border);
+			--_ring: color-mix(in oklab, var(--_border) 18%, transparent);
+			--_hint: var(--_border);
+		}
 
-  .selection-item.selected {
-    background-color: var(
-      --autocomplete-selected-item-background-color,
-      var(--autocomplete-default-selected-item-background-color)
-    );
-    color: var(
-      --autocomplete-selected-item-color,
-      var(--autocomplete-default-selected-item-color)
-    );
-  }
+		.aurora-autocomplete[data-state='success'] {
+			--_border: var(--autocomplete-success-color, var(--autocomplete-default-success-color));
+			--_hover-border: var(--_border);
+			--_focus-border: var(--_border);
+			--_ring: color-mix(in oklab, var(--_border) 18%, transparent);
+			--_hint: var(--_border);
+		}
 
-  .selection-item.focused:not(.selected) {
-    background-color: var(
-      --autocomplete-focused-item-background-color,
-      var(--autocomplete-default-focused-item-background-color)
-    );
-    color: var(
-      --autocomplete-focused-item-color,
-      var(--autocomplete-default-focused-item-color)
-    );
-  }
+		.aurora-autocomplete-label {
+			color: var(--autocomplete-label-color, var(--autocomplete-default-label-color));
+			font-size: var(--autocomplete-label-font-size, var(--autocomplete-default-label-font-size));
+			font-weight: var(
+				--autocomplete-label-font-weight,
+				var(--autocomplete-default-label-font-weight)
+			);
+		}
 
-  .selection-item:hover:not(.selected):not(.focused) {
-    background-color: var(
-      --autocomplete-hover-item-background-color,
-      var(--autocomplete-default-hover-item-background-color)
-    );
-    color: var(
-      --autocomplete-hover-item-color,
-      var(--autocomplete-default-hover-item-color)
-    );
-  }
+		.aurora-autocomplete-field {
+			box-sizing: border-box;
+			display: flex;
+			align-items: center;
+			gap: var(--autocomplete-inner-gap, var(--autocomplete-default-inner-gap));
+			min-height: var(--autocomplete-min-height, var(--autocomplete-default-min-height));
+			padding: var(--autocomplete-padding, var(--autocomplete-default-padding));
+			background: var(--autocomplete-background, var(--autocomplete-default-background));
+			color: var(--autocomplete-icon-color, var(--autocomplete-default-icon-color));
+			border: var(--autocomplete-border-width, var(--autocomplete-default-border-width)) solid
+				var(--_border);
+			border-radius: var(--autocomplete-border-radius, var(--autocomplete-default-border-radius));
+			box-shadow: var(--autocomplete-box-shadow, var(--autocomplete-default-box-shadow));
+			cursor: text;
+			transition:
+				border-color var(--global-duration) var(--global-ease),
+				box-shadow var(--global-duration) var(--global-ease),
+				background var(--global-duration) var(--global-ease);
+		}
 
-  .not-visible-chip-number {
-    opacity: 50%;
-    cursor: pointer;
-  }
+		@media (hover: hover) {
+			.aurora-autocomplete:not([data-disabled], [data-open]) .aurora-autocomplete-field:hover:not(:focus-within) {
+				border-color: var(--_hover-border);
+			}
+		}
 
-  .autocomplete-input {
-    background-color: rgb(1, 1, 1, 0);
-    margin-left: var(
-      --autocomplete-input-margin-left,
-      var(--autocomplete-default-input-margin-left)
-    );
-    width: var(
-      --autocomplete-input-width,
-      var(--autocomplete-default-input-width)
-    );
-    outline: none;
-    border: none;
-    color: inherit;
-  }
+		.aurora-autocomplete-field:focus-within,
+		.aurora-autocomplete[data-open] .aurora-autocomplete-field {
+			border-color: var(--_focus-border);
+			box-shadow:
+				0 0 0
+					var(--autocomplete-focus-ring-width, var(--autocomplete-default-focus-ring-width))
+					var(--_ring);
+			outline: 2px solid transparent;
+		}
 
-  .hint {
-    margin-left: var(
-      --autocomplete-hint-margin-left, 
-      var(--autocomplete-default-hint-margin-left)
-    );
-    font-size: var(
-      --autocomplete-hint-font-size, 
-      var(--autocomplete-default-hint-font-size)
-    );
-    color: var(
-      --autocomplete-hint-color,
-      var(--autocomplete-default-hint-color)
-    );
-  }
+		.aurora-autocomplete-selection {
+			flex: 1;
+			min-width: 0;
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--autocomplete-chip-gap, var(--autocomplete-default-chip-gap));
+		}
+
+		input {
+			--_input-min-width: var(
+				--autocomplete-input-min-width,
+				var(--autocomplete-default-input-min-width)
+			);
+
+			flex: 1 1 var(--_input-min-width);
+			min-width: var(--_input-min-width);
+			width: 0;
+			box-sizing: border-box;
+			margin: 0;
+			padding: var(--autocomplete-input-padding, var(--autocomplete-default-input-padding));
+			border: 0;
+			outline: none;
+			background: transparent;
+			color: var(--autocomplete-color, var(--autocomplete-default-color));
+			font-family: inherit;
+			font-size: var(--autocomplete-font-size, var(--autocomplete-default-font-size));
+			line-height: 1.5;
+			cursor: inherit;
+		}
+
+		input::placeholder {
+			color: var(--autocomplete-placeholder-color, var(--autocomplete-default-placeholder-color));
+			opacity: 1;
+		}
+
+		.aurora-autocomplete-counter {
+			color: var(--autocomplete-counter-color, var(--autocomplete-default-counter-color));
+			font-size: var(--autocomplete-counter-font-size, var(--autocomplete-default-counter-font-size));
+			font-weight: var(
+				--autocomplete-counter-font-weight,
+				var(--autocomplete-default-counter-font-weight)
+			);
+		}
+
+		.aurora-autocomplete-start {
+			display: flex;
+			align-items: center;
+			padding-inline-start: var(
+				--autocomplete-start-padding,
+				var(--autocomplete-default-start-padding)
+			);
+		}
+
+		.aurora-autocomplete-end {
+			display: flex;
+			align-items: center;
+			gap: var(--autocomplete-inner-gap, var(--autocomplete-default-inner-gap));
+			padding-inline-end: var(--autocomplete-end-padding, var(--autocomplete-default-end-padding));
+		}
+
+		.aurora-autocomplete-end :global(.aurora-autocomplete-state-icon) {
+			color: var(--_border);
+		}
+
+		.aurora-autocomplete-hint {
+			color: var(--_hint);
+			font-size: var(--autocomplete-hint-font-size, var(--autocomplete-default-hint-font-size));
+		}
+
+		.aurora-autocomplete[data-disabled] .aurora-autocomplete-field {
+			background: var(
+				--autocomplete-disabled-background,
+				var(--autocomplete-default-disabled-background)
+			);
+			opacity: var(--autocomplete-disabled-opacity, var(--autocomplete-default-disabled-opacity));
+			cursor: not-allowed;
+		}
+
+		.aurora-autocomplete-spinner {
+			--_spinner-size: var(--autocomplete-spinner-size, var(--autocomplete-default-spinner-size));
+			--_spinner-color: var(--autocomplete-spinner-color, var(--autocomplete-default-spinner-color));
+
+			box-sizing: border-box;
+			flex-shrink: 0;
+			width: var(--_spinner-size);
+			height: var(--_spinner-size);
+			border-radius: 50%;
+			border: var(
+					--autocomplete-spinner-border-width,
+					var(--autocomplete-default-spinner-border-width)
+				)
+				solid color-mix(in oklab, var(--_spinner-color) 25%, transparent);
+			border-top-color: var(--_spinner-color);
+			animation: autocomplete-spin 0.7s linear infinite;
+		}
+
+		:global(.aurora-autocomplete-menu) {
+			--menu-default-max-height: var(
+				--autocomplete-menu-max-height,
+				var(--autocomplete-default-menu-max-height)
+			);
+		}
+
+		:global(.aurora-autocomplete-drawer) {
+			--drawer-default-size: var(--autocomplete-drawer-size, var(--autocomplete-default-drawer-size));
+		}
+
+		:global(.aurora-autocomplete-drawer-fit) {
+			--drawer-default-size: auto;
+			--drawer-default-max-size: var(
+				--autocomplete-drawer-size,
+				var(--autocomplete-default-drawer-size)
+			);
+		}
+
+		:global(.aurora-drawer-body.aurora-autocomplete-drawer-body) {
+			display: flex;
+			flex-direction: column;
+			gap: var(--autocomplete-drawer-gap, var(--autocomplete-default-drawer-gap));
+			overflow: hidden;
+		}
+
+		.aurora-autocomplete-scroll {
+			flex: 1;
+			min-height: 0;
+			overflow: auto;
+			overscroll-behavior: contain;
+		}
+
+		.aurora-autocomplete-listbox {
+			display: flex;
+			flex-direction: column;
+			gap: var(--autocomplete-option-spacing, var(--autocomplete-default-option-spacing));
+			outline: none;
+		}
+
+		.aurora-autocomplete-listbox[data-columns] {
+			display: grid;
+			grid-template-columns: repeat(var(--_columns), minmax(0, 1fr));
+		}
+
+		.aurora-autocomplete-option {
+			--icon-size: var(--autocomplete-option-icon-size, var(--autocomplete-default-option-icon-size));
+
+			display: flex;
+			align-items: center;
+			gap: var(--autocomplete-option-gap, var(--autocomplete-default-option-gap));
+			padding: var(--autocomplete-option-padding, var(--autocomplete-default-option-padding));
+			border-radius: var(
+				--autocomplete-option-border-radius,
+				var(--autocomplete-default-option-border-radius)
+			);
+			color: var(--autocomplete-option-color, var(--autocomplete-default-option-color));
+			font-size: var(--autocomplete-option-font-size, var(--autocomplete-default-option-font-size));
+			line-height: 1.4;
+			cursor: pointer;
+			user-select: none;
+			transition:
+				background var(--global-duration-fast) var(--global-ease),
+				color var(--global-duration-fast) var(--global-ease);
+		}
+
+		.aurora-autocomplete-option[data-highlighted] {
+			background: var(
+				--autocomplete-option-highlighted-background,
+				var(--autocomplete-default-option-highlighted-background)
+			);
+			color: var(
+				--autocomplete-option-highlighted-color,
+				var(--autocomplete-default-option-highlighted-color)
+			);
+		}
+
+		.aurora-autocomplete-option[data-selected] {
+			background: var(
+				--autocomplete-option-selected-background,
+				var(--autocomplete-default-option-selected-background)
+			);
+			color: var(
+				--autocomplete-option-selected-color,
+				var(--autocomplete-default-option-selected-color)
+			);
+		}
+
+		.aurora-autocomplete-option[data-selected][data-highlighted] {
+			background: var(
+				--autocomplete-option-selected-highlighted-background,
+				var(--autocomplete-default-option-selected-highlighted-background)
+			);
+		}
+
+		:global(.aurora-autocomplete-drawer) .aurora-autocomplete-option {
+			padding: var(
+				--autocomplete-drawer-option-padding,
+				var(--autocomplete-default-drawer-option-padding)
+			);
+			font-size: var(
+				--autocomplete-drawer-option-font-size,
+				var(--autocomplete-default-drawer-option-font-size)
+			);
+		}
+
+		.aurora-autocomplete-option-label {
+			flex: 1;
+			min-width: 0;
+			overflow-wrap: anywhere;
+		}
+
+		.aurora-autocomplete-option :global(.aurora-autocomplete-check) {
+			color: var(--autocomplete-check-color, var(--autocomplete-default-check-color));
+		}
+
+		.aurora-autocomplete-match {
+			background: none;
+			color: var(--autocomplete-match-color, var(--autocomplete-default-match-color));
+			font-weight: var(--autocomplete-match-font-weight, var(--autocomplete-default-match-font-weight));
+		}
+
+		.aurora-autocomplete-status {
+			display: flex;
+			align-items: center;
+			gap: var(--autocomplete-option-gap, var(--autocomplete-default-option-gap));
+			padding: var(--autocomplete-status-padding, var(--autocomplete-default-status-padding));
+			color: var(--autocomplete-status-color, var(--autocomplete-default-status-color));
+			font-size: var(--autocomplete-status-font-size, var(--autocomplete-default-status-font-size));
+		}
+	}
+
+	@keyframes autocomplete-spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
 </style>

@@ -1,0 +1,45 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--period-selector-default-width: auto;
+		--period-selector-default-max-width: 100%;
+		--period-selector-default-min-height: 0;
+		--period-selector-default-background: transparent;
+		--period-selector-default-color: var(--global-color-text);
+		--period-selector-default-font-size: 13px;
+		--period-selector-default-divider-color: var(--global-color-border);
+		--period-selector-default-presets-width: 176px;
+		--period-selector-default-presets-padding: 8px;
+		--period-selector-default-presets-background: var(--global-color-surface);
+		--period-selector-default-preset-padding: 7px 10px;
+		--period-selector-default-preset-border-radius: var(--global-radius-sm);
+		--period-selector-default-preset-color: var(--global-color-text-2);
+		--period-selector-default-preset-font-size: 13px;
+		--period-selector-default-preset-hover-background: var(--global-color-surface-2);
+		--period-selector-default-preset-hover-color: var(--global-color-text);
+		--period-selector-default-preset-selected-background: var(--global-color-primary-soft);
+		--period-selector-default-preset-selected-color: var(--global-color-text);
+		--period-selector-default-preset-days-color: var(--global-color-text-3);
+		--period-selector-default-preset-days-font-size: 10.5px;
+		--period-selector-default-preset-selected-days-color: var(--global-color-primary);
+		--period-selector-default-group-gap: 6px;
+		--period-selector-default-months-gap: 24px;
+		--period-selector-default-months-padding: 12px 16px 8px;
+		--period-selector-default-month-width: 252px;
+		--period-selector-default-arrow-size: 28px;
+		--period-selector-default-month-title-color: var(--global-color-text);
+		--period-selector-default-month-title-font-size: 14px;
+		--period-selector-default-rolling-summary-color: var(--global-color-text);
+		--period-selector-default-footer-padding: 10px 16px 12px;
+		--period-selector-default-footer-row-height: 28px;
+		--period-selector-default-field-width: 100%;
+		--period-selector-default-field-height: 32px;
+		--period-selector-default-field-font-size: 12.5px;
+		--period-selector-default-field-padding-x: 10px;
+		--period-selector-default-field-label-color: var(--global-color-text-3);
+		--period-selector-default-duration-background: var(--global-color-surface-2);
+		--period-selector-default-duration-color: var(--global-color-text-2);
+		--period-selector-default-duration-font-size: 12px;
+	}
+}

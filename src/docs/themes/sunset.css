@@ -1,0 +1,13 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.theme {
+	:root[data-theme='sunset'] {
+		--global-color-bg: light-dark(#fff5ef, #1a0d0b);
+		--global-color-bg-2: light-dark(#ffe9de, #24120f);
+		--global-color-surface-solid: light-dark(#fffaf6, #2a1612);
+		--global-color-surface-pop: light-dark(#ffffff, #331b16);
+		--global-color-primary: light-dark(#c2410c, #ff8a4c);
+		--global-color-accent: light-dark(#be185d, #ff6b9a);
+		--global-gradient: linear-gradient(135deg, var(--global-color-primary), var(--global-color-accent));
+	}
+}

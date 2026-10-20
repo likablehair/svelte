@@ -1,0 +1,68 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--hierarchy-menu-default-width: 100%;
+		--hierarchy-menu-default-gap: 2px;
+		--hierarchy-menu-default-font-family: inherit;
+		--hierarchy-menu-default-duration: var(--global-duration-slow);
+		--hierarchy-menu-default-easing: var(--global-ease);
+		--hierarchy-menu-default-disabled-opacity: 0.45;
+		--hierarchy-menu-default-focus-ring-width: var(--global-focus-ring-width);
+		--hierarchy-menu-default-focus-ring-color: var(--global-focus-ring-color);
+
+		--hierarchy-menu-default-option-height: 38px;
+		--hierarchy-menu-default-option-padding: 0 13px;
+		--hierarchy-menu-default-option-gap: 10px;
+		--hierarchy-menu-default-option-border-radius: var(--global-radius-sm);
+		--hierarchy-menu-default-option-font-size: 14px;
+		--hierarchy-menu-default-option-font-weight: 500;
+		--hierarchy-menu-default-option-color: var(--global-color-text-2);
+		--hierarchy-menu-default-option-background: transparent;
+		--hierarchy-menu-default-option-hover-color: var(--global-color-text);
+		--hierarchy-menu-default-option-hover-background: var(--global-color-surface-2);
+		--hierarchy-menu-default-option-selected-color: var(--global-color-text);
+		--hierarchy-menu-default-option-selected-background: linear-gradient(
+			90deg,
+			var(--global-color-primary-soft),
+			transparent
+		);
+		--hierarchy-menu-default-option-selected-font-weight: 500;
+		--hierarchy-menu-default-option-ancestor-color: var(--global-color-text);
+
+		--hierarchy-menu-default-icon-size: 18px;
+		--hierarchy-menu-default-icon-color: currentColor;
+		--hierarchy-menu-default-icon-selected-color: var(--global-color-primary);
+
+		--hierarchy-menu-default-indicator-width: 3px;
+		--hierarchy-menu-default-indicator-inset: 9px;
+		--hierarchy-menu-default-indicator-offset: -10px;
+		--hierarchy-menu-default-indicator-background: var(--global-gradient);
+		--hierarchy-menu-default-indicator-box-shadow: 0 0 12px var(--global-color-primary);
+
+		--hierarchy-menu-default-badge-font-family: var(--global-font-family-mono);
+		--hierarchy-menu-default-badge-font-size: 11px;
+		--hierarchy-menu-default-badge-padding: 1px 7px;
+		--hierarchy-menu-default-badge-border-radius: var(--global-radius-full);
+		--hierarchy-menu-default-badge-background: var(--global-color-surface-3);
+		--hierarchy-menu-default-badge-color: var(--global-color-text-2);
+		--hierarchy-menu-default-badge-selected-background: var(--global-color-primary);
+		--hierarchy-menu-default-badge-selected-color: var(--global-color-on-primary);
+		--hierarchy-menu-default-dot-size: 7px;
+		--hierarchy-menu-default-dot-color: var(--global-color-primary);
+
+		--hierarchy-menu-default-caret-size: 16px;
+		--hierarchy-menu-default-caret-color: var(--global-color-text-3);
+
+		--hierarchy-menu-default-children-indent: 12px;
+		--hierarchy-menu-default-children-offset: 21px;
+		--hierarchy-menu-default-children-border: 1px dashed var(--global-color-border-strong);
+		--hierarchy-menu-default-child-height: 34px;
+		--hierarchy-menu-default-child-font-size: 13px;
+
+		--hierarchy-menu-default-flyout-padding: 6px;
+		--hierarchy-menu-default-flyout-min-width: 200px;
+		--hierarchy-menu-default-flyout-title-color: var(--global-color-text-3);
+		--hierarchy-menu-default-flyout-title-font-size: 11px;
+	}
+}

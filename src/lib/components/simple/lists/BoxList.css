@@ -1,0 +1,71 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--box-list-default-min-width: 240px;
+		--box-list-default-gap: 12px;
+		--box-list-default-box-padding-y: 12px;
+		--box-list-default-box-padding-x: 14px;
+		--box-list-default-box-gap: 12px;
+		--box-list-default-box-background: var(--global-color-surface-solid);
+		--box-list-default-box-border-width: 1px;
+		--box-list-default-box-border-color: var(--global-color-border);
+		--box-list-default-box-border-radius: var(--global-radius-lg);
+		--box-list-default-box-color: var(--global-color-text);
+		--box-list-default-box-shadow: none;
+		--box-list-default-box-hover-background: var(--global-color-surface-solid);
+		--box-list-default-box-hover-border-tint: 45%;
+		--box-list-default-box-hover-shadow-shape: 0 18px 36px -22px;
+		--box-list-default-box-hover-shadow-tint: 70%;
+		--box-list-default-box-hover-lift: 2px;
+		--box-list-default-glow-tint: 12%;
+		--box-list-default-glow-size: 140% 110%;
+		--box-list-default-glow-reach: 60%;
+		--box-list-default-icon-hover-shadow-shape: 0 6px 18px -4px;
+		--box-list-default-icon-hover-shadow-tint: 60%;
+		--box-list-default-disabled-opacity: 0.5;
+		--box-list-default-icon-tile-size: 34px;
+		--box-list-default-icon-tile-border-radius: var(--global-radius-md);
+		--box-list-default-icon-size: 19px;
+		--box-list-default-icon-gap: 10px;
+		--box-list-default-icon-color: var(--global-color-primary);
+		--box-list-default-icon-background: var(--global-color-primary-soft);
+		--box-list-default-icon-color-1: var(--global-color-data-1);
+		--box-list-default-icon-color-2: var(--global-color-data-2);
+		--box-list-default-icon-color-3: var(--global-color-data-3);
+		--box-list-default-icon-color-4: var(--global-color-data-4);
+		--box-list-default-icon-color-5: var(--global-color-data-5);
+		--box-list-default-icon-color-6: var(--global-color-data-6);
+		--box-list-default-icon-background-1: light-dark(
+			color-mix(in oklab, var(--global-color-data-1) 10%, transparent),
+			color-mix(in oklab, var(--global-color-data-1) 14%, transparent)
+		);
+		--box-list-default-icon-background-2: light-dark(
+			color-mix(in oklab, var(--global-color-data-2) 10%, transparent),
+			color-mix(in oklab, var(--global-color-data-2) 14%, transparent)
+		);
+		--box-list-default-icon-background-3: light-dark(
+			color-mix(in oklab, var(--global-color-data-3) 10%, transparent),
+			color-mix(in oklab, var(--global-color-data-3) 14%, transparent)
+		);
+		--box-list-default-icon-background-4: light-dark(
+			color-mix(in oklab, var(--global-color-data-4) 10%, transparent),
+			color-mix(in oklab, var(--global-color-data-4) 14%, transparent)
+		);
+		--box-list-default-icon-background-5: light-dark(
+			color-mix(in oklab, var(--global-color-data-5) 10%, transparent),
+			color-mix(in oklab, var(--global-color-data-5) 14%, transparent)
+		);
+		--box-list-default-icon-background-6: light-dark(
+			color-mix(in oklab, var(--global-color-data-6) 10%, transparent),
+			color-mix(in oklab, var(--global-color-data-6) 14%, transparent)
+		);
+		--box-list-default-label-color: var(--global-color-text);
+		--box-list-default-label-font-size: 14px;
+		--box-list-default-label-font-weight: 600;
+		--box-list-default-description-color: var(--global-color-text-3);
+		--box-list-default-description-font-size: 12.5px;
+		--box-list-default-text-gap: 2px;
+		--box-list-default-append-color: var(--global-color-text-3);
+	}
+}

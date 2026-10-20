@@ -1,0 +1,8 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--icon-default-size: 1em;
+		--icon-default-color: currentColor;
+	}
+}

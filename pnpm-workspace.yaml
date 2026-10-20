@@ -1,0 +1,6 @@
+packages:
+  - migrate
+  - mcp
+  - adonis-filters
+
+engineStrict: true

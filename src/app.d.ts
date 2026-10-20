@@ -1,12 +1,6 @@
-/// <reference types="@sveltejs/kit" />
-
-declare module 'highlightjs-svelte';
-
-declare namespace svelte.JSX {
-  interface HTMLAttributes {
-    onclickoutside: () => void
-  }
+declare global {
+	namespace App {
+	}
 }
 
-declare module 'svelte-grid';
-declare module 'svelte-grid/build/helper/index.mjs';
+export {};

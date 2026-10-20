@@ -1,135 +1,292 @@
+<!-- @component
+Radio button with an optional label and description. It renders a native `<input type="radio">` inside a `<label>`, so a click on the text selects it: `name`, `required`, `disabled` and events (`onchange`, `onclick`, ...) work as in HTML, and radios with the same `name` form a group that the arrow keys move through. Bind the selected value of the group with `bind:group`, as with Svelte's `bind:group`: every radio of the group gets the same variable and its own `value`. `card` turns it into a bordered box that highlights when selected. To render a whole group from a list use `RadioGroup`. Its state is exposed as `data-checked` (from `group`, or `checked` without it), `data-disabled` and `data-card` for app CSS.
+-->
 <script lang="ts">
-  import './RadioButton.css'
-  import "../../../css/main.css";
+	import '../../../css/tokens.css';
+	import './RadioButton.css';
+	import type { Snippet } from 'svelte';
+	import type { HTMLInputAttributes } from 'svelte/elements';
 
-  interface Props {
-    name: string;
-    value: string;
-    id?: string;
-    checked?: boolean;
-    label?: string;
-    disabled?: boolean;
-    onchange?: () => void
-    oninput?: () => void
-    onfocus?: () => void
-    onblur?: () => void
-    onkeydown?: () => void
-    onkeypress?: () => void
-    onkeyup?: () => void
-  }
+	interface Props
+		extends Omit<HTMLInputAttributes, 'type' | 'value' | 'checked' | 'class' | 'children' | 'group'> {
+		/** Value of this radio. It becomes `group` when the radio is selected; in a form it is sent as text. */
+		value: string | number;
+		/** Value of the selected radio of the group. Use `bind:group` with the same variable on every radio of the group. */
+		group?: string | number;
+		/** Native `checked`, one way. Used only while `group` is `undefined`. */
+		checked?: boolean;
+		/** Text next to the circle. A click on it selects the radio. */
+		label?: string;
+		/** Secondary text below the label. It is read as the description of the radio, not as part of its name. */
+		description?: string;
+		/** Shows the radio as a bordered box that highlights when selected. */
+		card?: boolean;
+		/** Native `disabled`. */
+		disabled?: boolean;
+		/** The native `<input>` element. */
+		input?: HTMLInputElement;
+		/** Extra classes for each part: the root `<label>`, the input, the label text and the description. */
+		class?: {
+			container?: string;
+			input?: string;
+			label?: string;
+			description?: string;
+		};
+		/** Replaces the text next to the circle. A click on it still selects the radio. */
+		labelSnippet?: Snippet<[{ label: string | undefined }]>;
+		/** Replaces the secondary text below the label. */
+		descriptionSnippet?: Snippet<[{ description: string | undefined }]>;
+	}
 
-  let {
-    name,
-    value,
-    id = undefined,
-    checked = $bindable(),
-    label = undefined,
-    disabled = false,
-    onblur,
-    onchange,
-    onfocus,
-    oninput,
-    onkeydown,
-    onkeypress,
-    onkeyup,
-  }: Props = $props();
+	let {
+		value,
+		group = $bindable(),
+		checked,
+		label,
+		description,
+		card = false,
+		disabled = false,
+		input = $bindable(),
+		class: clazz = {},
+		labelSnippet,
+		descriptionSnippet,
+		onchange,
+		...rest
+	}: Props = $props();
 
+	const uid = $props.id();
+	const labelId = `${uid}-label`;
+	const descriptionId = `${uid}-description`;
+
+	let selected = $derived(group === undefined ? !!checked : group === value);
+	let hasLabel = $derived(!!label || !!labelSnippet);
+	let hasDescription = $derived(!!description || !!descriptionSnippet);
+
+	function handleChange(event: Event & { currentTarget: EventTarget & HTMLInputElement }) {
+		if (event.currentTarget.checked) group = value;
+		onchange?.(event);
+	}
 </script>
 
-<input
-  type="radio"
-  {name}
-  {value}
-  {id}
-  {disabled}
-  {checked}
-  {onchange}
-  {oninput}
-  {onfocus}
-  {onblur}
-  {onkeydown}
-  {onkeypress}
-  {onkeyup}
-/>
-{#if label}
-  <label for={id}>
-    {label}
-  </label>
-{/if}
+<label
+	class={[
+		'aurora-radio-button',
+		(hasLabel || hasDescription) && 'aurora-radio-button-labelled',
+		clazz.container
+	]}
+	data-checked={selected || undefined}
+	data-disabled={disabled || undefined}
+	data-card={card || undefined}
+>
+	<input
+		{...rest}
+		bind:this={input}
+		type="radio"
+		{value}
+		checked={selected}
+		{disabled}
+		aria-labelledby={hasDescription && hasLabel ? labelId : rest['aria-labelledby']}
+		aria-describedby={hasDescription ? descriptionId : rest['aria-describedby']}
+		onchange={handleChange}
+		class={['aurora-radio-button-circle', clazz.input]}
+	/>
+	{#if hasLabel || hasDescription}
+		<span class="aurora-radio-button-text">
+			{#if labelSnippet}
+				<span class={['aurora-radio-button-label', clazz.label]} id={labelId}
+					>{@render labelSnippet({ label })}</span
+				>
+			{:else if label}
+				<span class={['aurora-radio-button-label', clazz.label]} id={labelId}>{label}</span>
+			{/if}
+			{#if descriptionSnippet}
+				<span class={['aurora-radio-button-description', clazz.description]} id={descriptionId}
+					>{@render descriptionSnippet({ description })}</span
+				>
+			{:else if description}
+				<span class={['aurora-radio-button-description', clazz.description]} id={descriptionId}
+					>{description}</span
+				>
+			{/if}
+		</span>
+	{/if}
+</label>
 
 <style>
-@supports (-webkit-appearance: none) or (-moz-appearance: none) {
-  input[type="radio"] {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    height: 21px;
-    width: 21px;
-    outline: none;
-    display: inline-block;
-    vertical-align: top;
-    position: relative;
-    margin: 0;
-    cursor: pointer;
-    border-radius: 50%;
-    border: 1px solid var(--bc, var(--radio-button-border-color, var(--radio-button-default-border-color)));
-    background: var(--b, var(--radio-button-background-color, var(--radio-button-default-background-color)));
-    transition: background 0.3s, border-color 0.3s, box-shadow 0.2s;
-  }
+	@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
 
-  input[type="radio"]:after {
-    content: "";
-    display: block;
-    position: absolute;
-    width: 19px;
-    height: 19px;
-    border-radius: 50%;
-    background: var(--radio-button-active-inner-color, var(--radio-button-default-active-inner-color));
-    opacity: var(--o, 0);
-    transform: scale(var(--s, 0.7));
-    transition: transform 0.3s ease, opacity 0.2s;
-  }
+	@layer global.components {
+		.aurora-radio-button {
+			--_size: var(--radio-button-size, var(--radio-button-default-size));
+			--_duration: var(--radio-button-duration, var(--radio-button-default-duration));
 
-  input[type="radio"]:checked:not(:disabled) {
-    --b: var(--radio-button-active-color, var(--radio-button-default-active-color));
-    --bc: var(--radio-button-active-color, var(--radio-button-default-active-color));
-    --o: 1;
-    --s: 0.5;
-  }
+			display: inline-flex;
+			align-items: center;
+			gap: var(--radio-button-gap, var(--radio-button-default-gap));
+			box-sizing: border-box;
+			vertical-align: middle;
+			color: var(--radio-button-label-color, var(--radio-button-default-label-color));
+			font-size: var(--radio-button-label-font-size, var(--radio-button-default-label-font-size));
+			font-weight: var(
+				--radio-button-label-font-weight,
+				var(--radio-button-default-label-font-weight)
+			);
+			line-height: var(
+				--radio-button-label-line-height,
+				var(--radio-button-default-label-line-height)
+			);
+			cursor: pointer;
+			user-select: none;
+			-webkit-tap-highlight-color: transparent;
+		}
 
-  input[type="radio"]:disabled {
-    --b: var(--radio-button-disabled-color, var(--radio-button-default-disabled-color));
-    --bc: var(--radio-button-disabled-active-color, var(--radio-button-default-disabled-active-color));
-    cursor: not-allowed;
-    opacity: 0.9; 
-  }
+		.aurora-radio-button-labelled {
+			align-items: flex-start;
+		}
 
-  input[type="radio"]:disabled:checked {
-    --b: var(--radio-button-disabled-active-color, var(--radio-button-default-disabled-active-color));
-    --bc: var(--radio-button-border-color, var(--radio-button-default-border-color));
-    --o: 1;
-    --s: 0.5;
-  }
+		.aurora-radio-button-circle {
+			box-sizing: border-box;
+			display: grid;
+			flex-shrink: 0;
+			place-items: center;
+			width: var(--_size);
+			height: var(--_size);
+			margin: 0;
+			border: var(--radio-button-border-width, var(--radio-button-default-border-width)) solid
+				var(--radio-button-border-color, var(--radio-button-default-border-color));
+			border-radius: 50%;
+			background: var(--radio-button-background, var(--radio-button-default-background));
+			box-shadow: var(--radio-button-box-shadow, var(--radio-button-default-box-shadow));
+			font: inherit;
+			appearance: none;
+			cursor: inherit;
+			transition:
+				background var(--_duration) var(--global-ease),
+				border-color var(--_duration) var(--global-ease),
+				box-shadow var(--_duration) var(--global-ease);
+		}
 
-  input[type="radio"]:hover:not(:checked):not(:disabled) {
-    --bc: var(--radio-button-border-hover-color, var(--radio-button-default-border-hover-color));
-  }
+		.aurora-radio-button-labelled .aurora-radio-button-circle {
+			margin-block: calc((1lh - var(--_size)) / 2);
+		}
 
-  input[type="radio"]:focus {
-    box-shadow: 0 0 0 var(--radio-button-focus-shadow, var(--radio-button-default-focus-shadow));
-  }
+		.aurora-radio-button-circle::after {
+			content: '';
+			width: var(--radio-button-dot-size, var(--radio-button-default-dot-size));
+			height: var(--radio-button-dot-size, var(--radio-button-default-dot-size));
+			border-radius: 50%;
+			background: var(--radio-button-dot-color, var(--radio-button-default-dot-color));
+			transform: scale(0);
+			transition: transform var(--_duration)
+				var(--radio-button-easing, var(--radio-button-default-easing));
+		}
 
-  input[type="radio"] + label {
-    font-size: 14px;
-    line-height: 21px;
-    display: inline-block;
-    vertical-align: top;
-    cursor: pointer;
-    margin-left: 4px;
-  }
+		.aurora-radio-button-circle:checked {
+			border-color: var(
+				--radio-button-checked-border-color,
+				var(--radio-button-default-checked-border-color)
+			);
+			background: var(
+				--radio-button-checked-background,
+				var(--radio-button-default-checked-background)
+			);
+			box-shadow: var(
+				--radio-button-checked-box-shadow,
+				var(--radio-button-default-checked-box-shadow)
+			);
+		}
 
-  input[type="radio"]:disabled + label {
-    cursor: not-allowed;
-  }
-}
+		.aurora-radio-button-circle:checked::after {
+			transform: scale(1);
+		}
+
+		@media (hover: hover) {
+			.aurora-radio-button:hover .aurora-radio-button-circle:not(:checked, :disabled) {
+				border-color: var(
+					--radio-button-hover-border-color,
+					var(--radio-button-default-hover-border-color)
+				);
+			}
+		}
+
+		.aurora-radio-button-circle:focus-visible {
+			outline: var(--radio-button-focus-ring-width, var(--radio-button-default-focus-ring-width))
+				solid var(--radio-button-focus-ring-color, var(--radio-button-default-focus-ring-color));
+			outline-offset: var(
+				--radio-button-focus-ring-offset,
+				var(--radio-button-default-focus-ring-offset)
+			);
+		}
+
+		.aurora-radio-button-text {
+			display: flex;
+			flex-direction: column;
+			min-width: 0;
+		}
+
+		.aurora-radio-button-description {
+			color: var(
+				--radio-button-description-color,
+				var(--radio-button-default-description-color)
+			);
+			font-size: var(
+				--radio-button-description-font-size,
+				var(--radio-button-default-description-font-size)
+			);
+		}
+
+		.aurora-radio-button[data-card] {
+			display: flex;
+			padding: var(--radio-button-card-padding, var(--radio-button-default-card-padding));
+			border: var(--radio-button-card-border-width, var(--radio-button-default-card-border-width))
+				solid var(--radio-button-card-border-color, var(--radio-button-default-card-border-color));
+			border-radius: var(
+				--radio-button-card-border-radius,
+				var(--radio-button-default-card-border-radius)
+			);
+			background: var(--radio-button-card-background, var(--radio-button-default-card-background));
+			box-shadow: var(--radio-button-card-box-shadow, var(--radio-button-default-card-box-shadow));
+			transition:
+				background var(--_duration) var(--global-ease),
+				border-color var(--_duration) var(--global-ease);
+		}
+
+		@media (hover: hover) {
+			.aurora-radio-button[data-card]:hover:not(:has(:checked, :disabled)) {
+				border-color: var(
+					--radio-button-card-hover-border-color,
+					var(--radio-button-default-card-hover-border-color)
+				);
+			}
+		}
+
+		.aurora-radio-button[data-card]:has(:checked) {
+			border-color: var(
+				--radio-button-card-checked-border-color,
+				var(--radio-button-default-card-checked-border-color)
+			);
+			background: var(
+				--radio-button-card-checked-background,
+				var(--radio-button-default-card-checked-background)
+			);
+		}
+
+		.aurora-radio-button[data-card]:has(:focus-visible) {
+			outline: var(--radio-button-focus-ring-width, var(--radio-button-default-focus-ring-width))
+				solid var(--radio-button-focus-ring-color, var(--radio-button-default-focus-ring-color));
+			outline-offset: var(
+				--radio-button-focus-ring-offset,
+				var(--radio-button-default-focus-ring-offset)
+			);
+		}
+
+		.aurora-radio-button[data-card] .aurora-radio-button-circle:focus-visible {
+			outline: none;
+		}
+
+		.aurora-radio-button:has(.aurora-radio-button-circle:disabled) {
+			opacity: var(--radio-button-disabled-opacity, var(--radio-button-default-disabled-opacity));
+			cursor: not-allowed;
+		}
+	}
 </style>

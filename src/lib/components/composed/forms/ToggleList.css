@@ -1,0 +1,10 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--toggle-list-default-gap: 8px;
+		--toggle-list-default-width: auto;
+		--toggle-list-default-max-width: none;
+		--toggle-list-default-height: auto;
+	}
+}

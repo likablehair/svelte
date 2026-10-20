@@ -1,305 +1,394 @@
+<!-- @component
+Panel that slides in from a side of the screen (`position`), modal and on the browser's top layer (`<dialog>` with `showModal()`): it needs no z-index, the page behind is inert and does not scroll, focus stays inside and goes back where it was on close. It closes on Escape (only the topmost one, and not while a menu inside it is open), on a click on the backdrop, with the close button, with `close` from a snippet and with a `<form method="dialog">`; `persistent` blocks Escape and the backdrop. The content is mounted only while open. Every part is optional: `title` (which also names the drawer for screen readers), `closable`, the body (`children`, which scrolls) and `actionsSnippet`, pinned at the bottom. A bottom drawer (a bottom sheet) has a handle at the top: dragging it, or the header, down closes the drawer, while a short drag springs back (`handle`). The side is exposed as `data-position`; while closing, the `<dialog>` gets `data-closing`, while dragged `data-dragging`, and with the handle `data-handle`.
+-->
 <script lang="ts">
-  import '../../../css/main.css'
-  import './Drawer.css'
-  import Navigator from "$lib/components/simple/navigation/Navigator.svelte";
-  import type { Item } from "$lib/components/simple/navigation/Navigator.svelte";
-  import { onMount, type ComponentProps, type Snippet } from 'svelte';
-  import Teleporter from '$lib/utils/teleporter';
-  import Keyboarder, { type CallbackFunction } from '$lib/utils/keyboarder';
-  import { BROWSER } from 'esm-env';
+	import '../../../css/tokens.css';
+	import './Drawer.css';
+	import type { Snippet } from 'svelte';
+	import type { HTMLDialogAttributes } from 'svelte/elements';
+	import Button from '../buttons/Button.svelte';
+	import { CLOSE_ICON, leave, modal } from '../dialogs/modal.js';
+	import { sheetDrag } from './sheet.js';
+	import ToastList from '../notifiers/ToastList.svelte';
+	import { inheritedLocale } from '../../../utils/locale.js';
+	import { libraryTexts } from '../../../utils/texts.js';
 
-  interface Props {
-    open?: boolean;
-    position?: "left" | "top" | "right" | "bottom";
-    overlay?: boolean;
-    closeOnClickOutside?: boolean;
-    items?: Item[];
-    teleportedUid?: string;
-    _space?: string;
-    _openingSpeed?: string;
-    _backgroundColor?: string;
-    _color?: string;
-    _overflow?: string;
-    _borderRadius?: string;
-    _margin?: string;
-    _overlaySpeed?: string;
-    _overlayBackgroundColor?: string;
-    _overlayOpacity?: string;
-    onclose?: () => void
-    onitemClick?: ComponentProps<typeof Navigator>['onitemClick']
-    children?: Snippet<[]>
-  }
+	type Close = (event: Event) => void;
 
-  let {
-    open = $bindable(),
-    position = $bindable("left"),
-    overlay = $bindable(false),
-    closeOnClickOutside = true,
-    items = [],
-    teleportedUid = undefined,
-    _space = undefined,
-    _openingSpeed = undefined,
-    _backgroundColor = undefined,
-    _color = undefined,
-    _overflow = undefined,
-    _borderRadius = undefined,
-    _margin = undefined,
-    _overlaySpeed = undefined,
-    _overlayBackgroundColor = undefined,
-    _overlayOpacity = undefined,
-    onclose,
-    children,
-    onitemClick,
-  }: Props = $props();
+	interface Props
+		extends Omit<HTMLDialogAttributes, 'children' | 'class' | 'open' | 'onclose' | 'title'> {
+		/** Whether the drawer is open. `undefined` counts as closed. */
+		open?: boolean;
+		/** Side of the screen the drawer slides in from. */
+		position?: 'left' | 'right' | 'top' | 'bottom';
+		/** Keeps the drawer open on Escape and on a click on the backdrop. The close button, `close` from a snippet and a `<form method="dialog">` still close it. */
+		persistent?: boolean;
+		/** Shows a handle at the top of a bottom drawer: dragging it, or the header (not its buttons), down past a quarter of the panel (at least 48px, at most 160px), or with a flick, closes the drawer; a shorter drag springs back. Defaults to `true` with `position="bottom"`, `false` when `persistent` (with both, the drawer only springs back). The other sides have no handle. */
+		handle?: boolean;
+		/** Title in the header. It also names the drawer for screen readers: without it, pass `aria-label`. */
+		title?: string;
+		/** Shows a close button in the header. */
+		closable?: boolean;
+		/** Accessible name of the close button. Defaults to "Close", in the language of `locale`. */
+		closeLabel?: string;
+		/** BCP 47 locale of the texts: `it` and `en` are built in, other languages fall back to English. Defaults to the one set with `setDefaultLocale`, else `en`. */
+		locale?: string;
+		/** Called when the drawer closes itself (Escape, backdrop, close button, drag on the handle, `close` from a snippet, `<form method="dialog">`), with the event that caused it. Not called when `open` is set to `false` from outside. */
+		onclose?: (event: Event) => void;
+		/** The `<dialog>` element. */
+		drawerElement?: HTMLDialogElement;
+		/** Extra classes for each part. */
+		class?: {
+			drawer?: string;
+			backdrop?: string;
+			panel?: string;
+			handle?: string;
+			header?: string;
+			title?: string;
+			body?: string;
+			actions?: string;
+		};
+		/** Body of the drawer. It scrolls when it does not fit. */
+		children?: Snippet<[{ close: Close }]>;
+		/** Replaces the title text, inside the heading. */
+		titleSnippet?: Snippet<[{ title: string | undefined }]>;
+		/** Replaces the close button. Shown even without `closable`. */
+		closeSnippet?: Snippet<[{ close: Close; closeLabel: string }]>;
+		/** Footer pinned at the bottom of the panel, usually the buttons, aligned to the right. */
+		actionsSnippet?: Snippet<[{ close: Close }]>;
+	}
 
-  let drawerElement: HTMLElement,
-    localOpen: boolean = $state(false)
+	let {
+		open = $bindable(),
+		position = 'left',
+		persistent = false,
+		handle,
+		title,
+		closable = false,
+		closeLabel,
+		locale: localeProp,
+		onclose,
+		drawerElement = $bindable(),
+		class: clazz = {},
+		children,
+		titleSnippet,
+		closeSnippet,
+		actionsSnippet,
+		...rest
+	}: Props = $props();
 
-  onMount(() => {
-    if(!teleportedUid) {
-      // let oldCssVars = {
-      //   '--drawer-space': getComputedStyle(drawerElement).getPropertyValue('--drawer-space')
-      // }
+	const defaultLocale = inheritedLocale();
+	let locale = $derived(localeProp ?? defaultLocale());
+	let texts = $derived(libraryTexts(locale).drawer);
 
-      let tp = new Teleporter()
-      teleportedUid = tp.attachNode(drawerElement)
+	let drawerNode = $state<HTMLDialogElement>();
 
-      // drawerElement.style.setProperty('--drawer-space', oldCssVars['--drawer-space'])
-    }
+	const id = $props.id();
+	const titleId = `${id}-title`;
 
-    let keyboarderHandler: CallbackFunction = (params) => {
-      if(params.key == 'Escape' && open) closeDrawer()
-    }
-    Keyboarder.on(keyboarderHandler)
+	let hasTitle = $derived(!!title || !!titleSnippet);
+	let hasHeader = $derived(hasTitle || closable || !!closeSnippet);
+	let hasHandle = $derived(position === 'bottom' && (handle ?? !persistent));
 
-    return () => {
-      if(!!teleportedUid) {
-        let tp = new Teleporter()
-        tp.destroyNode(teleportedUid)
-      }
+	function close(event: Event) {
+		if (!open) return;
+		open = false;
+		onclose?.(event);
+	}
 
-      Keyboarder.off(keyboarderHandler)
-    }
-  })
-
-  function closeDrawer() {
-    open = false;
-    overlay = false;
-    if(onclose) {
-      onclose()
-    }
-  }
-
-  function handleClickOverlay() {
-    if(closeOnClickOutside) {
-      open = false;
-      overlay = false;
-      if(onclose) {
-        onclose()
-      }
-    }
-  }
-
-  let zIndex: number = $state(50)
-  $effect.pre(() => {
-    if(BROWSER && open && localOpen !== open) {
-      let otherDialogs: NodeListOf<HTMLElement> =
-      document.querySelectorAll("[data-dialog=true]");
-
-      let maxZIndex = 0;
-
-      if (otherDialogs.length > 0) {
-        otherDialogs.forEach((dialog) => {
-          let computedStyle = getComputedStyle(dialog)
-          let currentZIndex = computedStyle.getPropertyValue('--dialog-z-index')
-          if (!maxZIndex || maxZIndex < Number(currentZIndex))
-            maxZIndex = Number(currentZIndex);
-        });
-        zIndex = maxZIndex + 2;
-      }
-
-      let otherDrawers: NodeListOf<HTMLElement> =
-        document.querySelectorAll("[data-drawer=true]");
-
-      if (otherDrawers.length > 0) {
-        otherDrawers.forEach((dialog) => {
-          let computedStyle = getComputedStyle(dialog)
-          let currentZIndex = computedStyle.getPropertyValue('--drawer-z-index')
-          if (!maxZIndex || maxZIndex < Number(currentZIndex))
-            maxZIndex = Number(currentZIndex);
-        });
-        zIndex = maxZIndex + 2;
-      }
-
-      overlay = true
-      localOpen = true
-    } else if(BROWSER && !open && localOpen !== open) {
-      localOpen = false
-    }
-  })
+	$effect(() => {
+		if (open) delete drawerNode?.dataset.closing;
+	});
 </script>
 
-<div
-  class="drawer-container"
-  bind:this={drawerElement}
-  data-drawer={localOpen}
-  style:--drawer-space={_space}
-  style:--drawer-opening-speed={_openingSpeed}
-  style:--drawer-background-color={_backgroundColor}
-  style:--drawer-color={_color}
-  style:--drawer-overflow={_overflow}
-  style:--drawer-border-radius={_borderRadius}
-  style:--drawer-margin={_margin}
-  style:--drawer-overlay-speed={_overlaySpeed}
-  style:--drawer-overlay-background-color={_overlayBackgroundColor}
-  style:--drawer-overlay-opacity={_overlayOpacity}
-  style:--drawer-z-index={zIndex}
->
-  <div
-    style:position="fixed"
-    class="drawer-container"
-    class:left={position == 'left'}
-    class:right={position == 'right'}
-    class:top={position == 'top'}
-    class:bottom={position == 'bottom'}
-    class:opened={localOpen}
-    class:animate-left={position == "left"}
-    class:animate-right={position == "right"}
-    class:animate-bottom={position == "bottom"}
-    class:animate-top={position == "top"}
-    style:z-index={zIndex + 1}
-  >
-    {#if children}
-      {@render children()}
-    {:else}
-      <div
-        style:display="flex"
-        style:justify-content="center"
-        style:align-items="center"
-        style:margin-top={position == "left" || position == "right"
-          ? "10px"
-          : "0px"}
-        style:height={position == "top" || position == "bottom"
-          ? "100%"
-          : "fit-content"}
-      >
-        <Navigator
-          {items}
-          vertical={position == "right" || position == "left"}
-          {onitemClick}
-        />
-      </div>
-    {/if}
-  </div>
-  {#if overlay}
-    <div
-      onclick={handleClickOverlay}
-      onkeypress={handleClickOverlay}
-      class="overlay"
-      class:overlay-active={localOpen}
-      class:overlay-hidden={!localOpen}
-      style:z-index={zIndex}
-      role="button"
-      tabindex="0"
-    ></div>
-  {/if}
-</div>
+{#if open}
+	<dialog
+		aria-labelledby={hasTitle ? titleId : undefined}
+		{...rest}
+		class={['aurora-drawer', clazz.drawer]}
+		data-position={position}
+		data-handle={hasHandle ? '' : undefined}
+		bind:this={() => drawerNode, (node) => (drawerNode = drawerElement = node)}
+		{@attach modal({ persistent: () => persistent, dismiss: close })}
+		out:leave
+	>
+		<div class={['aurora-drawer-backdrop', clazz.backdrop]} data-backdrop></div>
+		<div
+			class={['aurora-drawer-panel', clazz.panel]}
+			{@attach hasHandle && sheetDrag({ persistent: () => persistent, dismiss: close })}
+		>
+			{#if hasHandle}
+				<div class={['aurora-drawer-handle', clazz.handle]} aria-hidden="true"></div>
+			{/if}
+			{#if hasHeader}
+				<header class={['aurora-drawer-header', clazz.header]}>
+					{#if hasTitle}
+						<h2 id={titleId} class={['aurora-drawer-title', clazz.title]}>
+							{#if titleSnippet}
+								{@render titleSnippet({ title })}
+							{:else}
+								{title}
+							{/if}
+						</h2>
+					{/if}
+					{#if closeSnippet}
+						{@render closeSnippet({ close, closeLabel: closeLabel ?? texts.close })}
+					{:else if closable}
+						<Button
+							class="aurora-drawer-close"
+							buttonType="icon"
+							variant="secondary"
+							size="sm"
+							icon={CLOSE_ICON}
+							aria-label={closeLabel ?? texts.close}
+							onclick={close}
+						/>
+					{/if}
+				</header>
+			{/if}
+			{#if children}
+				<div class={['aurora-drawer-body', clazz.body]}>{@render children({ close })}</div>
+			{/if}
+			{#if actionsSnippet}
+				<footer class={['aurora-drawer-actions', clazz.actions]}>{@render actionsSnippet({ close })}</footer>
+			{/if}
+		</div>
+		<ToastList />
+	</dialog>
+{/if}
 
 <style>
-  .animate-left {
-    transition: left var(--drawer-opening-speed, var(--drawer-default-opening-speed)) cubic-bezier(0.4, 0, 0.2, 1);
-  }
+	@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
 
-  .animate-right {
-    transition: right var(--drawer-opening-speed, var(--drawer-default-opening-speed)) cubic-bezier(0.4, 0, 0.2, 1);
-  }
+	@layer global.components {
+		:global(html):has(.aurora-drawer:modal) {
+			overflow: hidden;
+		}
 
-  .animate-bottom {
-    transition: bottom var(--drawer-opening-speed, var(--drawer-default-opening-speed)) cubic-bezier(0.4, 0, 0.2, 1);
-  }
+		.aurora-drawer {
+			--_duration: var(--drawer-duration, var(--drawer-default-duration));
+			--_easing: var(--drawer-easing, var(--drawer-default-easing));
+			--_bleed: calc(var(--global-focus-ring-width) + var(--global-focus-ring-offset));
+			--_size: var(--drawer-size, var(--drawer-default-size));
+			--_max-size: var(--drawer-max-size, var(--drawer-default-max-size));
+			--_border: var(--drawer-border-width, var(--drawer-default-border-width)) solid
+				var(--drawer-border-color, var(--drawer-default-border-color));
 
-  .animate-top {
-    transition: top var(--drawer-opening-speed, var(--drawer-default-opening-speed)) cubic-bezier(0.4, 0, 0.2, 1);
-  }
+			position: fixed;
+			inset: 0;
+			box-sizing: border-box;
+			width: 100%;
+			height: 100%;
+			max-width: none;
+			max-height: none;
+			margin: 0;
+			padding: 0;
+			border: 0;
+			background: none;
+			color: inherit;
+			overflow: clip;
+		}
 
-  .drawer-container {
-    background-color: var(
-      --drawer-background-color,
-      var(--drawer-default-background-color)
-    );
-    color: var(--drawer-color, var(--drawer-default-color));
-    overflow: var(--drawer-overflow, var(--drawer-default-overflow));
-    border-radius: var(--drawer-border-radius);
-    margin: var(--drawer-margin);
-  }
+		.aurora-drawer::backdrop {
+			background: none;
+		}
 
-  .overlay {
-    transition: all var(--drawer-overlay-speed, var(--drawer-default-overlay-speed)) cubic-bezier(0.4, 0, 0.2, 1);
-    background-color: var(
-      --drawer-overlay-background-color,
-      var(--drawer-default-overlay-background-color)
-    );
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    width: 100vw;
-    height: 100vh;
-  }
+		.aurora-drawer-backdrop {
+			position: absolute;
+			inset: 0;
+			background: var(--drawer-backdrop-background, var(--drawer-default-backdrop-background));
+			backdrop-filter: var(--drawer-backdrop-filter, var(--drawer-default-backdrop-filter));
+			animation: fade-in var(--_duration) var(--_easing);
+		}
 
-  .overlay-active {
-    opacity: var(
-      --drawer-overlay-opacity,
-      var(--drawer-default-overlay-opacity)
-    );
-  }
+		.aurora-drawer-panel {
+			position: absolute;
+			box-sizing: border-box;
+			display: flex;
+			flex-direction: column;
+			margin: var(--drawer-margin, var(--drawer-default-margin));
+			padding: var(--drawer-padding, var(--drawer-default-padding));
+			background: var(--drawer-background, var(--drawer-default-background));
+			color: var(--drawer-color, var(--drawer-default-color));
+			box-shadow: var(--drawer-box-shadow, var(--drawer-default-box-shadow));
+			animation: slide-in var(--_duration) var(--_easing);
+		}
 
-  .overlay-hidden {
-    opacity: 0%;
-    display: none;
-    z-index: -1;
-  }
+		.aurora-drawer[data-position='left'] .aurora-drawer-panel,
+		.aurora-drawer[data-position='right'] .aurora-drawer-panel {
+			top: 0;
+			bottom: 0;
+			width: var(--_size);
+			max-width: var(--_max-size);
+		}
 
-  .left {
-    left: calc(0px - var(--drawer-space, var(--drawer-default-space)));
-    width: var(--drawer-space, var(--drawer-default-space));
-    bottom: 0px;
-    top: 0px;
-  }
+		.aurora-drawer[data-position='top'] .aurora-drawer-panel,
+		.aurora-drawer[data-position='bottom'] .aurora-drawer-panel {
+			left: 0;
+			right: 0;
+			height: var(--_size);
+			max-height: var(--_max-size);
+		}
 
-  .left.opened {
-    left: 0px;
-  }
+		.aurora-drawer[data-position='left'] .aurora-drawer-panel {
+			--_from: -100% 0;
+			left: 0;
+			border-right: var(--_border);
+			border-radius: var(--drawer-border-radius, var(--drawer-default-left-border-radius));
+		}
 
-  .right {
-    right: calc(0px - var(--drawer-space, var(--drawer-default-space)));
-    width: var(--drawer-space, var(--drawer-default-space));
-    bottom: 0px;
-    top: 0px;
-  }
+		.aurora-drawer[data-position='right'] .aurora-drawer-panel {
+			--_from: 100% 0;
+			right: 0;
+			border-left: var(--_border);
+			border-radius: var(--drawer-border-radius, var(--drawer-default-right-border-radius));
+		}
 
-  .right.opened {
-    right: calc(0px);
-  }
+		.aurora-drawer[data-position='top'] .aurora-drawer-panel {
+			--_from: 0 -100%;
+			top: 0;
+			border-bottom: var(--_border);
+			border-radius: var(--drawer-border-radius, var(--drawer-default-top-border-radius));
+		}
 
-  .top {
-    left: 0px;
-    right: 0px;
-    height: var(--drawer-space, var(--drawer-default-space));
-    top: calc(0px - var(--drawer-space, var(--drawer-default-space)));
-  }
+		.aurora-drawer[data-position='bottom'] .aurora-drawer-panel {
+			--_from: 0 100%;
+			bottom: 0;
+			border-top: var(--_border);
+			border-radius: var(--drawer-border-radius, var(--drawer-default-bottom-border-radius));
+		}
 
-  .top.opened {
-    top: 0px;
-  }
+		.aurora-drawer[data-closing] .aurora-drawer-backdrop {
+			animation: fade-out var(--_duration) var(--_easing) forwards;
+		}
 
-  .bottom {
-    left: 0px;
-    right: 0px;
-    height: var(--drawer-space, var(--drawer-default-space));
-    bottom: calc(0px - var(--drawer-space, var(--drawer-default-space)));
-  }
+		.aurora-drawer[data-closing] .aurora-drawer-panel {
+			animation: slide-out var(--_duration) var(--_easing) forwards;
+		}
 
-  .bottom.opened {
-    bottom: 0px;
-  }
+		.aurora-drawer[data-handle] .aurora-drawer-panel {
+			transition: translate var(--_duration) var(--_easing);
+		}
+
+		.aurora-drawer[data-handle] .aurora-drawer-header {
+			touch-action: none;
+		}
+
+		.aurora-drawer[data-dragging] {
+			cursor: grabbing;
+			user-select: none;
+		}
+
+		.aurora-drawer[data-dragging] .aurora-drawer-panel {
+			transition: none;
+		}
+
+		.aurora-drawer-handle {
+			flex: none;
+			display: flex;
+			justify-content: center;
+			margin: var(--drawer-handle-margin, var(--drawer-default-handle-margin));
+			padding: var(--drawer-handle-padding, var(--drawer-default-handle-padding));
+			touch-action: none;
+			user-select: none;
+		}
+
+		.aurora-drawer-handle::before {
+			content: '';
+			width: var(--drawer-handle-width, var(--drawer-default-handle-width));
+			height: var(--drawer-handle-height, var(--drawer-default-handle-height));
+			border-radius: var(--drawer-handle-border-radius, var(--drawer-default-handle-border-radius));
+			background: var(--drawer-handle-background, var(--drawer-default-handle-background));
+		}
+
+		@media (hover: hover) {
+			.aurora-drawer-handle {
+				cursor: grab;
+			}
+
+			.aurora-drawer[data-dragging] .aurora-drawer-handle {
+				cursor: grabbing;
+			}
+		}
+
+		.aurora-drawer-header {
+			display: flex;
+			align-items: center;
+			gap: var(--drawer-header-gap, var(--drawer-default-header-gap));
+			padding: var(--drawer-header-padding, var(--drawer-default-header-padding));
+		}
+
+		.aurora-drawer-header:not(:last-child) {
+			margin-bottom: var(--drawer-header-margin-bottom, var(--drawer-default-header-margin-bottom));
+		}
+
+		.aurora-drawer-header > :global(.aurora-drawer-close) {
+			flex: none;
+			margin-inline-start: auto;
+		}
+
+		.aurora-drawer-title {
+			flex: 1 1 auto;
+			min-width: 0;
+			margin: 0;
+			color: var(--drawer-title-color, var(--drawer-default-title-color));
+			font-family: var(--drawer-title-font-family, var(--drawer-default-title-font-family));
+			font-size: var(--drawer-title-font-size, var(--drawer-default-title-font-size));
+			font-weight: var(--drawer-title-font-weight, var(--drawer-default-title-font-weight));
+			line-height: var(--drawer-title-line-height, var(--drawer-default-title-line-height));
+			letter-spacing: var(--drawer-title-letter-spacing, var(--drawer-default-title-letter-spacing));
+			overflow-wrap: anywhere;
+		}
+
+		.aurora-drawer-body {
+			flex: 1 1 auto;
+			min-height: 0;
+			margin: calc(-1 * var(--_bleed));
+			padding: var(--_bleed);
+			overflow: var(--drawer-overflow, var(--drawer-default-overflow));
+			overscroll-behavior: contain;
+			color: var(--drawer-body-color, var(--drawer-default-body-color));
+			font-size: var(--drawer-body-font-size, var(--drawer-default-body-font-size));
+			line-height: var(--drawer-body-line-height, var(--drawer-default-body-line-height));
+		}
+
+		.aurora-drawer-actions {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--drawer-actions-gap, var(--drawer-default-actions-gap));
+			justify-content: var(
+				--drawer-actions-justify-content,
+				var(--drawer-default-actions-justify-content)
+			);
+			padding: var(--drawer-actions-padding, var(--drawer-default-actions-padding));
+		}
+
+		.aurora-drawer-actions:not(:first-child) {
+			margin-top: var(--drawer-actions-margin-top, var(--drawer-default-actions-margin-top));
+		}
+	}
+
+	@keyframes fade-in {
+		from {
+			opacity: 0;
+		}
+	}
+
+	@keyframes fade-out {
+		to {
+			opacity: 0;
+		}
+	}
+
+	@keyframes slide-in {
+		from {
+			translate: var(--_from);
+		}
+	}
+
+	@keyframes slide-out {
+		to {
+			translate: var(--_from);
+		}
+	}
 </style>

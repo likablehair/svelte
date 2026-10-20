@@ -1,0 +1,30 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--tooltip-default-max-width: 280px;
+		--tooltip-default-padding: 6px 10px;
+		--tooltip-default-background: var(--global-color-text);
+		--tooltip-default-color: var(--global-color-bg);
+		--tooltip-default-text-color: inherit;
+		--tooltip-default-border-width: 0px;
+		--tooltip-default-border-color: transparent;
+		--tooltip-default-border-radius: var(--global-radius-sm);
+		--tooltip-default-box-shadow: var(--global-shadow-md);
+		--tooltip-default-font-size: 12px;
+		--tooltip-default-font-weight: 500;
+		--tooltip-default-line-height: 1.4;
+		--tooltip-default-title-font-weight: 600;
+		--tooltip-default-rich-max-width: 240px;
+		--tooltip-default-rich-padding: 12px;
+		--tooltip-default-rich-background: var(--global-color-surface-pop);
+		--tooltip-default-rich-color: var(--global-color-text);
+		--tooltip-default-rich-text-color: var(--global-color-text-3);
+		--tooltip-default-rich-border-width: var(--global-border-width);
+		--tooltip-default-rich-border-color: var(--global-color-border-strong);
+		--tooltip-default-rich-font-weight: 400;
+		--tooltip-default-arrow-size: 8px;
+		--tooltip-default-duration: var(--global-duration);
+		--tooltip-default-transition-distance: 4px;
+	}
+}

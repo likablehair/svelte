@@ -1,56 +1,16 @@
+<!-- @component
+Renders `defaultSnippet` with the breakpoints of the window as flags (`xs`, `s`, `m`, `l`, `xl`, `sAndDown`, `mAndDown`, `lAndUp`, ...), to show different markup on phones, tablets and desktops. The widths are those of v4 and of the components, which switch to their mobile variant on `mAndDown` (up to 1024px). The same flags are reactive in scripts as `breakpoints`. On the server the window counts as wide (`xl`).
+-->
 <script lang="ts">
-  import mediaQuery from "$lib/stores/mediaQuery";
-  import type { Snippet } from "svelte";
+	import type { Snippet } from 'svelte';
+	import { breakpoints, type Breakpoints } from '../../../utils/breakpoints.svelte.js';
 
-  interface Props {
-    defaultSnippet?: Snippet<[{
-      xs: boolean,
-      s: boolean,
-      m: boolean,
-      l: boolean,
-      xl: boolean,
-      xsAndDown: boolean,
-      sAndDown: boolean,
-      lAndDown: boolean,
-      mAndDown: boolean,
-      xlAndDown: boolean,
-      xlAndUp: boolean,
-      lAndUp: boolean,
-      mAndUp: boolean,
-      sAndUp: boolean,
-      xsAndUp: boolean
-    }]>,
-  }
+	interface Props {
+		/** Content, which receives the flags of the breakpoints (see `Breakpoints`). */
+		defaultSnippet?: Snippet<[Breakpoints]>;
+	}
 
-  let { defaultSnippet }: Props = $props() 
-
-  let xsAndDown = $derived($mediaQuery.xs);
-let sAndDown = $derived($mediaQuery.s || $mediaQuery.xs);
-let mAndDown = $derived($mediaQuery.s || $mediaQuery.xs || $mediaQuery.m);
-let lAndDown = $derived($mediaQuery.s || $mediaQuery.xs || $mediaQuery.m || $mediaQuery.l);
-let xlAndDown = $derived($mediaQuery.s || $mediaQuery.xs || $mediaQuery.m || $mediaQuery.l || $mediaQuery.xl);
-
-let xlAndUp = $derived($mediaQuery.xl);
-let lAndUp = $derived($mediaQuery.xl || $mediaQuery.l);
-let mAndUp = $derived($mediaQuery.xl || $mediaQuery.l || $mediaQuery.m);
-let sAndUp = $derived($mediaQuery.xl || $mediaQuery.l || $mediaQuery.m || $mediaQuery.s || $mediaQuery.xs);
-let xsAndUp = $derived($mediaQuery.xl || $mediaQuery.l || $mediaQuery.m || $mediaQuery.s || $mediaQuery.xs);
+	let { defaultSnippet }: Props = $props();
 </script>
 
-{@render defaultSnippet?.({
-  xs: $mediaQuery.xs,
-  s: $mediaQuery.s,
-  m: $mediaQuery.m,
-  l: $mediaQuery.l,
-  xl: $mediaQuery.xl,
-  xsAndDown,
-  sAndDown,
-  mAndDown,
-  lAndDown,
-  xlAndDown,
-  xlAndUp,
-  lAndUp,
-  mAndUp,
-  sAndUp,
-  xsAndUp,
-})}
+{@render defaultSnippet?.(breakpoints)}

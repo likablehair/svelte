@@ -1,0 +1,28 @@
+{
+	"name": "@likable-hair/svelte-migrate",
+	"version": "0.1.0",
+	"private": true,
+	"description": "Migrates apps from @likable-hair/svelte v4 (and v3) to v5",
+	"type": "module",
+	"bin": {
+		"svelte-migrate": "./dist/cli.js"
+	},
+	"exports": {
+		".": "./dist/index.js"
+	},
+	"files": [
+		"dist",
+		"rules",
+		"skills"
+	],
+	"scripts": {
+		"prepack": "node scripts/build.ts"
+	},
+	"engines": {
+		"node": ">=20"
+	},
+	"dependencies": {
+		"magic-string": "^1.4.3",
+		"svelte": "^5.57.2"
+	}
+}

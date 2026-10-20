@@ -1,0 +1,48 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--line-chart-default-width: 100%;
+		--line-chart-default-min-width: 12rem;
+		--line-chart-default-height: 16rem;
+		--line-chart-default-gap: 12px;
+		--line-chart-default-grid-color: var(--global-color-border);
+		--line-chart-default-tick-color: var(--global-color-text-3);
+		--line-chart-default-tick-font-family: var(--global-font-family-mono);
+		--line-chart-default-tick-font-size: 11px;
+		--line-chart-default-line-width: 3px;
+		--line-chart-default-gradient-from: var(--global-color-data-1);
+		--line-chart-default-gradient-via: var(--global-color-data-3);
+		--line-chart-default-gradient-to: var(--global-color-data-2);
+		--line-chart-default-glow-color: var(--global-color-primary-glow);
+		--line-chart-default-glow-blur: 10px;
+		--line-chart-default-point-background: var(--global-color-surface-pop);
+		--line-chart-default-crosshair-color: var(--global-color-border-strong);
+		--line-chart-default-reset-background: var(--global-color-surface-pop);
+		--line-chart-default-zoom-color: var(--global-color-primary);
+		--line-chart-default-legend-gap: 16px;
+		--line-chart-default-legend-font-size: 12.5px;
+		--line-chart-default-legend-color: var(--global-color-text-2);
+		--line-chart-default-legend-swatch-size: 8px;
+		--line-chart-default-legend-swatch-radius: 2px;
+		--line-chart-default-legend-hidden-opacity: 0.45;
+		--line-chart-default-legend-detail-color: var(--global-color-text);
+		--line-chart-default-legend-detail-font-family: var(--global-font-family-mono);
+		--line-chart-default-legend-min-width: 180px;
+		--line-chart-default-tooltip-background: var(--global-color-surface-pop);
+		--line-chart-default-tooltip-border-color: var(--global-color-border-strong);
+		--line-chart-default-tooltip-border-width: var(--global-border-width);
+		--line-chart-default-tooltip-radius: var(--global-radius-lg);
+		--line-chart-default-tooltip-shadow: var(--global-shadow-md);
+		--line-chart-default-tooltip-padding: 8px 12px;
+		--line-chart-default-tooltip-min-width: auto;
+		--line-chart-default-tooltip-color: var(--global-color-text);
+		--line-chart-default-tooltip-title-color: var(--global-color-text-3);
+		--line-chart-default-tooltip-title-font-family: var(--global-font-family-mono);
+		--line-chart-default-tooltip-title-font-size: 10.5px;
+		--line-chart-default-tooltip-label-color: var(--global-color-text-2);
+		--line-chart-default-tooltip-label-font-size: 12px;
+		--line-chart-default-tooltip-value-font-family: var(--global-font-family-display);
+		--line-chart-default-tooltip-value-font-size: 13px;
+	}
+}

@@ -1,0 +1,26 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.theme {
+	:root[data-theme='terminal'] {
+		--global-color-bg: light-dark(#f2f7ee, #050805);
+		--global-color-bg-2: light-dark(#e6efe0, #0a100a);
+		--global-color-surface: light-dark(rgb(255 255 255 / 0.7), rgb(51 255 102 / 0.03));
+		--global-color-surface-solid: light-dark(#fbfdf9, #0b120b);
+		--global-color-surface-pop: light-dark(#ffffff, #0f180f);
+		--global-color-border: light-dark(rgb(20 80 30 / 0.2), rgb(51 255 102 / 0.18));
+		--global-color-border-strong: light-dark(rgb(20 80 30 / 0.4), rgb(51 255 102 / 0.35));
+		--global-color-text: light-dark(#0f2a12, #b6ffc4);
+		--global-color-text-2: light-dark(#2f5a34, #6fe08a);
+		--global-color-text-3: light-dark(#3f6644, #3fa457);
+		--global-color-primary: light-dark(#13803a, #33ff66);
+		--global-color-on-primary: light-dark(#f2f7ee, #031006);
+		--global-color-accent: light-dark(#8a5300, #ffb000);
+		--global-gradient: linear-gradient(var(--global-color-primary), var(--global-color-primary));
+		--global-fill-gradient: var(--global-gradient);
+		--global-fill-primary: var(--global-gradient);
+		--global-shadow-md: 0 0 24px -8px var(--global-color-primary-glow);
+		--global-radius-scale: 0;
+		--global-font-family: ui-monospace, 'Cascadia Code', monospace;
+		--global-font-family-display: var(--global-font-family);
+	}
+}

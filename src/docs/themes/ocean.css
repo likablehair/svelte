@@ -1,0 +1,13 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.theme {
+	:root[data-theme='ocean'] {
+		--global-color-bg: light-dark(#eef6f8, #04141a);
+		--global-color-bg-2: light-dark(#e1eef2, #071d25);
+		--global-color-surface-solid: light-dark(#f8fcfd, #0a2430);
+		--global-color-surface-pop: light-dark(#ffffff, #0e2c3a);
+		--global-color-primary: light-dark(#007a8a, #2ec4d6);
+		--global-color-accent: light-dark(#1f5f9e, #6fb3ff);
+		--global-radius-scale: 1.5;
+	}
+}

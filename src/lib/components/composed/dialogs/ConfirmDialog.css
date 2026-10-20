@@ -1,0 +1,24 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--confirm-dialog-default-max-width: 420px;
+		--confirm-dialog-default-icon-size: 40px;
+		--confirm-dialog-default-icon-glyph-size: 20px;
+		--confirm-dialog-default-icon-border-radius: var(--global-radius-md);
+		--confirm-dialog-default-icon-ring-width: 6px;
+		--confirm-dialog-default-icon-gap: 16px;
+		--confirm-dialog-default-danger-icon-background: var(--global-color-error-soft);
+		--confirm-dialog-default-danger-icon-color: var(--global-color-error);
+		--confirm-dialog-default-danger-icon-ring-color: color-mix(
+			in oklab,
+			var(--global-color-error) 6%,
+			transparent
+		);
+		--confirm-dialog-default-primary-icon-background: var(--global-color-primary-soft);
+		--confirm-dialog-default-primary-icon-color: var(--global-color-primary);
+		--confirm-dialog-default-primary-icon-ring-color: var(--global-color-primary-soft);
+		--confirm-dialog-default-paragraph-gap: 8px;
+		--confirm-dialog-default-content-gap: 16px;
+	}
+}

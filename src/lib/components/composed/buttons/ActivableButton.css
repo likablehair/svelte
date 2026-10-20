@@ -1,0 +1,31 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--activable-button-default-background: var(--global-color-surface-2);
+		--activable-button-default-color: var(--global-color-text-2);
+		--activable-button-default-border-color: var(--global-color-border);
+		--activable-button-default-hover-background: var(--global-color-surface-3);
+		--activable-button-default-hover-color: var(--global-color-text);
+		--activable-button-default-hover-border-color: var(--global-color-border-strong);
+		--activable-button-default-active-background: var(--global-color-primary-soft);
+		--activable-button-default-active-color: var(--global-color-primary);
+		--activable-button-default-active-border-color: color-mix(
+			in oklab,
+			var(--global-color-primary) 50%,
+			transparent
+		);
+		--activable-button-default-active-hover-background: color-mix(
+			in oklab,
+			var(--global-color-primary) 18%,
+			transparent
+		);
+		--activable-button-default-active-hover-color: var(--global-color-primary);
+		--activable-button-default-active-hover-border-color: var(--global-color-primary);
+		--activable-button-default-dot-size: 7px;
+		--activable-button-default-dot-color: var(--global-color-text-3);
+		--activable-button-default-active-dot-color: var(--global-color-primary);
+		--activable-button-default-active-dot-box-shadow: 0 0 0 3px
+			color-mix(in oklab, var(--global-color-primary) 25%, transparent);
+	}
+}

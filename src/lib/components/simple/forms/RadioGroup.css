@@ -1,0 +1,18 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--radio-group-default-gap: 10px;
+		--radio-group-default-items-gap: 10px;
+		--radio-group-default-horizontal-items-gap: 10px 20px;
+		--radio-group-default-card-min-width: 150px;
+		--radio-group-default-label-color: var(--global-input-label-color);
+		--radio-group-default-label-font-size: var(--global-input-label-font-size);
+		--radio-group-default-label-font-weight: var(--global-input-label-font-weight);
+		--radio-group-default-hint-color: var(--global-input-hint-color);
+		--radio-group-default-hint-font-size: var(--global-input-hint-font-size);
+		--radio-group-default-error-color: var(--global-input-error-color);
+		--radio-group-default-success-color: var(--global-input-success-color);
+		--radio-group-default-icon-size: 18px;
+	}
+}

@@ -1,11 +1,38 @@
-.DS_Store
 node_modules
+
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
 /build
 /dist
-/.svelte-kit
-/package
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor and tools
+.vscode
+.playwright-mcp/
+
+# Env
 .env
 .env.*
 !.env.example
-.vscode
-.vercel
+!.env.test
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Tests
+/tests/visual/report
+/tests/visual/results
+/tests/components/__screenshots__
+
+# Built packages
+/mcp/dist
+/mcp/bundled
+/migrate/dist

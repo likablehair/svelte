@@ -1,0 +1,8 @@
+:root {
+	--button-default-background-color: rgb(var(--global-color-primary-500));
+	--global-color-light-primary-500: 1, 2, 3;
+}
+
+.dark .card {
+	color: red;
+}

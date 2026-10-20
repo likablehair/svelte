@@ -1,8 +1,61 @@
-:root {
-  --avatar-default-width: 40px;
-  --avatar-default-height: 40px;
-  --avatar-default-border-radius: 9999px;
-  --avatar-default-background-color: rgb(var(--global-color-primary-500));
-  --avatar-default-text-color: rgb(var(--global-color-grey-50));
-  --avatar-default-text-weight: 700;
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--avatar-default-size: 40px;
+		--avatar-default-xs-size: 24px;
+		--avatar-default-sm-size: 32px;
+		--avatar-default-lg-size: 56px;
+		--avatar-default-xl-size: 80px;
+		--avatar-default-font-scale: 0.38;
+		--avatar-default-font-weight: 600;
+		--avatar-default-icon-scale: 0.6;
+		--avatar-default-border-radius: 50%;
+		--avatar-default-square-border-radius: 30%;
+		--avatar-default-color: light-dark(var(--global-color-on-primary), var(--global-color-bg));
+		--avatar-default-background-1: linear-gradient(
+			135deg,
+			light-dark(color-mix(in oklab, var(--global-color-data-1), black 14%), color-mix(in oklab, var(--global-color-data-1), white 22%)),
+			light-dark(color-mix(in oklab, color-mix(in oklab, var(--global-color-data-1), var(--global-color-data-3) 55%), black 14%), color-mix(in oklab, color-mix(in oklab, var(--global-color-data-1), var(--global-color-data-3) 55%), white 22%))
+		);
+		--avatar-default-background-2: linear-gradient(
+			135deg,
+			light-dark(color-mix(in oklab, var(--global-color-data-2), black 14%), color-mix(in oklab, var(--global-color-data-2), white 22%)),
+			light-dark(color-mix(in oklab, color-mix(in oklab, var(--global-color-data-2), var(--global-color-data-1) 55%), black 14%), color-mix(in oklab, color-mix(in oklab, var(--global-color-data-2), var(--global-color-data-1) 55%), white 22%))
+		);
+		--avatar-default-background-3: linear-gradient(
+			135deg,
+			light-dark(color-mix(in oklab, var(--global-color-data-3), black 14%), color-mix(in oklab, var(--global-color-data-3), white 22%)),
+			light-dark(color-mix(in oklab, color-mix(in oklab, var(--global-color-data-3), var(--global-color-data-6) 50%), black 14%), color-mix(in oklab, color-mix(in oklab, var(--global-color-data-3), var(--global-color-data-6) 50%), white 22%))
+		);
+		--avatar-default-background-4: linear-gradient(
+			135deg,
+			light-dark(color-mix(in oklab, var(--global-color-data-4), black 14%), color-mix(in oklab, var(--global-color-data-4), white 22%)),
+			light-dark(color-mix(in oklab, color-mix(in oklab, var(--global-color-data-4), var(--global-color-data-2) 55%), black 14%), color-mix(in oklab, color-mix(in oklab, var(--global-color-data-4), var(--global-color-data-2) 55%), white 22%))
+		);
+		--avatar-default-background-5: linear-gradient(
+			135deg,
+			light-dark(color-mix(in oklab, var(--global-color-data-5), black 14%), color-mix(in oklab, var(--global-color-data-5), white 22%)),
+			light-dark(color-mix(in oklab, color-mix(in oklab, var(--global-color-data-5), var(--global-color-data-6) 45%), black 14%), color-mix(in oklab, color-mix(in oklab, var(--global-color-data-5), var(--global-color-data-6) 45%), white 22%))
+		);
+		--avatar-default-background-6: linear-gradient(
+			135deg,
+			light-dark(color-mix(in oklab, var(--global-color-data-6), black 14%), color-mix(in oklab, var(--global-color-data-6), white 22%)),
+			light-dark(color-mix(in oklab, color-mix(in oklab, var(--global-color-data-6), var(--global-color-data-5) 40%), black 14%), color-mix(in oklab, color-mix(in oklab, var(--global-color-data-6), var(--global-color-data-5) 40%), white 22%))
+		);
+		--avatar-default-primary-background: var(--global-fill-gradient);
+		--avatar-default-primary-color: var(--global-color-on-primary);
+		--avatar-default-neutral-background: color-mix(in oklab, var(--global-color-surface-solid), var(--global-color-text) 12%);
+		--avatar-default-neutral-color: var(--global-color-text-2);
+		--avatar-default-gap-color: var(--global-color-bg);
+		--avatar-default-ring-gap: 2px;
+		--avatar-default-ring-width: 2px;
+		--avatar-default-ring-color: var(--global-color-primary);
+		--avatar-default-status-size: 28%;
+		--avatar-default-status-border-width: 2px;
+		--avatar-default-online-status-color: var(--global-color-success);
+		--avatar-default-away-status-color: var(--global-color-warning);
+		--avatar-default-busy-status-color: var(--global-color-error);
+		--avatar-default-offline-status-color: var(--global-color-text-3);
+	}
 }

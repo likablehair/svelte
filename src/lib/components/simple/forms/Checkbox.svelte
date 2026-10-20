@@ -1,194 +1,172 @@
+<!-- @component
+Checkbox with an optional label next to it. It renders a native `<input type="checkbox">` inside a `<label>`, so a click on the text toggles it: `name`, `value`, `required`, `disabled` and events (`onchange`, `onclick`, ...) work as in HTML. `indeterminate` shows the partial state of a "select all"; a click clears it, as in HTML. To know whether Shift was held (range selection), read `event.shiftKey` in `onclick`: it works for a click on the box, and in Chromium also for the Space key and a click on the text (Firefox reports Shift+Space without Shift and does not toggle the box on a Shift+click on the text). Its state is exposed as `data-checked`, `data-indeterminate` and `data-disabled` for app CSS.
+-->
 <script lang="ts">
-  import './Checkbox.css'
-  import '../../../css/main.css'
-  import { onMount } from 'svelte';
-  import type { HTMLInputAttributes } from 'svelte/elements';
+	import '../../../css/tokens.css';
+	import './Checkbox.css';
+	import type { Snippet } from 'svelte';
+	import type { HTMLInputAttributes } from 'svelte/elements';
 
-  interface Props extends Omit<HTMLInputAttributes,
-  'onchange' | 'disabled' | 'id' | 'type' | 'checked'> {
-    value?: boolean;
-    id?: string;
-    disabled?: boolean;
-    onchange?: (event: {
-      detail: {
-        shiftKeyPressed: boolean,
-        nativeEvent: Event
-      }
-    }) => void
-  }
+	interface Props
+		extends Omit<HTMLInputAttributes, 'type' | 'checked' | 'class' | 'children' | 'indeterminate'> {
+		/** Checked state. */
+		checked?: boolean;
+		/** Partial state, for example a "select all" with only some rows selected. A click clears it and toggles `checked`. */
+		indeterminate?: boolean;
+		/** Text next to the box. A click on it toggles the checkbox. */
+		label?: string;
+		/** Native `disabled`. */
+		disabled?: boolean;
+		/** The native `<input>` element. */
+		input?: HTMLInputElement;
+		/** Extra classes for each part: the root `<label>`, the input and the text. */
+		class?: {
+			container?: string;
+			input?: string;
+			label?: string;
+		};
+		/** Replaces the text next to the box (for example to add a link). A click on it still toggles the checkbox. */
+		labelSnippet?: Snippet<[{ label: string | undefined }]>;
+	}
 
-  let { 
-    value = $bindable(), 
-    id = undefined, 
-    disabled = false,
-    onchange,
-    ...rest
-  }: Props = $props();
+	let {
+		checked = $bindable(),
+		indeterminate = $bindable(),
+		label,
+		disabled = false,
+		input = $bindable(),
+		class: clazz = {},
+		labelSnippet,
+		...rest
+	}: Props = $props();
 
-  onMount(() => {
-    window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('keyup', handleKeyUp)
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-      window.removeEventListener('keyup', handleKeyUp)
-    }
-  })
-
-  function handleKeyDown(event: KeyboardEvent) {
-    if(event.key == 'Shift') {
-      shiftKeyPressed = true
-    }
-  }
-
-  function handleKeyUp(event: KeyboardEvent) {
-    if(event.key == 'Shift') {
-      shiftKeyPressed = false
-    }
-  }
-
-  let shiftKeyPressed: boolean = false
-
-  function handleChange(e: Event) {
-    if(onchange) {
-      onchange({
-        detail: {
-          shiftKeyPressed, 
-          nativeEvent: e
-        }
-      })
-    }
-  }
+	let labelled = $derived(!!label || !!labelSnippet);
 </script>
 
-<input
-  {id}
-  type="checkbox"
-  bind:checked={value}
-  onchange={handleChange}
-  {disabled}
-  {...rest}
-/>
+<label
+	class={['aurora-checkbox', labelled && 'aurora-checkbox-labelled', clazz.container]}
+	data-checked={checked || undefined}
+	data-indeterminate={indeterminate || undefined}
+	data-disabled={disabled || undefined}
+>
+	<input
+		{...rest}
+		bind:this={input}
+		bind:checked
+		bind:indeterminate
+		type="checkbox"
+		{disabled}
+		class={['aurora-checkbox-box', clazz.input]}
+	/>
+	{#if labelSnippet}
+		<span class={['aurora-checkbox-label', clazz.label]}>{@render labelSnippet({ label })}</span>
+	{:else if label}
+		<span class={['aurora-checkbox-label', clazz.label]}>{label}</span>
+	{/if}
+</label>
 
 <style>
-  @supports (-webkit-appearance: none) or (-moz-appearance: none) {
-    input[type="checkbox"] {
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-      height: 21px;
-      min-height: 21px;
-      outline: none;
-      display: inline-block;
-      vertical-align: top;
-      position: relative;
-      margin: 0;
-      cursor: pointer;
-      border: 1px solid var(--bc, var(
-        --checkbox-border-color,
-        var(--checkbox-default-border-color)
-      ));
-      background: var(--b, var(
-        --checkbox-background-color,
-        var(--checkbox-default-background-color)
-      ));
-      transition: background 0.3s, border-color 0.3s, box-shadow 0.2s;
-      width: 21px;
-      min-width: 21px;
-      border-radius: 8px;
-    }
+	@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
 
-    input[type="checkbox"]:after {
-      content: "";
-      display: block;
-      position: absolute;
-      opacity: var(--o, 0);
-      transition: transform var(--d-t, 0.3s) var(--d-t-e, ease),
-        opacity var(--d-o, 0.2s);
-      width: 5px;
-      height: 9px;
-      border: 2px solid var(
-        --checkbox-active-inner-color,
-        var(--checkbox-default-active-inner-color)
-      );
-      border-top: 0;
-      border-left: 0;
-      left: 7px;
-      top: 4px;
-      transform: rotate(var(--r, 20deg));
-      box-sizing: border-box;
-    }
+	@layer global.components {
+		.aurora-checkbox {
+			--_size: var(--checkbox-size, var(--checkbox-default-size));
 
-    input[type="checkbox"]:checked:not(:disabled) {
-      --b: var(
-        --checkbox-active-color,
-        var(--checkbox-default-active-color)
-      );
-      --bc: var(
-        --checkbox-active-color,
-        var(--checkbox-default-active-color)
-      );
-      --d-o: 0.3s;
-      --d-t: 0.6s;
-      --d-t-e: cubic-bezier(0.2, 0.85, 0.32, 1.2);
-      --o: 1;
-      --r: 43deg;
-    }
+			display: inline-flex;
+			align-items: center;
+			gap: var(--checkbox-gap, var(--checkbox-default-gap));
+			vertical-align: middle;
+			color: var(--checkbox-label-color, var(--checkbox-default-label-color));
+			font-size: var(--checkbox-label-font-size, var(--checkbox-default-label-font-size));
+			font-weight: var(--checkbox-label-font-weight, var(--checkbox-default-label-font-weight));
+			line-height: var(--checkbox-label-line-height, var(--checkbox-default-label-line-height));
+			cursor: pointer;
+			user-select: none;
+			-webkit-tap-highlight-color: transparent;
+		}
 
-    input[type="checkbox"]:disabled {
-      --b: var(
-        --checkbox-disabled-color,
-        var(--checkbox-default-disabled-color)
-      );
-      --bc: var(
-        --checkbox-disabled-active-color,
-        var(--checkbox-default-disabled-active-color)
-      );
-      cursor: not-allowed;
-      opacity: 0.5;
-    }
+		.aurora-checkbox-labelled {
+			align-items: flex-start;
+		}
 
-    input[type="checkbox"]:disabled:checked {
-      --b: var(
-        --checkbox-disabled-active-color,
-        var(--checkbox-default-disabled-active-color)
-      );
-      --bc: var(
-        --checkbox-border-color,
-        var(--checkbox-default-border-color)
-      );
-      --d-o: 0.3s;
-      --d-t: 0.6s;
-      --d-t-e: cubic-bezier(0.2, 0.85, 0.32, 1.2);
-      --o: .7;
-      --r: 43deg;
-    }
+		.aurora-checkbox-box {
+			box-sizing: border-box;
+			display: grid;
+			flex-shrink: 0;
+			place-items: center;
+			width: var(--_size);
+			height: var(--_size);
+			margin: 0;
+			border: var(--checkbox-border-width, var(--checkbox-default-border-width)) solid
+				var(--checkbox-border-color, var(--checkbox-default-border-color));
+			border-radius: var(--checkbox-border-radius, var(--checkbox-default-border-radius));
+			background: var(--checkbox-background, var(--checkbox-default-background));
+			box-shadow: var(--checkbox-box-shadow, var(--checkbox-default-box-shadow));
+			font: inherit;
+			appearance: none;
+			cursor: inherit;
+			transition:
+				background var(--checkbox-duration, var(--checkbox-default-duration)) var(--global-ease),
+				border-color var(--checkbox-duration, var(--checkbox-default-duration)) var(--global-ease),
+				box-shadow var(--checkbox-duration, var(--checkbox-default-duration)) var(--global-ease);
+		}
 
-    input[type="checkbox"]:hover:not(:checked):not(:disabled) {
-      --bc: var(
-        --checkbox-border-hover-color,
-        var(--checkbox-default-border-hover-color)
-      );
-    }
-    input[type="checkbox"]:focus {
-      box-shadow: 0 0 0 var(
-        --checkbox-focus-shadow,
-        var(--checkbox-default-focus-shadow)
-      );
-    }
+		.aurora-checkbox-labelled .aurora-checkbox-box {
+			margin-block: calc((1lh - var(--_size)) / 2);
+		}
 
-    input[type="checkbox"]:after {
-      width: 5px;
-      height: 9px;
-      border: 2px solid var(
-        --checkbox-active-inner-color,
-        var(--checkbox-default-active-inner-color)
-      );
-      border-top: 0;
-      border-left: 0;
-      left: 7px;
-      top: 4px;
-      transform: rotate(var(--r, 20deg));
-    }
-  }
+		.aurora-checkbox-box::after {
+			content: '';
+			box-sizing: border-box;
+			width: calc(var(--_size) * 0.55);
+			height: calc(var(--_size) * 0.33);
+			margin-top: calc(var(--_size) * -0.1);
+			border-left: var(--checkbox-mark-thickness, var(--checkbox-default-mark-thickness)) solid
+				var(--checkbox-mark-color, var(--checkbox-default-mark-color));
+			border-bottom: var(--checkbox-mark-thickness, var(--checkbox-default-mark-thickness)) solid
+				var(--checkbox-mark-color, var(--checkbox-default-mark-color));
+			transform: rotate(-45deg) scale(0);
+			transition: transform var(--checkbox-duration, var(--checkbox-default-duration))
+				var(--checkbox-easing, var(--checkbox-default-easing));
+		}
+
+		.aurora-checkbox-box:checked,
+		.aurora-checkbox-box:indeterminate {
+			border-color: var(--checkbox-checked-border-color, var(--checkbox-default-checked-border-color));
+			background: var(--checkbox-checked-background, var(--checkbox-default-checked-background));
+			box-shadow: var(--checkbox-checked-box-shadow, var(--checkbox-default-checked-box-shadow));
+		}
+
+		.aurora-checkbox-box:checked::after {
+			transform: rotate(-45deg) scale(1);
+		}
+
+		.aurora-checkbox-box:indeterminate::after {
+			height: 0;
+			margin: 0;
+			border-left: 0;
+			transform: none;
+		}
+
+		@media (hover: hover) {
+			.aurora-checkbox:hover .aurora-checkbox-box:not(:checked, :indeterminate, :disabled) {
+				border-color: var(--checkbox-hover-border-color, var(--checkbox-default-hover-border-color));
+			}
+		}
+
+		.aurora-checkbox-box:focus-visible {
+			outline: var(--checkbox-focus-ring-width, var(--checkbox-default-focus-ring-width)) solid
+				var(--checkbox-focus-ring-color, var(--checkbox-default-focus-ring-color));
+			outline-offset: var(--checkbox-focus-ring-offset, var(--checkbox-default-focus-ring-offset));
+		}
+
+		.aurora-checkbox:has(.aurora-checkbox-box:disabled) {
+			opacity: var(--checkbox-disabled-opacity, var(--checkbox-default-disabled-opacity));
+			cursor: not-allowed;
+		}
+
+		.aurora-checkbox-label {
+			min-width: 0;
+		}
+	}
 </style>

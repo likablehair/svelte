@@ -1,265 +1,81 @@
-export const countriesList = [
-  { alpha2: "AD", name: "Andorra" },
-  { alpha2: "AE", name: "United Arab Emirates" },
-  { alpha2: "AF", name: "Afghanistan" },
-  { alpha2: "AG", name: "Antigua and Barbuda" },
-  { alpha2: "AI", name: "Anguilla" },
-  { alpha2: "AL", name: "Albania" },
-  { alpha2: "AM", name: "Armenia" },
-  { alpha2: "AO", name: "Angola" },
-  { alpha2: "AQ", name: "Antarctica" },
-  { alpha2: "AR", name: "Argentina" },
-  { alpha2: "AS", name: "American Samoa" },
-  { alpha2: "AT", name: "Austria" },
-  { alpha2: "AU", name: "Australia" },
-  { alpha2: "AW", name: "Aruba" },
-  { alpha2: "AX", name: "Åland Islands" },
-  { alpha2: "AZ", name: "Azerbaijan" },
-  { alpha2: "BA", name: "Bosnia and Herzegovina" },
-  { alpha2: "BB", name: "Barbados" },
-  { alpha2: "BD", name: "Bangladesh" },
-  { alpha2: "BE", name: "Belgium" },
-  { alpha2: "BF", name: "Burkina Faso" },
-  { alpha2: "BG", name: "Bulgaria" },
-  { alpha2: "BH", name: "Bahrain" },
-  { alpha2: "BI", name: "Burundi" },
-  { alpha2: "BJ", name: "Benin" },
-  { alpha2: "BL", name: "Saint Barthélemy" },
-  { alpha2: "BM", name: "Bermuda" },
-  { alpha2: "BN", name: "Brunei Darussalam" },
-  { alpha2: "BO", name: "Bolivia" },
-  { alpha2: "BQ", name: "Bonaire, Sint Eustatius and Saba" },
-  { alpha2: "BR", name: "Brazil" },
-  { alpha2: "BS", name: "Bahamas" },
-  { alpha2: "BT", name: "Bhutan" },
-  { alpha2: "BV", name: "Bouvet Island" },
-  { alpha2: "BW", name: "Botswana" },
-  { alpha2: "BY", name: "Belarus" },
-  { alpha2: "BZ", name: "Belize" },
-  { alpha2: "CA", name: "Canada" },
-  { alpha2: "CC", name: "Cocos (Keeling) Islands" },
-  { alpha2: "CD", name: "Congo, Democratic Republic" },
-  { alpha2: "CF", name: "Central African Republic" },
-  { alpha2: "CG", name: "Congo" },
-  { alpha2: "CH", name: "Switzerland" },
-  { alpha2: "CI", name: "Cote d'Ivoire" },
-  { alpha2: "CK", name: "Cook Islands" },
-  { alpha2: "CL", name: "Chile" },
-  { alpha2: "CM", name: "Cameroon" },
-  { alpha2: "CN", name: "China" },
-  { alpha2: "CO", name: "Colombia" },
-  { alpha2: "CR", name: "Costa Rica" },
-  { alpha2: "CU", name: "Cuba" },
-  { alpha2: "CV", name: "Cabo Verde" },
-  { alpha2: "CW", name: "Curaçao" },
-  { alpha2: "CX", name: "Christmas Island" },
-  { alpha2: "CY", name: "Cyprus" },
-  { alpha2: "CZ", name: "Czech Republic" },
-  { alpha2: "DE", name: "Germany" },
-  { alpha2: "DJ", name: "Djibouti" },
-  { alpha2: "DK", name: "Denmark" },
-  { alpha2: "DM", name: "Dominica" },
-  { alpha2: "DO", name: "Dominican Republic" },
-  { alpha2: "DZ", name: "Algeria" },
-  { alpha2: "EC", name: "Ecuador" },
-  { alpha2: "EE", name: "Estonia" },
-  { alpha2: "EG", name: "Egypt" },
-  { alpha2: "EH", name: "Western Sahara" },
-  { alpha2: "ER", name: "Eritrea" },
-  { alpha2: "ES", name: "Spain" },
-  { alpha2: "ET", name: "Ethiopia" },
-  { alpha2: "FI", name: "Finland" },
-  { alpha2: "FJ", name: "Fiji" },
-  { alpha2: "FK", name: "Falkland Islands (Malvinas)" },
-  { alpha2: "FM", name: "Micronesia, Federated States of" },
-  { alpha2: "FO", name: "Faroe Islands" },
-  { alpha2: "FR", name: "France" },
-  { alpha2: "GA", name: "Gabon" },
-  { alpha2: "GB", name: "United Kingdom" },
-  { alpha2: "GD", name: "Grenada" },
-  { alpha2: "GE", name: "Georgia" },
-  { alpha2: "GF", name: "French Guiana" },
-  { alpha2: "GG", name: "Guernsey" },
-  { alpha2: "GH", name: "Ghana" },
-  { alpha2: "GI", name: "Gibraltar" },
-  { alpha2: "GL", name: "Greenland" },
-  { alpha2: "GM", name: "Gambia" },
-  { alpha2: "GN", name: "Guinea" },
-  { alpha2: "GP", name: "Guadeloupe" },
-  { alpha2: "GQ", name: "Equatorial Guinea" },
-  { alpha2: "GR", name: "Greece" },
-  { alpha2: "GS", name: "South Georgia and the South Sandwich Islands" },
-  { alpha2: "GT", name: "Guatemala" },
-  { alpha2: "GU", name: "Guam" },
-  { alpha2: "GW", name: "Guinea-Bissau" },
-  { alpha2: "GY", name: "Guyana" },
-  { alpha2: "HK", name: "Hong Kong" },
-  { alpha2: "HM", name: "Heard Island and McDonald Islands" },
-  { alpha2: "HN", name: "Honduras" },
-  { alpha2: "HR", name: "Croatia" },
-  { alpha2: "HT", name: "Haiti" },
-  { alpha2: "HU", name: "Hungary" },
-  { alpha2: "ID", name: "Indonesia" },
-  { alpha2: "IE", name: "Ireland" },
-  { alpha2: "IL", name: "Israel" },
-  { alpha2: "IM", name: "Isle of Man" },
-  { alpha2: "IN", name: "India" },
-  { alpha2: "IO", name: "British Indian Ocean Territory" },
-  { alpha2: "IQ", name: "Iraq" },
-  { alpha2: "IR", name: "Iran, Islamic Republic of" },
-  { alpha2: "IS", name: "Iceland" },
-  { alpha2: "IT", name: "Italy" },
-  { alpha2: "JE", name: "Jersey" },
-  { alpha2: "JM", name: "Jamaica" },
-  { alpha2: "JO", name: "Jordan" },
-  { alpha2: "JP", name: "Japan" },
-  { alpha2: "KE", name: "Kenya" },
-  { alpha2: "KG", name: "Kyrgyzstan" },
-  { alpha2: "KH", name: "Cambodia" },
-  { alpha2: "KI", name: "Kiribati" },
-  { alpha2: "KM", name: "Comoros" },
-  { alpha2: "KN", name: "Saint Kitts and Nevis" },
-  { alpha2: "KP", name: "Korea (Democratic People's Republic of)" },
-  { alpha2: "KR", name: "Korea, Republic of" },
-  { alpha2: "KW", name: "Kuwait" },
-  { alpha2: "KY", name: "Cayman Islands" },
-  { alpha2: "KZ", name: "Kazakhstan" },
-  { alpha2: "LA", name: "Lao People's Democratic Republic" },
-  { alpha2: "LB", name: "Lebanon" },
-  { alpha2: "LC", name: "Saint Lucia" },
-  { alpha2: "LI", name: "Liechtenstein" },
-  { alpha2: "LK", name: "Sri Lanka" },
-  { alpha2: "LR", name: "Liberia" },
-  { alpha2: "LS", name: "Lesotho" },
-  { alpha2: "LT", name: "Lithuania" },
-  { alpha2: "LU", name: "Luxembourg" },
-  { alpha2: "LV", name: "Latvia" },
-  { alpha2: "LY", name: "Libya" },
-  { alpha2: "MA", name: "Morocco" },
-  { alpha2: "MC", name: "Monaco" },
-  { alpha2: "MD", name: "Moldova, Republic of" },
-  { alpha2: "ME", name: "Montenegro" },
-  { alpha2: "MF", name: "Saint Martin" },
-  { alpha2: "MG", name: "Madagascar" },
-  { alpha2: "MH", name: "Marshall Islands" },
-  { alpha2: "MK", name: "North Macedonia" },
-  { alpha2: "ML", name: "Mali" },
-  { alpha2: "MM", name: "Myanmar" },
-  { alpha2: "MN", name: "Mongolia" },
-  { alpha2: "MO", name: "Macao" },
-  { alpha2: "MP", name: "Northern Mariana Islands" },
-  { alpha2: "MQ", name: "Martinique" },
-  { alpha2: "MR", name: "Mauritania" },
-  { alpha2: "MS", name: "Montserrat" },
-  { alpha2: "MT", name: "Malta" },
-  { alpha2: "MU", name: "Mauritius" },
-  { alpha2: "MV", name: "Maldives" },
-  { alpha2: "MW", name: "Malawi" },
-  { alpha2: "MX", name: "Mexico" },
-  { alpha2: "MY", name: "Malaysia" },
-  { alpha2: "MZ", name: "Mozambique" },
-  { alpha2: "NA", name: "Namibia" },
-  { alpha2: "NC", name: "New Caledonia" },
-  { alpha2: "NE", name: "Niger" },
-  { alpha2: "NF", name: "Norfolk Island" },
-  { alpha2: "NG", name: "Nigeria" },
-  { alpha2: "NI", name: "Nicaragua" },
-  { alpha2: "NL", name: "Netherlands" },
-  { alpha2: "NO", name: "Norway" },
-  { alpha2: "NP", name: "Nepal" },
-  { alpha2: "NR", name: "Nauru" },
-  { alpha2: "NU", name: "Niue" },
-  { alpha2: "NZ", name: "New Zealand" },
-  { alpha2: "OM", name: "Oman" },
-  { alpha2: "PA", name: "Panama" },
-  { alpha2: "PE", name: "Peru" },
-  { alpha2: "PF", name: "French Polynesia" },
-  { alpha2: "PG", name: "Papua New Guinea" },
-  { alpha2: "PH", name: "Philippines" },
-  { alpha2: "PK", name: "Pakistan" },
-  { alpha2: "PL", name: "Poland" },
-  { alpha2: "PM", name: "Saint Pierre and Miquelon" },
-  { alpha2: "PN", name: "Pitcairn" },
-  { alpha2: "PR", name: "Puerto Rico" },
-  { alpha2: "PS", name: "Palestine, State of" },
-  { alpha2: "PT", name: "Portugal" },
-  { alpha2: "PW", name: "Palau" },
-  { alpha2: "PY", name: "Paraguay" },
-  { alpha2: "QA", name: "Qatar" },
-  { alpha2: "RE", name: "Réunion" },
-  { alpha2: "RO", name: "Romania" },
-  { alpha2: "RS", name: "Serbia" },
-  { alpha2: "RU", name: "Russian Federation" },
-  { alpha2: "RW", name: "Rwanda" },
-  { alpha2: "SA", name: "Saudi Arabia" },
-  { alpha2: "SB", name: "Solomon Islands" },
-  { alpha2: "SC", name: "Seychelles" },
-  { alpha2: "SD", name: "Sudan" },
-  { alpha2: "SE", name: "Sweden" },
-  { alpha2: "SG", name: "Singapore" },
-  { alpha2: "SH", name: "Saint Helena, Ascension and Tristan da Cunha" },
-  { alpha2: "SI", name: "Slovenia" },
-  { alpha2: "SJ", name: "Svalbard and Jan Mayen" },
-  { alpha2: "SK", name: "Slovakia" },
-  { alpha2: "SL", name: "Sierra Leone" },
-  { alpha2: "SM", name: "San Marino" },
-  { alpha2: "SN", name: "Senegal" },
-  { alpha2: "SO", name: "Somalia" },
-  { alpha2: "SR", name: "Surilabel" },
-  { alpha2: "SS", name: "South Sudan" },
-  { alpha2: "ST", name: "Sao Tome and Principe" },
-  { alpha2: "SV", name: "El Salvador" },
-  { alpha2: "SX", name: "Sint Maarten, Dutch part" },
-  { alpha2: "SY", name: "Syrian Arab Republic" },
-  { alpha2: "SZ", name: "Eswatini" },
-  { alpha2: "TC", name: "Turks and Caicos Islands" },
-  { alpha2: "TD", name: "Chad" },
-  { alpha2: "TF", name: "French Southern Territories" },
-  { alpha2: "TG", name: "Togo" },
-  { alpha2: "TH", name: "Thailand" },
-  { alpha2: "TJ", name: "Tajikistan" },
-  { alpha2: "TK", name: "Tokelau" },
-  { alpha2: "TL", name: "Timor-Leste" },
-  { alpha2: "TM", name: "Turkmenistan" },
-  { alpha2: "TN", name: "Tunisia" },
-  { alpha2: "TO", name: "Tonga" },
-  { alpha2: "TR", name: "Turkiye" },
-  { alpha2: "TT", name: "Trinidad and Tobago" },
-  { alpha2: "TV", name: "Tuvalu" },
-  { alpha2: "TW", name: "Taiwan, Province of China" },
-  { alpha2: "TZ", name: "Tanzania, United Republic of" },
-  { alpha2: "UA", name: "Ukraine" },
-  { alpha2: "UG", name: "Uganda" },
-  { alpha2: "UM", name: "United States Minor Outlying Islands" },
-  { alpha2: "US", name: "United States of America" },
-  { alpha2: "UY", name: "Uruguay" },
-  { alpha2: "UZ", name: "Uzbekistan" },
-  { alpha2: "VA", name: "Holy See (Vatican City State)" },
-  { alpha2: "VC", name: "Saint Vincent and the Grenadines" },
-  { alpha2: "VE", name: "Venezuela, Bolivarian Republic of" },
-  { alpha2: "VG", name: "Virgin Islands, British" },
-  { alpha2: "VI", name: "Virgin Islands, U.S." },
-  { alpha2: "VN", name: "Vietnam" },
-  { alpha2: "VU", name: "Vanuatu" },
-  { alpha2: "WF", name: "Wallis and Futuna" },
-  { alpha2: "WS", name: "Samoa" },
-  { alpha2: "YE", name: "Yemen" },
-  { alpha2: "YT", name: "Mayotte" },
-  { alpha2: "ZA", name: "South Africa" },
-  { alpha2: "ZM", name: "Zambia" },
-  { alpha2: "ZW", name: "Zimbabwe" },
-]
+import type { Item } from '../components/simple/forms/item.js';
 
-export const countriesOptions: {
-  value: string,
-  label: string
-}[] = countriesList.map((c) => {
-  return {
-    value: c.alpha2,
-    label: c.name
-  }
-})
+/** Extra data of the country items made by `countryItems`. */
+export type CountryData = {
+	/** International dialing code with the plus sign, for example `+39`. Missing for territories without one. */
+	dialCode?: string;
+};
 
-export function getCountryInfoByAlpha2(alpha2: string) {
-  return countriesList.find((v) => v.alpha2 == alpha2)
+const TABLE =
+	'AD376 AE971 AF93 AG1 AI1 AL355 AM374 AO244 AQ AR54 AS1 AT43 AU61 AW297 AX358 AZ994 BA387 ' +
+	'BB1 BD880 BE32 BF226 BG359 BH973 BI257 BJ229 BL590 BM1 BN673 BO591 BQ599 BR55 BS1 BT975 ' +
+	'BV BW267 BY375 BZ501 CA1 CC61 CD243 CF236 CG242 CH41 CI225 CK682 CL56 CM237 CN86 CO57 ' +
+	'CR506 CU53 CV238 CW599 CX61 CY357 CZ420 DE49 DJ253 DK45 DM1 DO1 DZ213 EC593 EE372 EG20 ' +
+	'EH212 ER291 ES34 ET251 FI358 FJ679 FK500 FM691 FO298 FR33 GA241 GB44 GD1 GE995 GF594 ' +
+	'GG44 GH233 GI350 GL299 GM220 GN224 GP590 GQ240 GR30 GS GT502 GU1 GW245 GY592 HK852 HM ' +
+	'HN504 HR385 HT509 HU36 ID62 IE353 IL972 IM44 IN91 IO246 IQ964 IR98 IS354 IT39 JE44 JM1 ' +
+	'JO962 JP81 KE254 KG996 KH855 KI686 KM269 KN1 KP850 KR82 KW965 KY1 KZ7 LA856 LB961 LC1 ' +
+	'LI423 LK94 LR231 LS266 LT370 LU352 LV371 LY218 MA212 MC377 MD373 ME382 MF590 MG261 MH692 ' +
+	'MK389 ML223 MM95 MN976 MO853 MP1 MQ596 MR222 MS1 MT356 MU230 MV960 MW265 MX52 MY60 MZ258 ' +
+	'NA264 NC687 NE227 NF672 NG234 NI505 NL31 NO47 NP977 NR674 NU683 NZ64 OM968 PA507 PE51 ' +
+	'PF689 PG675 PH63 PK92 PL48 PM508 PN PR1 PS970 PT351 PW680 PY595 QA974 RE262 RO40 RS381 ' +
+	'RU7 RW250 SA966 SB677 SC248 SD249 SE46 SG65 SH290 SI386 SJ47 SK421 SL232 SM378 SN221 ' +
+	'SO252 SR597 SS211 ST239 SV503 SX1 SY963 SZ268 TC1 TD235 TF TG228 TH66 TJ992 TK690 TL670 ' +
+	'TM993 TN216 TO676 TR90 TT1 TV688 TW886 TZ255 UA380 UG256 UM US1 UY598 UZ998 VA39 VC1 ' +
+	'VE58 VG1 VI1 VN84 VU678 WF681 WS685 YE967 YT262 ZA27 ZM260 ZW263';
+
+const DIAL_CODES = new Map(
+	TABLE.split(' ').map((entry) => [entry.slice(0, 2), entry.slice(2) || undefined] as const)
+);
+
+/** ISO 3166-1 alpha-2 codes of the 249 countries and territories, uppercase and in alphabetical order. */
+export const countryCodes: readonly string[] = Object.freeze([...DIAL_CODES.keys()]);
+
+const displayNames = new Map<string, Intl.DisplayNames>();
+
+/**
+ * Name of a country in a language, from the browser (`Intl.DisplayNames`), so every language works without data in the library.
+ * Unknown codes are returned as they are.
+ * @param alpha2 ISO 3166-1 alpha-2 code, in any case.
+ * @param locale BCP 47 language tag, such as `en`, `it` or `fr-CH`.
+ */
+export function countryName(alpha2: string, locale = 'en'): string {
+	let names = displayNames.get(locale);
+	if (!names) {
+		names = new Intl.DisplayNames([locale], { type: 'region', fallback: 'code' });
+		displayNames.set(locale, names);
+	}
+	try {
+		return names.of(alpha2.toUpperCase()) ?? alpha2;
+	} catch {
+		return alpha2;
+	}
+}
+
+/**
+ * International dialing code of a country with the plus sign, such as `+39`, or `undefined` for territories without one.
+ * @param alpha2 ISO 3166-1 alpha-2 code, in any case.
+ */
+export function dialCode(alpha2: string): string | undefined {
+	const code = DIAL_CODES.get(alpha2.toUpperCase());
+	return code && `+${code}`;
+}
+
+/**
+ * Countries as `Item`s for `CountriesAutocomplete` and the other pickers: `value` is the uppercase ISO code, `label` the name in `locale`, `data.dialCode` the dialing code. Sorted by name in that language.
+ * @param locale BCP 47 language tag of the names, such as `en`, `it` or `fr-CH`.
+ * @param codes ISO codes to include, for a subset of the countries. Defaults to all of them.
+ */
+export function countryItems(
+	locale = 'en',
+	codes: readonly string[] = countryCodes
+): Item<CountryData>[] {
+	const collator = new Intl.Collator(locale);
+	return codes
+		.map((code) => ({
+			value: code.toUpperCase(),
+			label: countryName(code, locale),
+			data: { dialCode: dialCode(code) }
+		}))
+		.sort((a, b) => collator.compare(a.label, b.label));
 }
