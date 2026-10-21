@@ -1,6 +1,6 @@
 {
 	"name": "@likable-hair/svelte-migrate",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"private": true,
 	"description": "Migrates apps from @likable-hair/svelte v4 (and v3) to v5",
 	"type": "module",

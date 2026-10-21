@@ -1,6 +1,6 @@
 {
 	"name": "@likable-hair/svelte-mcp",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"private": true,
 	"description": "MCP server and agent skill for @likable-hair/svelte: component specs, themes, usage checks and the v4 to v5 migration",
 	"type": "module",
