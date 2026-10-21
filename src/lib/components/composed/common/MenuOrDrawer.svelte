@@ -113,8 +113,8 @@ Shows its content in a `Menu` anchored to `activator` on wide screens and in a b
 
 	@layer global.components {
 		:global(.aurora-menu-or-drawer-sheet) {
-			--drawer-default-size: auto;
-			--drawer-default-max-size: 85dvh;
+			--_drawer-size: auto;
+			--_drawer-max-size: 85dvh;
 		}
 	}
 </style>

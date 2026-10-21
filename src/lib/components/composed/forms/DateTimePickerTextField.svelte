@@ -1178,7 +1178,7 @@ Date and time field: type them or choose them in a panel with a calendar and the
 		}
 
 		:global(.aurora-date-time-picker-text-field-drawer) {
-			--drawer-default-size: auto;
+			--_drawer-size: auto;
 		}
 
 		:global(.aurora-drawer-body.aurora-date-time-picker-text-field-drawer-body) {

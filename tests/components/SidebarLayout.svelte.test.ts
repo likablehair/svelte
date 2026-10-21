@@ -5,6 +5,7 @@ import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import SidebarLayout from '#lib/components/layouts/SidebarLayout.svelte';
 import type { HierarchyMenuOption } from '#lib/components/simple/navigation/HierarchyMenu.svelte';
+import NestedSheet from '../fixtures/sidebar-layout/NestedSheet.svelte';
 import { instantDrawers, renderWithDefaultLocale, text } from '../helpers.js';
 
 const options: HierarchyMenuOption[] = [
@@ -503,5 +504,39 @@ describe('SidebarLayout', () => {
 		const labelled = await render(SidebarLayout, { options, sidebarLabel: 'Pannello', skipLabel: 'Salta' });
 		await expect.element(labelled.getByRole('button', { name: 'Pannello' })).toBeInTheDocument();
 		await expect.element(labelled.getByRole('link', { name: 'Salta' })).toBeInTheDocument();
+	});
+
+	test('on mobile a bottom sheet opened from the drawer covers the bottom of the screen with its own size and padding', async () => {
+		await page.viewport(400, 700);
+		const screen = await render(NestedSheet, { options });
+		const { root } = parts(screen.container);
+		await screen.getByRole('button', { name: 'Menu' }).click();
+		const drawer = screen.getByRole('dialog', { name: 'Menu' });
+		await expect.element(drawer).toBeVisible();
+		const drawerPanel = drawer.element().querySelector<HTMLElement>('.aurora-drawer-panel')!;
+		expect(drawerPanel.getBoundingClientRect().width).toBe(288);
+		expect(getComputedStyle(drawerPanel).padding).toBe('0px 0px 14px');
+
+		await screen.getByRole('button', { name: 'Account' }).click();
+		const sheet = screen.getByRole('dialog', { name: 'Account' });
+		await expect.element(sheet).toBeVisible();
+		expect(sheet.element().matches(':modal')).toBe(true);
+		const panel = sheet.element().querySelector<HTMLElement>('.aurora-drawer-panel')!;
+		const box = panel.getBoundingClientRect();
+		expect(box.left).toBe(0);
+		expect(box.width).toBe(window.innerWidth);
+		expect(box.bottom).toBe(window.innerHeight);
+		expect(box.height).toBeLessThan(288);
+		expect(box.height).toBeLessThanOrEqual(window.innerHeight * 0.85);
+		expect(panel.scrollHeight).toBeLessThanOrEqual(panel.clientHeight + 1);
+		expect(getComputedStyle(panel).padding).toBe('18px 12px');
+		await userEvent.keyboard('{Escape}');
+		await expect.element(sheet).not.toBeInTheDocument();
+		await expect.element(drawer).toBeVisible();
+
+		root.style.setProperty('--sidebar-layout-drawer-width', '20rem');
+		root.style.setProperty('--sidebar-layout-drawer-padding', '4px');
+		expect(drawerPanel.getBoundingClientRect().width).toBe(320);
+		expect(getComputedStyle(drawerPanel).padding).toBe('4px');
 	});
 });

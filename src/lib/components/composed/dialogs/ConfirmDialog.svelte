@@ -270,7 +270,7 @@ Dialog that asks to confirm an action, usually a delete: an icon in the tone of 
 
 	@layer global.components {
 		:global(.aurora-dialog.aurora-confirm-dialog) {
-			--dialog-default-max-width: var(
+			--_dialog-max-width: var(
 				--confirm-dialog-max-width,
 				var(--confirm-dialog-default-max-width)
 			);

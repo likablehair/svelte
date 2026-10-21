@@ -7,6 +7,7 @@ import NestedExample from '../../src/docs/examples/dialog/03-persistent.svelte';
 import LightboxExample from '../../src/docs/examples/dialog/04-lightbox.svelte';
 import DialogWithMenu from '../fixtures/dialog/DialogWithMenu.svelte';
 import ModalHarness from '../fixtures/dialog/ModalHarness.svelte';
+import NestedDialogs from '../fixtures/dialog/NestedDialogs.svelte';
 import { renderWithDefaultLocale, snippet, text } from '../helpers.js';
 
 const pause = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -298,6 +299,24 @@ describe('Dialog', () => {
 		const footer = element.querySelector('footer.aurora-dialog-actions.app-actions');
 		expect(footer?.querySelector('button')?.textContent).toBe('Confirm');
 	});
+
+	test('a dialog opened inside another one starts from its own defaults', async () => {
+		const screen = await render(NestedDialogs);
+		const outer = screen.getByRole('dialog', { name: 'Outer' });
+		await expect.element(outer).toBeVisible();
+		const outerSurface = getComputedStyle(outer.element().querySelector('.aurora-dialog-surface')!);
+		expect(outerSurface.maxWidth).toBe('600px');
+		expect(outerSurface.padding).toBe('0px');
+
+		await screen.getByRole('button', { name: 'Open inner' }).click();
+		const inner = screen.getByRole('dialog', { name: 'Inner' });
+		await expect.element(inner).toBeVisible();
+		const surface = getComputedStyle(inner.element().querySelector('.aurora-dialog-surface')!);
+		expect(surface.maxWidth).toBe('440px');
+		expect(surface.padding).toBe('20px');
+		expect(surface.borderTopLeftRadius).not.toBe('0px');
+	});
+
 });
 
 describe('Dialog texts', () => {

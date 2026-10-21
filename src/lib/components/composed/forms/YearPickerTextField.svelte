@@ -745,7 +745,7 @@ Year field: type the year or choose it in a scrolling grid of years. The value i
 		}
 
 		:global(.aurora-year-picker-text-field-drawer) {
-			--drawer-default-size: auto;
+			--_drawer-size: auto;
 		}
 
 		:global(.aurora-drawer-body.aurora-year-picker-text-field-drawer-body) {
@@ -754,11 +754,11 @@ Year field: type the year or choose it in a scrolling grid of years. The value i
 		}
 
 		:global(.aurora-year-picker-text-field-menu) {
-			--menu-default-width: var(
+			--_menu-width: var(
 				--year-picker-text-field-menu-width,
 				var(--year-picker-text-field-default-menu-width)
 			);
-			--menu-default-padding: var(
+			--_menu-padding: var(
 				--year-picker-text-field-menu-padding,
 				var(--year-picker-text-field-default-menu-padding)
 			);

@@ -44,3 +44,28 @@
 		--drawer-default-easing: var(--global-ease);
 	}
 }
+
+@property --_drawer-size {
+	syntax: '*';
+	inherits: false;
+}
+
+@property --_drawer-max-size {
+	syntax: '*';
+	inherits: false;
+}
+
+@property --_drawer-padding {
+	syntax: '*';
+	inherits: false;
+}
+
+@property --_drawer-backdrop-background {
+	syntax: '*';
+	inherits: false;
+}
+
+@property --_drawer-backdrop-filter {
+	syntax: '*';
+	inherits: false;
+}

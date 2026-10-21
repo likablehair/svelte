@@ -972,19 +972,19 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 		}
 
 		:global(.aurora-autocomplete-menu) {
-			--menu-default-max-height: var(
+			--_menu-max-height: var(
 				--autocomplete-menu-max-height,
 				var(--autocomplete-default-menu-max-height)
 			);
 		}
 
 		:global(.aurora-autocomplete-drawer) {
-			--drawer-default-size: var(--autocomplete-drawer-size, var(--autocomplete-default-drawer-size));
+			--_drawer-size: var(--autocomplete-drawer-size, var(--autocomplete-default-drawer-size));
 		}
 
 		:global(.aurora-autocomplete-drawer-fit) {
-			--drawer-default-size: auto;
-			--drawer-default-max-size: var(
+			--_drawer-size: auto;
+			--_drawer-max-size: var(
 				--autocomplete-drawer-size,
 				var(--autocomplete-default-drawer-size)
 			);

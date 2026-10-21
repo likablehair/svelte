@@ -5,6 +5,7 @@ import Menu from '#lib/components/simple/common/Menu.svelte';
 import ActionsExample from '../../src/docs/examples/menu/01-actions.svelte';
 import MenuGroup from '../fixtures/menu/MenuGroup.svelte';
 import MenuHarness from '../fixtures/menu/MenuHarness.svelte';
+import NestedMenus from '../fixtures/menu/NestedMenus.svelte';
 import SpreadAttributes from '../fixtures/menu/SpreadAttributes.svelte';
 import { text } from '../helpers.js';
 
@@ -372,4 +373,20 @@ describe('Menu', () => {
 		expect(element).toBeInstanceOf(HTMLDivElement);
 		expect(element?.matches(':popover-open')).toBe(true);
 	});
+
+	test('a menu opened inside another one starts from its own defaults', async () => {
+		const screen = await render(NestedMenus);
+		await screen.getByRole('button', { name: 'Outer' }).click();
+		const outer = screen.container.querySelector<HTMLElement>('[aria-label="Outer menu"]')!;
+		await expect.element(outer).toBeVisible();
+		expect(getComputedStyle(outer).padding).toBe('20px');
+		expect(getComputedStyle(outer).minWidth).toBe('400px');
+
+		await screen.getByRole('button', { name: 'Inner' }).click();
+		const inner = screen.container.querySelector<HTMLElement>('[aria-label="Inner menu"]')!;
+		await expect.element(inner).toBeVisible();
+		expect(getComputedStyle(inner).padding).toBe('4px');
+		expect(getComputedStyle(inner).minWidth).toBe('0px');
+	});
+
 });

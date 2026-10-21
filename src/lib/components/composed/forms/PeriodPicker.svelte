@@ -398,9 +398,9 @@ Field to choose a period, such as the range of a report or of a dashboard widget
 		}
 
 		:global(.aurora-period-picker-menu) {
-			--menu-padding: 0;
-			--menu-max-width: calc(100vw - 16px);
-			--menu-overflow: hidden;
+			--_menu-padding: 0;
+			--_menu-max-width: calc(100vw - 16px);
+			--_menu-overflow: hidden;
 		}
 	}
 </style>

@@ -157,12 +157,12 @@
 		}
 
 		:global(.aurora-filters-panel-menu) {
-			--menu-default-max-width: min(calc(100vw - 16px), 900px);
+			--_menu-max-width: min(calc(100vw - 16px), 900px);
 		}
 
 		:global(.aurora-filters-drawer) {
-			--drawer-default-size: auto;
-			--drawer-default-max-size: 90dvh;
+			--_drawer-size: auto;
+			--_drawer-max-size: 90dvh;
 		}
 
 		:global(.aurora-filters-drawer) .aurora-filters-panel {

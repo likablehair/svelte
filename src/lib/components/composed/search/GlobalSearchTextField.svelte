@@ -491,20 +491,20 @@ Search of the whole app, as a command palette: a button that looks like a search
 		}
 
 		:global(.aurora-dialog.aurora-global-search-dialog) {
-			--dialog-padding: 0;
-			--dialog-width: var(--global-search-text-field-dialog-width, var(--global-search-text-field-default-dialog-width));
-			--dialog-max-height: var(--global-search-text-field-dialog-max-height, var(--global-search-text-field-default-dialog-max-height));
-			--dialog-transition-y: -8px;
+			--_dialog-padding: 0;
+			--_dialog-width: var(--global-search-text-field-dialog-width, var(--global-search-text-field-default-dialog-width));
+			--_dialog-max-height: var(--global-search-text-field-dialog-max-height, var(--global-search-text-field-default-dialog-max-height));
+			--_dialog-transition-y: -8px;
 			align-items: flex-start;
 			padding-top: var(--global-search-text-field-dialog-top, var(--global-search-text-field-default-dialog-top));
 		}
 
 		:global(.aurora-dialog.aurora-global-search-dialog[data-fullscreen]) {
-			--dialog-width: 100%;
-			--dialog-height: 100%;
-			--dialog-max-height: 100%;
-			--dialog-border-radius: 0;
-			--dialog-border-width: 0;
+			--_dialog-width: 100%;
+			--_dialog-height: 100%;
+			--_dialog-max-height: 100%;
+			--_dialog-border-radius: 0;
+			--_dialog-border-width: 0;
 			padding: 0;
 		}
 

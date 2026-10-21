@@ -613,21 +613,21 @@ Panel where the user picks the columns of a table: which ones are shown, in whic
 
 	@layer global.components {
 		:global(.aurora-column-manager) {
-			--drawer-default-size: var(--column-manager-width, var(--column-manager-default-width));
-			--drawer-default-backdrop-background: var(
+			--_drawer-size: var(--column-manager-width, var(--column-manager-default-width));
+			--_drawer-backdrop-background: var(
 				--column-manager-backdrop-background,
 				var(--column-manager-default-backdrop-background)
 			);
-			--drawer-default-backdrop-filter: var(
+			--_drawer-backdrop-filter: var(
 				--column-manager-backdrop-filter,
 				var(--column-manager-default-backdrop-filter)
 			);
-			--drawer-default-max-size: 100%;
+			--_drawer-max-size: 100%;
 		}
 
 		:global(.aurora-column-manager[data-position='bottom']) {
-			--drawer-default-size: auto;
-			--drawer-default-max-size: var(
+			--_drawer-size: auto;
+			--_drawer-max-size: var(
 				--column-manager-sheet-max-height,
 				var(--column-manager-default-sheet-max-height)
 			);

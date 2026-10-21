@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
+import InsideDrawerExample from '../../src/docs/examples/menu-or-drawer/03-inside-drawer.svelte';
 import Harness from '../fixtures/menu-or-drawer/Harness.svelte';
 
 async function open(props: Record<string, unknown> = {}) {
@@ -14,6 +15,33 @@ async function open(props: Record<string, unknown> = {}) {
 describe('MenuOrDrawer', () => {
 	afterEach(async () => {
 		await page.viewport(1280, 800);
+	});
+
+	test('inside a Drawer, the sheet covers the bottom of the screen with its own size and padding', async () => {
+		await page.viewport(400, 700);
+		document.documentElement.style.setProperty('--drawer-duration', '0s');
+		try {
+			const screen = await render(InsideDrawerExample);
+			await screen.getByRole('button', { name: 'Open drawer' }).click();
+			const drawer = screen.getByRole('dialog', { name: 'Menu' });
+			await expect.element(drawer).toBeVisible();
+			await screen.getByRole('button', { name: 'Giulia Marini' }).click();
+			const sheet = screen.getByRole('dialog', { name: 'Account' });
+			await expect.element(sheet).toBeVisible();
+			const panel = sheet.element().querySelector<HTMLElement>('.aurora-drawer-panel')!;
+			const box = panel.getBoundingClientRect();
+			expect(box.left).toBe(0);
+			expect(box.width).toBe(window.innerWidth);
+			expect(box.bottom).toBe(window.innerHeight);
+			expect(box.height).toBeLessThan(320);
+			expect(panel.scrollHeight).toBeLessThanOrEqual(panel.clientHeight + 1);
+			expect(getComputedStyle(panel).padding).toBe('18px 12px');
+			await screen.getByRole('button', { name: 'Profile' }).click();
+			await expect.element(sheet).not.toBeInTheDocument();
+			await expect.element(drawer).toBeVisible();
+		} finally {
+			document.documentElement.style.removeProperty('--drawer-duration');
+		}
 	});
 
 	test('opens a menu anchored to the activator on wide screens', async () => {

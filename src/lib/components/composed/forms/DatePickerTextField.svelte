@@ -1074,7 +1074,7 @@ Date field: type the date or choose it in a calendar. The value is `selectedDate
 		}
 
 		:global(.aurora-date-picker-text-field-drawer) {
-			--drawer-default-size: auto;
+			--_drawer-size: auto;
 		}
 
 		:global(.aurora-drawer-body.aurora-date-picker-text-field-drawer-body) {

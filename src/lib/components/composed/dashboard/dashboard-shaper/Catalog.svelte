@@ -151,9 +151,9 @@
 
 	@layer global.components {
 		:global(.aurora-dashboard-shaper-catalog) {
-			--dialog-default-max-width: var(--dashboard-shaper-catalog-width, var(--dashboard-shaper-default-catalog-width));
-			--drawer-default-size: auto;
-			--drawer-default-max-size: 85dvh;
+			--_dialog-max-width: var(--dashboard-shaper-catalog-width, var(--dashboard-shaper-default-catalog-width));
+			--_drawer-size: auto;
+			--_drawer-max-size: 85dvh;
 		}
 
 		.aurora-dashboard-shaper-catalog-body {

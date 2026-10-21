@@ -21,3 +21,33 @@
 		--menu-default-transition-scale: 0.98;
 	}
 }
+
+@property --_menu-width {
+	syntax: '*';
+	inherits: false;
+}
+
+@property --_menu-min-width {
+	syntax: '*';
+	inherits: false;
+}
+
+@property --_menu-max-width {
+	syntax: '*';
+	inherits: false;
+}
+
+@property --_menu-max-height {
+	syntax: '*';
+	inherits: false;
+}
+
+@property --_menu-padding {
+	syntax: '*';
+	inherits: false;
+}
+
+@property --_menu-overflow {
+	syntax: '*';
+	inherits: false;
+}

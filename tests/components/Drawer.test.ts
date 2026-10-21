@@ -4,6 +4,7 @@ import { render } from 'vitest-browser-svelte';
 import Drawer from '#lib/components/simple/navigation/Drawer.svelte';
 import BottomSheetExample from '../../src/docs/examples/drawer/03-bottom-sheet.svelte';
 import ModalHarness from '../fixtures/dialog/ModalHarness.svelte';
+import NestedDrawers from '../fixtures/drawer/NestedDrawers.svelte';
 import { renderWithDefaultLocale, snippet, text } from '../helpers.js';
 
 const instant = '--drawer-duration: 0s';
@@ -267,6 +268,32 @@ describe('Drawer', () => {
 		const footer = element.querySelector('footer.aurora-drawer-actions.app-actions');
 		expect(footer?.querySelector('button')?.textContent).toBe('Log out');
 	});
+
+	test('a drawer opened inside another one starts from its own defaults and covers the screen', async () => {
+		const screen = await render(NestedDrawers);
+		const outer = screen.getByRole('dialog', { name: 'Outer' });
+		await expect.element(outer).toBeVisible();
+		const outerPanel = getComputedStyle(panelOf(outer));
+		expect(outerPanel.width).toBe('240px');
+		expect(outerPanel.padding).toBe('0px 0px 14px');
+		const outerBackdrop = outer.element().querySelector('[data-backdrop]')!;
+		expect(getComputedStyle(outerBackdrop).backgroundColor).toBe('rgb(1, 2, 3)');
+
+		await screen.getByRole('button', { name: 'Open inner' }).click();
+		const inner = screen.getByRole('dialog', { name: 'Inner' });
+		await expect.element(inner).toBeVisible();
+		expect(inner.element().matches(':modal')).toBe(true);
+		const panel = panelOf(inner);
+		const box = panel.getBoundingClientRect();
+		expect(box.left).toBe(0);
+		expect(box.width).toBe(window.innerWidth);
+		expect(box.bottom).toBe(window.innerHeight);
+		expect(box.height).toBe(320);
+		expect(getComputedStyle(panel).padding).toBe('18px 12px');
+		const innerBackdrop = inner.element().querySelector('[data-backdrop]')!;
+		expect(getComputedStyle(innerBackdrop).backgroundColor).not.toBe('rgb(1, 2, 3)');
+	});
+
 });
 
 function handleOf(drawer: { element(): Element }) {

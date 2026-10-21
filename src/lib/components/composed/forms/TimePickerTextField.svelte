@@ -910,7 +910,7 @@ Time field: type the time or choose it in a panel of hours and minutes. The valu
 		}
 
 		:global(.aurora-time-picker-text-field-drawer) {
-			--drawer-default-size: auto;
+			--_drawer-size: auto;
 		}
 
 		:global(.aurora-drawer-body.aurora-time-picker-text-field-drawer-body) {

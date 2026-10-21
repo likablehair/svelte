@@ -171,6 +171,14 @@ Modal dialog on the browser's top layer (`<dialog>` with `showModal()`): it need
 			--_inset: var(--dialog-inset, var(--dialog-default-inset));
 			--_duration: var(--dialog-duration, var(--dialog-default-duration));
 			--_easing: var(--dialog-easing, var(--dialog-default-easing));
+			--_width: var(--_dialog-width, var(--dialog-default-width));
+			--_max-width: var(--_dialog-max-width, var(--dialog-default-max-width));
+			--_height: var(--_dialog-height, var(--dialog-default-height));
+			--_max-height: var(--_dialog-max-height, var(--dialog-default-max-height));
+			--_padding: var(--_dialog-padding, var(--dialog-default-padding));
+			--_border-radius: var(--_dialog-border-radius, var(--dialog-default-border-radius));
+			--_border-width: var(--_dialog-border-width, var(--dialog-default-border-width));
+			--_transition-y: var(--_dialog-transition-y, var(--dialog-default-transition-y));
 			--_bleed: calc(var(--global-focus-ring-width) + var(--global-focus-ring-offset));
 
 			position: fixed;
@@ -234,7 +242,7 @@ Modal dialog on the browser's top layer (`<dialog>` with `showModal()`): it need
 
 		.aurora-dialog-surface {
 			--_x: var(--dialog-transition-x, var(--dialog-default-transition-x));
-			--_y: var(--dialog-transition-y, var(--dialog-default-transition-y));
+			--_y: var(--dialog-transition-y, var(--_transition-y));
 			--_scale: var(--dialog-transition-scale, var(--dialog-default-transition-scale));
 
 			position: relative;
@@ -242,25 +250,25 @@ Modal dialog on the browser's top layer (`<dialog>` with `showModal()`): it need
 			display: flex;
 			flex-direction: column;
 			flex: 0 1 auto;
-			width: var(--dialog-width, var(--dialog-default-width));
-			max-width: var(--dialog-max-width, var(--dialog-default-max-width));
-			height: var(--dialog-height, var(--dialog-default-height));
-			max-height: var(--dialog-max-height, var(--dialog-default-max-height));
-			padding: var(--dialog-padding, var(--dialog-default-padding));
+			width: var(--dialog-width, var(--_width));
+			max-width: var(--dialog-max-width, var(--_max-width));
+			height: var(--dialog-height, var(--_height));
+			max-height: var(--dialog-max-height, var(--_max-height));
+			padding: var(--dialog-padding, var(--_padding));
 			background: var(--dialog-background, var(--dialog-default-background));
 			color: var(--dialog-color, var(--dialog-default-color));
-			border: var(--dialog-border-width, var(--dialog-default-border-width)) solid
+			border: var(--dialog-border-width, var(--_border-width)) solid
 				var(--dialog-border-color, var(--dialog-default-border-color));
-			border-radius: var(--dialog-border-radius, var(--dialog-default-border-radius));
+			border-radius: var(--dialog-border-radius, var(--_border-radius));
 			box-shadow: var(--dialog-box-shadow, var(--dialog-default-box-shadow));
 			animation: pop-in var(--_duration) var(--_easing);
 		}
 
-		.aurora-dialog[data-closing] :is(.aurora-dialog-backdrop, .aurora-dialog-side, .aurora-dialog-top-right) {
+		.aurora-dialog[data-closing] > :is(.aurora-dialog-backdrop, .aurora-dialog-side, .aurora-dialog-top-right) {
 			animation: fade-out var(--_duration) var(--_easing) forwards;
 		}
 
-		.aurora-dialog[data-closing] .aurora-dialog-surface {
+		.aurora-dialog[data-closing] > .aurora-dialog-surface {
 			animation: pop-out var(--_duration) var(--_easing) forwards;
 		}
 

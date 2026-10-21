@@ -264,7 +264,7 @@ Button that picks an icon from a grid, for example the heading level or the text
 
 		:global(.aurora-menu.aurora-icons-dropdown-menu) {
 			--dropdown-default-menu-min-width: 0;
-			--menu-default-width: var(--icons-dropdown-menu-width, var(--icons-dropdown-default-menu-width));
+			--_menu-width: var(--icons-dropdown-menu-width, var(--icons-dropdown-default-menu-width));
 		}
 
 		:global(.aurora-autocomplete-listbox[data-columns]:has(> .aurora-icons-dropdown-option)) {

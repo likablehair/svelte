@@ -40,3 +40,43 @@
 		--dialog-default-transition-scale: 0.96;
 	}
 }
+
+@property --_dialog-width {
+	syntax: '*';
+	inherits: false;
+}
+
+@property --_dialog-max-width {
+	syntax: '*';
+	inherits: false;
+}
+
+@property --_dialog-height {
+	syntax: '*';
+	inherits: false;
+}
+
+@property --_dialog-max-height {
+	syntax: '*';
+	inherits: false;
+}
+
+@property --_dialog-padding {
+	syntax: '*';
+	inherits: false;
+}
+
+@property --_dialog-border-radius {
+	syntax: '*';
+	inherits: false;
+}
+
+@property --_dialog-border-width {
+	syntax: '*';
+	inherits: false;
+}
+
+@property --_dialog-transition-y {
+	syntax: '*';
+	inherits: false;
+}

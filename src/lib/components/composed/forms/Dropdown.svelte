@@ -304,7 +304,7 @@ Button that opens a list of options (`items`) and picks one or, with `multiple`,
 		}
 
 		:global(.aurora-dropdown-menu) {
-			--menu-default-min-width: var(--dropdown-menu-min-width, var(--dropdown-default-menu-min-width));
+			--_menu-min-width: var(--dropdown-menu-min-width, var(--dropdown-default-menu-min-width));
 		}
 
 		.aurora-dropdown-trigger {

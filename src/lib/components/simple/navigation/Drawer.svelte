@@ -169,8 +169,11 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 			--_duration: var(--drawer-duration, var(--drawer-default-duration));
 			--_easing: var(--drawer-easing, var(--drawer-default-easing));
 			--_bleed: calc(var(--global-focus-ring-width) + var(--global-focus-ring-offset));
-			--_size: var(--drawer-size, var(--drawer-default-size));
-			--_max-size: var(--drawer-max-size, var(--drawer-default-max-size));
+			--_size: var(--drawer-size, var(--_drawer-size, var(--drawer-default-size)));
+			--_max-size: var(--drawer-max-size, var(--_drawer-max-size, var(--drawer-default-max-size)));
+			--_padding: var(--_drawer-padding, var(--drawer-default-padding));
+			--_backdrop-background: var(--_drawer-backdrop-background, var(--drawer-default-backdrop-background));
+			--_backdrop-filter: var(--_drawer-backdrop-filter, var(--drawer-default-backdrop-filter));
 			--_border: var(--drawer-border-width, var(--drawer-default-border-width)) solid
 				var(--drawer-border-color, var(--drawer-default-border-color));
 
@@ -196,8 +199,8 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 		.aurora-drawer-backdrop {
 			position: absolute;
 			inset: 0;
-			background: var(--drawer-backdrop-background, var(--drawer-default-backdrop-background));
-			backdrop-filter: var(--drawer-backdrop-filter, var(--drawer-default-backdrop-filter));
+			background: var(--drawer-backdrop-background, var(--_backdrop-background));
+			backdrop-filter: var(--drawer-backdrop-filter, var(--_backdrop-filter));
 			animation: fade-in var(--_duration) var(--_easing);
 		}
 
@@ -207,70 +210,70 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 			display: flex;
 			flex-direction: column;
 			margin: var(--drawer-margin, var(--drawer-default-margin));
-			padding: var(--drawer-padding, var(--drawer-default-padding));
+			padding: var(--drawer-padding, var(--_padding));
 			background: var(--drawer-background, var(--drawer-default-background));
 			color: var(--drawer-color, var(--drawer-default-color));
 			box-shadow: var(--drawer-box-shadow, var(--drawer-default-box-shadow));
 			animation: slide-in var(--_duration) var(--_easing);
 		}
 
-		.aurora-drawer[data-position='left'] .aurora-drawer-panel,
-		.aurora-drawer[data-position='right'] .aurora-drawer-panel {
+		.aurora-drawer[data-position='left'] > .aurora-drawer-panel,
+		.aurora-drawer[data-position='right'] > .aurora-drawer-panel {
 			top: 0;
 			bottom: 0;
 			width: var(--_size);
 			max-width: var(--_max-size);
 		}
 
-		.aurora-drawer[data-position='top'] .aurora-drawer-panel,
-		.aurora-drawer[data-position='bottom'] .aurora-drawer-panel {
+		.aurora-drawer[data-position='top'] > .aurora-drawer-panel,
+		.aurora-drawer[data-position='bottom'] > .aurora-drawer-panel {
 			left: 0;
 			right: 0;
 			height: var(--_size);
 			max-height: var(--_max-size);
 		}
 
-		.aurora-drawer[data-position='left'] .aurora-drawer-panel {
+		.aurora-drawer[data-position='left'] > .aurora-drawer-panel {
 			--_from: -100% 0;
 			left: 0;
 			border-right: var(--_border);
 			border-radius: var(--drawer-border-radius, var(--drawer-default-left-border-radius));
 		}
 
-		.aurora-drawer[data-position='right'] .aurora-drawer-panel {
+		.aurora-drawer[data-position='right'] > .aurora-drawer-panel {
 			--_from: 100% 0;
 			right: 0;
 			border-left: var(--_border);
 			border-radius: var(--drawer-border-radius, var(--drawer-default-right-border-radius));
 		}
 
-		.aurora-drawer[data-position='top'] .aurora-drawer-panel {
+		.aurora-drawer[data-position='top'] > .aurora-drawer-panel {
 			--_from: 0 -100%;
 			top: 0;
 			border-bottom: var(--_border);
 			border-radius: var(--drawer-border-radius, var(--drawer-default-top-border-radius));
 		}
 
-		.aurora-drawer[data-position='bottom'] .aurora-drawer-panel {
+		.aurora-drawer[data-position='bottom'] > .aurora-drawer-panel {
 			--_from: 0 100%;
 			bottom: 0;
 			border-top: var(--_border);
 			border-radius: var(--drawer-border-radius, var(--drawer-default-bottom-border-radius));
 		}
 
-		.aurora-drawer[data-closing] .aurora-drawer-backdrop {
+		.aurora-drawer[data-closing] > .aurora-drawer-backdrop {
 			animation: fade-out var(--_duration) var(--_easing) forwards;
 		}
 
-		.aurora-drawer[data-closing] .aurora-drawer-panel {
+		.aurora-drawer[data-closing] > .aurora-drawer-panel {
 			animation: slide-out var(--_duration) var(--_easing) forwards;
 		}
 
-		.aurora-drawer[data-handle] .aurora-drawer-panel {
+		.aurora-drawer[data-handle] > .aurora-drawer-panel {
 			transition: translate var(--_duration) var(--_easing);
 		}
 
-		.aurora-drawer[data-handle] .aurora-drawer-header {
+		.aurora-drawer[data-handle] > .aurora-drawer-panel > .aurora-drawer-header {
 			touch-action: none;
 		}
 
@@ -279,7 +282,7 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 			user-select: none;
 		}
 
-		.aurora-drawer[data-dragging] .aurora-drawer-panel {
+		.aurora-drawer[data-dragging] > .aurora-drawer-panel {
 			transition: none;
 		}
 
@@ -306,7 +309,7 @@ Panel that slides in from a side of the screen (`position`), modal and on the br
 				cursor: grab;
 			}
 
-			.aurora-drawer[data-dragging] .aurora-drawer-handle {
+			.aurora-drawer[data-dragging] > .aurora-drawer-panel > .aurora-drawer-handle {
 				cursor: grabbing;
 			}
 		}

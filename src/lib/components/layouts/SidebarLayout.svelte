@@ -566,8 +566,8 @@ Page shell of an app: a sidebar on the left (logo, menu, user), a bar at the top
 		}
 
 		.aurora-sidebar-layout :global(.aurora-sidebar-layout-drawer) {
-			--drawer-size: var(--sidebar-layout-drawer-width, var(--sidebar-layout-default-drawer-width));
-			--drawer-padding: var(--sidebar-layout-drawer-padding, var(--sidebar-layout-default-drawer-padding));
+			--_drawer-size: var(--sidebar-layout-drawer-width, var(--sidebar-layout-default-drawer-width));
+			--_drawer-padding: var(--sidebar-layout-drawer-padding, var(--sidebar-layout-default-drawer-padding));
 		}
 
 		.aurora-sidebar-layout-drawer-content {

@@ -159,13 +159,13 @@ Floating surface anchored to an `activator`, for dropdowns, autocompletes, picke
 			inset: auto;
 			margin: 0;
 			box-sizing: border-box;
-			width: var(--menu-width, var(--menu-default-width));
-			min-width: var(--menu-min-width, var(--menu-default-min-width));
-			max-width: var(--menu-max-width, var(--menu-default-max-width));
+			width: var(--menu-width, var(--_menu-width, var(--menu-default-width)));
+			min-width: var(--menu-min-width, var(--_menu-min-width, var(--menu-default-min-width)));
+			max-width: var(--menu-max-width, var(--_menu-max-width, var(--menu-default-max-width)));
 			height: var(--menu-height, var(--menu-default-height));
-			max-height: var(--menu-max-height, var(--menu-default-max-height));
-			overflow: var(--menu-overflow, var(--menu-default-overflow));
-			padding: var(--menu-padding, var(--menu-default-padding));
+			max-height: var(--menu-max-height, var(--_menu-max-height, var(--menu-default-max-height)));
+			overflow: var(--menu-overflow, var(--_menu-overflow, var(--menu-default-overflow)));
+			padding: var(--menu-padding, var(--_menu-padding, var(--menu-default-padding)));
 			background: var(--menu-background, var(--menu-default-background));
 			color: var(--menu-color, var(--menu-default-color));
 			border: var(--menu-border-width, var(--menu-default-border-width)) solid
