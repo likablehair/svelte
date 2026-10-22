@@ -115,10 +115,12 @@ export type {
 	ChartItemClick
 } from './utils/chart/types.js';
 export { default as DashboardShaper } from './components/composed/dashboard/DashboardShaper.svelte';
+export { default as DashboardWidgetShape } from './components/composed/dashboard/DashboardWidgetShape.svelte';
 export type {
 	DashboardWidget,
 	DashboardWidgetSize,
 	DashboardCatalogItem,
+	DashboardCatalogEntry,
 	DashboardChange
 } from './utils/dashboard/types.js';
 export { default as CircularLoader } from './components/simple/loaders/CircularLoader.svelte';

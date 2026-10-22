@@ -1,4 +1,4 @@
-import { createRawSnippet, tick, type Component } from 'svelte';
+import { createRawSnippet, tick, type Component, type Snippet } from 'svelte';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
@@ -235,17 +235,247 @@ describe('DashboardShaper', () => {
 		expect(dialog.getByRole('button', { name: /Clients/ }).query()).toBeNull();
 	});
 
-	test('with two or more categories the catalog shows a tab for each, plus All', async () => {
-		mount({
-			editing: true,
-			catalog: catalog.map((item) => ({ ...item, category: item.name === 'monthly' ? 'Charts' : 'Numbers' }))
+	describe('catalog', () => {
+		const one = [{ width: 1, height: 1 }];
+		const many: DashboardCatalogItem[] = [
+			{ name: 'revenue', title: 'Revenue', description: 'Total of the invoices', category: 'Sales', sizes: one },
+			{ name: 'orders', title: 'Orders', category: 'Sales', sizes: one },
+			{ name: 'stock', title: 'Stock', description: 'Pieces in the warehouse', category: 'Warehouse', sizes: one },
+			{ name: 'arrivals', title: 'Arrivals', category: 'Warehouse', sizes: one },
+			{ name: 'caffe', title: 'Caffè venduti', category: 'Bar', sizes: one },
+			{ name: 'team', title: 'Team', category: 'People', sizes: one },
+			{ name: 'notes', title: 'Notes', category: 'People', sizes: one }
+		];
+		const titles = () =>
+			[...document.querySelectorAll<HTMLElement>('.aurora-dashboard-shaper-item:not([data-leaving]) .aurora-dashboard-shaper-item-title')].map(
+				(node) => node.textContent
+			);
+		const surface = () => document.querySelector<HTMLElement>('.aurora-dashboard-shaper-catalog .aurora-dialog-surface')!;
+
+		async function openMany(props: Record<string, unknown> = {}) {
+			mount({ editing: true, catalog: many, widgets: [], ...props });
+			await userEvent.click(page.getByRole('button', { name: /^(Add widget|Aggiungi widget)$/ }).first());
+			await expect.element(page.getByRole('dialog')).toBeVisible();
+			return page.getByRole('dialog');
+		}
+
+		test('the search matches title and description, ignoring case and accents, and takes the focus', async () => {
+			const dialog = await openMany();
+			const search = dialog.getByRole('searchbox', { name: 'Search widgets' });
+			await expect.element(search).toHaveFocus();
+			await expect.element(search).toHaveValue('');
+			await userEvent.type(search, 'INVOICES');
+			await expect.poll(titles).toEqual(['Revenue']);
+			await userEvent.clear(search);
+			await userEvent.type(search, 'caffe');
+			await expect.poll(titles).toEqual(['Caffè venduti']);
+			await expect.element(page.getByText('1 widget', { exact: true })).toBeInTheDocument();
 		});
-		await userEvent.click(page.getByRole('button', { name: 'Add widget' }).last());
-		const dialog = page.getByRole('dialog');
-		await expect.element(dialog.getByRole('tab', { name: 'All', selected: true })).toBeInTheDocument();
-		await userEvent.click(dialog.getByRole('tab', { name: 'Charts' }));
-		await expect.element(dialog.getByRole('button', { name: 'Add Monthly, 4 × 2' })).toBeInTheDocument();
-		expect(dialog.getByRole('button', { name: /Revenue/ }).query()).toBeNull();
+
+		test('opened by touch, the search does not take the focus; with few widgets or searchable={false} there is none', async () => {
+			mount({ editing: true, catalog: many, widgets: [] });
+			const add = page.getByRole('button', { name: 'Add widget' }).first().element() as HTMLElement;
+			pointer('pointerdown', add, { x: 1, y: 1 }, 'touch');
+			add.click();
+			const search = page.getByRole('searchbox', { name: 'Search widgets' });
+			await expect.element(search).toBeInTheDocument();
+			await tick();
+			expect(document.activeElement).not.toBe(search.element());
+			document.body.innerHTML = '';
+			await openMany({ catalog: many.slice(0, 5) });
+			expect(page.getByRole('searchbox').query()).toBeNull();
+			document.body.innerHTML = '';
+			await openMany({ searchable: false });
+			expect(page.getByRole('searchbox').query()).toBeNull();
+		});
+
+		test('category chips: none selected shows all, several show their union, each counts the matching widgets', async () => {
+			const dialog = await openMany();
+			const group = dialog.getByRole('group', { name: 'Categories' });
+			await expect.element(group).toBeInTheDocument();
+			expect(titles()).toHaveLength(7);
+			const sales = group.getByRole('button', { name: 'Sales 2' });
+			await expect.element(sales).toHaveAttribute('aria-pressed', 'false');
+			await userEvent.click(sales);
+			await expect.element(sales).toHaveAttribute('aria-pressed', 'true');
+			await expect.poll(titles).toEqual(['Revenue', 'Orders']);
+			await userEvent.click(group.getByRole('button', { name: 'Bar 1' }));
+			await expect.poll(titles).toEqual(['Revenue', 'Orders', 'Caffè venduti']);
+			await userEvent.type(dialog.getByRole('searchbox'), 'o');
+			await expect.element(group.getByRole('button', { name: 'Sales 2' })).toBeInTheDocument();
+			await expect.element(group.getByRole('button', { name: 'Bar 0' })).toBeInTheDocument();
+			await expect.element(group.getByRole('button', { name: 'Warehouse 1' })).toBeInTheDocument();
+			await userEvent.click(group.getByRole('button', { name: 'Sales 2' }));
+			await userEvent.click(group.getByRole('button', { name: 'Bar 0' }));
+			await expect.poll(titles).toEqual(['Revenue', 'Orders', 'Stock', 'Notes']);
+		});
+
+		test('with one category there are no chips', async () => {
+			await openMany({ catalog: many.map((item) => ({ ...item, category: 'Same' })) });
+			expect(page.getByRole('group', { name: 'Categories' }).query()).toBeNull();
+		});
+
+		test('nothing found shows the empty state, whose "Show all" clears search and chips and goes back to the search', async () => {
+			const dialog = await openMany();
+			await userEvent.click(dialog.getByRole('button', { name: 'Bar 1' }));
+			await userEvent.type(dialog.getByRole('searchbox'), 'zzz');
+			await expect.element(dialog.getByText('No widgets found')).toBeVisible();
+			expect(dialog.getByText('No widget fits this space').query()).toBeNull();
+			await userEvent.click(dialog.getByRole('button', { name: 'Show all' }));
+			await expect.poll(titles).toHaveLength(7);
+			await expect.element(dialog.getByRole('searchbox')).toHaveValue('');
+			await expect.element(dialog.getByRole('searchbox')).toHaveFocus();
+			await expect.element(dialog.getByRole('button', { name: 'Bar 1' })).toHaveAttribute('aria-pressed', 'false');
+		});
+
+		test('the dialog keeps its height while filters change and only the list scrolls', async () => {
+			const dialog = await openMany();
+			await expect.poll(() => surface().style.height || getComputedStyle(surface()).height).toBeTruthy();
+			const before = surface().getBoundingClientRect().height;
+			await userEvent.type(dialog.getByRole('searchbox'), 'stock');
+			await expect.poll(titles).toEqual(['Stock']);
+			expect(surface().getBoundingClientRect().height).toBeCloseTo(before, 0);
+			await userEvent.type(dialog.getByRole('searchbox'), 'zzz');
+			await expect.element(dialog.getByText('No widgets found')).toBeVisible();
+			expect(surface().getBoundingClientRect().height).toBeCloseTo(before, 0);
+		});
+
+		test('the height stops at --dashboard-shaper-catalog-height and the list scrolls under the search', async () => {
+			document.documentElement.style.setProperty('--dashboard-shaper-catalog-height', '260px');
+			try {
+				const dialog = await openMany();
+				await expect.poll(() => Math.round(surface().getBoundingClientRect().height)).toBeLessThanOrEqual(260);
+				const scroll = document.querySelector<HTMLElement>('.aurora-dashboard-shaper-catalog-scroll')!;
+				expect(scroll.scrollHeight).toBeGreaterThan(scroll.clientHeight);
+				await expect.element(dialog.getByRole('searchbox')).toBeVisible();
+			} finally {
+				document.documentElement.style.removeProperty('--dashboard-shaper-catalog-height');
+			}
+		});
+
+		test('with reduced motion the list changes without movement', async () => {
+			const real = window.matchMedia;
+			window.matchMedia = ((query: string) => {
+				const result = real.call(window, query);
+				if (!query.includes('reduced-motion')) return result;
+				return {
+					matches: true,
+					media: query,
+					onchange: null,
+					addEventListener: () => {},
+					removeEventListener: () => {},
+					addListener: () => {},
+					removeListener: () => {},
+					dispatchEvent: () => false
+				} as MediaQueryList;
+			}) as typeof window.matchMedia;
+			try {
+				const dialog = await openMany();
+				await userEvent.type(dialog.getByRole('searchbox'), 'stock');
+				await tick();
+				const items = [...document.querySelectorAll<HTMLElement>('.aurora-dashboard-shaper-item')];
+				expect(items).toHaveLength(1);
+				expect(items.flatMap((item) => item.getAnimations())).toHaveLength(0);
+				expect(document.querySelector('[data-leaving]')).toBeNull();
+			} finally {
+				window.matchMedia = real;
+			}
+		});
+
+		test('a widget that comes back while it is still leaving shows again', async () => {
+			document.documentElement.style.setProperty('--global-duration', '2s');
+			try {
+				const dialog = await openMany();
+				const sales = dialog.getByRole('button', { name: 'Sales 2' });
+				await userEvent.click(sales);
+				await expect.poll(() => document.querySelectorAll('[data-leaving]').length).toBeGreaterThan(0);
+				await userEvent.click(sales);
+				await expect.poll(titles).toHaveLength(7);
+				await expect.poll(() => document.querySelectorAll('[data-leaving]').length).toBe(0);
+			} finally {
+				document.documentElement.style.removeProperty('--global-duration');
+			}
+		});
+
+		test('the widgets that stay slide to their new place', async () => {
+			const dialog = await openMany();
+			await userEvent.click(dialog.getByRole('button', { name: 'Warehouse 2' }));
+			const stock = document.querySelector<HTMLElement>('[data-name="stock"]')!;
+			expect(stock.getAnimations().length + document.querySelectorAll('[data-leaving]').length).toBeGreaterThan(0);
+		});
+
+		test('the number of results is announced politely after a change', async () => {
+			const dialog = await openMany();
+			const live = document.querySelector<HTMLElement>('.aurora-dashboard-shaper-catalog-live')!;
+			expect(live.getAttribute('aria-live')).toBe('polite');
+			expect(live.textContent).toBe('');
+			await userEvent.click(dialog.getByRole('button', { name: 'People 2' }));
+			await expect.poll(() => live.textContent).toBe('2 widgets');
+		});
+
+		test('Tab goes from the search to the chips to the size buttons; Escape closes', async () => {
+			const dialog = await openMany();
+			await expect.element(dialog.getByRole('searchbox')).toHaveFocus();
+			await userEvent.tab();
+			await expect.element(dialog.getByRole('button', { name: 'Sales 2' })).toHaveFocus();
+			for (let index = 0; index < 4; index++) await userEvent.tab();
+			await expect.element(dialog.getByRole('button', { name: 'Add Revenue, 1 × 1' })).toHaveFocus();
+			await userEvent.keyboard('{Escape}');
+			await expect.element(page.getByRole('dialog')).not.toBeInTheDocument();
+		});
+
+		test('it reopens empty, with no chip selected', async () => {
+			const dialog = await openMany();
+			await userEvent.type(dialog.getByRole('searchbox'), 'stock');
+			await userEvent.click(dialog.getByRole('button', { name: 'Warehouse 1' }));
+			await userEvent.keyboard('{Escape}');
+			await userEvent.keyboard('{Escape}');
+			await expect.element(page.getByRole('dialog')).not.toBeInTheDocument();
+			await userEvent.click(page.getByRole('button', { name: 'Add widget' }).first());
+			await expect.element(page.getByRole('searchbox')).toHaveValue('');
+			await expect.poll(titles).toHaveLength(7);
+		});
+
+		test('Italian texts', async () => {
+			const dialog = await openMany({ locale: 'it' });
+			await expect.element(dialog.getByRole('searchbox', { name: 'Cerca widget' })).toBeInTheDocument();
+			await expect.element(dialog.getByRole('group', { name: 'Categorie' })).toBeInTheDocument();
+			await userEvent.type(dialog.getByRole('searchbox'), 'zzz');
+			await expect.element(dialog.getByText('Nessun widget trovato')).toBeVisible();
+			await expect.element(dialog.getByRole('button', { name: 'Mostra tutti' })).toBeVisible();
+		});
+
+		test('catalogItemSnippet gets the default size buttons, with their shapes', async () => {
+			await openMany({
+				catalogItemSnippet: createRawSnippet(
+					(params: () => { item: DashboardCatalogItem; sizeButtons: Snippet }) => ({
+						render: () => `<div class="custom"><b>${params().item.title}</b></div>`
+					})
+				)
+			});
+			await expect.element(page.getByText('Revenue')).toBeInTheDocument();
+		});
+
+		test('catalogBodySnippet replaces the body and adds through add', async () => {
+			const { widgets } = mount({
+				editing: true,
+				catalog: many,
+				widgets: [],
+				catalogBodySnippet: createRawSnippet(
+					(params: () => { entries: { item: DashboardCatalogItem; sizes: unknown[] }[]; add: (item: unknown, size: unknown) => void }) => ({
+						render: () => `<button>${params().entries.length} entries</button>`,
+						setup: (node) => {
+							node.addEventListener('click', () => params().add(params().entries[2].item, params().entries[2].sizes[0]));
+						}
+					})
+				)
+			});
+			await userEvent.click(page.getByRole('button', { name: 'Add widget' }).first());
+			expect(page.getByRole('searchbox').query()).toBeNull();
+			await userEvent.click(page.getByRole('button', { name: '7 entries' }));
+			await expect.element(page.getByRole('dialog')).not.toBeInTheDocument();
+			expect(widgets.value!.at(-1)).toMatchObject({ name: 'stock', left: 1, top: 1, width: 1, height: 1 });
+		});
 	});
 
 	test('when nothing fits, the catalog says so', async () => {
@@ -435,6 +665,49 @@ describe('DashboardShaper', () => {
 			widgetSnippet: createRawSnippet(() => ({ render: () => '<button>Inside</button>' }))
 		});
 		expect(document.querySelector('.aurora-dashboard-shaper-content')!.hasAttribute('inert')).toBe(true);
+	});
+
+	test('while the remove button and the handle show, the content is blurred and the snippet gets controls', async () => {
+		mount({
+			editing: true,
+			widgetSnippet: createRawSnippet((params: () => { widget: DashboardWidget; controls: boolean }) => ({
+				render: () => `<span class="state">${params().widget.name}:${params().controls}</span>`,
+				setup: (node) => {
+					$effect(() => {
+						node.textContent = `${params().widget.name}:${params().controls}`;
+					});
+				}
+			}))
+		});
+		const box = widgetBox('Clients, 1 × 1');
+		const content = box.querySelector<HTMLElement>('.aurora-dashboard-shaper-content')!;
+		if (matchMedia('(hover: none)').matches) return;
+		expect(box.hasAttribute('data-controls')).toBe(false);
+		expect(getComputedStyle(content).filter).toBe('none');
+		await userEvent.hover(box);
+		await expect.poll(() => box.hasAttribute('data-controls')).toBe(true);
+		await expect.element(page.getByText('clients:true')).toBeInTheDocument();
+		await expect.poll(() => getComputedStyle(content).filter).toContain('blur');
+		await userEvent.unhover(box);
+		await expect.poll(() => box.hasAttribute('data-controls')).toBe(false);
+		await expect.element(page.getByText('clients:false')).toBeInTheDocument();
+		(page.getByRole('button', { name: 'Arrange Clients' }).element() as HTMLElement).focus();
+		await expect.poll(() => box.hasAttribute('data-controls')).toBe(true);
+		(page.getByRole('button', { name: 'Arrange Clients' }).element() as HTMLElement).blur();
+		await expect.poll(() => box.hasAttribute('data-controls')).toBe(false);
+	});
+
+	test('--dashboard-shaper-content-controls-filter and -opacity change the effect', async () => {
+		mount({
+			editing: true,
+			style: '--dashboard-shaper-content-controls-filter: none; --dashboard-shaper-content-controls-opacity: 1'
+		});
+		const box = widgetBox('Clients, 1 × 1');
+		(page.getByRole('button', { name: 'Arrange Clients' }).element() as HTMLElement).focus();
+		await expect.poll(() => box.hasAttribute('data-controls')).toBe(true);
+		const content = box.querySelector<HTMLElement>('.aurora-dashboard-shaper-content')!;
+		expect(getComputedStyle(content).filter).toBe('none');
+		expect(getComputedStyle(content).opacity).toBe('1');
 	});
 
 	test('hasEmptySlots tells whether the rows in use have holes', async () => {

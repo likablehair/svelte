@@ -57,6 +57,12 @@ export interface LibraryTexts {
 		catalog: string;
 		all: string;
 		noFit: string;
+		search: string;
+		categories: string;
+		noResults: string;
+		clearFilters: string;
+		results: string;
+		result: string;
 		size: string;
 		addSize: string;
 		widget: string;
@@ -282,6 +288,12 @@ export const TEXTS_EN: LibraryTexts = {
 		catalog: 'Add widget',
 		all: 'All',
 		noFit: 'No widget fits this space',
+		search: 'Search widgets',
+		categories: 'Categories',
+		noResults: 'No widgets found',
+		clearFilters: 'Show all',
+		results: '{count} widgets',
+		result: '1 widget',
 		size: '{width} × {height}',
 		addSize: 'Add {title}, {width} × {height}',
 		widget: '{title}, {width} × {height}',
@@ -525,6 +537,12 @@ export const TEXTS_IT: LibraryTexts = {
 		catalog: 'Aggiungi widget',
 		all: 'Tutti',
 		noFit: 'Nessun widget entra in questo spazio',
+		search: 'Cerca widget',
+		categories: 'Categorie',
+		noResults: 'Nessun widget trovato',
+		clearFilters: 'Mostra tutti',
+		results: '{count} widget',
+		result: '1 widget',
 		size: '{width} × {height}',
 		addSize: 'Aggiungi {title}, {width} × {height}',
 		widget: '{title}, {width} × {height}',

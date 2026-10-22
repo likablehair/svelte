@@ -1,5 +1,5 @@
 <!-- @component Catalog with groups
-With two or more `category` values the catalog shows a tab for each, plus "All". A `unique` widget disappears from the catalog while it is on the dashboard (here "Revenue"), for backends that keep one widget per type. The default content of a widget is its title. -->
+With two or more `category` values the catalog shows a filter chip for each, with the number of widgets in it: no chip selected shows them all, several show their union. A `unique` widget disappears from the catalog while it is on the dashboard (here "Revenue"), for backends that keep one widget per type. The default content of a widget is its title. -->
 <script lang="ts">
 	import {
 		mdiAccountGroupOutline,

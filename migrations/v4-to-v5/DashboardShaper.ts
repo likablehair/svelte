@@ -169,7 +169,9 @@ export default {
 		'Moving widgets by dragging (mouse, or touch after a hold) and with the arrow keys; swapping two widgets of the same size.',
 		'Resizing among the `sizes` of the catalog with the corner handle or Shift and the arrow keys; `movable` and `resizable` to turn them off.',
 		'`stackBelow`, `catalogItemSnippet`, `labels`, `class` per part, `category` and `unique` in the catalog.',
+		'A catalog with a search field (`searchable`, on from 6 widgets), filter chips for `category` with counts, a stable height (`--dashboard-shaper-catalog-height`), an empty state, `catalogBodySnippet`, `sizeButtons` in `catalogItemSnippet` and the `DashboardWidgetShape` thumbnail.',
 		'Announcements for screen readers and a keyboard handle on each widget while editing.',
+		'While editing, the content of a widget is blurred and faded while its remove button and handle show (`--dashboard-shaper-content-controls-filter`, `-opacity`); `widgetSnippet` gets `controls`.',
 		'On narrow screens, editing on a small version of the grid: tap a block to select it, then drag it, resize it from its handle or remove it; holding any block drags it too.',
 		'On touch screens, holding a widget starts the drag, so swiping still scrolls the page.',
 		'`--dashboard-shaper-*` variables for slots, editing controls, drop target, catalog and min height.'

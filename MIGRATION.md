@@ -663,7 +663,7 @@ New, optional: `locale`, `dialCode`, `class.dialCode`, `dialCode(code)`, `Countr
 - **Moving and resizing**: while editing, widgets are dragged to free cells (on touch screens after holding them for a moment, so the page still scrolls) (onto one of the same size they swap places; the others never move) and resized among the `sizes` of their catalog entry with the corner handle; from the keyboard the handle next to the remove button moves (arrows), resizes (Shift + arrows) and removes (Delete). `movable={false} resizable={false}` keeps exactly the v4 behaviour (add and remove only).
 - While editing the dashboard draws its own remove button and the content of the widgets is inert: delete the remove overlays drawn in `widgetCellSnippet`.
 - `layoutWidth` → `columns`. `layoutHeight` → `rows`, now an optional maximum: a `layoutHeight` computed from the rows in use is not needed anymore.
-- `availableWidgetCells` → `catalog`: `availableSizes: [[2, 4]]` (height first) → `sizes: [{ width: 4, height: 2 }]`, `icon: "mdi-..."` → an SVG path from `@mdi/js`. Entries keep the given order (v4 sorted them by title, "Placeholder" first). New: `category` (tabs in the catalog) and `unique` (once per dashboard, for backends that save widgets by `name`).
+- `availableWidgetCells` → `catalog`: `availableSizes: [[2, 4]]` (height first) → `sizes: [{ width: 4, height: 2 }]`, `icon: "mdi-..."` → an SVG path from `@mdi/js`. Entries keep the given order (v4 sorted them by title, "Placeholder" first). New: `category` (filter chips in the catalog) and `unique` (once per dashboard, for backends that save widgets by `name`).
 - `someRowSlotEmpty` → `hasEmptySlots`. `lang` → `locale`.
 - `onaddWidgetCell({ widgetCell })` and `onremoveWidgetCell({ widgetCell })` → one `onchange({ widgets, added, removed, changed })` with the widgets (v4 passed an internal cell): `widgetCell.widget` → `added[0]` / `removed[0]`.
 - `widgetCellSnippet({ widgetCell, removeWidgetCell })` → `widgetSnippet({ widget, item, editing, remove })`: `widgetCell.widget` → `widget`, `widgetCell.title` → `item?.title`, `removeWidgetCell({ id })` → `remove()`. `addWidgetButtonSnippet({ handleAddClick, slot })` → `slotSnippet({ width, height, add })`. `widgetSelectionDialogHeaderSnippet` → `catalogHeaderSnippet`.
@@ -684,7 +684,7 @@ New, optional: `locale`, `dialCode`, `class.dialCode`, `dialCode(code)`, `Countr
 
 Defaults: the same changes on `--dashboard-shaper-default-*`.
 
-New, optional: `movable`, `resizable`, `stackBelow`, `catalogItemSnippet`, `labels`, `class` per part, catalog `category` and `unique`, keyboard and screen reader support, `--dashboard-shaper-*` variables for slots, editing controls, drop target, catalog and `min-height`.
+New, optional: `movable`, `resizable`, `stackBelow`, `catalogItemSnippet` (with `sizeButtons`), `catalogBodySnippet`, `searchable` (search in the catalog, on from 6 widgets), filter chips for catalog `category`, `unique`, a catalog of stable height (`--dashboard-shaper-catalog-height`), `DashboardWidgetShape` (the size thumbnail of the catalog), `controls` in `widgetSnippet` and a blurred content while the editing controls show (`--dashboard-shaper-content-controls-filter`, `-opacity`), `labels`, `class` per part, keyboard and screen reader support, `--dashboard-shaper-*` variables for slots, editing controls, drop target, catalog and `min-height`.
 
 ### DataTable
 

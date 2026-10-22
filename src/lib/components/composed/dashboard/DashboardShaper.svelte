@@ -1,5 +1,5 @@
 <!-- @component
-Grid of widgets for a dashboard: `columns` equal columns, rows `--dashboard-shaper-row-height` tall, each widget placed by its `left`, `top`, `width` and `height` (the same shape saved by v4) and drawn by `widgetSnippet`. Read-only by default, it shows only the rows in use. With `editing` the user arranges it: the empty spaces become dashed "Add widget" buttons that open the catalog (a dialog, a bottom sheet on screens up to 1024px) with the widgets of `catalog` and the sizes that fit there; widgets get a remove button, can be dragged to free cells (onto a widget of the same size they swap places, the others never move on their own; on touch screens after holding them for a moment, so that the page still scrolls, or at once from their handle) and resized with the handle in their corner among the `sizes` of their catalog entry; `movable` and `resizable` turn those two off. From the keyboard the handle next to the remove button moves the widget with the arrow keys, resizes it with Shift and the arrow keys and removes it with Delete. While editing, a free band as tall as the tallest size of the catalog stays below the widgets, up to `rows` when set. Every change updates `widgets` and calls `onchange`; `hasEmptySlots` tells whether the rows in use have holes. Narrower than `stackBelow` (640px of the component) the widgets go in one column, in reading order and with their height; while editing there the dashboard shows the real grid in small, each widget as a block with its icon, title and size: tapping a block selects it: then it drags at once and shows its remove button and the handle to resize it; any block also drags after a hold. `preview` draws plain blocks instead of the widgets, for thumbnails, and keeps the grid at every width. The root has `data-editing`, `data-stacked` and `data-preview`; a widget being dragged or resized has `data-dragging` or `data-resizing`.
+Grid of widgets for a dashboard: `columns` equal columns, rows `--dashboard-shaper-row-height` tall, each widget placed by its `left`, `top`, `width` and `height` (the same shape saved by v4) and drawn by `widgetSnippet`. Read-only by default, it shows only the rows in use. With `editing` the user arranges it: the empty spaces become dashed "Add widget" buttons that open the catalog (a dialog, a bottom sheet on screens up to 1024px) with the widgets of `catalog` and the sizes that fit there. From 6 widgets the catalog has a search field (`searchable`), which matches title and description ignoring case and accents and takes the focus when the catalog opens from the keyboard or the mouse; with two or more `category` values it has filter chips, each with the number of matching widgets (none selected shows them all, several show their union). The catalog keeps the height it opens with, up to `--dashboard-shaper-catalog-height`, and only its list scrolls; widgets get a remove button and a handle in their top right corner, shown on hover, on keyboard focus and always on touch screens, and while they show the content of the widget is blurred and faded (`--dashboard-shaper-content-controls-filter` and `-opacity`), so that it does not clash with them; widgets can be dragged to free cells (onto a widget of the same size they swap places, the others never move on their own; on touch screens after holding them for a moment, so that the page still scrolls, or at once from their handle) and resized with the handle in their corner among the `sizes` of their catalog entry; `movable` and `resizable` turn those two off. From the keyboard the handle next to the remove button moves the widget with the arrow keys, resizes it with Shift and the arrow keys and removes it with Delete. While editing, a free band as tall as the tallest size of the catalog stays below the widgets, up to `rows` when set. Every change updates `widgets` and calls `onchange`; `hasEmptySlots` tells whether the rows in use have holes. Narrower than `stackBelow` (640px of the component) the widgets go in one column, in reading order and with their height; while editing there the dashboard shows the real grid in small, each widget as a block with its icon, title and size: tapping a block selects it: then it drags at once and shows its remove button and the handle to resize it; any block also drags after a hold. `preview` draws plain blocks instead of the widgets, for thumbnails, and keeps the grid at every width. The root has `data-editing`, `data-stacked` and `data-preview`; a widget being dragged or resized has `data-dragging` or `data-resizing`.
 -->
 <script lang="ts" generics="Data = unknown, Name extends string = string">
 	import '../../../css/tokens.css';
@@ -33,6 +33,7 @@ Grid of widgets for a dashboard: `columns` equal columns, rows `--dashboard-shap
 		type Place
 	} from '../../../utils/dashboard/grid.js';
 	import type {
+		DashboardCatalogEntry,
 		DashboardCatalogItem,
 		DashboardChange,
 		DashboardWidget,
@@ -71,16 +72,24 @@ Grid of widgets for a dashboard: `columns` equal columns, rows `--dashboard-shap
 		preview?: boolean;
 		/** Whether some cell is empty in the rows in use, for example to save only complete dashboards. Read it with `bind:hasEmptySlots`. */
 		hasEmptySlots?: boolean;
+		/** Shows the search field at the top of the catalog. Defaults to on when the catalog offers 6 widgets or more. */
+		searchable?: boolean;
 		/** Width of the component, in pixels, under which the widgets go in one column. `false` keeps the grid at every width. */
 		stackBelow?: number | false;
 		/** BCP 47 locale of the texts: `it` and `en` are built in, other languages fall back to English. Defaults to the one set with `setDefaultLocale`, else `en`. */
 		locale?: string;
-		/** Texts to change, on top of those of `locale`. `{title}`, `{width}`, `{height}`, `{row}` and `{column}` are replaced by the title of a widget, its size and its place. */
+		/** Texts to change, on top of those of `locale`. `{title}`, `{width}`, `{height}`, `{row}` and `{column}` are replaced by the title of a widget, its size and its place, `{count}` by the number of widgets found. `all` is no longer shown. */
 		labels?: {
 			add?: string;
 			catalog?: string;
 			all?: string;
 			noFit?: string;
+			search?: string;
+			categories?: string;
+			noResults?: string;
+			clearFilters?: string;
+			results?: string;
+			result?: string;
 			size?: string;
 			addSize?: string;
 			widget?: string;
@@ -106,13 +115,14 @@ Grid of widgets for a dashboard: `columns` equal columns, rows `--dashboard-shap
 			slot?: string;
 			catalog?: string;
 		};
-		/** Content of a widget. `item` is its entry in `catalog`, `editing` is true while the dashboard is being arranged (the content is then inert) and `remove` takes the widget away. Defaults to the title of the widget. */
+		/** Content of a widget. `item` is its entry in `catalog`, `editing` is true while the dashboard is being arranged (the content is then inert), `controls` is true while the remove button and the handle show on the widget (hover, keyboard focus, drag, touch screens), for an effect of the app on top of the default blur, and `remove` takes the widget away. Defaults to the title of the widget. */
 		widgetSnippet?: Snippet<
 			[
 				{
 					widget: DashboardWidget<Data, Name>;
 					item: DashboardCatalogItem<Name> | undefined;
 					editing: boolean;
+					controls: boolean;
 					remove: () => void;
 				}
 			]
@@ -121,9 +131,26 @@ Grid of widgets for a dashboard: `columns` equal columns, rows `--dashboard-shap
 		slotSnippet?: Snippet<[{ width: number; height: number; add: () => void }]>;
 		/** Replaces the title of the catalog. */
 		catalogHeaderSnippet?: Snippet<[]>;
-		/** Content of a widget type in the catalog, instead of its icon, title, description and size buttons; `sizes` are the ones that fit and `add(size)` adds the widget. */
+		/** Content of a widget type in the catalog, instead of its icon, title, description and size buttons; `sizes` are the ones that fit, `add(size)` adds the widget and `sizeButtons` draws the default size buttons, with their shapes. `DashboardWidgetShape` draws a single shape. */
 		catalogItemSnippet?: Snippet<
-			[{ item: DashboardCatalogItem<Name>; sizes: DashboardWidgetSize[]; add: (size: DashboardWidgetSize) => void }]
+			[
+				{
+					item: DashboardCatalogItem<Name>;
+					sizes: DashboardWidgetSize[];
+					add: (size: DashboardWidgetSize) => void;
+					sizeButtons: Snippet;
+				}
+			]
+		>;
+		/** Whole body of the catalog, instead of the search field, the chips and the list. `entries` are the widgets that fit the chosen space, each with its sizes that fit, `add(item, size)` adds a widget and closes the catalog, `close` closes it. The dialog or sheet and its title stay. */
+		catalogBodySnippet?: Snippet<
+			[
+				{
+					entries: DashboardCatalogEntry<Name>[];
+					add: (item: DashboardCatalogItem<Name>, size: DashboardWidgetSize) => void;
+					close: () => void;
+				}
+			]
 		>;
 	}
 
@@ -137,6 +164,7 @@ Grid of widgets for a dashboard: `columns` equal columns, rows `--dashboard-shap
 		resizable = true,
 		preview = false,
 		hasEmptySlots = $bindable(),
+		searchable,
 		stackBelow = 640,
 		locale: localeProp,
 		labels,
@@ -146,6 +174,9 @@ Grid of widgets for a dashboard: `columns` equal columns, rows `--dashboard-shap
 		slotSnippet,
 		catalogHeaderSnippet,
 		catalogItemSnippet,
+		catalogBodySnippet,
+		onpointerdown,
+		onkeydown,
 		...rest
 	}: Props = $props();
 
@@ -158,6 +189,7 @@ Grid of widgets for a dashboard: `columns` equal columns, rows `--dashboard-shap
 
 	const id = $props.id();
 	const reducedMotion = new MediaQuery('prefers-reduced-motion: reduce', false);
+	const noHover = new MediaQuery('hover: none', false);
 
 	let list = $derived(widgets ?? []);
 	let ordered = $derived(readingOrder(list));
@@ -172,6 +204,20 @@ Grid of widgets for a dashboard: `columns` equal columns, rows `--dashboard-shap
 	let canResize = $derived(edit && resizable);
 
 	let selectedId = $state<string | number>();
+	let hoveredId = $state<string | number>();
+	let focusedId = $state<string | number>();
+
+	function showsControls(widget: Widget) {
+		if (!edit || schema) return false;
+		if (drag?.started && drag.widget.id === widget.id) return true;
+		return noHover.current || hoveredId === widget.id || focusedId === widget.id;
+	}
+
+	function leaveFocus(event: FocusEvent, widget: Widget) {
+		const next = event.relatedTarget;
+		if (!(next instanceof Node && (event.currentTarget as Element).contains(next)) && focusedId === widget.id)
+			focusedId = undefined;
+	}
 	let selected = $derived(schema ? list.find((widget) => widget.id === selectedId) : undefined);
 
 	let tallest = $derived(
@@ -276,6 +322,8 @@ Grid of widgets for a dashboard: `columns` equal columns, rows `--dashboard-shap
 
 	let catalogOpen = $state(false);
 	let catalogPlace = $state<Place>();
+	let catalogFocus = $state(true);
+	let lastInput = 'keyboard';
 
 	let catalogEntries = $derived.by(() => {
 		if (!catalogOpen) return [];
@@ -291,6 +339,7 @@ Grid of widgets for a dashboard: `columns` equal columns, rows `--dashboard-shap
 
 	function openCatalog(place: Place) {
 		catalogPlace = place;
+		catalogFocus = lastInput !== 'touch' && lastInput !== 'pen';
 		catalogOpen = true;
 	}
 
@@ -564,6 +613,14 @@ Grid of widgets for a dashboard: `columns` equal columns, rows `--dashboard-shap
 	data-schema={schema || undefined}
 	data-preview={preview || undefined}
 	data-dragging={drag?.started || undefined}
+	onpointerdown={(event) => {
+		lastInput = event.pointerType || 'mouse';
+		onpointerdown?.(event);
+	}}
+	onkeydown={(event) => {
+		lastInput = 'keyboard';
+		onkeydown?.(event);
+	}}
 	{@attach measure}
 >
 	<div class="aurora-dashboard-shaper-grid" style:--_columns={columns} style:--_rows={shownRows} bind:this={gridNode}>
@@ -573,6 +630,7 @@ Grid of widgets for a dashboard: `columns` equal columns, rows `--dashboard-shap
 			{@const label = fill(texts.widget, { title, width: widget.width, height: widget.height })}
 			{@const active = drag?.started && drag.widget.id === widget.id}
 			{@const resizableWidget = canResizeWidget(widget)}
+			{@const controls = showsControls(widget)}
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div
 				class={['aurora-dashboard-shaper-widget', clazz.widget]}
@@ -583,9 +641,14 @@ Grid of widgets for a dashboard: `columns` equal columns, rows `--dashboard-shap
 				data-dragging={(active && drag?.kind === 'move') || undefined}
 				data-resizing={(active && drag?.kind === 'resize') || undefined}
 				data-selected={selected?.id === widget.id || undefined}
+				data-controls={controls || undefined}
 				role={edit && !schema ? 'group' : undefined}
 				aria-label={edit && !schema ? label : undefined}
 				onpointerdown={canMove ? (event) => startDrag(event, widget, 'move') : undefined}
+				onpointerenter={edit ? (event) => event.pointerType === 'mouse' && (hoveredId = widget.id) : undefined}
+				onpointerleave={edit ? () => hoveredId === widget.id && (hoveredId = undefined) : undefined}
+				onfocusin={edit ? () => (focusedId = widget.id) : undefined}
+				onfocusout={edit ? (event) => leaveFocus(event, widget) : undefined}
 				animate:reorder
 			>
 				{#if preview}
@@ -630,7 +693,7 @@ Grid of widgets for a dashboard: `columns` equal columns, rows `--dashboard-shap
 				{:else}
 					<div class="aurora-dashboard-shaper-content" inert={edit}>
 						{#if widgetSnippet}
-							{@render widgetSnippet({ widget, item, editing: edit, remove: () => remove(widget) })}
+							{@render widgetSnippet({ widget, item, editing: edit, controls, remove: () => remove(widget) })}
 						{:else}
 							<span class="aurora-dashboard-shaper-name">{title}</span>
 						{/if}
@@ -713,12 +776,15 @@ Grid of widgets for a dashboard: `columns` equal columns, rows `--dashboard-shap
 		bind:open={catalogOpen}
 		entries={catalogEntries}
 		drawer={breakpoints.mAndDown}
-		texts={texts}
+		{texts}
 		{locale}
+		{searchable}
+		autofocus={catalogFocus}
 		className={clazz.catalog}
 		onadd={add}
 		headerSnippet={catalogHeaderSnippet}
 		itemSnippet={catalogItemSnippet}
+		bodySnippet={catalogBodySnippet}
 	/>
 {/if}
 
@@ -790,6 +856,15 @@ Grid of widgets for a dashboard: `columns` equal columns, rows `--dashboard-shap
 		.aurora-dashboard-shaper[data-editing] .aurora-dashboard-shaper-content {
 			pointer-events: none;
 			user-select: none;
+			transition:
+				filter var(--global-duration-fast) var(--global-ease),
+				opacity var(--global-duration-fast) var(--global-ease);
+		}
+
+		.aurora-dashboard-shaper-widget[data-controls] > .aurora-dashboard-shaper-content {
+			opacity: var(--dashboard-shaper-content-controls-opacity, var(--dashboard-shaper-default-content-controls-opacity));
+			filter: var(--dashboard-shaper-content-controls-filter, var(--dashboard-shaper-default-content-controls-filter));
+			clip-path: inset(0 round var(--_radius));
 		}
 
 		.aurora-dashboard-shaper[data-editing] .aurora-dashboard-shaper-widget {

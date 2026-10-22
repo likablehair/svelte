@@ -13,7 +13,8 @@ import {
 	stepSize,
 	stepTarget
 } from '../../src/lib/utils/dashboard/grid.js';
-import type { DashboardWidget } from '../../src/lib/utils/dashboard/types.js';
+import { catalogCategories, filterCatalog } from '../../src/lib/utils/dashboard/catalog.js';
+import type { DashboardCatalogEntry, DashboardWidget } from '../../src/lib/utils/dashboard/types.js';
 
 const widget = (id: string, left: number, top: number, width: number, height: number): DashboardWidget => ({
 	id,
@@ -114,5 +115,41 @@ describe('dashboard grid', () => {
 		const first = newWidgetId();
 		expect(typeof first).toBe('string');
 		expect(first).not.toBe(newWidgetId());
+	});
+});
+
+describe('catalog filter', () => {
+	const entry = (name: string, title: string, category?: string, description?: string): DashboardCatalogEntry => ({
+		item: { name, title, category, description, sizes: [{ width: 1, height: 1 }] },
+		sizes: [{ width: 1, height: 1 }]
+	});
+	const entries = [
+		entry('revenue', 'Revenue', 'Sales', 'Total of the invoices'),
+		entry('orders', 'Orders', 'Sales'),
+		entry('stock', 'Stock', 'Warehouse', 'Pieces in the warehouse'),
+		entry('caffe', 'Caffè venduti', 'Bar'),
+		entry('notes', 'Notes')
+	];
+	const names = (list: DashboardCatalogEntry[]) => list.map((item) => item.item.name);
+
+	test('the search matches title and description, ignoring case and accents, word by word', () => {
+		expect(names(filterCatalog(entries, 'INVOICES', []).shown)).toEqual(['revenue']);
+		expect(names(filterCatalog(entries, 'caffe', []).shown)).toEqual(['caffe']);
+		expect(names(filterCatalog(entries, 'pieces stock', []).shown)).toEqual(['stock']);
+		expect(names(filterCatalog(entries, '  ', []).shown)).toEqual(names(entries));
+	});
+
+	test('no category means all of them, several mean their union', () => {
+		expect(names(filterCatalog(entries, '', []).shown)).toEqual(names(entries));
+		expect(names(filterCatalog(entries, '', ['Sales', 'Bar']).shown)).toEqual(['revenue', 'orders', 'caffe']);
+	});
+
+	test('the counts are per category and follow the search', () => {
+		expect(Object.fromEntries(filterCatalog(entries, '', []).counts)).toEqual({ Sales: 2, Warehouse: 1, Bar: 1 });
+		expect(Object.fromEntries(filterCatalog(entries, 'or', ['Bar']).counts)).toEqual({ Sales: 1 });
+	});
+
+	test('the categories keep the order of the catalog', () => {
+		expect(catalogCategories(entries)).toEqual(['Sales', 'Warehouse', 'Bar']);
 	});
 });

@@ -14,7 +14,8 @@ const NEW_IN_V5 = [
 	'AvatarGroup',
 	'PageHeader',
 	'ConfirmDialog',
-	'ModeSwitch'
+	'ModeSwitch',
+	'DashboardWidgetShape'
 ];
 
 const files = import.meta.glob<ComponentMigration | GlobalMigration>('/migrations/v4-to-v5/*.ts', {

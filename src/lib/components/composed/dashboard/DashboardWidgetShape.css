@@ -1,0 +1,13 @@
+@layer reset, theme, base, global.base, global.theme, global.components, components, utilities;
+
+@layer global.base {
+	:root {
+		--dashboard-widget-shape-default-cell-size: 7px;
+		--dashboard-widget-shape-default-max-width: 28px;
+		--dashboard-widget-shape-default-max-height: 14px;
+		--dashboard-widget-shape-default-color: currentColor;
+		--dashboard-widget-shape-default-border-width: 1.5px;
+		--dashboard-widget-shape-default-border-radius: 2px;
+		--dashboard-widget-shape-default-opacity: 0.7;
+	}
+}

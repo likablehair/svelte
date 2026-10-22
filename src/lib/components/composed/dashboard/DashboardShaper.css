@@ -35,6 +35,8 @@
 		--dashboard-shaper-default-hover-outline-color: var(--global-color-primary);
 		--dashboard-shaper-default-hover-ring-color: var(--global-color-primary-soft);
 		--dashboard-shaper-default-dragging-opacity: 0.88;
+		--dashboard-shaper-default-content-controls-filter: blur(3px);
+		--dashboard-shaper-default-content-controls-opacity: 0.55;
 		--dashboard-shaper-default-dragging-box-shadow: var(--global-shadow-lg);
 		--dashboard-shaper-default-target-background: var(--global-color-primary-soft);
 		--dashboard-shaper-default-target-border-color: var(--global-color-primary);
@@ -50,6 +52,10 @@
 		--dashboard-shaper-default-resize-size: 20px;
 		--dashboard-shaper-default-resize-color: var(--global-color-primary);
 		--dashboard-shaper-default-catalog-width: 640px;
+		--dashboard-shaper-default-catalog-height: min(40rem, 85dvh);
+		--dashboard-shaper-default-catalog-filters-gap: 10px;
+		--dashboard-shaper-default-catalog-chips-gap: 6px;
+		--dashboard-shaper-default-item-enter-scale: 0.96;
 		--dashboard-shaper-default-item-gap: 14px;
 		--dashboard-shaper-default-item-padding: 14px;
 		--dashboard-shaper-default-item-background: var(--global-color-surface);

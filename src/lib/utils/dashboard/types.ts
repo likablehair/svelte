@@ -36,10 +36,18 @@ export interface DashboardCatalogItem<Name extends string = string> {
 	icon?: string;
 	/** Sizes the widget comes in: the catalog offers the ones that fit the chosen space, and resizing moves between them. One size means the widget cannot be resized. */
 	sizes: DashboardWidgetSize[];
-	/** Group of the widget in the catalog: with two or more groups the catalog shows a tab for each, plus "All". */
+	/** Group of the widget in the catalog: with two or more groups the catalog shows a filter chip for each; no chip selected shows every group, several show all of theirs. */
 	category?: string;
 	/** The widget can be on the dashboard only once: the catalog hides it while it is there. */
 	unique?: boolean;
+}
+
+/** A widget type as the catalog of a `DashboardShaper` offers it for the chosen space: its entry and the sizes that fit there. */
+export interface DashboardCatalogEntry<Name extends string = string> {
+	/** The entry of `catalog`. */
+	item: DashboardCatalogItem<Name>;
+	/** The sizes of the entry whose cells are free at the chosen space. */
+	sizes: DashboardWidgetSize[];
 }
 
 /** What changed on a `DashboardShaper`, passed to its `onchange`. */
