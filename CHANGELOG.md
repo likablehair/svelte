@@ -1,5 +1,17 @@
 # Changelog
 
+## @likable-hair/svelte 5.0.2 (2026-10-22)
+
+- dashboard shaper fixes
+
+## @likable-hair/svelte-migrate 0.1.2 (2026-10-22)
+
+- dashboard shaper fixes
+
+## @likable-hair/svelte-mcp 0.1.2 (2026-10-22)
+
+- dashboard shaper fixes
+
 ## @likable-hair/svelte 5.0.1 (2026-10-21)
 
 - fix drawer inside a drawer
