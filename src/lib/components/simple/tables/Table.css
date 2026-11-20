@@ -3,6 +3,7 @@
 @layer global.base {
 	:root {
 		--table-default-width: 100%;
+		--table-default-column-width: 150px;
 		--table-default-background: var(--global-color-surface-solid);
 		--table-default-color: var(--global-color-text);
 		--table-default-border: var(--global-border-width) solid var(--global-color-border);

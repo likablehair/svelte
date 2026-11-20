@@ -22,6 +22,41 @@ const optionLabels = () =>
 	[...document.querySelectorAll('[role="option"]')].map((option) => option.textContent?.trim());
 
 describe('Autocomplete', () => {
+	test('with single selection the placeholder hides once an option is selected and still names the field', async () => {
+		const screen = await render(Autocomplete, { items: services, placeholder: 'Pick a service' });
+		const input = screen.getByRole('combobox', { name: 'Pick a service' });
+		await expect.element(input).toHaveAttribute('placeholder', 'Pick a service');
+		await userEvent.click(input);
+		await userEvent.click(page.getByRole('option', { name: 'Color' }));
+		await expect.element(input).not.toHaveAttribute('placeholder');
+		await expect.element(screen.getByRole('combobox', { name: 'Pick a service' })).toBeInTheDocument();
+	});
+
+	test('after a chip the typed text starts one chip gap away, without the padding of the empty field', async () => {
+		const screen = await render(Autocomplete, { label: 'Service', items: services });
+		const input = screen.getByRole('combobox', { name: 'Service' });
+		const element = input.element() as HTMLInputElement;
+		expect(getComputedStyle(element).paddingInlineStart).toBe('6px');
+		await userEvent.click(input);
+		await userEvent.click(page.getByRole('option', { name: 'Color' }));
+		await expect.poll(() => getComputedStyle(element).paddingInlineStart).toBe('0px');
+		const chip = element.parentElement!.querySelector('.aurora-chip')!;
+		expect(Math.round(element.getBoundingClientRect().left - chip.getBoundingClientRect().right)).toBe(6);
+	});
+
+	test('with multiple selection the placeholder stays next to the chips', async () => {
+		const screen = await render(Autocomplete, {
+			label: 'Services',
+			items: services,
+			multiple: true,
+			placeholder: 'Add a service',
+			values: [services[0]]
+		});
+		await expect
+			.element(screen.getByRole('combobox', { name: 'Services' }))
+			.toHaveAttribute('placeholder', 'Add a service');
+	});
+
 	test('is an ARIA combobox whose listbox opens on focus', async () => {
 		const screen = await render(Autocomplete, { label: 'Service', items: services });
 		const input = screen.getByRole('combobox', { name: 'Service' });

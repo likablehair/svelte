@@ -547,6 +547,41 @@ describe('Table', () => {
 		expect(table.querySelector('th.aurora-table-filler')?.getAttribute('aria-hidden')).toBe('true');
 	});
 
+	test('with saved widths a column without width keeps a base width instead of collapsing to 0', async () => {
+		const host = narrow(400);
+		await render(Table, {
+			target: host,
+			props: {
+				rows: products,
+				cardBreakpoint: false,
+				columns: [columns[0], columns[1], { ...columns[2], minWidth: '200px' }],
+				columnState: [{ key: 'name', visible: true, width: 500 }]
+			}
+		});
+		const headers = [...host.querySelectorAll('thead th')] as HTMLElement[];
+		await expect.poll(() => Math.round(headers[1].getBoundingClientRect().width)).toBe(150);
+		expect(Math.round(headers[2].getBoundingClientRect().width)).toBe(200);
+		host.remove();
+	});
+
+	test('with saved widths the extra space goes to the filler, not to the columns without width', async () => {
+		const host = narrow(1200);
+		await render(Table, {
+			target: host,
+			props: {
+				rows: products,
+				cardBreakpoint: false,
+				columns,
+				columnState: [{ key: 'name', visible: true, width: 200 }]
+			}
+		});
+		const headers = [...host.querySelectorAll('thead th')] as HTMLElement[];
+		await expect.poll(() => Math.round(headers[1].getBoundingClientRect().width)).toBe(150);
+		expect(Math.round(headers[2].getBoundingClientRect().width)).toBe(150);
+		expect(host.querySelector('th.aurora-table-filler')!.getBoundingClientRect().width).toBeGreaterThan(600);
+		host.remove();
+	});
+
 	test('resizable columns: the separator changes the width with the arrow keys and saves it', async () => {
 		const state = bound<TableColumnState[]>();
 		const oncolumnstatechange = vi.fn();

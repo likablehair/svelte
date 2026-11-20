@@ -57,7 +57,7 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 		hint?: string;
 		/** Validation state: colors the border and the hint and shows an icon. `error` also sets `aria-invalid`. */
 		state?: 'error' | 'success';
-		/** Placeholder of the search input. */
+		/** Placeholder of the search input. With single selection it is hidden once an option is selected. */
 		placeholder?: string;
 		/** SVG path of an icon at the start of the field, for example a magnifier from `@mdi/js`. */
 		icon?: string;
@@ -287,6 +287,7 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 	let counterNode = $state<HTMLSpanElement>();
 	let removable = $derived(!disabled && !(mandatory && selection.length <= 1));
 	let hasLabel = $derived(!!label || !!labelSnippet);
+	let inputPlaceholder = $derived(multiple || selection.length === 0 ? placeholder : undefined);
 	let describedBy = $derived(hint || hintSnippet ? hintId : undefined);
 	let activeDescendant = $derived(
 		listboxShown && active !== undefined ? optionId(active) : undefined
@@ -683,7 +684,9 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 						type="text"
 						aria-autocomplete="list"
 						aria-labelledby={undefined}
-						{placeholder}
+						placeholder={inputPlaceholder}
+						data-after-selection={selection.length > 0 || undefined}
+						aria-label={rest['aria-label'] ?? (!hasLabel && !inputPlaceholder ? placeholder : undefined)}
 						{disabled}
 						readonly={drawerMode}
 						class={clazz.input}
@@ -908,6 +911,10 @@ Text field that searches a list of options (`items`) and picks one or, with `mul
 		input::placeholder {
 			color: var(--autocomplete-placeholder-color, var(--autocomplete-default-placeholder-color));
 			opacity: 1;
+		}
+
+		input[data-after-selection] {
+			padding-inline-start: 0;
 		}
 
 		.aurora-autocomplete-counter {
