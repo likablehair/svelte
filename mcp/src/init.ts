@@ -1,5 +1,5 @@
-import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { cpSync, existsSync, mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
+import { dirname, join, relative } from 'node:path';
 import { type AppInfo, PACKAGE, skillSource } from './spec.ts';
 
 export const AGENTS = ['claude', 'codex', 'cursor', 'copilot'] as const;
@@ -124,6 +124,21 @@ function copySkill(source: string, target: string, version: string, changes: str
 	changes.push(`${existed ? 'Updated' : 'Added'} skill ${label}`);
 }
 
+const AGENTS_IMPORT = /(^|\s)@(\.\.?\/)*AGENTS\.md\b/m;
+
+function importAgentsMd(dir: string, agentsFile: string, changes: string[], notes: string[]) {
+	const files = ['CLAUDE.md', '.claude/CLAUDE.md'].map((path) => join(dir, path)).filter((path) => existsSync(path));
+	if (!files.length) {
+		if (existsSync(join(dir, 'CLAUDE.local.md'))) notes.push('Claude Code reads AGENTS.md only when there is no CLAUDE.local.md: add the line @AGENTS.md to it.');
+		return;
+	}
+	if (files.some((file) => realpathSync(file) === realpathSync(agentsFile) || AGENTS_IMPORT.test(readFileSync(file, 'utf8')))) return;
+	const [file] = files;
+	const text = readFileSync(file, 'utf8');
+	const line = `@${relative(dirname(file), agentsFile)}`;
+	writeIfChanged(file, `${text.trimEnd()}${text.trim() ? '\n\n' : ''}${line}\n`, changes, `${relative(dir, file)} (${line}: with a CLAUDE.md, Claude Code reads AGENTS.md only through it)`);
+}
+
 export function init(app: AppInfo, specVersion: string, options: InitOptions = {}): InitResult {
 	const dir = app.dir;
 	const agents = options.agents?.length ? options.agents : detectAgents(dir);
@@ -166,6 +181,8 @@ export function init(app: AppInfo, specVersion: string, options: InitOptions = {
 	const agentsFile = join(dir, 'AGENTS.md');
 	const current = existsSync(agentsFile) ? readFileSync(agentsFile, 'utf8') : '';
 	writeIfChanged(agentsFile, mergeAgentsMd(current, agentsBlock(app.migrating)), changes, 'AGENTS.md');
+	if (agents.includes('claude')) importAgentsMd(dir, agentsFile, changes, notes);
+	if (changes.length) notes.push('Restart the agent, or reload its MCP servers and skills, to use the changes. Claude Code asks once to approve the "aurora" server.');
 
 	return { agents, changes, notes: [...new Set(notes)] };
 }

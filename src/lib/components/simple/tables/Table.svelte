@@ -757,7 +757,8 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 
 	function colWidth(entry: ResolvedColumn<Row>) {
 		const width = widthOf(entry);
-		return width !== undefined ? `${width}px` : entry.column.width;
+		if (width !== undefined) return `${width}px`;
+		return entry.column.width ?? (fixedLayout ? entry.column.minWidth : undefined);
 	}
 
 	function stickyStart(key: string) {
@@ -997,7 +998,7 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 					{#if selectable}<col class="aurora-table-control-col" />{/if}
 					{#if expandedSnippet}<col class="aurora-table-control-col" />{/if}
 					{#each resolved as entry (entry.column.key)}
-						<col style:width={colWidth(entry)} />
+						<col class="aurora-table-column-col" style:width={colWidth(entry)} />
 					{/each}
 					{#if actionsSnippet}
 						<col style:width={actionsColWidth()} />
@@ -1306,6 +1307,10 @@ Table of rows and columns. `columns` declares what each column shows (`key`, `la
 
 		.aurora-table-table[data-fixed] {
 			table-layout: fixed;
+		}
+
+		.aurora-table-table[data-fixed] .aurora-table-column-col {
+			width: var(--table-column-width, var(--table-default-column-width));
 		}
 
 		.aurora-table-table thead {

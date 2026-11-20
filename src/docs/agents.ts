@@ -32,9 +32,10 @@ export const AGENTS_SECTIONS: StylingSection[] = [
 .vscode/mcp.json             Copilot (VS Code): server
 .codex/config.toml           Codex: server (trusted projects only)
 .agents/skills/aurora-design Codex, Cursor, Copilot: skill
-AGENTS.md                    block between <!-- aurora:start --> and <!-- aurora:end -->`
+AGENTS.md                    block between <!-- aurora:start --> and <!-- aurora:end -->
+CLAUDE.md                    line @AGENTS.md, if the app has a CLAUDE.md (Claude Code then reads AGENTS.md only through it)`
 			},
-			'Restart the agent, or reload its MCP servers, after the first `init`.'
+			'Restart the agent, or reload its MCP servers and skills, after the first `init`. Claude Code asks once to approve the `aurora` server.'
 		]
 	},
 	{

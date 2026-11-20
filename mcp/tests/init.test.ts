@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
 import { detectAgents, init, installedSkillVersion, mergeAgentsMd, mergeCodexToml } from '../src/init.ts';
@@ -106,5 +106,54 @@ describe('init', () => {
 		expect(merged).toBe('[model]\nname = "x"\n\n[mcp_servers.aurora]\ncommand = "npx"\nargs = ["-y", "pkg"]\n\n[mcp_servers.other]\ncommand = "y"\n');
 		const md = mergeAgentsMd('A\n<!-- aurora:start -->\nold\n<!-- aurora:end -->\nB\n', 'NEW');
 		expect(md).toBe('A\nNEW\nB\n');
+	});
+
+	test('imports AGENTS.md into an existing CLAUDE.md', () => {
+		const dir = appWithLibrary('5.1.0');
+		writeFileSync(join(dir, 'CLAUDE.md'), '# App\n\nRules.\n');
+		const result = init(appInfo(dir), '5.1.0');
+		expect(result.agents).toEqual(['claude']);
+		expect(read(dir, 'CLAUDE.md')).toBe('# App\n\nRules.\n\n@AGENTS.md\n');
+		expect(result.notes.some((note) => note.startsWith('Restart the agent'))).toBe(true);
+		const again = init(appInfo(dir), '5.1.0');
+		expect(again.changes).toEqual([]);
+		expect(again.notes).toEqual([]);
+	});
+
+	test('imports AGENTS.md into .claude/CLAUDE.md with a relative path', () => {
+		const dir = appWithLibrary('5.1.0');
+		mkdirSync(join(dir, '.claude'));
+		writeFileSync(join(dir, '.claude/CLAUDE.md'), 'Rules.\n');
+		init(appInfo(dir), '5.1.0');
+		expect(read(dir, '.claude/CLAUDE.md')).toBe('Rules.\n\n@../AGENTS.md\n');
+	});
+
+	test('leaves CLAUDE.md alone when it already reads AGENTS.md', () => {
+		const dir = appWithLibrary('5.1.0');
+		writeFileSync(join(dir, 'CLAUDE.md'), 'See @./AGENTS.md for the rules.\n');
+		init(appInfo(dir), '5.1.0');
+		expect(read(dir, 'CLAUDE.md')).toBe('See @./AGENTS.md for the rules.\n');
+
+		const linked = appWithLibrary('5.1.0');
+		writeFileSync(join(linked, 'AGENTS.md'), '# Rules\n');
+		symlinkSync('AGENTS.md', join(linked, 'CLAUDE.md'));
+		init(appInfo(linked), '5.1.0');
+		expect(read(linked, 'CLAUDE.md')).not.toContain('@AGENTS.md');
+		expect(read(linked, 'CLAUDE.md')).toContain('<!-- aurora:start -->');
+	});
+
+	test('leaves CLAUDE.md alone when Claude Code is not configured', () => {
+		const dir = appWithLibrary('5.1.0');
+		writeFileSync(join(dir, 'CLAUDE.md'), 'Rules.\n');
+		init(appInfo(dir), '5.1.0', { agents: ['cursor'] });
+		expect(read(dir, 'CLAUDE.md')).toBe('Rules.\n');
+	});
+
+	test('notes a CLAUDE.local.md that hides AGENTS.md', () => {
+		const dir = appWithLibrary('5.1.0');
+		writeFileSync(join(dir, 'CLAUDE.local.md'), 'Mine.\n');
+		const result = init(appInfo(dir), '5.1.0', { agents: ['claude'] });
+		expect(read(dir, 'CLAUDE.local.md')).toBe('Mine.\n');
+		expect(result.notes.some((note) => note.includes('CLAUDE.local.md'))).toBe(true);
 	});
 });

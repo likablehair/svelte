@@ -16,17 +16,21 @@ There are four packages, plus the documentation site:
 | `@likable-hair/adonis-filters` | **For the AdonisJS backends.** Applies the filters sent by the tables to the database queries; it replaces the `FilterModifierApplier` class copied into every backend. Its README says how to switch. |
 | Documentation site | One page per component, with live examples. Not published as a package. |
 
-## Start here: from this repository to a migrated app
+## Start here: from this repository to an app
 
 The whole path, in order. Each step links to its section below.
 
 1. **Install the repository.** You need Node 22.18 or later (24 is best) and pnpm (`npm install -g pnpm`: it then switches by itself to the version the repository asks for). From the root: `pnpm install`.
 2. **Publish the packages**, once: the apps install them from npm, so nothing below works before this. `pnpm login`, then `pnpm release --dry-run` to see what would happen, then `pnpm release` ([Publishing](#publishing)).
-3. **Migrate an app** (only apps on version 4): commit everything in the app, run the steps *analyze* and *setup* of the migration tool, then let an AI assistant do the rest ([Letting an AI assistant do the migration](#letting-an-ai-assistant-do-the-migration)). Some points it lists are for the backend, for example the dates of the period filters.
-4. **Try and commit.** Open the pages the migration lists at the end, in light and dark mode, on desktop and phone; then commit the app yourself. The tool and the assistant never commit.
-5. **After a change to the library**, `pnpm release patch` publishes a new version of the packages that changed, and the apps update with `npm update @likable-hair/svelte` (or `pnpm update`).
+3. **Use the library in an app.**
+   - **A new app**: follow the eight steps of [Using the library in an app](#using-the-library-in-an-app).
+   - **An app on version 4**: commit everything in the app, run the steps *analyze* and *setup* of the migration tool, then let an AI assistant do the rest ([Letting an AI assistant do the migration](#letting-an-ai-assistant-do-the-migration)). Some points it lists are for the backend, for example the dates of the period filters. Apps still on version 3 stay as they are.
+4. **Try and commit.** Open the pages in light and dark mode, on desktop and phone (after a migration, the pages it lists at the end); then commit the app yourself. The tool and the assistant never commit.
+5. **After a change to the library**, `pnpm release patch` publishes a new version of the packages that changed. The apps update with `npm update @likable-hair/svelte` (or `pnpm update`) and run `npx svelte-mcp init` again, so the AI assistant gets the instructions of the new version.
 
 ## Using the library in an app
+
+The steps are for a SvelteKit app. Steps 1 to 4 prepare the app, once.
 
 **1. Install it**
 
@@ -36,7 +40,52 @@ npm install @likable-hair/svelte
 
 It needs Svelte 5.29 or later.
 
-**2. Use the components**
+**2. Prepare the main CSS file** (for example `src/app.css`, imported by the root layout). The library keeps all its CSS in cascade layers, so the app's own CSS always wins over it. Put this line at the top of the file, and put any reset inside `@layer reset`: a reset outside layers, such as `* { margin: 0 }` or `button { padding: 0 }`, would override the components.
+
+```css
+@layer reset, theme, base, global, components, utilities;
+
+@layer reset {
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+}
+```
+
+With **Tailwind 4**, add after the line above `@import 'tailwindcss';` and `@import '@likable-hair/svelte/tailwind.css';`. With **Tailwind 3**, put `@tailwind base;` inside `@layer reset` and add the preset `@likable-hair/svelte/tailwind-preset` to `tailwind.config.js`. The docs page *Styling* has both, in full.
+
+**3. Set up the root layout** (`src/routes/+layout.svelte`):
+
+```svelte
+<script>
+	import '../app.css';
+	import '@likable-hair/svelte/base.css';
+	import { appearanceScript, rememberAppearance, setDefaultLocale } from '@likable-hair/svelte';
+
+	let { children } = $props();
+
+	setDefaultLocale('it');
+	rememberAppearance();
+</script>
+
+<svelte:head>{@html '<script>' + appearanceScript() + '</script>'}</svelte:head>
+
+{@render children()}
+```
+
+- `base.css` gives the page the background, text color and font of the theme, also in dark mode. Leave it out only if the app styles `body` itself.
+- `setDefaultLocale('it')` sets the language of the built-in texts (such as "Cancel" or "No results"). Without it they are in English.
+- `rememberAppearance()` keeps the light or dark mode the user chose, and `appearanceScript()` applies it before the page appears, so the page does not flash in the wrong mode.
+
+**4. Load the fonts.** The library does not download fonts: without this line in the `<head>` of `src/app.html`, the components use the system font.
+
+```html
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap" />
+```
+
+**5. Use the components**
 
 ```svelte
 <script>
@@ -49,27 +98,28 @@ It needs Svelte 5.29 or later.
 <Button onclick={() => save(name)}>Save</Button>
 ```
 
-**3. Choose the language** of the built-in texts (such as "Cancel" or "No results"). The default is English. For an Italian app, add this once to the main layout (`src/routes/+layout.svelte`):
+**6. Change the look**, if needed. Colors, corners, shadows and spacing are CSS variables. Changing one, for example `--global-color-primary`, changes every component. Each component also has its own variables, listed on its docs page.
 
-```js
-import { setDefaultLocale } from '@likable-hair/svelte';
-setDefaultLocale('it');
-```
+**7. Themes and dark mode.** The default theme is Aurora. A second theme, `classic`, looks like version 4: import `@likable-hair/svelte/themes/classic.css` in the root layout and call `setTheme('classic')`. Light and dark follow the operating system. The `ModeSwitch` component lets the user pick light, dark or system.
 
-**4. Change the look**, if needed. Colors, corners, shadows and spacing are CSS variables. Changing one, for example `--global-color-primary`, changes every component. Each component also has its own variables, listed on its docs page.
-
-**5. Themes and dark mode.** The default theme is Aurora. A second theme, `classic`, looks like version 4. Light and dark follow the operating system. The `ModeSwitch` component lets the user pick light, dark or system.
-
-**6. Fonts.** The library does not load fonts. The docs give the line to add to the app, which loads the fonts the design uses.
-
-**7. AI assistants** (optional). To let an AI assistant write pages with the library, run this once in the app:
+**8. AI assistants** (optional). To let an AI assistant write pages with the library, run this once in the app:
 
 ```sh
 npm install -D @likable-hair/svelte-mcp
 npx svelte-mcp init
 ```
 
-It sets up Claude Code, Codex, Cursor or Copilot with the exact description of every component and with instructions on how to design pages with the library.
+`init` sets up the assistants the app already uses, found from their folders (`.claude`, `.codex`, `.cursor`, `.vscode`; all four when there are none). For each one it adds:
+
+- the `aurora` **MCP server**, which gives the assistant the exact description of every component of the installed version, and a tool to check the code it writes;
+- the `aurora-design` **skill**, with instructions on how to design pages with the library;
+- a block in `AGENTS.md` that points to both. If the app has a `CLAUDE.md`, `init` also adds the line `@AGENTS.md` to it: otherwise Claude Code does not read `AGENTS.md`.
+
+Then:
+
+- **Restart the assistant**, so it loads the server and the skill. Claude Code asks once to approve the `aurora` server: accept. Codex reads its configuration (`.codex/config.toml`) only in projects marked as trusted.
+- **Commit the files `init` writes** (`.mcp.json`, `.claude/skills/`, `.agents/skills/`, `AGENTS.md`…), so everyone working on the app gets them.
+- **Run `npx svelte-mcp init` again after every update of `@likable-hair/svelte`**: the skill is a copy of the installed version.
 
 ### What the components cover
 
@@ -133,7 +183,7 @@ At the end, `next` lists the **pages to try** in the browser and the things that
 The tool does the mechanical part (steps 1 to 3). What `next` lists afterwards needs judgment, and an AI assistant such as Claude Code can do it by itself: it fixes one file at a time, runs `next` again, and stops when no errors are left and it has gone through every point to write (the ones the tool cannot verify stay listed after they are done). **What stays with you**: trying the pages it lists at the end, and committing.
 
 1. Do steps 1 and 2 yourself (analyze and setup). Setup also gives the assistant the migration instructions and access to the tool.
-2. Open the assistant in the app folder.
+2. Open the assistant in the app folder (restart it if it was already open, and in Claude Code approve the `aurora` server when asked).
 3. Tell it: *"Migrate this app to @likable-hair/svelte 5 (Aurora)."*
 4. When it is done, try the pages it lists and commit.
 
